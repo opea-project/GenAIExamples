@@ -14,29 +14,29 @@ This project provides a collective list of Generative AI (GenAI) examples such a
 <table>
 	<tbody>
 		<tr>
-			<td colspan="2">Framework</td>
-			<td colspan="2">LLM</td>
-			<td colspan="2">Embedding</td>
-			<td colspan="2">Vector Database</td>
-			<td colspan="2">Serving</td>
-			<td colspan="2">HW</td>
-			<td colspan="2">Description</td>
+			<td>Framework</td>
+			<td>LLM</td>
+			<td>Embedding</td>
+			<td>Vector Database</td>
+			<td>Serving</td>
+			<td>HW</td>
+			<td>Description</td>
 		</tr>
 		<tr>
-			<td>[angChain](https://www.langchain.com/)</td>
-			<td>[NeuralChat-v3](https://huggingface.co/Intel/neural-chat-7b-v3-1)</td>
-			<td>[BGE-Base](https://huggingface.co/BAAI/bge-base-en)</td>
-			<td>[Redis](https://redis.io/)</td>
-			<td>[TGI-Habana](https://github.com/huggingface/tgi-gaudi)</td>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-1">NeuralChat-v3</a></td>
+			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
+			<td><a href="https://redis.io/">Redis</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
 			<td>Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 		<tr>
-			<td>[angChain](https://www.langchain.com/)</td>
-			<td>[NeuralChat-v3](https://huggingface.co/Intel/neural-chat-7b-v3-1)</td>
-			<td>[BGE-Base](https://huggingface.co/BAAI/bge-base-en)</td>
-			<td>[Chroma](https://www.trychroma.com/)</td>
-			<td>[TGI-Habana](https://github.com/huggingface/tgi-gaudi)</td>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-1">NeuralChat-v3</a></td>
+			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
+			<td><a href="https://www.trychroma.com/">Chroma</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
 			<td>Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
