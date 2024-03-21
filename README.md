@@ -9,13 +9,15 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 
 * <b>Easy to use</b>. Use ecosystem-compliant APIs to build the end-to-end GenAI examples
 
-* <b>Easy to customize</b>. Customize the example using different framework, LLM, embedding, serving
+* <b>Easy to customize</b>. Customize the example using different framework, LLM, embedding, serving etc.
 
 * <b>Easy to deploy</b>. Deploy the GenAI examples with performance on Intel platforms
 
+> **Note**: 
+> The below support matrix gives the validated configurations. Feel free to customize per your needs.
+
 ### ChatQnA
 [ChatQnA](./ChatQnA/README.md) is an example of chatbot for question and answering through retrieval argumented generation (RAG).
-
 
 <table>
 	<tbody>
@@ -131,3 +133,10 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 		</tr>
 	</tbody>
 </table>
+
+## Additional Content
+
+* [Release Information](tbd)
+* [Contribution Guidelines](tbd)
+* [Legal Information](tbd)
+* [Security Policy](tbd)
