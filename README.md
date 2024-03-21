@@ -7,11 +7,11 @@ This project provides a collective list of Generative AI (GenAI) examples such a
 ## GenAI Examples
 All the examples are well-validated on Intel platforms withe below features:
 
-* <b>Easy to use</b>. Use ecosystem-compliant APIs to build the end-to-end GenAI examples.
+* <b>Easy to use</b>. Use ecosystem-compliant APIs to build the end-to-end GenAI examples
 
-* <b>Easy to customize</b>. Customize the example using different framework, LLM, embedding, serving.
+* <b>Easy to customize</b>. Customize the example using different framework, LLM, embedding, serving
 
-* <b>Easy to deploy</b>. Deploy the GenAI examples with performance on Intel platforms.
+* <b>Easy to deploy</b>. Deploy the GenAI examples with performance on Intel platforms
 
 ### ChatQnA
 [ChatQnA](./ChatQnA/README.md) is an example of chatbot for question and answering through retrieval argumented generation (RAG).
@@ -75,14 +75,14 @@ All the examples are well-validated on Intel platforms withe below features:
 			<td><a href="https://huggingface.co/deepseek-ai/deepseek-coder-33b-instruct">Deepseek-Coder-33B</a></td>
 			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
 			<td>Gaudi2</td>
-			<td>Chatbot</td>
+			<td>Copilot</td>
 		</tr>
 	</tbody>
 </table>
 
 
 ### DocSum
-[DocSum](./DocSum/README.md) is an example of chatbot for summarizing the content of your documents or reports.
+[DocSum](./DocSum/README.md) is an example of chatbot for summarizing the content of documents or reports.
 
 <table>
 	<tbody>
@@ -111,7 +111,7 @@ All the examples are well-validated on Intel platforms withe below features:
 </table>
 
 ### VisualQnA
-[VisualQnA](./VisualQnA/README.md) is an example of chatbot for question and answering based on images.
+[VisualQnA](./VisualQnA/README.md) is an example of chatbot for question and answering based on the images.
 
 <table>
 	<tbody>
