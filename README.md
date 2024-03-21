@@ -1,15 +1,133 @@
-# GenerativeAIExamples
-Generative AI (GenAI) Examples is a collection of GenAI examples such as ChatQnA, Copilot, which heavily reused ecosystem-based components plus Intel optimizations.
+# Intel Generative AI Examples
 
-# ChatQnA
-[ChatQnA](./ChatQnA/README.md) is a chatbot for question and answering through retrieval argumented generation (RAG). The example is developed with Langchain API and Redis as vector store, and deployed on Gaudi with Xeon through Hugging Face text generation inference (TGI) serving.
+## Introduction
 
-# CodeGen
-[CodeGen](./CodeGen/README.md) is a copilot application designed for code generation use case. We offer a VS Code plugin for easy usage. In this example, we demonstrate how code generation can be efficiently executed on the Intel Gaudi2 platform.
+This project provides a collective list of Generative AI (GenAI) examples such as chatbot with question and answering (ChatQnA), code generation, document summary, etc. The examples are developed by leveraging the ecosystem components such as LangChain with Intel optimizations, therefore delivering the high performance for your deployment on Intel platforms.
+
+## GenAI Examples
+All the examples are well-validated on Intel platforms withe below features:
+
+* <b>Easy to use</b>. Use ecosystem-compliant APIs to build the end-to-end GenAI examples
+
+* <b>Easy to customize</b>. Customize the example using different framework, LLM, embedding, serving
+
+* <b>Easy to deploy</b>. Deploy the GenAI examples with performance on Intel platforms
+
+### ChatQnA
+[ChatQnA](./ChatQnA/README.md) is an example of chatbot for question and answering through retrieval argumented generation (RAG).
 
 
-# DocSum
-[DocSum](./DocSum/README.md) is a chatbot for summarizing the content of your documents or reports. The example is developed with Langchain API and deployed on Gaudi through Hugging Face text generation inference (TGI) serving.
+<table>
+	<tbody>
+		<tr>
+			<td>Framework</td>
+			<td>LLM</td>
+			<td>Embedding</td>
+			<td>Vector Database</td>
+			<td>Serving</td>
+			<td>HW</td>
+			<td>Description</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
+			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
+			<td><a href="https://redis.io/">Redis</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
+			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
+			<td><a href="https://www.trychroma.com/">Chroma</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
+			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
+			<td><a href="https://redis.io/">Redis</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
+	</tbody>
+</table>
 
-# VisualQnA
-[VisualQnA](./VisualQnA/README.md) is a chatbot for visual question and answering task. This example guides you through how to deploy a [LLaVA](https://llava-vl.github.io/) (Large Language and Vision Assistant) model on Intel Gaudi2.
+### CodeGen
+[CodeGen](./CodeGen/README.md) is an example of copilot designed for code generation in Visual Studio Code.
+
+<table>
+	<tbody>
+		<tr>
+			<td>Framework</td>
+			<td>LLM</td>
+			<td>Serving</td>
+			<td>HW</td>
+			<td>Description</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/deepseek-ai/deepseek-coder-33b-instruct">Deepseek-Coder-33B</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Copilot</td>
+		</tr>
+	</tbody>
+</table>
+
+
+### DocSum
+[DocSum](./DocSum/README.md) is an example of chatbot for summarizing the content of documents or reports.
+
+<table>
+	<tbody>
+		<tr>
+			<td>Framework</td>
+			<td>LLM</td>
+			<td>Serving</td>
+			<td>HW</td>
+			<td>Description</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
+	</tbody>
+</table>
+
+### VisualQnA
+[VisualQnA](./VisualQnA/README.md) is an example of chatbot for question and answering based on the images.
+
+<table>
+	<tbody>
+		<tr>
+			<td>Framework</td>
+			<td>LLM</td>
+			<td>Serving</td>
+			<td>HW</td>
+			<td>Description</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/llava-hf/llava-1.5-7b-hf">LLaVA-1.5-7B</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
+	</tbody>
+</table>
