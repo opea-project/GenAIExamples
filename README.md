@@ -135,8 +135,6 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 </table>
 
 ## Additional Content
-
-* [Release Information](tbd)
-* [Contribution Guidelines](tbd)
-* [Legal Information](tbd)
-* [Security Policy](tbd)
+* [Contribution](/CONTRIBUTING.md)
+* [Legal Information](/LEGAL_INFORMATION.md)
+* [Security Policy](/SECURITY.md)
