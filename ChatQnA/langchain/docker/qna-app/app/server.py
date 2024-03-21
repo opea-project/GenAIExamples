@@ -158,8 +158,9 @@ async def rag_chat(request: Request):
         return JSONResponse(status_code=400, content={"message":"Wrong knowledge base id."})
 
     def stream_generator():
+        chat_response = ""
         for text in router.llm_chain.stream({"question": query, "chat_history": router.chat_history}):
-            # print(f"[rag - chat_stream] text: {text}")
+            chat_response += text
             if text == " ":
                 yield f"data: @#$\n\n"
                 continue
@@ -169,6 +170,9 @@ async def rag_chat(request: Request):
                 yield f"data: <br/>\n\n"
             new_text = text.replace(" ", "@#$")
             yield f"data: {new_text}\n\n"
+        chat_response = chat_response.split("</s>")[0]
+        print(f"[rag - chat_stream] stream response: {chat_response}")
+        router.chat_history.extend([HumanMessage(content=query), chat_response])
         yield f"data: [DONE]\n\n"
 
     return StreamingResponse(stream_generator(), media_type="text/event-stream")
