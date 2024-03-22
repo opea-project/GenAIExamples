@@ -113,6 +113,17 @@ Note: `ingest.py` will download the embedding model, please set the proxy if nec
 
 # Start LangChain Server
 
+## Enable GuardRails using Meta's Llama Guard model (Optional)
+
+We offer content moderation support utilizing Meta's [Llama Guard](https://huggingface.co/meta-llama/LlamaGuard-7b) model. To activate GuardRails, kindly follow the instructions below to deploy the Llama Guard model on TGI Gaudi.
+
+```bash
+volume=$PWD/data
+model_id="meta-llama/LlamaGuard-7b"
+docker run -p 8088:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy tgi_gaudi --model-id $model_id
+export SAFETY_GUARD_ENDPOINT="http://xxx.xxx.xxx.xxx:8088"
+```
+
 ## Start the Backend Service
 Make sure TGI-Gaudi service is running and also make sure data is populated into Redis. Launch the backend service:
 

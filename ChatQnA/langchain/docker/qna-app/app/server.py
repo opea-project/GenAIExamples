@@ -16,6 +16,7 @@ from utils import (
     get_current_beijing_time, create_retriever_from_links
 )
 from prompts import contextualize_q_prompt, qa_prompt
+from guardrails import format_guard_messages
 
 app = FastAPI()
 
@@ -29,17 +30,18 @@ app.add_middleware(
 
 class RAGAPIRouter(APIRouter):
 
-    def __init__(self, upload_dir, entrypoint) -> None:
+    def __init__(self, upload_dir, entrypoint, safety_guard_endpoint) -> None:
         super().__init__()
         self.upload_dir = upload_dir
         self.entrypoint = entrypoint
+        self.safety_guard_endpoint = safety_guard_endpoint
         print(f"[rag - router] Initializing API Router, params:\n \
                     upload_dir={upload_dir}, entrypoint={entrypoint}")
 
         # Define LLM
         self.llm = HuggingFaceEndpoint(
             endpoint_url=entrypoint,
-            max_new_tokens=512,
+            max_new_tokens=1024,
             top_k=10,
             top_p=0.95,
             typical_p=0.95,
@@ -47,6 +49,16 @@ class RAGAPIRouter(APIRouter):
             repetition_penalty=1.03,
             streaming=True,
         )
+        if self.safety_guard_endpoint:
+            self.llm_guard = HuggingFaceEndpoint(
+                endpoint_url=safety_guard_endpoint,
+                max_new_tokens=100,
+                top_k=1,
+                top_p=0.95,
+                typical_p=0.95,
+                temperature=0.01,
+                repetition_penalty=1.03,
+            )
         print("[rag - router] LLM initialized.")
 
         # Define LLM Chain
@@ -85,12 +97,26 @@ class RAGAPIRouter(APIRouter):
         response = self.llm_chain.invoke({"question": query, "chat_history": self.chat_history})
         result = response.split("</s>")[0]
         self.chat_history.extend([HumanMessage(content=query), response])
+        # output guardrails
+        if self.safety_guard_endpoint:
+            messages_input = [
+                    {"role": "user", "content": query},
+                    {"role": "assistant", "content": response}
+                ]
+            response_output_guard = self.llm_guard(format_guard_messages(messages_input))
+            if response_output_guard[0]["generated_text"].strip() == "safe":
+                return result
+            else:
+                policy_violations = response_output_guard.split("unsafe")[1].strip().split(" ")
+                print(f"Violated policies: {policy_violations}")
+                return policy_violations
         return result
 
 
 upload_dir = os.getenv("RAG_UPLOAD_DIR", "./upload_dir")
 tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
-router = RAGAPIRouter(upload_dir, tgi_endpoint)
+safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT")
+router = RAGAPIRouter(upload_dir, tgi_endpoint, safety_guard_endpoint)
 
 
 @router.post("/v1/rag/chat")
@@ -100,6 +126,17 @@ async def rag_chat(request: Request):
     query = params['query']
     kb_id = params.get("knowledge_base_id", "default")
     print(f"[rag - chat] history: {router.chat_history}")
+
+    # prompt guardrails
+    if router.safety_guard_endpoint:
+        messages_input = [
+                {"role": "user", "content": query},
+            ]
+        response_input_guard = router.llm_guard(format_guard_messages(messages_input))
+        if not response_input_guard[0]["generated_text"].strip() == "safe":
+            policy_violations = response_input_guard.split("unsafe")[1].strip().split(" ")
+            print(f"Violated policies: {policy_violations}")
+            return JSONResponse(status_code=200, content={"message":policy_violations})
 
     if kb_id == "default":
         print(f"[rag - chat] use default knowledge base")
@@ -134,6 +171,17 @@ async def rag_chat(request: Request):
     query = params['query']
     kb_id = params.get("knowledge_base_id", "default")
     print(f"[rag - chat_stream] history: {router.chat_history}")
+
+    # prompt guardrails
+    if router.safety_guard_endpoint:
+        messages_input = [
+                {"role": "user", "content": query},
+            ]
+        response_input_guard = router.llm_guard(format_guard_messages(messages_input))
+        if not response_input_guard[0]["generated_text"].strip() == "safe":
+            policy_violations = response_input_guard.split("unsafe")[1].strip().split(" ")
+            print(f"Violated policies: {policy_violations}")
+            return JSONResponse(status_code=200, content={"message":policy_violations})
 
     if kb_id == "default":
         retriever = reload_retriever(router.embeddings, INDEX_NAME)
