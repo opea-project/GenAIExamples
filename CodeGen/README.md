@@ -4,9 +4,17 @@ Code generation is a noteworthy application of Large Language Model (LLM) techno
 # Environment Setup
 To use [🤗 text-generation-inference](https://github.com/huggingface/text-generation-inference) on Intel Gaudi2, please follow these steps:
 
-## Build TGI Gaudi Docker Image
+## Prepare Gaudi Image
+Getting started is straightforward with the official Docker container. Simply pull the image using:
+
 ```bash
-bash ./tgi_gaudi/build_docker.sh
+docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+```
+
+Alternatively, you can build the Docker image yourself with:
+
+```bash
+bash ./serving/tgi_gaudi/build_docker.sh
 ```
 
 ## Launch TGI Gaudi Service
