@@ -3,7 +3,16 @@ This ChatQnA use case performs RAG using LangChain, Redis vectordb and Text Gene
 # Environment Setup
 To use [🤗 text-generation-inference](https://github.com/huggingface/text-generation-inference) on Habana Gaudi/Gaudi2, please follow these steps:
 
-## Build TGI Gaudi Docker Image
+## Prepare Docker
+
+Getting started is straightforward with the official Docker container. Simply pull the image using:
+
+```bash
+docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+```
+
+Alternatively, you can build the Docker image yourself with:
+
 ```bash
 bash ./serving/tgi_gaudi/build_docker.sh
 ```
