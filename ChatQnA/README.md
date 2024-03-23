@@ -77,7 +77,7 @@ docker cp 262e04bbe466:/usr/src/optimum-habana/examples/text-generation/quantiza
 
 ```bash
 docker run -d -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -e HUGGING_FACE_HUB_TOKEN=<your HuggingFace token> -v $volume:/data --
-runtime=habana -e HABANA_VISIBLE_DEVICES="4,5,6" -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --
+runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --
 model-id meta-llama/Llama-2-7b-hf
 ```
 
@@ -129,7 +129,7 @@ We offer content moderation support utilizing Meta's [Llama Guard](https://huggi
 ```bash
 volume=$PWD/data
 model_id="meta-llama/LlamaGuard-7b"
-docker run -p 8088:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy tgi_gaudi --model-id $model_id
+docker run -p 8088:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HUGGING_FACE_HUB_TOKEN=<your HuggingFace token> -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy tgi_gaudi --model-id $model_id
 export SAFETY_GUARD_ENDPOINT="http://xxx.xxx.xxx.xxx:8088"
 ```
 
