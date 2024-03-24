@@ -5,8 +5,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from langchain_community.llms import HuggingFaceEndpoint
-import intel_extension_for_pytorch as ipex
-import torch
 
 from rag_redis.config import (
     EMBED_MODEL,
@@ -22,7 +20,6 @@ class Question(BaseModel):
 
 # Init Embeddings
 embedder = HuggingFaceEmbeddings(model_name=EMBED_MODEL)
-embedder.client= ipex.optimize(embedder.client.eval(), dtype=torch.bfloat16)
 
 #Setup semantic cache for LLM
 from langchain.cache import RedisSemanticCache

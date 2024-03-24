@@ -31,7 +31,6 @@ RUN pip install --upgrade pip \
 ENV PYTHONPATH=/ws:/qna-app/app
 
 COPY qna-app /qna-app
-COPY qna-app-no-rag /qna-app-no-rag
 WORKDIR /qna-app
 
 ENTRYPOINT ["/usr/bin/sleep", "infinity"]
