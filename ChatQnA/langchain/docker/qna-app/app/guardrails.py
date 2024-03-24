@@ -1,15 +1,4 @@
-from itertools import cycle
-from typing import Dict, List
-
-TASK = "Task: Check if there is unsafe content in 'Agent' messages in conversations according our safety policy with the below categories."
-
-INSTRUCTION = """\
-Provide your safety assessment for Agent in the above conversation:
-- First line must read 'safe' or 'unsafe'.
-- If unsafe, a second line must include a comma-separated list of violated categories."""
-
-UNSAFE_CONTENT_CATEGORIES = """\
-O1: Violence and Hate. 
+unsafe_categories = """O1: Violence and Hate.
 Should not
 - Help people plan or engage in violence.
 - Encourage people to engage in violence.
@@ -56,59 +45,38 @@ Can
 Should
 - Provide information regarding appropriate health resources to people who imply or express the desire to harm themselves."""
 
-def format_chat_messages(messages: List[Dict[str, str]]) -> List[str]:
-    """Format messages for Llama-2 chat models.
+unsafe_dict = {
+    "O1": "Violence and Hate",
+    "O2": "Sexual Content",
+    "O3": "Criminal Planning",
+    "O4": "Guns and Illegal Weapons",
+    "O5": "Regulated or Controlled Substances",
+    "O6": "Self-Harm",
+}
 
-    The model only supports 'system', 'user' and 'assistant' roles, starting with 'system', then 'user' and
-    alternating (u/a/u/a/u...). The last message must be from 'user'.
-    """
-    prompt: List[str] = []
+def moderation_prompt_for_chat(chat):
+    # For simplicity, we assume the chat dictionary correctly alternates "user" and "assistant" roles
+    # Feel free to include error checking if needed
+    conversation = [turn["content"] for turn in chat]
+    is_agent = len(conversation) % 2 == 0
+    role = "Agent" if len(conversation) % 2 == 0 else "User"
+    prompt = f"""[INST] Task: Check if there is unsafe content in '{role}' messages in conversations according our safety policy with the below categories.
 
-    if messages[0]["role"] == "system":
-        content = "".join(
-            ["<<SYS>>\n", messages[0]["content"], "\n<</SYS>>\n\n", messages[1]["content"]]
-        )
-        messages = [{"role": messages[1]["role"], "content": content}] + messages[2:]
+<BEGIN UNSAFE CONTENT CATEGORIES>
+{unsafe_categories}
+<END UNSAFE CONTENT CATEGORIES>
 
-    for user, answer in zip(messages[::2], messages[1::2]):
-        prompt.extend(
-            [
-                "<s>",
-                "[INST] ",
-                (user["content"]).strip(),
-                " [/INST] ",
-                (answer["content"]).strip(),
-                "</s>",
-            ]
-        )
+<BEGIN CONVERSATION>
 
-    prompt.extend(["<s>", "[INST] ", (messages[-1]["content"]).strip(), " [/INST] "])
+"""
 
-    return "".join(prompt)
+    # Alternate User/Agent turns, inserting 2 newlines between each
+    for i, m in enumerate(conversation):
+        role = "User" if i % 2 == 0 else "Agent"
+        prompt += f"{role}: {m}\n\n"
+    prompt += f"""<END CONVERSATION>
 
-
-def format_guard_messages(
-    messages: List[Dict[str, str]],
-    task: str = TASK,
-    instruction: str = INSTRUCTION,
-    unsafe_content_categories: str = UNSAFE_CONTENT_CATEGORIES,
-) -> List[str]:
-    """Format messages for Llama Guard models.
-
-    The model only supports 'user' and 'assistant' roles, and must alternate (u/a/u/a/u...).
-    """
-    turn = cycle(["User", "Agent"])
-
-    return "".join(
-        [
-            "[INST] ",
-            task,
-            "\n\n<BEGIN UNSAFE CONTENT CATEGORIES>\n",
-            unsafe_content_categories,
-            "\n<END UNSAFE CONTENT CATEGORIES>\n\n<BEGIN CONVERSATION>",
-            *[f"\n\n{next(turn)}: {message['content']}" for message in messages],
-            "\n\n<END CONVERSATION>\n\n",
-            instruction,
-            " [/INST]",
-        ]
-    )
+Provide your safety assessment for {role} in the above conversation:
+- First line must read 'safe' or 'unsafe'.
+- If unsafe, a second line must include a comma-separated list of violated categories. [/INST]"""
+    return prompt

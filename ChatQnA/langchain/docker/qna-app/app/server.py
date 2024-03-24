@@ -2,21 +2,20 @@ import os
 from fastapi import FastAPI, APIRouter, Request, UploadFile, File
 from fastapi.responses import RedirectResponse, StreamingResponse, JSONResponse
 from langserve import add_routes
-from rag_redis.chain import chain as qna_rag_redis_chain
 from starlette.middleware.cors import CORSMiddleware
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_community.vectorstores import Redis
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough
 from rag_redis.config import EMBED_MODEL, INDEX_NAME, REDIS_URL, INDEX_SCHEMA
 from utils import (
     create_retriever_from_files, reload_retriever, create_kb_folder, 
     get_current_beijing_time, create_retriever_from_links
 )
 from prompts import contextualize_q_prompt, qa_prompt
-from guardrails import format_guard_messages
+from guardrails import moderation_prompt_for_chat, unsafe_dict
 
 app = FastAPI()
 
@@ -99,17 +98,14 @@ class RAGAPIRouter(APIRouter):
         self.chat_history.extend([HumanMessage(content=query), response])
         # output guardrails
         if self.safety_guard_endpoint:
-            messages_input = [
-                    {"role": "user", "content": query},
-                    {"role": "assistant", "content": response}
-                ]
-            response_output_guard = self.llm_guard(format_guard_messages(messages_input))
-            if response_output_guard[0]["generated_text"].strip() == "safe":
-                return result
-            else:
-                policy_violations = response_output_guard.split("unsafe")[1].strip().split(" ")
+            response_output_guard = self.llm_guard(moderation_prompt_for_chat("Agent", f"User: {query}\n Agent: {response}"))
+            if 'unsafe' in response_output_guard:
+                policy_violation_level = response_output_guard.split("\n")[1].strip()
+                policy_violations = unsafe_dict[policy_violation_level]
                 print(f"Violated policies: {policy_violations}")
-                return policy_violations
+                return policy_violations + " are found in the output"
+            else:
+                return result
         return result
 
 
@@ -129,14 +125,12 @@ async def rag_chat(request: Request):
 
     # prompt guardrails
     if router.safety_guard_endpoint:
-        messages_input = [
-                {"role": "user", "content": query},
-            ]
-        response_input_guard = router.llm_guard(format_guard_messages(messages_input))
-        if not response_input_guard[0]["generated_text"].strip() == "safe":
-            policy_violations = response_input_guard.split("unsafe")[1].strip().split(" ")
+        response_input_guard = router.llm_guard(moderation_prompt_for_chat("User", query))
+        if 'unsafe' in response_input_guard:
+            policy_violation_level = response_input_guard.split("\n")[1].strip()
+            policy_violations = unsafe_dict[policy_violation_level]
             print(f"Violated policies: {policy_violations}")
-            return JSONResponse(status_code=200, content={"message":policy_violations})
+            return f"Violated policies: {policy_violations}, please check your input."
 
     if kb_id == "default":
         print(f"[rag - chat] use default knowledge base")
@@ -174,14 +168,16 @@ async def rag_chat(request: Request):
 
     # prompt guardrails
     if router.safety_guard_endpoint:
-        messages_input = [
-                {"role": "user", "content": query},
-            ]
-        response_input_guard = router.llm_guard(format_guard_messages(messages_input))
-        if not response_input_guard[0]["generated_text"].strip() == "safe":
-            policy_violations = response_input_guard.split("unsafe")[1].strip().split(" ")
+        response_input_guard = router.llm_guard(moderation_prompt_for_chat("User", query))
+        if 'unsafe' in response_input_guard:
+            policy_violation_level = response_input_guard.split("\n")[1].strip()
+            policy_violations = unsafe_dict[policy_violation_level]
             print(f"Violated policies: {policy_violations}")
-            return JSONResponse(status_code=200, content={"message":policy_violations})
+            def generate_content():
+                content = f"Violated policies: {policy_violations}, please check your input."
+                yield f"data: {content}\n\n"
+                yield f"data: [DONE]\n\n"
+            return StreamingResponse(generate_content(), media_type="text/event-stream")
 
     if kb_id == "default":
         retriever = reload_retriever(router.embeddings, INDEX_NAME)
@@ -296,7 +292,7 @@ app.include_router(router)
 async def redirect_root_to_docs():
     return RedirectResponse("/docs")
 
-add_routes(app, qna_rag_redis_chain, path="/rag-redis")
+add_routes(app, router.llm_chain, path="/rag-redis")
 
 if __name__ == "__main__":
     import uvicorn
