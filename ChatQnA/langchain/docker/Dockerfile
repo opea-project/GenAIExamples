@@ -15,7 +15,7 @@ RUN pip install --upgrade pip \
     sentence-transformers \
     redis \
     unstructured \
-    unstructured[pdf] \
+    unstructured[all-docs] \
     langchain-cli \
     pydantic==1.10.13 \
     langchain==0.1.12 \
