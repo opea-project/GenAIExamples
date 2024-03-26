@@ -1,36 +1,23 @@
-FROM langchain/langchain
+FROM langchain/langchain:latest
 
-ARG http_proxy
-ARG https_proxy
-ENV http_proxy=$http_proxy
-ENV https_proxy=$https_proxy
+RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    libgl1-mesa-glx \
+    libjemalloc-dev
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
-        libgl1-mesa-glx \
-        libjemalloc-dev
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
 
-RUN pip install --upgrade pip \
-    sentence-transformers \
-    redis \
-    unstructured \
-    unstructured[all-docs] \
-    langchain-cli \
-    pydantic==1.10.13 \
-    langchain==0.1.12 \
-    poetry \
-    pymupdf \
-    easyocr \
-    langchain_benchmarks \
-    pyarrow \
-    jupyter \
-    intel-extension-for-pytorch \
-    intel-openmp
+USER user
 
-ENV PYTHONPATH=/ws:/qna-app/app
+COPY requirements.txt /tmp/requirements.txt
 
-COPY qna-app /qna-app
-WORKDIR /qna-app
+RUN pip install --upgrade pip && \
+    pip install -r /tmp/requirements.txt
+
+ENV PYTHONPATH=/home/user:/home/user/qna-app/app
+
+WORKDIR /home/user/qna-app
+COPY qna-app /home/user/qna-app
 
 ENTRYPOINT ["/usr/bin/sleep", "infinity"]

@@ -1,9 +1,16 @@
 version: '3'
 services:
   qna-rag-redis-server:
-    image: qna-rag-redis:latest
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      dockerfile: Dockerfile
+    image: intel/gen-ai-examples:qna-rag-redis-server
     container_name: qna-rag-redis-server
     environment:
+      - http_proxy=${http_proxy}
+      - https_proxy=${https_proxy}
       - "REDIS_PORT=6379"
       - "EMBED_MODEL=BAAI/bge-base-en-v1.5"
       - "REDIS_SCHEMA=schema_dim_768.yml"

@@ -13,22 +13,28 @@
 # limitations under the License.
 
 # HABANA environment
-FROM vault.habana.ai/gaudi-docker/1.14.0/ubuntu22.04/habanalabs/pytorch-installer-2.1.1 as hpu
+FROM vault.habana.ai/gaudi-docker/1.14.0/ubuntu22.04/habanalabs/pytorch-installer-2.1.1 AS hpu
 
 # Set environment variables
 ENV LANG=en_US.UTF-8
-ENV PYTHONPATH=/root:/usr/lib/habanalabs/:/optimum-habana
+ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/optimum-habana
+
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
+
+USER user
 
 # Install required branch
-RUN git clone https://github.com/lkk12014402/optimum-habana.git && \
-    cd optimum-habana && \
-    git checkout enable_llava_generation
+RUN git clone https://github.com/lkk12014402/optimum-habana.git /optimum-habana -b enable_llava_generation
+
+COPY requirements.txt /tmp/requirements.txt
 
 # Install dependency
-RUN pip install --upgrade-strategy eager optimum[habana] && \
-    pip install fastapi uvicorn
+RUN pip install --no-cache-dir -U -r /tmp/requirements.txt
 
 # work dir should contains the server
 WORKDIR /llava_server
+COPY llava_server /llava_server
 
 ENTRYPOINT ["python", "llava_server.py"]
