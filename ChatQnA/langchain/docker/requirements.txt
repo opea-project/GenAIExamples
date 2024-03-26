@@ -1,3 +1,4 @@
+cryptography==42.0.4
 easyocr
 intel-extension-for-pytorch
 intel-openmp
