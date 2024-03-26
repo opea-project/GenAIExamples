@@ -12,6 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/bin/bash
+FROM langchain/langchain:latest
 
-docker build . -t copilot:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    libgl1-mesa-glx \
+    libjemalloc-dev
+
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
+
+USER user
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN pip install -U -r /tmp/requirements.txt
+
+ENV PYTHONPATH=/home/user:/home/user/codegen-app
+
+WORKDIR /home/user/codegen-app
+COPY codegen-app /home/user/codegen-app
+
+SHELL ["/bin/bash", "-c"]

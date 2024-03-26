@@ -1,0 +1,15 @@
+easyocr
+intel-extension-for-pytorch
+intel-openmp
+jupyter
+langchain_benchmarks
+langchain-cli
+langchain==0.1.12
+poetry
+pyarrow
+pydantic==1.10.13
+pymupdf
+redis
+sentence-transformers
+unstructured
+unstructured[pdf]
