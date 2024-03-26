@@ -19,14 +19,14 @@ FROM vault.habana.ai/gaudi-docker/1.14.0/ubuntu22.04/habanalabs/pytorch-installe
 ENV LANG=en_US.UTF-8
 ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/optimum-habana
 
+# Install required branch
+RUN git clone https://github.com/lkk12014402/optimum-habana.git /optimum-habana -b enable_llava_generation
+
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/
 
 USER user
-
-# Install required branch
-RUN git clone https://github.com/lkk12014402/optimum-habana.git /optimum-habana -b enable_llava_generation
 
 COPY requirements.txt /tmp/requirements.txt
 
