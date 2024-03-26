@@ -26,7 +26,7 @@ USER user
 
 COPY requirements.txt /tmp/requirements.txt
 
-RUN pip install -U -r /tmp/requirements.txt
+RUN pip install --no-cache-dir -U -r /tmp/requirements.txt
 
 ENV PYTHONPATH=/home/user:/home/user/codegen-app
 

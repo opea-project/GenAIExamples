@@ -12,8 +12,8 @@ USER user
 
 COPY requirements.txt /tmp/requirements.txt
 
-RUN pip install --upgrade pip && \
-    pip install -r /tmp/requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /tmp/requirements.txt
 
 ENV PYTHONPATH=/home/user:/home/user/summarize-app/app
 
