@@ -1,0 +1,14 @@
+beautifulsoup4
+docx2txt
+intel-extension-for-pytorch
+intel-openmp
+jupyter
+langchain_benchmarks
+langchain-cli
+langchain==0.1.12
+poetry
+pyarrow
+pydantic==1.10.13
+pypdf
+python-multipart
+sentence-transformers

@@ -14,7 +14,7 @@ docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 Alternatively, you can build the Docker image yourself with:
 
 ```bash
-bash ./serving/tgi_gaudi/build_docker.sh
+bash ./tgi_gaudi/build_docker.sh
 ```
 
 ## Launch TGI Gaudi Service
@@ -43,7 +43,7 @@ export TGI_ENDPOINT="xxx.xxx.xxx.xxx:8080"
 
 ## Launch Copilot Docker
 
-### Build Copilot Docker Image
+### Build Copilot Docker Image (Optional)
 
 ```bash
 cd codegen
@@ -54,9 +54,8 @@ cd ..
 ### Lanuch Copilot Docker
 
 ```bash
-docker run -it --net=host --ipc=host -v /var/run/docker.sock:/var/run/docker.sock copilot:latest
+docker run -it -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} --net=host --ipc=host -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:copilot bash
 ```
-
 
 # Start Copilot Server
 

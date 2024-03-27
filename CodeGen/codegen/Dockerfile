@@ -12,14 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM langchain/langchain
-RUN apt-get update && apt-get -y install libgl1-mesa-glx
-RUN pip install -U langchain-cli pydantic==1.10.13
-RUN pip install langchain==0.1.11
-RUN pip install shortuuid
-RUN pip install huggingface_hub
-RUN mkdir -p /ws
-ENV PYTHONPATH=/ws
-COPY codegen-app /codegen-app
-WORKDIR /codegen-app
-CMD ["/bin/bash"]
+FROM langchain/langchain:latest
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    libgl1-mesa-glx \
+    libjemalloc-dev
+
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
+
+USER user
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN pip install --no-cache-dir -U -r /tmp/requirements.txt
+
+ENV PYTHONPATH=/home/user:/home/user/codegen-app
+
+WORKDIR /home/user/codegen-app
+COPY codegen-app /home/user/codegen-app
+
+SHELL ["/bin/bash", "-c"]
