@@ -111,6 +111,7 @@ repos:
     rev: v2.2.6
     hooks:
       - id: codespell
+        args: [-w]
         additional_dependencies:
           - tomli
 
