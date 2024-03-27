@@ -14,19 +14,19 @@ docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 Alternatively, you can build the Docker image yourself with:
 
 ```bash
-bash ./tgi_gaudi/build_docker.sh
+bash ./serving/tgi_gaudi/build_docker.sh
 ```
 
 ## Launch TGI Gaudi Service
 
 ### Launch a local server instance on 1 Gaudi card:
 ```bash
-bash ./tgi_gaudi/launch_tgi_service.sh
+bash ./serving/tgi_gaudi/launch_tgi_service.sh
 ```
 
 ### Launch a local server instance on 4 Gaudi cards:
 ```bash
-bash ./tgi_gaudi/launch_tgi_service.sh 4 9000 "deepseek-ai/deepseek-coder-33b-instruct"
+bash ./serving/tgi_gaudi/launch_tgi_service.sh 4 9000 "deepseek-ai/deepseek-coder-33b-instruct"
 ```
 
 ### Customize TGI Gaudi Service
@@ -71,13 +71,12 @@ nohup python server.py &
 ```
 
 
-## Install Copilot VSCode extension offline
+## Install Copilot VSCode extension from Plugin Marketplace
 
-Copy the vsix file `copilot-0.0.1.vsix` to local and install it in VSCode as below.
+Install `Neural Copilot` in VSCode as below.
 
-![Install-screenshot](https://i.imgur.com/JXQ3rqE.jpg)
+![Install-screenshot](https://i.imgur.com/cnHRAdD.png)
 
-We will be also releasing the plugin in Visual Studio Code plugin market to facilitate the installation.
 
 # How to use
 
@@ -94,7 +93,7 @@ The Copilot enables users to input their corresponding sensitive information and
 
 ![Customize](https://i.imgur.com/PkObak9.png)
 
-## Code suggestion
+## Code Suggestion
 
 To trigger inline completion, you'll need to type # {your keyword} (start with your programming language's comment keyword, like // in C++ and # in python). Make sure Inline Suggest is enabled from the VS Code Settings.
 For example:

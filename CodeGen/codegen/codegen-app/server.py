@@ -71,7 +71,7 @@ class CodeGenAPIRouter(APIRouter):
                 def stream_generator():
                     nonlocal buffered_texts
                     for output in generator:
-                        yield f"data: {output}\n\n"
+                        yield f"data: {output.encode()}\n\n"
                     yield f"data: [DONE]\n\n"
                 return StreamingResponse(stream_generator(), media_type="text/event-stream")
             else:
