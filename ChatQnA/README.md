@@ -143,7 +143,7 @@ This will initiate the frontend service and launch the application.
 # Enable TGI Gaudi FP8 for higher throughput (Optional)
 The TGI Gaudi utilizes BFLOAT16 optimization as the default setting. If you aim to achieve higher throughput, you can enable FP8 quantization on the TGI Gaudi. According to our test results, FP8 quantization yields approximately a 1.8x performance gain compared to BFLOAT16. Please follow the below steps to enable FP8 quantization.
 
-### Prepare Metadata for FP8 Quantization
+## Prepare Metadata for FP8 Quantization
 
 Enter into the TGI Gaudi docker container, and then run the below commands:
 
@@ -165,7 +165,7 @@ docker cp 262e04bbe466:/usr/src/optimum-habana/examples/text-generation/quantiza
 Then modify the `dump_stats_path` to "/data/hqt_output/measure" and update `dump_stats_xlsx_path` to /data/hqt_output/measure/fp8stats.xlsx" in maxabs_quant.json file.
 
 
-### Restart the TGI Gaudi server within all the metadata mapped
+## Restart the TGI Gaudi server within all the metadata mapped
 
 ```bash
 docker run -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:1.2.1 --model-id Intel/neural-chat-7b-v3-3
