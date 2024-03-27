@@ -1,0 +1,122 @@
+ci:
+  autofix_prs: true
+  autoupdate_schedule: quarterly
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: end-of-file-fixer
+        files: (.*\.(py|md|rst|yaml|yml|json|ts|js|html|svelte|sh))$
+      - id: check-json
+        exclude: |
+          (?x)^(
+              ChatQnA/ui/tsconfig.json
+          )$
+      - id: check-yaml
+      - id: debug-statements
+      - id: requirements-txt-fixer
+      - id: trailing-whitespace
+        files: (.*\.(py|rst|cmake|yaml|yml|json|ts|js|html|svelte|sh))$
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: insert-license
+        files: |
+          (?x)^(
+            (ChatQnA|CodeGen|DocSum|VisualQnA)/.*(py|yaml|yml|sh)|
+          )$
+        args:
+          [
+            --license-filepath=.github/license_template.txt,
+            --use-current-year,
+            --detect-license-in-X-top-lines=40,
+            --skip-license-insertion-comment=Copyright,
+          ]
+      - id: insert-license
+        files: |
+          (?x)^(
+            (ChatQnA|CodeGen|DocSum|VisualQnA)/.*(ts|js)|
+          )$
+        args:
+          [
+            --license-filepath=.github/license_template.txt,
+            --use-current-year,
+            --detect-license-in-X-top-lines=40,
+            --skip-license-insertion-comment=Copyright,
+            --comment-style=//,
+          ]
+      - id: insert-license
+        files: |
+          (?x)^(
+            (ChatQnA|CodeGen|DocSum|VisualQnA)/.*(html|svelte)|
+          )$
+        args:
+          [
+            --license-filepath=.github/license_template.txt,
+            --use-current-year,
+            --detect-license-in-X-top-lines=40,
+            --skip-license-insertion-comment=Copyright,
+            --comment-style=<!--| |-->,
+          ]
+
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.5.0
+    hooks:
+      - id: yesqa
+        name: Unused noqa
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/PyCQA/docformatter
+    rev: v1.7.5
+    hooks:
+      - id: docformatter
+        args: [
+            --in-place,
+            --wrap-summaries=0, # 0 means disable wrap
+            --wrap-descriptions=0, # 0 means disable wrap
+            --black,
+            --style=google,
+          ]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.1.0" # Use the sha / tag you want to point at
+    hooks:
+      - id: prettier
+        args: [--print-width=120]
+        types_or: [yaml, markdown, html, css, scss, javascript, json]
+        additional_dependencies:
+          - prettier@3.2.5
+
+  - repo: https://github.com/psf/black.git
+    rev: 24.3.0
+    hooks:
+      - id: black
+        files: (.*\.py)$
+
+  - repo: https://github.com/asottile/blacken-docs
+    rev: 1.16.0
+    hooks:
+      - id: blacken-docs
+        args: [--line-length=120, --skip-errors]
+        additional_dependencies:
+          - black==24.3.0
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+      - id: codespell
+        args: [-w]
+        additional_dependencies:
+          - tomli
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.4
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix, --no-cache]
