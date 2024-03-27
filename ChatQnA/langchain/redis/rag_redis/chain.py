@@ -11,7 +11,7 @@ from rag_redis.config import (
     INDEX_NAME,
     INDEX_SCHEMA,
     REDIS_URL,
-    TGI_ENDPOINT,
+    TGI_LLM_ENDPOINT,
 )
 
 # Make this look better in the docs.
@@ -60,7 +60,7 @@ prompt = ChatPromptTemplate.from_template(template)
 
 # RAG Chain
 model = HuggingFaceEndpoint(
-    endpoint_url=TGI_ENDPOINT,
+    endpoint_url=TGI_LLM_ENDPOINT,
     max_new_tokens=512,
     top_k=10,
     top_p=0.95,
