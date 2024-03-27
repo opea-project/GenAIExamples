@@ -70,6 +70,8 @@ export HUGGINGFACEHUB_API_TOKEN=<token>
 nohup python server.py &
 ```
 
+The Copilot backend defaults to listening on port 8000, but you can adjust the port number as needed.
+
 
 ## Install Copilot VSCode extension from Plugin Marketplace
 
@@ -85,7 +87,7 @@ Install `Neural Copilot` in VSCode as below.
 Please adjust the service URL in the extension settings based on the endpoint of the code generation backend service.
 
 ![Setting-screenshot](https://i.imgur.com/4hjvKPu.png)
-![Setting-screenshot](https://i.imgur.com/JfJVFV3.png)
+![Setting-screenshot](https://i.imgur.com/AQZuzqd.png)
 
 ## Customize
 
