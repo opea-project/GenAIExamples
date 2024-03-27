@@ -89,7 +89,7 @@ repos:
     hooks:
       - id: prettier
         args: [--print-width=120]
-        exclude: (.*\.svelte)$
+        types_or: [yaml, markdown, html, css, scss, javascript, json]
         additional_dependencies:
           - prettier@3.2.5
 
