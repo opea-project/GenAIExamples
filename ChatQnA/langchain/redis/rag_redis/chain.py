@@ -1,3 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Redis
 from langchain_core.output_parsers import StrOutputParser
@@ -11,7 +28,7 @@ from rag_redis.config import (
     INDEX_NAME,
     INDEX_SCHEMA,
     REDIS_URL,
-    TGI_ENDPOINT,
+    TGI_LLM_ENDPOINT,
 )
 
 # Make this look better in the docs.
@@ -60,7 +77,7 @@ prompt = ChatPromptTemplate.from_template(template)
 
 # RAG Chain
 model = HuggingFaceEndpoint(
-    endpoint_url=TGI_ENDPOINT,
+    endpoint_url=TGI_LLM_ENDPOINT,
     max_new_tokens=512,
     top_k=10,
     top_p=0.95,

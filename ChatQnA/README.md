@@ -11,7 +11,7 @@ Getting started is straightforward with the official Docker container. Simply pu
 docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 ```
 
-Alternatively, you can build the Docker image yourself with:
+Alternatively, you can build the Docker image yourself using latest [TGI-Gaudi](https://github.com/huggingface/tgi-gaudi) code with the below command:
 
 ```bash
 bash ./serving/tgi_gaudi/build_docker.sh
@@ -44,45 +44,10 @@ The ./serving/tgi_gaudi/launch_tgi_service.sh script accepts three parameters:
 - port_number: The port number assigned to the TGI Gaudi endpoint, with the default being 8080.
 - model_name: The model name utilized for LLM, with the default set to "Intel/neural-chat-7b-v3-3".
 
-You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the TGI Gaudi endpoint by exporting the environment variable `TGI_ENDPOINT`:
+You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the TGI Gaudi endpoint by exporting the environment variable `TGI_LLM_ENDPOINT`:
 ```bash
-export TGI_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
+export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
-
-## Enable TGI Gaudi FP8 for higher throughput
-The TGI Gaudi utilizes BFLOAT16 optimization as the default setting. If you aim to achieve higher throughput, you can enable FP8 quantization on the TGI Gaudi. According to our test results, FP8 quantization yields approximately a 1.8x performance gain compared to BFLOAT16. Please follow the below steps to enable FP8 quantization.
-
-### Prepare Metadata for FP8 Quantization
-
-Enter into the TGI Gaudi docker container, and then run the below commands:
-
-```bash
-git clone https://github.com/huggingface/optimum-habana.git
-cd optimum-habana/examples/text-generation
-pip install -r requirements_lm_eval.txt
-QUANT_CONFIG=./quantization_config/maxabs_measure.json python ../gaudi_spawn.py run_lm_eval.py -o acc_7b_bs1_measure.txt --
-model_name_or_path meta-llama/Llama-2-7b-hf --attn_softmax_bf16 --use_hpu_graphs --trim_logits --use_kv_cache --reuse_cache --bf16 --batch_size 1
-QUANT_CONFIG=./quantization_config/maxabs_quant.json python ../gaudi_spawn.py run_lm_eval.py -o acc_7b_bs1_quant.txt --model_name_or_path
-meta-llama/Llama-2-7b-hf --attn_softmax_bf16 --use_hpu_graphs --trim_logits --use_kv_cache --reuse_cache --bf16 --batch_size 1 --fp8
-```
-
-After finishing the above commands, the quantization metadata will be generated. Move the metadata directory ./hqt_output/ and copy the quantization JSON file to the host (under …/data). Please adapt the commands with your Docker ID and directory path.
-
-```bash
-docker cp 262e04bbe466:/usr/src/optimum-habana/examples/text-generation/hqt_output data/
-docker cp 262e04bbe466:/usr/src/optimum-habana/examples/text-generation/quantization_config/maxabs_quant.json data/
-```
-
-### Restart the TGI Gaudi server within all the metadata mapped
-
-```bash
-docker run -d -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -e HUGGING_FACE_HUB_TOKEN=<your HuggingFace token> -v $volume:/data --
-runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --
-model-id meta-llama/Llama-2-7b-hf
-```
-
-Now the TGI Gaudi will launch the FP8 model by default. Please note that currently only Llama2 and Mistral models support FP8 quantization.
-
 
 ## Launch Redis
 ```bash
@@ -173,3 +138,37 @@ nohup npm run dev &
 ```
 
 This will initiate the frontend service and launch the application.
+
+
+# Enable TGI Gaudi FP8 for higher throughput (Optional)
+The TGI Gaudi utilizes BFLOAT16 optimization as the default setting. If you aim to achieve higher throughput, you can enable FP8 quantization on the TGI Gaudi. According to our test results, FP8 quantization yields approximately a 1.8x performance gain compared to BFLOAT16. Please follow the below steps to enable FP8 quantization.
+
+## Prepare Metadata for FP8 Quantization
+
+Enter into the TGI Gaudi docker container, and then run the below commands:
+
+```bash
+pip install git+https://github.com/huggingface/optimum-habana.git
+git clone https://github.com/huggingface/optimum-habana.git
+cd optimum-habana/examples/text-generation
+pip install -r requirements_lm_eval.txt
+QUANT_CONFIG=./quantization_config/maxabs_measure.json python ../gaudi_spawn.py run_lm_eval.py -o acc_7b_bs1_measure.txt --model_name_or_path Intel/neural-chat-7b-v3-3 --attn_softmax_bf16 --use_hpu_graphs --trim_logits --use_kv_cache --reuse_cache --bf16 --batch_size 1
+QUANT_CONFIG=./quantization_config/maxabs_quant.json python ../gaudi_spawn.py run_lm_eval.py -o acc_7b_bs1_quant.txt --model_name_or_path Intel/neural-chat-7b-v3-3 --attn_softmax_bf16 --use_hpu_graphs --trim_logits --use_kv_cache --reuse_cache --bf16 --batch_size 1 --fp8
+```
+
+After finishing the above commands, the quantization metadata will be generated. Move the metadata directory ./hqt_output/ and copy the quantization JSON file to the host (under …/data). Please adapt the commands with your Docker ID and directory path.
+
+```bash
+docker cp 262e04bbe466:/usr/src/optimum-habana/examples/text-generation/hqt_output data/
+docker cp 262e04bbe466:/usr/src/optimum-habana/examples/text-generation/quantization_config/maxabs_quant.json data/
+```
+Then modify the `dump_stats_path` to "/data/hqt_output/measure" and update `dump_stats_xlsx_path` to /data/hqt_output/measure/fp8stats.xlsx" in maxabs_quant.json file.
+
+
+## Restart the TGI Gaudi server within all the metadata mapped
+
+```bash
+docker run -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:1.2.1 --model-id Intel/neural-chat-7b-v3-3
+```
+
+Now the TGI Gaudi will launch the FP8 model by default. Please note that currently only Llama2 series and Mistral series models support FP8 quantization.
