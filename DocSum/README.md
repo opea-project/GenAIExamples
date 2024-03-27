@@ -42,7 +42,7 @@ export TGI_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 
 ## Launch Document Summary Docker
 
-### Build Document Summary Docker Image
+### Build Document Summary Docker Image (Optional)
 
 ```bash
 cd langchain/docker/
@@ -53,7 +53,7 @@ cd ../../
 ### Lanuch Document Summary Docker
 
 ```bash
-docker run -it --net=host --ipc=host -v /var/run/docker.sock:/var/run/docker.sock document-summarize:latest
+docker run -it --net=host --ipc=host -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:document-summarize bash
 ```
 
 
