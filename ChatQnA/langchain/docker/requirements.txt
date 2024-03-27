@@ -13,4 +13,4 @@ pymupdf
 redis
 sentence-transformers
 unstructured
-unstructured[pdf]
+unstructured[all-docs]
