@@ -77,5 +77,5 @@ parent_dir = os.path.dirname(current_file_path)
 REDIS_SCHEMA = os.getenv("REDIS_SCHEMA", "schema.yml")
 schema_path = os.path.join(parent_dir, REDIS_SCHEMA)
 INDEX_SCHEMA = schema_path
-TGI_ENDPOINT = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
-TGI_ENDPOINT_NO_RAG = os.getenv("TGI_ENDPOINT_NO_RAG", "http://localhost:8081")
+TGI_LLM_ENDPOINT = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
+TGI_LLM_ENDPOINT_NO_RAG = os.getenv("TGI_LLM_ENDPOINT_NO_RAG", "http://localhost:8081")
