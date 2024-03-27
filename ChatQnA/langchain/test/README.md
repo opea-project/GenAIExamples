@@ -6,11 +6,13 @@ Pre-requisite: Signup in langsmith [https://www.langchain.com/langsmith] and get
 3. Statr redis container with docker-compose-redis.yml
 4. Add your hugging face access token in docker-compose-langchain.yml and start langchain-rag-server container
 5. enter into langchain-rag-server container and start jupyter notebook server (can specify needed IP address and jupyter will run on port 8888)
-        ```
-        docker exec -it langchain-rag-server bash
-        cd /test
-        jupyter notebook --allow-root --ip=X.X.X.X
-        ```
+
+```
+docker exec -it langchain-rag-server bash
+cd /test
+jupyter notebook --allow-root --ip=X.X.X.X
+```
+
 6. Launch jupyter notebook in your browser and open the tgi_gaudi.ipynb notebook
 7. Add langsmith api key in first cell of the notebook [os.environ["LANGCHAIN_API_KEY"] = "add-your-langsmith-key"  # Your API key]
 8. Clear all the cells and run all the cells
