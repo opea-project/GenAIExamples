@@ -127,9 +127,17 @@ class RAGAPIRouter(APIRouter):
 
 
 upload_dir = os.getenv("RAG_UPLOAD_DIR", "./upload_dir")
-tgi_llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
+tgi_llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", None)
+ray_llm_endpoint = os.getenv("RAY_LLM_ENDPOINT", None)
+if tgi_llm_endpoint:
+    llm_endpoint = tgi_llm_endpoint
+elif ray_llm_endpoint:
+    llm_endpoint = ray_llm_endpoint
+else:
+    llm_endpoint = "http://localhost:8080"
+
 safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT")
-router = RAGAPIRouter(upload_dir, tgi_llm_endpoint, safety_guard_endpoint)
+router = RAGAPIRouter(upload_dir, llm_endpoint, safety_guard_endpoint)
 
 
 @router.post("/v1/rag/chat")

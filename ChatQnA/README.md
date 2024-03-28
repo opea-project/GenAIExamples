@@ -1,9 +1,12 @@
 This ChatQnA use case performs RAG using LangChain, Redis vectordb and Text Generation Inference on Intel Gaudi2. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
 # Environment Setup
+For deploying model service on Gaudi/Gaudi2, you can choose HuggingFace [text-generation-inference](https://github.com/huggingface/text-generation-inference) or Intel [llm-on-ray](https://github.com/intel/llm-on-ray) kit.
+
+## Environment Setup for TGI
 To use [🤗 text-generation-inference](https://github.com/huggingface/text-generation-inference) on Habana Gaudi/Gaudi2, please follow these steps:
 
-## Prepare Docker
+### Prepare Docker for TGI Gaudi
 
 Getting started is straightforward with the official Docker container. Simply pull the image using:
 
@@ -17,9 +20,9 @@ Alternatively, you can build the Docker image yourself using latest [TGI-Gaudi](
 bash ./serving/tgi_gaudi/build_docker.sh
 ```
 
-## Launch TGI Gaudi Service
+### Launch TGI Gaudi Service
 
-### Launch a local server instance on 1 Gaudi card:
+#### Launch a local server instance on 1 Gaudi card:
 ```bash
 bash ./serving/tgi_gaudi/launch_tgi_service.sh
 ```
@@ -32,12 +35,12 @@ Please follow this link [huggingface token](https://huggingface.co/docs/hub/secu
 export HUGGINGFACEHUB_API_TOKEN=<token>
 ```
 
-### Launch a local server instance on 8 Gaudi cards:
+#### Launch a local server instance on 8 Gaudi cards:
 ```bash
 bash ./serving/tgi_gaudi/launch_tgi_service.sh 8
 ```
 
-### Customize TGI Gaudi Service
+#### Customize TGI Gaudi Service
 
 The ./serving/tgi_gaudi/launch_tgi_service.sh script accepts three parameters:
 - num_cards: The number of Gaudi cards to be utilized, ranging from 1 to 8. The default is set to 1.
@@ -47,6 +50,41 @@ The ./serving/tgi_gaudi/launch_tgi_service.sh script accepts three parameters:
 You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the TGI Gaudi endpoint by exporting the environment variable `TGI_LLM_ENDPOINT`:
 ```bash
 export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
+```
+
+## Environment Setup for LLM-on-Ray
+To use Intel [LLM-on-Ray](https://github.com/intel/llm-on-ray) on Habana Gaudi/Gaudi2, please follow these steps:
+
+### Launch Ray Gaudi Service
+
+#### Launch a local server instance on 1 Gaudi card:
+```bash
+bash ./serving/ray_gaudi/launch_ray_service.sh
+```
+
+For gated models such as `LLAMA-2`, you will have to pass -e HUGGING_FACE_HUB_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
+
+Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token ans export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
+
+```bash
+export HUGGINGFACEHUB_API_TOKEN=<token>
+```
+
+#### Launch a local server instance on 8 Gaudi cards:
+```bash
+bash ./serving/ray_gaudi/launch_ray_service.sh 8
+```
+
+#### Customize Ray Gaudi Service
+
+The ./serving/ray_gaudi/launch_ray_service.sh script accepts three parameters:
+- num_cards: The number of Gaudi cards to be utilized, ranging from 1 to 8. The default is set to 1.
+- port_number: The port number assigned to the Ray Gaudi endpoint, with the default being 8080.
+- model_name: The model name utilized for LLM, with the default set to "Intel/neural-chat-7b-v3-3".
+
+You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the Ray Gaudi endpoint by exporting the environment variable `RAY_LLM_ENDPOINT`:
+```bash
+export RAY_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
 ## Launch Redis
