@@ -10,6 +10,7 @@ on:
       - DocSum/**
       - VisualQnA/**
       - .github/workflows/format_scan.yml
+      - .github/workflows/docker/format-scan.dockerfile
       - .github/workflows/script/formatScan/**
   workflow_dispatch:
 
@@ -20,20 +21,17 @@ concurrency:
 
 env:
   DOCKER_CONFIG_NAME: "commonDockerConfig"
-  REPO_NAME: "code-scan"
+  REPO_NAME: "format-scan"
   REPO_TAG: "1.0"
-  DOCKER_FILE_NAME: "codeScan"
-  CONTAINER_NAME: "codeScan"
+  DOCKER_FILE_NAME: "format-scan"
+  CONTAINER_NAME: "format-scan"
 
 jobs:
   format-scan:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        job_name: [
-            "pylint",
-            "bandit",
-          ]
+        job_name: ["pylint", "bandit"]
       fail-fast: false
     steps:
       - name: Checkout out Repo

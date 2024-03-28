@@ -7,30 +7,12 @@ $BOLD_YELLOW && echo "---------------- git submodule update --init --recursive -
 git config --global --add safe.directory "*"
 git submodule update --init --recursive
 
-$BOLD_YELLOW && echo "---------------- install ITREX -------------" && $RESET
-export PYTHONPATH=`pwd`
+export PYTHONPATH=$(pwd)
+pip install langchain fastapi
 pip list
-
-cd /GenAIExamples/intel_extension_for_transformers/neural_chat/tests/
-if [ -f "requirements.txt" ]; then
-    python -m pip install --default-timeout=100 -r requirements.txt
-    pip list
-else
-    echo "Not found requirements.txt file."
-fi
 
 cd /GenAIExamples
 log_dir=/GenAIExamples/.github/workflows/scripts/formatScan
-if [ -f "requirements.txt" ]; then
-    python -m pip install --default-timeout=100 -r requirements.txt
-    pip list
-else
-    echo "Not found requirements.txt file."
-fi
-# install packages
-pip install git+https://github.com/EleutherAI/lm-evaluation-harness.git@83dbfbf6070324f3e5872f63e49d49ff7ef4c9b3
-pip install accelerate nlpaug nltk schema optimum-intel optimum peft
-pip install --upgrade --force-reinstall transformers==4.36.2
 
 echo "[DEBUG] list pipdeptree..."
 pip install pipdeptree
@@ -42,18 +24,8 @@ python -m pylint -f json --disable=R,C,W,E1129 \
     --extension-pkg-whitelist=numpy,nltk \
     --ignored-classes=TensorProto,NodeProto \
     --ignored-modules=tensorflow,torch,torch.quantization,torch.tensor,torchvision,mxnet,onnx,onnxruntime,neural_compressor,neural_compressor.benchmark,intel_extension_for_transformers.neural_engine_py,cv2,PIL.Image \
-    /GenAIExamples/intel_extension_for_transformers >${log_dir}/pylint.json
+    /GenAIExamples >${log_dir}/pylint.json
 exit_code1=$?
-
-python -m pylint -f json --disable=R,C,W,E1129 \
-    --enable=line-too-long \
-    --max-line-length=120 \
-    --disable=no-name-in-module,import-error,no-member,undefined-variable,no-value-for-parameter,unexpected-keyword-arg,not-callable,no-self-argument,too-many-format-args,invalid-unary-operand-type,too-many-function-args \
-    --extension-pkg-whitelist=numpy,nltk \
-    --ignored-classes=TensorProto,NodeProto \
-    --ignored-modules=tensorflow,torch,torch.quantization,torch.tensor,torchvision,mxnet,onnx,onnxruntime,neural_compressor,neural_compressor.benchmark,intel_extension_for_transformers.neural_engine_py,cv2,PIL.Image \
-    /GenAIExamples/intel_extension_for_transformers >> ${log_dir}/pylint.json
-exit_code2=$?
 
 $BOLD_YELLOW && echo " -----------------  Current log file output start --------------------------" && $RESET
 cat ${log_dir}/pylint.json
