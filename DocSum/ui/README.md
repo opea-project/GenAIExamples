@@ -7,7 +7,6 @@
 ![project-screenshot](https://imgur.com/KOSeGa8.png)
 ![project-screenshot](https://imgur.com/AWuBhjQ.png)
 
-
 <h2>🧐 Features</h2>
 
 Here're some of the project's features:
@@ -23,9 +22,9 @@ Here're some of the project's features:
 2. cd command to the current folder.
 
 3. Modify the required .env variables.
-    ```
-    BASIC_URL = ''
-    ```
+   ```
+   BASIC_URL = ''
+   ```
 4. Execute `npm install` to install the corresponding dependencies.
 
-5. Execute `npm run dev` in both enviroments
+5. Execute `npm run dev` in both environments

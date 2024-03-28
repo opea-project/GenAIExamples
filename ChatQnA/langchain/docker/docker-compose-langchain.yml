@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: '3'
+version: "3"
 services:
   qna-rag-redis-server:
     build:
@@ -34,6 +34,6 @@ services:
         soft: -1 # Set memlock to unlimited (no soft or hard limit)
         hard: -1
     volumes:
-      - ../redis:/ws 
+      - ../redis:/ws
       - ../test:/test
     network_mode: "host"

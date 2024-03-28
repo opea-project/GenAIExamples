@@ -3,9 +3,9 @@ docx2txt
 intel-extension-for-pytorch
 intel-openmp
 jupyter
-langchain_benchmarks
-langchain-cli
 langchain==0.1.12
+langchain-cli
+langchain_benchmarks
 poetry
 pyarrow
 pydantic==1.10.13

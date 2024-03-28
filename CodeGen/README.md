@@ -1,10 +1,11 @@
 Code generation is a noteworthy application of Large Language Model (LLM) technology. In this example, we present a Copilot application to showcase how code generation can be executed on the Intel Gaudi2 platform. This CodeGen use case involves code generation utilizing open source models such as "m-a-p/OpenCodeInterpreter-DS-6.7B", "deepseek-ai/deepseek-coder-33b-instruct" and Text Generation Inference on Intel Gaudi2.
 
-
 # Environment Setup
+
 To use [🤗 text-generation-inference](https://github.com/huggingface/text-generation-inference) on Intel Gaudi2, please follow these steps:
 
 ## Prepare Gaudi Image
+
 Getting started is straightforward with the official Docker container. Simply pull the image using:
 
 ```bash
@@ -20,11 +21,13 @@ bash ./tgi_gaudi/build_docker.sh
 ## Launch TGI Gaudi Service
 
 ### Launch a local server instance on 1 Gaudi card:
+
 ```bash
 bash ./tgi_gaudi/launch_tgi_service.sh
 ```
 
 ### Launch a local server instance on 4 Gaudi cards:
+
 ```bash
 bash ./tgi_gaudi/launch_tgi_service.sh 4 9000 "deepseek-ai/deepseek-coder-33b-instruct"
 ```
@@ -32,11 +35,13 @@ bash ./tgi_gaudi/launch_tgi_service.sh 4 9000 "deepseek-ai/deepseek-coder-33b-in
 ### Customize TGI Gaudi Service
 
 The ./tgi_gaudi/launch_tgi_service.sh script accepts three parameters:
+
 - num_cards: The number of Gaudi cards to be utilized, ranging from 1 to 8. The default is set to 1.
 - port_number: The port number assigned to the TGI Gaudi endpoint, with the default being 8080.
 - model_name: The model name utilized for LLM, with the default set to "m-a-p/OpenCodeInterpreter-DS-6.7B".
 
 You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the TGI Gaudi endpoint by exporting the environment variable `TGI_ENDPOINT`:
+
 ```bash
 export TGI_ENDPOINT="xxx.xxx.xxx.xxx:8080"
 ```
@@ -51,7 +56,7 @@ bash ./build_docker.sh
 cd ..
 ```
 
-### Lanuch Copilot Docker
+### Launch Copilot Docker
 
 ```bash
 docker run -it -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} --net=host --ipc=host -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:copilot bash
@@ -60,16 +65,15 @@ docker run -it -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} --net=h
 # Start Copilot Server
 
 ## Start the Backend Service
+
 Make sure TGI-Gaudi service is running and also make sure data is populated into Redis. Launch the backend service:
 
-Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token ans export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
-
+Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=<token>
 nohup python server.py &
 ```
-
 
 ## Install Copilot VSCode extension offline
 
@@ -102,11 +106,11 @@ For example:
 ![code suggestion](https://i.imgur.com/sH5UoTO.png)
 
 To provide programmers with a smooth experience, the Copilot supports multiple ways to trigger inline code suggestions. If you are interested in the details, they are summarized as follows:
+
 - Generate code from single-line comments: The simplest way introduced before.
 - Generate code from consecutive single-line comments:
 
 ![codegen from single-line comments](https://i.imgur.com/GZsQywX.png)
-
 
 - Generate code from multi-line comments, which will not be triggered until there is at least one `space` outside the multi-line comment):
 
@@ -121,13 +125,13 @@ To provide programmers with a smooth experience, the Copilot supports multiple w
 You can start a conversation with the AI programming assistant by clicking on the robot icon in the plugin bar on the left:
 ![icon](https://i.imgur.com/f7rzfCQ.png)
 
-
 Then you can see the conversation window on the left, where you can chat with AI assistant:
 ![dialog](https://i.imgur.com/aiYzU60.png)
 
 There are 4 areas worth noting:
+
 - Enter and submit your question
-- Your previous questions 
+- Your previous questions
 - Answers from AI assistant (Code will be highlighted properly according to the programming language it is written in, also support streaming output)
 - Copy or replace code with one click (Note that you need to select the code in the editor first and then click "replace", otherwise the code will be inserted)
 

@@ -71,6 +71,7 @@ unsafe_dict = {
     "O6": "Self-Harm",
 }
 
+
 def moderation_prompt_for_chat(chat):
     # For simplicity, we assume the chat dictionary correctly alternates "user" and "assistant" roles
     # Feel free to include error checking if needed

@@ -1,3 +1,19 @@
+<!--
+  Copyright (c) 2024 Intel Corporation
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
 <script lang="ts">
 	export let data;
 	import { ifStoreMsg, knowledge1 } from "$lib/shared/stores/common/Store";
@@ -50,7 +66,7 @@
 
 	function storeMessages() {
 		console.log('localStorage', chatMessages);
-		
+
 		localStorage.setItem(
 			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
 			JSON.stringify(chatMessages)
@@ -156,7 +172,7 @@
 			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0"
 		>
 			<div class="relative my-4 flex w-full flex-row justify-center">
-				<div class="foucs:border-none relative w-full">
+				<div class="focus:border-none relative w-full">
 					<input
 						class="text-md block w-full border-0 border-b-2 border-gray-300 px-1 py-4
 						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"

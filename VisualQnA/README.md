@@ -2,7 +2,6 @@
 
 This example guides you through how to deploy a [LLaVA](https://llava-vl.github.io/) (Large Language and Vision Assistant) model on Intel Gaudi2 to do visual question and answering task. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products/) for more details.
 
-
 ![llava screenshot](https://i.imgur.com/Sqmoql8.png)
 ![llava-screenshot](https://i.imgur.com/4wETEe7.png)
 
@@ -22,10 +21,11 @@ docker run -d -p 8084:80 -p 8085:8000 -v ./data:/root/.cache/huggingface/hub/ -e
 ```
 
 Here are some explanation about the above parameters:
-* `-p 8085:8000`: This will map the 8000 port of the LLaVA service inside the container to the 8085 port on the host
-* `-v ./data:/root/.cache/huggingface/hub/`: This is to prevent from re-downloading model files
-* `http_proxy` and `https_proxy` are used if you have some proxy setting
-* `--runtime=habana ...` is required for running this service on Intel Gaudi2
+
+- `-p 8085:8000`: This will map the 8000 port of the LLaVA service inside the container to the 8085 port on the host
+- `-v ./data:/root/.cache/huggingface/hub/`: This is to prevent from re-downloading model files
+- `http_proxy` and `https_proxy` are used if you have some proxy setting
+- `--runtime=habana ...` is required for running this service on Intel Gaudi2
 
 Now you have a LLaVa service with the exposed port `8085` and you can check whether this service is up by:
 
@@ -44,8 +44,9 @@ cd ui/
 pip install -r requirements.txt
 python app.py --host 0.0.0.0 --port 7860 --worker-addr http://localhost:8085 --share
 ```
+
 Here are some explanation about the above parameters:
 
-* `--host`: the host of the gradio app
-* `--port`: the port of the gradio app, by default 7860
-* `--worker-addr`: the LLaVA service IP address. If you setup the service on a different machine, please replace `localhost` to the IP address of your Gaudi2 host machine
+- `--host`: the host of the gradio app
+- `--port`: the port of the gradio app, by default 7860
+- `--worker-addr`: the LLaVA service IP address. If you setup the service on a different machine, please replace `localhost` to the IP address of your Gaudi2 host machine
