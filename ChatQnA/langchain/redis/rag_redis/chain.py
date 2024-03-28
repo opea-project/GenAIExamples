@@ -16,35 +16,28 @@
 # limitations under the License.
 
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Redis
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-from langchain_community.llms import HuggingFaceEndpoint
+from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL, TGI_LLM_ENDPOINT
 
-from rag_redis.config import (
-    EMBED_MODEL,
-    INDEX_NAME,
-    INDEX_SCHEMA,
-    REDIS_URL,
-    TGI_LLM_ENDPOINT,
-)
 
 # Make this look better in the docs.
 class Question(BaseModel):
     __root__: str
 
+
 # Init Embeddings
 embedder = HuggingFaceEmbeddings(model_name=EMBED_MODEL)
 
-#Setup semantic cache for LLM
+# Setup semantic cache for LLM
 from langchain.cache import RedisSemanticCache
 from langchain.globals import set_llm_cache
-set_llm_cache(RedisSemanticCache(
-    embedding=embedder,
-    redis_url=REDIS_URL
-))
+
+set_llm_cache(RedisSemanticCache(embedding=embedder, redis_url=REDIS_URL))
 
 # Connect to pre-loaded vectorstore
 # run the ingest.py script to populate this
@@ -85,12 +78,9 @@ model = HuggingFaceEndpoint(
     temperature=0.01,
     repetition_penalty=1.03,
     streaming=True,
-    truncate=1024
+    truncate=1024,
 )
 
 chain = (
-    RunnableParallel({"context": retriever, "question": RunnablePassthrough()})
-    | prompt
-    | model
-    | StrOutputParser()
+    RunnableParallel({"context": retriever, "question": RunnablePassthrough()}) | prompt | model | StrOutputParser()
 ).with_types(input_type=Question)

@@ -15,30 +15,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import multiprocessing
 import os
 import re
-import uuid
-import requests
 import unicodedata
-import multiprocessing
+import uuid
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urlunparse
-from datetime import timedelta, timezone, datetime
 
+import requests
+from bs4 import BeautifulSoup
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_community.vectorstores import Redis
 from langchain_core.documents import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-
 from rag_redis.config import INDEX_SCHEMA, REDIS_URL
 
+
 def get_current_beijing_time():
-    SHA_TZ = timezone(
-        timedelta(hours=8),
-        name='Asia/Shanghai'
-    )
+    SHA_TZ = timezone(timedelta(hours=8), name="Asia/Shanghai")
     utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
     beijing_time = utc_now.astimezone(SHA_TZ).strftime("%Y-%m-%d-%H:%M:%S")
     return beijing_time
@@ -64,66 +60,72 @@ class Crawler:
 
     def __init__(self, pool=None):
         if pool:
-            assert isinstance(pool, (str, list, tuple)), 'url pool should be str, list or tuple'
+            assert isinstance(pool, (str, list, tuple)), "url pool should be str, list or tuple"
         self.pool = pool
         self.headers = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng, \
-            */*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, \
-            like Gecko) Chrome/113.0.0.0 Safari/537.36'
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng, \
+            */*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, \
+            like Gecko) Chrome/113.0.0.0 Safari/537.36",
         }
         self.fetched_pool = set()
 
     def get_sublinks(self, soup):
         sublinks = []
-        for links in soup.find_all('a'):
-            sublinks.append(str(links.get('href')))
+        for links in soup.find_all("a"):
+            sublinks.append(str(links.get("href")))
         return sublinks
 
     def get_hyperlink(self, soup, base_url):
         sublinks = []
-        for links in soup.find_all('a'):
-            link = str(links.get('href'))
-            if link.startswith('#') or link is None or link == 'None':
+        for links in soup.find_all("a"):
+            link = str(links.get("href"))
+            if link.startswith("#") or link is None or link == "None":
                 continue
-            suffix = link.split('/')[-1]
-            if '.' in suffix and suffix.split('.')[-1] not in ['html', 'htmld']:
+            suffix = link.split("/")[-1]
+            if "." in suffix and suffix.split(".")[-1] not in ["html", "htmld"]:
                 continue
             link_parse = urlparse(link)
             base_url_parse = urlparse(base_url)
-            if link_parse.path == '':
+            if link_parse.path == "":
                 continue
-            if link_parse.netloc != '':
+            if link_parse.netloc != "":
                 # keep crawler works in the same domain
                 if link_parse.netloc != base_url_parse.netloc:
                     continue
                 sublinks.append(link)
             else:
-                sublinks.append(urlunparse((base_url_parse.scheme,
-                                            base_url_parse.netloc,
-                                            link_parse.path,
-                                            link_parse.params,
-                                            link_parse.query,
-                                            link_parse.fragment)))
+                sublinks.append(
+                    urlunparse(
+                        (
+                            base_url_parse.scheme,
+                            base_url_parse.netloc,
+                            link_parse.path,
+                            link_parse.params,
+                            link_parse.query,
+                            link_parse.fragment,
+                        )
+                    )
+                )
         return sublinks
 
     def fetch(self, url, headers=None, max_times=5):
         if not headers:
             headers = self.headers
         while max_times:
-            if not url.startswith('http') or not url.startswith('https'):
-                url = 'http://' + url
-            print('start fetch %s...', url)
+            if not url.startswith("http") or not url.startswith("https"):
+                url = "http://" + url
+            print("start fetch %s...", url)
             try:
                 response = requests.get(url, headers=headers, verify=True)
                 if response.status_code != 200:
-                    print('fail to fetch %s, response status code: %s', url, response.status_code)
+                    print("fail to fetch %s, response status code: %s", url, response.status_code)
                 else:
                     return response
             except Exception as e:
-                print('fail to fetch %s, caused by %s', url, e)
+                print("fail to fetch %s, caused by %s", url, e)
                 raise Exception(e)
             max_times -= 1
         return None
@@ -151,7 +153,7 @@ class Crawler:
             url_pool.update(sublinks)
             depth = 0
             while len(url_pool) > 0 and depth < max_depth:
-                print('current depth %s...', depth)
+                print("current depth %s...", depth)
                 mp = multiprocessing.Pool(processes=workers)
                 results = []
                 for sub_url in url_pool:
@@ -166,11 +168,11 @@ class Crawler:
                 depth += 1
 
     def parse(self, html_doc):
-        soup = BeautifulSoup(html_doc, 'lxml')
+        soup = BeautifulSoup(html_doc, "lxml")
         return soup
 
     def download(self, url, file_name):
-        print('download %s into %s...', url, file_name)
+        print("download %s into %s...", url, file_name)
         try:
             r = requests.get(url, stream=True, headers=self.headers, verify=True)
             f = open(file_name, "wb")
@@ -178,26 +180,26 @@ class Crawler:
                 if chunk:
                     f.write(chunk)
         except Exception as e:
-            print('fail to download %s, caused by %s', url, e)
+            print("fail to download %s, caused by %s", url, e)
 
     def get_base_url(self, url):
         result = urlparse(url)
-        return urlunparse((result.scheme, result.netloc, '', '', '', ''))
+        return urlunparse((result.scheme, result.netloc, "", "", "", ""))
 
     def clean_text(self, text):
-        text = text.strip().replace('\r', '\n')
-        text = re.sub(' +', ' ', text)
-        text = re.sub('\n+', '\n', text)
-        text = text.split('\n')
-        return '\n'.join([i for i in text if i and i != ' '])
+        text = text.strip().replace("\r", "\n")
+        text = re.sub(" +", " ", text)
+        text = re.sub("\n+", "\n", text)
+        text = text.split("\n")
+        return "\n".join([i for i in text if i and i != " "])
 
 
 def uni_pro(text):
     """Check if the character is ASCII or falls in the category of non-spacing marks."""
-    normalized_text = unicodedata.normalize('NFKD', text)
-    filtered_text = ''
+    normalized_text = unicodedata.normalize("NFKD", text)
+    filtered_text = ""
     for char in normalized_text:
-        if ord(char) < 128 or unicodedata.category(char) == 'Mn':
+        if ord(char) < 128 or unicodedata.category(char) == "Mn":
             filtered_text += char
     return filtered_text
 
@@ -205,28 +207,28 @@ def uni_pro(text):
 def load_html_data(url):
     crawler = Crawler()
     res = crawler.fetch(url)
-    if res == None:
+    if res is None:
         return None
     soup = crawler.parse(res.text)
-    all_text = crawler.clean_text(soup.select_one('body').text)
-    main_content = ''
-    for element_name in ['main', 'container']:
+    all_text = crawler.clean_text(soup.select_one("body").text)
+    main_content = ""
+    for element_name in ["main", "container"]:
         main_block = None
-        if soup.select(f'.{element_name}'):
-            main_block = soup.select(f'.{element_name}')
-        elif soup.select(f'#{element_name}'):
-            main_block = soup.select(f'#{element_name}')
+        if soup.select(f".{element_name}"):
+            main_block = soup.select(f".{element_name}")
+        elif soup.select(f"#{element_name}"):
+            main_block = soup.select(f"#{element_name}")
         if main_block:
             for element in main_block:
                 text = crawler.clean_text(element.text)
                 if text not in main_content:
-                    main_content += f'\n{text}'
+                    main_content += f"\n{text}"
             main_content = crawler.clean_text(main_content)
 
-    main_content = main_content.replace('\n', '')
-    main_content = main_content.replace('\n\n', '')
+    main_content = main_content.replace("\n", "")
+    main_content = main_content.replace("\n\n", "")
     main_content = uni_pro(main_content)
-    main_content = re.sub(r'\s+', ' ', main_content)
+    main_content = re.sub(r"\s+", " ", main_content)
 
     # {'text': all_text, 'main_content': main_content}
 
@@ -235,22 +237,22 @@ def load_html_data(url):
 
 def get_chuck_data(content, max_length, min_length, input):
     """Process the context to make it maintain a suitable length for the generation."""
-    sentences = re.split('(?<=[!.?])', content)
+    sentences = re.split("(?<=[!.?])", content)
 
     paragraphs = []
     current_length = 0
     count = 0
     current_paragraph = ""
     for sub_sen in sentences:
-        count +=1
+        count += 1
         sentence_length = len(sub_sen)
         if current_length + sentence_length <= max_length:
             current_paragraph += sub_sen
             current_length += sentence_length
-            if count == len(sentences) and len(current_paragraph.strip())>min_length:
-                paragraphs.append([current_paragraph.strip() ,input])
+            if count == len(sentences) and len(current_paragraph.strip()) > min_length:
+                paragraphs.append([current_paragraph.strip(), input])
         else:
-            paragraphs.append([current_paragraph.strip() ,input])
+            paragraphs.append([current_paragraph.strip(), input])
             current_paragraph = sub_sen
             current_length = sentence_length
 
@@ -258,21 +260,19 @@ def get_chuck_data(content, max_length, min_length, input):
 
 
 def parse_html(input):
-        """
-        Parse the uploaded file.
-        """
-        chucks = []
-        for link in input:
-            if re.match(r'^https?:/{2}\w.+$', link):
-                content = load_html_data(link)
-                if content == None:
-                    continue
-                chuck = [[content.strip(), link]]
-                chucks += chuck
-            else:
-                print("The given link/str {} cannot be parsed.".format(link))
+    """Parse the uploaded file."""
+    chucks = []
+    for link in input:
+        if re.match(r"^https?:/{2}\w.+$", link):
+            content = load_html_data(link)
+            if content is None:
+                continue
+            chuck = [[content.strip(), link]]
+            chucks += chuck
+        else:
+            print("The given link/str {} cannot be parsed.".format(link))
 
-        return chucks
+    return chucks
 
 
 def document_transfer(data_collection):
@@ -280,7 +280,7 @@ def document_transfer(data_collection):
     documents = []
     for data, meta in data_collection:
         doc_id = str(uuid.uuid4())
-        metadata = {"source": meta, "identify_id":doc_id}
+        metadata = {"source": meta, "identify_id": doc_id}
         doc = Document(page_content=data, metadata=metadata)
         documents.append(doc)
     return documents
@@ -288,9 +288,7 @@ def document_transfer(data_collection):
 
 def create_retriever_from_files(doc, embeddings, index_name: str):
     print(f"[rag - create retriever] create with index: {index_name}")
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1500, chunk_overlap=100, add_start_index=True
-    )
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
     loader = UnstructuredFileLoader(doc, mode="single", strategy="fast")
     chunks = loader.load_and_split(text_splitter)
 
@@ -313,7 +311,7 @@ def create_retriever_from_links(embeddings, link_list: list, index_name):
     metadatas = []
     for data, meta in data_collection:
         doc_id = str(uuid.uuid4())
-        metadata = {"source": meta, "identify_id":doc_id}
+        metadata = {"source": meta, "identify_id": doc_id}
         texts.append(data)
         metadatas.append(metadata)
 
