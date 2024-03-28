@@ -13,13 +13,13 @@
 # limitations under the License.
 
 text:
-- name: content
-- name: source
+  - name: content
+  - name: source
 numeric:
-- name: start_index
+  - name: start_index
 vector:
-- name: content_vector
-  algorithm: HNSW
-  datatype: FLOAT32
-  dims: 1024
-  distance_metric: COSINE
+  - name: content_vector
+    algorithm: HNSW
+    datatype: FLOAT32
+    dims: 1024
+    distance_metric: COSINE

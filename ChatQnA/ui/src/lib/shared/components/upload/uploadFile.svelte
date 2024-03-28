@@ -1,3 +1,19 @@
+<!--
+  Copyright (c) 2024 Intel Corporation
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
 <script lang="ts">
 	import { Drawer, Button, CloseButton, Tabs, TabItem } from "flowbite-svelte";
 	import { InfoCircleSolid } from "flowbite-svelte-icons";
@@ -131,7 +147,7 @@
 	</p>
 	<Tabs
 		style="full"
-		defaultClass="flex rounded-lg divide-x rtl:divide-x-reverse divide-gray-200 shadow dark:divide-gray-700 foucs:ring-0"
+		defaultClass="flex rounded-lg divide-x rtl:divide-x-reverse divide-gray-200 shadow dark:divide-gray-700 focus:ring-0"
 	>
 		<TabItem class="w-full" open>
 			<span slot="title">Upload File</span>
