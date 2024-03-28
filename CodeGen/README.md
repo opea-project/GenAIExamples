@@ -1,4 +1,22 @@
-Code generation is a noteworthy application of Large Language Model (LLM) technology. In this example, we present a Copilot application to showcase how code generation can be executed on the Intel Gaudi2 platform. This CodeGen use case involves code generation utilizing open source models such as "m-a-p/OpenCodeInterpreter-DS-6.7B", "deepseek-ai/deepseek-coder-33b-instruct" and Text Generation Inference on Intel Gaudi2.
+# Code Generation
+
+Code-generating LLMs are specialized AI models designed for the task of generating computer code. Such models undergo training with datasets that encompass repositories, specialized documentation, programming code, relevant web content, and other related data. They possess a deep understanding of various programming languages, coding patterns, and software development concepts. Code LLMs are engineered to assist developers and programmers. When these LLMs are seamlessly integrated into the developer's Integrated Development Environment (IDE), they possess a comprehensive understanding of the coding context, which includes elements such as comments, function names, and variable names. This contextual awareness empowers them to provide more refined and contextually relevant coding suggestions.
+
+Capabilities of LLMs in Coding:
+
+- Code Generation: streamline coding through Code Generation, enabling non-programmers to describe tasks for code creation.
+- Code Completion: accelerate coding by suggesting contextually relevant snippets as developers type.
+- Code Translation and Modernization: translate and modernize code across multiple programming languages, aiding interoperability and updating legacy projects.
+- Code summarization: extract key insights from codebases, improving readability and developer productivity.
+- Code Refactoring: offer suggestions for code refactoring, enhancing code performance and efficiency.
+- AI-Assisted Testing: assist in creating test cases, ensuring code robustness and accelerating development cycles.
+- Error Detection and Debugging: detect errors in code and provide detailed descriptions and potential fixes, expediting debugging processes.
+
+In this example, we present a Code Copilot application to showcase how code generation can be executed on the Intel Gaudi2 platform. This CodeGen use case involves code generation utilizing open source models such as "m-a-p/OpenCodeInterpreter-DS-6.7B", "deepseek-ai/deepseek-coder-33b-instruct" and Text Generation Inference on Intel Gaudi2.
+
+CodeGen architecture shows below:
+
+![architecture](https://i.imgur.com/G9ozwFX.png)
 
 # Environment Setup
 
@@ -15,7 +33,7 @@ docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 Alternatively, you can build the Docker image yourself with:
 
 ```bash
-bash ./tgi_gaudi/build_docker.sh
+bash ./serving/tgi_gaudi/build_docker.sh
 ```
 
 ## Launch TGI Gaudi Service
@@ -23,13 +41,13 @@ bash ./tgi_gaudi/build_docker.sh
 ### Launch a local server instance on 1 Gaudi card:
 
 ```bash
-bash ./tgi_gaudi/launch_tgi_service.sh
+bash ./serving/tgi_gaudi/launch_tgi_service.sh
 ```
 
 ### Launch a local server instance on 4 Gaudi cards:
 
 ```bash
-bash ./tgi_gaudi/launch_tgi_service.sh 4 9000 "deepseek-ai/deepseek-coder-33b-instruct"
+bash ./serving/tgi_gaudi/launch_tgi_service.sh 4 9000 "deepseek-ai/deepseek-coder-33b-instruct"
 ```
 
 ### Customize TGI Gaudi Service
@@ -43,7 +61,7 @@ The ./tgi_gaudi/launch_tgi_service.sh script accepts three parameters:
 You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the TGI Gaudi endpoint by exporting the environment variable `TGI_ENDPOINT`:
 
 ```bash
-export TGI_ENDPOINT="xxx.xxx.xxx.xxx:8080"
+export TGI_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
 ## Launch Copilot Docker
@@ -75,13 +93,13 @@ export HUGGINGFACEHUB_API_TOKEN=<token>
 nohup python server.py &
 ```
 
-## Install Copilot VSCode extension offline
+The Copilot backend defaults to listening on port 8000, but you can adjust the port number as needed.
 
-Copy the vsix file `copilot-0.0.1.vsix` to local and install it in VSCode as below.
+# Install Copilot VSCode extension from Plugin Marketplace
 
-![Install-screenshot](https://i.imgur.com/JXQ3rqE.jpg)
+Install `Neural Copilot` in VSCode as below.
 
-We will be also releasing the plugin in Visual Studio Code plugin market to facilitate the installation.
+![Install-screenshot](https://i.imgur.com/cnHRAdD.png)
 
 # How to use
 
@@ -90,7 +108,7 @@ We will be also releasing the plugin in Visual Studio Code plugin market to faci
 Please adjust the service URL in the extension settings based on the endpoint of the code generation backend service.
 
 ![Setting-screenshot](https://i.imgur.com/4hjvKPu.png)
-![Setting-screenshot](https://i.imgur.com/JfJVFV3.png)
+![Setting-screenshot](https://i.imgur.com/AQZuzqd.png)
 
 ## Customize
 
@@ -98,7 +116,7 @@ The Copilot enables users to input their corresponding sensitive information and
 
 ![Customize](https://i.imgur.com/PkObak9.png)
 
-## Code suggestion
+## Code Suggestion
 
 To trigger inline completion, you'll need to type # {your keyword} (start with your programming language's comment keyword, like // in C++ and # in python). Make sure Inline Suggest is enabled from the VS Code Settings.
 For example:
@@ -123,9 +141,11 @@ To provide programmers with a smooth experience, the Copilot supports multiple w
 ## Chat with AI assistant
 
 You can start a conversation with the AI programming assistant by clicking on the robot icon in the plugin bar on the left:
+
 ![icon](https://i.imgur.com/f7rzfCQ.png)
 
 Then you can see the conversation window on the left, where you can chat with AI assistant:
+
 ![dialog](https://i.imgur.com/aiYzU60.png)
 
 There are 4 areas worth noting:
