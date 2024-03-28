@@ -77,14 +77,11 @@ nohup python server.py &
 
 The Copilot backend defaults to listening on port 8000, but you can adjust the port number as needed.
 
-
-
 # Install Copilot VSCode extension from Plugin Marketplace
 
 Install `Neural Copilot` in VSCode as below.
 
 ![Install-screenshot](https://i.imgur.com/cnHRAdD.png)
-
 
 # How to use
 
