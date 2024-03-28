@@ -176,7 +176,7 @@ async def rag_chat(request: Request):
 
 
 @router.post("/v1/rag/chat_stream")
-async def rag_chat(request: Request):
+async def rag_chat_stream(request: Request):
     params = await request.json()
     print(f"[rag - chat_stream] POST request: /v1/rag/chat_stream, params:{params}")
     query = params['query']
@@ -276,7 +276,7 @@ async def rag_create(file: UploadFile = File(...)):
 
 
 @router.post("/v1/rag/upload_link")
-async def rag_create(request: Request):
+async def rag_upload_link(request: Request):
     params = await request.json()
     link_list = params['link_list']
     print(f"[rag - upload_link] POST request: /v1/rag/upload_link, link list:{link_list}")
