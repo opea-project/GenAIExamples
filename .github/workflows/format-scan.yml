@@ -61,4 +61,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.job_name }}
-          path: ${{ github.workspace }}/.github/workflows/script/formatScan/${{ matrix.job_name }}.*
+          path: ${{ github.workspace }}/.github/workflows/scripts/formatScan/${{ matrix.job_name }}.*
