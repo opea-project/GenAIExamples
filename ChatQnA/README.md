@@ -1,4 +1,4 @@
-This ChatQnA use case performs RAG using LangChain, Redis vectordb and Text Generation Inference on Intel Gaudi2. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
+This ChatQnA use case performs RAG using LangChain, Redis vectordb, Text Generation Inference and Intel LLM-on-Ray on Intel Gaudi2. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
 # Environment Setup
 For deploying model service on Gaudi/Gaudi2, you can choose HuggingFace [text-generation-inference](https://github.com/huggingface/text-generation-inference) or Intel [llm-on-ray](https://github.com/intel/llm-on-ray) kit.
