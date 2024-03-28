@@ -1,18 +1,34 @@
-from bs4 import BeautifulSoup
-import docx2txt
-from langchain.document_loaders import PyPDFLoader
-from langchain.docstore.document import Document
-from langchain.text_splitter import CharacterTextSplitter
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import re
-import requests
 import uuid
-from datetime import timedelta, timezone, datetime
+from datetime import datetime, timedelta, timezone
+
+import docx2txt
+import requests
+from bs4 import BeautifulSoup
+from langchain.docstore.document import Document
+from langchain.document_loaders import PyPDFLoader
+from langchain.text_splitter import CharacterTextSplitter
+
 
 def get_current_beijing_time():
-    SHA_TZ = timezone(
-        timedelta(hours=8),
-        name='Asia/Shanghai'
-    )
+    SHA_TZ = timezone(timedelta(hours=8), name="Asia/Shanghai")
     utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
     beijing_time = utc_now.astimezone(SHA_TZ).strftime("%Y-%m-%d-%H:%M:%S")
     return beijing_time
@@ -20,12 +36,12 @@ def get_current_beijing_time():
 
 emoji_pattern = re.compile(
     "["
-    u"\U0001F600-\U0001F64F"  # emoticons
-    u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-    u"\U0001F680-\U0001F6FF"  # transport & map symbols
-    u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-    u"\U00002702-\U000027B0"
-    u"\U000024C2-\U0001F251"
+    "\U0001F600-\U0001F64F"  # emoticons
+    "\U0001F300-\U0001F5FF"  # symbols & pictographs
+    "\U0001F680-\U0001F6FF"  # transport & map symbols
+    "\U0001F1E0-\U0001F1FF"  # flags (iOS)
+    "\U00002702-\U000027B0"
+    "\U000024C2-\U0001F251"
     "]+",
     flags=re.UNICODE,
 )
@@ -38,7 +54,7 @@ def clean_text(x):
     x = re.sub(r"#\S+", " ", x)  # hastags
     x = re.sub(r"\s{2,}", " ", x)  # over spaces
     x = emoji_pattern.sub(r"", x)  # emojis
-    x = re.sub("[^.,!?A-Za-z0-9]+", " ", x)  # special charachters except .,!?
+    x = re.sub("[^.,!?A-Za-z0-9]+", " ", x)  # special characters except .,!?
 
     return x
 
@@ -80,7 +96,7 @@ def read_pdf(file):
 
 def read_text_from_file(file, save_file_name):
     # read text file
-    if file.headers["content-type"]  == "text/plain":
+    if file.headers["content-type"] == "text/plain":
         file.file.seek(0)
         content = file.file.read().decode("utf-8")
         # Split text
@@ -93,10 +109,7 @@ def read_text_from_file(file, save_file_name):
         file_content = read_pdf(save_file_name)
 
     # read docx file
-    elif (
-        file.headers["content-type"]
-        == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ):
+    elif file.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
         file_content = docx2txt.process(file)
 
     doc_id = f"doc_{str(uuid.uuid1())[:8]}"

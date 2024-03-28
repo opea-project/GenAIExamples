@@ -1,3 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 
 
@@ -28,7 +45,7 @@ def get_boolean_env_var(var_name, default_value=False):
 
 
 # Check for openai API key
-#if "OPENAI_API_KEY" not in os.environ:
+# if "OPENAI_API_KEY" not in os.environ:
 #    raise Exception("Must provide an OPENAI_API_KEY as an env var.")
 
 
@@ -77,5 +94,5 @@ parent_dir = os.path.dirname(current_file_path)
 REDIS_SCHEMA = os.getenv("REDIS_SCHEMA", "schema.yml")
 schema_path = os.path.join(parent_dir, REDIS_SCHEMA)
 INDEX_SCHEMA = schema_path
-TGI_ENDPOINT = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
-TGI_ENDPOINT_NO_RAG = os.getenv("TGI_ENDPOINT_NO_RAG", "http://localhost:8081")
+TGI_LLM_ENDPOINT = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
+TGI_LLM_ENDPOINT_NO_RAG = os.getenv("TGI_LLM_ENDPOINT_NO_RAG", "http://localhost:8081")

@@ -1,33 +1,43 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Redis
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-from langchain_community.llms import HuggingFaceEndpoint
+from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL, TGI_LLM_ENDPOINT
 
-from rag_redis.config import (
-    EMBED_MODEL,
-    INDEX_NAME,
-    INDEX_SCHEMA,
-    REDIS_URL,
-    TGI_ENDPOINT,
-)
 
 # Make this look better in the docs.
 class Question(BaseModel):
     __root__: str
 
+
 # Init Embeddings
 embedder = HuggingFaceEmbeddings(model_name=EMBED_MODEL)
 
-#Setup semantic cache for LLM
+# Setup semantic cache for LLM
 from langchain.cache import RedisSemanticCache
 from langchain.globals import set_llm_cache
-set_llm_cache(RedisSemanticCache(
-    embedding=embedder,
-    redis_url=REDIS_URL
-))
+
+set_llm_cache(RedisSemanticCache(embedding=embedder, redis_url=REDIS_URL))
 
 # Connect to pre-loaded vectorstore
 # run the ingest.py script to populate this
@@ -60,7 +70,7 @@ prompt = ChatPromptTemplate.from_template(template)
 
 # RAG Chain
 model = HuggingFaceEndpoint(
-    endpoint_url=TGI_ENDPOINT,
+    endpoint_url=TGI_LLM_ENDPOINT,
     max_new_tokens=512,
     top_k=10,
     top_p=0.95,
@@ -68,12 +78,9 @@ model = HuggingFaceEndpoint(
     temperature=0.01,
     repetition_penalty=1.03,
     streaming=True,
-    truncate=1024
+    truncate=1024,
 )
 
 chain = (
-    RunnableParallel({"context": retriever, "question": RunnablePassthrough()})
-    | prompt
-    | model
-    | StrOutputParser()
+    RunnableParallel({"context": retriever, "question": RunnablePassthrough()}) | prompt | model | StrOutputParser()
 ).with_types(input_type=Question)

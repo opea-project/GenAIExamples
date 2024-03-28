@@ -15,28 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import requests
 import json
+import os
 import types
 from concurrent import futures
 from typing import Optional
-from fastapi import FastAPI, APIRouter
+
+import requests
+from fastapi import APIRouter, FastAPI
 from fastapi.responses import RedirectResponse, StreamingResponse
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_core.pydantic_v1 import BaseModel
-from starlette.middleware.cors import CORSMiddleware
 from openai_protocol import ChatCompletionRequest, ChatCompletionResponse
+from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"])
+    CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
+)
+
 
 class CodeGenAPIRouter(APIRouter):
     def __init__(self, entrypoint) -> None:
@@ -68,11 +67,13 @@ class CodeGenAPIRouter(APIRouter):
                 generator = self.llm(request.prompt, callbacks=[StreamingStdOutCallbackHandler()])
                 if not self.is_generator(generator):
                     generator = (generator,)
+
                 def stream_generator():
                     nonlocal buffered_texts
                     for output in generator:
                         yield f"data: {output}\n\n"
-                    yield f"data: [DONE]\n\n"
+                    yield "data: [DONE]\n\n"
+
                 return StreamingResponse(stream_generator(), media_type="text/event-stream")
             else:
                 response = self.llm(request.prompt)
@@ -82,10 +83,12 @@ class CodeGenAPIRouter(APIRouter):
             print("Chat completion finished.")
             return ChatCompletionResponse(response=response)
 
+
 tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
 router = CodeGenAPIRouter(tgi_endpoint)
 
 app.include_router(router)
+
 
 def check_completion_request(request: BaseModel) -> Optional[str]:
     if request.temperature is not None and request.temperature < 0:
@@ -111,6 +114,7 @@ def check_completion_request(request: BaseModel) -> Optional[str]:
 
     return None
 
+
 def filter_code_format(code):
     language_prefixes = {
         "go": "```go",
@@ -118,7 +122,7 @@ def filter_code_format(code):
         "cpp": "```cpp",
         "java": "```java",
         "python": "```python",
-        "typescript": "```typescript"
+        "typescript": "```typescript",
     }
     suffix = "\n```"
 
@@ -140,6 +144,7 @@ def filter_code_format(code):
 
     return code
 
+
 # router /v1/code_generation only supports non-streaming mode.
 @router.post("/v1/code_generation")
 async def code_generation_endpoint(chat_request: ChatCompletionRequest):
@@ -148,11 +153,11 @@ async def code_generation_endpoint(chat_request: ChatCompletionRequest):
 
         def send_request(port):
             try:
-                url = f'http://{router.host}:{port}/v1/code_generation'
+                url = f"http://{router.host}:{port}/v1/code_generation"
                 response = requests.post(url, json=chat_request.dict())
                 response.raise_for_status()
                 json_response = json.loads(response.content)
-                cleaned_code = filter_code_format(json_response['response'])
+                cleaned_code = filter_code_format(json_response["response"])
                 chat_completion_response = ChatCompletionResponse(response=cleaned_code)
                 responses.append(chat_completion_response)
             except requests.exceptions.RequestException as e:
@@ -169,28 +174,32 @@ async def code_generation_endpoint(chat_request: ChatCompletionRequest):
             raise RuntimeError("Invalid parameter.")
         return router.handle_chat_completion_request(chat_request)
 
+
 # router /v1/code_chat supports both non-streaming and streaming mode.
 @router.post("/v1/code_chat")
 async def code_chat_endpoint(chat_request: ChatCompletionRequest):
     if router.use_deepspeed:
         if chat_request.stream:
             responses = []
+
             def generate_stream(port):
-                url = f'http://{router.host}:{port}/v1/code_generation'
+                url = f"http://{router.host}:{port}/v1/code_generation"
                 response = requests.post(url, json=chat_request.dict(), stream=True, timeout=1000)
                 responses.append(response)
+
             with futures.ThreadPoolExecutor(max_workers=router.world_size) as executor:
                 worker_ports = [router.port + i + 1 for i in range(router.world_size)]
                 executor.map(generate_stream, worker_ports)
 
             while not responses:
                 pass
+
             def generate():
                 if responses[0]:
                     for chunk in responses[0].iter_lines(decode_unicode=False, delimiter=b"\0"):
                         if chunk:
                             yield f"data: {chunk}\n\n"
-                    yield f"data: [DONE]\n\n"
+                    yield "data: [DONE]\n\n"
 
             return StreamingResponse(generate(), media_type="text/event-stream")
         else:
@@ -198,11 +207,11 @@ async def code_chat_endpoint(chat_request: ChatCompletionRequest):
 
             def send_request(port):
                 try:
-                    url = f'http://{router.host}:{port}/v1/code_generation'
+                    url = f"http://{router.host}:{port}/v1/code_generation"
                     response = requests.post(url, json=chat_request.dict())
                     response.raise_for_status()
                     json_response = json.loads(response.content)
-                    chat_completion_response = ChatCompletionResponse(response=json_response['response'])
+                    chat_completion_response = ChatCompletionResponse(response=json_response["response"])
                     responses.append(chat_completion_response)
                 except requests.exceptions.RequestException as e:
                     print(f"Error sending/receiving on port {port}: {e}")
@@ -218,12 +227,13 @@ async def code_chat_endpoint(chat_request: ChatCompletionRequest):
             raise RuntimeError("Invalid parameter.")
         return router.handle_chat_completion_request(chat_request)
 
+
 @app.get("/")
 async def redirect_root_to_docs():
     return RedirectResponse("/docs")
+
 
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
