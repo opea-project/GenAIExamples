@@ -21,9 +21,8 @@ pipdeptree
 python -m pylint -f json --disable=R,C,W,E1129 \
     --enable=line-too-long \
     --max-line-length=120 \
-    --extension-pkg-whitelist=numpy,nltk \
-    --ignored-classes=TensorProto,NodeProto \
-    --ignored-modules=tensorflow,torch,torch.quantization,torch.tensor,torchvision,mxnet,onnx,onnxruntime,neural_compressor,neural_compressor.benchmark,intel_extension_for_transformers.neural_engine_py,cv2,PIL.Image \
+    --recursive=true \
+    --ignored-modules=tensorflow,torch,torchvision \
     /GenAIExamples >${log_dir}/pylint.json
 exit_code1=$?
 
