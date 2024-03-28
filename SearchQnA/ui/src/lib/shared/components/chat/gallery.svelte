@@ -12,7 +12,7 @@
 
 	export let items;
 	export let label: string;
-	export let scrollName: string;	
+	export let scrollName: string;
 
 	onMount(async () => {
 		scrollToDiv = document

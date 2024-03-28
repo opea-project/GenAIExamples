@@ -2,7 +2,7 @@
 	import { isCheckedStore } from "$lib/shared/stores/common/Store";
 
 	let isChecked = false;
-	
+
     $: isChecked ? isCheckedStore.set(isChecked) : '';
 </script>
 

@@ -7,7 +7,6 @@ Neural Chat</h1>
 ![project-screenshot](https://imgur.com/iGTDcwU.png)
 ![project-screenshot](https://imgur.com/cbJi5gj.png)
 
-
 <h2>🧐 Features</h2>
 
 Here're some of the project's features:
@@ -26,9 +25,9 @@ Here're some of the project's features:
 2. cd command to the current folder.
 
 3. Modify the required .env variables.
-    ```
-    PDF_BASE_URL = ''
-    ```
+   ```
+   PDF_BASE_URL = ''
+   ```
 4. Execute `npm install` to install the corresponding dependencies.
 
-5. Execute `npm run dev` in both enviroments
+5. Execute `npm run dev` in both environments

@@ -40,4 +40,3 @@ export function formatTime(seconds) {
     const remainingSeconds = String(seconds % 60).padStart(2, '0');
     return `${hours}:${minutes}:${remainingSeconds}`;
 }
-

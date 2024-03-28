@@ -9,7 +9,7 @@ export enum MessageType {
 
 type Map<T> = T extends MessageType.Text | MessageType.SingleAudio ? string :
 				T extends MessageType.AudioList ? string[] :
-				T extends MessageType.SingleImage ? { imgSrc: string; imgId: string; } : 
+				T extends MessageType.SingleImage ? { imgSrc: string; imgId: string; } :
 				{ imgSrc: string; imgId: string; }[];
 
 export interface Message {

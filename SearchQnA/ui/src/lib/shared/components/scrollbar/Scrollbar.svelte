@@ -10,7 +10,7 @@
         <div class={classLayout}>
             <slot></slot>
         </div>
-    </Svroller>	
+    </Svroller>
 </div>
 
 <style>
