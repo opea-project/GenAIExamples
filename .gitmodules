@@ -1,0 +1,3 @@
+[submodule "ChatQnA/serving/ray_gaudi/llm-on-ray"]
+	path = ChatQnA/serving/ray_gaudi/llm-on-ray
+	url = https://github.com/intel/llm-on-ray.git
