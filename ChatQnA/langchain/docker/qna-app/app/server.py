@@ -4,12 +4,12 @@ from fastapi.responses import RedirectResponse, StreamingResponse, JSONResponse
 from langserve import add_routes
 from starlette.middleware.cors import CORSMiddleware
 from langchain_community.llms import HuggingFaceEndpoint
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.embeddings import HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import RunnablePassthrough
-from rag_redis.config import EMBED_MODEL, INDEX_NAME, REDIS_URL, INDEX_SCHEMA
+from rag_redis.config import INDEX_NAME, REDIS_URL, INDEX_SCHEMA
 from utils import (
     create_retriever_from_files, reload_retriever, create_kb_folder, 
     get_current_beijing_time, create_retriever_from_links
@@ -29,7 +29,7 @@ app.add_middleware(
 
 class RAGAPIRouter(APIRouter):
 
-    def __init__(self, upload_dir, entrypoint, safety_guard_endpoint) -> None:
+    def __init__(self, upload_dir, entrypoint, safety_guard_endpoint, tei_endpoint) -> None:
         super().__init__()
         self.upload_dir = upload_dir
         self.entrypoint = entrypoint
@@ -61,7 +61,9 @@ class RAGAPIRouter(APIRouter):
         print("[rag - router] LLM initialized.")
 
         # Define LLM Chain
-        self.embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
+        # construct embeddings using hf endpoint
+        self.embeddings = HuggingFaceHubEmbeddings(model=tei_endpoint)
+
         rds = Redis.from_existing_index(
             self.embeddings,
             index_name=INDEX_NAME,
@@ -112,7 +114,8 @@ class RAGAPIRouter(APIRouter):
 upload_dir = os.getenv("RAG_UPLOAD_DIR", "./upload_dir")
 tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
 safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT")
-router = RAGAPIRouter(upload_dir, tgi_endpoint, safety_guard_endpoint)
+tei_endpoint = os.getenv("TEI_ENDPOINT", "http://localhost:8081")
+router = RAGAPIRouter(upload_dir, tgi_endpoint, safety_guard_endpoint, tei_endpoint)
 
 
 @router.post("/v1/rag/chat")
