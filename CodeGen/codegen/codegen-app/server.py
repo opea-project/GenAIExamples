@@ -66,6 +66,8 @@ class CodeGenAPIRouter(APIRouter):
             buffered_texts = ""
             if request.stream:
                 generator = self.llm(request.prompt, callbacks=[StreamingStdOutCallbackHandler()])
+                breakpoint()
+                print("generator================", generator)
                 if not self.is_generator(generator):
                     generator = (generator,)
                 def stream_generator():
@@ -84,8 +86,6 @@ class CodeGenAPIRouter(APIRouter):
 
 tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
 router = CodeGenAPIRouter(tgi_endpoint)
-
-app.include_router(router)
 
 def check_completion_request(request: BaseModel) -> Optional[str]:
     if request.temperature is not None and request.temperature < 0:
@@ -143,80 +143,20 @@ def filter_code_format(code):
 # router /v1/code_generation only supports non-streaming mode.
 @router.post("/v1/code_generation")
 async def code_generation_endpoint(chat_request: ChatCompletionRequest):
-    if router.use_deepspeed:
-        responses = []
-
-        def send_request(port):
-            try:
-                url = f'http://{router.host}:{port}/v1/code_generation'
-                response = requests.post(url, json=chat_request.dict())
-                response.raise_for_status()
-                json_response = json.loads(response.content)
-                cleaned_code = filter_code_format(json_response['response'])
-                chat_completion_response = ChatCompletionResponse(response=cleaned_code)
-                responses.append(chat_completion_response)
-            except requests.exceptions.RequestException as e:
-                print(f"Error sending/receiving on port {port}: {e}")
-
-        with futures.ThreadPoolExecutor(max_workers=router.world_size) as executor:
-            worker_ports = [router.port + i + 1 for i in range(router.world_size)]
-            executor.map(send_request, worker_ports)
-        if responses:
-            return responses[0]
-    else:
-        ret = check_completion_request(chat_request)
-        if ret is not None:
-            raise RuntimeError("Invalid parameter.")
-        return router.handle_chat_completion_request(chat_request)
+    ret = check_completion_request(chat_request)
+    if ret is not None:
+        raise RuntimeError("Invalid parameter.")
+    return router.handle_chat_completion_request(chat_request)
 
 # router /v1/code_chat supports both non-streaming and streaming mode.
 @router.post("/v1/code_chat")
 async def code_chat_endpoint(chat_request: ChatCompletionRequest):
-    if router.use_deepspeed:
-        if chat_request.stream:
-            responses = []
-            def generate_stream(port):
-                url = f'http://{router.host}:{port}/v1/code_generation'
-                response = requests.post(url, json=chat_request.dict(), stream=True, timeout=1000)
-                responses.append(response)
-            with futures.ThreadPoolExecutor(max_workers=router.world_size) as executor:
-                worker_ports = [router.port + i + 1 for i in range(router.world_size)]
-                executor.map(generate_stream, worker_ports)
+    ret = check_completion_request(chat_request)
+    if ret is not None:
+        raise RuntimeError("Invalid parameter.")
+    return router.handle_chat_completion_request(chat_request)
 
-            while not responses:
-                pass
-            def generate():
-                if responses[0]:
-                    for chunk in responses[0].iter_lines(decode_unicode=False, delimiter=b"\0"):
-                        if chunk:
-                            yield f"data: {chunk}\n\n"
-                    yield f"data: [DONE]\n\n"
-
-            return StreamingResponse(generate(), media_type="text/event-stream")
-        else:
-            responses = []
-
-            def send_request(port):
-                try:
-                    url = f'http://{router.host}:{port}/v1/code_generation'
-                    response = requests.post(url, json=chat_request.dict())
-                    response.raise_for_status()
-                    json_response = json.loads(response.content)
-                    chat_completion_response = ChatCompletionResponse(response=json_response['response'])
-                    responses.append(chat_completion_response)
-                except requests.exceptions.RequestException as e:
-                    print(f"Error sending/receiving on port {port}: {e}")
-
-            with futures.ThreadPoolExecutor(max_workers=router.world_size) as executor:
-                worker_ports = [router.port + i + 1 for i in range(router.world_size)]
-                executor.map(send_request, worker_ports)
-            if responses:
-                return responses[0]
-    else:
-        ret = check_completion_request(chat_request)
-        if ret is not None:
-            raise RuntimeError("Invalid parameter.")
-        return router.handle_chat_completion_request(chat_request)
+app.include_router(router)
 
 @app.get("/")
 async def redirect_root_to_docs():

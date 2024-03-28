@@ -38,7 +38,7 @@ The ./tgi_gaudi/launch_tgi_service.sh script accepts three parameters:
 
 You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the TGI Gaudi endpoint by exporting the environment variable `TGI_ENDPOINT`:
 ```bash
-export TGI_ENDPOINT="xxx.xxx.xxx.xxx:8080"
+export TGI_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
 ## Launch Copilot Docker
