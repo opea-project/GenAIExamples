@@ -54,7 +54,7 @@ jobs:
       - name: Code scan check
         run: |
           docker exec ${{ env.CONTAINER_NAME }} \
-          bash -c "bash /GenAIExamples/.github/workflows/script/formatScan/${{ matrix.job_name }}.sh"
+          bash -c "bash /GenAIExamples/.github/workflows/scripts/formatScan/${{ matrix.job_name }}.sh"
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
