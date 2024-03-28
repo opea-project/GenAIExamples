@@ -16,13 +16,12 @@
 # limitations under the License.
 
 import os
-from fastapi import FastAPI, APIRouter, Request, UploadFile, File
-from fastapi.responses import RedirectResponse, StreamingResponse, JSONResponse
+
+from fastapi import APIRouter, FastAPI, File, Request, UploadFile
+from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from guardrails import moderation_prompt_for_chat, unsafe_dict
-from langserve import add_routes
-from starlette.middleware.cors import CORSMiddleware
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
-from langchain_community.embeddings import HuggingFaceHubEmbeddings, HuggingFaceBgeEmbeddings
 from langchain_community.vectorstores import Redis
 from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
