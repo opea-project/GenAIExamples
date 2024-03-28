@@ -60,7 +60,7 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
         self,
         entrypoint: str,
         vectordb_embedding_model: str = "hkunlp/instructor-large",
-        vectordb_persistent_directory: str = "./chroma_db_oai"
+        vectordb_persistent_directory: str = "/home/user/chroma_db_oai"
     ) -> None:
         super().__init__()
         self.entrypoint = entrypoint
@@ -69,7 +69,7 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
         # setup TGI endpoint
         self.llm = HuggingFaceEndpoint(
             endpoint_url=entrypoint,
-            max_new_tokens=256,
+            max_new_tokens=1024,
             top_k=10,
             top_p=0.95,
             typical_p=0.95,

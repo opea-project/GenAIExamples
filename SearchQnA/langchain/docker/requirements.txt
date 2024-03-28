@@ -6,3 +6,5 @@ sentence-transformers==2.2.2
 InstructorEmbedding
 chromadb
 google-api-python-client>=2.100.0
+beautifulsoup4
+html2text
