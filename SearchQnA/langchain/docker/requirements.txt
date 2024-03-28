@@ -1,0 +1,6 @@
+eager
+fastapi
+optimum[habana]
+uvicorn
+sentence-transformers==2.2.2
+langchain
