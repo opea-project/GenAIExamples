@@ -1,6 +1,7 @@
 This ChatQnA use case performs RAG using LangChain, Redis vectordb and Text Generation Inference on Intel Gaudi2. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
 # Environment Setup
+
 To use [🤗 text-generation-inference](https://github.com/huggingface/text-generation-inference) on Habana Gaudi/Gaudi2, please follow these steps:
 
 ## Prepare Docker
@@ -20,19 +21,21 @@ bash ./serving/tgi_gaudi/build_docker.sh
 ## Launch TGI Gaudi Service
 
 ### Launch a local server instance on 1 Gaudi card:
+
 ```bash
 bash ./serving/tgi_gaudi/launch_tgi_service.sh
 ```
 
 For gated models such as `LLAMA-2`, you will have to pass -e HUGGING_FACE_HUB_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
 
-Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token ans export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
+Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=<token>
 ```
 
 ### Launch a local server instance on 8 Gaudi cards:
+
 ```bash
 bash ./serving/tgi_gaudi/launch_tgi_service.sh 8
 ```
@@ -40,16 +43,19 @@ bash ./serving/tgi_gaudi/launch_tgi_service.sh 8
 ### Customize TGI Gaudi Service
 
 The ./serving/tgi_gaudi/launch_tgi_service.sh script accepts three parameters:
+
 - num_cards: The number of Gaudi cards to be utilized, ranging from 1 to 8. The default is set to 1.
 - port_number: The port number assigned to the TGI Gaudi endpoint, with the default being 8080.
 - model_name: The model name utilized for LLM, with the default set to "Intel/neural-chat-7b-v3-3".
 
 You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the TGI Gaudi endpoint by exporting the environment variable `TGI_LLM_ENDPOINT`:
+
 ```bash
 export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
 ## Launch Redis
+
 ```bash
 docker compose -f langchain/docker/docker-compose-redis.yml up -d
 ```
@@ -93,6 +99,7 @@ export SAFETY_GUARD_ENDPOINT="http://xxx.xxx.xxx.xxx:8088"
 ```
 
 ## Start the Backend Service
+
 Make sure TGI-Gaudi service is running and also make sure data is populated into Redis. Launch the backend service:
 
 ```bash
@@ -102,7 +109,8 @@ nohup python app/server.py &
 
 ## Start the Frontend Service
 
-Navigate to the "ui" folder and execute the following commands to start the fronend GUI:
+Navigate to the "ui" folder and execute the following commands to start the frontend GUI:
+
 ```bash
 cd ui
 sudo apt-get install npm && \
@@ -122,19 +130,21 @@ sudo yum install -y nodejs
 Update the `DOC_BASE_URL` environment variable in the `.env` file by replacing the IP address '127.0.0.1' with the actual IP address.
 
 Run the following command to install the required dependencies:
+
 ```bash
 npm install
 ```
 
 Start the development server by executing the following command:
+
 ```bash
 nohup npm run dev &
 ```
 
 This will initiate the frontend service and launch the application.
 
-
 # Enable TGI Gaudi FP8 for higher throughput (Optional)
+
 The TGI Gaudi utilizes BFLOAT16 optimization as the default setting. If you aim to achieve higher throughput, you can enable FP8 quantization on the TGI Gaudi. According to our test results, FP8 quantization yields approximately a 1.8x performance gain compared to BFLOAT16. Please follow the below steps to enable FP8 quantization.
 
 ## Prepare Metadata for FP8 Quantization
@@ -156,8 +166,8 @@ After finishing the above commands, the quantization metadata will be generated.
 docker cp 262e04bbe466:/usr/src/optimum-habana/examples/text-generation/hqt_output data/
 docker cp 262e04bbe466:/usr/src/optimum-habana/examples/text-generation/quantization_config/maxabs_quant.json data/
 ```
-Then modify the `dump_stats_path` to "/data/hqt_output/measure" and update `dump_stats_xlsx_path` to /data/hqt_output/measure/fp8stats.xlsx" in maxabs_quant.json file.
 
+Then modify the `dump_stats_path` to "/data/hqt_output/measure" and update `dump_stats_xlsx_path` to /data/hqt_output/measure/fp8stats.xlsx" in maxabs_quant.json file.
 
 ## Restart the TGI Gaudi server within all the metadata mapped
 

@@ -13,17 +13,17 @@
 # limitations under the License.
 
 text:
-- name: content
-- name: changefreq
-- name: description
-- name: language
-- name: loc
-- name: priority
-- name: source
-- name: title
+  - name: content
+  - name: changefreq
+  - name: description
+  - name: language
+  - name: loc
+  - name: priority
+  - name: source
+  - name: title
 vector:
-- name: content_vector
-  algorithm: HNSW
-  datatype: FLOAT32
-  dims: 768
-  distance_metric: COSINE
+  - name: content_vector
+    algorithm: HNSW
+    datatype: FLOAT32
+    dims: 768
+    distance_metric: COSINE

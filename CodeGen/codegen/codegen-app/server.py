@@ -15,28 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import requests
 import json
+import os
 import types
 from concurrent import futures
 from typing import Optional
-from fastapi import FastAPI, APIRouter
+
+import requests
+from fastapi import APIRouter, FastAPI
 from fastapi.responses import RedirectResponse, StreamingResponse
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_core.pydantic_v1 import BaseModel
-from starlette.middleware.cors import CORSMiddleware
 from openai_protocol import ChatCompletionRequest, ChatCompletionResponse
+from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"])
+    CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
+)
+
 
 class CodeGenAPIRouter(APIRouter):
     def __init__(self, entrypoint) -> None:
@@ -70,6 +69,7 @@ class CodeGenAPIRouter(APIRouter):
                 print("generator================", generator)
                 if not self.is_generator(generator):
                     generator = (generator,)
+
                 def stream_generator():
                     nonlocal buffered_texts
                     for output in generator:
@@ -83,6 +83,7 @@ class CodeGenAPIRouter(APIRouter):
         else:
             print("Chat completion finished.")
             return ChatCompletionResponse(response=response)
+
 
 tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
 router = CodeGenAPIRouter(tgi_endpoint)
@@ -111,6 +112,7 @@ def check_completion_request(request: BaseModel) -> Optional[str]:
 
     return None
 
+
 def filter_code_format(code):
     language_prefixes = {
         "go": "```go",
@@ -118,7 +120,7 @@ def filter_code_format(code):
         "cpp": "```cpp",
         "java": "```java",
         "python": "```python",
-        "typescript": "```typescript"
+        "typescript": "```typescript",
     }
     suffix = "\n```"
 
@@ -140,6 +142,7 @@ def filter_code_format(code):
 
     return code
 
+
 # router /v1/code_generation only supports non-streaming mode.
 @router.post("/v1/code_generation")
 async def code_generation_endpoint(chat_request: ChatCompletionRequest):
@@ -147,6 +150,7 @@ async def code_generation_endpoint(chat_request: ChatCompletionRequest):
     if ret is not None:
         raise RuntimeError("Invalid parameter.")
     return router.handle_chat_completion_request(chat_request)
+
 
 # router /v1/code_chat supports both non-streaming and streaming mode.
 @router.post("/v1/code_chat")
@@ -158,12 +162,13 @@ async def code_chat_endpoint(chat_request: ChatCompletionRequest):
 
 app.include_router(router)
 
+
 @app.get("/")
 async def redirect_root_to_docs():
     return RedirectResponse("/docs")
+
 
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
