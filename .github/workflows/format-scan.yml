@@ -43,17 +43,17 @@ jobs:
 
       - name: Docker Run
         run: |
-          if [[ $(docker ps -a | grep -i '${{ env.CONTAINER_NAME }}-${{ runner.name }}'$) ]]; then
-            docker stop ${{ env.CONTAINER_NAME }}-${{ runner.name }}
-            docker rm -vf ${{ env.CONTAINER_NAME }}-${{ runner.name }} || true
+          if [[ $(docker ps -a | grep -i '${{ env.CONTAINER_NAME }}'$) ]]; then
+            docker stop ${{ env.CONTAINER_NAME }}
+            docker rm -vf ${{ env.CONTAINER_NAME }} || true
           fi
-          docker run -dit --memory="4g" --memory-reservation="1g" --disable-content-trust --privileged --name=${{ env.CONTAINER_NAME }}-${{ runner.name }} --shm-size="1g" \
+          docker run -dit --memory="4g" --memory-reservation="1g" --disable-content-trust --privileged --name=${{ env.CONTAINER_NAME }} --shm-size="1g" \
           -v ${{ github.workspace }}:/GenAIExamples \
           ${{ env.REPO_NAME }}:${{ env.REPO_TAG }}
 
       - name: Code scan check
         run: |
-          docker exec ${{ env.CONTAINER_NAME }}-${{ runner.name }} \
+          docker exec ${{ env.CONTAINER_NAME }} \
           bash -c "bash /GenAIExamples/.github/workflows/script/formatScan/${{ matrix.job_name }}.sh"
 
       - name: Publish pipeline artifact
