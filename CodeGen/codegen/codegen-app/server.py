@@ -32,6 +32,7 @@ app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
 )
 
+
 def filter_code_format(code):
     language_prefixes = {
         "go": "```go",
@@ -87,6 +88,7 @@ class CodeGenAPIRouter(APIRouter):
         try:
             print(f"Predicting chat completion using prompt '{request.prompt}'")
             if request.stream:
+
                 async def stream_generator():
                     for chunk in self.llm.stream(request.prompt):
                         yield f"data: {chunk.encode()}\n\n"
@@ -130,6 +132,7 @@ def check_completion_request(request: BaseModel) -> Optional[str]:
         return f"Param Error: {request.max_new_tokens} is not valid under any of the given schemas --- 'max_new_tokens'"
 
     return None
+
 
 # router /v1/code_generation only supports non-streaming mode.
 @router.post("/v1/code_generation")
