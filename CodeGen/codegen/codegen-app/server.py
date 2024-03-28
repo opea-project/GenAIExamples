@@ -74,7 +74,8 @@ class CodeGenAPIRouter(APIRouter):
                     nonlocal buffered_texts
                     for output in generator:
                         yield f"data: {output.encode()}\n\n"
-                    yield f"data: [DONE]\n\n"
+                    yield "data: [DONE]\n\n"
+
                 return StreamingResponse(stream_generator(), media_type="text/event-stream")
             else:
                 response = self.llm(request.prompt)
@@ -87,6 +88,7 @@ class CodeGenAPIRouter(APIRouter):
 
 tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
 router = CodeGenAPIRouter(tgi_endpoint)
+
 
 def check_completion_request(request: BaseModel) -> Optional[str]:
     if request.temperature is not None and request.temperature < 0:
@@ -159,6 +161,7 @@ async def code_chat_endpoint(chat_request: ChatCompletionRequest):
     if ret is not None:
         raise RuntimeError("Invalid parameter.")
     return router.handle_chat_completion_request(chat_request)
+
 
 app.include_router(router)
 
