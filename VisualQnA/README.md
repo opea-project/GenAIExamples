@@ -1,5 +1,18 @@
 # Visual Question and Answering
 
+Visual Question Answering (VQA) is the task of answering open-ended questions based on an image. The input to models supporting this task is typically a combination of an image and a question, and the output is an answer expressed in natural language.
+
+Some noteworthy use case examples for VQA include:
+
+- Accessibility applications for visually impaired individuals.
+- Education: posing questions about visual materials presented in lectures or textbooks. VQA can also be utilized in interactive museum exhibits or historical sites.
+- Customer service and e-commerce: VQA can enhance user experience by letting users ask questions about products.
+- Image retrieval: VQA models can be used to retrieve images with specific characteristics. For example, the user can ask “Is there a dog?” to find all images with dogs from a set of images.
+
+General architecture of VQA shows below:
+
+![VQA](https://i.imgur.com/BUntlSn.png)
+
 This example guides you through how to deploy a [LLaVA](https://llava-vl.github.io/) (Large Language and Vision Assistant) model on Intel Gaudi2 to do visual question and answering task. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products/) for more details.
 
 ![llava screenshot](https://i.imgur.com/Sqmoql8.png)
