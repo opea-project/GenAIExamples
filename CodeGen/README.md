@@ -140,9 +140,11 @@ To provide programmers with a smooth experience, the Copilot supports multiple w
 ## Chat with AI assistant
 
 You can start a conversation with the AI programming assistant by clicking on the robot icon in the plugin bar on the left:
+
 ![icon](https://i.imgur.com/f7rzfCQ.png)
 
 Then you can see the conversation window on the left, where you can chat with AI assistant:
+
 ![dialog](https://i.imgur.com/aiYzU60.png)
 
 There are 4 areas worth noting:
