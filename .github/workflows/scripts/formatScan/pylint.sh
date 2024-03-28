@@ -8,7 +8,7 @@ git config --global --add safe.directory "*"
 git submodule update --init --recursive
 
 export PYTHONPATH=$(pwd)
-pip install langchain fastapi
+pip install langchain fastapi pylint --upgrade
 pip list
 
 cd /GenAIExamples
