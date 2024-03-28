@@ -16,21 +16,20 @@
 # limitations under the License.
 
 import os
-
-from langchain_community.embeddings import HuggingFaceInstructEmbeddings
-from langchain_community.vectorstores import Chroma
-from langchain_community.utilities import GoogleSearchAPIWrapper
-from langchain.retrievers.web_research import WebResearchRetriever
-from langchain.chains import RetrievalQAWithSourcesChain
-from fastapi import FastAPI, APIRouter, Request
-from fastapi.responses import StreamingResponse
-from langchain_community.llms import HuggingFaceEndpoint
-from starlette.middleware.cors import CORSMiddleware
-from langchain.callbacks.base import BaseCallbackHandler
-
+import sys
 from queue import Queue
 from threading import Thread
-import sys
+
+from fastapi import APIRouter, FastAPI, Request
+from fastapi.responses import StreamingResponse
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.retrievers.web_research import WebResearchRetriever
+from langchain_community.embeddings import HuggingFaceInstructEmbeddings
+from langchain_community.llms import HuggingFaceEndpoint
+from langchain_community.utilities import GoogleSearchAPIWrapper
+from langchain_community.vectorstores import Chroma
+from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -44,8 +43,7 @@ app.add_middleware(
 
 
 class QueueCallbackHandler(BaseCallbackHandler):
-    """A queue that holds the result answer token buffer for streaming response.
-    """
+    """A queue that holds the result answer token buffer for streaming response."""
 
     def __init__(self, queue: Queue):
         self.queue = queue
@@ -77,7 +75,7 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
         self,
         entrypoint: str,
         vectordb_embedding_model: str = "hkunlp/instructor-large",
-        vectordb_persistent_directory: str = "/home/user/chroma_db_oai"
+        vectordb_persistent_directory: str = "/home/user/chroma_db_oai",
     ) -> None:
         super().__init__()
         self.entrypoint = entrypoint
@@ -97,14 +95,12 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
         )
 
         # check google api key is provided
-        if not "GOOGLE_API_KEY" in os.environ or not "GOOGLE_API_KEY" in os.environ:
+        if "GOOGLE_API_KEY" not in os.environ or "GOOGLE_API_KEY" not in os.environ:
             raise Exception("Please make sure to set GOOGLE_API_KEY and GOOGLE_API_KEY environment variables!")
 
         # Notice: please check or manually delete the vectordb directory if you do not previous histories
         self.vectorstore = Chroma(
-            embedding_function=HuggingFaceInstructEmbeddings(
-                model_name=vectordb_embedding_model
-            ),
+            embedding_function=HuggingFaceInstructEmbeddings(model_name=vectordb_embedding_model),
             persist_directory=vectordb_persistent_directory,
         )
 
@@ -148,9 +144,7 @@ async def web_search_chat(request: Request):
 async def web_search_chat_stream(request: Request):
     params = await request.json()
     print(tgi_endpoint)
-    print(
-        f"[websearch - streaming chat] POST request: /v1/rag/web_search_chat_stream, params:{params}"
-    )
+    print(f"[websearch - streaming chat] POST request: /v1/rag/web_search_chat_stream, params:{params}")
     query = params["query"]
 
     def stream_callback(query):
@@ -178,17 +172,17 @@ async def web_search_chat_stream(request: Request):
             text = res_dict["answer"]
             chat_response += text
             if text == " ":
-                yield f"data: @#$\n\n"
+                yield "data: @#$\n\n"
                 continue
             if text.isspace():
                 continue
             if "\n" in text:
-                yield f"data: <br/>\n\n"
+                yield "data: <br/>\n\n"
             new_text = text.replace(" ", "@#$")
             yield f"data: {new_text}\n\n"
         chat_response = chat_response.split("</s>")[0]
         print(f"[rag - chat_stream] stream response: {chat_response}")
-        yield f"data: [DONE]\n\n"
+        yield "data: [DONE]\n\n"
 
     return StreamingResponse(stream_generator(), media_type="text/event-stream")
 
@@ -197,5 +191,6 @@ app.include_router(router)
 
 if __name__ == "__main__":
     import uvicorn
+
     fastapi_port = os.getenv("FASTAPI_PORT", "8000")
     uvicorn.run(app, host="0.0.0.0", port=int(fastapi_port))
