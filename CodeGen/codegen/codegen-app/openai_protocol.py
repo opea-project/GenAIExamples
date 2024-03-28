@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2023 Intel Corporation
+# Copyright (c) 2024 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Code source from FastChat's OpenAI protocol: 
+"""Code source from FastChat's OpenAI protocol:
+
 https://github.com/lm-sys/FastChat/blob/main/fastchat/protocol/openai_api_protocol.py
 """
-from typing import Optional, List, Any, Union
 import time
+from typing import Any, List, Optional, Union
+
 import shortuuid
+
 # pylint: disable=E0611
 from pydantic import BaseModel, Field
 
+
 class ChatCompletionRequest(BaseModel):
     prompt: Union[str, List[Any]]
-    device: Optional[str] = 'cpu'
+    device: Optional[str] = "cpu"
     temperature: Optional[float] = 0.7
     top_p: Optional[float] = 1.0
     top_k: Optional[int] = 1
