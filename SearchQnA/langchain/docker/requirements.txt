@@ -3,4 +3,6 @@ fastapi
 optimum[habana]
 uvicorn
 sentence-transformers==2.2.2
-langchain
+InstructorEmbedding
+chromadb
+google-api-python-client>=2.100.0

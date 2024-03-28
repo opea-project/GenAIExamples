@@ -18,7 +18,13 @@ RUN rm -rf /etc/ssh/ssh_host*
 
 # Set environment variables
 ENV LANG=en_US.UTF-8
-ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/
+ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/langchain/libs/community:/langchain/libs/langchain
+
+# Install required branch
+RUN git clone https://github.com/Spycsh/langchain.git /langchain -b master
+RUN cd /langchain/libs/langchain && \
+    pip install -e . && \
+    cd -
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
@@ -32,7 +38,8 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -U -r /tmp/requirements.txt
 
 # work dir should contains the server
-WORKDIR /qna-app
-COPY qna-app /qna-app
+# make sure it can be edited by user
+WORKDIR /home/user/qna-app
+COPY qna-app /home/user/qna-app
 
 ENTRYPOINT ["python", "server.py"]

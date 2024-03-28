@@ -1,8 +1,8 @@
 import os
 
-from langchain.embeddings import HuggingFaceInstructEmbeddings
-from langchain.vectorstores import Chroma
-from langchain.utilities import GoogleSearchAPIWrapper
+from langchain_community.embeddings import HuggingFaceInstructEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_community.utilities import GoogleSearchAPIWrapper
 from langchain.retrievers.web_research import WebResearchRetriever
 from langchain.chains import RetrievalQAWithSourcesChain
 from fastapi import FastAPI, APIRouter, Request
@@ -110,7 +110,7 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
         return response["answer"], response["sources"]
 
 
-tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8083")
+tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
 
 router = SearchQuestionAnsweringAPIRouter(
     entrypoint=tgi_endpoint,
@@ -130,6 +130,7 @@ async def web_search_chat(request: Request):
 @router.post("/v1/rag/web_search_chat_stream")
 async def web_search_chat_stream(request: Request):
     params = await request.json()
+    print(tgi_endpoint)
     print(
         f"[websearch - streaming chat] POST request: /v1/rag/web_search_chat_stream, params:{params}"
     )
@@ -179,5 +180,5 @@ app.include_router(router)
 
 if __name__ == "__main__":
     import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8003)
+    fastapi_port = os.getenv("FASTAPI_PORT", "8000")
+    uvicorn.run(app, host="0.0.0.0", port=int(fastapi_port))
