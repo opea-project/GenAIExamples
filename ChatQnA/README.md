@@ -51,6 +51,7 @@ bash ./serving/tgi_gaudi/launch_tgi_service.sh 8
 ```
 
 And then you can make requests like below to check the service status:
+
 ```bash
 curl 127.0.0.1:8080/generate \
   -X POST \
@@ -117,6 +118,7 @@ export SAFETY_GUARD_ENDPOINT="http://xxx.xxx.xxx.xxx:8088"
 ```
 
 And then you can make requests like below to check the service status:
+
 ```bash
 curl 127.0.0.1:8088/generate \
   -X POST \
@@ -136,6 +138,7 @@ nohup python app/server.py &
 The LangChain backend service listens to port 8000 by port, you can customize it by change the code in `docker/qna-app/app/server.py`.
 
 And then you can make requests like below to check the LangChain backend service status:
+
 ```bash
 # non-streaming endpoint
 curl 127.0.0.1:8000/v1/rag/chat \
@@ -223,13 +226,13 @@ docker run -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -v $volume:/data -
 Now the TGI Gaudi will launch the FP8 model by default. Please note that currently only Llama2 series and Mistral series models support FP8 quantization.
 
 And then you can make requests like below to check the service status:
+
 ```bash
 curl 127.0.0.1:8080/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":32}}' \
   -H 'Content-Type: application/json'
 ```
-
 
 # Enable TEI for embedding model higher throughput (Optional)
 Text Embeddings Inference (TEI) is a toolkit designed for deploying and serving open-source text embeddings and sequence classification models efficiently. With TEI, users can extract high-performance features using various popular models. It supports token-based dynamic batching for enhanced performance.
@@ -245,6 +248,7 @@ export TEI_ENDPOINT="http://xxx.xxx.xxx.xxx:9090"
 ```
 
 And then you can make requests like below to check the service status:
+
 ```bash
 curl 127.0.0.1:9090/embed \
     -X POST \
