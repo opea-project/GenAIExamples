@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        job_name: ["langchain", "llamaindex"]
+        job_name: ["langchain"]
       fail-fast: false
     steps:
       - name: Checkout out Repo
@@ -33,7 +33,7 @@ jobs:
 
       - name: backend check
         run: |
-          cd ${{ github.workspace }}/ChatQnA/tests/${{ matrix.job_name }}
+          cd ${{ github.workspace }}/ChatQnA/tests
           bash test_${{ matrix.job_name }}_inference.sh
 
       - name: Publish pipeline artifact
@@ -41,4 +41,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.job_name }}
-          path: ${{ github.workspace }}/ChatQnA/tests/${{ matrix.job_name }}/*.log
+          path: ${{ github.workspace }}/ChatQnA/tests/*.log

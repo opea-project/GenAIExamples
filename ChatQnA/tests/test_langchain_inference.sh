@@ -17,7 +17,7 @@ set -xe
 function test_env_setup() {
     WORKPATH=$(dirname $(dirname "$PWD"))
     DOCKER_NAME="qna-rag-redis-server"
-    LOG_PATH="$WORKPATH/tests/langchain/langchain.log"
+    LOG_PATH="$WORKPATH/tests/langchain.log"
     cd $WORKPATH # go to ChatQnA
 }
 
@@ -31,25 +31,28 @@ function docker_setup() {
 }
 
 function launch_redis() {
-    # todo
+    # Launch LangChain Docker
     cd $WORKPATH/langchain/docker
     docker compose -f docker-compose-langchain.yml up -d
-}
 
-function launch_server() {
-    # todo
+    # Ingest data into redis
     cd $WORKPATH
     docker exec -it $DOCKER_NAME \
         bash -c "cd /ws && python ingest.py"
+}
+
+function launch_server() {
+    # Start the Backend Service
+    cd $WORKPATH
 
     docker exec -it $DOCKER_NAME \
-        bash -c "python app/server.py"
+        bash -c "nohup python app/server.py &"
 }
 
 function run_tests() {
     # todo
     cd $WORKPATH
-    echo "Requesting sth..." >> $LOG_PATH
+    echo "Requesting sth..." >>$LOG_PATH
 }
 
 function check_response() {
