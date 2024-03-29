@@ -14,26 +14,61 @@
 # limitations under the License.
 set -xe
 
-cd ../.. # go to ChatQnA
+function test_env_setup() {
+    workpath=$(dirname $(dirname "$PWD"))
+    cd $workpath # go to ChatQnA
+}
 
-# docker setup
-docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
-bash serving/tgi_gaudi/launch_tgi_service.sh 1 8888
+function docker_setup() {
+    local card_num=1
+    local port=8888
+    local model_name="Intel/neural-chat-7b-v3-3"
+    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
+}
 
-# launch redis
-cd langchain/docker
-docker compose -f docker-compose-langchain.yml up -d
-cd ../../
+function launch_redis() {
+    cd $workpath/langchain/docker
+    docker compose -f docker-compose-langchain.yml up -d
+}
 
-docker exec -it qna-rag-redis-server \
-    bash -c "cd /ws && python ingest.py"
+function launch_server() {
+    cd $workpath
+    docker exec -it qna-rag-redis-server \
+        bash -c "cd /ws && python ingest.py"
 
-# launch server
-docker exec -it qna-rag-redis-server \
-    bash -c "python app/server.py"
+    docker exec -it qna-rag-redis-server \
+        bash -c "python app/server.py"
+}
 
-# request
+function run_tests() {
+    # todo
+    cd $workpath
+    echo "Requesting sth..."
+}
 
-# docker stop
+function check_response() {
+    # todo
+    cd $workpath
+    echo "Checking response"
+}
 
-# check response
+function docker_stop() {
+    docker stop qna-rag-redis-server
+    docker rm qna-rag-redis-server
+}
+
+function main() {
+    test_env_setup
+
+    docker_setup
+    launch_redis
+    launch_server
+
+    run_tests
+    check_response
+
+    docker_stop
+}
+
+main
