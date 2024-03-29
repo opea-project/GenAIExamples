@@ -27,6 +27,7 @@ jobs:
 
       - name: Check env
         run: |
+          echo y | docker system prune
           cid=$(docker ps -aq --filter "name=qna-rag-redis-server")
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
 

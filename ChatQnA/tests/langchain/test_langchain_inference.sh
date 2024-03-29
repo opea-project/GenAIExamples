@@ -22,6 +22,7 @@ function test_env_setup() {
 }
 
 function docker_setup() {
+    # todo
     local card_num=1
     local port=8888
     local model_name="Intel/neural-chat-7b-v3-3"
@@ -30,11 +31,13 @@ function docker_setup() {
 }
 
 function launch_redis() {
+    # todo
     cd $WORKPATH/langchain/docker
     docker compose -f docker-compose-langchain.yml up -d
 }
 
 function launch_server() {
+    # todo
     cd $WORKPATH
     docker exec -it $DOCKER_NAME \
         bash -c "cd /ws && python ingest.py"
