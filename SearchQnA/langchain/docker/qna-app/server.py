@@ -45,7 +45,8 @@ app.add_middleware(
 )
 
 TGI_ENDPOINT = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
-SHOW_INTERMEDIATE_LOG = os.getenv("SHOW_INTERMEDIATE_LOG", "True").lower() in ('true', '1')
+SHOW_INTERMEDIATE_LOG = os.getenv("SHOW_INTERMEDIATE_LOG", "True").lower() in ("true", "1")
+
 
 class QueueCallbackHandler(BaseCallbackHandler):
     """A queue that holds the result answer token buffer for streaming response."""
@@ -75,7 +76,6 @@ class QueueCallbackHandler(BaseCallbackHandler):
                     "answer": msg,
                 }
             )
-
 
     def on_llm_end(self, *args, **kwargs):
         self.enter_answer_phase = not self.enter_answer_phase
@@ -148,7 +148,6 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
             print(f"LLM chain error: {e}")
             return "Internal Server Error", ""
         return response["answer"], response["sources"]
-
 
 
 router = SearchQuestionAnsweringAPIRouter(
