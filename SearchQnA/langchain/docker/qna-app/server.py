@@ -15,24 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import os
 import shutil
 import sys
 from queue import Queue
 from threading import Thread
-import asyncio
 
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import StreamingResponse
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.globals import set_debug
 from langchain.retrievers.web_research import WebResearchRetriever
 from langchain_community.embeddings import HuggingFaceInstructEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.utilities import GoogleSearchAPIWrapper
 from langchain_community.vectorstores import Chroma
 from starlette.middleware.cors import CORSMiddleware
-from langchain.globals import set_debug
 
 set_debug(True)
 app = FastAPI()
@@ -115,7 +115,9 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
 
         # Compose the websearch retriever
         self.web_search_retriever = WebResearchRetriever.from_llm(
-            vectorstore=self.vectorstore, llm=self.llm, search=self.search,
+            vectorstore=self.vectorstore,
+            llm=self.llm,
+            search=self.search,
             # num_search_results=3
         )
 
