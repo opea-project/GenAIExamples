@@ -15,7 +15,7 @@
 import { env } from "$env/dynamic/public";
 import { SSE } from "sse.js";
 
-const PDF_BASE_URL = env.PDF_BASE_URL;
+const BACKEND_BASE_URL = env.BACKEND_BASE_URL;
 
 
 export async function fetchTextStream(
@@ -30,7 +30,7 @@ export async function fetchTextStream(
 		query: query,
 		knowledge_base_id: knowledge_base_id,
 	};
-	url = `${PDF_BASE_URL}/web_search_chat_stream`;
+	url = `${BACKEND_BASE_URL}/web_search_chat_stream`;
 
 	return new SSE(url, {
 		headers: { "Content-Type": "application/json" },
