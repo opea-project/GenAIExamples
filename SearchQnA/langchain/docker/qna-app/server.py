@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import os
+import shutil
 import sys
 from queue import Queue
 from threading import Thread
@@ -24,6 +25,7 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import StreamingResponse
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.globals import set_debug
 from langchain.retrievers.web_research import WebResearchRetriever
 from langchain_community.embeddings import HuggingFaceInstructEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
@@ -31,6 +33,7 @@ from langchain_community.utilities import GoogleSearchAPIWrapper
 from langchain_community.vectorstores import Chroma
 from starlette.middleware.cors import CORSMiddleware
 
+set_debug(True)
 app = FastAPI()
 
 app.add_middleware(
@@ -40,6 +43,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+TGI_ENDPOINT = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
+SHOW_INTERMEDIATE_LOG = os.getenv("SHOW_INTERMEDIATE_LOG", "True").lower() in ("true", "1")
 
 
 class QueueCallbackHandler(BaseCallbackHandler):
@@ -52,10 +58,22 @@ class QueueCallbackHandler(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs):
         sys.stdout.write(token)
         sys.stdout.flush()
-        if self.enter_answer_phase:
+        if SHOW_INTERMEDIATE_LOG or self.enter_answer_phase:
             self.queue.put(
                 {
                     "answer": token,
+                }
+            )
+
+    def on_llm_start(self, *args, **kwargs):
+        if SHOW_INTERMEDIATE_LOG:
+            if not self.enter_answer_phase:
+                msg = "The search engine begin to fetch the HTML pages with these questions:"
+            else:
+                msg = "\nGet the answer from Large Language Models:\n"
+            self.queue.put(
+                {
+                    "answer": msg,
                 }
             )
 
@@ -94,11 +112,13 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
             callbacks=[QueueCallbackHandler(queue=self.queue)],
         )
 
-        # check google api key is provided
+        # Check that google api key is provided
         if "GOOGLE_API_KEY" not in os.environ or "GOOGLE_API_KEY" not in os.environ:
             raise Exception("Please make sure to set GOOGLE_API_KEY and GOOGLE_API_KEY environment variables!")
 
-        # Notice: please check or manually delete the vectordb directory if you do not previous histories
+        # Clear the last time searching history, which is useful to avoid interfering with current retrievals
+        if os.path.exists(vectordb_persistent_directory) and os.path.isdir(vectordb_persistent_directory):
+            shutil.rmtree(vectordb_persistent_directory)
         self.vectorstore = Chroma(
             embedding_function=HuggingFaceInstructEmbeddings(model_name=vectordb_embedding_model),
             persist_directory=vectordb_persistent_directory,
@@ -109,7 +129,10 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
 
         # Compose the websearch retriever
         self.web_search_retriever = WebResearchRetriever.from_llm(
-            vectorstore=self.vectorstore, llm=self.llm, search=self.search
+            vectorstore=self.vectorstore,
+            llm=self.llm,
+            search=self.search,
+            # num_search_results=3
         )
 
         # Compose the whole chain
@@ -119,14 +142,16 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
         )
 
     def handle_search_chat(self, query: str):
-        response = self.llm_chain({"question": query})
+        try:
+            response = self.llm_chain({"question": query})
+        except Exception as e:
+            print(f"LLM chain error: {e}")
+            return "Internal Server Error", ""
         return response["answer"], response["sources"]
 
 
-tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
-
 router = SearchQuestionAnsweringAPIRouter(
-    entrypoint=tgi_endpoint,
+    entrypoint=TGI_ENDPOINT,
 )
 
 
@@ -135,7 +160,7 @@ async def web_search_chat(request: Request):
     params = await request.json()
     print(f"[websearch - chat] POST request: /v1/rag/web_search_chat, params:{params}")
     query = params["query"]
-    answer, sources = router.handle_search_chat(query=query)
+    answer, sources = router.handle_search_chat(query={"question": query})
     print(f"[websearch - chat] answer: {answer}, sources: {sources}")
     return {"answer": answer, "sources": sources}
 
@@ -143,7 +168,6 @@ async def web_search_chat(request: Request):
 @router.post("/v1/rag/web_search_chat_stream")
 async def web_search_chat_stream(request: Request):
     params = await request.json()
-    print(tgi_endpoint)
     print(f"[websearch - streaming chat] POST request: /v1/rag/web_search_chat_stream, params:{params}")
     query = params["query"]
 
@@ -151,8 +175,13 @@ async def web_search_chat_stream(request: Request):
         finished = object()
 
         def task():
-            _ = router.llm_chain({"question": query})
-            router.queue.put(finished)
+            try:
+                _ = router.llm_chain({"question": query})
+                router.queue.put(finished)
+            except Exception as e:
+                print(f"LLM chain error: {e}")
+                router.queue.put({"answer": "\nInternal Server Error\n"})
+                router.queue.put(finished)
 
         t = Thread(target=task)
         t.start()
@@ -166,22 +195,25 @@ async def web_search_chat_stream(request: Request):
                 continue
 
     def stream_generator():
+        import codecs
+
         chat_response = ""
-        # FIXME need to add the sources and chat_history
-        for res_dict in stream_callback({"question": query}):
+        for res_dict in stream_callback(query={"question": query}):
             text = res_dict["answer"]
             chat_response += text
             if text == " ":
                 yield "data: @#$\n\n"
                 continue
-            if text.isspace():
+            # if text.isspace():
+            #     continue
+            if "\n" in text or "\r" in text:
+                text = text.replace("\n", "<br/>").replace(" ", "@#$")
+                yield f"data: {text}\n\n"
                 continue
-            if "\n" in text:
-                yield "data: <br/>\n\n"
-            new_text = text.replace(" ", "@#$")
-            yield f"data: {new_text}\n\n"
+            text = text.replace(" ", "@#$")
+            yield f"data: {text}\n\n"
         chat_response = chat_response.split("</s>")[0]
-        print(f"[rag - chat_stream] stream response: {chat_response}")
+        print(f"\n\n[rag - chat_stream] stream response: {chat_response}\n\n")
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(stream_generator(), media_type="text/event-stream")
