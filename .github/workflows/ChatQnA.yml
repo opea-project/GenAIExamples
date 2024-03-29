@@ -27,7 +27,7 @@ jobs:
 
       - name: backend check
         run: |
-          cd ${{ github.workspace }}/ChatQnA/tests
+          cd ${{ github.workspace }}/ChatQnA/tests/${{ matrix.job_name }}
           bash test_${{ matrix.job_name }}_inference.sh
 
       - name: Publish pipeline artifact
