@@ -67,9 +67,9 @@ class QueueCallbackHandler(BaseCallbackHandler):
     def on_llm_start(self, *args, **kwargs):
         if SHOW_INTERMEDIATE_LOG:
             if not self.enter_answer_phase:
-                msg = "The search engine begin to fetch the HTML pages with these prompts:\n"
+                msg = "The search engine begin to fetch the HTML pages with these questions:"
             else:
-                msg = "Get the answer from Large Language Models:\n"
+                msg = "\nGet the answer from Large Language Models:\n"
             self.queue.put(
                 {
                     "answer": msg,
@@ -181,7 +181,7 @@ async def web_search_chat_stream(request: Request):
                 router.queue.put(finished)
             except Exception as e:
                 print(f"LLM chain error: {e}")
-                router.queue.put({"answer": "Internal Server Error"})
+                router.queue.put({"answer": "\nInternal Server Error\n"})
                 router.queue.put(finished)
 
         t = Thread(target=task)
@@ -196,6 +196,7 @@ async def web_search_chat_stream(request: Request):
                 continue
 
     def stream_generator():
+        import codecs
         chat_response = ""
         for res_dict in stream_callback(query={"question": query}):
             text = res_dict["answer"]
@@ -203,12 +204,14 @@ async def web_search_chat_stream(request: Request):
             if text == " ":
                 yield "data: @#$\n\n"
                 continue
-            if text.isspace():
+            # if text.isspace():
+            #     continue
+            if '\n' in text or '\r' in text:
+                text = text.replace("\n", "<br/>").replace(" ", "@#$")
+                yield f"data: {text}\n\n"
                 continue
-            if "\n" in text:
-                yield "data: <br/>\n\n"
-            new_text = text.replace(" ", "@#$")
-            yield f"data: {new_text}\n\n"
+            text = text.replace(" ", "@#$")
+            yield f"data: {text}\n\n"
         chat_response = chat_response.split("</s>")[0]
         print(f"\n\n[rag - chat_stream] stream response: {chat_response}\n\n")
         yield "data: [DONE]\n\n"

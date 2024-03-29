@@ -151,11 +151,12 @@
 	class="h-full items-center gap-5 bg-white sm:flex sm:pb-2 lg:rounded-tl-3xl"
 >
 	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[72%]">
+	<!--
 		<div class="flex justify-between p-2">
-			<!-- web search -->
 			<WebSearch />
 			<UploadFile />
 		</div>
+	-->
 		<div
 			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0"
 		>
