@@ -11,7 +11,8 @@ repos:
       - id: check-json
         exclude: |
           (?x)^(
-              ChatQnA/ui/tsconfig.json
+              ChatQnA/ui/tsconfig.json|
+              SearchQnA/ui/tsconfig.json
           )$
       - id: check-yaml
       - id: debug-statements
@@ -25,7 +26,7 @@ repos:
       - id: insert-license
         files: |
           (?x)^(
-            (ChatQnA|CodeGen|DocSum|VisualQnA)/.*(py|yaml|yml|sh)|
+            (ChatQnA|CodeGen|DocSum|SearchQnA|VisualQnA)/.*(py|yaml|yml|sh)|
           )$
         args:
           [
@@ -37,7 +38,7 @@ repos:
       - id: insert-license
         files: |
           (?x)^(
-            (ChatQnA|CodeGen|DocSum|VisualQnA)/.*(ts|js)|
+            (ChatQnA|CodeGen|DocSum|SearchQnA|VisualQnA)/.*(ts|js)|
           )$
         args:
           [
@@ -50,7 +51,7 @@ repos:
       - id: insert-license
         files: |
           (?x)^(
-            (ChatQnA|CodeGen|DocSum|VisualQnA)/.*(html|svelte)|
+            (ChatQnA|CodeGen|DocSum|SearchQnA|VisualQnA)/.*(html|svelte)|
           )$
         args:
           [
