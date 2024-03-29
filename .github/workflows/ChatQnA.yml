@@ -1,4 +1,4 @@
-name: Format Scan
+name: ChatQnA-test
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  format-scan:
+  ChatQnA:
     runs-on: ubuntu-latest
     strategy:
       matrix:
