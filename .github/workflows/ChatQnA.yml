@@ -25,6 +25,11 @@ jobs:
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
+      - name: Check env
+        run: |
+          cid=$(docker ps -aq --filter "name=qna-rag-redis-server")
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
+
       - name: backend check
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests/${{ matrix.job_name }}

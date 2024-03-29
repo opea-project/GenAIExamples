@@ -51,6 +51,13 @@ function check_response() {
     # todo
     cd $workpath
     echo "Checking response"
+    local status=true
+    if [ $status == false ]; then
+        echo "Response check failed"
+        exit 1
+    else
+        echo "Response check succeed"
+    fi
 }
 
 function docker_stop() {
@@ -66,9 +73,9 @@ function main() {
     launch_server
 
     run_tests
-    check_response
-
     docker_stop
+
+    check_response
 }
 
 main
