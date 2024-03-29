@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.job_name }}
-          path: ${{ github.workspace }}/ChatQnA/tests/${{ matrix.job_name }}.*
+          path: ${{ github.workspace }}/ChatQnA/tests/${{ matrix.job_name }}/*.log

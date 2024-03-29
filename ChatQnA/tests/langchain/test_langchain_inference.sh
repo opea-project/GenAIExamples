@@ -15,8 +15,10 @@
 set -xe
 
 function test_env_setup() {
-    workpath=$(dirname $(dirname "$PWD"))
-    cd $workpath # go to ChatQnA
+    WORKPATH=$(dirname $(dirname "$PWD"))
+    DOCKER_NAME="qna-rag-redis-server"
+    LOG_PATH="$WORKPATH/tests/langchain/langchain.log"
+    cd $WORKPATH # go to ChatQnA
 }
 
 function docker_setup() {
@@ -28,28 +30,28 @@ function docker_setup() {
 }
 
 function launch_redis() {
-    cd $workpath/langchain/docker
+    cd $WORKPATH/langchain/docker
     docker compose -f docker-compose-langchain.yml up -d
 }
 
 function launch_server() {
-    cd $workpath
-    docker exec -it qna-rag-redis-server \
+    cd $WORKPATH
+    docker exec -it $DOCKER_NAME \
         bash -c "cd /ws && python ingest.py"
 
-    docker exec -it qna-rag-redis-server \
+    docker exec -it $DOCKER_NAME \
         bash -c "python app/server.py"
 }
 
 function run_tests() {
     # todo
-    cd $workpath
-    echo "Requesting sth..."
+    cd $WORKPATH
+    echo "Requesting sth..." >> $LOG_PATH
 }
 
 function check_response() {
     # todo
-    cd $workpath
+    cd $WORKPATH
     echo "Checking response"
     local status=true
     if [ $status == false ]; then
@@ -61,8 +63,8 @@ function check_response() {
 }
 
 function docker_stop() {
-    docker stop qna-rag-redis-server
-    docker rm qna-rag-redis-server
+    docker stop $DOCKER_NAME
+    docker rm $DOCKER_NAME
 }
 
 function main() {
