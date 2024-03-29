@@ -50,6 +50,15 @@ export HUGGINGFACEHUB_API_TOKEN=<token>
 bash ./serving/tgi_gaudi/launch_tgi_service.sh 8
 ```
 
+And then you can make requests like below to check the service status:
+
+```bash
+curl 127.0.0.1:8080/generate \
+  -X POST \
+  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":32}}' \
+  -H 'Content-Type: application/json'
+```
+
 ### Customize TGI Gaudi Service
 
 The ./serving/tgi_gaudi/launch_tgi_service.sh script accepts three parameters:
@@ -108,6 +117,15 @@ docker run -p 8088:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICE
 export SAFETY_GUARD_ENDPOINT="http://xxx.xxx.xxx.xxx:8088"
 ```
 
+And then you can make requests like below to check the service status:
+
+```bash
+curl 127.0.0.1:8088/generate \
+  -X POST \
+  -d '{"inputs":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
+  -H 'Content-Type: application/json'
+```
+
 ## Start the Backend Service
 
 Make sure TGI-Gaudi service is running and also make sure data is populated into Redis. Launch the backend service:
@@ -115,6 +133,26 @@ Make sure TGI-Gaudi service is running and also make sure data is populated into
 ```bash
 docker exec -it qna-rag-redis-server bash
 nohup python app/server.py &
+```
+
+The LangChain backend service listens to port 8000 by port, you can customize it by change the code in `docker/qna-app/app/server.py`.
+
+And then you can make requests like below to check the LangChain backend service status:
+
+```bash
+# non-streaming endpoint
+curl 127.0.0.1:8000/v1/rag/chat \
+  -X POST \
+  -d '{"query":"What's the total revenue of Nike in 2023?"}' \
+  -H 'Content-Type: application/json'
+```
+
+```bash
+# streaming endpoint
+curl 127.0.0.1:8000/v1/rag/chat_stream \
+  -X POST \
+  -d '{"query":"What's the total revenue of Nike in 2023?"}' \
+  -H 'Content-Type: application/json'
 ```
 
 ## Start the Frontend Service
@@ -186,3 +224,37 @@ docker run -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -v $volume:/data -
 ```
 
 Now the TGI Gaudi will launch the FP8 model by default. Please note that currently only Llama2 series and Mistral series models support FP8 quantization.
+
+And then you can make requests like below to check the service status:
+
+```bash
+curl 127.0.0.1:8080/generate \
+  -X POST \
+  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":32}}' \
+  -H 'Content-Type: application/json'
+```
+
+# Enable TEI for embedding model higher throughput (Optional)
+
+Text Embeddings Inference (TEI) is a toolkit designed for deploying and serving open-source text embeddings and sequence classification models efficiently. With TEI, users can extract high-performance features using various popular models. It supports token-based dynamic batching for enhanced performance.
+
+To launch the TEI service, you can use the following commands:
+
+```bash
+model=BAAI/bge-large-en-v1.5
+revision=refs/pr/5
+volume=$PWD/data # share a volume with the Docker container to avoid downloading weights every run
+docker run -p 9090:80 -v $volume:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
+export TEI_ENDPOINT="http://xxx.xxx.xxx.xxx:9090"
+```
+
+And then you can make requests like below to check the service status:
+
+```bash
+curl 127.0.0.1:9090/embed \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?"}' \
+    -H 'Content-Type: application/json'
+```
+
+Note: If you want to integrate the TEI service into the LangChain application, you'll need to restart the LangChain backend service after launching the TEI service.
