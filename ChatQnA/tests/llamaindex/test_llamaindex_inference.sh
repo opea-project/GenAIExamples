@@ -34,4 +34,6 @@ docker exec -it qna-rag-redis-server \
 
 # request
 
+# docker stop
+
 # check response
