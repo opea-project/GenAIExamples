@@ -20,7 +20,7 @@ import os
 from fastapi import APIRouter, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from guardrails import moderation_prompt_for_chat, unsafe_dict
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Redis
 from langchain_core.messages import HumanMessage
@@ -47,7 +47,7 @@ app.add_middleware(
 
 class RAGAPIRouter(APIRouter):
 
-    def __init__(self, upload_dir, entrypoint, safety_guard_endpoint) -> None:
+    def __init__(self, upload_dir, entrypoint, safety_guard_endpoint, tei_endpoint=None) -> None:
         super().__init__()
         self.upload_dir = upload_dir
         self.entrypoint = entrypoint
@@ -81,7 +81,13 @@ class RAGAPIRouter(APIRouter):
         print("[rag - router] LLM initialized.")
 
         # Define LLM Chain
-        self.embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
+        if tei_endpoint:
+            # create embeddings using TEI endpoint service
+            self.embeddings = HuggingFaceHubEmbeddings(model=tei_endpoint)
+        else:
+            # create embeddings using local embedding model
+            self.embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
+
         rds = Redis.from_existing_index(
             self.embeddings,
             index_name=INDEX_NAME,
@@ -130,7 +136,8 @@ class RAGAPIRouter(APIRouter):
 upload_dir = os.getenv("RAG_UPLOAD_DIR", "./upload_dir")
 tgi_llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
 safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT")
-router = RAGAPIRouter(upload_dir, tgi_llm_endpoint, safety_guard_endpoint)
+tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
+router = RAGAPIRouter(upload_dir, tgi_llm_endpoint, safety_guard_endpoint, tei_embedding_endpoint)
 
 
 @router.post("/v1/rag/chat")
