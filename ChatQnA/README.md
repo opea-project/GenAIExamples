@@ -235,6 +235,7 @@ curl 127.0.0.1:8080/generate \
 ```
 
 # Enable TEI for embedding model higher throughput (Optional)
+
 Text Embeddings Inference (TEI) is a toolkit designed for deploying and serving open-source text embeddings and sequence classification models efficiently. With TEI, users can extract high-performance features using various popular models. It supports token-based dynamic batching for enhanced performance.
 
 To launch the TEI service, you can use the following commands:
