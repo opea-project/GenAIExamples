@@ -232,8 +232,9 @@ curl 127.0.0.1:8080/generate \
 
 
 # Enable TEI for embedding model higher throughput (Optional)
-Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, it supports token based dynamic batching. We 
+Text Embeddings Inference (TEI) is a toolkit designed for deploying and serving open-source text embeddings and sequence classification models efficiently. With TEI, users can extract high-performance features using various popular models. It supports token-based dynamic batching for enhanced performance.
 
+To launch the TEI service, you can use the following commands:
 
 ```bash
 model=BAAI/bge-large-en-v1.5
@@ -250,3 +251,5 @@ curl 127.0.0.1:9090/embed \
     -d '{"inputs":"What is Deep Learning?"}' \
     -H 'Content-Type: application/json'
 ```
+
+Note: If you want to integrate the TEI service into the LangChain application, you'll need to restart the LangChain backend service after launching the TEI service.
