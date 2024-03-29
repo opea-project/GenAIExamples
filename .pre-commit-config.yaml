@@ -11,7 +11,7 @@ repos:
       - id: check-json
         exclude: |
           (?x)^(
-              ChatQnA/ui/tsconfig.json,
+              ChatQnA/ui/tsconfig.json|
               SearchQnA/ui/tsconfig.json
           )$
       - id: check-yaml
