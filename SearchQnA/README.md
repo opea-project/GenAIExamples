@@ -17,7 +17,7 @@ By integrating search capabilities with LLMs within the LangChain framework, thi
 
 The workflow falls into the following architecture:
 
-![architecture](https://i.imgur.com/34QEM3j.png)
+![architecture](https://i.imgur.com/Caer3DT.png)
 
 # Start Backend Service
 
