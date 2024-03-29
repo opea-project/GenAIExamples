@@ -16,7 +16,7 @@ export async function fetchTextStream(
 		query: query,
 		knowledge_base_id: knowledge_base_id,
 	};
-	url = `${PDF_BASE_URL}/chat_stream`;
+	url = `${PDF_BASE_URL}/web_search_chat_stream`;
 
 	return new SSE(url, {
 		headers: { "Content-Type": "application/json" },

@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
 import os
 import shutil
 import sys
@@ -45,6 +44,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+TGI_ENDPOINT = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
+SHOW_INTERMEDIATE_LOG = os.getenv("SHOW_INTERMEDIATE_LOG", "True").lower() in ('true', '1')
 
 class QueueCallbackHandler(BaseCallbackHandler):
     """A queue that holds the result answer token buffer for streaming response."""
@@ -56,12 +57,25 @@ class QueueCallbackHandler(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs):
         sys.stdout.write(token)
         sys.stdout.flush()
-        if self.enter_answer_phase:
+        if SHOW_INTERMEDIATE_LOG or self.enter_answer_phase:
             self.queue.put(
                 {
                     "answer": token,
                 }
             )
+
+    def on_llm_start(self, *args, **kwargs):
+        if SHOW_INTERMEDIATE_LOG:
+            if not self.enter_answer_phase:
+                msg = "The search engine begin to fetch the HTML pages with these prompts:\n"
+            else:
+                msg = "Get the answer from Large Language Models:\n"
+            self.queue.put(
+                {
+                    "answer": msg,
+                }
+            )
+
 
     def on_llm_end(self, *args, **kwargs):
         self.enter_answer_phase = not self.enter_answer_phase
@@ -136,10 +150,9 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
         return response["answer"], response["sources"]
 
 
-tgi_endpoint = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
 
 router = SearchQuestionAnsweringAPIRouter(
-    entrypoint=tgi_endpoint,
+    entrypoint=TGI_ENDPOINT,
 )
 
 

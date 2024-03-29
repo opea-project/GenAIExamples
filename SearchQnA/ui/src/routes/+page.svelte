@@ -64,6 +64,7 @@
 
 		eventSource.addEventListener("message", (e: any) => {
 			let currentMsg = e.data;
+			currentMsg = currentMsg.replaceAll("@#$", " ")
 			console.log("currentMsg", currentMsg);
 			if (currentMsg == "[DONE]") {
 				console.log("done getCurrentTimeStamp", getCurrentTimeStamp);
@@ -100,7 +101,7 @@
 				} else {
 					let content = chatMessages[chatMessages.length - 1].content as string;
 					chatMessages[chatMessages.length - 1].content =
-						content + " " + currentMsg;
+						content + currentMsg;
 				}
 				scrollToBottom(scrollToDiv);
 			}
