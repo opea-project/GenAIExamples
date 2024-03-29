@@ -196,6 +196,7 @@ async def web_search_chat_stream(request: Request):
 
     def stream_generator():
         import codecs
+
         chat_response = ""
         for res_dict in stream_callback(query={"question": query}):
             text = res_dict["answer"]
@@ -205,7 +206,7 @@ async def web_search_chat_stream(request: Request):
                 continue
             # if text.isspace():
             #     continue
-            if '\n' in text or '\r' in text:
+            if "\n" in text or "\r" in text:
                 text = text.replace("\n", "<br/>").replace(" ", "@#$")
                 yield f"data: {text}\n\n"
                 continue
