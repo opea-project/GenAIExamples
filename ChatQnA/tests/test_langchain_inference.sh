@@ -15,7 +15,7 @@
 set -xe
 
 function test_env_setup() {
-    WORKPATH=$(dirname $(dirname "$PWD"))
+    WORKPATH=$(dirname "$PWD")
     DOCKER_NAME="qna-rag-redis-server"
     LOG_PATH="$WORKPATH/tests/langchain.log"
     cd $WORKPATH # go to ChatQnA
