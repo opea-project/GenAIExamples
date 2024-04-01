@@ -46,7 +46,7 @@ function launch_server() {
     # Start the Backend Service
     cd $WORKPATH
 
-    docker exec -it $DOCKER_NAME \
+    docker exec $DOCKER_NAME \
         bash -c "nohup python app/server.py &"
 }
 
