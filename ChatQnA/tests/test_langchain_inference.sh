@@ -51,8 +51,21 @@ function launch_server() {
 }
 
 function run_tests() {
-    # todo
     cd $WORKPATH
+    local query="{\"query\":\"What's the total revenue of Nike in 2023?\"}"
+
+    # non-streaming endpoint
+    curl 127.0.0.1:$port/v1/rag/chat \
+        -X POST \
+        -d $query \
+        -H 'Content-Type: application/json'
+
+    # streaming endpoint
+    curl 127.0.0.1:$port/v1/rag/chat_stream \
+        -X POST \
+        -d $query \
+        -H 'Content-Type: application/json'
+
     echo "Requesting sth..." >>$LOG_PATH
 }
 
