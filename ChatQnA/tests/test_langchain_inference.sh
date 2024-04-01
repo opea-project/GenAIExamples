@@ -38,7 +38,7 @@ function launch_redis() {
 
     # Ingest data into redis
     cd $WORKPATH
-    docker exec -it $DOCKER_NAME \
+    docker exec $DOCKER_NAME \
         bash -c "cd /ws && python ingest.py"
 }
 
