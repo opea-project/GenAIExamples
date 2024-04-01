@@ -115,6 +115,36 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 	</tbody>
 </table>
 
+### SearchQnA
+
+[SearchQnA](./SearchQnA/README.md) is an example of chatbot for using search engine to enhance QA quality.
+
+<table>
+	<tbody>
+		<tr>
+			<td>Framework</td>
+			<td>LLM</td>
+			<td>Serving</td>
+			<td>HW</td>
+			<td>Description</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
+	</tbody>
+</table>
+
 ### VisualQnA
 
 [VisualQnA](./VisualQnA/README.md) is an example of chatbot for question and answering based on the images.
