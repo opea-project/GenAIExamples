@@ -28,6 +28,7 @@ function docker_setup() {
     local model_name="Intel/neural-chat-7b-v3-3"
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
+    sleep 3m # Waits 3 minutes
 }
 
 function launch_redis() {
@@ -69,21 +70,23 @@ function check_response() {
 }
 
 function docker_stop() {
-    docker stop $DOCKER_NAME
-    docker rm $DOCKER_NAME
-    docker stop "ChatQnA_server"
-    docker rm "ChatQnA_server"
+    local container_name=$1
+    cid=$(docker ps -aq --filter "name=$container_name")
+    if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
 }
 
 function main() {
     test_env_setup
+    docker_stop "ChatQnA_server" & docker_stop "langchain-rag-server" & docker_stop $DOCKER_NAME
 
     docker_setup
     launch_redis
     launch_server
 
     run_tests
-    docker_stop
+
+    docker_stop "ChatQnA_server" & docker_stop "langchain-rag-server" & docker_stop $DOCKER_NAME
+    echo y | docker system prune
 
     check_response
 }
