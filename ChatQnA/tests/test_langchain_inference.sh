@@ -71,6 +71,8 @@ function check_response() {
 function docker_stop() {
     docker stop $DOCKER_NAME
     docker rm $DOCKER_NAME
+    docker stop "ChatQnA_server"
+    docker rm "ChatQnA_server"
 }
 
 function main() {

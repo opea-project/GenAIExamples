@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   ChatQnA:
-    runs-on: ubuntu-latest
+    runs-on: gaudi2
     strategy:
       matrix:
         job_name: ["langchain"]
