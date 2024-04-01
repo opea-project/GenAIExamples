@@ -77,7 +77,7 @@ function docker_stop() {
 
 function main() {
     test_env_setup
-    docker_stop "ChatQnA_server" & docker_stop "langchain-rag-server" & docker_stop $DOCKER_NAME
+    docker_stop "ChatQnA_server" && docker_stop "langchain-rag-server" && docker_stop $DOCKER_NAME
 
     docker_setup
     launch_redis
@@ -85,7 +85,7 @@ function main() {
 
     run_tests
 
-    docker_stop "ChatQnA_server" & docker_stop "langchain-rag-server" & docker_stop $DOCKER_NAME
+    docker_stop "ChatQnA_server" && docker_stop "langchain-rag-server" && docker_stop $DOCKER_NAME
     echo y | docker system prune
 
     check_response
