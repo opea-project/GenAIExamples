@@ -17,7 +17,6 @@
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-
 # ========= Raw Q&A template prompt =========
 template = """
     Use the following pieces of context from retrieved
