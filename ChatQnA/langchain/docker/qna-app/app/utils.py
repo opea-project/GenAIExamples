@@ -346,7 +346,7 @@ def post_process_text(text: str):
         return "data: @#$\n\n"
     if text.isspace():
         return None
-    if text == '\n':
+    if text == "\n":
         return "data: <br/>\n\n"
     new_text = text.replace(" ", "@#$")
     return f"data: {new_text}\n\n"

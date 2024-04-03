@@ -35,8 +35,8 @@ from utils import (
     create_retriever_from_files,
     create_retriever_from_links,
     get_current_beijing_time,
+    post_process_text,
     reload_retriever,
-    post_process_text
 )
 
 app = FastAPI()

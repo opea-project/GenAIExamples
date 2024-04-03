@@ -18,12 +18,10 @@
 
 import json
 import logging
-import requests
 from typing import Any, AsyncIterator, Dict, Iterator, List, Mapping, Optional
-from langchain_core.callbacks import (
-    AsyncCallbackManagerForLLMRun,
-    CallbackManagerForLLMRun,
-)
+
+import requests
+from langchain_core.callbacks import AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun
 from langchain_core.language_models.llms import LLM
 from langchain_core.outputs import GenerationChunk
 from langchain_core.pydantic_v1 import root_validator
@@ -40,8 +38,7 @@ VALID_TASKS = (
 
 
 class NeuralChatEndpoint(LLM):
-    """
-    NeuralChat Endpoint.
+    """NeuralChat Endpoint.
     To leverage the endpoint of NeuralChat which support Tensor Parallelism for LLM inferencing.
 
     Example:
@@ -59,16 +56,15 @@ class NeuralChatEndpoint(LLM):
                 typical_p=0.95,
                 temperature=0.01,
                 repetition_penalty=1.03,
-                streaming=True
+                streaming=True,
             )
             print(llm("What is Deep Learning?"))
-
     """  # noqa: E501
 
     endpoint_url: Optional[str] = None
     """Endpoint URL to use."""
     max_new_tokens: int = 512
-    """Maximum number of generated tokens"""
+    """Maximum number of generated tokens."""
     top_k: Optional[int] = 1
     """The number of highest probability vocabulary tokens to keep for
     top-k-filtering."""
@@ -78,16 +74,20 @@ class NeuralChatEndpoint(LLM):
     temperature: Optional[float] = 0.7
     """The value used to module the logits distribution."""
     repetition_penalty: Optional[float] = 1.0
-    """The parameter for repetition penalty. 1.0 means no penalty.
-    See [this paper](https://arxiv.org/pdf/1909.05858.pdf) for more details."""
+    """The parameter for repetition penalty.
+
+    1.0 means no penalty.
+    See [this paper](https://arxiv.org/pdf/1909.05858.pdf) for more details.
+    """
     timeout: int = 120
-    """Timeout in seconds"""
+    """Timeout in seconds."""
     streaming: bool = False
-    """Whether to generate a stream of tokens asynchronously"""
+    """Whether to generate a stream of tokens asynchronously."""
     task: Optional[str] = None
     """Task to call the model with.
-    Should be a task that returns `generated_text` or `summary_text`."""
 
+    Should be a task that returns `generated_text` or `summary_text`.
+    """
 
     @root_validator(pre=True)
     def build_extra(cls, values: Dict[str, Any]) -> Dict[str, Any]:
@@ -114,12 +114,9 @@ class NeuralChatEndpoint(LLM):
 
         values["model_kwargs"] = extra
         if "endpoint_url" not in values:
-            raise ValueError(
-                "Please specify an `endpoint_url` for the model."
-            )
+            raise ValueError("Please specify an `endpoint_url` for the model.")
         values["model"] = values.get("endpoint_url")
         return values
-
 
     @property
     def _default_params(self) -> Dict[str, Any]:
@@ -129,7 +126,7 @@ class NeuralChatEndpoint(LLM):
             "top_k": self.top_k,
             "top_p": self.top_p,
             "temperature": self.temperature,
-            "repetition_penalty": self.repetition_penalty
+            "repetition_penalty": self.repetition_penalty,
         }
 
     @property
@@ -146,9 +143,7 @@ class NeuralChatEndpoint(LLM):
         """Return type of llm."""
         return "neuralchat_endpoint"
 
-    def _invocation_params(
-        self, runtime_stop: Optional[List[str]], **kwargs: Any
-    ) -> Dict[str, Any]:
+    def _invocation_params(self, runtime_stop: Optional[List[str]], **kwargs: Any) -> Dict[str, Any]:
         params = {**self._default_params, **kwargs}
         # params["stop_sequences"] = params["stop_sequences"] + (runtime_stop or [])
         return params
@@ -185,27 +180,26 @@ class NeuralChatEndpoint(LLM):
             "messages": prompt,
             "model": "Intel/neural-chat-7b-v3-1",
             "stream": True,
-            "max_tokens": invocation_params["max_new_tokens"]
+            "max_tokens": invocation_params["max_new_tokens"],
         }
-        
+
         response = requests.post(endpoint_url, json=data, stream=True)
 
         if response.status_code == 200:
             for line in response.iter_lines():
                 if line:
-                    decoded_line = line.decode('utf-8')
-                    if decoded_line != 'data: [DONE]':
+                    decoded_line = line.decode("utf-8")
+                    if decoded_line != "data: [DONE]":
                         json_res = json.loads(decoded_line[6:])
-                        delta = json_res['choices'][0]['delta']
-                        if 'content' in delta.keys():
-                            text = delta['content']
+                        delta = json_res["choices"][0]["delta"]
+                        if "content" in delta.keys():
+                            text = delta["content"]
                             chunk = GenerationChunk(text=text)
                             yield chunk
                             if run_manager:
                                 run_manager.on_llm_new_token(chunk.text)
         else:
             print(f"fail to call {endpoint_url}: {response.status_code}")
-
 
     async def _astream(
         self,
@@ -220,20 +214,20 @@ class NeuralChatEndpoint(LLM):
             "messages": prompt,
             "model": "Intel/neural-chat-7b-v3-1",
             "stream": True,
-            "max_tokens": invocation_params["max_new_tokens"]
+            "max_tokens": invocation_params["max_new_tokens"],
         }
-        
+
         response = requests.post(endpoint_url, json=data, stream=True)
 
         if response.status_code == 200:
             for line in response.iter_lines():
                 if line:
-                    decoded_line = line.decode('utf-8')
-                    if decoded_line != 'data: [DONE]':
+                    decoded_line = line.decode("utf-8")
+                    if decoded_line != "data: [DONE]":
                         json_res = json.loads(decoded_line[6:])
-                        delta = json_res['choices'][0]['delta']
-                        if 'content' in delta.keys():
-                            text = delta['content']
+                        delta = json_res["choices"][0]["delta"]
+                        if "content" in delta.keys():
+                            text = delta["content"]
                             chunk = GenerationChunk(text=text)
                             yield chunk
                             if run_manager:
