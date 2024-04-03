@@ -21,6 +21,7 @@ from fastapi import APIRouter, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from guardrails import moderation_prompt_for_chat, unsafe_dict
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
+from langchain_openai import ChatOpenAI
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Redis
 from langchain_core.messages import HumanMessage
@@ -47,7 +48,7 @@ app.add_middleware(
 
 class RAGAPIRouter(APIRouter):
 
-    def __init__(self, upload_dir, entrypoint, safety_guard_endpoint, tei_endpoint=None) -> None:
+    def __init__(self, upload_dir, entrypoint, safety_guard_endpoint, tei_endpoint=None, is_ray=False) -> None:
         super().__init__()
         self.upload_dir = upload_dir
         self.entrypoint = entrypoint
@@ -58,16 +59,25 @@ class RAGAPIRouter(APIRouter):
         )
 
         # Define LLM
-        self.llm = HuggingFaceEndpoint(
-            endpoint_url=entrypoint,
-            max_new_tokens=1024,
-            top_k=10,
-            top_p=0.95,
-            typical_p=0.95,
-            temperature=0.01,
-            repetition_penalty=1.03,
-            streaming=True,
-        )
+        if not is_ray:
+            self.llm = HuggingFaceEndpoint(
+                endpoint_url=entrypoint,
+                max_new_tokens=1024,
+                top_k=10,
+                top_p=0.95,
+                typical_p=0.95,
+                temperature=0.01,
+                repetition_penalty=1.03,
+                streaming=True,
+            )
+        else:
+            self.llm = ChatOpenAI(
+                openai_api_base=entrypoint,
+                model_name="neural-chat-7b-v3-3",
+                openai_api_key="no need",
+                streaming=True,
+                max_tokens=1024,
+            )
         if self.safety_guard_endpoint:
             self.llm_guard = HuggingFaceEndpoint(
                 endpoint_url=safety_guard_endpoint,
@@ -136,16 +146,18 @@ class RAGAPIRouter(APIRouter):
 upload_dir = os.getenv("RAG_UPLOAD_DIR", "./upload_dir")
 tgi_llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", None)
 ray_llm_endpoint = os.getenv("RAY_LLM_ENDPOINT", None)
+is_ray = False
 if tgi_llm_endpoint:
     llm_endpoint = tgi_llm_endpoint
 elif ray_llm_endpoint:
     llm_endpoint = ray_llm_endpoint
+    is_ray = True
 else:
     llm_endpoint = "http://localhost:8080"
 
 safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT")
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
-router = RAGAPIRouter(upload_dir, llm_endpoint, safety_guard_endpoint, tei_embedding_endpoint)
+router = RAGAPIRouter(upload_dir, llm_endpoint, safety_guard_endpoint, tei_embedding_endpoint, is_ray)
 
 
 @router.post("/v1/rag/chat")

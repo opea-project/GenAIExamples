@@ -38,8 +38,8 @@ cd serving/ray_gaudi/llm-on-ray/dev/docker && docker build -f Dockerfile.habana 
 # Build the Docker run command based on the number of cards
 if [ "$num_cards" -eq 1 ]; then
 cd ../../../ && docker run -p $port_number:$port_number --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy --cap-add=sys_nice --net=host --ipc=host -v $PWD/llm-on-ray:/root/llm-on-ray --name="llm-ray-habana" \
-llm-ray-habana:latest /bin/bash -c "ray start --head --port 8002 --dashboard-host='0.0.0.0' --dashboard-port=8265 && llm_on_ray-serve --config-file /root/llm-on-ray/llm_on_ray/inference/models/hpu/$model_name_file --port $port_number --keep_serve_terminal"
+llm-ray-habana:latest /bin/bash -c "ray start --head --port 8002 --dashboard-host='0.0.0.0' --dashboard-port=8265 && llm_on_ray-serve --config_file /root/llm-on-ray/llm_on_ray/inference/models/hpu/$model_name_file --port $port_number --keep_serve_terminal"
 else
 cd ../../../ && docker run -p $port_number:$port_number --runtime=habana -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy --cap-add=sys_nice --net=host --ipc=host -v $PWD/llm-on-ray:/root/llm-on-ray --name="llm-ray-habana" \
-llm-ray-habana:latest /bin/bash -c "ray start --head --port 8002 --dashboard-host='0.0.0.0' --dashboard-port=8265 && llm_on_ray-serve --config-file /root/llm-on-ray/llm_on_ray/inference/models/hpu/$model_name_file --port $port_number --keep_serve_terminal"
+llm-ray-habana:latest /bin/bash -c "ray start --head --port 8002 --dashboard-host='0.0.0.0' --dashboard-port=8265 && llm_on_ray-serve --config_file /root/llm-on-ray/llm_on_ray/inference/models/hpu/$model_name_file --port $port_number --keep_serve_terminal"
 fi

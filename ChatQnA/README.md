@@ -10,7 +10,7 @@ ChatQnA architecture shows below:
 
 This ChatQnA use case performs RAG using LangChain, Redis vectordb and Text Generation Inference on Intel Gaudi2. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
-# Environment Setup
+## Environment Setup for TGI
 
 To use [🤗 text-generation-inference](https://github.com/huggingface/text-generation-inference) on Habana Gaudi/Gaudi2, please follow these steps:
 
@@ -30,7 +30,7 @@ bash ./serving/tgi_gaudi/build_docker.sh
 
 ### Launch TGI Gaudi Service
 
-### Launch a local server instance on 1 Gaudi card:
+#### Launch a local server instance on 1 Gaudi card:
 
 ```bash
 bash ./serving/tgi_gaudi/launch_tgi_service.sh
@@ -44,7 +44,7 @@ Please follow this link [huggingface token](https://huggingface.co/docs/hub/secu
 export HUGGINGFACEHUB_API_TOKEN=<token>
 ```
 
-### Launch a local server instance on 8 Gaudi cards:
+#### Launch a local server instance on 8 Gaudi cards:
 
 ```bash
 bash ./serving/tgi_gaudi/launch_tgi_service.sh 8
@@ -105,7 +105,7 @@ The ./serving/ray_gaudi/launch_ray_service.sh script accepts three parameters:
 
 You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the Ray Gaudi endpoint by exporting the environment variable `RAY_LLM_ENDPOINT`:
 ```bash
-export RAY_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
+export RAY_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080/v1"
 ```
 
 ## Launch Redis
