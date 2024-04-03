@@ -1,3 +1,4 @@
+-f https://download.pytorch.org/whl/torch_stable.html
 beautifulsoup4
 docx2txt
 intel-extension-for-pytorch
@@ -12,4 +13,3 @@ pydantic==1.10.13
 pypdf
 python-multipart
 sentence-transformers
--f https://download.pytorch.org/whl/torch_stable.html
