@@ -78,7 +78,9 @@ export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose-langchain.yml`
 
 ```bash
+cd langchain/docker
 docker compose up -d
+cd ../..
 ```
 
 > [!NOTE]
