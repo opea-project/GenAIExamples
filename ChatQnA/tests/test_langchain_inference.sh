@@ -32,6 +32,11 @@ function docker_setup() {
 }
 
 function launch_redis() {
+    cd $WORKPATH
+    docker compose -f langchain/docker/docker-compose-redis.yml up -d
+}
+
+function launch_langchain() {
     # Launch LangChain Docker
     cd $WORKPATH/langchain/docker
     docker compose -f docker-compose-langchain.yml up -d
@@ -94,6 +99,7 @@ function main() {
 
     docker_setup
     launch_redis
+    launch_langchain
     launch_server
 
     run_tests
