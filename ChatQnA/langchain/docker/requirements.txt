@@ -14,3 +14,4 @@ redis
 sentence-transformers
 unstructured
 unstructured[all-docs]
+-f https://download.pytorch.org/whl/torch_stable.html
