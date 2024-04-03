@@ -31,7 +31,7 @@ model_name_file=${3:-$default_model}.yaml
 git submodule update --init --recursive
 
 # Build the Docker run command
-cd serving/ray_gaudi/llm-on-ray/dev/docker && docker build -f Dockerfile.habana ../../  -t llm-ray-habana:latest --network=host --build-arg no_proxy="127.0.0.1,localhost" 
+cd serving/ray_gaudi/llm-on-ray/dev/docker && docker build -f Dockerfile.habana ../../  -t llm-ray-habana:latest --network=host --build-arg no_proxy="127.0.0.1,localhost"
 
 # Build the Docker run command based on the number of cards
 if [ "$num_cards" -eq 1 ]; then

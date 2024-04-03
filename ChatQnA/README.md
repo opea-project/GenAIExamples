@@ -74,11 +74,13 @@ export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
 ## Environment Setup for LLM-on-Ray
+
 To use Intel [LLM-on-Ray](https://github.com/intel/llm-on-ray) on Habana Gaudi/Gaudi2, please follow these steps:
 
 ### Launch Ray Gaudi Service
 
 #### Launch a local server instance on 1 Gaudi card:
+
 ```bash
 bash ./serving/ray_gaudi/launch_ray_service.sh
 ```
@@ -94,7 +96,8 @@ export HUGGINGFACEHUB_API_TOKEN=<token>
 ```
 
 #### Launch a local server instance on 8 Gaudi cards:
-You can edit the corresonding model yaml file `ChatQnA/serving/ray_gaudi/llm-on-ray/llm_on_ray/inference/models`. For example, in the `models/hpu/neural-chat-7b-v3-3.yaml`, you can set `hpus_per_worker` to 8. Then:
+
+You can edit the corresponding model yaml file `ChatQnA/serving/ray_gaudi/llm-on-ray/llm_on_ray/inference/models`. For example, in the `models/hpu/neural-chat-7b-v3-3.yaml`, you can set `hpus_per_worker` to 8. Then:
 
 ```bash
 bash ./serving/ray_gaudi/launch_ray_service.sh
@@ -102,7 +105,8 @@ bash ./serving/ray_gaudi/launch_ray_service.sh
 
 #### Customize Ray Gaudi Service
 
-The corresonding model yaml file in the folder `ChatQnA/serving/ray_gaudi/llm-on-ray/llm_on_ray/inference/models` accepts many parameters, for example:
+The corresponding model yaml file in the folder `ChatQnA/serving/ray_gaudi/llm-on-ray/llm_on_ray/inference/models` accepts many parameters, for example:
+
 - num_cards `hpus_per_worker`: The number of Gaudi cards to be utilized, ranging from 1 to 8. The default is set to 1.
 - port_number `port`: The port number assigned to the Ray Gaudi endpoint, with the default being 8080.
 - model_name `name`: The model name utilized for LLM, with the default set to "Intel/neural-chat-7b-v3-3".
@@ -110,6 +114,7 @@ The corresonding model yaml file in the folder `ChatQnA/serving/ray_gaudi/llm-on
 In addition, you can set the port_number and model_name in the ./serving/tgi_gaudi/launch_tgi_service.sh script.
 
 You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the Ray Gaudi endpoint by exporting the environment variable `RAY_LLM_ENDPOINT`:
+
 ```bash
 export RAY_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```

@@ -5,8 +5,8 @@ intel-openmp
 jupyter
 langchain==0.1.12
 langchain-cli
-langchain_openai
 langchain_benchmarks
+langchain_openai
 poetry
 pyarrow
 pydantic==1.10.13

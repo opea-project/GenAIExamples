@@ -21,12 +21,12 @@ from fastapi import APIRouter, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from guardrails import moderation_prompt_for_chat, unsafe_dict
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
-from langchain_openai import ChatOpenAI
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Redis
 from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import ChatOpenAI
 from langserve import add_routes
 from prompts import contextualize_q_prompt, qa_prompt
 from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
@@ -73,7 +73,7 @@ class RAGAPIRouter(APIRouter):
             )
         else:
             self.llm = ChatOpenAI(
-                openai_api_base=entrypoint+"/v1",
+                openai_api_base=entrypoint + "/v1",
                 model_name="neural-chat-7b-v3-3",
                 openai_api_key="no need",
                 streaming=False,
