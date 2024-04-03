@@ -105,7 +105,7 @@ The ./serving/ray_gaudi/launch_ray_service.sh script accepts three parameters:
 
 You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the Ray Gaudi endpoint by exporting the environment variable `RAY_LLM_ENDPOINT`:
 ```bash
-export RAY_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080/v1"
+export RAY_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
 ## Launch Redis

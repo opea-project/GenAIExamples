@@ -72,10 +72,10 @@ class RAGAPIRouter(APIRouter):
             )
         else:
             self.llm = ChatOpenAI(
-                openai_api_base=entrypoint,
+                openai_api_base=entrypoint+"/v1",
                 model_name="neural-chat-7b-v3-3",
                 openai_api_key="no need",
-                streaming=True,
+                streaming=False,
                 max_tokens=1024,
             )
         if self.safety_guard_endpoint:
