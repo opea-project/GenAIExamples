@@ -28,7 +28,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langserve import add_routes
 from prompts import contextualize_q_prompt, qa_prompt
-from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
+from config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 from starlette.middleware.cors import CORSMiddleware
 from utils import (
     create_kb_folder,
