@@ -85,23 +85,29 @@ bash ./serving/ray_gaudi/launch_ray_service.sh
 
 For gated models such as `LLAMA-2`, you will have to pass -e HUGGING_FACE_HUB_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
 
-Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token ans export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
+Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
+
+And add the HUGGINGFACEHUB_API_TOKEN to `use_auth_token` in the `ChatQnA/serving/ray_gaudi/llm-on-ray/llm_on_ray/inference/models` corresponding model yaml file or export in the env:
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=<token>
 ```
 
 #### Launch a local server instance on 8 Gaudi cards:
+You can edit the corresonding model yaml file `ChatQnA/serving/ray_gaudi/llm-on-ray/llm_on_ray/inference/models`. For example, in the `models/hpu/neural-chat-7b-v3-3.yaml`, you can set `hpus_per_worker` to 8. Then:
+
 ```bash
-bash ./serving/ray_gaudi/launch_ray_service.sh 8
+bash ./serving/ray_gaudi/launch_ray_service.sh
 ```
 
 #### Customize Ray Gaudi Service
 
-The ./serving/ray_gaudi/launch_ray_service.sh script accepts three parameters:
-- num_cards: The number of Gaudi cards to be utilized, ranging from 1 to 8. The default is set to 1.
-- port_number: The port number assigned to the Ray Gaudi endpoint, with the default being 8080.
-- model_name: The model name utilized for LLM, with the default set to "Intel/neural-chat-7b-v3-3".
+The corresonding model yaml file in the folder `ChatQnA/serving/ray_gaudi/llm-on-ray/llm_on_ray/inference/models` accepts many parameters, for example:
+- num_cards `hpus_per_worker`: The number of Gaudi cards to be utilized, ranging from 1 to 8. The default is set to 1.
+- port_number `port`: The port number assigned to the Ray Gaudi endpoint, with the default being 8080.
+- model_name `name`: The model name utilized for LLM, with the default set to "Intel/neural-chat-7b-v3-3".
+
+In addition, you can set the port_number and model_name in the ./serving/tgi_gaudi/launch_tgi_service.sh script.
 
 You have the flexibility to customize these parameters according to your specific needs. Additionally, you can set the Ray Gaudi endpoint by exporting the environment variable `RAY_LLM_ENDPOINT`:
 ```bash
@@ -163,7 +169,7 @@ curl 127.0.0.1:8088/generate \
 
 ## Start the Backend Service
 
-Make sure TGI-Gaudi service is running and also make sure data is populated into Redis. Launch the backend service:
+Make sure TGI-Gaudi or LLM-on-Ray service is running and also make sure data is populated into Redis. Launch the backend service:
 
 ```bash
 docker exec -it qna-rag-redis-server bash

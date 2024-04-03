@@ -16,16 +16,14 @@
 # Set default values
 default_port=8080
 default_model="neural-chat-7b-v3-3"
-default_num_cards=1
 
 # Check if all required arguments are provided
-if [ "$#" -lt 0 ] || [ "$#" -gt 3 ]; then
+if [ "$#" -lt 0 ] || [ "$#" -gt 2 ]; then
     echo "Usage: $0 [num_cards] [port_number] [model_name]"
     exit 1
 fi
 
 # Assign arguments to variables
-num_cards=${1:-$default_num_cards}
 port_number=${2:-$default_port}
 model_name_file=${3:-$default_model}.yaml
 
