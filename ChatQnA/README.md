@@ -143,7 +143,7 @@ And then you can make requests like below to check the LangChain backend service
 # non-streaming endpoint
 curl 127.0.0.1:8000/v1/rag/chat \
   -X POST \
-  -d '{"query":"What's the total revenue of Nike in 2023?"}' \
+  -d '{"query":"What is the total revenue of Nike in 2023?"}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -151,7 +151,7 @@ curl 127.0.0.1:8000/v1/rag/chat \
 # streaming endpoint
 curl 127.0.0.1:8000/v1/rag/chat_stream \
   -X POST \
-  -d '{"query":"What's the total revenue of Nike in 2023?"}' \
+  -d '{"query":"What is the total revenue of Nike in 2023?"}' \
   -H 'Content-Type: application/json'
 ```
 
