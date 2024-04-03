@@ -50,6 +50,7 @@ class RAGAPIRouter(APIRouter):
 
     def __init__(self, upload_dir, entrypoint, safety_guard_endpoint, tei_endpoint=None, is_ray=False) -> None:
         super().__init__()
+        self.is_ray = is_ray
         self.upload_dir = upload_dir
         self.entrypoint = entrypoint
         self.safety_guard_endpoint = safety_guard_endpoint
@@ -59,7 +60,7 @@ class RAGAPIRouter(APIRouter):
         )
 
         # Define LLM
-        if not is_ray:
+        if not self.is_ray:
             self.llm = HuggingFaceEndpoint(
                 endpoint_url=entrypoint,
                 max_new_tokens=1024,
@@ -126,7 +127,10 @@ class RAGAPIRouter(APIRouter):
 
     def handle_rag_chat(self, query: str):
         response = self.llm_chain.invoke({"question": query, "chat_history": self.chat_history})
-        result = response.split("</s>")[0]
+        if not self.is_ray:
+            result = response.split("</s>")[0]
+        else:
+            result = response.content.split("</s>")[0]
         self.chat_history.extend([HumanMessage(content=query), response])
         # output guardrails
         if self.safety_guard_endpoint:
