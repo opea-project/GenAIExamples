@@ -30,7 +30,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_community.vectorstores import Redis
 from langchain_core.documents import Document
-from config import INDEX_SCHEMA, REDIS_URL
+from rag_redis.config import INDEX_SCHEMA, REDIS_URL
 
 
 def get_current_beijing_time():
