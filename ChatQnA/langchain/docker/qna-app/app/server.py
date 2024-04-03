@@ -17,6 +17,7 @@
 
 import os
 
+from config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 from fastapi import APIRouter, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from guardrails import moderation_prompt_for_chat, unsafe_dict
@@ -28,7 +29,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langserve import add_routes
 from prompts import contextualize_q_prompt, qa_prompt
-from config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 from starlette.middleware.cors import CORSMiddleware
 from utils import (
     create_kb_folder,
