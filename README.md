@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project provides a collective list of Generative AI (GenAI) examples such as chatbot with question and answering (ChatQnA), code generation, document summary, etc. The examples are developed by leveraging the ecosystem components such as LangChain with Intel optimizations, therefore delivering the high performance for your deployment on Intel platforms.
+This project provides a collective list of Generative AI (GenAI) and RAG (Retrieval and Augmentation) examples such as chatbot with question and answering (ChatQnA), code generation, document summary, etc. The examples are developed by leveraging the ecosystem components such as LangChain with Intel optimizations, therefore delivering the high performance for your deployment on Intel platforms.
 
 ## GenAI Examples
 
