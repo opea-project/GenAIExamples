@@ -22,7 +22,6 @@ function test_env_setup() {
 }
 
 function docker_setup() {
-    # todo
     local card_num=1
     local port=8888
     local model_name="Intel/neural-chat-7b-v3-3"
@@ -58,18 +57,17 @@ function launch_server() {
 
 function run_tests() {
     cd $WORKPATH
-    local query="{\"query\":\"What's the total revenue of Nike in 2023?\"}"
 
     # non-streaming endpoint
     curl 127.0.0.1:$port/v1/rag/chat \
         -X POST \
-        -d $query \
+        -d "{\"query\":\"What's the total revenue of Nike in 2023?\"}" \
         -H 'Content-Type: application/json'
 
     # streaming endpoint
     curl 127.0.0.1:$port/v1/rag/chat_stream \
         -X POST \
-        -d $query \
+        -d "{\"query\":\"What's the total revenue of Nike in 2023?\"}" \
         -H 'Content-Type: application/json'
 
     echo "Requesting sth..." >>$LOG_PATH
@@ -103,7 +101,7 @@ function main() {
     launch_langchain
     launch_server
 
-    run_tests
+    run_tests;
 
     docker exec "ChatQnA_server" bash -c "rm -rf /data"
     docker_stop "ChatQnA_server" && docker_stop "langchain-rag-server" && docker_stop $DOCKER_NAME && docker_stop "redis-vector-db"
