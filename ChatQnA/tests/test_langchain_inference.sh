@@ -49,27 +49,21 @@ function docker_setup() {
     sleep 3m # Waits 3 minutes
 }
 
-function launch_redis() {
+function launch_redis_and_langchain_container() {
     cd $WORKPATH
-    docker compose -f langchain/docker/docker-compose-redis.yml up -d
+    export HUGGINGFACEHUB_API_TOKEN=${HUGGING_FACE_TOKEN}
+    local port=8890
+    sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
+    docker compose -f langchain/docker/docker-compose.yml up -d --build
 }
 
-function launch_langchain() {
-    # Launch LangChain Docker
-    cd $WORKPATH/langchain/docker
-    echo """your-hugging-face-token=${HUGGING_FACE_TOKEN}""" >.env
-    docker compose -f docker-compose-langchain.yml up -d --build
-
+function launch_server() {
     # Ingest data into redis
     cd $WORKPATH
     docker exec $LANGCHAIN_CONTAINER_NAME \
         bash -c "cd /ws && python ingest.py"
-}
 
-function launch_server() {
     # Start the Backend Service
-    cd $WORKPATH
-
     docker exec $LANGCHAIN_CONTAINER_NAME \
         bash -c "nohup python app/server.py &"
 }
@@ -77,22 +71,20 @@ function launch_server() {
 function run_tests() {
     cd $WORKPATH
     local port=8890
-
-    sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
-
     curl 127.0.0.1:$port/v1/rag/chat \
         -X POST \
         -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
-        -H 'Content-Type: application/json'
-
-    echo "Requesting sth..." >>$LOG_PATH
+        -H 'Content-Type: application/json' > $LOG_PATH
 }
 
 function check_response() {
-    # todo
     cd $WORKPATH
     echo "Checking response"
-    local status=true
+    local status=false
+    if [[ $(grep -c "\$51.2 billion" $LOG_PATH) != 0 ]]; then
+        status=true
+    fi
+
     if [ $status == false ]; then
         echo "Response check failed"
         exit 1
@@ -113,8 +105,7 @@ function main() {
     docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
 
     docker_setup
-    launch_redis
-    launch_langchain
+    launch_redis_and_langchain_container
     launch_server
 
     run_tests
