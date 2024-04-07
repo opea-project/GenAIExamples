@@ -4,14 +4,8 @@ on:
   pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
-    paths:
-      - ChatQnA/**
-      - CodeGen/**
-      - DocSum/**
-      - VisualQnA/**
-      - .github/workflows/format_scan.yml
-      - .github/workflows/docker/format-scan.dockerfile
-      - .github/workflows/script/formatScan/**
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
 
 # If there is a new commit, the previous jobs will be canceled
