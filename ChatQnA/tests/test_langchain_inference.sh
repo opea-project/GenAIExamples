@@ -59,10 +59,10 @@ function launch_redis_and_langchain_container() {
 }
 
 function launch_server() {
-    # Ingest data into redis
     cd $WORKPATH
+    # Ingest data into redis
     docker exec $LANGCHAIN_CONTAINER_NAME \
-        bash -c "cd /ws && python ingest.py"
+        bash -c "cd /ws && python ingest.py > /dev/null"
 
     # Start the Backend Service
     docker exec $LANGCHAIN_CONTAINER_NAME \
@@ -111,7 +111,7 @@ function main() {
     launch_server
 
     run_tests
-    docker exec $CHATQNA_CONTAINER_NAME bash -c "rm -rf /data"
+
     docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
     echo y | docker system prune
 
