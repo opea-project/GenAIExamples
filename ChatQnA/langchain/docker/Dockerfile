@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM intel/intel-optimized-pytorch:2.2.0-pip-jupyter
+FROM langchain/langchain:latest
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
@@ -29,7 +29,7 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /tmp/requirements.txt
 
-ENV PYTHONPATH=/ws:/home/user:/home/user/qna-app/app
+ENV PYTHONPATH=$PYTHONPATH:/ws:/home/user:/home/user/qna-app/app
 
 WORKDIR /home/user/qna-app
 COPY qna-app /home/user/qna-app

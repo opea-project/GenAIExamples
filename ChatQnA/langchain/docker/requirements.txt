@@ -1,6 +1,9 @@
+-f https://download.pytorch.org/whl/torch_stable.html
 cryptography==42.0.4
 easyocr
+intel-extension-for-pytorch
 intel-openmp
+jupyter
 langchain==0.1.12
 langchain-cli
 langchain_benchmarks
