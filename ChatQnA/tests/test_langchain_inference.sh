@@ -67,6 +67,7 @@ function launch_server() {
     # Start the Backend Service
     docker exec $LANGCHAIN_CONTAINER_NAME \
         bash -c "nohup python app/server.py &"
+    sleep 1m
 }
 
 function run_tests() {
