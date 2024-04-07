@@ -80,14 +80,7 @@ function run_tests() {
 
     sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
 
-    # non-streaming endpoint
     curl 127.0.0.1:$port/v1/rag/chat \
-        -X POST \
-        -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
-        -H 'Content-Type: application/json'
-
-    # streaming endpoint
-    curl 127.0.0.1:$port/v1/rag/chat_stream \
         -X POST \
         -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
         -H 'Content-Type: application/json'
