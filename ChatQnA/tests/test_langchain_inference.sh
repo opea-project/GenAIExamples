@@ -39,6 +39,7 @@ function launch_redis() {
 function launch_langchain() {
     # Launch LangChain Docker
     cd $WORKPATH/langchain/docker
+    echo """your-hugging-face-token=${HUGGING_FACE_TOKEN}""" >.env
     docker compose -f docker-compose-langchain.yml up -d
 
     # Ingest data into redis
