@@ -62,7 +62,7 @@ function run_tests() {
     # non-streaming endpoint
     curl 127.0.0.1:$port/v1/rag/chat \
         -X POST \
-        -d "{\"query\":\"What' is the total revenue of Nike in 2023?\"}" \
+        -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
         -H 'Content-Type: application/json'
 
     # streaming endpoint
