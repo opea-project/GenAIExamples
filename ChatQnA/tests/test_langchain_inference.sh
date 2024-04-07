@@ -40,9 +40,9 @@ function docker_setup() {
     cd ${WORKPATH}
 
     # Reset the tgi port
-    # sed -i "s/8080/$port/g" langchain/redis/rag_redis/config.py
-    # sed -i "s/8080/$port/g" langchain/docker/qna-app/app/server.py
-    # sed -i "s/8080/$port/g" langchain/docker/qna-app/Dockerfile
+    sed -i "s/8080/$port/g" langchain/redis/rag_redis/config.py
+    sed -i "s/8080/$port/g" langchain/docker/qna-app/app/server.py
+    sed -i "s/8080/$port/g" langchain/docker/qna-app/Dockerfile
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
