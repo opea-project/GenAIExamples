@@ -26,9 +26,9 @@ function test_env_setup() {
 
 function rename() {
     # Rename the container names
-    sed -i "s/redis-vector-db/${REDIS_CONTAINER_NAME}/g" langchain/docker/docker-compose-redis.yml
-    sed -i "s/container_name: qna-rag-redis-serverb/container_name: ${LANGCHAIN_CONTAINER_NAME}/g" langchain/docker/docker-compose-redis.yml
-    sed -i "s/ChatQnA_server/${CHATQNA_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
+    sed -i "s|redis-vector-db/${REDIS_CONTAINER_NAME}/g" langchain/docker/docker-compose-redis.yml
+    sed -i "s|container_name: qna-rag-redis-serverb/container_name: ${LANGCHAIN_CONTAINER_NAME}/g" langchain/docker/docker-compose-redis.yml
+    sed -i "s|ChatQnA_server/${CHATQNA_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
 }
 
 function docker_setup() {
@@ -37,9 +37,9 @@ function docker_setup() {
     local model_name="Intel/neural-chat-7b-v3-3"
 
     # Reset the tgi port
-    sed -i "s/http://localhost:8080/http://localhost:$port/g" langchain/redis/rag_redis/config.py
-    sed -i "s/http://localhost:8080/http://localhost:$port/g" langchain/docker/qna-app/app/server.py
-    sed -i "s/8080/$port/g" langchain/docker/qna-app/Dockerfile
+    sed -i "s|http://localhost:8080/http://localhost:$port/g" langchain/redis/rag_redis/config.py
+    sed -i "s|http://localhost:8080/http://localhost:$port/g" langchain/docker/qna-app/app/server.py
+    sed -i "s|8080/$port/g" langchain/docker/qna-app/Dockerfile
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
@@ -75,7 +75,7 @@ function run_tests() {
     cd $WORKPATH
     local port=8890
 
-    sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
+    sed -i "s|port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
 
     # non-streaming endpoint
     curl 127.0.0.1:$port/v1/rag/chat \
@@ -113,6 +113,7 @@ function docker_stop() {
 
 function main() {
     test_env_setup
+    rename
     docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
 
     docker_setup
