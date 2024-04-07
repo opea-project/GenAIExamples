@@ -57,17 +57,18 @@ function launch_server() {
 
 function run_tests() {
     cd $WORKPATH
+    local port=8000
 
     # non-streaming endpoint
     curl 127.0.0.1:$port/v1/rag/chat \
         -X POST \
-        -d "{\"query\":\"What's the total revenue of Nike in 2023?\"}" \
+        -d "{\"query\":\"What' is the total revenue of Nike in 2023?\"}" \
         -H 'Content-Type: application/json'
 
     # streaming endpoint
     curl 127.0.0.1:$port/v1/rag/chat_stream \
         -X POST \
-        -d "{\"query\":\"What's the total revenue of Nike in 2023?\"}" \
+        -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
         -H 'Content-Type: application/json'
 
     echo "Requesting sth..." >>$LOG_PATH
@@ -101,9 +102,7 @@ function main() {
     launch_langchain
     launch_server
 
-    run_tests;
-
-    docker exec "ChatQnA_server" bash -c "rm -rf /data"
+    run_tests;docker exec "ChatQnA_server" bash -c "rm -rf /data"
     docker_stop "ChatQnA_server" && docker_stop "langchain-rag-server" && docker_stop $DOCKER_NAME && docker_stop "redis-vector-db"
     echo y | docker system prune
 
