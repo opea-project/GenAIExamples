@@ -21,10 +21,9 @@ ENV LANG=en_US.UTF-8
 ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/langchain/libs/community:/langchain/libs/langchain
 
 # Install required branch
-RUN git clone https://github.com/Spycsh/langchain.git /langchain -b master
-RUN cd /langchain/libs/langchain && \
-    pip install -e . && \
-    cd -
+RUN git clone https://github.com/Spycsh/langchain.git /langchain -b master && \
+    pip install --no-cache-dir -e /langchain/libs/langchain && \
+    rm -rf /langchain
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
