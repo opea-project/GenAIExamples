@@ -28,7 +28,7 @@ jobs:
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
-      - name: backend check
+      - name: Run Test
         env:
           HUGGING_FACE_TOKEN: ${{ secrets.HUGGING_FACE_TOKEN }}
         run: |
