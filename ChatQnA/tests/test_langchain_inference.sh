@@ -32,7 +32,7 @@ function docker_setup() {
 
 function launch_redis() {
     cd $WORKPATH
-    docker compose -f langchain/docker/docker-compose-redis.yml up -d
+    docker compose -f langchain/docker/docker-compose-redis.yml up -d --build
 }
 
 function launch_langchain() {
