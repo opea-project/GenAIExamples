@@ -26,7 +26,6 @@ USER user
 
 COPY requirements.txt /tmp/requirements.txt
 
-ENV PATH=/home/user/.local/bin:$PATH
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /tmp/requirements.txt
 
