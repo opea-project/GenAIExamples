@@ -104,6 +104,7 @@ function main() {
 
     run_tests
 
+    docker exec "ChatQnA_server" bash -c "rm -rf /data"
     docker_stop "ChatQnA_server" && docker_stop "langchain-rag-server" && docker_stop $DOCKER_NAME && docker_stop "redis-vector-db"
     echo y | docker system prune
 
