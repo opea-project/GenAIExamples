@@ -29,7 +29,7 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /tmp/requirements.txt
 
-ENV PYTHONPATH=/home/user:/home/user/qna-app/app
+ENV PYTHONPATH=$PYTHONPATH:/ws:/home/user:/home/user/qna-app/app
 
 WORKDIR /home/user/qna-app
 COPY qna-app /home/user/qna-app

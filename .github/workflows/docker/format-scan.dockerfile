@@ -1,3 +1,4 @@
+#
 # Copyright (c) 2024 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM intel/intel-optimized-pytorch:2.2.0-pip-jupyter
+ARG UBUNTU_VER=22.04
+FROM ubuntu:${UBUNTU_VER} as devel
 
-RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
-    libgl1-mesa-glx \
-    libjemalloc-dev
+ENV LANG C.UTF-8
 
-RUN useradd -m -s /bin/bash user && \
-    mkdir -p /home/user && \
-    chown -R user /home/user/
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
+    aspell \
+    aspell-en \
+    build-essential \
+    python3 \
+    python3-pip \
+    python3-dev \
+    python3-distutils \
+    wget
 
-USER user
+RUN ln -sf $(which python3) /usr/bin/python
 
-COPY requirements.txt /tmp/requirements.txt
+RUN python -m pip install --no-cache-dir pylint==2.12.1\
+    bandit
 
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /tmp/requirements.txt
-
-ENV PYTHONPATH=/home/user:/home/user/summarize-app/app
-
-WORKDIR /home/user/summarize-app
-COPY summarize-app /home/user/summarize-app
+WORKDIR /
