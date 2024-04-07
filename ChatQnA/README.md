@@ -73,19 +73,13 @@ You have the flexibility to customize these parameters according to your specifi
 export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
-## Launch Redis
+## Launch Redis and LangChain Backend Service
 
-```bash
-docker compose -f langchain/docker/docker-compose-redis.yml up -d
-```
-
-## Launch LangChain Docker
-
-Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose-langchain.yml`
+Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose.yml`
 
 ```bash
 cd langchain/docker
-docker compose -f docker-compose-langchain.yml up -d
+docker compose -f docker-compose.yml up -d
 cd ../../
 ```
 
@@ -143,7 +137,7 @@ And then you can make requests like below to check the LangChain backend service
 # non-streaming endpoint
 curl 127.0.0.1:8000/v1/rag/chat \
   -X POST \
-  -d '{"query":"What's the total revenue of Nike in 2023?"}' \
+  -d '{"query":"What is the total revenue of Nike in 2023?"}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -151,7 +145,7 @@ curl 127.0.0.1:8000/v1/rag/chat \
 # streaming endpoint
 curl 127.0.0.1:8000/v1/rag/chat_stream \
   -X POST \
-  -d '{"query":"What's the total revenue of Nike in 2023?"}' \
+  -d '{"query":"What is the total revenue of Nike in 2023?"}' \
   -H 'Content-Type: application/json'
 ```
 
