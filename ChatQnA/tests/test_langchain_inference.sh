@@ -117,7 +117,7 @@ function docker_stop() {
 function main() {
     test_env_setup
     rename
-    docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
+    docker_stop $CHATQNA_CONTAINER_NAME && docker_stop langchain-rag-server && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
 
     docker_setup
     launch_redis
@@ -126,7 +126,7 @@ function main() {
 
     run_tests
     docker exec $CHATQNA_CONTAINER_NAME bash -c "rm -rf /data"
-    docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
+    docker_stop $CHATQNA_CONTAINER_NAME && docker_stop langchain-rag-server && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
     echo y | docker system prune
 
     check_response
