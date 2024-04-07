@@ -32,14 +32,14 @@ function docker_setup() {
 
 function launch_redis() {
     cd $WORKPATH
-    docker compose -f langchain/docker/docker-compose-redis.yml up -d --build
+    docker compose -f langchain/docker/docker-compose-redis.yml up -d
 }
 
 function launch_langchain() {
     # Launch LangChain Docker
     cd $WORKPATH/langchain/docker
     echo """your-hugging-face-token=${HUGGING_FACE_TOKEN}""" >.env
-    docker compose -f docker-compose-langchain.yml up -d
+    docker compose -f docker-compose-langchain.yml up -d --build
 
     # Ingest data into redis
     cd $WORKPATH
