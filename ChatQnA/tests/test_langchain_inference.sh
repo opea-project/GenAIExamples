@@ -44,7 +44,7 @@ function docker_setup() {
     sed -i "s/8080/$port/g" langchain/docker/qna-app/app/server.py
     sed -i "s/8080/$port/g" langchain/docker/qna-app/Dockerfile
 
-    sudo lsof -ti:$port | xargs kill -s 9
+    sudo lsof -ti:$port | xargs sudo kill -s 9
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
