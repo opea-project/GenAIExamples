@@ -16,15 +16,34 @@ set -xe
 
 function test_env_setup() {
     WORKPATH=$(dirname "$PWD")
-    DOCKER_NAME="qna-rag-redis-server"
     LOG_PATH="$WORKPATH/tests/langchain.log"
+
+    REDIS_CONTAINER_NAME="test-redis-vector-db"
+    LANGCHAIN_CONTAINER_NAME="test-qna-rag-redis-server"
+    CHATQNA_CONTAINER_NAME="test-ChatQnA_server"
     cd $WORKPATH # go to ChatQnA
+}
+
+function rename() {
+    # Rename the container names
+    cd ${WORKPATH}
+    sed -i "s/container_name: redis-vector-db/container_name: ${REDIS_CONTAINER_NAME}/g" langchain/docker/docker-compose-redis.yml
+    sed -i "s/container_name: qna-rag-redis-server/container_name: ${LANGCHAIN_CONTAINER_NAME}/g" langchain/docker/docker-compose-langchain.yml
+    sed -i "s/ChatQnA_server/${CHATQNA_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
 }
 
 function docker_setup() {
     local card_num=1
     local port=8888
     local model_name="Intel/neural-chat-7b-v3-3"
+
+    cd ${WORKPATH}
+
+    # Reset the tgi port
+    sed -i "s/8080/$port/g" langchain/redis/rag_redis/config.py
+    sed -i "s/8080/$port/g" langchain/docker/qna-app/app/server.py
+    sed -i "s/8080/$port/g" langchain/docker/qna-app/Dockerfile
+
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
     sleep 3m # Waits 3 minutes
@@ -43,7 +62,7 @@ function launch_langchain() {
 
     # Ingest data into redis
     cd $WORKPATH
-    docker exec $DOCKER_NAME \
+    docker exec $LANGCHAIN_CONTAINER_NAME \
         bash -c "cd /ws && python ingest.py"
 }
 
@@ -51,13 +70,15 @@ function launch_server() {
     # Start the Backend Service
     cd $WORKPATH
 
-    docker exec $DOCKER_NAME \
+    docker exec $LANGCHAIN_CONTAINER_NAME \
         bash -c "nohup python app/server.py &"
 }
 
 function run_tests() {
     cd $WORKPATH
-    local port=8000
+    local port=8890
+
+    sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
 
     # non-streaming endpoint
     curl 127.0.0.1:$port/v1/rag/chat \
@@ -95,15 +116,17 @@ function docker_stop() {
 
 function main() {
     test_env_setup
-    docker_stop "ChatQnA_server" && docker_stop "langchain-rag-server" && docker_stop $DOCKER_NAME && docker_stop "redis-vector-db"
+    rename
+    docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
 
     docker_setup
     launch_redis
     launch_langchain
     launch_server
 
-    run_tests;docker exec "ChatQnA_server" bash -c "rm -rf /data"
-    docker_stop "ChatQnA_server" && docker_stop "langchain-rag-server" && docker_stop $DOCKER_NAME && docker_stop "redis-vector-db"
+    run_tests
+    docker exec $CHATQNA_CONTAINER_NAME bash -c "rm -rf /data"
+    docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
     echo y | docker system prune
 
     check_response
