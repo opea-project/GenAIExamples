@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
 
 export let kb_id = writable("");
 

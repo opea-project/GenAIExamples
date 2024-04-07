@@ -73,14 +73,14 @@ You have the flexibility to customize these parameters according to your specifi
 export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
-## Launch Redis
+## Launch Redis and LangChain Backend Service
 
-Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose-langchain.yml`
+Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose.yml`
 
 ```bash
 cd langchain/docker
-docker compose up -d
-cd ../..
+docker compose -f docker-compose.yml up -d
+cd ../../
 ```
 
 > [!NOTE]

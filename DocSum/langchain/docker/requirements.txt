@@ -1,7 +1,5 @@
--f https://download.pytorch.org/whl/torch_stable.html
 beautifulsoup4
 docx2txt
-intel-extension-for-pytorch
 intel-openmp
 jupyter
 langchain==0.1.12

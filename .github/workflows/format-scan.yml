@@ -1,0 +1,58 @@
+name: Format Scan
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOCKER_CONFIG_NAME: "commonDockerConfig"
+  REPO_NAME: "format-scan"
+  REPO_TAG: "1.0"
+  DOCKER_FILE_NAME: "format-scan"
+  CONTAINER_NAME: "format-scan"
+
+jobs:
+  format-scan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        job_name: ["bandit"]
+      fail-fast: false
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Docker Build
+        run: |
+          docker build -f ${{ github.workspace }}/.github/workflows/docker/${{ env.DOCKER_FILE_NAME }}.dockerfile -t ${{ env.REPO_NAME }}:${{ env.REPO_TAG }} .
+
+      - name: Docker Run
+        run: |
+          if [[ $(docker ps -a | grep -i '${{ env.CONTAINER_NAME }}'$) ]]; then
+            docker stop ${{ env.CONTAINER_NAME }}
+            docker rm -vf ${{ env.CONTAINER_NAME }} || true
+          fi
+          docker run -dit --memory="4g" --memory-reservation="1g" --disable-content-trust --privileged --name=${{ env.CONTAINER_NAME }} --shm-size="1g" \
+          -v ${{ github.workspace }}:/GenAIExamples \
+          ${{ env.REPO_NAME }}:${{ env.REPO_TAG }}
+
+      - name: Code scan check
+        run: |
+          docker exec ${{ env.CONTAINER_NAME }} \
+          bash -c "bash /GenAIExamples/.github/workflows/scripts/formatScan/${{ matrix.job_name }}.sh"
+
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.job_name }}
+          path: ${{ github.workspace }}/.github/workflows/scripts/formatScan/${{ matrix.job_name }}.*
