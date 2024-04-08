@@ -35,6 +35,7 @@ from utils import (
     create_retriever_from_files,
     create_retriever_from_links,
     get_current_beijing_time,
+    post_process_text,
     reload_retriever,
 )
 
@@ -68,6 +69,19 @@ class RAGAPIRouter(APIRouter):
             repetition_penalty=1.03,
             streaming=True,
         )
+        # for NeuralChatEndpoint:
+        """
+        self.llm = NeuralChatEndpoint(
+            endpoint_url=entrypoint,
+            max_new_tokens=1024,
+            top_k=10,
+            top_p=0.95,
+            typical_p=0.95,
+            temperature=0.01,
+            repetition_penalty=1.03,
+            streaming=True,
+        )
+        """
         if self.safety_guard_endpoint:
             self.llm_guard = HuggingFaceEndpoint(
                 endpoint_url=safety_guard_endpoint,
@@ -216,15 +230,9 @@ async def rag_chat_stream(request: Request):
         chat_response = ""
         for text in router.llm_chain.stream({"question": query, "chat_history": router.chat_history}):
             chat_response += text
-            if text == " ":
-                yield "data: @#$\n\n"
-                continue
-            if text.isspace():
-                continue
-            if "\n" in text:
-                yield "data: <br/>\n\n"
-            new_text = text.replace(" ", "@#$")
-            yield f"data: {new_text}\n\n"
+            processed_text = post_process_text(text)
+            if text is not None:
+                yield processed_text
         chat_response = chat_response.split("</s>")[0]
         print(f"[rag - chat_stream] stream response: {chat_response}")
         router.chat_history.extend([HumanMessage(content=query), chat_response])
