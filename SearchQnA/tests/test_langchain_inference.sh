@@ -59,7 +59,7 @@ function run_tests() {
     cd $WORKPATH
     local port=8890
 
-    curl http://localhost:8085/v1/rag/web_search_chat \
+    curl http://localhost:${port}/v1/rag/web_search_chat \
         -X POST \
         -d '{"query":"When is Chinese National Holiday?"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
