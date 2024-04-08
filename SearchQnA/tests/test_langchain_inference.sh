@@ -30,7 +30,7 @@ function rename() {
 
 function launch_tgi_gaudi_service() {
     local card_num=1
-    local port=8889
+    local port=8870
     local model_name="Intel/neural-chat-7b-v3-3"
 
     cd ${WORKPATH}
@@ -45,7 +45,7 @@ function launch_tgi_gaudi_service() {
 
 function launch_langchain_service() {
     cd $WORKPATH
-    local port=8890
+    local port=8875
     cd langchain/docker
     docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy}  -t intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME} --no-cache
     docker run -d --name=${LANGCHAIN_CONTAINER_NAME} -e GOOGLE_CSE_ID=${GOOGLE_CSE_ID} -e GOOGLE_API_KEY=${GOOGLE_API_KEY} -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
@@ -57,7 +57,7 @@ function launch_langchain_service() {
 
 function run_tests() {
     cd $WORKPATH
-    local port=8890
+    local port=8875
 
     curl http://localhost:${port}/v1/rag/web_search_chat \
         -X POST \
