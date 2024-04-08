@@ -25,16 +25,12 @@ jobs:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
 
-      - name: Load environment variables
-        run: |
-          cat ~/suyue/actions-runner/.env >> $GITHUB_ENV
-
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
       - name: Run Test
         env:
-          HUGGINGFACEHUB_API_TOKEN: ${{ env.HUGGINGFACEHUB_API_TOKEN }}
+          HUGGING_FACE_TOKEN: ${{ secrets.HUGGING_FACE_TOKEN }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
           bash test_${{ matrix.job_name }}_inference.sh
