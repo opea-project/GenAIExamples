@@ -30,6 +30,7 @@ jobs:
 
       - name: Run Test
         run: |
+          cat ${{ github.workspace }}/actions-runner/.env >> $GITHUB_ENV
           cd ${{ github.workspace }}/VisualQnA/tests
           bash test_${{ matrix.job_name }}_inference.sh
 
