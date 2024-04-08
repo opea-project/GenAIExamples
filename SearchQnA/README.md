@@ -23,6 +23,7 @@ The workflow falls into the following architecture:
 # Start Backend Service
 
 1. Start the TGI service to deploy your LLM
+
 ```sh
 cd serving/tgi_gaudi
 bash build_docker.sh
@@ -39,7 +40,7 @@ docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${ht
 docker run -e TGI_ENDPOINT=<TGI ENDPOINT> -e GOOGLE_CSE_ID=<GOOGLE CSE ID> -e GOOGLE_API_KEY=<GOOGLE API KEY> -e HUGGINGFACEHUB_API_TOKEN=<HUGGINGFACE API TOKEN> -p 8085:8000 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -v $PWD/qna-app:/qna-app --runtime=habana -e HABANA_VISIBE_DEVILCES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:searchqna-gaudi
 ```
 
-Here is the explaination of some of the above parameters:
+Here is the explanation of some of the above parameters:
 
 - `TGI_ENDPOINT`: the endpoint of your TGI service, usually equal to `<ip of your machine>:<port of your TGI service>`
 - `GOOGLE_CSE_ID`: your CSE ID for Google Search Engine, usually generated [here](https://programmablesearchengine.google.com/controlpanel/all)
