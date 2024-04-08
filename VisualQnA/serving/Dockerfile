@@ -36,6 +36,5 @@ RUN pip install --no-cache-dir -U -r /tmp/requirements.txt
 
 # work dir should contains the server
 WORKDIR /llava_server
-COPY llava_server /llava_server
 
 ENTRYPOINT ["python", "llava_server.py"]
