@@ -27,7 +27,7 @@ jobs:
 
       - name: Load environment variables
         run: |
-          cat ~/suyue/actions-runner >> $GITHUB_ENV
+          cat ~/suyue/actions-runner/.env >> $GITHUB_ENV
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
