@@ -75,6 +75,8 @@ function run_tests() {
         -X POST \
         -H 'Content-Type: application/json' \
         -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}')
+
+    sleep 5s
 }
 
 function check_response() {
