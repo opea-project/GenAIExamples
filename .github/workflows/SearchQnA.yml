@@ -30,7 +30,9 @@ jobs:
 
       - name: Run Test
         env:
-          HUGGING_FACE_TOKEN: ${{ env.HUGGING_FACE_TOKEN }}
+          HUGGINGFACEHUB_API_TOKEN: ${{ env.HUGGINGFACEHUB_API_TOKEN }}
+          GOOGLE_CSE_ID: ${{ env.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ env.GOOGLE_API_KEY }}
         run: |
           cd ${{ github.workspace }}/SearchQnA/tests
           bash test_${{ matrix.job_name }}_inference.sh
