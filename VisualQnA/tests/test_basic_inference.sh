@@ -35,7 +35,7 @@ function launch_llava_service() {
 function run_tests() {
     cd $WORKPATH
     local port=8855
-    curl localhost:${port}/health -v > $LOG_PATH
+    curl localhost:${port}/health -v 2>&1 | tee $LOG_PATH
 }
 
 function check_response() {
