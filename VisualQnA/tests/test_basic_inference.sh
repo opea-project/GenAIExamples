@@ -29,7 +29,7 @@ function launch_llava_service() {
     docker run -d --name=${CONTAINER_NAME} -p ${port}:8000 -v ~/.cache/huggingface/hub/:/root/.cache/huggingface/hub/ -e http_proxy=$http_proxy -e https_proxy=$http_proxy \
     --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:${CONTAINER_NAME}
 
-    sleep 1m # Waits 3 minutes
+    sleep 3m
 }
 
 function run_tests() {
