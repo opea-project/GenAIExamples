@@ -31,7 +31,7 @@ function rename() {
 
 function docker_setup() {
     local card_num=1
-    local port=8888
+    local port=8902
     local model_name="m-a-p/OpenCodeInterpreter-DS-6.7B"
 
     cd ${WORKPATH}
@@ -45,7 +45,7 @@ function docker_setup() {
 }
 
 function launch_copilot_docker() {
-    local port=8890
+    local port=8903
     sed -i "s/port=8000/port=$port/g" codegen/codegen-app/server.py
 
     cd $WORKPATH/codegen
@@ -68,7 +68,7 @@ function launch_server() {
 
 function run_tests() {
     cd $WORKPATH
-    local port=8890
+    local port=8903
 }
 
 function check_response() {

@@ -31,7 +31,7 @@ function rename() {
 
 function docker_setup() {
     local card_num=1
-    local port=8888
+    local port=8900
     local model_name="Intel/neural-chat-7b-v3-3"
 
     cd ${WORKPATH}
@@ -46,7 +46,7 @@ function docker_setup() {
 }
 
 function launch_document_summary_docker() {
-    local port=8890
+    local port=8901
     sed -i "s/port=8000/port=$port/g" langchain/docker/summarize-app/app/server.py
 
     cd $WORKPATH/langchain/docker/
@@ -69,7 +69,7 @@ function launch_server() {
 
 function run_tests() {
     cd $WORKPATH
-    local port=8890
+    local port=8901
 }
 
 function check_response() {
