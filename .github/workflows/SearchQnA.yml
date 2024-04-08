@@ -29,8 +29,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Test
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
-          cat ${{ github.workspace }}/actions-runner/.env >> $GITHUB_ENV
           cd ${{ github.workspace }}/SearchQnA/tests
           bash test_${{ matrix.job_name }}_inference.sh
 

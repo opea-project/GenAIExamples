@@ -29,8 +29,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Test
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
-          cat ${{ github.workspace }}/actions-runner/.env >> $GITHUB_ENV
           cd ${{ github.workspace }}/VisualQnA/tests
           bash test_${{ matrix.job_name }}_inference.sh
 
