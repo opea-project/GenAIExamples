@@ -10,11 +10,26 @@ ChatQnA architecture shows below:
 
 This ChatQnA use case performs RAG using LangChain, Redis vectordb and Text Generation Inference on Intel Gaudi2. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
-# Environment Setup
+# Solution Overview
+
+Steps to implement the solution are as follows
+
+## In Intel Gaudi2 Platform
+
+1. [Deploy a TGI container with LLM model of your choice](#launch-tgi-gaudi-service) (Solution uses 70B model by default)
+
+## In Intel Xeon Platform
+
+1. [Export TGI endpoint as environment variable](#customize-tgi-gaudi-service)
+2. [Deploy a TEI container for Embedding model service and export the endpoint](#enable-tei-for-embedding-model)
+3. [Launch a Redis container](#launch-redis) and ingest your knowledge base. This example provides few example PDF documents
+4. [Build langchain](#launch-langchain-docker) container and start the Langchain service
+5. [Start the backend service](#start-the-backend-service) to accept queries to Langchain
+6. [Start the GUI](#start-the-frontend-service) based chatbot service to experiment with RAG based Chatbot
 
 To use [🤗 text-generation-inference](https://github.com/huggingface/text-generation-inference) on Habana Gaudi/Gaudi2, please follow these steps:
 
-## Prepare Docker
+## Prepare TGI Docker
 
 Getting started is straightforward with the official Docker container. Simply pull the image using:
 
@@ -73,7 +88,38 @@ You have the flexibility to customize these parameters according to your specifi
 export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
-## Launch Redis and LangChain Backend Service
+## Enable TEI for embedding model
+
+Text Embeddings Inference (TEI) is a toolkit designed for deploying and serving open-source text embeddings and sequence classification models efficiently. With TEI, users can extract high-performance features using various popular models. It supports token-based dynamic batching for enhanced performance.
+
+To launch the TEI service, you can use the following commands:
+
+```bash
+model=BAAI/bge-large-en-v1.5
+revision=refs/pr/5
+volume=$PWD/data # share a volume with the Docker container to avoid downloading weights every run
+docker run -p 9090:80 -v $volume:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
+export TEI_ENDPOINT="http://xxx.xxx.xxx.xxx:9090"
+```
+
+And then you can make requests like below to check the service status:
+
+```bash
+curl 127.0.0.1:9090/embed \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?"}' \
+    -H 'Content-Type: application/json'
+```
+
+Note: If you want to integrate the TEI service into the LangChain application, you'll need to restart the LangChain backend service after launching the TEI service.
+
+## Launch Redis
+
+```bash
+docker compose -f langchain/docker/docker-compose-redis.yml up -d
+```
+
+## Launch LangChain Docker
 
 Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose.yml`
 
@@ -227,28 +273,3 @@ curl 127.0.0.1:8080/generate \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":32}}' \
   -H 'Content-Type: application/json'
 ```
-
-# Enable TEI for embedding model higher throughput (Optional)
-
-Text Embeddings Inference (TEI) is a toolkit designed for deploying and serving open-source text embeddings and sequence classification models efficiently. With TEI, users can extract high-performance features using various popular models. It supports token-based dynamic batching for enhanced performance.
-
-To launch the TEI service, you can use the following commands:
-
-```bash
-model=BAAI/bge-large-en-v1.5
-revision=refs/pr/5
-volume=$PWD/data # share a volume with the Docker container to avoid downloading weights every run
-docker run -p 9090:80 -v $volume:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
-export TEI_ENDPOINT="http://xxx.xxx.xxx.xxx:9090"
-```
-
-And then you can make requests like below to check the service status:
-
-```bash
-curl 127.0.0.1:9090/embed \
-    -X POST \
-    -d '{"inputs":"What is Deep Learning?"}' \
-    -H 'Content-Type: application/json'
-```
-
-Note: If you want to integrate the TEI service into the LangChain application, you'll need to restart the LangChain backend service after launching the TEI service.
