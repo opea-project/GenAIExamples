@@ -1,7 +1,6 @@
 <div align="center">
 
-Intel Generative AI Examples
-=======
+# Intel Generative AI Examples
 
 This project provides a collective list of Generative AI (GenAI) examples such as chatbot with question and answering (ChatQnA), code generation (CodeGen), document summary (DocSum), etc.
 
