@@ -53,9 +53,9 @@ function launch_document_summary_docker() {
     bash ./build_docker.sh
 
     cd $WORKPATH
-    docker run -d --net=host --ipc=host \
+    docker run -dit --net=host --ipc=host \
         --name=$DOCUMENT_SUMMARY_CONTAINER_NAME \
-        -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:document-summarize bash
+        -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:document-summarize /bin/bash
 }
 
 function launch_server() {
@@ -97,7 +97,7 @@ function docker_stop() {
 function main() {
     test_env_setup
     rename
-    docker_stop $DOCSUM_CONTAINER_NAME && docker_stop $DOCUMENT_SUMMARY_CONTAINER_NAME
+    docker_stop $DOCSUM_CONTAINER_NAME && docker_stop $DOCUMENT_SUMMARY_CONTAINER_NAME && sleep 5s
 
     docker_setup
     launch_document_summary_docker
@@ -105,7 +105,7 @@ function main() {
 
     run_tests
 
-    docker_stop $DOCSUM_CONTAINER_NAME && docker_stop $DOCUMENT_SUMMARY_CONTAINER_NAME
+    docker_stop $DOCSUM_CONTAINER_NAME && docker_stop $DOCUMENT_SUMMARY_CONTAINER_NAME && sleep 5s
     echo y | docker system prune
 
     check_response

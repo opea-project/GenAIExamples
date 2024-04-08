@@ -52,9 +52,9 @@ function launch_copilot_docker() {
     bash ./build_docker.sh
 
     cd $WORKPATH
-    docker run -d --name=$COPILOT_CONTAINER_NAME \
+    docker run -dit --name=$COPILOT_CONTAINER_NAME \
         --net=host --ipc=host \
-        -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:copilot bash
+        -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:copilot /bin/bash
 }
 
 function launch_server() {
@@ -96,7 +96,7 @@ function docker_stop() {
 function main() {
     test_env_setup
     rename
-    docker_stop $CODEGEN_CONTAINER_NAME && docker_stop $COPILOT_CONTAINER_NAME
+    docker_stop $CODEGEN_CONTAINER_NAME && docker_stop $COPILOT_CONTAINER_NAME && sleep 5s
 
     docker_setup
     launch_copilot_docker
@@ -104,7 +104,7 @@ function main() {
 
     run_tests
 
-    docker_stop $CODEGEN_CONTAINER_NAME && docker_stop $COPILOT_CONTAINER_NAME
+    docker_stop $CODEGEN_CONTAINER_NAME && docker_stop $COPILOT_CONTAINER_NAME && sleep 5s
     echo y | docker system prune
 
     check_response
