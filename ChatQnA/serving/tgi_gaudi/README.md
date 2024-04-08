@@ -1,4 +1,4 @@
-[TGI-Gaudi](https://github.com/huggingface/tgi-gaudi) provides many parameters aimed at optimizing performance for text generation inference tasks. By optimizing these parameters, users can achieve the best results in terms of inference speed, memory usage, and overall efficiency. These parameters cover various aspects such as maximum sequence length, batch size, Gaudi processor utilization, and environment configurations. By carefully adjusting these parameters according to the specific requirements of the workload and hardware environment, users can unlock the full potential of TGI-Gaudi for their text generation tasks.
+[TGI-Gaudi](https://github.com/huggingface/tgi-gaudi) provides many parameters aimed at optimizing performance for text generation inference tasks. By optimizing these parameters, users can achieve the best results in terms of inference speed, memory usage, and overall efficiency. These parameters cover various aspects such as maximum sequence length, batch size, Gaudi processor utilization, and environment configurations. By carefully adjusting these parameters according to the specific requirements of the workload and hardware environment, users can unlock the full potential of TGI-Gaudi for the text generation tasks.
 
 # Knowledeges about TGI-Gaudi performance tuning
 
@@ -78,5 +78,5 @@ docker run -p 8080:80 -v $volume:/data --runtime=habana -e HUGGING_FACE_HUB_TOKE
 
 ## Docker command for 13B model
 ```bash
-docker run -p 8895:80 -v $volume:/data --runtime=habana -e HUGGING_FACE_HUB_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e PAD_SEQUENCE_TO_MULTIPLE_OF=128  -e HABANA_VISIBLE_DEVICES="4" -e BATCH_BUCKET_SIZE=16 -e PREFILL_BATCH_BUCKET_SIZE=1 -e MAX_BATCH_PREFILL_TOKENS=4096 -e MAX_BATCH_TOTAL_TOKENS=18432 -e PAD_SEQUENCE_TO_MULTIPLE_OF=1024 -e MAX_INPUT_LENGTH=1024 -e MAX_TOTAL_TOKENS=1152  -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --model-id $model
+docker run -p 8080:80 -v $volume:/data --runtime=habana -e HUGGING_FACE_HUB_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e PAD_SEQUENCE_TO_MULTIPLE_OF=128  -e HABANA_VISIBLE_DEVICES="4" -e BATCH_BUCKET_SIZE=16 -e PREFILL_BATCH_BUCKET_SIZE=1 -e MAX_BATCH_PREFILL_TOKENS=4096 -e MAX_BATCH_TOTAL_TOKENS=18432 -e PAD_SEQUENCE_TO_MULTIPLE_OF=1024 -e MAX_INPUT_LENGTH=1024 -e MAX_TOTAL_TOKENS=1152  -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --model-id $model
 ```
