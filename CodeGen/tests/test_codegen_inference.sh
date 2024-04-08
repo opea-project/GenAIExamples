@@ -49,6 +49,7 @@ function launch_copilot_docker() {
     local port=8890
     sed -i "s/port=8000/port=$port/g" codegen/codegen-app/server.py
     docker run -d --name=$COPILOT_CONTAINER_NAME \
+        -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} \
         --net=host --ipc=host \
         -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:copilot bash
 }

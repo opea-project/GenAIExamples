@@ -51,6 +51,7 @@ function launch_document_summary_docker() {
     sed -i "s/port=8000/port=$port/g" langchain/docker/summarize-app/app/server.py
 
     docker run -d --net=host --ipc=host \
+        -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} \
         --name=$DOCUMENT_SUMMARY_CONTAINER_NAME \
         -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:document-summarize bash
 }
