@@ -85,6 +85,7 @@ nohup python app/server.py &
 ```
 
 Then you can make requests like below to check the DocSum backend service status:
+
 ```bash
 curl http://127.0.0.1:8000/v1/text_summarize \
     -X POST \
