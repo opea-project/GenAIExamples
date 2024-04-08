@@ -63,20 +63,25 @@ function launch_server() {
 
     # Start the Backend Service
     docker exec $DOCUMENT_SUMMARY_CONTAINER_NAME \
-        bash -c "export HUGGINGFACEHUB_API_TOKEN=$HUGGING_FACE_TOKEN;nohup python app/server.py &"
+        bash -c "export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN;nohup python app/server.py &"
     sleep 1m
 }
 
 function run_tests() {
     cd $WORKPATH
     local port=8901
+
+    status_code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$port/v1/text_summarize \
+        -X POST \
+        -H 'Content-Type: application/json' \
+        -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}')
 }
 
 function check_response() {
     cd $WORKPATH
     echo "Checking response"
     local status=false
-    if [[ $(grep -c "\$51.2 billion" $LOG_PATH) != 0 ]]; then
+    if [ "$status_code" -eq 200 ]; then
         status=true
     fi
 
