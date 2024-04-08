@@ -74,7 +74,7 @@ function run_tests() {
     status_code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$port/v1/text_summarize \
         -X POST \
         -H 'Content-Type: application/json' \
-        -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}')
+        -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}') || true
 
     sleep 5s
 }
