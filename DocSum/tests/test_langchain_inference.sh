@@ -20,7 +20,7 @@ function test_env_setup() {
 
     DOCUMENT_SUMMARY_CONTAINER_NAME="test-document-summary"
     DOCSUM_CONTAINER_NAME="test-DocSum_server"
-    cd $WORKPATH # go to ChatQnA
+    cd $WORKPATH # go to DocSum
 }
 
 function rename() {
@@ -63,7 +63,7 @@ function launch_server() {
 
     # Start the Backend Service
     docker exec $DOCUMENT_SUMMARY_CONTAINER_NAME \
-        bash -c "export HUGGINGFACEHUB_API_TOKEN=$HUGGING_FACE_TOKEN;nohup python server.py &"
+        bash -c "export HUGGINGFACEHUB_API_TOKEN=$HUGGING_FACE_TOKEN;nohup python app/server.py &"
     sleep 1m
 }
 

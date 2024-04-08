@@ -20,7 +20,7 @@ function test_env_setup() {
 
     COPILOT_CONTAINER_NAME="test-copilot"
     CODEGEN_CONTAINER_NAME="test-CodeGen_server"
-    cd $WORKPATH # go to ChatQnA
+    cd $WORKPATH # go to CodeGen
 }
 
 function rename() {
