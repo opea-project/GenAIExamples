@@ -28,6 +28,10 @@ jobs:
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
+      - name: Load environment variables
+        run: |
+          cat ~/suyue/actions-runner >> $GITHUB_ENV
+
       - name: Run Test
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ env.HUGGINGFACEHUB_API_TOKEN }}
