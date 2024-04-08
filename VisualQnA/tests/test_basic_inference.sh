@@ -62,13 +62,13 @@ function docker_stop() {
 
 function main() {
     test_env_setup
-    docker_stop $CONTAINER_NAME
+    docker_stop $CONTAINER_NAME && sleep 5s
 
     launch_llava_service
 
     run_tests
 
-    docker_stop $CONTAINER_NAME
+    docker_stop $CONTAINER_NAME && sleep 5s
     echo y | docker system prune
 
     check_response
