@@ -339,3 +339,14 @@ def reload_retriever(embeddings, index_name):
 
     retriever = rds.as_retriever(search_type="mmr")
     return retriever
+
+
+def post_process_text(text: str):
+    if text == " ":
+        return "data: @#$\n\n"
+    if text.isspace():
+        return None
+    if text == "\n":
+        return "data: <br/>\n\n"
+    new_text = text.replace(" ", "@#$")
+    return f"data: {new_text}\n\n"
