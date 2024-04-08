@@ -28,13 +28,9 @@ jobs:
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
-      - name: Load environment variables
-        run: |
-          cat ~/suyue/actions-runner/.env >> $GITHUB_ENV
-
       - name: Run Test
         env:
-          HUGGINGFACEHUB_API_TOKEN: ${{ env.HUGGINGFACEHUB_API_TOKEN }}
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
           cd ${{ github.workspace }}/CodeGen/tests
           bash test_${{ matrix.job_name }}_inference.sh
