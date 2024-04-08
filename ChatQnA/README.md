@@ -11,18 +11,21 @@ ChatQnA architecture shows below:
 This ChatQnA use case performs RAG using LangChain, Redis vectordb and Text Generation Inference on Intel Gaudi2. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
 # Solution Overview
+
 Steps to implement the solution are as follows
+
 ## In Intel Gaudi2 Platform
+
 1. [Deploy a TGI container with LLM model of your choice](#launch-tgi-gaudi-service) (Solution uses 70B model by default)
 
 ## In Intel Xeon Platform
+
 1. [Export TGI endpoint as environment variable](#customize-tgi-gaudi-service)
 2. [Deploy a TEI container for Embedding model service and export the endpoint](#enable-tei-for-embedding-model)
 3. [Launch a Redis container](#launch-redis) and ingest your knowledge base. This example provides few example PDF documents
 4. [Build langchain](#launch-langchain-docker) container and start the Langchain service
 5. [Start the backend service](#start-the-backend-service) to accept queries to Langchain
 6. [Start the GUI](#start-the-frontend-service) based chatbot service to experiment with RAG based Chatbot
-
 
 To use [🤗 text-generation-inference](https://github.com/huggingface/text-generation-inference) on Habana Gaudi/Gaudi2, please follow these steps:
 
@@ -270,5 +273,3 @@ curl 127.0.0.1:8080/generate \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":32}}' \
   -H 'Content-Type: application/json'
 ```
-
-
