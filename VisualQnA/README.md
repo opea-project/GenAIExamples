@@ -55,7 +55,7 @@ Now you can start the frontend UI by following commands:
 ```
 cd ui/
 pip install -r requirements.txt
-python app.py --host 0.0.0.0 --port 7860 --worker-addr http://localhost:8085 --share
+http_proxy= python app.py --host 0.0.0.0 --port 7860 --worker-addr http://localhost:8085 --share
 ```
 
 Here are some explanation about the above parameters:
