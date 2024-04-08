@@ -25,7 +25,7 @@ function test_env_setup() {
 }
 
 function rename() {
-    # Rename the container names
+    # Rename the docker container/image names to avoid conflict with local test
     cd ${WORKPATH}
     sed -i "s/container_name: redis-vector-db/container_name: ${REDIS_CONTAINER_NAME}/g" langchain/docker/docker-compose.yml
     sed -i "s/container_name: qna-rag-redis-server/container_name: ${LANGCHAIN_CONTAINER_NAME}/g" langchain/docker/docker-compose.yml
@@ -33,7 +33,7 @@ function rename() {
     sed -i "s/ChatQnA_server/${CHATQNA_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
 }
 
-function docker_setup() {
+function launch_tgi_gaudi_service() {
     local card_num=1
     local port=8888
     local model_name="Intel/neural-chat-7b-v3-3"
@@ -50,21 +50,20 @@ function docker_setup() {
     sleep 3m # Waits 3 minutes
 }
 
-function launch_redis_and_langchain_container() {
+function launch_redis_and_langchain_service() {
     cd $WORKPATH
     export HUGGINGFACEHUB_API_TOKEN=${HUGGING_FACE_TOKEN}
     local port=8890
     sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
     docker compose -f langchain/docker/docker-compose.yml up -d --build
-}
 
-function launch_server() {
-    cd $WORKPATH
     # Ingest data into redis
     docker exec $LANGCHAIN_CONTAINER_NAME \
         bash -c "cd /ws && python ingest.py > /dev/null"
+}
 
-    # Start the Backend Service
+function start_backend_service() {
+    cd $WORKPATH
     docker exec $LANGCHAIN_CONTAINER_NAME \
         bash -c "nohup python app/server.py &"
     sleep 1m
@@ -106,9 +105,9 @@ function main() {
     rename
     docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME
 
-    docker_setup
-    launch_redis_and_langchain_container
-    launch_server
+    launch_tgi_gaudi_service
+    launch_redis_and_langchain_service
+    start_backend_service
 
     run_tests
 
