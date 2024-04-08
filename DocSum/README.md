@@ -89,7 +89,7 @@ Then you can make requests like below to check the DocSum backend service status
 ```bash
 curl http://127.0.0.1:8000/v1/text_summarize \
     -X POST \
-    -H 'Content-Type: application/json'
+    -H 'Content-Type: application/json' \
     -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 ```
 
