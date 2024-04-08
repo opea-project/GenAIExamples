@@ -118,11 +118,11 @@ docker compose -f langchain/docker/docker-compose-redis.yml up -d
 
 ## Launch LangChain Docker
 
-Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose-langchain.yml`
+Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose.yml`
 
 ```bash
 cd langchain/docker
-docker compose -f docker-compose-langchain.yml up -d
+docker compose -f docker-compose.yml up -d
 cd ../../
 ```
 
