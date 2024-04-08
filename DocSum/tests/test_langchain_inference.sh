@@ -46,10 +46,13 @@ function docker_setup() {
 }
 
 function launch_document_summary_docker() {
-    cd $WORKPATH
     local port=8890
     sed -i "s/port=8000/port=$port/g" langchain/docker/summarize-app/app/server.py
 
+    cd $WORKPATH/langchain/docker/
+    bash ./build_docker.sh
+
+    cd $WORKPATH
     docker run -d --net=host --ipc=host \
         -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} \
         --name=$DOCUMENT_SUMMARY_CONTAINER_NAME \

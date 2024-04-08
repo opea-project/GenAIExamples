@@ -45,9 +45,13 @@ function docker_setup() {
 }
 
 function launch_copilot_docker() {
-    cd $WORKPATH
     local port=8890
     sed -i "s/port=8000/port=$port/g" codegen/codegen-app/server.py
+
+    cd $WORKPATH/codegen
+    bash ./build_docker.sh
+
+    cd $WORKPATH
     docker run -d --name=$COPILOT_CONTAINER_NAME \
         -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} \
         --net=host --ipc=host \
