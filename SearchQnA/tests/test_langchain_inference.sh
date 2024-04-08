@@ -18,7 +18,7 @@ function test_env_setup() {
     WORKPATH=$(dirname "$PWD")
     LOG_PATH="$WORKPATH/tests/langchain.log"
 
-    TGI_CONTAINER_NAME="test-tgi-gaudi-server "
+    TGI_CONTAINER_NAME="test-tgi-gaudi-server"
     LANGCHAIN_CONTAINER_NAME="test-searchqna-gaudi"
 }
 
