@@ -31,8 +31,6 @@ jobs:
       - name: Run Test
         env:
           HUGGING_FACE_TOKEN: ${{ secrets.HUGGING_FACE_TOKEN }}
-          http_proxy: ${{ secrets.HTTP_PROXY }}
-          https_proxy: ${{ secrets.HTTPS_PROXY }}
         run: |
           cd ${{ github.workspace }}/CodeGen/tests
           bash test_${{ matrix.job_name }}_inference.sh

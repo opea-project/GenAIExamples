@@ -53,7 +53,6 @@ function launch_copilot_docker() {
 
     cd $WORKPATH
     docker run -d --name=$COPILOT_CONTAINER_NAME \
-        -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} \
         --net=host --ipc=host \
         -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:copilot bash
 }
