@@ -113,13 +113,7 @@ curl 127.0.0.1:9090/embed \
 
 Note: If you want to integrate the TEI service into the LangChain application, you'll need to restart the LangChain backend service after launching the TEI service.
 
-## Launch Redis
-
-```bash
-docker compose -f langchain/docker/docker-compose-redis.yml up -d
-```
-
-## Launch LangChain Docker
+## Launch Redis and LangChain Backend Service
 
 Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose.yml`
 
