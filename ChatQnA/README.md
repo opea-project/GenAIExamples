@@ -126,9 +126,9 @@ cd ../../
 > [!NOTE]
 > If you modified any files and want that change introduced in this step, add `--build` to the end of the command to build the container image instead of pulling it from dockerhub.
 
-## Ingest data into redis
+## Ingest data into Redis
 
-After every time of redis container is launched, data should be ingested in the container ingestion steps:
+Each time the Redis container is launched, data should be ingested into the container using the commands:
 
 ```bash
 docker exec -it qna-rag-redis-server bash
@@ -136,7 +136,7 @@ cd /ws
 python ingest.py
 ```
 
-Note: `ingest.py` will download the embedding model, please set the proxy if necessary.
+Note: `ingest.py` will download the embedding model. Please set the proxy if necessary.
 
 # Start LangChain Server
 
@@ -169,7 +169,7 @@ docker exec -it qna-rag-redis-server bash
 nohup python app/server.py &
 ```
 
-The LangChain backend service listens to port 8000 by port, you can customize it by change the code in `docker/qna-app/app/server.py`.
+The LangChain backend service listens to port 8000, you can customize it by changing the code in `docker/qna-app/app/server.py`.
 
 And then you can make requests like below to check the LangChain backend service status:
 
@@ -227,7 +227,7 @@ This will initiate the frontend service and launch the application.
 
 # Enable TGI Gaudi FP8 for higher throughput (Optional)
 
-The TGI Gaudi utilizes BFLOAT16 optimization as the default setting. If you aim to achieve higher throughput, you can enable FP8 quantization on the TGI Gaudi. According to our test results, FP8 quantization yields approximately a 1.8x performance gain compared to BFLOAT16. Please follow the below steps to enable FP8 quantization.
+The TGI Gaudi utilizes BFLOAT16 optimization as the default setting. If you aim to achieve higher throughput, you can enable FP8 quantization on the TGI Gaudi. Note that currently only Llama2 series and Mistral series models support FP8 quantization. Please follow the below steps to enable FP8 quantization.
 
 ## Prepare Metadata for FP8 Quantization
 
@@ -257,9 +257,7 @@ Then modify the `dump_stats_path` to "/data/hqt_output/measure" and update `dump
 docker run -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:1.2.1 --model-id Intel/neural-chat-7b-v3-3
 ```
 
-Now the TGI Gaudi will launch the FP8 model by default. Please note that currently only Llama2 series and Mistral series models support FP8 quantization.
-
-And then you can make requests like below to check the service status:
+Now the TGI Gaudi will launch the FP8 model by default and you can make requests like below to check the service status:
 
 ```bash
 curl 127.0.0.1:8080/generate \
