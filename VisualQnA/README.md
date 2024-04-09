@@ -30,7 +30,7 @@ docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${ht
 2. Start the LLaVA service on Intel Gaudi2
 
 ```
-docker run -d -p 8084:80 -p 8085:8000 -v ./data:/root/.cache/huggingface/hub/ -e http_proxy=$http_proxy -e https_proxy=$http_proxy -v $PWD/llava_server:/llava_server --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:llava-gaudi
+docker run -d -p 8085:8000 -v ./data:/root/.cache/huggingface/hub/ -e http_proxy=$http_proxy -e https_proxy=$http_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:llava-gaudi
 ```
 
 Here are some explanation about the above parameters:
@@ -55,7 +55,7 @@ Now you can start the frontend UI by following commands:
 ```
 cd ui/
 pip install -r requirements.txt
-python app.py --host 0.0.0.0 --port 7860 --worker-addr http://localhost:8085 --share
+http_proxy= python app.py --host 0.0.0.0 --port 7860 --worker-addr http://localhost:8085 --share
 ```
 
 Here are some explanation about the above parameters:
