@@ -1,12 +1,12 @@
-name: ChatQnA-test
+name: VisualQnA-test
 
 on:
   pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - ChatQnA/**
-      - .github/workflows/ChatQnA.yml
+      - VisualQnA/**
+      - .github/workflows/VisualQnA.yml
   workflow_dispatch:
 
 # If there is a new commit, the previous jobs will be canceled
@@ -15,11 +15,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ChatQnA:
+  VisualQnA:
     runs-on: gaudi2
     strategy:
       matrix:
-        job_name: ["langchain"]
+        job_name: ["basic"]
       fail-fast: false
     steps:
       - name: Clean Up Working Directory
@@ -32,7 +32,7 @@ jobs:
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
-          cd ${{ github.workspace }}/ChatQnA/tests
+          cd ${{ github.workspace }}/VisualQnA/tests
           bash test_${{ matrix.job_name }}_inference.sh
 
       - name: Publish pipeline artifact
@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.job_name }}
-          path: ${{ github.workspace }}/ChatQnA/tests/*.log
+          path: ${{ github.workspace }}/VisualQnA/tests/*.log

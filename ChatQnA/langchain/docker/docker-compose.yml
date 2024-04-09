@@ -14,7 +14,7 @@
 
 services:
   redis-vector-db:
-    image: redis/redis-stack:latest
+    image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
     ports:
       - "6379:6379"

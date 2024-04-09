@@ -22,7 +22,7 @@ The workflow falls into the following architecture:
 
 # Start Backend Service
 
-- Start the TGI service to deploy your LLM
+1. Start the TGI service to deploy your LLM
 
 ```sh
 cd serving/tgi_gaudi
@@ -30,15 +30,25 @@ bash build_docker.sh
 bash launch_tgi_service.sh
 ```
 
-- Start the SearchQnA application using Google Search
+`launch_tgi_service.sh` by default uses `8080` as the TGI service's port. Please replace it if there are any port conflicts.
+
+2. Start the SearchQnA application using Google Search
 
 ```sh
-cd /home/sdp/sihanche/GenAIExamples/SearchQnA/langchain/docker
+cd langchain/docker
 docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy}  -t intel/gen-ai-examples:searchqna-gaudi --no-cache
-docker run -e TGI_ENDPOINT=<TGI ENDPOINT> -e GOOGLE_CSE_ID=<GOOGLE CSE ID> -e GOOGLE_API_KEY=<GOOGLE API KEY> -e HUGGINGFACEHUB_API_TOKEN=<HUGGINGFACE API TOKEN> -p 8080:8000 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -v $PWD/qna-app:/qna-app --runtime=habana -e HABANA_VISIBE_DEVILCES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:searchqna-gaudi
+docker run -e TGI_ENDPOINT=<TGI ENDPOINT> -e GOOGLE_CSE_ID=<GOOGLE CSE ID> -e GOOGLE_API_KEY=<GOOGLE API KEY> -e HUGGINGFACEHUB_API_TOKEN=<HUGGINGFACE API TOKEN> -p 8085:8000 -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBE_DEVILCES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:searchqna-gaudi
 ```
 
-- Test
+Here is the explanation of some of the above parameters:
+
+- `TGI_ENDPOINT`: the endpoint of your TGI service, usually equal to `<ip of your machine>:<port of your TGI service>`
+- `GOOGLE_CSE_ID`: your CSE ID for Google Search Engine, usually generated [here](https://programmablesearchengine.google.com/controlpanel/all)
+- `GOOGLE_API_KEY`: your API key for Google Search Engine, usually generated [here](https://console.cloud.google.com/apis/credentials)
+- `HUGGINGFACEHUB_API_TOKEN`: your HuggingFace hub API token, usually generated [here](https://huggingface.co/settings/tokens)
+- `-p 8085:8000`: This will map the 8000 port of the SearchQnA service inside the container to the 8085 port on the host
+
+3. Quick test
 
 ```sh
 curl http://localhost:8085/v1/rag/web_search_chat_stream -X POST -d '{"query":"Give me some latest news?"}' -H 'Content-Type: application/json'
