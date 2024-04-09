@@ -63,3 +63,7 @@ Here are some explanation about the above parameters:
 - `--host`: the host of the gradio app
 - `--port`: the port of the gradio app, by default 7860
 - `--worker-addr`: the LLaVA service IP address. If you setup the service on a different machine, please replace `localhost` to the IP address of your Gaudi2 host machine
+
+#
+
+SCRIPT USAGE NOTICE:  By downloading and using any script file included with the associated software package (such as files with .bat, .cmd, or .JS extensions, Docker files, or any other type of file that, when executed, automatically downloads and/or installs files onto your system) (the “Script File”), it is your obligation to review the Script File to understand what files (e.g.,  other software, AI models, AI Datasets) the Script File will download to your system (“Downloaded Files”). Furthermore, by downloading and using the Downloaded Files, even if they are installed through a silent install, you agree to any and all terms and conditions associated with such files, including but not limited to, license terms, notices, or disclaimers.
