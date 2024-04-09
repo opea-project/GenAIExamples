@@ -82,7 +82,7 @@ function check_response() {
     cd $WORKPATH
     echo "Checking response"
     local status=false
-    if [[ $(grep -c "\$51.2 billion" $LOG_PATH) != 0 ]]; then
+    if [[ -f $LOG_PATH ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH) != 0 ]]; then
         status=true
     fi
 
