@@ -80,11 +80,11 @@ def ingest_dataset(args,langchain_docs):
         embedding=embedder,
         index_name=args.db_index,
         index_schema=args.db_schema,
-        redis_url=arg.db_url)
+        redis_url=args.db_url)
 
 def GetLangchainDataset(args):
-    registry = registry.filter(Type="RetrievalTask")
-    langchain_docs = registry[args.langchain_dataset]
+    registry_retrieved = registry.filter(Type="RetrievalTask")
+    langchain_docs = registry_retrieved[args.langchain_dataset]
     return langchain_docs
 
 def buildchain(args):
