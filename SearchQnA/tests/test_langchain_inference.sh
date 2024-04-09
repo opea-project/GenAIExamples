@@ -35,9 +35,6 @@ function launch_tgi_gaudi_service() {
 
     cd ${WORKPATH}
 
-    # Reset the tgi port
-    sed -i "s/8080/$port/g" langchain/docker/qna-app/server.py
-
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
     sleep 2m
@@ -47,8 +44,11 @@ function launch_langchain_service() {
     cd $WORKPATH
     local port=8875
     cd langchain/docker
-    docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy}  -t intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME} --no-cache
-    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} -e TGI_ENDPOINT=http://localhost:8870 -e GOOGLE_CSE_ID=${GOOGLE_CSE_ID} -e GOOGLE_API_KEY=${GOOGLE_API_KEY} -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
+    docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -t intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
+
+    tgi_ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
+    tgi_ip=$(eval echo '$'$tgi_ip_name)
+    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} -e TGI_ENDPOINT=http://${tgi_ip}:8870 -e GOOGLE_CSE_ID=${GOOGLE_CSE_ID} -e GOOGLE_API_KEY=${GOOGLE_API_KEY} -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
     -p ${port}:8000 --runtime=habana -e HABANA_VISIBE_DEVILCES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
 
     sleep 2m
@@ -61,7 +61,7 @@ function run_tests() {
 
     curl http://localhost:${port}/v1/rag/web_search_chat \
         -X POST \
-        -d '{"query":"When is Chinese National Holiday?"}' \
+        -d '{"query":"What is the GitHub Repo link of Intel Neural Compressor?"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
 }
@@ -70,7 +70,7 @@ function check_response() {
     cd $WORKPATH
     echo "Checking response"
     local status=false
-    if [[ $(grep -c "Oct 1" $LOG_PATH) != 0 ]]; then
+    if [[ $(grep -c "github.com/intel/neural-compressor" $LOG_PATH) != 0 ]]; then
         status=true
     fi
 
