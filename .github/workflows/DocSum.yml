@@ -6,6 +6,7 @@ on:
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - DocSum/**
+      - "!**.md"
       - .github/workflows/DocSum.yml
   workflow_dispatch:
 

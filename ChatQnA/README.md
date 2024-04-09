@@ -22,8 +22,8 @@ Steps to implement the solution are as follows
 
 1. [Export TGI endpoint as environment variable](#customize-tgi-gaudi-service)
 2. [Deploy a TEI container for Embedding model service and export the endpoint](#enable-tei-for-embedding-model)
-3. [Launch a Redis container](#launch-redis) and ingest your knowledge base. This example provides few example PDF documents
-4. [Build langchain](#launch-langchain-docker) container and start the Langchain service
+3. [Launch a Redis container and Langchain container](#launch-redis-and-langchain-backend-service)
+4. [Ingest data into redis](#ingest-data-into-redis), this example provides few example PDF documents
 5. [Start the backend service](#start-the-backend-service) to accept queries to Langchain
 6. [Start the GUI](#start-the-frontend-service) based chatbot service to experiment with RAG based Chatbot
 
