@@ -49,10 +49,10 @@
   }
 
   function panelExchange() {
-    if (currentIdx === 1) {
+    if (currentIdx === 2) {
       kb_id.set("");
       dispatch("clearMsg", { status: true });
-    } else if (currentIdx === 2) {
+    } else if (currentIdx === 1) {
       message = "";
       dispatch("clearMsg", { status: true });
     }
