@@ -2,7 +2,7 @@ name: ChatQnA-test
 
 on:
   pull_request_target:
-    branches: [main]
+    branches: [main, for_test]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - ChatQnA/**
