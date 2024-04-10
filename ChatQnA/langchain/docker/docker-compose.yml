@@ -23,7 +23,9 @@ services:
     build:
       args:
         https_proxy: ${https_proxy}
+        http_proxy: ${http_proxy}
       dockerfile: Dockerfile
+      context: .
     image: intel/gen-ai-examples:qna-rag-redis-server
     container_name: qna-rag-redis-server
     environment:
