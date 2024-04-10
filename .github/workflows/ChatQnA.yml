@@ -55,7 +55,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
           bash test_${{ matrix.job_name }}_inference.sh
-          echo "from fork PR"
+          echo "from fork PR!"
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
