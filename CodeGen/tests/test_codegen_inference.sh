@@ -73,7 +73,7 @@ function run_tests() {
     curl http://localhost:${port}/v1/code_generation \
         -X POST \
         -H "Content-Type: application/json" \
-        -d '{"prompt": "def print_hello_world():", "max_new_tokens": 128, "stream": true}' > $LOG_PATH
+        -d '{"prompt": "def print_hello_world():", "max_new_tokens": 128}' > $LOG_PATH
 
 }
 
