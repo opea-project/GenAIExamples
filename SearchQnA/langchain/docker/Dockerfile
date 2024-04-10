@@ -21,7 +21,7 @@ ENV LANG=en_US.UTF-8
 ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/
 
 # Install required branch
-RUN git clone https://github.com/Spycsh/langchain.git /langchain -b master && \
+RUN git clone https://github.com/Spycsh/langchain.git /langchain -b genai_examples && \
     pip install --no-cache-dir /langchain/libs/langchain && \
     pip install --no-cache-dir /langchain/libs/community && \
     rm -rf /langchain
