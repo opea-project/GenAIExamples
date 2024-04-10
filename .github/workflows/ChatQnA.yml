@@ -47,7 +47,7 @@ jobs:
       - name: Checkout out Repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Run Test
         env:
