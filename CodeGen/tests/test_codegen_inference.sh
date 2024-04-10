@@ -109,11 +109,10 @@ function main() {
     launch_server
 
     run_tests
+    check_response
 
     docker_stop $CODEGEN_CONTAINER_NAME && docker_stop $COPILOT_CONTAINER_NAME && sleep 5s
     echo y | docker system prune
-
-    check_response
 }
 
 main
