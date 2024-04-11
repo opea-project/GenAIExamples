@@ -1,0 +1,25 @@
+.custom-pre-wrapper {
+  position: relative;
+  padding: 1rem 3.25rem 1rem 1rem;
+  border-radius: 0.25rem;
+  background-color: #2f303a;
+  white-space: pre;
+
+  & .copy-code-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+
+    & .icon {
+      pointer-events: none;
+
+      &.success {
+        color: #8bae46;
+      }
+
+      &.error {
+        color: #e96115;
+      }
+    }
+  }
+}

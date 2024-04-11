@@ -18,13 +18,13 @@ RUN rm -rf /etc/ssh/ssh_host*
 
 # Set environment variables
 ENV LANG=en_US.UTF-8
-ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/langchain/libs/community:/langchain/libs/langchain
+ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/
 
 # Install required branch
-RUN git clone https://github.com/Spycsh/langchain.git /langchain -b master
-RUN cd /langchain/libs/langchain && \
-    pip install -e . && \
-    cd -
+RUN git clone https://github.com/Spycsh/langchain.git /langchain -b genai_examples && \
+    pip install --no-cache-dir /langchain/libs/langchain && \
+    pip install --no-cache-dir /langchain/libs/community && \
+    rm -rf /langchain
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \

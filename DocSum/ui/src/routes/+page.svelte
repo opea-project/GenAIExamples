@@ -50,7 +50,7 @@
         logs.forEach((log: { op: string; path: string; value: any }) => {
           if (log.op === "add") {
             if (
-              log.path.endsWith("/streamed_output/-") && typeof log.value === "string"
+              log.value !== "</s>" && log.path.endsWith("/streamed_output/-") && log.path.length > "/streamed_output/-".length
             ) {
               messages += log.value;
               scrollToBottom(scrollToDiv)

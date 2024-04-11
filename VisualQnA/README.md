@@ -30,7 +30,7 @@ docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${ht
 2. Start the LLaVA service on Intel Gaudi2
 
 ```
-docker run -d -p 8084:80 -p 8085:8000 -v ./data:/root/.cache/huggingface/hub/ -e http_proxy=$http_proxy -e https_proxy=$http_proxy -v $PWD/llava_server:/llava_server --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:llava-gaudi
+docker run -d -p 8085:8000 -v ./data:/root/.cache/huggingface/hub/ -e http_proxy=$http_proxy -e https_proxy=$http_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:llava-gaudi
 ```
 
 Here are some explanation about the above parameters:
@@ -55,7 +55,7 @@ Now you can start the frontend UI by following commands:
 ```
 cd ui/
 pip install -r requirements.txt
-python app.py --host 0.0.0.0 --port 7860 --worker-addr http://localhost:8085 --share
+http_proxy= python app.py --host 0.0.0.0 --port 7860 --worker-addr http://localhost:8085 --share
 ```
 
 Here are some explanation about the above parameters:
@@ -63,3 +63,7 @@ Here are some explanation about the above parameters:
 - `--host`: the host of the gradio app
 - `--port`: the port of the gradio app, by default 7860
 - `--worker-addr`: the LLaVA service IP address. If you setup the service on a different machine, please replace `localhost` to the IP address of your Gaudi2 host machine
+
+#
+
+SCRIPT USAGE NOTICE:  By downloading and using any script file included with the associated software package (such as files with .bat, .cmd, or .JS extensions, Docker files, or any other type of file that, when executed, automatically downloads and/or installs files onto your system) (the “Script File”), it is your obligation to review the Script File to understand what files (e.g.,  other software, AI models, AI Datasets) the Script File will download to your system (“Downloaded Files”). Furthermore, by downloading and using the Downloaded Files, even if they are installed through a silent install, you agree to any and all terms and conditions associated with such files, including but not limited to, license terms, notices, or disclaimers.
