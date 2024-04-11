@@ -44,6 +44,11 @@ jobs:
           echo "Job originally triggered by ${{ github.actor }}"
           exit 1
 
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
       - name: Checkout out Repo
         uses: actions/checkout@v4
         with:
