@@ -1,0 +1,21 @@
+.prompt-input-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 2.5rem 2.5rem 2.5rem;
+  gap: 1rem;
+
+  .MuiInputBase-root {
+    border-radius: 0;
+  }
+
+  & .send-btn {
+    block-size: 2.5rem;
+    inline-size: 2.5rem;
+    min-width: unset;
+    max-width: 2.5rem;
+  }
+
+  & .upload-loader {
+    margin: 0.5rem;
+    color: #00c7fd;
+  }
+}
