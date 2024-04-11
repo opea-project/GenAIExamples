@@ -1,0 +1,8 @@
+main.chat-page {
+  display: grid !important;
+  grid-template-rows: 2.5rem 1fr;
+  gap: 1.5rem;
+  height: calc(100vh - 3rem);
+  background-color: #003243;
+  padding: 1rem 6rem;
+}

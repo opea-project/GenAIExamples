@@ -1,0 +1,352 @@
+main.telemetry-page {
+  height: auto;
+  background-color: #003243;
+  padding: 2rem 6rem 1rem;
+
+  $graph-height: calc(100vh - 9rem);
+  $section-height: calc(100vh - 13rem);
+  $flow-section-height: calc(100vh - 10rem);
+
+  & .telemetry-graph {
+    height: $graph-height;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    font-family: "IntelOneDisplay", sans-serif;
+
+    & .section-title {
+      text-align: center;
+      font-size: 2rem;
+      height: 4rem;
+      font-weight: 300;
+      color: white;
+    }
+
+    & .client-section {
+      width: 20%;
+
+      & .client-box {
+        height: $section-height;
+        background-color: #225368;
+        outline: 0.25rem solid #41728a;
+        outline-offset: -0.75rem;
+      }
+    }
+
+    & .llm-section {
+      width: 20%;
+
+      & .llm-box {
+        position: relative;
+        height: $section-height;
+        border: 0.125rem solid #00c7fd;
+
+        & img {
+          position: absolute;
+          inline-size: 4rem;
+          block-size: 4rem;
+          left: 1rem;
+          bottom: 1rem;
+          border: 0.125rem solid white;
+        }
+      }
+    }
+
+    & .flow-box {
+      width: 100%;
+      height: $flow-section-height;
+      padding-top: 4rem;
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      & .latency-metrics,
+      & .token-metrics {
+        width: 20%;
+      }
+
+      & .io-flow {
+        width: 60%;
+        padding-inline: 4rem;
+        display: flex;
+        flex-direction: column;
+
+        & .arrow {
+          width: 100%;
+          height: 3rem;
+          position: relative;
+
+          & .arrow-head {
+            border-left-width: 0.25rem;
+            border-bottom-width: 0.25rem;
+            border-left-style: solid;
+            border-bottom-style: solid;
+            width: 2.5rem;
+            height: 2.5rem;
+            position: absolute;
+            transform: rotate(45deg); // left
+            overflow: visible;
+          }
+
+          & .arrow-body {
+            width: 100%;
+            height: 0.25rem;
+            position: absolute;
+            top: 1.125rem;
+            left: -0.25rem; // left
+          }
+
+          &.white {
+            & .arrow-head {
+              border-left-color: white;
+              border-bottom-color: white;
+            }
+
+            & .arrow-body {
+              background-color: white;
+            }
+          }
+
+          &.blue {
+            & .arrow-head {
+              border-left-color: #00c7fd;
+              border-bottom-color: #00c7fd;
+            }
+
+            & .arrow-body {
+              background-color: #00c7fd;
+            }
+          }
+
+          &.right {
+            & .arrow-head {
+              transform: rotate(225deg); // right
+              right: 0.5rem;
+            }
+
+            & .arrow-body {
+              right: 0.0625rem; // right
+            }
+          }
+        }
+
+        & .input-token-size-label {
+          font-size: 1rem;
+          font-family: "IntelOneText", sans-serif;
+          position: absolute;
+          color: white;
+          top: -1rem;
+          text-align: right;
+          width: 100%;
+          padding-right: 2.5rem;
+        }
+
+        & .output-token-size-label {
+          font-size: 1rem;
+          font-family: "IntelOneText", sans-serif;
+          position: absolute;
+          color: #00c7fd;
+          bottom: 0;
+          text-align: left;
+          width: 100%;
+          padding-left: 2.5rem;
+        }
+      }
+
+      & .token-metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      & .inference-flow {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        align-items: center;
+      }
+
+      & .without-rag {
+        top: 5rem;
+        padding-bottom: 1rem;
+        border-bottom: 0.25rem solid #427289;
+
+        & .latency-metric-label {
+          background-color: #eec3f7;
+          color: #1b3746;
+
+          & .divider {
+            background-color: #1b3746;
+          }
+        }
+      }
+
+      & .with-rag {
+        bottom: 3rem;
+
+        & .latency-metric-label {
+          background-color: #06afdf;
+          color: white;
+
+          & .divider {
+            background-color: white;
+          }
+        }
+
+        & .vector-database-flow {
+          display: flex;
+          flex-direction: column;
+
+          & .vector-database-box {
+            width: 60%;
+            margin: 1rem auto;
+            outline: 0.125rem solid white;
+            outline-offset: 0.5rem;
+            border: 1px solid #00c7fd;
+            display: flex;
+            position: relative;
+            min-height: 6rem;
+            padding-block: 1rem 2rem;
+
+            & p {
+              padding-block: 0.5rem;
+              padding-inline: 4rem;
+              height: 80%;
+              width: 100%;
+              background-color: #00c7fd;
+              color: #1b3746;
+              text-align: center;
+              font-size: 1.5rem;
+            }
+
+            & .with-rag-lock-icon {
+              background-color: #242528;
+              inline-size: 2rem;
+              block-size: 2.5rem;
+              position: absolute;
+              bottom: -1.25rem;
+              left: calc(50% - 1rem);
+              border: 0.25rem solid white;
+              border-bottom-left-radius: 50%;
+              border-bottom-right-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              & svg {
+                color: #00c7fd;
+                inline-size: 2rem;
+              }
+            }
+
+            & .intel-xeon-logo {
+              inline-size: 4rem;
+              block-size: 4rem;
+              position: absolute;
+              border: 0.125rem solid #00c7fd;
+              left: 0.5rem;
+              top: calc(50% - 0.5rem);
+            }
+          }
+        }
+
+        & .other-metrics {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          height: 4rem;
+          width: 100%;
+          position: absolute;
+          bottom: -5rem;
+
+          & .other-metrics-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+          }
+
+          & .db-retriever-latency-wrapper {
+            border: 0.25rem solid #8bae46;
+            display: flex;
+
+            & .db-retriever-latency-name {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              text-align: center;
+              background-color: #8bae46;
+              padding-inline: 1rem;
+              width: 60%;
+              min-width: 6rem;
+            }
+
+            & .db-retriever-latency-value {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              color: white;
+              width: 40%;
+              min-width: 4rem;
+              background-color: #183544;
+            }
+          }
+        }
+      }
+
+      & .latency-metric-label {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 0.25rem minmax(0, 1fr);
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+        min-height: 5rem;
+        box-shadow: 0.125rem 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+        z-index: 10;
+        margin-inline: 1rem;
+
+        & label {
+          display: flex;
+          flex-direction: column;
+          text-align: left;
+
+          & span:first-child {
+            font-size: 1.5rem;
+          }
+
+          & span:last-child {
+            font-size: 0.875rem;
+          }
+
+          & span:only-child {
+            font-size: 1rem;
+          }
+        }
+
+        & .divider {
+          height: 100%;
+          width: 0.25rem;
+        }
+
+        & span.latency-metric-value {
+          font-size: 1.5rem;
+          line-height: 1.5rem;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  & footer.disclaimer {
+    margin-top: 2rem;
+    height: 1rem;
+    position: relative;
+
+    & p {
+      font-family: "IntelOneDisplay", sans-serif;
+      color: white;
+      text-align: center;
+      font-size: 0.875rem;
+    }
+  }
+}
