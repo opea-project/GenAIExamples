@@ -2,12 +2,12 @@
 
 ## License
 
-Intel Generative AI Examples is licensed under the terms in [LICENSE](/LICENSE).
+Generative AI Examples is licensed under the terms in [LICENSE](/LICENSE).
 By contributing to the project, you agree to the license and copyright terms therein and release your contribution under these terms.
 
 ## Create Pull Request
 
-If you have improvements to Intel Generative AI Examples, send your pull requests for
+If you have improvements to Generative AI Examples, send your pull requests for
 [review](https://github.com/opea-project/GenAIExamples/pulls).
 If you are new to GitHub, view the pull request [How To](https://help.github.com/articles/using-pull-requests/).
 
@@ -38,7 +38,7 @@ See [PR template](/.github/pull_request_template.md)
 
 ## Pull Request Status Checks Overview
 
-Intel Generative AI Examples use [Actions](https://github.com/opea-project/GenAIExamples/actions) for CI test.
+Generative AI Examples use [Actions](https://github.com/opea-project/GenAIExamples/actions) for CI test.
 | Test Name | Test Scope | Test Pass Criteria |
 |-------------------------------|-----------------------------------------------|---------------------------|
 | Security Scan | Dependabot/Bandit | PASS |
