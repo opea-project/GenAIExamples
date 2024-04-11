@@ -40,6 +40,8 @@ Intel Generative AI Examples use [Actions](https://github.com/opea-project/GenAI
 |     Examples Test             |     Cases under Examples/tests folder   |     PASS          |
 |     DCO                       |     Use `git commit -s` to sign off     |     PASS          |
 
+> Notes: [Developer Certificate of Origin (DCO)](https://en.wikipedia.org/wiki/Developer_Certificate_of_Origin), you must agree to the terms of Developer Certificate of Origin by signing off each of your commits with `-s`, e.g. `git commit -s -m 'This is my commit message'`.
+
 ## Support
 Submit your questions, feature requests, and bug reports to the [GitHub issues](https://github.com/opea-project/GenAIExamples/issues) page.
 
