@@ -1,6 +1,6 @@
 # Contributing
 
-### License
+## License
 
 Intel Generative AI Examples is licensed under the terms in [LICENSE](/LICENSE).
 By contributing to the project, you agree to the license and copyright terms therein and release your contribution under these terms.
