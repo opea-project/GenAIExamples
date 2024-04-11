@@ -20,13 +20,13 @@ node --version
 npm --version
 ```
 
-_```--version``` option can be replaced with ```-v``` shorthand_
+_`--version` option can be replaced with `-v` shorthand_
 
 ## Setup
 
 ### Environment variables
 
-Create ```.env``` file in this folder. It has to contain the following variables that represent corresponding endpoints
+Create `.env` file in this folder. It has to contain the following variables that represent corresponding endpoints
 for communication with **without RAG** and **with RAG** backend:
 
 ```
@@ -48,18 +48,18 @@ Execute the following command to start GUI:
 npm run dev
 ```
 
-By default, UI will run on ```http://localhost:5147```.
-The port and IP address that the UI will be served on can be changed by modifying npm ```dev``` script
-in ```package.json```.
+By default, UI will run on `http://localhost:5147`.
+The port and IP address that the UI will be served on can be changed by modifying npm `dev` script
+in `package.json`.
 
-The following example presents how to change port and IP address by setting corresponding options: ```--port```
-and ```--host```.
+The following example presents how to change port and IP address by setting corresponding options: `--port`
+and `--host`.
 
 ```json
 "dev": "vite dev --port 9090 --host 0.0.0.0",
 ```
 
-This also can be set via CLI by adding ```-- --port <port> --host <ip>``` :
+This also can be set via CLI by adding `-- --port <port> --host <ip>` :
 
 ```bash
 npm run dev -- --port 9090 --host 0.0.0.0

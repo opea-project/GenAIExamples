@@ -12,7 +12,7 @@ main.telemetry-page {
     position: relative;
     display: flex;
     justify-content: space-between;
-    font-family: 'IntelOneDisplay', sans-serif;
+    font-family: "IntelOneDisplay", sans-serif;
 
     & .section-title {
       text-align: center;
@@ -28,7 +28,7 @@ main.telemetry-page {
       & .client-box {
         height: $section-height;
         background-color: #225368;
-        outline: 0.25rem solid #41728A;
+        outline: 0.25rem solid #41728a;
         outline-offset: -0.75rem;
       }
     }
@@ -39,7 +39,7 @@ main.telemetry-page {
       & .llm-box {
         position: relative;
         height: $section-height;
-        border: 0.125rem solid #00C7FD;
+        border: 0.125rem solid #00c7fd;
 
         & img {
           position: absolute;
@@ -109,12 +109,12 @@ main.telemetry-page {
 
           &.blue {
             & .arrow-head {
-              border-left-color: #00C7FD;
-              border-bottom-color: #00C7FD;
+              border-left-color: #00c7fd;
+              border-bottom-color: #00c7fd;
             }
 
             & .arrow-body {
-              background-color: #00C7FD;
+              background-color: #00c7fd;
             }
           }
 
@@ -132,7 +132,7 @@ main.telemetry-page {
 
         & .input-token-size-label {
           font-size: 1rem;
-          font-family: 'IntelOneText', sans-serif;
+          font-family: "IntelOneText", sans-serif;
           position: absolute;
           color: white;
           top: -1rem;
@@ -143,9 +143,9 @@ main.telemetry-page {
 
         & .output-token-size-label {
           font-size: 1rem;
-          font-family: 'IntelOneText', sans-serif;
+          font-family: "IntelOneText", sans-serif;
           position: absolute;
-          color: #00C7FD;
+          color: #00c7fd;
           bottom: 0;
           text-align: left;
           width: 100%;
@@ -172,11 +172,11 @@ main.telemetry-page {
         border-bottom: 0.25rem solid #427289;
 
         & .latency-metric-label {
-          background-color: #EEC3F7;
-          color: #1B3746;
+          background-color: #eec3f7;
+          color: #1b3746;
 
           & .divider {
-            background-color: #1B3746;
+            background-color: #1b3746;
           }
         }
       }
@@ -185,7 +185,7 @@ main.telemetry-page {
         bottom: 3rem;
 
         & .latency-metric-label {
-          background-color: #06AFDF;
+          background-color: #06afdf;
           color: white;
 
           & .divider {
@@ -202,7 +202,7 @@ main.telemetry-page {
             margin: 1rem auto;
             outline: 0.125rem solid white;
             outline-offset: 0.5rem;
-            border: 1px solid #00C7FD;
+            border: 1px solid #00c7fd;
             display: flex;
             position: relative;
             min-height: 6rem;
@@ -213,8 +213,8 @@ main.telemetry-page {
               padding-inline: 4rem;
               height: 80%;
               width: 100%;
-              background-color: #00C7FD;
-              color: #1B3746;
+              background-color: #00c7fd;
+              color: #1b3746;
               text-align: center;
               font-size: 1.5rem;
             }
@@ -234,7 +234,7 @@ main.telemetry-page {
               justify-content: center;
 
               & svg {
-                color: #00C7FD;
+                color: #00c7fd;
                 inline-size: 2rem;
               }
             }
@@ -243,7 +243,7 @@ main.telemetry-page {
               inline-size: 4rem;
               block-size: 4rem;
               position: absolute;
-              border: 0.125rem solid #00C7FD;
+              border: 0.125rem solid #00c7fd;
               left: 0.5rem;
               top: calc(50% - 0.5rem);
             }
@@ -266,7 +266,7 @@ main.telemetry-page {
           }
 
           & .db-retriever-latency-wrapper {
-            border: 0.25rem solid #8BAE46;
+            border: 0.25rem solid #8bae46;
             display: flex;
 
             & .db-retriever-latency-name {
@@ -274,7 +274,7 @@ main.telemetry-page {
               justify-content: center;
               align-items: center;
               text-align: center;
-              background-color: #8BAE46;
+              background-color: #8bae46;
               padding-inline: 1rem;
               width: 60%;
               min-width: 6rem;
@@ -343,7 +343,7 @@ main.telemetry-page {
     position: relative;
 
     & p {
-      font-family: 'IntelOneDisplay', sans-serif;
+      font-family: "IntelOneDisplay", sans-serif;
       color: white;
       text-align: center;
       font-size: 0.875rem;

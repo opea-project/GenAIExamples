@@ -3,7 +3,7 @@
 
   & .source-grid-item {
     height: 4rem;
-    background-color: #2F303A;
+    background-color: #2f303a;
     border-radius: 0.25rem;
     padding: 0.75rem;
     position: relative;
@@ -54,11 +54,11 @@
     transition: top 0.7s linear;
 
     &.error {
-      background-color: #CE0000;
+      background-color: #ce0000;
     }
 
     &.success {
-      background-color: #008A00;
+      background-color: #008a00;
     }
 
     &.visible {

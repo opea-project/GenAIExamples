@@ -1,5 +1,5 @@
 .results-card {
-  $font-family: 'IntelOneDisplay', 'sans-serif' !important;
+  $font-family: "IntelOneDisplay", "sans-serif" !important;
 
   display: block !important;
   position: relative;
@@ -9,7 +9,7 @@
   &#with-rag {
     outline: 0.125rem solid white;
     outline-offset: 0.5rem;
-    border: 0.125rem solid #00C7FD;
+    border: 0.125rem solid #00c7fd;
 
     & .with-rag-lock-icon {
       background-color: #242528;
@@ -26,7 +26,7 @@
       justify-content: center;
 
       & svg {
-        color: #00C7FD;
+        color: #00c7fd;
         inline-size: 2rem;
       }
     }
@@ -47,18 +47,18 @@
     align-items: center;
 
     &.without-rag {
-      background-color: #EEC3F7;
+      background-color: #eec3f7;
     }
 
     &.with-rag {
-      background-color: #00C7FD;
+      background-color: #00c7fd;
     }
 
     .results-card__title {
       font-size: 1.5rem !important;
       font-family: $font-family;
 
-      & span[role='img'] {
+      & span[role="img"] {
         margin-right: 0.5rem;
       }
     }
@@ -67,7 +67,7 @@
   .results-card__results-list-wrapper {
     position: relative;
     color: white;
-    background-color: #1F2029;
+    background-color: #1f2029;
     text-align: left;
     word-break: break-all;
     width: 100%;
@@ -100,7 +100,7 @@
     max-height: 5.25rem;
     border: 0.125rem solid white;
     padding: 0.5rem;
-    background-color: #1F2029;
+    background-color: #1f2029;
 
     img {
       $cpu-logo-size: 4rem !important;

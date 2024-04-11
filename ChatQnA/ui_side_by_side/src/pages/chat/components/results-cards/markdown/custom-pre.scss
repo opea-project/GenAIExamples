@@ -2,7 +2,7 @@
   position: relative;
   padding: 1rem 3.25rem 1rem 1rem;
   border-radius: 0.25rem;
-  background-color: #2F303A;
+  background-color: #2f303a;
   white-space: pre;
 
   & .copy-code-btn {
@@ -10,18 +10,16 @@
     top: 0.5rem;
     right: 0.5rem;
 
-
     & .icon {
       pointer-events: none;
 
       &.success {
-        color: #8BAE46;
+        color: #8bae46;
       }
 
       &.error {
-        color: #E96115;
+        color: #e96115;
       }
     }
   }
 }
-

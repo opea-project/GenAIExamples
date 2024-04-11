@@ -3,8 +3,8 @@
   inline-size: 100%;
   block-size: 3rem;
   line-height: 3rem;
-  color: #FFFFFF;
-  background-color: #1F2029;
+  color: #ffffff;
+  background-color: #1f2029;
   align-items: center;
   padding-block: 0.5rem;
 
@@ -20,7 +20,7 @@
     font-weight: 300;
     line-height: 2.125rem;
     height: 100%;
-    border-left: 0.25rem solid #00C7FD;
+    border-left: 0.25rem solid #00c7fd;
   }
 
   & > nav {
@@ -40,7 +40,7 @@
       }
 
       &.active {
-        box-shadow: inset 0 -0.125rem #00C7FD;
+        box-shadow: inset 0 -0.125rem #00c7fd;
       }
     }
   }
