@@ -2,56 +2,52 @@
 
 ### License
 
-Intel Generative AI Examples is licensed under the terms in [LICENSE](/LICENSE). By contributing to the project, you agree to the license and copyright terms therein and release your contribution under these terms.
+Intel Generative AI Examples is licensed under the terms in [LICENSE](/LICENSE).
+By contributing to the project, you agree to the license and copyright terms therein and release your contribution under these terms.
 
-### Sign your work
+## Create Pull Request
 
-Please use the sign-off line at the end of the patch. Your signature certifies that you wrote the patch or otherwise have the right to pass it on as an open-source patch. The rules are pretty simple: if you can certify
-the below (from [developercertificate.org](http://developercertificate.org/)):
+If you have improvements to Intel Generative AI Examples, send your pull requests for
+[review](https://github.com/opea-project/GenAIExamples/pulls).
+If you are new to GitHub, view the pull request [How To](https://help.github.com/articles/using-pull-requests/).
 
-```
-Developer Certificate of Origin
-Version 1.1
+### Step-by-Step guidelines
 
-Copyright (C) 2004, 2006 The Linux Foundation and its contributors.
-660 York Street, Suite 102,
-San Francisco, CA 94110 USA
+- Star this repository using the button `Star` in the top right corner.
+- Fork this Repository using the button `Fork` in the top right corner.
+- Clone your forked repository to your pc.
+  `git clone "url to your repo"`
+- Create a new branch for your modifications.
+  `git checkout -b new-branch`
+- Add your files with `git add -A`, commit with `git commit -s -m "This is my commit message"` and push `git push origin new-branch`.
+- Create a [pull request](https://github.com/opea-project/GenAIExamples/pulls).
 
-Everyone is permitted to copy and distribute verbatim copies of this
-license document, but changing it is not allowed.
+## Pull Request Template
 
-Developer's Certificate of Origin 1.1
+See [PR template](/.github/pull_request_template.md)
 
-By making a contribution to this project, I certify that:
+## Pull Request Acceptance Criteria
 
-(a) The contribution was created in whole or in part by me and I
-    have the right to submit it under the open source license
-    indicated in the file; or
+- At least two approvals from reviewers
 
-(b) The contribution is based upon previous work that, to the best
-    of my knowledge, is covered under an appropriate open source
-    license and I have the right under that license to submit that
-    work with modifications, whether created in whole or in part
-    by me, under the same open source license (unless I am
-    permitted to submit under a different license), as indicated
-    in the file; or
+- All detected status checks pass
 
-(c) The contribution was provided directly to me by some other
-    person who certified (a), (b) or (c) and I have not modified
-    it.
+- All conversations solved
 
-(d) I understand and agree that this project and the contribution
-    are public and that a record of the contribution (including all
-    personal information I submit with it, including my sign-off) is
-    maintained indefinitely and may be redistributed consistent with
-    this project or the open source license(s) involved.
-```
+- Third-party dependency license compatible
 
-Then you just add a line to every git commit message:
+## Pull Request Status Checks Overview
 
-    Signed-off-by: Joe Smith <joe.smith@email.com>
+Intel Generative AI Examples use [Actions](https://github.com/opea-project/GenAIExamples/actions) for CI test.
+| Test Name | Test Scope | Test Pass Criteria |
+|-------------------------------|-----------------------------------------------|---------------------------|
+| Security Scan | Dependabot/Bandit | PASS |
+| Format Scan | pre-commit.ci | PASS |
+| Examples Test | Cases under Examples/tests folder | PASS |
+| DCO | Use `git commit -s` to sign off | PASS |
 
-Use your real name (sorry, no pseudonyms or anonymous contributions.)
+> Notes: [Developer Certificate of Origin (DCO)](https://en.wikipedia.org/wiki/Developer_Certificate_of_Origin), you must agree to the terms of Developer Certificate of Origin by signing off each of your commits with `-s`, e.g. `git commit -s -m 'This is my commit message'`.
 
-If you set your `user.name` and `user.email` git configs, you can sign your
-commit automatically with `git commit -s`.
+## Support
+
+Submit your questions, feature requests, and bug reports to the [GitHub issues](https://github.com/opea-project/GenAIExamples/issues) page.
