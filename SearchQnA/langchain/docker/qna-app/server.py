@@ -132,6 +132,7 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
             vectorstore=self.vectorstore,
             llm=self.llm,
             search=self.search,
+            trust_env=True,
             # num_search_results=3
         )
 
