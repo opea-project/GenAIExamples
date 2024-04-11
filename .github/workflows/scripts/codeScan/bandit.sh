@@ -1,7 +1,7 @@
 #!/bin/bash
 source /GenAIExamples/.github/workflows/scripts/change_color
 pip install bandit==1.7.8
-log_dir=/GenAIExamples/.github/workflows/scripts/formatScan
+log_dir=/GenAIExamples/.github/workflows/scripts/codeScan
 python -m bandit -r -lll -iii /GenAIExamples >${log_dir}/bandit.log
 exit_code=$?
 
