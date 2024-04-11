@@ -15,3 +15,4 @@ redis
 sentence-transformers
 unstructured
 unstructured[all-docs]
+pinecone-client

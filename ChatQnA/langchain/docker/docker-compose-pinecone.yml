@@ -1,0 +1,39 @@
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+services:
+  qna-rag-pinecone-server:
+    build:
+      args:
+        https_proxy: ${https_proxy}
+        http_proxy: ${http_proxy}
+      dockerfile: Dockerfile
+      context: .
+    image: intel/gen-ai-examples:qna-rag-pinecone-server
+    container_name: qna-rag-pinecone-server
+    environment:
+      - https_proxy=${https_proxy}
+      - HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+      - PINECONE_ENVIRONMENT=${PINECONE_ENVIRONMENT}
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_INDEX=${PINECONE_INDEX}
+      - EMBED_MODEL=BAAI/bge-base-en-v1.5
+    ulimits:
+      memlock:
+        soft: -1 # Set memlock to unlimited (no soft or hard limit)
+        hard: -1
+    volumes:
+      - ../pinecone:/ws
+      - ../test:/test
+    network_mode: "host"

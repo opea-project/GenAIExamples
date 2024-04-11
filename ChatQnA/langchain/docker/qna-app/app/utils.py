@@ -30,8 +30,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_community.vectorstores import Redis
 from langchain_core.documents import Document
-from rag_redis.config import INDEX_SCHEMA, REDIS_URL
-
 
 def get_current_beijing_time():
     SHA_TZ = timezone(timedelta(hours=8), name="Asia/Shanghai")
@@ -286,26 +284,34 @@ def document_transfer(data_collection):
     return documents
 
 
-def create_retriever_from_files(doc, embeddings, index_name: str):
+def create_retriever_from_files(vectordbStr, doc, embeddings, index_name: str):
     print(f"[rag - create retriever] create with index: {index_name}")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
     loader = UnstructuredFileLoader(doc, mode="single", strategy="fast")
     chunks = loader.load_and_split(text_splitter)
 
-    rds = Redis.from_texts(
-        texts=[chunk.page_content for chunk in chunks],
-        metadatas=[chunk.metadata for chunk in chunks],
-        embedding=embeddings,
-        index_name=index_name,
-        redis_url=REDIS_URL,
-        index_schema=INDEX_SCHEMA,
-    )
+    if vectordbStr == "redis":
+        from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+        vectorstore = Redis.from_texts(
+            texts=[chunk.page_content for chunk in chunks],
+            metadatas=[chunk.metadata for chunk in chunks],
+            embedding=embeddings,
+            index_name=index_name,
+            redis_url=REDIS_URL,
+            index_schema=INDEX_SCHEMA,
+        )
+    else:
+        vectorstore = Pinecone(
+            texts=[chunk.page_content for chunk in chunks],
+            metadatas=[chunk.metadata for chunk in chunks],
+            embedding=embeddings,
+            index_name=index_name)
 
-    retriever = rds.as_retriever(search_type="mmr")
+    retriever = vectorstore.as_retriever(search_type="mmr")
     return retriever
 
 
-def create_retriever_from_links(embeddings, link_list: list, index_name):
+def create_retriever_from_links(vectordbStr, embeddings, link_list: list, index_name):
     data_collection = parse_html(link_list)
     texts = []
     metadatas = []
@@ -315,29 +321,41 @@ def create_retriever_from_links(embeddings, link_list: list, index_name):
         texts.append(data)
         metadatas.append(metadata)
 
-    rds = Redis.from_texts(
-        texts=texts,
-        metadatas=metadatas,
-        embedding=embeddings,
-        index_name=index_name,
-        redis_url=REDIS_URL,
-        index_schema=INDEX_SCHEMA,
-    )
+    if vectordbStr == "redis":
+        from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+        vectorstore = Redis.from_texts(
+            texts=texts,
+            metadatas=metadatas,
+            embedding=embeddings,
+            index_name=index_name,
+            redis_url=REDIS_URL,
+            index_schema=INDEX_SCHEMA,
+        )
+    else:
+        vectorstore = Pinecone(
+            texts=texts,
+            metadatas=metadatas,
+            embedding=embeddings,
+            index_name=index_name)
 
-    retriever = rds.as_retriever(search_type="mmr")
+    retriever = vectorstore.as_retriever(search_type="mmr")
     return retriever
 
 
-def reload_retriever(embeddings, index_name):
+def reload_retriever(vectordbStr, embeddings, index_name):
     print(f"[rag - reload retriever] reload with index: {index_name}")
-    rds = Redis.from_existing_index(
-        embeddings,
-        index_name=index_name,
-        redis_url=REDIS_URL,
-        schema=INDEX_SCHEMA,
-    )
+    if vectordbStr == "redis":
+        from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+        vectorstore = Redis.from_existing_index(
+            embeddings,
+            index_name=index_name,
+            redis_url=REDIS_URL,
+            schema=INDEX_SCHEMA,
+        )
+    else:
+        vectorstore = PineconeVectorStore.from_existing_index(index_name, embeddings)
 
-    retriever = rds.as_retriever(search_type="mmr")
+    retriever = vectorstore.as_retriever(search_type="mmr")
     return retriever
 
 
