@@ -48,9 +48,6 @@ const PromptInput = ({
         size="small"
         id="prompt-input-text-field"
         name="prompt-input-text-field"
-        inputProps={{
-          style: { fontFamily: "IntelOneText" },
-        }}
         onChange={onPromptTextFieldChange}
         onKeyDown={onKeyDownHandler}
       />

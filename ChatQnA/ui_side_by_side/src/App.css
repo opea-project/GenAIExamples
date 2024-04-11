@@ -8,7 +8,7 @@
 
 html {
   font-size: 16px;
-  font-family: "IntelOneText", sans-serif !important;
+  font-family: sans-serif !important;
 
   @media screen and (min-width: 2500px) {
     font-size: 24px;

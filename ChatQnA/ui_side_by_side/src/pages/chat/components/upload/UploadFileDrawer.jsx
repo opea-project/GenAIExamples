@@ -147,12 +147,6 @@ const UploadFileDrawer = ({ show, onUploadFileDrawerClose, onConfirmUpload }) =>
                       type="text"
                       id={id}
                       name={id}
-                      inputProps={{
-                        style: {
-                          fontFamily: "IntelOneText",
-                          padding: "8px 12px",
-                        },
-                      }}
                       fullWidth
                       size="small"
                       value={value}

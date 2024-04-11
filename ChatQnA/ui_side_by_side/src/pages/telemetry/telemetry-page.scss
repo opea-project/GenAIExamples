@@ -12,7 +12,7 @@ main.telemetry-page {
     position: relative;
     display: flex;
     justify-content: space-between;
-    font-family: "IntelOneDisplay", sans-serif;
+    font-family: sans-serif;
 
     & .section-title {
       text-align: center;
@@ -132,7 +132,7 @@ main.telemetry-page {
 
         & .input-token-size-label {
           font-size: 1rem;
-          font-family: "IntelOneText", sans-serif;
+          font-family: sans-serif;
           position: absolute;
           color: white;
           top: -1rem;
@@ -143,7 +143,7 @@ main.telemetry-page {
 
         & .output-token-size-label {
           font-size: 1rem;
-          font-family: "IntelOneText", sans-serif;
+          font-family: sans-serif;
           position: absolute;
           color: #00c7fd;
           bottom: 0;
@@ -343,7 +343,7 @@ main.telemetry-page {
     position: relative;
 
     & p {
-      font-family: "IntelOneDisplay", sans-serif;
+      font-family: sans-serif;
       color: white;
       text-align: center;
       font-size: 0.875rem;

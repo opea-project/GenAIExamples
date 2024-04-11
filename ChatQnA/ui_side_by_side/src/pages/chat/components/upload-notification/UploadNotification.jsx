@@ -11,7 +11,7 @@ const UploadNotification = ({ notification, onNotificationClose }) => (
     <Alert
       severity={notification.severity}
       variant="filled"
-      sx={{ fontFamily: "IntelOneText, sans-serif" }}
+      sx={{ fontFamily: "sans-serif" }}
       onClose={onNotificationClose}
     >
       {notification.message}
