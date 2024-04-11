@@ -1,4 +1,4 @@
-name: Format Scan
+name: Code Scan
 
 on:
   pull_request:
@@ -15,13 +15,13 @@ concurrency:
 
 env:
   DOCKER_CONFIG_NAME: "commonDockerConfig"
-  REPO_NAME: "format-scan"
+  REPO_NAME: "code-scan"
   REPO_TAG: "1.0"
-  DOCKER_FILE_NAME: "format-scan"
-  CONTAINER_NAME: "format-scan"
+  DOCKER_FILE_NAME: "code-scan"
+  CONTAINER_NAME: "code-scan"
 
 jobs:
-  format-scan:
+  code-scan:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -48,11 +48,11 @@ jobs:
       - name: Code scan check
         run: |
           docker exec ${{ env.CONTAINER_NAME }} \
-          bash -c "bash /GenAIExamples/.github/workflows/scripts/formatScan/${{ matrix.job_name }}.sh"
+          bash -c "bash /GenAIExamples/.github/workflows/scripts/codeScan/${{ matrix.job_name }}.sh"
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.job_name }}
-          path: ${{ github.workspace }}/.github/workflows/scripts/formatScan/${{ matrix.job_name }}.*
+          path: ${{ github.workspace }}/.github/workflows/scripts/codeScan/${{ matrix.job_name }}.*
