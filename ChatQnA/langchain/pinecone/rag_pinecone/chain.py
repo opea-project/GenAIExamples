@@ -16,23 +16,26 @@
 # limitations under the License.
 
 import os
+
+from langchain.callbacks import streaming_stdout
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
-from langchain_pinecone import PineconeVectorStore
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-from langchain.callbacks import streaming_stdout
+from langchain_pinecone import PineconeVectorStore
+
 
 # Make this look better in the docs.
 class Question(BaseModel):
     __root__: str
 
+
 if os.environ.get("PINECONE_API_KEY", None) is None:
     raise Exception("Missing `PINECONE_API_KEY` environment variable.")
 
-#if os.environ.get("PINECONE_ENVIRONMENT", None) is None:
+# if os.environ.get("PINECONE_ENVIRONMENT", None) is None:
 #    raise Exception("Missing `PINECONE_ENVIRONMENT` environment variable.")
 
 PINECONE_INDEX_NAME = os.environ.get("INDEX_NAME", "langchain-test")
@@ -41,9 +44,7 @@ embedder = HuggingFaceEmbeddings(model_name=embed_model)
 
 # set_llm_cache for pinecone for semantic search
 
-vectorstore = PineconeVectorStore.from_existing_index(
-    PINECONE_INDEX_NAME, embedder
-)
+vectorstore = PineconeVectorStore.from_existing_index(PINECONE_INDEX_NAME, embedder)
 retriever = vectorstore.as_retriever(search_type="mmr")
 
 # Define our prompt

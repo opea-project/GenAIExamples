@@ -15,9 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+<<<<<<< HEAD
 import argparse
 import os
+=======
+>>>>>>> 3061284 ([pre-commit.ci] auto fixes from pre-commit.com hooks)
 import argparse
+import os
 
 from fastapi import APIRouter, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
@@ -25,10 +29,10 @@ from guardrails import moderation_prompt_for_chat, unsafe_dict
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Redis
-from langchain_pinecone import PineconeVectorStore
 from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
+from langchain_pinecone import PineconeVectorStore
 from langserve import add_routes
 from prompts import contextualize_q_prompt, qa_prompt, prompt
 from starlette.middleware.cors import CORSMiddleware
@@ -116,7 +120,7 @@ class RAGAPIRouter(APIRouter):
             )
         elif args.vectordb == "pinecone":
             vectorstore = PineconeVectorStore.from_existing_index(INDEX_NAME, self.embeddings)
-        
+
         retriever = vectorstore.as_retriever(search_type="mmr")
 
         # Define contextualize chain
@@ -185,6 +189,7 @@ tgi_llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
 safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT")
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 router = RAGAPIRouter(upload_dir, tgi_llm_endpoint, safety_guard_endpoint, tei_embedding_endpoint)
+
 
 @router.post("/v1/rag/chat")
 async def rag_chat(request: Request):
@@ -374,14 +379,15 @@ app.include_router(router)
 async def redirect_root_to_docs():
     return RedirectResponse("/docs")
 
-#add_routes(app, router.llm_chain, path="/rag-redis")
-add_routes(app, router.llm_chain, path="/rag-pinecone")
 
+# add_routes(app, router.llm_chain, path="/rag-redis")
+add_routes(app, router.llm_chain, path="/rag-pinecone")
 
 
 if __name__ == "__main__":
     if args.vectordb == "redis":
         from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+
         print("Redis url: ", REDIS_URL)
     elif args.vectordb == "pinecone":
         if os.environ.get("PINECONE_API_KEY", None) is None:
@@ -389,7 +395,9 @@ if __name__ == "__main__":
 
     if args.debug:
         import langchain
+
         langchain.debug = True
-    
+
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

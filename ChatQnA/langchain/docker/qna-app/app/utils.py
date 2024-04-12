@@ -32,6 +32,7 @@ from langchain_community.vectorstores import Redis
 from langchain_core.documents import Document
 from langchain_pinecone import PineconeVectorStore
 
+
 def get_current_beijing_time():
     SHA_TZ = timezone(timedelta(hours=8), name="Asia/Shanghai")
     utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -293,6 +294,7 @@ def create_retriever_from_files(vectordbStr, doc, embeddings, index_name: str):
 
     if vectordbStr == "redis":
         from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+
         vectorstore = Redis.from_texts(
             texts=[chunk.page_content for chunk in chunks],
             metadatas=[chunk.metadata for chunk in chunks],
@@ -306,7 +308,8 @@ def create_retriever_from_files(vectordbStr, doc, embeddings, index_name: str):
             texts=[chunk.page_content for chunk in chunks],
             metadatas=[chunk.metadata for chunk in chunks],
             embedding=embeddings,
-            index_name=index_name)
+            index_name=index_name,
+        )
 
     retriever = vectorstore.as_retriever(search_type="mmr")
     return retriever
@@ -324,6 +327,7 @@ def create_retriever_from_links(vectordbStr, embeddings, link_list: list, index_
 
     if vectordbStr == "redis":
         from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+
         vectorstore = Redis.from_texts(
             texts=texts,
             metadatas=metadatas,
@@ -333,11 +337,7 @@ def create_retriever_from_links(vectordbStr, embeddings, link_list: list, index_
             index_schema=INDEX_SCHEMA,
         )
     else:
-        vectorstore = Pinecone(
-            texts=texts,
-            metadatas=metadatas,
-            embedding=embeddings,
-            index_name=index_name)
+        vectorstore = Pinecone(texts=texts, metadatas=metadatas, embedding=embeddings, index_name=index_name)
 
     retriever = vectorstore.as_retriever(search_type="mmr")
     return retriever
@@ -347,6 +347,7 @@ def reload_retriever(vectordbStr, embeddings, index_name):
     print(f"[rag - reload retriever] reload with index: {index_name}")
     if vectordbStr == "redis":
         from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+
         vectorstore = Redis.from_existing_index(
             embeddings,
             index_name=index_name,

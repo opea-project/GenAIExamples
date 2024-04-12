@@ -15,14 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import io
+import os
 
 import numpy as np
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_pinecone import PineconeVectorStore
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from PIL import Image
+
 
 def pdf_loader(file_path):
     try:
@@ -60,11 +61,13 @@ def pdf_loader(file_path):
                 result = result + pageimg
     return result
 
+
 if os.environ.get("PINECONE_API_KEY", None) is None:
     raise Exception("Missing `PINECONE_API_KEY` environment variable.")
 
 
 PINECONE_INDEX_NAME = os.environ.get("INDEX_NAME", "langchain-test")
+
 
 def ingest_documents():
     """Ingest PDF to Redis from the data/ directory that
@@ -76,19 +79,21 @@ def ingest_documents():
 
     print("Parsing 10k filing doc for NIKE", doc_path)
 
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1500, chunk_overlap=100, add_start_index=True
-    )
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
     content = pdf_loader(doc_path)
     chunks = text_splitter.split_text(content)
 
-    print("Done preprocessing. Created", len(chunks), "chunks of the original pdf")  # noqa: T201
+    print("Done preprocessing. Created", len(chunks), "chunks of the original pdf")
 
     embed_model = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-    print('embed_model: ', embed_model)
+    print("embed_model: ", embed_model)
     embedder = HuggingFaceEmbeddings(model_name=embed_model)
-    
-    _ = PineconeVectorStore.from_texts(texts=[f"Company: {company_name}. " + chunk for chunk in chunks], embedding=embedder, index_name=PINECONE_INDEX_NAME)
+
+    _ = PineconeVectorStore.from_texts(
+        texts=[f"Company: {company_name}. " + chunk for chunk in chunks],
+        embedding=embedder,
+        index_name=PINECONE_INDEX_NAME,
+    )
 
 
 if __name__ == "__main__":
