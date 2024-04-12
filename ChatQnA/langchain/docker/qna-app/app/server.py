@@ -69,19 +69,7 @@ class RAGAPIRouter(APIRouter):
             repetition_penalty=1.03,
             streaming=True,
         )
-        # for NeuralChatEndpoint:
-        """
-        self.llm = NeuralChatEndpoint(
-            endpoint_url=entrypoint,
-            max_new_tokens=1024,
-            top_k=10,
-            top_p=0.95,
-            typical_p=0.95,
-            temperature=0.01,
-            repetition_penalty=1.03,
-            streaming=True,
-        )
-        """
+
         if self.safety_guard_endpoint:
             self.llm_guard = HuggingFaceEndpoint(
                 endpoint_url=safety_guard_endpoint,
