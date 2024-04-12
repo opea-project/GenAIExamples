@@ -30,6 +30,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_community.vectorstores import Redis
 from langchain_core.documents import Document
+from langchain_pinecone import PineconeVectorStore
 
 def get_current_beijing_time():
     SHA_TZ = timezone(timedelta(hours=8), name="Asia/Shanghai")

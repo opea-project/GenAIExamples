@@ -32,12 +32,12 @@ class Question(BaseModel):
 if os.environ.get("PINECONE_API_KEY", None) is None:
     raise Exception("Missing `PINECONE_API_KEY` environment variable.")
 
-if os.environ.get("PINECONE_ENVIRONMENT", None) is None:
-    raise Exception("Missing `PINECONE_ENVIRONMENT` environment variable.")
+#if os.environ.get("PINECONE_ENVIRONMENT", None) is None:
+#    raise Exception("Missing `PINECONE_ENVIRONMENT` environment variable.")
 
-PINECONE_INDEX_NAME = os.environ.get("PINECONE_INDEX", "langchain-test")
+PINECONE_INDEX_NAME = os.environ.get("INDEX_NAME", "langchain-test")
 embed_model = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-embedder = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+embedder = HuggingFaceEmbeddings(model_name=embed_model)
 
 # set_llm_cache for pinecone for semantic search
 
@@ -65,6 +65,7 @@ Answer:
 """
 prompt = ChatPromptTemplate.from_template(template)
 
+print("In endpoint: ", TGI_LLM_ENDPOINT)
 # RAG Chain
 model = HuggingFaceEndpoint(
     endpoint_url=TGI_LLM_ENDPOINT,

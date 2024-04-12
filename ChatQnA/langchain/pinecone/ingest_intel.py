@@ -66,7 +66,7 @@ if os.environ.get("PINECONE_API_KEY", None) is None:
 if os.environ.get("PINECONE_ENVIRONMENT", None) is None:
     raise Exception("Missing `PINECONE_ENVIRONMENT` environment variable.")
 
-PINECONE_INDEX_NAME = os.environ.get("PINECONE_INDEX", "langchain-test")
+PINECONE_INDEX_NAME = os.environ.get("INDEX_NAME", "langchain-test")
 
 def ingest_documents():
     """Ingest PDF to Redis from the data/ directory that

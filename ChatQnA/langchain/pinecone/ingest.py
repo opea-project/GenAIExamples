@@ -63,10 +63,8 @@ def pdf_loader(file_path):
 if os.environ.get("PINECONE_API_KEY", None) is None:
     raise Exception("Missing `PINECONE_API_KEY` environment variable.")
 
-if os.environ.get("PINECONE_ENVIRONMENT", None) is None:
-    raise Exception("Missing `PINECONE_ENVIRONMENT` environment variable.")
 
-PINECONE_INDEX_NAME = os.environ.get("PINECONE_INDEX", "langchain-test")
+PINECONE_INDEX_NAME = os.environ.get("INDEX_NAME", "langchain-test")
 
 def ingest_documents():
     """Ingest PDF to Redis from the data/ directory that
@@ -87,9 +85,10 @@ def ingest_documents():
     print("Done preprocessing. Created", len(chunks), "chunks of the original pdf")  # noqa: T201
 
     embed_model = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+    print('embed_model: ', embed_model)
     embedder = HuggingFaceEmbeddings(model_name=embed_model)
     
-    _ = PineconeVectorStore.from_documents(documents=chunks, embedding=embedder, index_name=PINECONE_INDEX_NAME)
+    _ = PineconeVectorStore.from_texts(texts=[f"Company: {company_name}. " + chunk for chunk in chunks], embedding=embedder, index_name=PINECONE_INDEX_NAME)
 
 
 if __name__ == "__main__":
