@@ -65,7 +65,6 @@ Answer:
 """
 prompt = ChatPromptTemplate.from_template(template)
 
-print("In endpoint: ", TGI_LLM_ENDPOINT)
 # RAG Chain
 model = HuggingFaceEndpoint(
     endpoint_url=TGI_LLM_ENDPOINT,

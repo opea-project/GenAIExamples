@@ -17,6 +17,7 @@
 
 import argparse
 import os
+import argparse
 
 from fastapi import APIRouter, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
@@ -24,12 +25,12 @@ from guardrails import moderation_prompt_for_chat, unsafe_dict
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Redis
+from langchain_pinecone import PineconeVectorStore
 from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langserve import add_routes
-from prompts import contextualize_q_prompt, prompt, qa_prompt
-from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
+from prompts import contextualize_q_prompt, qa_prompt, prompt
 from starlette.middleware.cors import CORSMiddleware
 from utils import (
     create_kb_folder,
@@ -42,7 +43,18 @@ from utils import (
 
 parser = argparse.ArgumentParser(description="Server Configuration")
 parser.add_argument("--chathistory", action="store_true", help="Enable debug mode")
+parser.add_argument("--vectordb", type=str, default="redis")
+parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 args = parser.parse_args()
+
+embed_model = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+INDEX_NAME = os.getenv("INDEX_NAME")
+
+if args.vectordb == "redis":
+    from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+elif args.vectordb == "pinecone":
+    if os.environ.get("PINECONE_API_KEY", None) is None:
+        raise Exception("Missing `PINECONE_API_KEY` environment variable.")
 
 app = FastAPI()
 
@@ -93,15 +105,19 @@ class RAGAPIRouter(APIRouter):
             self.embeddings = HuggingFaceHubEmbeddings(model=tei_endpoint)
         else:
             # create embeddings using local embedding model
-            self.embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
+            self.embeddings = HuggingFaceBgeEmbeddings(model_name=embed_model)
 
-        rds = Redis.from_existing_index(
-            self.embeddings,
-            index_name=INDEX_NAME,
-            redis_url=REDIS_URL,
-            schema=INDEX_SCHEMA,
-        )
-        retriever = rds.as_retriever(search_type="mmr")
+        if args.vectordb == "redis":
+            vectorstore = Redis.from_existing_index(
+                self.embeddings,
+                index_name=INDEX_NAME,
+                redis_url=REDIS_URL,
+                schema=INDEX_SCHEMA,
+            )
+        elif args.vectordb == "pinecone":
+            vectorstore = PineconeVectorStore.from_existing_index(INDEX_NAME, self.embeddings)
+        
+        retriever = vectorstore.as_retriever(search_type="mmr")
 
         # Define contextualize chain
         self.contextualize_q_chain = contextualize_q_prompt | self.llm | StrOutputParser()
@@ -120,6 +136,21 @@ class RAGAPIRouter(APIRouter):
 
         # Define chat history
         self.chat_history = []
+
+    def get_vector_store(embeddings):
+        if args.vectordb == "redis":
+            vectorstore = Redis.from_existing_index(
+                embeddings,
+                index_name=INDEX_NAME,
+                redis_url=REDIS_URL,
+                schema=INDEX_SCHEMA,
+            )
+        elif vectordb == "pinecone":
+            vectorstore = PineconeVectorStore.from_existing_index(INDEX_NAME, embeddings)
+        else:
+            raise ValueError("Invalid vectordb parameter. Must be 'redis' or 'pinecone'.")
+
+        return vectorstore
 
     def contextualized_question(self, input: dict):
         if input.get("chat_history"):
@@ -155,7 +186,6 @@ safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT")
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 router = RAGAPIRouter(upload_dir, tgi_llm_endpoint, safety_guard_endpoint, tei_embedding_endpoint)
 
-
 @router.post("/v1/rag/chat")
 async def rag_chat(request: Request):
     params = await request.json()
@@ -174,7 +204,7 @@ async def rag_chat(request: Request):
 
     if kb_id == "default":
         print("[rag - chat] use default knowledge base")
-        retriever = reload_retriever(router.embeddings, INDEX_NAME)
+        retriever = reload_retriever(args.vectordb, router.embeddings, INDEX_NAME)
         if args.chathistory:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
@@ -185,8 +215,10 @@ async def rag_chat(request: Request):
             )
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
+        if args.vectordb == "pinecone":
+            new_index_name = INDEX_NAME
         print(f"[rag - chat] use knowledge base {kb_id}, index name is {new_index_name}")
-        retriever = reload_retriever(router.embeddings, new_index_name)
+        retriever = reload_retriever(args.vectordb, router.embeddings, new_index_name)
         if args.chathistory:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
@@ -223,7 +255,7 @@ async def rag_chat_stream(request: Request):
             return StreamingResponse(generate_content(), media_type="text/event-stream")
 
     if kb_id == "default":
-        retriever = reload_retriever(router.embeddings, INDEX_NAME)
+        retriever = reload_retriever(args.vectordb, router.embeddings, INDEX_NAME)
         if args.chathistory:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
@@ -234,7 +266,9 @@ async def rag_chat_stream(request: Request):
             )
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
-        retriever = reload_retriever(router.embeddings, new_index_name)
+        if args.vectordb == "pinecone":
+            new_index_name = INDEX_NAME
+        retriever = reload_retriever(args.vectordb, router.embeddings, new_index_name)
         if args.chathistory:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
@@ -285,7 +319,9 @@ async def rag_create(file: UploadFile = File(...)):
         # get retrieval instance and reload db with new knowledge base
         print("[rag - create] starting to create local db...")
         index_name = INDEX_NAME + kb_id
-        retriever = create_retriever_from_files(save_file_name, router.embeddings, index_name)
+        if args.vectordb == "pinecone":
+            index_name = INDEX_NAME
+        retriever = create_retriever_from_files(args.vectordb, save_file_name, router.embeddings, index_name)
         if args.chathistory:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
@@ -313,7 +349,9 @@ async def rag_upload_link(request: Request):
     try:
         print("[rag - upload_link] starting to create local db...")
         index_name = INDEX_NAME + kb_id
-        retriever = create_retriever_from_links(router.embeddings, link_list, index_name)
+        if args.vectordb == "pinecone":
+            index_name = INDEX_NAME
+        retriever = create_retriever_from_links(args.vectordb, router.embeddings, link_list, index_name)
         if args.chathistory:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
@@ -336,10 +374,22 @@ app.include_router(router)
 async def redirect_root_to_docs():
     return RedirectResponse("/docs")
 
+#add_routes(app, router.llm_chain, path="/rag-redis")
+add_routes(app, router.llm_chain, path="/rag-pinecone")
 
-add_routes(app, router.llm_chain, path="/rag-redis")
+
 
 if __name__ == "__main__":
-    import uvicorn
+    if args.vectordb == "redis":
+        from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+        print("Redis url: ", REDIS_URL)
+    elif args.vectordb == "pinecone":
+        if os.environ.get("PINECONE_API_KEY", None) is None:
+            raise Exception("Missing `PINECONE_API_KEY` environment variable.")
 
+    if args.debug:
+        import langchain
+        langchain.debug = True
+    
+    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
