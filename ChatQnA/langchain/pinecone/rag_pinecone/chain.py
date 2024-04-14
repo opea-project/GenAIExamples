@@ -41,6 +41,7 @@ if os.environ.get("PINECONE_API_KEY", None) is None:
 PINECONE_INDEX_NAME = os.environ.get("INDEX_NAME", "langchain-test")
 embed_model = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 embedder = HuggingFaceEmbeddings(model_name=embed_model)
+TGI_LLM_ENDPOINT = os.environ.get("TGI_LLM_ENDPOINT", "http://localhost:8080")
 
 # set_llm_cache for pinecone for semantic search
 

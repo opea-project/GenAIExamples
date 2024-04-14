@@ -304,7 +304,7 @@ def create_retriever_from_files(vectordbStr, doc, embeddings, index_name: str):
             index_schema=INDEX_SCHEMA,
         )
     else:
-        vectorstore = Pinecone(
+        vectorstore = PineconeVectorStore.from_texts(
             texts=[chunk.page_content for chunk in chunks],
             metadatas=[chunk.metadata for chunk in chunks],
             embedding=embeddings,
@@ -337,7 +337,7 @@ def create_retriever_from_links(vectordbStr, embeddings, link_list: list, index_
             index_schema=INDEX_SCHEMA,
         )
     else:
-        vectorstore = Pinecone(texts=texts, metadatas=metadatas, embedding=embeddings, index_name=index_name)
+        vectorstore = PineconeVectorStore.from_texts(texts=texts, metadatas=metadatas, embedding=embeddings, index_name=index_name)
 
     retriever = vectorstore.as_retriever(search_type="mmr")
     return retriever

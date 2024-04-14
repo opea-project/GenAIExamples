@@ -77,9 +77,9 @@ def ingest_documents():
     # Load list of pdfs
     company_name = "Intel"
     data_path = "data_intel/"
-    doc = [os.path.join(data_path, file) for file in os.listdir(data_path)][0]
+    doc_path = [os.path.join(data_path, file) for file in os.listdir(data_path)][0]
 
-    print("Parsing Intel architecture manuals", doc)
+    print("Parsing Intel architecture manuals", doc_path)
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
     content = pdf_loader(doc_path)
@@ -90,7 +90,11 @@ def ingest_documents():
     embed_model = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
     embedder = HuggingFaceEmbeddings(model_name=embed_model)
 
-    _ = PineconeVectorStore.from_documents(documents=chunks, embedding=embedder, index_name=PINECONE_INDEX_NAME)
+    _ = PineconeVectorStore.from_texts(
+        texts=[f"Company: {company_name}. " + chunk for chunk in chunks],
+        embedding=embedder, 
+        index_name=PINECONE_INDEX_NAME
+        )
 
 
 if __name__ == "__main__":

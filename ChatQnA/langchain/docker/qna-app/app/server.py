@@ -149,7 +149,7 @@ class RAGAPIRouter(APIRouter):
                 redis_url=REDIS_URL,
                 schema=INDEX_SCHEMA,
             )
-        elif vectordb == "pinecone":
+        elif args.vectordb == "pinecone":
             vectorstore = PineconeVectorStore.from_existing_index(INDEX_NAME, embeddings)
         else:
             raise ValueError("Invalid vectordb parameter. Must be 'redis' or 'pinecone'.")
