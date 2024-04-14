@@ -92,9 +92,9 @@ def ingest_documents():
 
     _ = PineconeVectorStore.from_texts(
         texts=[f"Company: {company_name}. " + chunk for chunk in chunks],
-        embedding=embedder, 
-        index_name=PINECONE_INDEX_NAME
-        )
+        embedding=embedder,
+        index_name=PINECONE_INDEX_NAME,
+    )
 
 
 if __name__ == "__main__":

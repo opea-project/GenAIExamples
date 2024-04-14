@@ -337,7 +337,9 @@ def create_retriever_from_links(vectordbStr, embeddings, link_list: list, index_
             index_schema=INDEX_SCHEMA,
         )
     else:
-        vectorstore = PineconeVectorStore.from_texts(texts=texts, metadatas=metadatas, embedding=embeddings, index_name=index_name)
+        vectorstore = PineconeVectorStore.from_texts(
+            texts=texts, metadatas=metadatas, embedding=embeddings, index_name=index_name
+        )
 
     retriever = vectorstore.as_retriever(search_type="mmr")
     return retriever
