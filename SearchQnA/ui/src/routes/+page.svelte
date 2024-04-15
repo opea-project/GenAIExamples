@@ -26,20 +26,15 @@
 		type Message,
 	} from "$lib/shared/constant/Interface";
 	import {
-		fromTimeStampToTime,
 		getCurrentTimeStamp,
 		scrollToBottom,
 		scrollToTop,
 	} from "$lib/shared/Utils";
 	import { fetchTextStream } from "$lib/network/chat/Network";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
-	import { browser } from "$app/environment";
 	import "driver.js/dist/driver.css";
 	import "$lib/assets/layout/css/driver.css";
-	import UploadFile from "$lib/shared/components/upload/uploadFile.svelte";
-	import WebSearch from "$lib/shared/components/webSearch/webSearch.svelte";
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
-	import Gallery from "$lib/shared/components/chat/gallery.svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 
@@ -161,18 +156,11 @@
 	}
 </script>
 
-<!-- <DropZone on:drop={handleImageSubmit}> -->
 <Header />
 <div
 	class="h-full items-center gap-5 bg-white sm:flex sm:pb-2 lg:rounded-tl-3xl"
 >
 	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[72%]">
-	<!--
-		<div class="flex justify-between p-2">
-			<WebSearch />
-			<UploadFile />
-		</div>
-	-->
 		<div
 			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0"
 		>
