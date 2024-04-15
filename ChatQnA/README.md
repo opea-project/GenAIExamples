@@ -10,11 +10,26 @@ ChatQnA architecture shows below:
 
 This ChatQnA use case performs RAG using LangChain, Redis vectordb and Text Generation Inference on Intel Gaudi2. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
-# Environment Setup
+# Solution Overview
+
+Steps to implement the solution are as follows
+
+## In Intel Gaudi2 Platform
+
+1. [Deploy a TGI container with LLM model of your choice](#launch-tgi-gaudi-service) (Solution uses 70B model by default)
+
+## In Intel Xeon Platform
+
+1. [Export TGI endpoint as environment variable](#customize-tgi-gaudi-service)
+2. [Deploy a TEI container for Embedding model service and export the endpoint](#enable-tei-for-embedding-model)
+3. [Launch a Redis container and Langchain container](#launch-redis-and-langchain-backend-service)
+4. [Ingest data into redis](#ingest-data-into-redis), this example provides few example PDF documents
+5. [Start the backend service](#start-the-backend-service) to accept queries to Langchain
+6. [Start the GUI](#start-the-frontend-service) based chatbot service to experiment with RAG based Chatbot
 
 To use [🤗 text-generation-inference](https://github.com/huggingface/text-generation-inference) on Habana Gaudi/Gaudi2, please follow these steps:
 
-## Prepare Docker
+## Prepare TGI Docker
 
 Getting started is straightforward with the official Docker container. Simply pull the image using:
 
@@ -73,28 +88,47 @@ You have the flexibility to customize these parameters according to your specifi
 export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
 ```
 
-## Launch Redis
+## Enable TEI for embedding model
+
+Text Embeddings Inference (TEI) is a toolkit designed for deploying and serving open-source text embeddings and sequence classification models efficiently. With TEI, users can extract high-performance features using various popular models. It supports token-based dynamic batching for enhanced performance.
+
+To launch the TEI service, you can use the following commands:
 
 ```bash
-docker compose -f langchain/docker/docker-compose-redis.yml up -d
+model=BAAI/bge-large-en-v1.5
+revision=refs/pr/5
+volume=$PWD/data # share a volume with the Docker container to avoid downloading weights every run
+docker run -p 9090:80 -v $volume:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
+export TEI_ENDPOINT="http://xxx.xxx.xxx.xxx:9090"
 ```
 
-## Launch LangChain Docker
+And then you can make requests like below to check the service status:
 
-Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose-langchain.yml`
+```bash
+curl 127.0.0.1:9090/embed \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?"}' \
+    -H 'Content-Type: application/json'
+```
+
+Note: If you want to integrate the TEI service into the LangChain application, you'll need to restart the LangChain backend service after launching the TEI service.
+
+## Launch Redis and LangChain Backend Service
+
+Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose.yml`
 
 ```bash
 cd langchain/docker
-docker compose -f docker-compose-langchain.yml up -d
+docker compose -f docker-compose.yml up -d
 cd ../../
 ```
 
 > [!NOTE]
 > If you modified any files and want that change introduced in this step, add `--build` to the end of the command to build the container image instead of pulling it from dockerhub.
 
-## Ingest data into redis
+## Ingest data into Redis
 
-After every time of redis container is launched, data should be ingested in the container ingestion steps:
+Each time the Redis container is launched, data should be ingested into the container using the commands:
 
 ```bash
 docker exec -it qna-rag-redis-server bash
@@ -102,7 +136,7 @@ cd /ws
 python ingest.py
 ```
 
-Note: `ingest.py` will download the embedding model, please set the proxy if necessary.
+Note: `ingest.py` will download the embedding model. Please set the proxy if necessary.
 
 # Start LangChain Server
 
@@ -135,7 +169,7 @@ docker exec -it qna-rag-redis-server bash
 nohup python app/server.py &
 ```
 
-The LangChain backend service listens to port 8000 by port, you can customize it by change the code in `docker/qna-app/app/server.py`.
+The LangChain backend service listens to port 8000, you can customize it by changing the code in `docker/qna-app/app/server.py`.
 
 And then you can make requests like below to check the LangChain backend service status:
 
@@ -143,7 +177,7 @@ And then you can make requests like below to check the LangChain backend service
 # non-streaming endpoint
 curl 127.0.0.1:8000/v1/rag/chat \
   -X POST \
-  -d '{"query":"What's the total revenue of Nike in 2023?"}' \
+  -d '{"query":"What is the total revenue of Nike in 2023?"}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -151,7 +185,7 @@ curl 127.0.0.1:8000/v1/rag/chat \
 # streaming endpoint
 curl 127.0.0.1:8000/v1/rag/chat_stream \
   -X POST \
-  -d '{"query":"What's the total revenue of Nike in 2023?"}' \
+  -d '{"query":"What is the total revenue of Nike in 2023?"}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -193,7 +227,7 @@ This will initiate the frontend service and launch the application.
 
 # Enable TGI Gaudi FP8 for higher throughput (Optional)
 
-The TGI Gaudi utilizes BFLOAT16 optimization as the default setting. If you aim to achieve higher throughput, you can enable FP8 quantization on the TGI Gaudi. According to our test results, FP8 quantization yields approximately a 1.8x performance gain compared to BFLOAT16. Please follow the below steps to enable FP8 quantization.
+The TGI Gaudi utilizes BFLOAT16 optimization as the default setting. If you aim to achieve higher throughput, you can enable FP8 quantization on the TGI Gaudi. Note that currently only Llama2 series and Mistral series models support FP8 quantization. Please follow the below steps to enable FP8 quantization.
 
 ## Prepare Metadata for FP8 Quantization
 
@@ -223,9 +257,7 @@ Then modify the `dump_stats_path` to "/data/hqt_output/measure" and update `dump
 docker run -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:1.2.1 --model-id Intel/neural-chat-7b-v3-3
 ```
 
-Now the TGI Gaudi will launch the FP8 model by default. Please note that currently only Llama2 series and Mistral series models support FP8 quantization.
-
-And then you can make requests like below to check the service status:
+Now the TGI Gaudi will launch the FP8 model by default and you can make requests like below to check the service status:
 
 ```bash
 curl 127.0.0.1:8080/generate \
@@ -234,27 +266,6 @@ curl 127.0.0.1:8080/generate \
   -H 'Content-Type: application/json'
 ```
 
-# Enable TEI for embedding model higher throughput (Optional)
+#
 
-Text Embeddings Inference (TEI) is a toolkit designed for deploying and serving open-source text embeddings and sequence classification models efficiently. With TEI, users can extract high-performance features using various popular models. It supports token-based dynamic batching for enhanced performance.
-
-To launch the TEI service, you can use the following commands:
-
-```bash
-model=BAAI/bge-large-en-v1.5
-revision=refs/pr/5
-volume=$PWD/data # share a volume with the Docker container to avoid downloading weights every run
-docker run -p 9090:80 -v $volume:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
-export TEI_ENDPOINT="http://xxx.xxx.xxx.xxx:9090"
-```
-
-And then you can make requests like below to check the service status:
-
-```bash
-curl 127.0.0.1:9090/embed \
-    -X POST \
-    -d '{"inputs":"What is Deep Learning?"}' \
-    -H 'Content-Type: application/json'
-```
-
-Note: If you want to integrate the TEI service into the LangChain application, you'll need to restart the LangChain backend service after launching the TEI service.
+SCRIPT USAGE NOTICE:  By downloading and using any script file included with the associated software package (such as files with .bat, .cmd, or .JS extensions, Docker files, or any other type of file that, when executed, automatically downloads and/or installs files onto your system) (the “Script File”), it is your obligation to review the Script File to understand what files (e.g.,  other software, AI models, AI Datasets) the Script File will download to your system (“Downloaded Files”). Furthermore, by downloading and using the Downloaded Files, even if they are installed through a silent install, you agree to any and all terms and conditions associated with such files, including but not limited to, license terms, notices, or disclaimers.

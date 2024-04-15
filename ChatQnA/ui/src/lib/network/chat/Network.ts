@@ -17,11 +17,7 @@ import { SSE } from "sse.js";
 
 const DOC_BASE_URL = env.DOC_BASE_URL;
 
-
-export async function fetchTextStream(
-	query: string,
-	knowledge_base_id: string,
-) {
+export async function fetchTextStream(query: string, knowledge_base_id: string) {
 	let payload = {};
 	let url = "";
 

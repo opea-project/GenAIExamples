@@ -84,6 +84,15 @@ export HUGGINGFACEHUB_API_TOKEN=<token>
 nohup python app/server.py &
 ```
 
+Then you can make requests like below to check the DocSum backend service status:
+
+```bash
+curl http://127.0.0.1:8000/v1/text_summarize \
+    -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+```
+
 ## Start the Frontend Service
 
 Navigate to the "ui" folder and execute the following commands to start the frontend GUI:
@@ -119,3 +128,7 @@ nohup npm run dev &
 ```
 
 This will initiate the frontend service and launch the application.
+
+#
+
+SCRIPT USAGE NOTICE:  By downloading and using any script file included with the associated software package (such as files with .bat, .cmd, or .JS extensions, Docker files, or any other type of file that, when executed, automatically downloads and/or installs files onto your system) (the “Script File”), it is your obligation to review the Script File to understand what files (e.g.,  other software, AI models, AI Datasets) the Script File will download to your system (“Downloaded Files”). Furthermore, by downloading and using the Downloaded Files, even if they are installed through a silent install, you agree to any and all terms and conditions associated with such files, including but not limited to, license terms, notices, or disclaimers.

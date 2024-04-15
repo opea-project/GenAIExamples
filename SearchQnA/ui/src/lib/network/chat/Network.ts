@@ -17,12 +17,7 @@ import { SSE } from "sse.js";
 
 const BACKEND_BASE_URL = env.BACKEND_BASE_URL;
 
-
-export async function fetchTextStream(
-	query: string,
-	knowledge_base_id: string,
-	isCheckedStore: boolean
-) {
+export async function fetchTextStream(query: string, knowledge_base_id: string, isCheckedStore: boolean) {
 	let payload = {};
 	let url = "";
 

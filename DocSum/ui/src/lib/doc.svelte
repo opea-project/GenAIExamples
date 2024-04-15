@@ -17,7 +17,7 @@
 <script lang="ts">
   import { Button, Helper, Input, Label, Modal } from "flowbite-svelte";
   import { ExclamationCircleOutline } from "flowbite-svelte-icons";
-  import DropFile from "./DropFile.svelte";
+  import DropFile from "./dropFile.svelte";
   import SpinLoading from "./assets/spinLoading.svelte";
   import { kb_id, loading } from "./shared/Store.js";
   import { Textarea } from "flowbite-svelte";
@@ -49,10 +49,10 @@
   }
 
   function panelExchange() {
-    if (currentIdx === 1) {
+    if (currentIdx === 2) {
       kb_id.set("");
       dispatch("clearMsg", { status: true });
-    } else if (currentIdx === 2) {
+    } else if (currentIdx === 1) {
       message = "";
       dispatch("clearMsg", { status: true });
     }
