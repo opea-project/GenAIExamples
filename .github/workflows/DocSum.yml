@@ -7,6 +7,7 @@ on:
     paths:
       - DocSum/**
       - "!**.md"
+      - "!**/ui/**"
       - .github/workflows/DocSum.yml
   workflow_dispatch:
 

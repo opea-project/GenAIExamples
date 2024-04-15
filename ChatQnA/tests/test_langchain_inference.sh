@@ -87,10 +87,10 @@ function check_response() {
     fi
 
     if [ $status == false ]; then
-        echo "Response check failed"
+        echo "Response check failed, please check the logs in artifacts!"
         exit 1
     else
-        echo "Response check succeed"
+        echo "Response check succeed!"
     fi
 }
 
@@ -110,11 +110,10 @@ function main() {
     start_backend_service
 
     run_tests
+    check_response
 
     docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME && sleep 5s
     echo y | docker system prune
-
-    check_response
 }
 
 main

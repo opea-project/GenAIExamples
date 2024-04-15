@@ -7,6 +7,7 @@ on:
     paths:
       - CodeGen/**
       - "!**.md"
+      - "!**/ui/**"
       - .github/workflows/CodeGen.yml
   workflow_dispatch:
 

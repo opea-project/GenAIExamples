@@ -70,15 +70,15 @@ function check_response() {
     cd $WORKPATH
     echo "Checking response"
     local status=false
-    if [[ -f $LOG_PATH ]] && [[ $(grep -c "github.com/intel/neural-compressor" $LOG_PATH) != 0 ]]; then
+    if [[ -f $LOG_PATH ]] && [[ $(grep -c "Neural Compressor" $LOG_PATH) != 0 ]]; then
         status=true
     fi
 
     if [ $status == false ]; then
-        echo "Response check failed"
+        echo "Response check failed, please check the logs in artifacts!"
         exit 1
     else
-        echo "Response check succeed"
+        echo "Response check succeed!"
     fi
 }
 
@@ -97,11 +97,10 @@ function main() {
     launch_langchain_service
 
     run_tests
+    check_response
 
     docker_stop $TGI_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && sleep 5s
     echo y | docker system prune
-
-    check_response
 }
 
 main
