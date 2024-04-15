@@ -19,9 +19,9 @@ There are four folders under the current example.
 cd audio/docker
 
 # Build ASR Docker service
-docker build . -f Dockerfile_asr -t intel/gen-ai-examples:audioqna-asr
+docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_asr -t intel/gen-ai-examples:audioqna-asr
 # Build TTS Docker service
-docker build . -f Dockerfile_tts -t intel/gen-ai-examples:audioqna-tts
+docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_tts -t intel/gen-ai-examples:audioqna-tts
 
 ```
 
@@ -29,10 +29,11 @@ docker build . -f Dockerfile_tts -t intel/gen-ai-examples:audioqna-tts
 
 ```shell
 # Start ASR service
-docker run -d http_proxy=$http_proxy -e https_proxy=$https_proxy -p 8008:8008 intel/gen-ai-examples:audioqna-asr
+docker run -d -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 8008:8008 intel/gen-ai-examples:audioqna-asr
 
 # Test ASR
-http_proxy= curl -F 'file=@/home/sdp/sihanche/intel-extension-for-transformers/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav' http://localhost:8008/asr
+wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
+http_proxy= curl -F 'file=@sample.wav' http://localhost:8008/asr
 
 # Start TTS service
 # Predownload local models and mapped in
@@ -40,7 +41,6 @@ git clone https://huggingface.co/lj1995/GPT-SoVITS pretrained_tts_models
 docker run -d -v ./pretrained_tts_models:/GPT-SoVITS/GPT_SoVITS/pretrained_models -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 9880:9880 intel/gen-ai-examples:audioqna-tts --bf16
 
 # Upload reference audio
-wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
 http_proxy= curl --location 'localhost:9880/upload_as_default' \
 --form 'default_refer_file=@"sample.wav"' \
 --form 'default_refer_text="Who is Pat Gelsinger?"' \
@@ -161,6 +161,7 @@ Each time the Redis container is launched, data should be ingested into the cont
 docker exec -it qna-rag-redis-server bash
 cd /ws
 python ingest.py
+exit
 ```
 
 Note: `ingest.py` will download the embedding model. Please set the proxy if necessary.
