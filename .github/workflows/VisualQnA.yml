@@ -7,6 +7,7 @@ on:
     paths:
       - VisualQnA/**
       - "!**.md"
+      - "!**/ui/**"
       - .github/workflows/VisualQnA.yml
   workflow_dispatch:
 
