@@ -27,6 +27,7 @@ function rename() {
     # Rename the container names
     cd ${WORKPATH}
     sed -i "s/CodeGen_server/${CODEGEN_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
+    sed -i "s/copilot/${COPILOT_CONTAINER_NAME}/g" codegen/build_docker.sh
 }
 
 function docker_setup() {
