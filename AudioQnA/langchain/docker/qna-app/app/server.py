@@ -146,8 +146,8 @@ class RAGAPIRouter(APIRouter):
                 print(f"Violated policies: {policy_violations}")
                 return policy_violations + " are found in the output"
             else:
-                return result
-        return result
+                return result.lstrip()
+        return result.lstrip()
 
 
 upload_dir = os.getenv("RAG_UPLOAD_DIR", "./upload_dir")
