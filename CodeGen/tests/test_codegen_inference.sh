@@ -27,6 +27,7 @@ function rename() {
     # Rename the container names
     cd ${WORKPATH}
     sed -i "s/CodeGen_server/${CODEGEN_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
+    sed -i "s/copilot/${COPILOT_CONTAINER_NAME}/g" codegen/build_docker.sh
 }
 
 function docker_setup() {
@@ -54,7 +55,7 @@ function launch_copilot_docker() {
     cd $WORKPATH
     docker run -dit --name=$COPILOT_CONTAINER_NAME \
         --net=host --ipc=host \
-        -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:copilot /bin/bash
+        -v /var/run/docker.sock:/var/run/docker.sock intel/gen-ai-examples:${COPILOT_CONTAINER_NAME} /bin/bash
 }
 
 function launch_server() {
@@ -86,10 +87,10 @@ function check_response() {
     fi
 
     if [ $status == false ]; then
-        echo "Response check failed"
+        echo "Response check failed, please check the logs in artifacts!"
         exit 1
     else
-        echo "Response check succeed"
+        echo "Response check succeed!"
     fi
 }
 
