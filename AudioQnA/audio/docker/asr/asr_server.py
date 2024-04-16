@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
@@ -17,17 +16,17 @@
 # limitations under the License.
 
 import argparse
-import uvicorn
-from fastapi import FastAPI
-from fastapi.responses import Response
-from pydub import AudioSegment
-from fastapi import File, UploadFile
 import os
 
+import uvicorn
 from asr import AudioSpeechRecognition
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import Response
+from pydub import AudioSegment
 
 app = FastAPI()
 asr = None
+
 
 @app.get("/health")
 async def health() -> Response:
@@ -38,14 +37,14 @@ async def health() -> Response:
 @app.post("/asr")
 async def audio_to_text(file: UploadFile = File(...)):
     file_name = file.filename
-    print(f'Received file: {file_name}')
-    with open("tmp_audio_bytes", 'wb') as fout:
+    print(f"Received file: {file_name}")
+    with open("tmp_audio_bytes", "wb") as fout:
         content = await file.read()
         fout.write(content)
     audio = AudioSegment.from_file("tmp_audio_bytes")
     audio = audio.set_frame_rate(16000)
     # bytes to wav
-    file_name = file_name +'.wav'
+    file_name = file_name + ".wav"
     audio.export(f"{file_name}", format="wav")
     try:
         asr_result = asr.audio2text(file_name)
@@ -69,10 +68,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     asr = AudioSpeechRecognition(
-        model_name_or_path=args.model_name_or_path,
-        bf16=args.bf16,
-        language=args.language,
-        device=args.device
+        model_name_or_path=args.model_name_or_path, bf16=args.bf16, language=args.language, device=args.device
     )
 
     uvicorn.run(app, host=args.host, port=args.port)

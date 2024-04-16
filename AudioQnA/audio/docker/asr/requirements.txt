@@ -1,11 +1,11 @@
-fastapi
-uvicorn
-pydub
-transformers
-datasets
-numpy
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.1.0
-zhconv
+datasets
+fastapi
 ffmpeg-python
+numpy
+pydub
 python-multipart
+torch==2.1.0
+transformers
+uvicorn
+zhconv

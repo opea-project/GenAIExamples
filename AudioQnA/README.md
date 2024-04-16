@@ -6,9 +6,9 @@ In this example we will show you how to build an Audio Question and Answering ap
 
 What AudioQnA is delivering and why it stands out:
 
-* Fast ASR/TTS inference as microservices on Intel Xeon CPUs with optimization
-* Multilingual Zero-shot voice cloning cross languages, customizable voice
-* Fast LLM inference on Intel Gaudi through TGI with RAG and other features support
+- Fast ASR/TTS inference as microservices on Intel Xeon CPUs with optimization
+- Multilingual Zero-shot voice cloning cross languages, customizable voice
+- Fast LLM inference on Intel Gaudi through TGI with RAG and other features support
 
 There are four folders under the current example.
 

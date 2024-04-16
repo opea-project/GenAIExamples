@@ -40,31 +40,34 @@
 # SOFTWARE.
 
 import argparse
-import os,re
-import sys
+import contextlib
+import logging
+import os
+import re
 import signal
-import LangSegment
-from time import time as ttime
-import torch
-import librosa
-import soundfile as sf
-from fastapi import FastAPI, Request, HTTPException, File, UploadFile, Form
-from fastapi.responses import StreamingResponse, JSONResponse
-import uvicorn
-from transformers import AutoModelForMaskedLM, AutoTokenizer
-import numpy as np
-from feature_extractor import cnhubert
+import subprocess
+import sys
 from io import BytesIO
-from module.models import SynthesizerTrn
+from time import time as ttime
+
+import config as global_config
+import LangSegment
+import librosa
+import numpy as np
+import soundfile as sf
+import torch
+import uvicorn
 from AR.models.t2s_lightning_module import Text2SemanticLightningModule
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import JSONResponse, StreamingResponse
+from feature_extractor import cnhubert
+from module.mel_processing import spectrogram_torch
+from module.models import SynthesizerTrn
+from my_utils import load_audio
 from text import cleaned_text_to_sequence
 from text.cleaner import clean_text
-from module.mel_processing import spectrogram_torch
-from my_utils import load_audio
-import config as global_config
-import logging
-import subprocess
-import contextlib
+from transformers import AutoModelForMaskedLM, AutoTokenizer
+
 
 class DefaultRefer:
     def __init__(self, path, text, language):
@@ -75,17 +78,20 @@ class DefaultRefer:
     def is_ready(self) -> bool:
         return is_full(self.path, self.text, self.language)
 
+
 def is_empty(*items):
     for item in items:
         if item is not None and item != "":
             return False
     return True
 
+
 def is_full(*items):
     for item in items:
         if item is None or item == "":
             return False
     return True
+
 
 def change_sovits_weights(sovits_path):
     global vq_model, hps
@@ -97,9 +103,9 @@ def change_sovits_weights(sovits_path):
         hps.data.filter_length // 2 + 1,
         hps.train.segment_size // hps.data.hop_length,
         n_speakers=hps.data.n_speakers,
-        **hps.model
+        **hps.model,
     )
-    if ("pretrained" not in sovits_path):
+    if "pretrained" not in sovits_path:
         del vq_model.enc_q
     if is_half == True:
         vq_model = vq_model.half().to(device)
@@ -148,7 +154,7 @@ def clean_text_inf(text, language):
 
 
 def get_bert_inf(phones, word2ph, norm_text, language):
-    language=language.replace("all_","")
+    language = language.replace("all_", "")
     if language == "zh":
         bert = get_bert_feature(norm_text, word2ph).to(device)
     else:
@@ -160,9 +166,9 @@ def get_bert_inf(phones, word2ph, norm_text, language):
     return bert
 
 
-def get_phones_and_bert(text,language):
-    if language in {"en","all_zh","all_ja"}:
-        language = language.replace("all_","")
+def get_phones_and_bert(text, language):
+    if language in {"en", "all_zh", "all_ja"}:
+        language = language.replace("all_", "")
         if language == "en":
             LangSegment.setfilters(["en"])
             formattext = " ".join(tmp["text"] for tmp in LangSegment.getTexts(text))
@@ -178,10 +184,10 @@ def get_phones_and_bert(text,language):
                 (1024, len(phones)),
                 dtype=torch.float16 if is_half == True else torch.float32,
             ).to(device)
-    elif language in {"zh", "ja","auto"}:
-        textlist=[]
-        langlist=[]
-        LangSegment.setfilters(["zh","ja","en","ko"])
+    elif language in {"zh", "ja", "auto"}:
+        textlist = []
+        langlist = []
+        LangSegment.setfilters(["zh", "ja", "en", "ko"])
         if language == "auto":
             for tmp in LangSegment.getTexts(text):
                 if tmp["lang"] == "ko":
@@ -210,9 +216,9 @@ def get_phones_and_bert(text,language):
             bert_list.append(bert)
         bert = torch.cat(bert_list, dim=1)
         phones = sum(phones_list, [])
-        norm_text = ''.join(norm_text_list)
+        norm_text = "".join(norm_text_list)
 
-    return phones,bert.to(torch.float16 if is_half == True else torch.float32),norm_text
+    return phones, bert.to(torch.float16 if is_half == True else torch.float32), norm_text
 
 
 class DictToAttrRecursive:
@@ -229,8 +235,14 @@ def get_spepc(hps, filename):
     audio = torch.FloatTensor(audio)
     audio_norm = audio
     audio_norm = audio_norm.unsqueeze(0)
-    spec = spectrogram_torch(audio_norm, hps.data.filter_length, hps.data.sampling_rate, hps.data.hop_length,
-                             hps.data.win_length, center=False)
+    spec = spectrogram_torch(
+        audio_norm,
+        hps.data.filter_length,
+        hps.data.sampling_rate,
+        hps.data.hop_length,
+        hps.data.win_length,
+        center=False,
+    )
     return spec
 
 
@@ -246,7 +258,7 @@ def pack_audio(audio_bytes, data, rate):
 
 
 def pack_ogg(audio_bytes, data, rate):
-    with sf.SoundFile(audio_bytes, mode='w', samplerate=rate, channels=1, format='ogg') as audio_file:
+    with sf.SoundFile(audio_bytes, mode="w", samplerate=rate, channels=1, format="ogg") as audio_file:
         audio_file.write(data)
 
     return audio_bytes
@@ -259,26 +271,38 @@ def pack_raw(audio_bytes, data, rate):
 
 
 def pack_wav(audio_bytes, rate):
-    data = np.frombuffer(audio_bytes.getvalue(),dtype=np.int16)
+    data = np.frombuffer(audio_bytes.getvalue(), dtype=np.int16)
     wav_bytes = BytesIO()
-    sf.write(wav_bytes, data, rate, format='wav')
+    sf.write(wav_bytes, data, rate, format="wav")
 
     return wav_bytes
 
 
 def pack_aac(audio_bytes, data, rate):
-    process = subprocess.Popen([
-        'ffmpeg',
-        '-f', 's16le',
-        '-ar', str(rate),
-        '-ac', '1',
-        '-i', 'pipe:0',
-        '-c:a', 'aac',
-        '-b:a', '192k',
-        '-vn',
-        '-f', 'adts',
-        'pipe:1'
-    ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        [
+            "ffmpeg",
+            "-f",
+            "s16le",
+            "-ar",
+            str(rate),
+            "-ac",
+            "1",
+            "-i",
+            "pipe:0",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "192k",
+            "-vn",
+            "-f",
+            "adts",
+            "pipe:1",
+        ],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
     out, _ = process.communicate(input=data.tobytes())
     audio_bytes.write(out)
 
@@ -300,7 +324,7 @@ def cut_text(text, punc):
         text = text.strip("\n")
         items = re.split(f"({punds})", text)
         mergeitems = ["".join(group) for group in zip(items[::2], items[1::2])]
-        if len(items)%2 == 1:
+        if len(items) % 2 == 1:
             mergeitems.append(items[-1])
         text = "\n".join(mergeitems)
 
@@ -323,7 +347,7 @@ def get_tts_wav(ref_wav_path, prompt_text, prompt_language, text, text_language)
         wav16k, sr = librosa.load(ref_wav_path, sr=16000)
         wav16k = torch.from_numpy(wav16k)
         zero_wav_torch = torch.from_numpy(zero_wav)
-        if (is_half == True):
+        if is_half == True:
             wav16k = wav16k.half().to(device)
             zero_wav_torch = zero_wav_torch.half().to(device)
         else:
@@ -359,41 +383,49 @@ def get_tts_wav(ref_wav_path, prompt_text, prompt_language, text, text_language)
         with torch.no_grad():
             # with profiler.profile(record_shapes=True) as prof:
             #     with profiler.record_function("model_inference"):
-            with torch.cpu.amp.autocast(enabled=True, dtype=torch.bfloat16, cache_enabled=True) if use_bf16 else contextlib.nullcontext():
+            with (
+                torch.cpu.amp.autocast(enabled=True, dtype=torch.bfloat16, cache_enabled=True)
+                if use_bf16
+                else contextlib.nullcontext()
+            ):
                 pred_semantic, idx = t2s_model.model.infer_panel(
                     all_phoneme_ids,
                     all_phoneme_len,
                     prompt,
                     bert,
                     # prompt_phone_len=ph_offset,
-                    top_k=config['inference']['top_k'],
-                    early_stop_num=hz * max_sec)
+                    top_k=config["inference"]["top_k"],
+                    early_stop_num=hz * max_sec,
+                )
             # print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
         t3 = ttime()
         pred_semantic = pred_semantic[:, -idx:].unsqueeze(0)
         refer = get_spepc(hps, ref_wav_path)
-        if (is_half == True):
+        if is_half == True:
             refer = refer.half().to(device)
         else:
             refer = refer.to(device)
-        audio = \
-            vq_model.decode(pred_semantic, torch.LongTensor(phones2).to(device).unsqueeze(0),
-                            refer).detach().cpu().numpy()[
-                0, 0]
+        audio = (
+            vq_model.decode(pred_semantic, torch.LongTensor(phones2).to(device).unsqueeze(0), refer)
+            .detach()
+            .cpu()
+            .numpy()[0, 0]
+        )
         audio_opt.append(audio)
         audio_opt.append(zero_wav)
         t4 = ttime()
-        audio_bytes = pack_audio(audio_bytes,(np.concatenate(audio_opt, 0) * 32768).astype(np.int16),hps.data.sampling_rate)
+        audio_bytes = pack_audio(
+            audio_bytes, (np.concatenate(audio_opt, 0) * 32768).astype(np.int16), hps.data.sampling_rate
+        )
         logger.info("%.3f\t%.3f\t%.3f\t%.3f" % (t1 - t0, t2 - t1, t3 - t2, t4 - t3))
         if stream_mode == "normal":
             audio_bytes, audio_chunk = read_clean_buffer(audio_bytes)
             yield audio_chunk
-    
-    if not stream_mode == "normal": 
-        if media_type == "wav":
-            audio_bytes = pack_wav(audio_bytes,hps.data.sampling_rate)
-        yield audio_bytes.getvalue()
 
+    if not stream_mode == "normal":
+        if media_type == "wav":
+            audio_bytes = pack_wav(audio_bytes, hps.data.sampling_rate)
+        yield audio_bytes.getvalue()
 
 
 def handle_control(command):
@@ -407,8 +439,9 @@ def handle_control(command):
 def handle_change(path, text, language):
     if is_empty(path, text, language):
         return JSONResponse(
-            {"code": 400,
-             "message": 'missing any of the following parameters: "path", "text", "language"'}, status_code=400)
+            {"code": 400, "message": 'missing any of the following parameters: "path", "text", "language"'},
+            status_code=400,
+        )
 
     if path != "" or path is not None:
         default_refer.path = path
@@ -427,9 +460,12 @@ def handle_change(path, text, language):
 
 def handle(refer_wav_path, prompt_text, prompt_language, text, text_language, cut_punc):
     if (
-            refer_wav_path == "" or refer_wav_path is None
-            or prompt_text == "" or prompt_text is None
-            or prompt_language == "" or prompt_language is None
+        refer_wav_path == ""
+        or refer_wav_path is None
+        or prompt_text == ""
+        or prompt_text is None
+        or prompt_language == ""
+        or prompt_language is None
     ):
         refer_wav_path, prompt_text, prompt_language = (
             default_refer.path,
@@ -440,13 +476,13 @@ def handle(refer_wav_path, prompt_text, prompt_language, text, text_language, cu
             return JSONResponse({"code": 400, "message": "unspecified refer audio!"}, status_code=400)
 
     if cut_punc == None:
-        text = cut_text(text,default_cut_punc)
+        text = cut_text(text, default_cut_punc)
     else:
-        text = cut_text(text,cut_punc)
+        text = cut_text(text, cut_punc)
 
-    return StreamingResponse(get_tts_wav(refer_wav_path, prompt_text, prompt_language, text, text_language), media_type="audio/"+media_type)
-
-
+    return StreamingResponse(
+        get_tts_wav(refer_wav_path, prompt_text, prompt_language, text, text_language), media_type="audio/" + media_type
+    )
 
 
 # --------------------------------
@@ -472,7 +508,7 @@ dict_language = {
 }
 
 logging.config.dictConfig(uvicorn.config.LOGGING_CONFIG)
-logger = logging.getLogger('uvicorn')
+logger = logging.getLogger("uvicorn")
 
 g_config = global_config.Config()
 
@@ -486,14 +522,22 @@ parser.add_argument("-dl", "--default_refer_language", type=str, default="", hel
 parser.add_argument("-d", "--device", type=str, default=g_config.infer_device, help="cuda / cpu")
 parser.add_argument("-a", "--bind_addr", type=str, default="0.0.0.0", help="default: 0.0.0.0")
 parser.add_argument("-p", "--port", type=int, default=g_config.api_port, help="default: 9880")
-parser.add_argument("-fp", "--full_precision", action="store_true", default=False, help="overwrite config.is_half, use fp32")
-parser.add_argument("-hp", "--half_precision", action="store_true", default=False, help="overwrite config.is_half, use fp16")
+parser.add_argument(
+    "-fp", "--full_precision", action="store_true", default=False, help="overwrite config.is_half, use fp32"
+)
+parser.add_argument(
+    "-hp", "--half_precision", action="store_true", default=False, help="overwrite config.is_half, use fp16"
+)
 # Here add an argument for specifying torch.bfloat16 inference on Xeon CPU
 parser.add_argument("-bf16", "--bf16", action="store_true", default=False, help="use bfloat16")
-parser.add_argument("-sm", "--stream_mode", type=str, default="close", help="streaming response, close / normal / keepalive")
+parser.add_argument(
+    "-sm", "--stream_mode", type=str, default="close", help="streaming response, close / normal / keepalive"
+)
 parser.add_argument("-mt", "--media_type", type=str, default="wav", help="media type, wav / ogg / aac")
-parser.add_argument("-cp", "--cut_punc", type=str, default="", help="text splitter, amoung ,.;?!、，。？！;：…")
-parser.add_argument("-hb", "--hubert_path", type=str, default=g_config.cnhubert_path, help="overwrite config.cnhubert_path")
+parser.add_argument("-cp", "--cut_punc", type=str, default="", help="text splitter, among ,.;?!、，。？！;：…")
+parser.add_argument(
+    "-hb", "--hubert_path", type=str, default=g_config.cnhubert_path, help="overwrite config.cnhubert_path"
+)
 parser.add_argument("-b", "--bert_path", type=str, default=g_config.bert_path, help="overwrite config.bert_path")
 
 args = parser.parse_args()
@@ -526,7 +570,7 @@ else:
     logger.info(f"default refer audio language: {default_refer.language}")
 
 # deal with half precision
-if device == 'cuda':
+if device == "cuda":
     is_half = g_config.is_half
     use_bf16 = False
     if args.full_precision:
@@ -547,14 +591,14 @@ else:
     logger.info(f"bf16 half: {use_bf16}")
 
 # stream response mode
-if args.stream_mode.lower() in ["normal","n"]:
+if args.stream_mode.lower() in ["normal", "n"]:
     stream_mode = "normal"
     logger.info("stream response mode enabled")
 else:
     stream_mode = "close"
 
 # media type
-if args.media_type.lower() in ["aac","ogg"]:
+if args.media_type.lower() in ["aac", "ogg"]:
     media_type = args.media_type.lower()
 elif stream_mode == "close":
     media_type = "wav"
@@ -582,14 +626,15 @@ change_gpt_weights(gpt_path)
 # --------------------------------
 app = FastAPI()
 
+
 @app.post("/set_model")
 async def set_model(request: Request):
     json_post_raw = await request.json()
     global gpt_path
-    gpt_path=json_post_raw.get("gpt_model_path")
+    gpt_path = json_post_raw.get("gpt_model_path")
     global sovits_path
-    sovits_path=json_post_raw.get("sovits_model_path")
-    logger.info("gptpath"+gpt_path+";vitspath"+sovits_path)
+    sovits_path = json_post_raw.get("sovits_model_path")
+    logger.info("gptpath" + gpt_path + ";vitspath" + sovits_path)
     change_sovits_weights(sovits_path)
     change_gpt_weights(gpt_path)
     return "ok"
@@ -610,18 +655,12 @@ async def control(command: str = None):
 async def change_refer(request: Request):
     json_post_raw = await request.json()
     return handle_change(
-        json_post_raw.get("refer_wav_path"),
-        json_post_raw.get("prompt_text"),
-        json_post_raw.get("prompt_language")
+        json_post_raw.get("refer_wav_path"), json_post_raw.get("prompt_text"), json_post_raw.get("prompt_language")
     )
 
 
 @app.get("/change_refer")
-async def change_refer(
-        refer_wav_path: str = None,
-        prompt_text: str = None,
-        prompt_language: str = None
-):
+async def change_refer(refer_wav_path: str = None, prompt_text: str = None, prompt_language: str = None):
     return handle_change(refer_wav_path, prompt_text, prompt_language)
 
 
@@ -640,21 +679,26 @@ async def tts_endpoint(request: Request):
 
 @app.get("/")
 async def tts_endpoint(
-        refer_wav_path: str = None,
-        prompt_text: str = None,
-        prompt_language: str = None,
-        text: str = None,
-        text_language: str = None,
-        cut_punc: str = None,
+    refer_wav_path: str = None,
+    prompt_text: str = None,
+    prompt_language: str = None,
+    text: str = None,
+    text_language: str = None,
+    cut_punc: str = None,
 ):
     return handle(refer_wav_path, prompt_text, prompt_language, text, text_language, cut_punc)
 
+
 @app.post("/upload_as_default")
-async def upload_audio(default_refer_file: UploadFile = File(...),
-                       default_refer_text: str = Form(...),
-                       default_refer_language: str = Form(...)):
+async def upload_audio(
+    default_refer_file: UploadFile = File(...),
+    default_refer_text: str = Form(...),
+    default_refer_language: str = Form(...),
+):
     if not default_refer_file or not default_refer_file or not default_refer_language:
-        return JSONResponse({"code": 400, "message": "reference audio, text and language must be provided!"}, status_code=400)
+        return JSONResponse(
+            {"code": 400, "message": "reference audio, text and language must be provided!"}, status_code=400
+        )
     name = default_refer_file.filename
 
     if name.endswith(".mp3") or name.endswith(".wav"):
@@ -663,11 +707,10 @@ async def upload_audio(default_refer_file: UploadFile = File(...),
         with open(tmp_file_location, "wb+") as f:
             f.write(default_refer_file.file.read())
         logger.info(f"reference audio saved at {tmp_file_location}!")
-        return handle_change(path=tmp_file_location,
-                    text=default_refer_text,
-                    language=default_refer_language)
+        return handle_change(path=tmp_file_location, text=default_refer_text, language=default_refer_language)
     else:
         return JSONResponse({"code": 400, "message": "audio name invalid!"}, status_code=400)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host=host, port=port, workers=1)
