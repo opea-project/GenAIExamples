@@ -23,8 +23,8 @@ function test_env_setup() {
 
 function start_asr_service() {
     cd $WORKPATH
-    docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_asr -t ${ASR_CONTAINER_NAME}
-    docker run -d -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 8018:8008 ${ASR_CONTAINER_NAME}
+    docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_asr -t intel/gen-ai-examples:audioqna-asr
+    docker run -d --name=$ASR_CONTAINER_NAME -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 8018:8008 intel/gen-ai-examples:audioqna-asr
     sleep 1m
 }
 
