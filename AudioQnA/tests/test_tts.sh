@@ -24,8 +24,8 @@ function test_env_setup() {
 function start_tts_service() {
     cd $WORKPATH
     git clone https://huggingface.co/lj1995/GPT-SoVITS pretrained_tts_models
-    docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_tts -t ${TTS_CONTAINER_NAME}
-    docker run -d -v ./pretrained_tts_models:/GPT-SoVITS/GPT_SoVITS/pretrained_models -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} -p 9888:9880 ${TTS_CONTAINER_NAME} --bf16
+    docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_tts -t intel/gen-ai-examples:audioqna-tts
+    docker run -d --name=$TTS_CONTAINER_NAME -v ./pretrained_tts_models:/GPT-SoVITS/GPT_SoVITS/pretrained_models -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} -p 9888:9880 intel/gen-ai-examples:audioqna-tts --bf16
     sleep 1m
 }
 
