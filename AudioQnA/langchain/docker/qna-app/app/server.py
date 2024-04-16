@@ -27,7 +27,7 @@ from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langserve import add_routes
-from prompts import contextualize_q_prompt, qa_prompt, prompt
+from prompts import contextualize_q_prompt, prompt, qa_prompt
 from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 from starlette.middleware.cors import CORSMiddleware
 from utils import (
@@ -117,7 +117,9 @@ class RAGAPIRouter(APIRouter):
         # Define LLM chain
         self.llm_chain = (
             # RunnablePassthrough.assign(context=self.contextualized_question | retriever) | qa_prompt | self.llm
-            RunnablePassthrough.assign(context=self.contextualized_question | retriever) | prompt | self.llm
+            RunnablePassthrough.assign(context=self.contextualized_question | retriever)
+            | prompt
+            | self.llm
         )
         print("[rag - router] LLM chain initialized.")
 
@@ -179,7 +181,9 @@ async def rag_chat(request: Request):
         retriever = reload_retriever(router.embeddings, INDEX_NAME)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
+            | prompt
+            | router.llm
         )
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
@@ -187,7 +191,9 @@ async def rag_chat(request: Request):
         retriever = reload_retriever(router.embeddings, new_index_name)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
+            | prompt
+            | router.llm
         )
     else:
         return JSONResponse(status_code=400, content={"message": "Wrong knowledge base id."})
@@ -221,14 +227,18 @@ async def rag_chat_stream(request: Request):
         retriever = reload_retriever(router.embeddings, INDEX_NAME)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
+            | prompt
+            | router.llm
         )
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
         retriever = reload_retriever(router.embeddings, new_index_name)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
+            | prompt
+            | router.llm
         )
     else:
         return JSONResponse(status_code=400, content={"message": "Wrong knowledge base id."})
@@ -273,7 +283,9 @@ async def rag_create(file: UploadFile = File(...)):
         retriever = create_retriever_from_files(save_file_name, router.embeddings, index_name)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
+            | prompt
+            | router.llm
         )
         print("[rag - create] kb created successfully")
     except Exception as e:
@@ -297,7 +309,9 @@ async def rag_upload_link(request: Request):
         retriever = create_retriever_from_links(router.embeddings, link_list, index_name)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
+            | prompt
+            | router.llm
         )
         print("[rag - upload_link] kb created successfully")
     except Exception as e:
