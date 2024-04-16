@@ -87,7 +87,7 @@ def ingest_documents():
         embedder = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
     else:
         # create embeddings using local embedding model
-        embedder = HuggingFaceBgeEmbeddings(model_name=embed_model)
+        embedder = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
 
     # Batch size
     batch_size = 32
