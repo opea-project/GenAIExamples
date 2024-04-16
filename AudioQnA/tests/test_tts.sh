@@ -43,7 +43,7 @@ function run_tests() {
     --form 'default_refer_language="en"'
 
     # Do text to speech conversion
-    http_proxy= curl --location 'localhost:9888' \
+    http_proxy= curl --location 'localhost:9888/tts' \
     --header 'Content-Type: application/json' \
     --data '{
         "text": "You can have a look, but you should not touch this item.",

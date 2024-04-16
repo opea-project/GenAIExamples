@@ -664,7 +664,7 @@ async def change_refer(refer_wav_path: str = None, prompt_text: str = None, prom
     return handle_change(refer_wav_path, prompt_text, prompt_language)
 
 
-@app.post("/")
+@app.post("/tts")
 async def tts_endpoint_req(request: Request):
     json_post_raw = await request.json()
     return handle(
@@ -677,7 +677,7 @@ async def tts_endpoint_req(request: Request):
     )
 
 
-@app.get("/")
+@app.get("/tts")
 async def tts_endpoint(
     refer_wav_path: str = None,
     prompt_text: str = None,

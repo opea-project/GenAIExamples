@@ -44,16 +44,16 @@ http_proxy= curl -F 'file=@sample.wav' http://localhost:8008/asr
 # Start TTS service
 # Predownload local models and mapped in
 git clone https://huggingface.co/lj1995/GPT-SoVITS pretrained_tts_models
-docker run -d -v ./pretrained_tts_models:/GPT-SoVITS/GPT_SoVITS/pretrained_models -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 9880:9880 intel/gen-ai-examples:audioqna-tts --bf16
+docker run -d -v ./pretrained_tts_models:/GPT-SoVITS/GPT_SoVITS/pretrained_models -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 9880:9880 intel/gen-ai-examples:audioqna-tts --default_refer_path /GPT-SoVITS/sample.wav --default_refer_text="Who is Pat Gelsinger?" --default_refer_language="en" --bf16
 
-# Upload reference audio
-http_proxy= curl --location 'localhost:9880/upload_as_default' \
---form 'default_refer_file=@"sample.wav"' \
---form 'default_refer_text="Who is Pat Gelsinger?"' \
---form 'default_refer_language="en"'
+# Upload/Change reference audio
+# http_proxy= curl --location 'localhost:9880/upload_as_default' \
+# --form 'default_refer_file=@"sample.wav"' \
+# --form 'default_refer_text="Who is Pat Gelsinger?"' \
+# --form 'default_refer_language="en"'
 
 # Test TTS
-http_proxy= curl --location 'localhost:9880' \
+http_proxy= curl --location 'localhost:9880/tts' \
 --header 'Content-Type: application/json' \
 --data '{
     "text": "You can have a look, but you should not touch this item.",
