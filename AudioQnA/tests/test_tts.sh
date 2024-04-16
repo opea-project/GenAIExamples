@@ -23,6 +23,7 @@ function test_env_setup() {
 
 function start_tts_service() {
     cd $WORKPATH
+    rm -rf pretrained_tts_models
     git clone https://huggingface.co/lj1995/GPT-SoVITS pretrained_tts_models
     docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_tts -t intel/gen-ai-examples:audioqna-tts
     docker run -d --name=$TTS_CONTAINER_NAME -v ./pretrained_tts_models:/GPT-SoVITS/GPT_SoVITS/pretrained_models -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} -p 9888:9880 intel/gen-ai-examples:audioqna-tts --bf16
@@ -49,10 +50,7 @@ function run_tests() {
         "text_language": "en"
     }' \
     --output ${OUTPUT_PATH}
-
-    # clear resources
     rm -f sample.wav
-    rm -f ${OUTPUT_PATH}
 }
 
 function check_response() {
@@ -60,7 +58,7 @@ function check_response() {
     echo "Checking response"
     local status=false
 
-    if [[ -f ${OUTPUT_PATH}]]; then
+    if [[ -f $OUTPUT_PATH ]]; then
         status=true
     fi
 
@@ -70,6 +68,9 @@ function check_response() {
     else
         echo "Response check succeed"
     fi
+
+    # clear resources
+    rm -f ${OUTPUT_PATH}
 }
 
 function docker_stop() {
