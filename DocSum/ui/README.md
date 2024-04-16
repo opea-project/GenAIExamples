@@ -2,10 +2,10 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/6ipZx7H.png)
-![project-screenshot](https://imgur.com/T4o7syP.png)
-![project-screenshot](https://imgur.com/KOSeGa8.png)
-![project-screenshot](https://imgur.com/AWuBhjQ.png)
+![project-screenshot](https://imgur.com/oRuDrGX.png)
+![project-screenshot](https://imgur.com/j6vo4gl.png)
+![project-screenshot](https://imgur.com/LPBvBmM.png)
+![project-screenshot](https://imgur.com/yHryOQS.png)
 
 <h2>🧐 Features</h2>
 
