@@ -16,15 +16,15 @@ set -xe
 
 function test_env_setup() {
     WORKPATH=$(dirname "$PWD")/audio/docker
-    LOG_PATH="$WORKPATH/tests/tts.log"
-    ASR_CONTAINER_NAME="test-audioqna-tts"
+    LOG_PATH=$(dirname "$PWD")/tests/asr.log
+    ASR_CONTAINER_NAME="test-audioqna-asr"
     cd $WORKPATH
 }
 
 function start_asr_service() {
     cd $WORKPATH
     docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_asr -t ${ASR_CONTAINER_NAME}
-    docker run -d -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 8008:8008 ${ASR_CONTAINER_NAME}
+    docker run -d -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 8018:8008 ${ASR_CONTAINER_NAME}
     sleep 1m
 }
 
@@ -32,7 +32,7 @@ function run_tests() {
     cd $WORKPATH
     rm -f sample.wav
     wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
-    http_proxy= curl -F 'file=@sample.wav' http://localhost:8008/asr > $LOG_PATH
+    http_proxy= curl -F 'file=@sample.wav' http://localhost:8018/asr > $LOG_PATH
     rm -f sample.wav
 }
 
