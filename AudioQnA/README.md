@@ -28,7 +28,6 @@ cd audio/docker
 docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_asr -t intel/gen-ai-examples:audioqna-asr
 # Build TTS Docker service
 docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -f Dockerfile_tts -t intel/gen-ai-examples:audioqna-tts
-
 ```
 
 ### Usage

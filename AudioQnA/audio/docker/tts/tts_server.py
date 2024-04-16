@@ -67,7 +67,7 @@ from my_utils import load_audio
 from text import cleaned_text_to_sequence
 from text.cleaner import clean_text
 from transformers import AutoModelForMaskedLM, AutoTokenizer
-
+from starlette.middleware.cors import CORSMiddleware
 
 class DefaultRefer:
     def __init__(self, path, text, language):
@@ -626,6 +626,9 @@ change_gpt_weights(gpt_path)
 # --------------------------------
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
+)
 
 @app.post("/set_model")
 async def set_model(request: Request):
@@ -664,7 +667,7 @@ async def change_refer(refer_wav_path: str = None, prompt_text: str = None, prom
     return handle_change(refer_wav_path, prompt_text, prompt_language)
 
 
-@app.post("/tts")
+@app.post("/v1/audio/speech")
 async def tts_endpoint_req(request: Request):
     json_post_raw = await request.json()
     return handle(
@@ -677,7 +680,7 @@ async def tts_endpoint_req(request: Request):
     )
 
 
-@app.get("/tts")
+@app.get("/v1/audio/speech")
 async def tts_endpoint(
     refer_wav_path: str = None,
     prompt_text: str = None,

@@ -23,18 +23,22 @@ from asr import AudioSpeechRecognition
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import Response
 from pydub import AudioSegment
+from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 asr = None
 
+app.add_middleware(
+    CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
+)
 
-@app.get("/health")
+@app.get("/v1/health")
 async def health() -> Response:
     """Health check."""
     return Response(status_code=200)
 
 
-@app.post("/asr")
+@app.post("/v1/audio/transcriptions")
 async def audio_to_text(file: UploadFile = File(...)):
     file_name = file.filename
     print(f"Received file: {file_name}")
