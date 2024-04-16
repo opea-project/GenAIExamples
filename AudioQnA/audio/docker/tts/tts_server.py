@@ -64,10 +64,11 @@ from feature_extractor import cnhubert
 from module.mel_processing import spectrogram_torch
 from module.models import SynthesizerTrn
 from my_utils import load_audio
+from starlette.middleware.cors import CORSMiddleware
 from text import cleaned_text_to_sequence
 from text.cleaner import clean_text
 from transformers import AutoModelForMaskedLM, AutoTokenizer
-from starlette.middleware.cors import CORSMiddleware
+
 
 class DefaultRefer:
     def __init__(self, path, text, language):
@@ -629,6 +630,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
 )
+
 
 @app.post("/set_model")
 async def set_model(request: Request):
