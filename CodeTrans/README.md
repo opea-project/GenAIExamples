@@ -4,7 +4,7 @@ Code translation is the process of converting code written in one programming la
 
 The workflow falls into the following architecture:
 
-![architecture](https://imgur.com/ssvrwxx)
+![architecture](https://i.imgur.com/PMAqY8k.png)
 
 # Start Backend Service
 
