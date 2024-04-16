@@ -20,13 +20,13 @@ import os
 
 import numpy as np
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
 from PIL import Image
 from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
+
 
 def pdf_loader(file_path):
     try:
@@ -93,7 +93,7 @@ def ingest_documents():
     batch_size = 32
     num_chunks = len(chunks)
     for i in range(0, num_chunks, batch_size):
-        batch_chunks = chunks[i:i+batch_size]
+        batch_chunks = chunks[i : i + batch_size]
         batch_texts = [f"Company: {company_name}. " + chunk for chunk in batch_chunks]
 
         _ = Redis.from_texts(
@@ -104,7 +104,6 @@ def ingest_documents():
             redis_url=REDIS_URL,
         )
         print(f"Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
-
 
 
 if __name__ == "__main__":
