@@ -107,7 +107,7 @@ def change_sovits_weights(sovits_path):
     )
     if "pretrained" not in sovits_path:
         del vq_model.enc_q
-    if is_half == True:
+    if is_half:
         vq_model = vq_model.half().to(device)
     else:
         vq_model = vq_model.to(device)
@@ -123,7 +123,7 @@ def change_gpt_weights(gpt_path):
     max_sec = config["data"]["max_sec"]
     t2s_model = Text2SemanticLightningModule(config, "****", is_train=False)
     t2s_model.load_state_dict(dict_s1["weight"])
-    if is_half == True:
+    if is_half:
         t2s_model = t2s_model.half()
     t2s_model = t2s_model.to(device)
     t2s_model.eval()
@@ -160,7 +160,7 @@ def get_bert_inf(phones, word2ph, norm_text, language):
     else:
         bert = torch.zeros(
             (1024, len(phones)),
-            dtype=torch.float16 if is_half == True else torch.float32,
+            dtype=torch.float16 if is_half else torch.float32,
         ).to(device)
 
     return bert
@@ -182,7 +182,7 @@ def get_phones_and_bert(text, language):
         else:
             bert = torch.zeros(
                 (1024, len(phones)),
-                dtype=torch.float16 if is_half == True else torch.float32,
+                dtype=torch.float16 if is_half else torch.float32,
             ).to(device)
     elif language in {"zh", "ja", "auto"}:
         textlist = []
@@ -218,7 +218,7 @@ def get_phones_and_bert(text, language):
         phones = sum(phones_list, [])
         norm_text = "".join(norm_text_list)
 
-    return phones, bert.to(torch.float16 if is_half == True else torch.float32), norm_text
+    return phones, bert.to(torch.float16 if is_half else torch.float32), norm_text
 
 
 class DictToAttrRecursive:
@@ -342,12 +342,12 @@ def get_tts_wav(ref_wav_path, prompt_text, prompt_language, text, text_language)
     t0 = ttime()
     prompt_text = prompt_text.strip("\n")
     prompt_language, text = prompt_language, text.strip("\n")
-    zero_wav = np.zeros(int(hps.data.sampling_rate * 0.3), dtype=np.float16 if is_half == True else np.float32)
+    zero_wav = np.zeros(int(hps.data.sampling_rate * 0.3), dtype=np.float16 if is_half else np.float32)
     with torch.no_grad():
         wav16k, sr = librosa.load(ref_wav_path, sr=16000)
         wav16k = torch.from_numpy(wav16k)
         zero_wav_torch = torch.from_numpy(zero_wav)
-        if is_half == True:
+        if is_half:
             wav16k = wav16k.half().to(device)
             zero_wav_torch = zero_wav_torch.half().to(device)
         else:
@@ -401,7 +401,7 @@ def get_tts_wav(ref_wav_path, prompt_text, prompt_language, text, text_language)
         t3 = ttime()
         pred_semantic = pred_semantic[:, -idx:].unsqueeze(0)
         refer = get_spepc(hps, ref_wav_path)
-        if is_half == True:
+        if is_half:
             refer = refer.half().to(device)
         else:
             refer = refer.to(device)
@@ -475,7 +475,7 @@ def handle(refer_wav_path, prompt_text, prompt_language, text, text_language, cu
         if not default_refer.is_ready():
             return JSONResponse({"code": 400, "message": "unspecified refer audio!"}, status_code=400)
 
-    if cut_punc == None:
+    if cut_punc is None:
         text = cut_text(text, default_cut_punc)
     else:
         text = cut_text(text, cut_punc)
@@ -641,7 +641,7 @@ async def set_model(request: Request):
 
 
 @app.post("/control")
-async def control(request: Request):
+async def control_req(request: Request):
     json_post_raw = await request.json()
     return handle_control(json_post_raw.get("command"))
 
@@ -652,7 +652,7 @@ async def control(command: str = None):
 
 
 @app.post("/change_refer")
-async def change_refer(request: Request):
+async def change_refer_req(request: Request):
     json_post_raw = await request.json()
     return handle_change(
         json_post_raw.get("refer_wav_path"), json_post_raw.get("prompt_text"), json_post_raw.get("prompt_language")
@@ -665,7 +665,7 @@ async def change_refer(refer_wav_path: str = None, prompt_text: str = None, prom
 
 
 @app.post("/")
-async def tts_endpoint(request: Request):
+async def tts_endpoint_req(request: Request):
     json_post_raw = await request.json()
     return handle(
         json_post_raw.get("refer_wav_path"),
