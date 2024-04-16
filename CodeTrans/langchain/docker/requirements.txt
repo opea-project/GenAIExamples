@@ -1,4 +1,4 @@
 fastapi
-langchain
 huggingface_hub
+langchain
 uvicorn
