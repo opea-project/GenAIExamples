@@ -32,7 +32,7 @@ function run_tests() {
     cd $WORKPATH
     rm -f sample.wav
     wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
-    http_proxy= curl -F 'file=@sample.wav' http://localhost:8018/asr > $LOG_PATH
+    http_proxy= curl -F 'file=@sample.wav' http://localhost:8018/v1/audio/transcriptions > $LOG_PATH
     rm -f sample.wav
 }
 

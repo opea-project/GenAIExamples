@@ -1,6 +1,6 @@
 # AudioQnA
 
-![audioqna](./audioqna.jpg)
+![audioqna](https://i.imgur.com/2hit8HL.jpeg)
 
 In this example we will show you how to build an Audio Question and Answering application (AudioQnA). AudioQnA serves like a talking bot, let LLMs talk with users. It basically accepts users' audio inputs, converts to texts and feed to LLMs, gets the text answers and converts back to audio outputs.
 
@@ -38,7 +38,7 @@ docker run -d -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 8008:8008
 
 # Test ASR
 wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
-http_proxy= curl -F 'file=@sample.wav' http://localhost:8008/asr
+http_proxy= curl -F 'file=@sample.wav' http://localhost:8008/v1/audio/transcriptions
 
 # Start TTS service
 # Predownload local models and mapped in
@@ -52,7 +52,7 @@ docker run -d -v ./pretrained_tts_models:/GPT-SoVITS/GPT_SoVITS/pretrained_model
 # --form 'default_refer_language="en"'
 
 # Test TTS
-http_proxy= curl --location 'localhost:9880/tts' \
+http_proxy= curl --location 'localhost:9880/v1/audio/speech' \
 --header 'Content-Type: application/json' \
 --data '{
     "text": "You can have a look, but you should not touch this item.",
