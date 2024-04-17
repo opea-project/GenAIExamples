@@ -92,7 +92,6 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 	</tbody>
 </table>
 
-
 ### CodeTrans
 
 [CodeTrans](./CodeTrans/README.md) is an example of chatbot for converting code written in one programming language to another programming language while maintaining the same functionality.
