@@ -42,7 +42,7 @@ docker run -e TGI_ENDPOINT=<TGI ENDPOINT> -e GOOGLE_CSE_ID=<GOOGLE CSE ID> -e GO
 
 Here is the explanation of some of the above parameters:
 
-- `TGI_ENDPOINT`: the endpoint of your TGI service, usually equal to `<ip of your machine>:<port of your TGI service>`
+- `TGI_ENDPOINT`: the endpoint of your TGI service, usually equal to `http://<ip of your machine>:<port of your TGI service>`
 - `GOOGLE_CSE_ID`: your CSE ID for Google Search Engine, usually generated [here](https://programmablesearchengine.google.com/controlpanel/all)
 - `GOOGLE_API_KEY`: your API key for Google Search Engine, usually generated [here](https://console.cloud.google.com/apis/credentials)
 - `HUGGINGFACEHUB_API_TOKEN`: your HuggingFace hub API token, usually generated [here](https://huggingface.co/settings/tokens)

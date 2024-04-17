@@ -97,11 +97,14 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
     ) -> None:
         super().__init__()
         self.entrypoint = entrypoint
-        self.queue = Queue()  # For streaming output tokens
+        self.vectordb_embedding_model = vectordb_embedding_model
+        self.vectordb_persistent_directory = vectordb_persistent_directory
+
+        self.queue = Queue()
 
         # setup TGI endpoint
         self.llm = HuggingFaceEndpoint(
-            endpoint_url=entrypoint,
+            endpoint_url=self.vectordb_embedding_modelentrypoint,
             max_new_tokens=1024,
             top_k=10,
             top_p=0.95,
@@ -112,16 +115,20 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
             callbacks=[QueueCallbackHandler(queue=self.queue)],
         )
 
+    def build_searchqna_chain(self):
+        """Build the chain at runtime"""
+        self.queue.queue.clear()  # For streaming output tokens
+
         # Check that google api key is provided
         if "GOOGLE_API_KEY" not in os.environ or "GOOGLE_API_KEY" not in os.environ:
             raise Exception("Please make sure to set GOOGLE_API_KEY and GOOGLE_API_KEY environment variables!")
 
         # Clear the last time searching history, which is useful to avoid interfering with current retrievals
-        if os.path.exists(vectordb_persistent_directory) and os.path.isdir(vectordb_persistent_directory):
-            shutil.rmtree(vectordb_persistent_directory)
+        if os.path.exists(self.vectordb_persistent_directory) and os.path.isdir(self.vectordb_persistent_directory):
+            shutil.rmtree(self.vectordb_persistent_directory)
         self.vectorstore = Chroma(
-            embedding_function=HuggingFaceInstructEmbeddings(model_name=vectordb_embedding_model),
-            persist_directory=vectordb_persistent_directory,
+            embedding_function=HuggingFaceInstructEmbeddings(model_name=self.vectordb_embedding_model),
+            persist_directory=self.vectordb_persistent_directory,
         )
 
         # Build up the google search service
@@ -161,6 +168,7 @@ async def web_search_chat(request: Request):
     params = await request.json()
     print(f"[websearch - chat] POST request: /v1/rag/web_search_chat, params:{params}")
     query = params["query"]
+    router.build_searchqna_chain()
     answer, sources = router.handle_search_chat(query={"question": query})
     print(f"[websearch - chat] answer: {answer}, sources: {sources}")
     return {"answer": answer, "sources": sources}
@@ -171,7 +179,7 @@ async def web_search_chat_stream(request: Request):
     params = await request.json()
     print(f"[websearch - streaming chat] POST request: /v1/rag/web_search_chat_stream, params:{params}")
     query = params["query"]
-
+    router.build_searchqna_chain()
     def stream_callback(query):
         finished = object()
 
@@ -196,7 +204,6 @@ async def web_search_chat_stream(request: Request):
                 continue
 
     def stream_generator():
-        import codecs
 
         chat_response = ""
         for res_dict in stream_callback(query={"question": query}):
