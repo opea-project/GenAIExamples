@@ -25,7 +25,7 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import StreamingResponse
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import RetrievalQAWithSourcesChain
-from langchain.globals import set_debug
+from langchain.globals import set_debug, set_verbose
 from langchain.retrievers.web_research import WebResearchRetriever
 from langchain_community.embeddings import HuggingFaceInstructEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
@@ -34,6 +34,7 @@ from langchain_community.vectorstores import Chroma
 from starlette.middleware.cors import CORSMiddleware
 
 set_debug(True)
+set_verbose(True)
 app = FastAPI()
 
 app.add_middleware(
