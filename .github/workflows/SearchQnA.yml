@@ -28,9 +28,15 @@ jobs:
         run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout out Repo
+        if: ${{ github.event_name == 'pull_request_target' }}
         uses: actions/checkout@v4
         with:
           ref: "refs/pull/${{ github.event.number }}/merge"
+
+      - name: Checkout out Repo
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/checkout@v4
+
       - name: Run Test
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
