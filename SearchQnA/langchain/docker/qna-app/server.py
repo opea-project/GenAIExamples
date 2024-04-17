@@ -116,6 +116,8 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
             callbacks=[QueueCallbackHandler(queue=self.queue)],
         )
 
+        self.vectorstore = None
+
     def build_searchqna_chain(self):
         """Build the chain at runtime"""
         self.queue.queue.clear()  # For streaming output tokens
@@ -125,11 +127,14 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
             raise Exception("Please make sure to set GOOGLE_API_KEY and GOOGLE_API_KEY environment variables!")
 
         # Clear the last time searching history, which is useful to avoid interfering with current retrievals
-        if os.path.exists(self.vectordb_persistent_directory) and os.path.isdir(self.vectordb_persistent_directory):
-            shutil.rmtree(self.vectordb_persistent_directory)
+        # if os.path.exists(self.vectordb_persistent_directory) and os.path.isdir(self.vectordb_persistent_directory):
+        #     shutil.rmtree(self.vectordb_persistent_directory)
+        if self.vectorstore and self.vectorstore._collection:
+            self.vectorstore.delete_collection()
         self.vectorstore = Chroma(
+            collection_name="summaries",
             embedding_function=HuggingFaceInstructEmbeddings(model_name=self.vectordb_embedding_model),
-            persist_directory=self.vectordb_persistent_directory,
+            # persist_directory=self.vectordb_persistent_directory,
         )
 
         # Build up the google search service
