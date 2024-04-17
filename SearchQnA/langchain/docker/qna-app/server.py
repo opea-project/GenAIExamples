@@ -105,7 +105,7 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
 
         # setup TGI endpoint
         self.llm = HuggingFaceEndpoint(
-            endpoint_url=self.vectordb_embedding_modelentrypoint,
+            endpoint_url=self.entrypoint,
             max_new_tokens=1024,
             top_k=10,
             top_p=0.95,
