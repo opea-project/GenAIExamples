@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import argparse
+import os
 
 from fastapi import APIRouter, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
@@ -28,7 +28,7 @@ from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langserve import add_routes
-from prompts import contextualize_q_prompt, qa_prompt, prompt
+from prompts import contextualize_q_prompt, prompt, qa_prompt
 from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 from starlette.middleware.cors import CORSMiddleware
 from utils import (
@@ -115,7 +115,7 @@ class RAGAPIRouter(APIRouter):
             self.llm_chain = (
                 RunnablePassthrough.assign(context=self.contextualized_question | retriever) | prompt | self.llm
             )
-        
+
         print("[rag - router] LLM chain initialized.")
 
         # Define chat history
@@ -128,7 +128,9 @@ class RAGAPIRouter(APIRouter):
             return input["question"]
 
     def handle_rag_chat(self, query: str):
-        response = self.llm_chain.invoke({"question": query, "chat_history": self.chat_history} if args.chathistory else {"question": query})
+        response = self.llm_chain.invoke(
+            {"question": query, "chat_history": self.chat_history} if args.chathistory else {"question": query}
+        )
         result = response.split("</s>")[0]
         if args.chathistory:
             self.chat_history.extend([HumanMessage(content=query), response])
@@ -177,7 +179,7 @@ async def rag_chat(request: Request):
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             )
-        else:        
+        else:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
             )
@@ -189,7 +191,7 @@ async def rag_chat(request: Request):
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             )
-        else:        
+        else:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
             )
@@ -226,7 +228,7 @@ async def rag_chat_stream(request: Request):
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             )
-        else:  
+        else:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
             )
@@ -237,7 +239,7 @@ async def rag_chat_stream(request: Request):
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             )
-        else:  
+        else:
             router.llm_chain = (
                 RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
             )
@@ -246,7 +248,9 @@ async def rag_chat_stream(request: Request):
 
     def stream_generator():
         chat_response = ""
-        for text in router.llm_chain.stream({"question": query, "chat_history": router.chat_history} if args.chathistory else {"question": query}):
+        for text in router.llm_chain.stream(
+            {"question": query, "chat_history": router.chat_history} if args.chathistory else {"question": query}
+        ):
             chat_response += text
             processed_text = post_process_text(text)
             if text is not None:
