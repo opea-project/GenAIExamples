@@ -16,7 +16,7 @@ set -xe
 
 function test_env_setup() {
     WORKPATH=$(dirname "$PWD")
-    LOG_PATH="$WORKPATH/tests/langchain.log"
+    LOG_PATH="$WORKPATH/tests"
 
     REDIS_CONTAINER_NAME="test-redis-vector-db"
     LANGCHAIN_CONTAINER_NAME="test-qna-rag-redis-server"
@@ -75,15 +75,24 @@ function run_tests() {
     curl 127.0.0.1:$port/v1/rag/chat \
         -X POST \
         -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' > $LOG_PATH/langchain.log
+
+    curl 127.0.0.1:$port/v1/rag/chat_stream  \
+        -X POST \
+        -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
+        -H 'Content-Type: application/json' > $LOG_PATH/langchain_stream.log
 }
 
 function check_response() {
     cd $WORKPATH
     echo "Checking response"
     local status=false
-    if [[ -f $LOG_PATH ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH) != 0 ]]; then
+    if [[ -f $LOG_PATH/langchain.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/langchain.log) != 0 ]]; then
         status=true
+    fi
+
+    if [[ ! -f $LOG_PATH/langchain_stream.log ]] || [[ $(grep -c "billion" $LOG_PATH/langchain_stream.log) == 0 ]]; then
+        status=false
     fi
 
     if [ $status == false ]; then
@@ -92,6 +101,7 @@ function check_response() {
     else
         echo "Response check succeed!"
     fi
+
 }
 
 function docker_stop() {

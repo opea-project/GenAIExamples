@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   CodeGen:
-    runs-on: gaudi2
+    runs-on: aise-cluster
     strategy:
       matrix:
         job_name: ["codegen"]
