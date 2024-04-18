@@ -76,6 +76,11 @@ function run_tests() {
         -X POST \
         -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
         -H 'Content-Type: application/json' > $LOG_PATH
+
+    stream_status_code=$(curl 127.0.0.1:$port/v1/rag/chat_stream  \
+        -X POST \
+        -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
+        -H 'Content-Type: application/json')
 }
 
 function check_response() {
@@ -92,6 +97,19 @@ function check_response() {
     else
         echo "Response check succeed!"
     fi
+
+    local stream_status=false
+    if [ "$stream_status_code" -eq 200 ]; then
+        stream_status=true
+    fi
+
+    if [ $stream_status == false ]; then
+        echo "Stream response check failed!"
+        exit 1
+    else
+        echo "Stream response check succeed!"
+    fi
+
 }
 
 function docker_stop() {
