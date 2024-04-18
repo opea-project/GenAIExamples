@@ -116,7 +116,9 @@ class RAGAPIRouter(APIRouter):
             )
             retriever = rds.as_retriever(search_type="mmr")
         except Exception as e:
-            print("[rag - chat] Initializing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
+            print(
+                "[rag - chat] Initializing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!"
+            )
             retriever = None
         # Define contextualize chain
         # self.contextualize_q_chain = contextualize_q_prompt | self.llm | StrOutputParser()
@@ -246,7 +248,7 @@ async def rag_chat_stream(request: Request):
     def stream_generator():
         chat_response = ""
         for text in router.llm_chain.stream({"question": query, "chat_history": router.chat_history}):
-        # for text in router.llm_chain.stream({"question": query}):
+            # for text in router.llm_chain.stream({"question": query}):
             chat_response += text
             processed_text = post_process_text(text)
             if text is not None:
