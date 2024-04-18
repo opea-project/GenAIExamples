@@ -20,6 +20,7 @@ import os
 from fastapi import APIRouter, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from guardrails import moderation_prompt_for_chat, unsafe_dict
+from langchain.globals import set_debug, set_verbose
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Redis
@@ -38,8 +39,6 @@ from utils import (
     post_process_text,
     reload_retriever,
 )
-
-from langchain.globals import set_debug, set_verbose
 
 set_verbose(True)
 set_debug(True)
@@ -184,7 +183,7 @@ async def rag_chat(request: Request):
 
     if kb_id == "default":
         print("[rag - chat] use default knowledge base")
-        #retriever = reload_retriever(router.embeddings, INDEX_NAME)
+        # retriever = reload_retriever(router.embeddings, INDEX_NAME)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             RunnablePassthrough.assign(context=router.contextualized_question)
@@ -194,7 +193,7 @@ async def rag_chat(request: Request):
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
         print(f"[rag - chat] use knowledge base {kb_id}, index name is {new_index_name}")
-        #retriever = reload_retriever(router.embeddings, new_index_name)
+        # retriever = reload_retriever(router.embeddings, new_index_name)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             RunnablePassthrough.assign(context=router.contextualized_question)
@@ -230,7 +229,7 @@ async def rag_chat_stream(request: Request):
             return StreamingResponse(generate_content(), media_type="text/event-stream")
 
     if kb_id == "default":
-        #retriever = reload_retriever(router.embeddings, INDEX_NAME)
+        # retriever = reload_retriever(router.embeddings, INDEX_NAME)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             RunnablePassthrough.assign(context=router.contextualized_question)
@@ -239,7 +238,7 @@ async def rag_chat_stream(request: Request):
         )
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
-        #retriever = reload_retriever(router.embeddings, new_index_name)
+        # retriever = reload_retriever(router.embeddings, new_index_name)
         router.llm_chain = (
             # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             RunnablePassthrough.assign(context=router.contextualized_question)

@@ -18,7 +18,7 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # ========= Raw Q&A template prompt =========
-template ="""### System:\n\n
+template = """### System:\n\n
     You are an assistant chatbot. You answer questions. \
     If you don't know the answer, just say that you don't know. \
     Use three sentences maximum and keep the answer concise.\
