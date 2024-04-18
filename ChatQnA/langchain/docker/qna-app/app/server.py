@@ -219,7 +219,7 @@ async def rag_chat_stream(request: Request):
         for text in router.llm_chain.stream({"question": query, "chat_history": router.chat_history}):
             chat_response += text
             processed_text = post_process_text(text)
-            if text is not None:
+            if text and processed_text:
                 yield processed_text
         chat_response = chat_response.split("</s>")[0]
         print(f"[rag - chat_stream] stream response: {chat_response}")
