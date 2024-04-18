@@ -166,6 +166,8 @@ Make sure TGI-Gaudi service is running and also make sure data is populated into
 
 ```bash
 docker exec -it qna-rag-redis-server bash
+# export TGI_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080" - can be omitted if set before in docker-compose.yml
+# export TEI_ENDPOINT="http://xxx.xxx.xxx.xxx:9090" - Needs to be added only if TEI to be used and can be omitted if set before in docker-compose.yml
 nohup python app/server.py &
 ```
 
