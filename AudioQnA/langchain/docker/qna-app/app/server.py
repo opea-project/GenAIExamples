@@ -116,7 +116,7 @@ class RAGAPIRouter(APIRouter):
             )
             retriever = rds.as_retriever(search_type="mmr")
         except Exception as e:
-            print("[rag - chat] Initializing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
+            print("[rag - chat] Initilizing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
             retriever = None
         # Define contextualize chain
         # self.contextualize_q_chain = contextualize_q_prompt | self.llm | StrOutputParser()
@@ -128,14 +128,10 @@ class RAGAPIRouter(APIRouter):
                 RunnablePassthrough.assign(context=self.contextualized_question | retriever)
                 | qa_prompt
                 | self.llm
-                | prompt
-                | self.llm
             )
         else:
             self.llm_chain = (
                 RunnablePassthrough.assign(context=self.contextualized_question)
-                | qa_prompt
-                | self.llm
                 | prompt
                 | self.llm
             )
@@ -206,14 +202,10 @@ async def rag_chat(request: Request):
     try:
         retriever = reload_retriever(router.embeddings, new_index_name)
         router.llm_chain = (
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
-            | qa_prompt
-            | router.llm
-            | prompt
-            | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
         )
     except Exception as e:
-        print("[rag - chat] Initializing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
+        print("[rag - chat] Initilizing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
     return router.handle_rag_chat(query=query)
 
 
@@ -252,14 +244,10 @@ async def rag_chat_stream(request: Request):
     try:
         retriever = reload_retriever(router.embeddings, new_index_name)
         router.llm_chain = (
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
-            | qa_prompt
-            | router.llm
-            | prompt
-            | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
         )
     except Exception as e:
-        print("[rag - chat] Initializing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
+        print("[rag - chat] Initilizing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
 
     def stream_generator():
         chat_response = ""
@@ -300,10 +288,7 @@ async def rag_create(file: UploadFile = File(...)):
         index_name = INDEX_NAME + kb_id
         retriever = create_retriever_from_files(save_file_name, router.embeddings, index_name)
         router.llm_chain = (
-            # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
-            | prompt
-            | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
         )
         print("[rag - create] kb created successfully")
     except Exception as e:
@@ -326,10 +311,7 @@ async def rag_upload_link(request: Request):
         index_name = INDEX_NAME + kb_id
         retriever = create_retriever_from_links(router.embeddings, link_list, index_name)
         router.llm_chain = (
-            # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever)
-            | prompt
-            | router.llm
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
         )
         print("[rag - upload_link] kb created successfully")
     except Exception as e:
