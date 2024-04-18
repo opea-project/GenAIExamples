@@ -18,22 +18,11 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # ========= Raw Q&A template prompt =========
-template = """
-    Use the following pieces of context from retrieved
-    dataset to answer the question. Do not make up an answer if there is no
-    context provided to help answer it. Include the 'source' and 'start_index'
-    from the metadata included in the context you used to answer the question
-
-    Context:
-    ---------
-    {context}
-
-    ---------
-    Question: {question}
-    ---------
-
-    Answer:
-"""
+template ="""### System:\n\n
+    You are an assistant chatbot. You answer questions. \
+    If you don't know the answer, just say that you don't know. \
+    Use three sentences maximum and keep the answer concise.\
+### User:\n{question}\n### Assistant:\n"""
 prompt = ChatPromptTemplate.from_template(template)
 
 
