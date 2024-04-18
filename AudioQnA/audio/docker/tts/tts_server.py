@@ -40,6 +40,7 @@
 # SOFTWARE.
 
 import argparse
+import base64
 import contextlib
 import logging
 import os
@@ -69,7 +70,6 @@ from text import cleaned_text_to_sequence
 from text.cleaner import clean_text
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 
-import base64
 
 class DefaultRefer:
     def __init__(self, path, text, language):
@@ -459,8 +459,9 @@ def handle_change(path, text, language):
 
     return JSONResponse({"code": 0, "message": "Success"}, status_code=200)
 
+
 def text_stream_generator(result):
-    """embed the unicode byte values to base64 and yield the text stream with data prefix.
+    """Embed the unicode byte values to base64 and yield the text stream with data prefix.
 
     Accepts a generator of bytes
     Returns a generator of string
@@ -468,7 +469,8 @@ def text_stream_generator(result):
     for bytes in result:
         data = base64.b64encode(bytes)
         yield f"data: {data}\n\n"
-    yield f"data: [DONE]\n\n"
+    yield "data: [DONE]\n\n"
+
 
 def handle(refer_wav_path, prompt_text, prompt_language, text, text_language, cut_punc):
     if (
@@ -494,7 +496,8 @@ def handle(refer_wav_path, prompt_text, prompt_language, text, text_language, cu
 
     if not return_text_stream:
         return StreamingResponse(
-            get_tts_wav(refer_wav_path, prompt_text, prompt_language, text, text_language), media_type="audio/" + media_type
+            get_tts_wav(refer_wav_path, prompt_text, prompt_language, text, text_language),
+            media_type="audio/" + media_type,
         )
     else:
         result = get_tts_wav(refer_wav_path, prompt_text, prompt_language, text, text_language)
@@ -558,7 +561,13 @@ parser.add_argument(
 parser.add_argument("-b", "--bert_path", type=str, default=g_config.bert_path, help="overwrite config.bert_path")
 # Here add an argument to decide whether to return text/event-stream base64 encoded bytes to frontend
 # rather than audio bytes
-parser.add_argument("-rts", "--return_text_stream", action="store_true", default=False, help="whether to return text/event-stream base64 encoded bytes to frontend")
+parser.add_argument(
+    "-rts",
+    "--return_text_stream",
+    action="store_true",
+    default=False,
+    help="whether to return text/event-stream base64 encoded bytes to frontend",
+)
 
 args = parser.parse_args()
 sovits_path = args.sovits_path
