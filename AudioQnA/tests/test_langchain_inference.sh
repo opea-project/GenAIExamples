@@ -20,8 +20,8 @@ function test_env_setup() {
 
     REDIS_CONTAINER_NAME="test-redis-vector-db"
     LANGCHAIN_CONTAINER_NAME="test-qna-rag-redis-server"
-    CHATQNA_CONTAINER_NAME="test-ChatQnA_server"
-    cd $WORKPATH # go to ChatQnA
+    CHATQNA_CONTAINER_NAME="test-AudioQnA_server"
+    cd $WORKPATH
 }
 
 function rename() {
