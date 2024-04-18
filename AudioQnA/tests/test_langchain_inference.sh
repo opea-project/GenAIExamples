@@ -20,7 +20,7 @@ function test_env_setup() {
 
     REDIS_CONTAINER_NAME="test-redis-vector-db"
     LANGCHAIN_CONTAINER_NAME="test-qna-rag-redis-server"
-    CHATQNA_CONTAINER_NAME="test-AudioQnA_server"
+    AUDIOQNA_CONTAINER_NAME="test-AudioQnA_server"
     cd $WORKPATH
 }
 
@@ -30,7 +30,7 @@ function rename() {
     sed -i "s/container_name: redis-vector-db/container_name: ${REDIS_CONTAINER_NAME}/g" langchain/docker/docker-compose.yml
     sed -i "s/container_name: qna-rag-redis-server/container_name: ${LANGCHAIN_CONTAINER_NAME}/g" langchain/docker/docker-compose.yml
     sed -i "s/image: intel\/gen-ai-examples:qna-rag-redis-server/image: intel\/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}/g" langchain/docker/docker-compose.yml
-    sed -i "s/ChatQnA_server/${CHATQNA_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
+    sed -i "s/ChatQnA_server/${AUDIOQNA_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
 }
 
 function launch_tgi_gaudi_service() {
@@ -111,7 +111,7 @@ function main() {
 
     run_tests
 
-    docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME && sleep 5s
+    docker_stop $AUDIOQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME && sleep 5s
     echo y | docker system prune
 
     check_response
