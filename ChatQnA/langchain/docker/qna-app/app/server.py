@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 import os
 
 from fastapi import APIRouter, FastAPI, File, Request, UploadFile
@@ -27,7 +28,7 @@ from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langserve import add_routes
-from prompts import contextualize_q_prompt, qa_prompt
+from prompts import contextualize_q_prompt, prompt, qa_prompt
 from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 from starlette.middleware.cors import CORSMiddleware
 from utils import (
@@ -38,6 +39,10 @@ from utils import (
     post_process_text,
     reload_retriever,
 )
+
+parser = argparse.ArgumentParser(description="Server Configuration")
+parser.add_argument("--chathistory", action="store_true", help="Enable debug mode")
+args = parser.parse_args()
 
 app = FastAPI()
 
@@ -102,9 +107,15 @@ class RAGAPIRouter(APIRouter):
         self.contextualize_q_chain = contextualize_q_prompt | self.llm | StrOutputParser()
 
         # Define LLM chain
-        self.llm_chain = (
-            RunnablePassthrough.assign(context=self.contextualized_question | retriever) | qa_prompt | self.llm
-        )
+        if args.chathistory:
+            self.llm_chain = (
+                RunnablePassthrough.assign(context=self.contextualized_question | retriever) | qa_prompt | self.llm
+            )
+        else:
+            self.llm_chain = (
+                RunnablePassthrough.assign(context=self.contextualized_question | retriever) | prompt | self.llm
+            )
+
         print("[rag - router] LLM chain initialized.")
 
         # Define chat history
@@ -117,9 +128,12 @@ class RAGAPIRouter(APIRouter):
             return input["question"]
 
     def handle_rag_chat(self, query: str):
-        response = self.llm_chain.invoke({"question": query, "chat_history": self.chat_history})
+        response = self.llm_chain.invoke(
+            {"question": query, "chat_history": self.chat_history} if args.chathistory else {"question": query}
+        )
         result = response.split("</s>")[0]
-        self.chat_history.extend([HumanMessage(content=query), response])
+        if args.chathistory:
+            self.chat_history.extend([HumanMessage(content=query), response])
         # output guardrails
         if self.safety_guard_endpoint:
             response_output_guard = self.llm_guard(
@@ -148,7 +162,6 @@ async def rag_chat(request: Request):
     print(f"[rag - chat] POST request: /v1/rag/chat, params:{params}")
     query = params["query"]
     kb_id = params.get("knowledge_base_id", "default")
-    print(f"[rag - chat] history: {router.chat_history}")
 
     # prompt guardrails
     if router.safety_guard_endpoint:
@@ -162,16 +175,26 @@ async def rag_chat(request: Request):
     if kb_id == "default":
         print("[rag - chat] use default knowledge base")
         retriever = reload_retriever(router.embeddings, INDEX_NAME)
-        router.llm_chain = (
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-        )
+        if args.chathistory:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
+            )
+        else:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            )
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
         print(f"[rag - chat] use knowledge base {kb_id}, index name is {new_index_name}")
         retriever = reload_retriever(router.embeddings, new_index_name)
-        router.llm_chain = (
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-        )
+        if args.chathistory:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
+            )
+        else:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            )
     else:
         return JSONResponse(status_code=400, content={"message": "Wrong knowledge base id."})
     return router.handle_rag_chat(query=query)
@@ -183,7 +206,6 @@ async def rag_chat_stream(request: Request):
     print(f"[rag - chat_stream] POST request: /v1/rag/chat_stream, params:{params}")
     query = params["query"]
     kb_id = params.get("knowledge_base_id", "default")
-    print(f"[rag - chat_stream] history: {router.chat_history}")
 
     # prompt guardrails
     if router.safety_guard_endpoint:
@@ -202,28 +224,41 @@ async def rag_chat_stream(request: Request):
 
     if kb_id == "default":
         retriever = reload_retriever(router.embeddings, INDEX_NAME)
-        router.llm_chain = (
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-        )
+        if args.chathistory:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
+            )
+        else:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            )
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
         retriever = reload_retriever(router.embeddings, new_index_name)
-        router.llm_chain = (
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-        )
+        if args.chathistory:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
+            )
+        else:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            )
     else:
         return JSONResponse(status_code=400, content={"message": "Wrong knowledge base id."})
 
     def stream_generator():
         chat_response = ""
-        for text in router.llm_chain.stream({"question": query, "chat_history": router.chat_history}):
+        for text in router.llm_chain.stream(
+            {"question": query, "chat_history": router.chat_history} if args.chathistory else {"question": query}
+        ):
             chat_response += text
             processed_text = post_process_text(text)
             if text and processed_text:
                 yield processed_text
         chat_response = chat_response.split("</s>")[0]
         print(f"[rag - chat_stream] stream response: {chat_response}")
-        router.chat_history.extend([HumanMessage(content=query), chat_response])
+        if args.chathistory:
+            router.chat_history.extend([HumanMessage(content=query), chat_response])
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(stream_generator(), media_type="text/event-stream")
@@ -251,9 +286,14 @@ async def rag_create(file: UploadFile = File(...)):
         print("[rag - create] starting to create local db...")
         index_name = INDEX_NAME + kb_id
         retriever = create_retriever_from_files(save_file_name, router.embeddings, index_name)
-        router.llm_chain = (
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-        )
+        if args.chathistory:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
+            )
+        else:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            )
         print("[rag - create] kb created successfully")
     except Exception as e:
         print(f"[rag - create] create knowledge base failed! {e}")
@@ -274,9 +314,14 @@ async def rag_upload_link(request: Request):
         print("[rag - upload_link] starting to create local db...")
         index_name = INDEX_NAME + kb_id
         retriever = create_retriever_from_links(router.embeddings, link_list, index_name)
-        router.llm_chain = (
-            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-        )
+        if args.chathistory:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
+            )
+        else:
+            router.llm_chain = (
+                RunnablePassthrough.assign(context=router.contextualized_question | retriever) | prompt | router.llm
+            )
         print("[rag - upload_link] kb created successfully")
     except Exception as e:
         print(f"[rag - upload_link] create knowledge base failed! {e}")
