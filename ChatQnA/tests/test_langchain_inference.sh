@@ -87,11 +87,11 @@ function check_response() {
     cd $WORKPATH
     echo "Checking response"
     local status=false
-    if [[ -f $$LOG_PATH/langchain.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/langchain.log) != 0 ]]; then
+    if [[ -f $LOG_PATH/langchain.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/langchain.log) != 0 ]]; then
         status=true
     fi
 
-    if [[ ! -f $$LOG_PATH/langchain_stream.log ]] || [[ $(grep -c "billion" $LOG_PATH/langchain_stream.log) == 0 ]]; then
+    if [[ ! -f $LOG_PATH/langchain_stream.log ]] || [[ $(grep -c "billion" $LOG_PATH/langchain_stream.log) == 0 ]]; then
         status=false
     fi
 
