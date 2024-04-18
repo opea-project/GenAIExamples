@@ -92,7 +92,7 @@ class AudioSpeechRecognition:
                 predicted_ids = self.model.generate(inputs)
         # pylint: disable=E1101
         result = self.processor.tokenizer.batch_decode(predicted_ids, skip_special_tokens=True, normalize=True)[0]
-        if self.language == "auto" or self.language == "cn":
+        if self.language == "auto" or self.language == "zh":
             from zhconv import convert
 
             result = convert(result, "zh-cn")
@@ -101,7 +101,7 @@ class AudioSpeechRecognition:
 
 
 if __name__ == "__main__":
-    asr = AudioSpeechRecognition()
+    asr = AudioSpeechRecognition(language="auto")
     import urllib.request
 
     urllib.request.urlretrieve(
