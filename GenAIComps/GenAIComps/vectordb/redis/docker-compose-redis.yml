@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   redis-vector-db:
     image: redis/redis-stack:7.2.0-v9

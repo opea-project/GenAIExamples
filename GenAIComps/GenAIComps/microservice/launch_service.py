@@ -8,9 +8,7 @@ def main() -> None:
     parser.add_argument("--load-balancer-port", type=int, default=0, help="Port of load balancer")
     parser.add_argument("--server-port", type=int, default=0, help="Port of microservice inference server")
     args = parser.parse_args()
-    assert not (
-        args.load_balancer and args.restful_gateway
-    ), "Select only load-balancer OR restful-gateway."
+    assert not (args.load_balancer and args.restful_gateway), "Select only load-balancer OR restful-gateway."
 
     if args.load_balancer:
         assert args.load_balancer_port, "--load-balancer-port must be provided."
@@ -26,4 +24,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
