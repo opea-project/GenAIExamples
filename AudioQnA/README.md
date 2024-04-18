@@ -158,7 +158,7 @@ cd ../../
 > [!NOTE]
 > If you modified any files and want that change introduced in this step, add `--build` to the end of the command to build the container image instead of pulling it from dockerhub.
 
-## Ingest data into Redis
+## Ingest data into Redis (Optional)
 
 Each time the Redis container is launched, data should be ingested into the container using the commands:
 

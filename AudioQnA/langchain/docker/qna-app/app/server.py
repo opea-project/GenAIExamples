@@ -147,10 +147,10 @@ class RAGAPIRouter(APIRouter):
             return input["question"]
 
     def handle_rag_chat(self, query: str):
-        # response = self.llm_chain.invoke({"question": query, "chat_history": self.chat_history})
-        response = self.llm_chain.invoke({"question": query})
+        response = self.llm_chain.invoke({"question": query, "chat_history": self.chat_history})
+        # response = self.llm_chain.invoke({"question": query})
         result = response.split("</s>")[0]
-        # self.chat_history.extend([HumanMessage(content=query), response])
+        self.chat_history.extend([HumanMessage(content=query), response])
         # output guardrails
         if self.safety_guard_endpoint:
             response_output_guard = self.llm_guard(
@@ -251,15 +251,15 @@ async def rag_chat_stream(request: Request):
 
     def stream_generator():
         chat_response = ""
-        # for text in router.llm_chain.stream({"question": query, "chat_history": router.chat_history}):
-        for text in router.llm_chain.stream({"question": query}):
+        for text in router.llm_chain.stream({"question": query, "chat_history": router.chat_history}):
+        # for text in router.llm_chain.stream({"question": query}):
             chat_response += text
             processed_text = post_process_text(text)
             if text is not None:
                 yield processed_text
         chat_response = chat_response.split("</s>")[0]
         print(f"[rag - chat_stream] stream response: {chat_response}")
-        # router.chat_history.extend([HumanMessage(content=query), chat_response])
+        router.chat_history.extend([HumanMessage(content=query), chat_response])
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(stream_generator(), media_type="text/event-stream")
