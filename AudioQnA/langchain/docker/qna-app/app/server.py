@@ -116,7 +116,7 @@ class RAGAPIRouter(APIRouter):
             )
             retriever = rds.as_retriever(search_type="mmr")
         except Exception as e:
-            print("[rag - chat] Initilizing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
+            print("[rag - chat] Initializing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
             retriever = None
         # Define contextualize chain
         # self.contextualize_q_chain = contextualize_q_prompt | self.llm | StrOutputParser()
@@ -125,16 +125,10 @@ class RAGAPIRouter(APIRouter):
         # Define LLM chain
         if retriever:
             self.llm_chain = (
-                RunnablePassthrough.assign(context=self.contextualized_question | retriever)
-                | qa_prompt
-                | self.llm
+                RunnablePassthrough.assign(context=self.contextualized_question | retriever) | qa_prompt | self.llm
             )
         else:
-            self.llm_chain = (
-                RunnablePassthrough.assign(context=self.contextualized_question)
-                | prompt
-                | self.llm
-            )
+            self.llm_chain = RunnablePassthrough.assign(context=self.contextualized_question) | prompt | self.llm
         print("[rag - router] LLM chain initialized.")
 
         # Define chat history
@@ -205,7 +199,7 @@ async def rag_chat(request: Request):
             RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
         )
     except Exception as e:
-        print("[rag - chat] Initilizing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
+        print("[rag - chat] Initializing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
     return router.handle_rag_chat(query=query)
 
 
@@ -247,7 +241,7 @@ async def rag_chat_stream(request: Request):
             RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
         )
     except Exception as e:
-        print("[rag - chat] Initilizing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
+        print("[rag - chat] Initializing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
 
     def stream_generator():
         chat_response = ""
