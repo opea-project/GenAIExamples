@@ -69,6 +69,7 @@ from text import cleaned_text_to_sequence
 from text.cleaner import clean_text
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 
+import base64
 
 class DefaultRefer:
     def __init__(self, path, text, language):
@@ -458,6 +459,16 @@ def handle_change(path, text, language):
 
     return JSONResponse({"code": 0, "message": "Success"}, status_code=200)
 
+def text_stream_generator(result):
+    """embed the unicode byte values to base64 and yield the text stream with data prefix.
+
+    Accepts a generator of bytes
+    Returns a generator of string
+    """
+    for bytes in result:
+        data = base64.b64encode(bytes)
+        yield f"data: {data}\n\n"
+    yield f"data: [DONE]\n\n"
 
 def handle(refer_wav_path, prompt_text, prompt_language, text, text_language, cut_punc):
     if (
@@ -481,9 +492,14 @@ def handle(refer_wav_path, prompt_text, prompt_language, text, text_language, cu
     else:
         text = cut_text(text, cut_punc)
 
-    return StreamingResponse(
-        get_tts_wav(refer_wav_path, prompt_text, prompt_language, text, text_language), media_type="audio/" + media_type
-    )
+    if not return_text_stream:
+        return StreamingResponse(
+            get_tts_wav(refer_wav_path, prompt_text, prompt_language, text, text_language), media_type="audio/" + media_type
+        )
+    else:
+        result = get_tts_wav(refer_wav_path, prompt_text, prompt_language, text, text_language)
+
+        return StreamingResponse(text_stream_generator(result), media_type="text/event-stream")
 
 
 # --------------------------------
@@ -540,6 +556,9 @@ parser.add_argument(
     "-hb", "--hubert_path", type=str, default=g_config.cnhubert_path, help="overwrite config.cnhubert_path"
 )
 parser.add_argument("-b", "--bert_path", type=str, default=g_config.bert_path, help="overwrite config.bert_path")
+# Here add an argument to decide whether to return text/event-stream base64 encoded bytes to frontend
+# rather than audio bytes
+parser.add_argument("-rts", "--return_text_stream", action="store_true", default=False, help="whether to return text/event-stream base64 encoded bytes to frontend")
 
 args = parser.parse_args()
 sovits_path = args.sovits_path
@@ -550,6 +569,7 @@ host = args.bind_addr
 cnhubert_base_path = args.hubert_path
 bert_path = args.bert_path
 default_cut_punc = args.cut_punc
+return_text_stream = args.return_text_stream
 
 # Set default reference configuration
 default_refer = DefaultRefer(args.default_refer_path, args.default_refer_text, args.default_refer_language)
