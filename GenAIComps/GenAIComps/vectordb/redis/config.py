@@ -7,6 +7,7 @@ EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 
+
 def get_boolean_env_var(var_name, default_value=False):
     """Retrieve the boolean value of an environment variable.
 
@@ -31,6 +32,7 @@ def get_boolean_env_var(var_name, default_value=False):
         return False
     else:
         return default_value
+
 
 def format_redis_conn_from_env():
     redis_url = os.getenv("REDIS_URL", None)
@@ -59,7 +61,3 @@ parent_dir = os.path.dirname(current_file_path)
 REDIS_SCHEMA = os.getenv("REDIS_SCHEMA", "schema.yml")
 schema_path = os.path.join(parent_dir, REDIS_SCHEMA)
 INDEX_SCHEMA = schema_path
-
-
-
-

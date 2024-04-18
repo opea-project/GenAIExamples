@@ -1,6 +1,7 @@
 import os
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
+
 from fastapi import APIRouter, FastAPI, Request
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -23,8 +24,10 @@ class EmbeddingRouter(APIRouter):
             # create embeddings using local embedding model
             self.embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-large-en-v1.5")
 
+
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 router = EmbeddingRouter(tei_embedding_endpoint)
+
 
 @router.post("/v1/embeddings")
 async def rag_chat(request: Request):
@@ -34,6 +37,7 @@ async def rag_chat(request: Request):
 
     embeddings = router.embeddings(query)
     return embeddings
+
 
 app.include_router(router)
 

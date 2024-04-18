@@ -1,10 +1,8 @@
-
-from typing import List, Dict
+from typing import Dict, List
 
 
 def client(service_name: str):
-    """
-    Creates a client object for interfacing with an existing microservice.
+    """Creates a client object for interfacing with an existing microservice.
 
     :return: Client object that can be used to interface with the deployed microservice.
     """
@@ -15,8 +13,7 @@ def serve(
     service_config: Dict = None,
     **kwargs,
 ):
-    """
-    Creates a microservice.
+    """Creates a microservice.
 
     :param service_name: microservice name.
     :param service_config: Dictionary containing microservice configuration fields.
@@ -28,9 +25,8 @@ def pipeline(
     service_list: List[str] = None,
     **kwargs,
 ):
-    """
-    Creates a microservice pipeline to deploy a applicaiton.
+    """Creates a microservice pipeline to deploy a application.
 
-    :param application_name: the applicaiton name.
-    :param 
+    :param application_name: the application name.
+    :param
     """

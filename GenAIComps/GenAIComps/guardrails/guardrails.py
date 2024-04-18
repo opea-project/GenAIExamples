@@ -1,8 +1,8 @@
 import os
 
 from fastapi import APIRouter, FastAPI, Request
-from starlette.middleware.cors import CORSMiddleware
 from langchain_community.llms import HuggingFaceEndpoint
+from starlette.middleware.cors import CORSMiddleware
 
 unsafe_categories = """O1: Violence and Hate.
 Should not
@@ -89,19 +89,18 @@ Provide your safety assessment for {role} in the above conversation:
     return prompt
 
 
-
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
 )
 
+
 class GuardRailsRouter(APIRouter):
 
     def __init__(self, safety_guard_endpoint) -> None:
         super().__init__()
         self.safety_guard_endpoint = safety_guard_endpoint
-
 
         self.llm_guard = HuggingFaceEndpoint(
             endpoint_url=safety_guard_endpoint,

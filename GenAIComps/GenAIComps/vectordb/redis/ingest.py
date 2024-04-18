@@ -47,7 +47,7 @@ def pdf_loader(file_path):
 
 
 def ingest_documents(data_path):
-    """Ingest PDF to Redis from data_path"""
+    """Ingest PDF to Redis from data_path."""
     # Load list of pdfs
     doc_path = [os.path.join(data_path, file) for file in os.listdir(data_path)][0]
 
