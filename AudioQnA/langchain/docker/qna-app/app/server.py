@@ -106,26 +106,35 @@ class RAGAPIRouter(APIRouter):
         else:
             # create embeddings using local embedding model
             self.embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
-        """
-        rds = Redis.from_existing_index(
-            self.embeddings,
-            index_name=INDEX_NAME,
-            redis_url=REDIS_URL,
-            schema=INDEX_SCHEMA,
-        )
-        retriever = rds.as_retriever(search_type="mmr")
-        """
+
+        try:
+            rds = Redis.from_existing_index(
+                self.embeddings,
+                index_name=INDEX_NAME,
+                redis_url=REDIS_URL,
+                schema=INDEX_SCHEMA,
+            )
+            retriever = rds.as_retriever(search_type="mmr")
+        except Exception as e:
+            print("[rag - chat] Initilizing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
+            retriever = None
         # Define contextualize chain
         # self.contextualize_q_chain = contextualize_q_prompt | self.llm | StrOutputParser()
         self.contextualize_q_chain = prompt | self.llm | StrOutputParser()
 
         # Define LLM chain
-        self.llm_chain = (
-            # RunnablePassthrough.assign(context=self.contextualized_question | retriever) | qa_prompt | self.llm
-            RunnablePassthrough.assign(context=self.contextualized_question)
-            | prompt
-            | self.llm
-        )
+        if retriever:
+            self.llm_chain = (
+                RunnablePassthrough.assign(context=self.contextualized_question | retriever) | qa_prompt | self.llm
+                | prompt
+                | self.llm
+            )
+        else:
+            self.llm_chain = (
+                RunnablePassthrough.assign(context=self.contextualized_question) | qa_prompt | self.llm
+                | prompt
+                | self.llm
+            )
         print("[rag - router] LLM chain initialized.")
 
         # Define chat history
@@ -183,25 +192,22 @@ async def rag_chat(request: Request):
 
     if kb_id == "default":
         print("[rag - chat] use default knowledge base")
-        # retriever = reload_retriever(router.embeddings, INDEX_NAME)
-        router.llm_chain = (
-            # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question)
-            | prompt
-            | router.llm
-        )
+        new_index_name = INDEX_NAME
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
         print(f"[rag - chat] use knowledge base {kb_id}, index name is {new_index_name}")
-        # retriever = reload_retriever(router.embeddings, new_index_name)
+    else:
+        return JSONResponse(status_code=400, content={"message": "Wrong knowledge base id."})
+
+    try:
+        retriever = reload_retriever(router.embeddings, new_index_name)
         router.llm_chain = (
-            # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question)
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             | prompt
             | router.llm
         )
-    else:
-        return JSONResponse(status_code=400, content={"message": "Wrong knowledge base id."})
+    except Exception as e:
+        print("[rag - chat] Initilizing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
     return router.handle_rag_chat(query=query)
 
 
@@ -229,24 +235,23 @@ async def rag_chat_stream(request: Request):
             return StreamingResponse(generate_content(), media_type="text/event-stream")
 
     if kb_id == "default":
-        # retriever = reload_retriever(router.embeddings, INDEX_NAME)
-        router.llm_chain = (
-            # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question)
-            | prompt
-            | router.llm
-        )
+        print("[rag - chat] use default knowledge base")
+        new_index_name = INDEX_NAME
     elif kb_id.startswith("kb"):
         new_index_name = INDEX_NAME + kb_id
-        # retriever = reload_retriever(router.embeddings, new_index_name)
+        print(f"[rag - chat] use knowledge base {kb_id}, index name is {new_index_name}")
+    else:
+        return JSONResponse(status_code=400, content={"message": "Wrong knowledge base id."})
+
+    try:
+        retriever = reload_retriever(router.embeddings, new_index_name)
         router.llm_chain = (
-            # RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
-            RunnablePassthrough.assign(context=router.contextualized_question)
+            RunnablePassthrough.assign(context=router.contextualized_question | retriever) | qa_prompt | router.llm
             | prompt
             | router.llm
         )
-    else:
-        return JSONResponse(status_code=400, content={"message": "Wrong knowledge base id."})
+    except Exception as e:
+        print("[rag - chat] Initilizing Redis RAG failure, will skip RAG and fallback to normal chat in the chain!")
 
     def stream_generator():
         chat_response = ""
