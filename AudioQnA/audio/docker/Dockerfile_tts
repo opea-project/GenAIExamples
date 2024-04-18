@@ -26,11 +26,11 @@ RUN wget https://github.com/intel/intel-extension-for-transformers/raw/main/inte
 RUN wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/welcome_cn.wav -P /GPT-SoVITS
 
 
-RUN useradd -m -s /bin/bash user && \
-    mkdir -p /home/user && \
-    chown -R user /home/user/
+#RUN useradd -m -s /bin/bash user && \
+#    mkdir -p /home/user && \
+#    chown -R user /home/user/
 
-USER user
+#USER user
 
 WORKDIR /GPT-SoVITS
 
