@@ -92,6 +92,29 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 	</tbody>
 </table>
 
+### CodeTrans
+
+[CodeTrans](./CodeTrans/README.md) is an example of chatbot for converting code written in one programming language to another programming language while maintaining the same functionality.
+
+<table>
+	<tbody>
+		<tr>
+			<td>Framework</td>
+			<td>LLM</td>
+			<td>Serving</td>
+			<td>HW</td>
+			<td>Description</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/HuggingFaceH4/mistral-7b-grok">HuggingFaceH4/mistral-7b-grok</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Code Translation</td>
+		</tr>
+	</tbody>
+</table>
+
 ### DocSum
 
 [DocSum](./DocSum/README.md) is an example of chatbot for summarizing the content of documents or reports.
