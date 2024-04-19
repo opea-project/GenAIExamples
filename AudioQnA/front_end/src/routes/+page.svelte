@@ -10,7 +10,7 @@
 	import { fetchAudioStream, fetchAudioText, fetchTextResponse } from "$lib/modules/chat/network";
 	import VoiceButton from "$lib/components/talkbot/voice-button.svelte";
 	import LoadingButtonSpinnerIcon from "$lib/assets/icons/svelte/loading-button-spinner-icon.svelte";
-	
+
 	let loading: boolean = false;
 	let enableRegenerate: boolean = false;
 	let scrollToDiv: HTMLDivElement;
@@ -19,7 +19,7 @@
 
 	$: enableRegenerateMessage = !loading && chatMessages.length > 2;
 	console.log('chatMessages', chatMessages);
-	
+
 
 	const handleSubmit = async (enableRegenerate = false): Promise<void> => {
 		scrollToBottom(scrollToDiv);
@@ -34,7 +34,7 @@
 		}
 
 		const content = chatMessages[chatMessages.length - 1].content;
-		
+
 		const blob = await fetch(content).then(r => r.blob());
 
 		const res = await fetchAudioText(blob);

@@ -43,7 +43,7 @@
 					audioRecorder.addEventListener("stop", () => {
 						const blob = new Blob(chunks, { type: "audio/mp3; codecs=opus" });
 						audioSrc = window.URL.createObjectURL(blob);
-						
+
 						chatMessages = [
 							...chatMessages,
 							{ role: "user", content: audioSrc },

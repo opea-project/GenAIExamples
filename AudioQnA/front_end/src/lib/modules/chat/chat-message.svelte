@@ -2,7 +2,7 @@
 	import MessageTimer from "./message-timer.svelte";
 	import ChatAudio from "./chat-audio.svelte";
 	import MessageAvatar from "$lib/assets/icons/svelte/message-avatar.svelte";
-		
+
 	export let type: string;
 	export let message: string;
 	export let displayTimer: Boolean = true;

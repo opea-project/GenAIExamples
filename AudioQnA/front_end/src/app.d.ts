@@ -10,8 +10,7 @@ declare namespace App {
 	// interface Platform {}
 }
 
-
 interface ChatMessage {
-	role: string,
-	content: string
+	role: string;
+	content: string;
 }

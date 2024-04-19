@@ -79,4 +79,3 @@ export async function fetchTextResponse(query) {
 		return undefined;
 	}
 }
-

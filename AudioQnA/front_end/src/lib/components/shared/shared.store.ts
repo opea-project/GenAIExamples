@@ -1,9 +1,6 @@
-import { derived, writable } from 'svelte/store';
+import { derived, writable } from "svelte/store";
 
-import type {
-  Chat,
-  ChatListItem,
-} from './shared.type';
+import type { Chat, ChatListItem } from "./shared.type";
 
 /**
  * Banners
@@ -11,7 +8,7 @@ import type {
 export const banners$ = writable([] as any);
 
 export const hasBanners$ = derived(banners$, (banners) => {
-  return banners.length > 0;
+	return banners.length > 0;
 });
 
 /**
@@ -19,4 +16,3 @@ export const hasBanners$ = derived(banners$, (banners) => {
  */
 export const chatList$ = writable([] as ChatListItem[]);
 export const chats$ = writable({} as Record<string, Chat>);
-
