@@ -11,8 +11,8 @@ repos:
       - id: check-json
         exclude: |
           (?x)^(
-              ChatQnA/ui/tsconfig.json|
-              SearchQnA/ui/tsconfig.json
+              ChatQnA/ui/svelte/tsconfig.json|
+              SearchQnA/ui/svelte/tsconfig.json
           )$
       - id: check-yaml
       - id: debug-statements
