@@ -15,12 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-<<<<<<< HEAD
-import argparse
-import os
-
-=======
->>>>>>> 3061284 ([pre-commit.ci] auto fixes from pre-commit.com hooks)
 import argparse
 import os
 
