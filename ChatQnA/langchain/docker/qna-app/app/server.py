@@ -18,6 +18,7 @@
 <<<<<<< HEAD
 import argparse
 import os
+
 =======
 >>>>>>> 3061284 ([pre-commit.ci] auto fixes from pre-commit.com hooks)
 import argparse
@@ -34,7 +35,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_pinecone import PineconeVectorStore
 from langserve import add_routes
-from prompts import contextualize_q_prompt, qa_prompt, prompt
+from prompts import contextualize_q_prompt, prompt, qa_prompt
 from starlette.middleware.cors import CORSMiddleware
 from utils import (
     create_kb_folder,
