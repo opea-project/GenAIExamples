@@ -119,7 +119,7 @@ class SearchQuestionAnsweringAPIRouter(APIRouter):
         self.vectorstore = None
 
     def build_searchqna_chain(self):
-        """Build the chain at runtime"""
+        """Build the chain at runtime."""
         self.queue.queue.clear()  # For streaming output tokens
 
         # Check that google api key is provided
@@ -186,6 +186,7 @@ async def web_search_chat_stream(request: Request):
     print(f"[websearch - streaming chat] POST request: /v1/rag/web_search_chat_stream, params:{params}")
     query = params["query"]
     router.build_searchqna_chain()
+
     def stream_callback(query):
         finished = object()
 
