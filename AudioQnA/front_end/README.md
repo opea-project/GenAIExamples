@@ -11,8 +11,7 @@ Here're some of the project's features:
 
 - Start a Talking Chat：Initiate voice chat, able to input voice content, and customize the conversation sound based on the uploaded file.
 - Upload File: Select local upload of voice file. Chat based on the uploaded sound.
-- Scroll to Bottom: The chat automatically slides to the bottom. 
-
+- Scroll to Bottom: The chat automatically slides to the bottom.
 
 <h2>🛠️ Get it Running:</h2>
 
@@ -21,6 +20,7 @@ Here're some of the project's features:
 2. cd command to the current folder.
 
 3. Modify the required .env variables.
+
    ```
     TTS_URL = ''
 
@@ -30,7 +30,7 @@ Here're some of the project's features:
 
     ASR_URL = ''
    ```
-   
+
 4. Execute `npm install` to install the corresponding dependencies.
 
 5. Execute `npm run dev` in both environments

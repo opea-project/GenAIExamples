@@ -27,10 +27,10 @@
 
 <div class="flex">
     <label class="swap">
-  
+
         <!-- this hidden checkbox controls the state -->
         <input type="checkbox" bind:checked={play} on:change={handlePlayClick} />
-        
+
         <!-- volume on icon -->
         <svg class="swap-on fill-current w-5 h-5" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M512 1024A512 512 0 1 1 512 0a512 512 0 0 1 0 1024z m3.008-92.992a416 416 0 1 0 0-832 416 416 0 0 0 0 832zM320 320h128v384H320V320z m256 0h128v384H576V320z" fill="#bcdbff"></path></svg>
         <!-- volume off icon -->
