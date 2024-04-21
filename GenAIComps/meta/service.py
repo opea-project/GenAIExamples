@@ -1,0 +1,1 @@
+# microservice base class
