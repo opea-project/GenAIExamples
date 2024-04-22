@@ -12,7 +12,7 @@ What AudioQnA is delivering and why it stands out:
 
 There are four folders under the current example.
 
-`ui/`: the frontend users interact with  
+`front_end/`: the UI users interact with  
 `serving/`: TGI LLM service endpoint  
 `langchain/`: pipeline the flow of text input -> RAG -> TGI LLM service -> text output  
 `audio/`: pipeline the flow of audio-to-text service -> langchain -> text-to-audio service -> ui
@@ -224,39 +224,7 @@ curl 127.0.0.1:8000/v1/rag/chat_stream \
 
 ## Start the Frontend Service
 
-Navigate to the "ui" folder and execute the following commands to start the frontend GUI:
-
-```bash
-cd ui
-sudo apt-get install npm && \
-    npm install -g n && \
-    n stable && \
-    hash -r && \
-    npm install -g npm@latest
-```
-
-For CentOS, please use the following commands instead:
-
-```bash
-curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
-sudo yum install -y nodejs
-```
-
-Update the `DOC_BASE_URL` environment variable in the `.env` file by replacing the IP address '127.0.0.1' with the actual IP address.
-
-Run the following command to install the required dependencies:
-
-```bash
-npm install
-```
-
-Start the development server by executing the following command:
-
-```bash
-nohup npm run dev &
-```
-
-This will initiate the frontend service and launch the application.
+Please refer to frontend [README](./front_end/README.md).
 
 ## Enable TGI Gaudi FP8 for higher throughput (Optional)
 
