@@ -61,7 +61,7 @@ def ingest_documents(wiki_url, page_ids):
         embedder = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
 
     # Batch size
-    batch_size = 32
+    batch_size = 2
     num_chunks = len(chunks)
     for i in range(0, num_chunks, batch_size):
         batch_chunks = chunks[i : i + batch_size]
