@@ -37,6 +37,47 @@ TGI_ENDPOINT = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
 SERVICE_PORT = os.getenv("SERVER_PORT", 8000)
 
 
+short_cut_mapping = {
+    'en': 'English',
+    'de': 'German',
+    'fr': 'French'
+    'es': 'Spanish',
+    'it': 'Italian',
+    'pt': 'Portuguese',
+    'ru': 'Russian',
+    'zh': 'Chinese',
+    'ja': 'Japanese',
+    'ko': 'Korean',
+    'sv': 'Swedish', 
+    'nl': 'Dutch', 
+    'no': 'Norwegian', 
+    'da': 'Danish', 
+    'ar': 'Arabic', 
+    'hi': 'Hindi', 
+    'tr': 'Turkish', 
+    'pl': 'Polish', 
+    'fi': 'Finnish', 
+    'el': 'Greek', 
+    'cs': 'Czech', 
+    'hu': 'Hungarian', 
+    'id': 'Indonesian', 
+    'is': 'Icelandic',
+    'ms': 'Malay', 
+    'th': 'Thai', 
+    'uk': 'Ukrainian', 
+    'vi': 'Vietnamese', 
+    'ro': 'Romanian', 
+    'he': 'Hebrew', 
+    'bn': 'Bengali', 
+    'bg': 'Bulgarian', 
+    'ca': 'Catalan', 
+    'hr': 'Croatian', 
+    'pirate': 'Pirate', 
+    'yoda': 'Yoda',
+    'minion': 'Minion',
+}
+
+
 class TranslationAPIRouter(APIRouter):
     """The router for Language Translation example."""
 
@@ -59,12 +100,17 @@ class TranslationAPIRouter(APIRouter):
         self.prompt_template = prompt_template
 
     def handle_translation(self, language_from: str, language_to: str, source_language: str):
+        if language_from in short_cut_mapping.keys():
+            language_from = short_cut_mapping[language_from]
+        if language_to in short_cut_mapping.keys():
+            language_to = short_cut_mapping[language_to] 
         prompt = self.prompt_template.format(
             language_from=language_from, language_to=language_to, source_language=source_language
         )
         print(f"[translation - nonstream] prompt:{prompt}")
         try:
             response = self.llm(prompt)
+            response = {"target_language": response.replace("</s>", "")}
         except Exception as e:
             print(f"[translation - nonstream] Error occurred: {e}")
             raise Exception(f"[translation - nonstream] {e}")
@@ -72,6 +118,10 @@ class TranslationAPIRouter(APIRouter):
         return response
 
     async def handle_translation_stream(self, language_from: str, language_to: str, source_language: str):
+        if language_from in short_cut_mapping.keys():
+            language_from = short_cut_mapping[language_from]
+        if language_to in short_cut_mapping.keys():
+            language_to = short_cut_mapping[language_to] 
         prompt = self.prompt_template.format(
             language_from=language_from, language_to=language_to, source_language=source_language
         )

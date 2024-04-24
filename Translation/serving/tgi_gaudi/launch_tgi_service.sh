@@ -16,7 +16,7 @@
 
 # Set default values
 default_port=8080
-default_model="haoranxu/ALMA-7B"
+default_model="haoranxu/ALMA-13B"
 default_num_cards=1
 
 # Check if all required arguments are provided
