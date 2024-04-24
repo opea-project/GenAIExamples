@@ -22,61 +22,33 @@ import numpy as np
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
-from PIL import Image
+# from PIL import Image
 from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
+from langchain_community.document_loaders import ConfluenceLoader
 
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
+# confluence_access_token = os.getenv("CONFLUENCE_ACCESS_TOKEN")
+confluence_access_token = "MzA4Mzc0NTE4MDExOq8IGeVJAXqNN2hSfNbR/tsqFn+D"
 
+def wiki_loader(wiki_url, page_ids):
+    loader = ConfluenceLoader(url=wiki_url, token=confluence_access_token, confluence_kwargs={"verify_ssl": False},  )
+    print(wiki_url)
+    print(page_ids)
+    documents = loader.load(page_ids=page_ids, include_attachments=True, limit=50, max_pages=50)    
+    return documents
 
-def pdf_loader(file_path):
-    try:
-        import easyocr
-        import fitz
-    except ImportError:
-        raise ImportError(
-            "`PyMuPDF` or 'easyocr' package is not found, please install it with "
-            "`pip install pymupdf or pip install easyocr.`"
-        )
+def ingest_documents(wiki_url, page_ids):
+    """Ingest Wiki Pages to Redis from the variables (wiki_url, page_ids) that
+    contains your contents of interest."""
 
-    doc = fitz.open(file_path)
-    reader = easyocr.Reader(["en"])
-    result = ""
-    for i in range(doc.page_count):
-        page = doc.load_page(i)
-        pagetext = page.get_text().strip()
-        if pagetext:
-            result = result + pagetext
-        if len(doc.get_page_images(i)) > 0:
-            for img in doc.get_page_images(i):
-                if img:
-                    pageimg = ""
-                    xref = img[0]
-                    img_data = doc.extract_image(xref)
-                    img_bytes = img_data["image"]
-                    pil_image = Image.open(io.BytesIO(img_bytes))
-                    img = np.array(pil_image)
-                    img_result = reader.readtext(img, paragraph=True, detail=0)
-                    pageimg = pageimg + ", ".join(img_result).strip()
-                    if pageimg.endswith("!") or pageimg.endswith("?") or pageimg.endswith("."):
-                        pass
-                    else:
-                        pageimg = pageimg + "."
-                result = result + pageimg
-    return result
-
-
-def ingest_documents():
-    """Ingest PDF to Redis from the data/ directory that
-    contains Intel manuals."""
-    # Load list of pdfs
+    # Load list of wiki pages 
     company_name = "Intel"
-    data_path = "data_intel/"
-    doc_path = [os.path.join(data_path, file) for file in os.listdir(data_path)][0]
-
-    print("Parsing Intel architecture manuals", doc_path)
-
+    print("Parsing Intel wiki pages", page_ids)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
-    content = pdf_loader(doc_path)
+    documents = wiki_loader(wiki_url, page_ids)
+    content = ""
+    for doc in documents: 
+        content += doc.page_content
     chunks = text_splitter.split_text(content)
 
     print("Done preprocessing. Created", len(chunks), "chunks of the original pdf")
@@ -107,4 +79,8 @@ def ingest_documents():
 
 
 if __name__ == "__main__":
-    ingest_documents()
+
+    wiki_url = "https://wiki.ith.intel.com/"
+    page_ids = [3458609323, 3467299836]
+
+    ingest_documents(wiki_url, page_ids)

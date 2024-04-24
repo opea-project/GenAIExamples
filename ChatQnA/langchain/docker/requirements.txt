@@ -7,6 +7,7 @@ jupyter
 langchain==0.1.12
 langchain-cli
 langchain_benchmarks
+atlassian-python-api
 poetry
 pyarrow
 pydantic==1.10.13
