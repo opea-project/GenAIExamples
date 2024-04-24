@@ -27,8 +27,7 @@ from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 from langchain_community.document_loaders import ConfluenceLoader
 
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
-# confluence_access_token = os.getenv("CONFLUENCE_ACCESS_TOKEN")
-confluence_access_token = "MzA4Mzc0NTE4MDExOq8IGeVJAXqNN2hSfNbR/tsqFn+D"
+confluence_access_token = os.getenv("CONFLUENCE_ACCESS_TOKEN")
 
 def wiki_loader(wiki_url, page_ids):
     loader = ConfluenceLoader(url=wiki_url, token=confluence_access_token, confluence_kwargs={"verify_ssl": False},  )
