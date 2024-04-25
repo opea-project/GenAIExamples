@@ -79,7 +79,7 @@ class CodeTranslationAPIRouter(APIRouter):
 
         async def stream_generator():
             for chunk in self.llm.stream(prompt):
-                chunk_repr = repr(chunk)[1:-1]
+                chunk_repr = repr(chunk.encode('utf-8'))
                 print(f"[codetrans - stream] data: {chunk_repr}")
                 yield f"data: {chunk_repr}\n\n"
             yield "data: [DONE]\n\n"
