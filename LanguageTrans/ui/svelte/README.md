@@ -1,4 +1,4 @@
-<h1 align="center" id="title">Language Translation</h1>
+<h1 align="center" id="title">Code Translation</h1>
 
 ### 📸 Project Screenshots
 
@@ -9,7 +9,7 @@
 
 Here're some of the project's features:
 
-- Language Translation: It is able to recognize and handle multiple languages, providing translations for individual words, phrases, or even entire sentences.
+- Code Translation: It is able to recognize and handle multiple languages, providing translations for individual words, phrases, or even entire sentences.
 
 <h2>🛠️ Get it Running:</h2>
 

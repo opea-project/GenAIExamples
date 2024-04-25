@@ -25,7 +25,7 @@
   >
     <div class="mx-auto flex flex-wrap justify-center items-center w-full">
       <span
-        class="whitespace-nowrap py-2 text-3xl font-semibold text-white ml-4">Language Translation</span
+        class="whitespace-nowrap py-2 text-3xl font-semibold text-white ml-4">Code Translation</span
       >
     </div>
   </nav>

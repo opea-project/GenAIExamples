@@ -17,15 +17,15 @@
 <script lang="ts">
   import Header from "$lib/header.svelte";
   import {
-    fetchLanguageResponse,
+    fetchTextStream,
   } from "$lib/shared/Network.js";
   import type { Language } from "./types.js";
   import { languagesList } from "$lib/shared/constant.js";
   import LoadingAnimation from "$lib/assets/loadingAnimation.svelte";
 
   // Set default language
-  let langFrom: string = "en";
-  let langTo: string = "zh";
+  let langFrom: string = "Python";
+  let langTo: string = "Java";
   let languages: Language[] = languagesList;
   // Initialize disabled state of input
   let inputDisabled: boolean = false;
@@ -35,14 +35,41 @@
   let loading = false;
 
 
-  async function handelTranslate() {
+  const handelTranslate = async (
+  ) => {
     loading = true;
-    const res = await fetchLanguageResponse(input, langFrom, langTo);
-    if (res) {
-      output = res.target_language;
-      loading = false;
-    }
-  }
+
+    const eventSource = await fetchTextStream(input, langFrom, langTo);
+ 
+    eventSource.addEventListener("message", (e: any) => {
+      let Msg = e.data;
+      console.log('Msg', Msg);
+      
+      // if (Msg !== "[DONE]") {
+      //   let res = JSON.parse(Msg);
+      //   let logs = res.ops;
+ 
+      //   logs.forEach((log: { op: string; path: string; value: any }) => {
+      //     if (log.op === "add") {
+      //       if (
+      //         log.value !== "</s>" &&
+      //         log.path.endsWith("/streamed_output/-") &&
+      //         log.path.length > "/streamed_output/-".length
+      //       ) {
+      //         messages += log.value;
+      //         // scrollToBottom(scrollToDiv);
+      //       }
+      //     }
+      //   });
+      // } else {
+      //   loading = false;
+      //   // scrollToBottom(scrollToDiv);
+      // }
+    });
+    eventSource.stream();
+  };
+
+
 
   let timer;
 
@@ -68,9 +95,8 @@
           bind:value={langFrom}
         >
           {#each languages as language}
-            <option value={language.shortcode}
-              >{#if language.flagUnicode}{language.flagUnicode} |
-              {/if}{language.name}</option
+            <option value={language.name}
+              >{language.name}</option
             >
           {/each}
         </select>
@@ -82,9 +108,8 @@
           bind:value={langTo}
         >
           {#each languages as language}
-            <option value={language.shortcode}
-              >{#if language.flagUnicode}{language.flagUnicode} |
-              {/if}{language.name}</option
+            <option value={language.name}
+              >{language.name}</option
             >
           {/each}
         </select>
