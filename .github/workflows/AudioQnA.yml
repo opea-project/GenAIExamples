@@ -58,4 +58,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.job_name }}
-          path: ${{ github.workspace }}/SearchQnA/tests/*.log
+          path: ${{ github.workspace }}/AudioQnA/tests/*.log
