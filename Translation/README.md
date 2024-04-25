@@ -37,6 +37,14 @@ Here is the explanation of some of the above parameters:
 ```sh
 curl http://localhost:8000/v1/translation \
     -X POST \
-    -d '{"language_from": "Chinese","language_to": "English","source_language": "\n我爱机器翻译。\n"}' \
+    -d '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}' \
+    -H 'Content-Type: application/json'
+```
+
+The shortcodes of languages are also supported:
+```sh
+curl http://localhost:8000/v1/translation \
+    -X POST \
+    -d '{"language_from": "de","language_to": "en","source_language": "Maschinelles Lernen"}' \
     -H 'Content-Type: application/json'
 ```

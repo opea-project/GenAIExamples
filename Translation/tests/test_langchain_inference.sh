@@ -62,61 +62,61 @@ function run_tests() {
     # response: {"target_language":"I love machine translation"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "Chinese","language_to": "English","source_language": "\n我爱机器翻译。\n"}' \
+        -d '{"language_from": "zh","language_to": "en","source_language": "我爱机器翻译。"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
     #response: {"target_language":"我是一名翻译"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "English","language_to": "Chinese","source_language": "\nI am a translator\n"}' \
+        -d '{"language_from": "English","language_to": "Chinese","source_language": "I am a translator"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
     # response: {"target_language":"Hallo Welt"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "English","language_to": "German","source_language": "\nhello world\n"}' \
+        -d '{"language_from": "en","language_to": "de","source_language": "hello world"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
     # response: {"target_language":"Machine learning"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "German","language_to": "English","source_language": "\nMaschinelles Lernen\n"}' \
+        -d '{"language_from": "German","language_to": "English","source_language": "Maschinelles Lernen"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
     # response: {"target_language":"Ég er glöð"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "English","language_to": "Icelandic","source_language": "\nI am happy\n"}' \
+        -d '{"language_from": "en","language_to": "is","source_language": "I am happy"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
     # response: {"target_language":"Hello world"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "Icelandic","language_to": "English","source_language": "\nHalló heimur\n"}' \
+        -d '{"language_from": "Icelandic","language_to": "English","source_language": "Halló heimur"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
     # response: {"target_language":"Velká jazyková model"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "English","language_to": "Czech","source_language": "\nLarge Language Model\n"}' \
+        -d '{"language_from": "en","language_to": "cs","source_language": "Large Language Model"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
     # response: {"target_language":"I'm glad to see you"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "Czech","language_to": "English","source_language": "\nrád tě vidím\n"}' \
+        -d '{"language_from": "Czech","language_to": "English","source_language": "rád tě vidím"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
     # response: {"target_language":"Хотите танцевать"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "English","language_to": "Russian","source_language": "\nShall we dance?\n"}' \
+        -d '{"language_from": "English","language_to": "ru","source_language": "Shall we dance?"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 
     # response: {"target_language":"operating system"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
-        -d '{"language_from": "Russian","language_to": "English","source_language": "\nоперационная система\n"}' \
+        -d '{"language_from": "Russian","language_to": "English","source_language": "операционная система"}' \
         -H 'Content-Type: application/json' > $LOG_PATH
 }
 
