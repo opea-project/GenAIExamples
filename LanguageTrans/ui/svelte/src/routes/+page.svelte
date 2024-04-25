@@ -38,33 +38,36 @@
   const handelTranslate = async (
   ) => {
     loading = true;
+    output = "";
 
     const eventSource = await fetchTextStream(input, langFrom, langTo);
  
     eventSource.addEventListener("message", (e: any) => {
       let Msg = e.data;
-      console.log('Msg', Msg);
       
-      // if (Msg !== "[DONE]") {
-      //   let res = JSON.parse(Msg);
-      //   let logs = res.ops;
+      if (Msg !== "[DONE]") {
+        let res = (Msg);
+        // let logs = res.ops;
+        console.log('res', res);
+        // console.log('logs', logs);
+
  
-      //   logs.forEach((log: { op: string; path: string; value: any }) => {
-      //     if (log.op === "add") {
-      //       if (
-      //         log.value !== "</s>" &&
-      //         log.path.endsWith("/streamed_output/-") &&
-      //         log.path.length > "/streamed_output/-".length
-      //       ) {
-      //         messages += log.value;
-      //         // scrollToBottom(scrollToDiv);
-      //       }
-      //     }
-      //   });
-      // } else {
-      //   loading = false;
-      //   // scrollToBottom(scrollToDiv);
-      // }
+        // logs.forEach((log: { op: string; path: string; value: any }) => {
+        //   if (log.op === "add") {
+        //     if (
+        //       log.value !== "</s>" &&
+        //       log.path.endsWith("/streamed_output/-") &&
+        //       log.path.length > "/streamed_output/-".length
+        //     ) {
+        //       output += log.value;
+        //       // scrollToBottom(scrollToDiv);
+        //     }
+        //   }
+        // });
+      } else {
+        loading = false;
+        // scrollToBottom(scrollToDiv);
+      }
     });
     eventSource.stream();
   };
