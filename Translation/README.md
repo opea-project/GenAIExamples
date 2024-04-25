@@ -42,6 +42,7 @@ curl http://localhost:8000/v1/translation \
 ```
 
 The shortcodes of languages are also supported:
+
 ```sh
 curl http://localhost:8000/v1/translation \
     -X POST \
