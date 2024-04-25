@@ -23,7 +23,7 @@ bash launch_tgi_service.sh
 ```sh
 cd langchain/docker
 bash build_docker.sh
-docker run -it --name code_trans_server --net=host --ipc=host -e TGI_ENDPOINT=${TGI ENDPOINT} -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACE_API_TOKEN} -e SERVER_PORT=8000 -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} code_tranlation:latest bash
+docker run -it --name code_trans_server --net=host --ipc=host -e TGI_ENDPOINT=${TGI ENDPOINT} -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACE_API_TOKEN} -e SERVER_PORT=8000 -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} intel/gen-ai-examples:code-translation bash
 ```
 
 Here is the explanation of some of the above parameters:
