@@ -69,62 +69,62 @@ function run_tests() {
     curl http://localhost:${port}/v1/translation \
         -X POST \
         -d '{"language_from": "English","language_to": "Chinese","source_language": "I am a translator"}' \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' >> $LOG_PATH
 
     # response: {"target_language":"Hallo Welt"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
         -d '{"language_from": "en","language_to": "de","source_language": "hello world"}' \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' >> $LOG_PATH
 
     # response: {"target_language":"Machine learning"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
         -d '{"language_from": "German","language_to": "English","source_language": "Maschinelles Lernen"}' \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' >> $LOG_PATH
 
     # response: {"target_language":"Ég er glöð"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
         -d '{"language_from": "en","language_to": "is","source_language": "I am happy"}' \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' >> $LOG_PATH
 
     # response: {"target_language":"Hello world"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
         -d '{"language_from": "Icelandic","language_to": "English","source_language": "Halló heimur"}' \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' >> $LOG_PATH
 
     # response: {"target_language":"Velká jazyková model"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
         -d '{"language_from": "en","language_to": "cs","source_language": "Large Language Model"}' \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' >> $LOG_PATH
 
     # response: {"target_language":"I'm glad to see you"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
         -d '{"language_from": "Czech","language_to": "English","source_language": "rád tě vidím"}' \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' >> $LOG_PATH
 
     # response: {"target_language":"Хотите танцевать"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
         -d '{"language_from": "English","language_to": "ru","source_language": "Shall we dance?"}' \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' >> $LOG_PATH
 
     # response: {"target_language":"operating system"}
     curl http://localhost:${port}/v1/translation \
         -X POST \
         -d '{"language_from": "Russian","language_to": "English","source_language": "операционная система"}' \
-        -H 'Content-Type: application/json' > $LOG_PATH
+        -H 'Content-Type: application/json' >> $LOG_PATH
 }
 
 function check_response() {
     cd $WORKPATH
     echo "Checking response"
     local status=false
-    if [[ -f $LOG_PATH ]] && [[ $(grep -c "Neural Compressor" $LOG_PATH) != 0 ]]; then
+    if [[ -f $LOG_PATH ]] && [[ $(grep -c "translation" $LOG_PATH) != 0 ]]; then
         status=true
     fi
 
