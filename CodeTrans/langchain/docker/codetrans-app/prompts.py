@@ -7,9 +7,9 @@ prompt_template = """
     '''{language_from}
 
     {source_code}
-    
+
     '''
-    
+
     ### Translated codes:
 """
 codetrans_prompt_template = PromptTemplate.from_template(prompt_template)
