@@ -34,7 +34,6 @@ services:
       - "REDIS_PORT=6379"
       - "EMBED_MODEL=BAAI/bge-base-en-v1.5"
       - "REDIS_SCHEMA=schema_dim_768.yml"
-      - TGI_LLM_ENDPOINT=http://127.0.0.1:8080
       - INDEX_NAME=rag-redis
     ulimits:
       memlock:
