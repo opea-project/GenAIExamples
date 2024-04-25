@@ -20,33 +20,40 @@ import os
 
 import numpy as np
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import ConfluenceLoader
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
+
 # from PIL import Image
 from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
-from langchain_community.document_loaders import ConfluenceLoader
 
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 confluence_access_token = os.getenv("CONFLUENCE_ACCESS_TOKEN")
 
+
 def wiki_loader(wiki_url, page_ids):
-    loader = ConfluenceLoader(url=wiki_url, token=confluence_access_token, confluence_kwargs={"verify_ssl": False},  )
+    loader = ConfluenceLoader(
+        url=wiki_url,
+        token=confluence_access_token,
+        confluence_kwargs={"verify_ssl": False},
+    )
     print(wiki_url)
     print(page_ids)
-    documents = loader.load(page_ids=page_ids, include_attachments=True, limit=50, max_pages=50)    
+    documents = loader.load(page_ids=page_ids, include_attachments=True, limit=50, max_pages=50)
     return documents
+
 
 def ingest_documents(wiki_url, page_ids):
     """Ingest Wiki Pages to Redis from the variables (wiki_url, page_ids) that
     contains your contents of interest."""
 
-    # Load list of wiki pages 
+    # Load list of wiki pages
     company_name = "Intel"
     print("Parsing Intel wiki pages", page_ids)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
     documents = wiki_loader(wiki_url, page_ids)
     content = ""
-    for doc in documents: 
+    for doc in documents:
         content += doc.page_content
     chunks = text_splitter.split_text(content)
 
