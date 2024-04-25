@@ -48,31 +48,31 @@ short_cut_mapping = {
     'zh': 'Chinese',
     'ja': 'Japanese',
     'ko': 'Korean',
-    'sv': 'Swedish', 
-    'nl': 'Dutch', 
-    'no': 'Norwegian', 
-    'da': 'Danish', 
-    'ar': 'Arabic', 
-    'hi': 'Hindi', 
-    'tr': 'Turkish', 
-    'pl': 'Polish', 
-    'fi': 'Finnish', 
-    'el': 'Greek', 
-    'cs': 'Czech', 
-    'hu': 'Hungarian', 
-    'id': 'Indonesian', 
+    'sv': 'Swedish',
+    'nl': 'Dutch',
+    'no': 'Norwegian',
+    'da': 'Danish',
+    'ar': 'Arabic',
+    'hi': 'Hindi',
+    'tr': 'Turkish',
+    'pl': 'Polish',
+    'fi': 'Finnish',
+    'el': 'Greek',
+    'cs': 'Czech',
+    'hu': 'Hungarian',
+    'id': 'Indonesian',
     'is': 'Icelandic',
-    'ms': 'Malay', 
-    'th': 'Thai', 
-    'uk': 'Ukrainian', 
-    'vi': 'Vietnamese', 
-    'ro': 'Romanian', 
-    'he': 'Hebrew', 
-    'bn': 'Bengali', 
-    'bg': 'Bulgarian', 
-    'ca': 'Catalan', 
-    'hr': 'Croatian', 
-    'pirate': 'Pirate', 
+    'ms': 'Malay',
+    'th': 'Thai',
+    'uk': 'Ukrainian',
+    'vi': 'Vietnamese',
+    'ro': 'Romanian',
+    'he': 'Hebrew',
+    'bn': 'Bengali',
+    'bg': 'Bulgarian',
+    'ca': 'Catalan',
+    'hr': 'Croatian',
+    'pirate': 'Pirate',
     'yoda': 'Yoda',
     'minion': 'Minion',
 }
@@ -103,7 +103,7 @@ class TranslationAPIRouter(APIRouter):
         if language_from in short_cut_mapping.keys():
             language_from = short_cut_mapping[language_from]
         if language_to in short_cut_mapping.keys():
-            language_to = short_cut_mapping[language_to] 
+            language_to = short_cut_mapping[language_to]
         prompt = self.prompt_template.format(
             language_from=language_from, language_to=language_to, source_language=source_language
         )
@@ -121,7 +121,7 @@ class TranslationAPIRouter(APIRouter):
         if language_from in short_cut_mapping.keys():
             language_from = short_cut_mapping[language_from]
         if language_to in short_cut_mapping.keys():
-            language_to = short_cut_mapping[language_to] 
+            language_to = short_cut_mapping[language_to]
         prompt = self.prompt_template.format(
             language_from=language_from, language_to=language_to, source_language=source_language
         )
