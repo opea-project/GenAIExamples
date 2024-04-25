@@ -37,13 +37,13 @@ function run_tests() {
 
     # Upload reference audio as default voice
     wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
-    http_proxy= curl --location 'localhost:9888/upload_as_default' \
+    curl --location 'localhost:9888/upload_as_default' \
     --form 'default_refer_file=@"sample.wav"' \
     --form 'default_refer_text="Who is Pat Gelsinger?"' \
     --form 'default_refer_language="en"'
 
     # Do text to speech conversion
-    http_proxy= curl --location 'localhost:9888/v1/audio/speech' \
+    curl --location 'localhost:9888/v1/audio/speech' \
     --header 'Content-Type: application/json' \
     --data '{
         "text": "You can have a look, but you should not touch this item.",
@@ -79,16 +79,16 @@ function docker_stop() {
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
 }
 
-
-
 function main() {
     test_env_setup
     docker_stop $TTS_CONTAINER_NAME && sleep 5s
+
     start_tts_service
     run_tests
+    check_response
+
     docker_stop $TTS_CONTAINER_NAME && sleep 5s
     echo y | docker system prune
-    check_response
 }
 
 main
