@@ -40,7 +40,7 @@ SERVICE_PORT = os.getenv("SERVER_PORT", 8000)
 short_cut_mapping = {
     'en': 'English',
     'de': 'German',
-    'fr': 'French'
+    'fr': 'French',
     'es': 'Spanish',
     'it': 'Italian',
     'pt': 'Portuguese',
@@ -110,7 +110,7 @@ class TranslationAPIRouter(APIRouter):
         print(f"[translation - nonstream] prompt:{prompt}")
         try:
             response = self.llm(prompt)
-            response = {"target_language": response.replace("</s>", "")}
+            response = {"target_language": response.replace("</s>", "").lstrip()}
         except Exception as e:
             print(f"[translation - nonstream] Error occurred: {e}")
             raise Exception(f"[translation - nonstream] {e}")
