@@ -1,7 +1,7 @@
 export interface Language {
-	shortcode: string;
-	name: string;
-	flagUnicode?: string;
+  shortcode: string;
+  name: string;
+  flagUnicode?: string;
 }
 
 /**
