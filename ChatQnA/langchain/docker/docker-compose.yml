@@ -30,7 +30,16 @@ services:
     container_name: qna-rag-redis-server
     environment:
       - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - no_proxy=${no_proxy}
+      - SOCKS_PROXY=${SOCKS_PROXY}
+      - socks_proxy=${socks_proxy}
+      - FTP_PROXY=${FTP_PROXY}
+      - ftp_proxy=${ftp_proxy}
       - HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+      - CONFLUENCE_ACCESS_TOKEN=${CONFLUENCE_ACCESS_TOKEN}
       - "REDIS_PORT=6379"
       - "EMBED_MODEL=BAAI/bge-base-en-v1.5"
       - "REDIS_SCHEMA=schema_dim_768.yml"

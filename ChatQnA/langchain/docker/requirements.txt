@@ -1,4 +1,5 @@
 -f https://download.pytorch.org/whl/torch_stable.html
+atlassian-python-api
 cryptography==42.0.4
 easyocr
 intel-extension-for-pytorch
