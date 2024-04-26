@@ -24,10 +24,7 @@ repos:
     rev: v1.5.5
     hooks:
       - id: insert-license
-        files: |
-          (?x)^(
-            (ChatQnA|CodeGen|DocSum|SearchQnA|VisualQnA)/.*(py|yaml|yml|sh)|
-          )$
+        files: (.*\.(py|yaml|yml|sh))$
         args:
           [
             --license-filepath=.github/license_template.txt,
@@ -36,10 +33,7 @@ repos:
             --skip-license-insertion-comment=Copyright,
           ]
       - id: insert-license
-        files: |
-          (?x)^(
-            (ChatQnA|CodeGen|DocSum|SearchQnA|VisualQnA)/.*(ts|js)|
-          )$
+        files: (.*\.(ts|js))$
         args:
           [
             --license-filepath=.github/license_template.txt,
@@ -49,10 +43,7 @@ repos:
             --comment-style=//,
           ]
       - id: insert-license
-        files: |
-          (?x)^(
-            (ChatQnA|CodeGen|DocSum|SearchQnA|VisualQnA)/.*(html|svelte)|
-          )$
+        files: (.*\.(html|svelte))$
         args:
           [
             --license-filepath=.github/license_template.txt,
