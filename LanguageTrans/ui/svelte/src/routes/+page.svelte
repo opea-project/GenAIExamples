@@ -16,9 +16,7 @@
 
 <script lang="ts">
   import Header from "$lib/header.svelte";
-  import {
-    fetchLanguageResponse,
-  } from "$lib/shared/Network.js";
+  import { fetchLanguageResponse } from "$lib/shared/Network.js";
   import type { Language } from "./types.js";
   import { languagesList } from "$lib/shared/constant.js";
   import LoadingAnimation from "$lib/assets/loadingAnimation.svelte";
@@ -34,7 +32,6 @@
   let output: string = "";
   let loading = false;
 
-
   async function handelTranslate() {
     loading = true;
     const res = await fetchLanguageResponse(input, langFrom, langTo);
@@ -47,13 +44,13 @@
   let timer;
 
   $: if ((input || langFrom || langTo) && input !== "") {
-    clearTimeout(timer);
-    timer = setTimeout(handelTranslate, 1000);
-  } else {
-    handelTranslate;
+    if (langFrom === langTo) {
+      output = input;
+    } else {
+      clearTimeout(timer);
+      timer = setTimeout(handelTranslate, 1000);
+    }
   }
-
-
 </script>
 
 <div>
@@ -142,5 +139,4 @@
   #translateinput:hover {
     border: solid #0054ae 4px;
   }
-
 </style>
