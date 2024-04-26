@@ -1,8 +1,6 @@
 -f https://download.pytorch.org/whl/torch_stable.html
 cryptography==42.0.4
 easyocr
-intel-extension-for-pytorch
-intel-openmp
 jupyter
 langchain==0.1.12
 langchain-cli
@@ -11,6 +9,7 @@ poetry
 pyarrow
 pydantic==1.10.13
 pymupdf
+qdrant-client==1.9.0
 redis
 sentence-transformers
 unstructured
