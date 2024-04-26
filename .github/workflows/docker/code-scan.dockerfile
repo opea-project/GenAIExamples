@@ -1,10 +1,11 @@
+#
 # Copyright (c) 2024 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#    http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,14 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-text:
-  - name: content
-  - name: source
-numeric:
-  - name: start_index
-vector:
-  - name: content_vector
-    algorithm: HNSW
-    datatype: FLOAT32
-    dims: 768
-    distance_metric: COSINE
+ARG UBUNTU_VER=22.04
+FROM ubuntu:${UBUNTU_VER} as devel
+
+ENV LANG C.UTF-8
+
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
+    aspell \
+    aspell-en \
+    build-essential \
+    python3 \
+    python3-pip \
+    python3-dev \
+    python3-distutils \
+    wget
+
+RUN ln -sf $(which python3) /usr/bin/python
+
+RUN python -m pip install --no-cache-dir bandit
+
+WORKDIR /

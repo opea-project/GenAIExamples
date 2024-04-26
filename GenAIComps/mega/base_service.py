@@ -1,26 +1,36 @@
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import abc
-from logger import CustomLogger
 from types import SimpleNamespace
-from typing import Dict, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Optional
+
+from logger import CustomLogger
+
+__all__ = ["BaseService"]
 
 
-__all__ = ['BaseServer']
-
-
-class BaseService():
-    """
-    BaseService creates a HTTP/gRPC server as a microservice.
-    """
+class BaseService:
+    """BaseService creates an HTTP/gRPC server as a microservice."""
 
     def __init__(
         self,
-        name: Optional[str] = 'Base service',
+        name: Optional[str] = "Base service",
         runtime_args: Optional[Dict] = None,
         **kwargs,
     ):
-        """
-        Initialize the BaseService with a name, runtime arguments, and any additional arguments.
-        """
+        """Initialize the BaseService with a name, runtime arguments, and any additional arguments."""
         self.name = name
         self.runtime_args = runtime_args
         self._process_runtime_args()
@@ -30,78 +40,62 @@ class BaseService():
         self.server = None
 
     def _process_runtime_args(self):
-        """
-        Process the runtime arguments to ensure they are in the correct format.
-        """
-        _runtime_args = (
-            self.runtime_args
-            if isinstance(self.runtime_args, dict)
-            else vars(self.runtime_args or {})
-        )
+        """Process the runtime arguments to ensure they are in the correct format."""
+        _runtime_args = self.runtime_args if isinstance(self.runtime_args, dict) else vars(self.runtime_args or {})
         self.runtime_args = SimpleNamespace(**_runtime_args)
 
     @property
     def primary_port(self):
-        """
-        Gets the first port of the port list argument.
+        """Gets the first port of the port list argument.
+
         :return: The first port to be exposed
         """
-        return (
-            self.runtime_args.port[0]
-            if isinstance(self.runtime_args.port, list)
-            else self.runtime_args.port
-        )
+        return self.runtime_args.port[0] if isinstance(self.runtime_args.port, list) else self.runtime_args.port
 
     @property
     def all_ports(self):
-        """
-        Gets all the list of ports from the runtime_args as a list.
+        """Gets all the list of ports from the runtime_args as a list.
+
         :return: The lists of ports to be exposed
         """
-        return (
-            self.runtime_args.port
-            if isinstance(self.runtime_args.port, list)
-            else [self.runtime_args.port]
-        )
+        return self.runtime_args.port if isinstance(self.runtime_args.port, list) else [self.runtime_args.port]
 
     @property
     def protocols(self):
-        """
-        Gets all the list of protocols from the runtime_args as a list.
+        """Gets all the list of protocols from the runtime_args as a list.
+
         :return: The lists of protocols to be exposed
         """
         return (
-            self.runtime_args.protocol
-            if isinstance(self.runtime_args.protocol, list)
-            else [self.runtime_args.protocol]
+            self.runtime_args.protocol if isinstance(self.runtime_args.protocol, list) else [self.runtime_args.protocol]
         )
 
     @property
     def host_address(self):
-        """
-        Gets the host from the runtime_args
-        :return: The host where to bind the gateway
-        """
-        return self.runtime_args.host or '127.0.0.1'
+        """Gets the host from the runtime_args
+        :return: The host where to bind the gateway."""
+        return self.runtime_args.host or "127.0.0.1"
 
     @abc.abstractmethod
     async def initialize_server(self):
-        """
-        Abstract method to setup the server. This should be implemented in the child class.
+        """Abstract method to setup the server.
+
+        This should be implemented in the child class.
         """
         ...
 
     @abc.abstractmethod
     async def execute_server(self):
-        """
-        Abstract method to run the server indefinitely. This should be implemented in the child class.
+        """Abstract method to run the server indefinitely.
+
+        This should be implemented in the child class.
         """
         ...
 
     @abc.abstractmethod
     async def terminate_server(self):
-        """
-        Abstract method to shutdown the server and free other allocated resources, e.g, health check service, etc.
+        """Abstract method to shutdown the server and free other allocated resources, e.g, health check service, etc.
+
         This should be implemented in the child class.
         """
         ...
@@ -109,31 +103,31 @@ class BaseService():
     @staticmethod
     def check_server_readiness(
         ctrl_address: str,
-        protocol: Optional[str] = 'http',
+        protocol: Optional[str] = "http",
         **kwargs,
     ) -> bool:
-        """
-        Check if server status is ready.
+        """Check if server status is ready.
+
         :param ctrl_address: the address where the control request needs to be sent.
         :param protocol: protocol of the service.
         :param kwargs: extra keyword arguments.
         :return: True if status is ready else False.
         """
         from http_service import HTTPService
+
         res = False
-        if protocol is None or protocol == 'http':
+        if protocol is None or protocol == "http":
             res = HTTPService.check_readiness(ctrl_address)
         return res
 
-    
     @staticmethod
     async def async_check_server_readiness(
         ctrl_address: str,
-        protocol: Optional[str] = 'grpc',
+        protocol: Optional[str] = "grpc",
         **kwargs,
     ) -> bool:
-        """
-        Asynchronously check if server status is ready.
+        """Asynchronously check if server status is ready.
+
         :param ctrl_address: the address where the control request needs to be sent.
         :param protocol: protocol of the service.
         :param kwargs: extra keyword arguments.
@@ -142,8 +136,6 @@ class BaseService():
         if TYPE_CHECKING:
             from http_service import HTTPService
         res = False
-        if protocol is None or protocol == 'http':
+        if protocol is None or protocol == "http":
             res = await HTTPService.async_check_readiness(ctrl_address)
         return res
-
-
