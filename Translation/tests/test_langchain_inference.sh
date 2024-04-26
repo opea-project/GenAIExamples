@@ -25,7 +25,7 @@ function test_env_setup() {
 function rename() {
     # Rename the docker container/image names to avoid conflict with local test
     cd ${WORKPATH}
-    sed -i "s/tgi-gaudi-server/${TGI_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
+    sed -i "s/tgi-gaudi-server-translation/${TGI_CONTAINER_NAME}/g" serving/tgi_gaudi/launch_tgi_service.sh
 }
 
 function launch_tgi_gaudi_service() {
