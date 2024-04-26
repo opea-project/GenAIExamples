@@ -20,10 +20,12 @@ import os
 
 import numpy as np
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
 from PIL import Image
 from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
+
+tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 
 
 def pdf_loader(file_path):
@@ -79,17 +81,28 @@ def ingest_documents():
 
     print("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
     # Create vectorstore
-    embedder = HuggingFaceEmbeddings(model_name=EMBED_MODEL)
+    if tei_embedding_endpoint:
+        # create embeddings using TEI endpoint service
+        embedder = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
+    else:
+        # create embeddings using local embedding model
+        embedder = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
 
-    _ = Redis.from_texts(
-        # appending this little bit can sometimes help with semantic retrieval
-        # especially with multiple companies
-        texts=[f"Company: {company_name}. " + chunk for chunk in chunks],
-        embedding=embedder,
-        index_name=INDEX_NAME,
-        index_schema=INDEX_SCHEMA,
-        redis_url=REDIS_URL,
-    )
+    # Batch size
+    batch_size = 32
+    num_chunks = len(chunks)
+    for i in range(0, num_chunks, batch_size):
+        batch_chunks = chunks[i : i + batch_size]
+        batch_texts = [f"Company: {company_name}. " + chunk for chunk in batch_chunks]
+
+        _ = Redis.from_texts(
+            texts=batch_texts,
+            embedding=embedder,
+            index_name=INDEX_NAME,
+            index_schema=INDEX_SCHEMA,
+            redis_url=REDIS_URL,
+        )
+        print(f"Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
 
 
 if __name__ == "__main__":
