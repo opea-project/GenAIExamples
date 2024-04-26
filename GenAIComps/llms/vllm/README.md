@@ -1,5 +1,6 @@
 # vLLM Endpoint Serive
-[vLLM](https://github.com/vllm-project/vllm) is a RESTful service that provides a simple way to interact with the vLLM API, which is eary to use for LLM inference and serving on [Intel products](https://www.intel.com/content/www/us/en/products/overview.html). Currently, the vLLM is supporting Intel CPU, and will be extended to Intel Gaudi accelerators soon.
+
+[vLLM](https://github.com/vllm-project/vllm) is a RESTful service that provides a simple way to interact with the vLLM API, which is eerie to use for LLM inference and serving on [Intel products](https://www.intel.com/content/www/us/en/products/overview.html). Currently, the vLLM is supporting Intel CPU, and will be extended to Intel Gaudi accelerators soon.
 
 ## Getting Started
 
