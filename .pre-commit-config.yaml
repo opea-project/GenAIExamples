@@ -26,7 +26,7 @@ repos:
       - id: insert-license
         files: |
           (?x)^(
-            (ChatQnA|CodeGen|DocSum|SearchQnA|VisualQnA)/.*(py|yaml|yml|sh)|
+            \.*(py|yaml|yml|sh)|
           )$
         args:
           [
@@ -38,7 +38,7 @@ repos:
       - id: insert-license
         files: |
           (?x)^(
-            (ChatQnA|CodeGen|DocSum|SearchQnA|VisualQnA)/.*(ts|js)|
+            \.*(ts|js)|
           )$
         args:
           [
@@ -51,7 +51,7 @@ repos:
       - id: insert-license
         files: |
           (?x)^(
-            (ChatQnA|CodeGen|DocSum|SearchQnA|VisualQnA)/.*(html|svelte)|
+            \.*(html|svelte)|
           )$
         args:
           [
