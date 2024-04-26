@@ -116,31 +116,3 @@ class YAMLServiceBuilder(DAG):
                         break
                 prev_nodes = cur_nodes
         return is_valid
-
-
-if __name__ == "__main__":
-    service_builder = YAMLServiceBuilder(yaml_file_path="mega_service.yaml")
-
-    try:
-
-        # def init_all_services():
-        #     """Just for testing."""
-        #     for node in service_builder.topological_sort():
-        #         launcher, port = (
-        #             f"{node}.py",
-        #             service_builder.docs["opea_micro_services"][node]["endpoint"].split(":")[-1].split("/")[0],
-        #         )
-        #         result = subprocess.Popen(f"python {launcher} --port {port}", shell=True)
-        #         # result.wait()
-        #     time.sleep(5)
-
-        # init_all_services()
-
-        service_builder.schedule(initial_inputs={"number": 0})
-        print("get final outputs: ===>")
-        service_builder.get_all_final_outputs()
-        print("all outputs: ===>")
-        print(service_builder.result_dict)
-    except Exception as e:
-        os.system("pkill -9 python")
-    os.system("pkill -9 python")

@@ -35,7 +35,7 @@ class BaseService:
 class ServiceBuilder(DAG):
     """Manage 1 or N micro services in a DAG through Python API."""
 
-    def __init__(self, port=1234, hostfile=None) -> None:
+    def __init__(self, host="localhost", port=8000, hostfile=None) -> None:
         self.services = {}  # all services, id -> service
         self.result_dict = {}
         super().__init__()
@@ -87,43 +87,3 @@ class ServiceBuilder(DAG):
 
         for leaf in self.all_leaves():
             print(self.result_dict[leaf])
-
-
-if __name__ == "__main__":
-    service_builder = ServiceBuilder(port=1234, hostfile=None)
-    s1 = BaseService(id="s1", endpoint="http://localhost:8081/v1/add")
-    s2 = BaseService(id="s2", endpoint="http://localhost:8082/v1/add")
-    s3 = BaseService(id="s3", endpoint="http://localhost:8083/v1/add")
-    s4 = BaseService(id="s4", endpoint="http://localhost:8084/v1/add")
-    s5 = BaseService(id="s5", endpoint="http://localhost:8085/v1/add")
-    service_builder.add(s1).add(s2).add(s3).add(s4).add(s5)
-    # corresponding yaml
-    # - (s1, s5) >> s2
-    # - s2 >> (s3, s4)
-    # - s3 >> s4
-    service_builder.flow_to(s1, s2)
-    service_builder.flow_to(s5, s2)
-    service_builder.flow_to(s2, s3)
-    service_builder.flow_to(s2, s4)
-    service_builder.flow_to(s3, s4)
-
-    try:
-
-        # def init_all_services():
-        #     """Just for testing."""
-        #     for node in service_builder.topological_sort():
-        #         launcher, port = f"{node}.py", service_builder.services[node].endpoint.split(":")[-1].split("/")[0]
-        #         print(f"python {launcher} --port {port}")
-        #         result = subprocess.Popen(f"python {launcher} --port {port}", shell=True)
-        #     time.sleep(5)
-
-        # init_all_services()
-
-        service_builder.schedule(initial_inputs={"number": 0})
-        print("get final outputs: ===>")
-        service_builder.get_all_final_outputs()
-        print("all outputs: ===>")
-        print(service_builder.result_dict)
-    except Exception as e:
-        os.system("pkill -9 python")
-    os.system("pkill -9 python")

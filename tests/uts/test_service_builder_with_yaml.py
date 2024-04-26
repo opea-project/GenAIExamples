@@ -11,3 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import unittest
+from unittest.mock import patch
+
+from comps.mega.yaml_service_builder import YAMLServiceBuilder
+
+
+class TestYAMLServiceBuilder(unittest.TestCase):
+    def test_schedule(self):
+        service_builder = YAMLServiceBuilder(yaml_file_path="mega_service.yaml")
+        service_builder.schedule(initial_inputs={"number": 0})
+        service_builder.get_all_final_outputs()
+        result_dict = service_builder.result_dict
+        self.assertEqual(result_dict, "")
+
+
+if __name__ == "__main__":
+    unittest.main()

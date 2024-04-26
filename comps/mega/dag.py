@@ -151,37 +151,3 @@ class DAG(object):
 
     def size(self):
         return len(self.graph)
-
-
-if __name__ == "__main__":
-    dag = DAG()
-    # a->b->c->d
-    # a->d
-    dag.add_node("a")
-    dag.add_node("b")
-    dag.add_edge("a", "b")
-    dag.add_node("c")
-    dag.add_node("d")
-    dag.add_edge("a", "d")
-    dag.add_edge("b", "c")
-    dag.add_edge("c", "d")
-    assert dag.topological_sort() == ["a", "b", "c", "d"]
-    assert dag.graph == OrderedDict([("a", {"d", "b"}), ("b", {"c"}), ("c", {"d"}), ("d", set())])
-    assert sorted(dag.all_downstreams("a")) == ["b", "c", "d"]
-    assert dag.size() == 4
-    assert sorted(dag.predecessors("d")) == ["a", "c"]
-    assert dag.ind_nodes() == ["a"]
-    assert dag.all_leaves() == ["d"]
-    assert sorted(dag.all_downstreams("a")) == ["b", "c", "d"]
-    assert sorted(dag.downstream("a")) == ["b", "d"]
-    assert dag.predecessors("c") == ["b"]
-
-    dag2 = DAG()
-    graph_dict = {"a": ["b", "d"], "b": ["c"], "c": ["d"], "d": []}
-    dag2.from_dict(graph_dict)
-    assert dag.graph == dag2.graph
-
-    dag2.delete_edge("a", "b")
-    assert dag2.graph == OrderedDict([("a", {"d"}), ("b", {"c"}), ("c", {"d"}), ("d", set())])
-    dag2.delete_node("c")
-    assert dag2.graph == OrderedDict([("a", {"d"}), ("b", set()), ("d", set())])
