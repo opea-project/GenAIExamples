@@ -33,10 +33,10 @@ function launch_tgi_gaudi_service() {
     local port=8870
     local model_name="haoranxu/ALMA-13B"
 
-    cd ${WORKPATH}
+    cd ${WORKPATH}/serving/tgi_gaudi
 
-    bash serving/tgi_gaudi/build_docker.sh
-    bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
+    bash build_docker.sh
+    bash launch_tgi_service.sh $card_num $port $model_name
     sleep 2m
 }
 
