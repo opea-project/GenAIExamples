@@ -32,7 +32,9 @@
   // Initialize input and output
   let input: string = "";
   let output: string = "";
+  let timer;
   let loading = false;
+  let deleteFlag: boolean = false;
 
 
   const handelTranslate = async (
@@ -45,36 +47,25 @@
     eventSource.addEventListener("message", (e: any) => {
       let Msg = e.data;
       
-      if (Msg !== "[DONE]") {
-        let res = (Msg);
-        // let logs = res.ops;
-        console.log('res', res);
-        // console.log('logs', logs);
-
- 
-        // logs.forEach((log: { op: string; path: string; value: any }) => {
-        //   if (log.op === "add") {
-        //     if (
-        //       log.value !== "</s>" &&
-        //       log.path.endsWith("/streamed_output/-") &&
-        //       log.path.length > "/streamed_output/-".length
-        //     ) {
-        //       output += log.value;
-        //       // scrollToBottom(scrollToDiv);
-        //     }
-        //   }
-        // });
-      } else {
-        loading = false;
-        // scrollToBottom(scrollToDiv);
+      if (Msg.startsWith("b")) {
+      const trimmedData = Msg.slice(2, -1);
+      if (trimmedData.includes("'''")) {
+        deleteFlag = true;
+      } else if (deleteFlag && trimmedData.includes("\\n")) {
+        deleteFlag = false;
+      } else if (trimmedData !== "</s>" && !deleteFlag) {
+        output += trimmedData.replace(/\\n/g, "\n");
       }
-    });
+    } else if (Msg === "[DONE]") {
+      deleteFlag = false;
+      loading = false;
+      Prism.highlightAll(); // 手动触发高亮逻辑
+    }
+  });
     eventSource.stream();
   };
 
 
-
-  let timer;
 
   $: if ((input || langFrom || langTo) && input !== "") {
     clearTimeout(timer);

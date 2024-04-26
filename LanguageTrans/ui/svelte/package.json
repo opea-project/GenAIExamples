@@ -29,6 +29,7 @@
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/package": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "@types/prismjs": "^1.26.3",
     "autoprefixer": "^10.4.16",
     "flowbite": "^2.3.0",
     "flowbite-svelte": "^0.38.5",
@@ -47,6 +48,7 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "dependencies": {
+    "prismjs": "^1.29.0",
     "sse.js": "^0.6.1",
     "svelte-notifications": "^0.9.98"
   }
