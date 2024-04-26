@@ -26,14 +26,12 @@ async function fetchPostRes(url, init) {
   }
 }
 
-
-export async function fetchLanguageResponse(input: string, transFrom: string, transTo: string) {
+export async function fetchLanguageResponse(input: string, transform: string, transTo: string) {
   const url = `${BASIC_URL}/v1/translation`;
   const transData = {
-    language_from: transFrom,
+    language_from: transform,
     language_to: transTo,
-    source_language: input
-    
+    source_language: input,
   };
 
   const init: RequestInit = {
