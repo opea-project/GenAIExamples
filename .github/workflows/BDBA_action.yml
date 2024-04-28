@@ -1,21 +1,35 @@
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: BDBA
 on:
   workflow_call:
     inputs:
       org:
-        description: 'Enter Project organizational repo to run BDBA scan (ex: intel-innersource):'
+        description: "Enter Project organizational repo to run BDBA scan (ex: intel-innersource):"
         required: true
         type: string
       repo:
-        description: 'Enter Project repo for which you want to run BDBA scan (ex: frameworks.ai.infrastructure.code-scan-tools):'
+        description: "Enter Project repo for which you want to run BDBA scan (ex: frameworks.ai.infrastructure.code-scan-tools):"
         required: true
         type: string
       refs:
-        description: 'Enter Project branch, tag:'
+        description: "Enter Project branch, tag:"
         required: true
         type: string
       group:
-        description: 'Enter BDBA group (ex: 32):'
+        description: "Enter BDBA group (ex: 32):"
         required: true
         type: string
       runners:
@@ -24,57 +38,57 @@ on:
         description: Runners labels on which scan should be executed
         default: "['self-hosted', 'Linux']"
       bdba_baseurl:
-        description: 'URL to the BDBA server (ending in intel.com)'
+        description: "URL to the BDBA server (ending in intel.com)"
         required: true
-        default: 'https://bdba001.icloud.intel.com'
+        default: "https://bdba001.icloud.intel.com"
         type: string
       bdba_group:
-        description: 'Business Unit or team within BDBA'
+        description: "Business Unit or team within BDBA"
         required: true
         type: string
       bdba_binary:
-        description: 'Path the binary to be scanned relative to the workspace'
+        description: "Path the binary to be scanned relative to the workspace"
         required: true
         type: string
       components_task_id:
-        description: 'SD Elements task ID for labeling the BDBA components report'
-        default: 'CT36'
+        description: "SD Elements task ID for labeling the BDBA components report"
+        default: "CT36"
         required: false
         type: string
       cve_task_id:
-        description: 'SD Elements task ID for labeling the BDBA CVE report'
-        default: 'CT7'
+        description: "SD Elements task ID for labeling the BDBA CVE report"
+        default: "CT7"
         required: false
         type: string
       sdl_project_id:
-        description: 'SD Elements project ID (usually 4-6 digits) used for SDL evidence'
+        description: "SD Elements project ID (usually 4-6 digits) used for SDL evidence"
         required: false
-        default: '0'
+        default: "0"
         type: string
       setpriv_uid:
-        description: 'If run as root, lower priviliges to the specified UID'
+        description: "If run as root, lower privileges to the specified UID"
         required: false
         type: number
       setpriv_gid:
-        description: 'If run as root, lower priviliges to the specified GID'
+        description: "If run as root, lower privileges to the specified GID"
         required: false
         type: number
       ignore_vulnerabilities:
-        description: 'Return an exit code of 0 even if vulnerabilities were found'
+        description: "Return an exit code of 0 even if vulnerabilities were found"
         required: false
-        default: 'false'
+        default: "false"
         type: string
       ignore_triaged:
-        description: 'Return an exit code of 0 if all vulnerabilities marked as triaged'
+        description: "Return an exit code of 0 if all vulnerabilities marked as triaged"
         required: false
-        default: 'false'
+        default: "false"
         type: string
     secrets:
       BDBA_TOKEN:
-        description: 'Enter BDBA Token:'
+        description: "Enter BDBA Token:"
         required: true
       token:
-        description: 'GITHUB_TOKEN or a repo scoped PAT.'
+        description: "GITHUB_TOKEN or a repo scoped PAT."
         required: true
 jobs:
   bdba_scan:
