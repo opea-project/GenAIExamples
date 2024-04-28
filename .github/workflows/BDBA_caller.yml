@@ -1,0 +1,97 @@
+name: BDBA Scan
+on:
+  workflow_dispatch:
+    inputs:
+      org:
+        description: 'Enter Project organizational repo to run BDBA scan (ex: intel-innersource):'
+        required: true
+        type: string
+      repo:
+        description: 'Enter Project repo for which you want to run BDBA scan (ex: frameworks.ai.infrastructure.code-scan-tools):'
+        required: true
+        type: string
+      refs:
+        description: 'Enter Project branch, tag:'
+        required: true
+        type: string
+      group:
+        description: 'Enter BDBA group (ex: 32):'
+        required: true
+        type: string
+      runners:
+        description: 'Array of runner labels: '
+        required: true
+        type: string
+        default: "['gasp']"
+  pull_request:
+      branches: [main]
+      types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+      paths-ignore:
+        - "**.md"
+
+
+jobs:
+  bdba_scan:
+    runs-on: ${{ fromJson(inputs.runners) }}
+    container:
+      image: cache-registry.caas.intel.com/cache/library/python:slim
+    steps:
+      - name: Checkout Project Repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.org }}/${{ inputs.repo }}
+          token: ${{ secrets.token || secrets.ACTION_TOKEN }}
+          path: code
+          ref: ${{ inputs.refs }}
+      - name: Pack Additional Resources
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install zip unzip wget -y
+          apt-get install curl jq -y
+          zip -r ${{ inputs.repo }}-bdba.zip ${GITHUB_WORKSPACE}/code/.*
+      - name: get intel certs
+        shell: bash
+        run: |
+          mkdir -p ${{ github.workspace }}/certs
+          wget http://certificates.intel.com/repository/certificates/IntelSHA256RootCA-Base64.crt -O- >> ${{ github.workspace }}/certs/ca-certificates.crt
+      - name: Run BDBA Scan
+        id: bdba
+        env:
+          BDBA_TOKEN: "${{ secrets.BDBA_TOKEN }}"
+        uses: ./.github/workflows/BDBA_action.yml
+        with:
+          bdba_group: ${{ inputs.group }}
+          bdba_binary: ${{ inputs.repo }}-bdba.zip
+      - name: Fetch BDBA projects
+        id: data
+        shell: bash
+        run: |
+          export CURL_CA_BUNDLE="${{ github.workspace }}/certs/ca-certificates.crt"
+          curl -H "Authorization: Bearer ${{ secrets.BDBA_TOKEN }}" "https://bdba001.icloud.intel.com/api/apps/?q=file:${{ inputs.repo }}-bdba.zip" -o /tmp/scan.txt
+          echo "PRODUCT=$(jq -r '.products[0].product_id' /tmp/scan.txt)" >> $GITHUB_ENV
+      - name: Download BDBA project Scan data
+        shell: bash
+        run: |
+          export CURL_CA_BUNDLE="${{ github.workspace }}/certs/ca-certificates.crt"
+          curl -H "Authorization: Bearer ${{ secrets.BDBA_TOKEN }}" "https://bdba001.icloud.intel.com/api/product/${{ env.PRODUCT }}/pdf-report" -o /tmp/${{ inputs.repo }}-bdba_scan.pdf
+      - name: Upload Scan artifact to Github
+        uses: actions/upload-artifact@v4
+        with:
+          name: BDBA-log
+          path: /tmp/${{ inputs.repo }}-bdba_scan.pdf
+          if-no-files-found: ignore # 'warn' or 'ignore' are also available, defaults to `warn`
+          retention-days: 60 # 1 <= retention-days <= 90
+
+#jobs:
+#  bdba_job:
+#    name: BDBA Scan
+#    uses: intel-innersource/frameworks.ai.infrastructure.code-scan-tools/.github/workflows/Scanner_Bdba.yml@one-ci-cd
+#    with:
+#      repos: ${{ github.event.repository.name }}
+#      refs: ${{ github.ref_name }}
+#      group: "22"
+#      runners: "['self-hosted']"
+#    secrets:
+#      token: ${{ secrets.GITHUB_TOKEN }}
+#      BDBA_TOKEN: ${{ secrets.BDBA_TOKEN }}
