@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        job_name: ["bandit"]
+        job_name: ["bandit", "hadolint"]
       fail-fast: false
     steps:
       - name: Checkout out Repo
