@@ -28,4 +28,4 @@ jobs:
     runs-on: internal
     steps:
       - name: Execute Scan
-        uses: ./.github/workflows/McAfee/action.yml
+        uses: ./.github/workflows/McAfee/
