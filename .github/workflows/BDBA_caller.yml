@@ -32,7 +32,7 @@ on:
 
 jobs:
   bdba_scan:
-    runs-on: ${{ fromJson(inputs.runners) }}
+    runs-on: internal
     container:
       image: cache-registry.caas.intel.com/cache/library/python:slim
     steps:

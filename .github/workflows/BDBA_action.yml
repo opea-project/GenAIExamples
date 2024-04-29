@@ -79,7 +79,7 @@ on:
 jobs:
   bdba_scan:
     name: BDBA Scan
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJson(inputs.runners) }}
     steps:
       - id: bdba
         run: ./.github/workflows/BDBA/bdba.sh

@@ -1,0 +1,20 @@
+name: Virus Scan
+
+on:
+  workflow_dispatch:
+  pull_request:
+      branches: [main]
+      types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+      paths-ignore:
+        - "**.md"
+
+jobs:
+  virus:
+    name: McAfee Virus Scan
+    runs-on: internal
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute Scan
+        uses: ./.github/workflows/McAfee.yml
+        with:
+          scan_path: ./

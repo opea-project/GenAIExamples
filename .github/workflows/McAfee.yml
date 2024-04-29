@@ -1,0 +1,96 @@
+name: McAfee Virus Scan
+on:
+  workflow_call:
+    inputs:
+      scan_path:
+        description: Directory to scan (relative to workspace)
+        default: '.'
+        required: true
+        type: string
+      virus_defs:
+        description: Update site with virus defenitions
+        default: https://hec-mcafee-proxy.intel.com/repository/mcafee-defs/commonupdater # more generic but rate limited http://update.nai.com/products/commonupdater
+        required: false
+        type: string
+      image:
+        description: Virus scan Docker image
+        default: amr-registry.caas.intel.com/rbhe-public/mcafee-docker-scanner:latest
+        required: false
+        type: string
+      image_user:
+        description: User name or id to use when running the docker image
+        required: false
+        type: string
+      image_group:
+        description: Group name or id to use when running the docker image
+        required: false
+        type: string
+      scan_args:
+        description: Arguments to pass into McAfee virus scan
+        default: --analyze --mime --program --recursive --unzip --threads 4 --summary --verbose
+        required: false
+        type: string
+      report_path:
+        description: Path to store virus scan reports
+        default: artifacts/VirusScan
+        required: false
+        type: string
+      output_format:
+        description: Choose report output format (txt, html)
+        default: html
+        required: false
+        type: string
+      fail_build:
+        description: Fail workflow if a virus is found
+        default: true
+        required: false
+        type: boolean
+
+jobs:
+  mcafee_scan:
+    name: McAfee Scan
+    runs-on: ${{ fromJson(inputs.runners) }}
+    steps:
+      - name: Prep
+        shell: bash
+        run: docker pull ${{ inputs.image }}
+      - name: Scan
+        shell: bash
+        env:
+          SCAN_UID: ${{ inputs.image_user }}
+          SCAN_GID: ${{ inputs.image_group }}
+        run: |
+          echo "[virusScan] about to run virus scan..."
+          rm -rf ${{ inputs.report_path }}
+          mkdir -p ${{ inputs.report_path }}
+          [ -z $SCAN_UID ] && SCAN_UID=$(id -u)
+          [ -z $SCAN_GID ] && SCAN_GID=$(id -g)
+          set +e; 
+          if [ "${{ inputs.output_format }}" == "txt" ]; then
+            docker run --rm -u "$SCAN_UID:$SCAN_GID" \
+                -e ENV_DEFS_URL="${{ inputs.virus_defs }}" \
+                -e ENV_SCAN_OPTS="${{ inputs.scan_args}}" \
+                -v $GITHUB_WORKSPACE:/workspace \
+                -w /workspace \
+                ${{ inputs.image }} /resources/scripts/scan.sh "${{ inputs.scan_path }}" > ${{ inputs.report_path }}/report.txt
+          else
+            docker run --rm -u "$SCAN_UID:$SCAN_GID" \
+                -e ENV_DEFS_URL="${{ inputs.virus_defs }}" \
+                -e ENV_SCAN_OPTS="${{ inputs.scan_args}} --html=${{ inputs.report_path }}/report.html" \
+                -v $GITHUB_WORKSPACE:/workspace \
+                -w /workspace \
+                ${{ inputs.image }} /resources/scripts/scan.sh "${{ inputs.scan_path }}"
+          fi
+          ec=$?
+          set -e
+          if [ "${{ inputs.fail_build }}" = "false" ]; then
+            ec=0
+          fi
+          echo "[virusScan] Cleanup Virus Defs"
+          rm -rf avvdat*
+          exit $ec
+      - name: Upload Virus Scan Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Virus Scan Report
+          path: ${{ inputs.report_path }}/
