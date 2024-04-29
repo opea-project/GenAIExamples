@@ -15,17 +15,13 @@
 
 source /GenAIExamples/.github/workflows/scripts/change_color
 log_dir=/GenAIExamples/.github/workflows/scripts/codeScan
-python -m bandit -r -lll -iii /GenAIExamples >${log_dir}/bandit.log
-exit_code=$?
 
-$BOLD_YELLOW && echo " -----------------  Current log file output start --------------------------"
-cat ${log_dir}/bandit.log
-$BOLD_YELLOW && echo " -----------------  Current log file output end --------------------------" && $RESET
+find . -type f \( -name "Dockerfile*" \) -print -exec hadolint --ignore DL3006 --ignore DL3007 --ignore DL3008 {} \; 2>&1 | tee ${log_dir}/hadolint.log
 
-if [ ${exit_code} -ne 0 ]; then
+if [[ $(grep -c "error" ${log_dir}/hadolint.log) != 0 ]]; then
     $BOLD_RED && echo "Error!! Please Click on the artifact button to download and check error details." && $RESET
     exit 1
 fi
 
-$BOLD_PURPLE && echo "Congratulations, Bandit check passed!" && $LIGHT_PURPLE && echo " You can click on the artifact button to see the log details." && $RESET
+$BOLD_PURPLE && echo "Congratulations, Hadolint check passed!" && $LIGHT_PURPLE && echo " You can click on the artifact button to see the log details." && $RESET
 exit 0
