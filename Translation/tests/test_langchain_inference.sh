@@ -46,9 +46,7 @@ function launch_langchain_service() {
     cd langchain/docker
     docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -t intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
 
-    tgi_ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
-    tgi_ip=$(eval echo '$'$tgi_ip_name)
-    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} -e TGI_ENDPOINT=http://${tgi_ip}:8870 -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
+    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} -e TGI_ENDPOINT=http://localhost:8870 -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
     -p ${port}:8000 --runtime=habana -e HABANA_VISIBE_DEVILCES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
 
     sleep 2m
@@ -124,7 +122,12 @@ function check_response() {
     cd $WORKPATH
     echo "Checking response"
     local status=false
-    if [[ -f $LOG_PATH ]] && [[ $(grep -c "translation" $LOG_PATH) != 0 ]]; then
+    if [[ -f $LOG_PATH ]] && [[ $(grep -c "I love machine translation" $LOG_PATH) != 0 ]] && \
+       [[ $(grep -c "我是一名翻译" $LOG_PATH) != 0 ]] && [[ $(grep -c "Hallo Welt" $LOG_PATH) != 0 ]] && \
+       [[ $(grep -c "Machine learning" $LOG_PATH) != 0 ]] && [[ $(grep -c "Ég er glöð" $LOG_PATH) != 0 ]] && \
+       [[ $(grep -c "Velká jazyková model" $LOG_PATH) != 0 ]] && [[ $(grep -c "I'm glad to see you" $LOG_PATH) != 0 ]] && \
+       [[ $(grep -c "Хотите танцевать" $LOG_PATH) != 0 ]] && [[ $(grep -c "operating system" $LOG_PATH) != 0 ]] && \
+    ; then
         status=true
     fi
 
