@@ -40,6 +40,8 @@ jobs:
           set +e;
 
           docker run --rm \
+              -e http_proxy="http://proxy-prc.intel.com:913" \
+              -e https_proxy="http://proxy-prc.intel.com:913" \
               -e ENV_DEFS_URL="https://hec-mcafee-proxy.intel.com/repository/mcafee-defs/commonupdater" \
               -e ENV_SCAN_OPTS="--analyze --mime --program --recursive --unzip --threads 4 --summary --verbose --html=artifacts/VirusScan/report.html" \
               -v $GITHUB_WORKSPACE:/workspace \
