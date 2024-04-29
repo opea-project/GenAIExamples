@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright (c) 2024 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/bin/bash
-
-docker build -t tgi-gaudi-translation:1.2.1 . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+docker build . -t tgi-gaudi-translation:1.2.1 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
