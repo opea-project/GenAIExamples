@@ -16,10 +16,9 @@
 source /GenAIExamples/.github/workflows/scripts/change_color
 log_dir=/GenAIExamples/.github/workflows/scripts/codeScan
 
-find . -type f \( -name "Dockerfile*" \) -print -exec hadolint --ingore DL3006 --ingore DL3007 --ingore DL3008 {} \; 2>&1 | tee ${log_dir}/hadolint.log
-exit_code=$?
+find . -type f \( -name "Dockerfile*" \) -print -exec hadolint --ignore DL3006 --ignore DL3007 --ignore DL3008 {} \; 2>&1 | tee ${log_dir}/hadolint.log
 
-if [ ${exit_code} -ne 0 ]; then
+if [[ $(grep -c "error" ${log_dir}/hadolint.log) != 0 ]]; then
     $BOLD_RED && echo "Error!! Please Click on the artifact button to download and check error details." && $RESET
     exit 1
 fi
