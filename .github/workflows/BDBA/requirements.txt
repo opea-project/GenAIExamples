@@ -1,3 +1,0 @@
-certifi
-pandas
-requests

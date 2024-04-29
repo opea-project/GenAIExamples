@@ -27,5 +27,31 @@ jobs:
     name: McAfee Virus Scan
     runs-on: internal
     steps:
-      - name: Execute Scan
-        uses: ./.github/workflows/McAfee/
+      - uses: actions/checkout@v4
+      - name: Prep
+        shell: bash
+        run: docker pull amr-registry.caas.intel.com/rbhe-public/mcafee-docker-scanner:latest
+      - name: Scan
+        shell: bash
+        run: |
+          echo "[virusScan] about to run virus scan..."
+          rm -rf artifacts/VirusScan
+          mkdir -p artifacts/VirusScan
+          set +e;
+
+          docker run --rm \
+              -e ENV_DEFS_URL="https://hec-mcafee-proxy.intel.com/repository/mcafee-defs/commonupdater" \
+              -e ENV_SCAN_OPTS="--analyze --mime --program --recursive --unzip --threads 4 --summary --verbose --html=artifacts/VirusScan/report.html" \
+              -v $GITHUB_WORKSPACE:/workspace \
+              -w /workspace \
+              amr-registry.caas.intel.com/rbhe-public/mcafee-docker-scanner:latest /resources/scripts/scan.sh "./"
+          ec=$?
+          set -e
+          echo "[virusScan] Cleanup Virus Defs"
+          rm -rf avvdat*
+          exit $ec
+      - name: Upload Virus Scan Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Virus Scan Report
+          path: artifacts/VirusScan/
