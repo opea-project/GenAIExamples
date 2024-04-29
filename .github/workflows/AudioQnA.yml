@@ -1,0 +1,61 @@
+name: AudioQnA-test
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths:
+      - AudioQnA/**
+      - "!**.md"
+      - "!**/ui/**"
+      - .github/workflows/AudioQnA.yml
+  workflow_dispatch:
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  SearchQnA:
+    runs-on: aise-cluster
+    strategy:
+      matrix:
+        job_name: ["langchain"]
+      fail-fast: false
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+
+      - name: Run Test ASR
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+        run: |
+          cd ${{ github.workspace }}/AudioQnA/tests
+          bash test_asr.sh
+
+      - name: Run Test TTS
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+        run: |
+          cd ${{ github.workspace }}/AudioQnA/tests
+          bash test_tts.sh
+
+      - name: Run Test LLM engine
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+        run: |
+          cd ${{ github.workspace }}/AudioQnA/tests
+          bash test_${{ matrix.job_name }}_inference.sh
+
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.job_name }}
+          path: ${{ github.workspace }}/AudioQnA/tests/*.log
