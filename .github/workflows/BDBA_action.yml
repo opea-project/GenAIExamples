@@ -95,6 +95,7 @@ jobs:
     name: BDBA Scan
     runs-on: ${{ fromJson(inputs.runners) }}
     steps:
+      - uses: actions/checkout@v4
       - id: bdba
         run: ./.github/workflows/BDBA/bdba.sh
         shell: bash

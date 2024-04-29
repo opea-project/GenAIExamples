@@ -49,8 +49,6 @@ jobs:
     container:
       image: cache-registry.caas.intel.com/cache/library/python:slim
     steps:
-      - name: Checkout Project Repo
-        uses: actions/checkout@v4
       - name: Pack Additional Resources
         shell: bash
         run: |
@@ -83,23 +81,10 @@ jobs:
         run: |
           export CURL_CA_BUNDLE="${{ github.workspace }}/certs/ca-certificates.crt"
           curl -H "Authorization: Bearer ${{ secrets.BDBA_TOKEN }}" "https://bdba001.icloud.intel.com/api/product/${{ env.PRODUCT }}/pdf-report" -o /tmp/genai-bdba_scan.pdf
-      - name: Upload Scan artifact to Github
-        uses: actions/upload-artifact@v4
-        with:
-          name: BDBA-log
-          path: /tmp/genai-bdba_scan.pdf
-          if-no-files-found: ignore # 'warn' or 'ignore' are also available, defaults to `warn`
-          retention-days: 60 # 1 <= retention-days <= 90
-
-#jobs:
-#  bdba_job:
-#    name: BDBA Scan
-#    uses: intel-innersource/frameworks.ai.infrastructure.code-scan-tools/.github/workflows/Scanner_Bdba.yml@one-ci-cd
-#    with:
-#      repos: ${{ github.event.repository.name }}
-#      refs: ${{ github.ref_name }}
-#      group: "22"
-#      runners: "['self-hosted']"
-#    secrets:
-#      token: ${{ secrets.GITHUB_TOKEN }}
-#      BDBA_TOKEN: ${{ secrets.BDBA_TOKEN }}
+      #- name: Upload Scan artifact to Github
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: BDBA-log
+      #    path: /tmp/genai-bdba_scan.pdf
+      #    if-no-files-found: ignore # 'warn' or 'ignore' are also available, defaults to `warn`
+      #    retention-days: 60 # 1 <= retention-days <= 90

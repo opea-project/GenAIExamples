@@ -65,6 +65,7 @@ jobs:
     name: McAfee Scan
     runs-on: ${{ fromJson(inputs.runners) }}
     steps:
+      - uses: actions/checkout@v4
       - name: Prep
         shell: bash
         run: docker pull ${{ inputs.image }}

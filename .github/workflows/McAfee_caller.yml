@@ -27,6 +27,5 @@ jobs:
     name: McAfee Virus Scan
     runs-on: internal
     steps:
-      - uses: actions/checkout@v4
       - name: Execute Scan
         uses: ./.github/workflows/McAfee/action.yml
