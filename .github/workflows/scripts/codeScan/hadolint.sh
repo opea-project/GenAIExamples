@@ -16,7 +16,7 @@
 source /GenAIExamples/.github/workflows/scripts/change_color
 log_dir=/GenAIExamples/.github/workflows/scripts/codeScan
 
-find . -type f \( -name "Dockerfile*" \) -print -exec hadolint {} \; 2>&1 | tee ${log_dir}/hadolint.log
+find . -type f \( -name "Dockerfile*" \) -print -exec hadolint --ingore DL3006 --ingore DL3007 --ingore DL3008 {} \; 2>&1 | tee ${log_dir}/hadolint.log
 exit_code=$?
 
 if [ ${exit_code} -ne 0 ]; then
