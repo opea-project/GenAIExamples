@@ -29,6 +29,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Execute Scan
-        uses: ./.github/workflows/McAfee_action.yml
-        with:
-          scan_path: ./
+        uses: ./.github/workflows/McAfee/action.yml
