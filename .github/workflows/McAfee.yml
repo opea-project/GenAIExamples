@@ -1,14 +1,28 @@
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: McAfee Virus Scan
 on:
   workflow_call:
     inputs:
       scan_path:
         description: Directory to scan (relative to workspace)
-        default: '.'
+        default: "."
         required: true
         type: string
       virus_defs:
-        description: Update site with virus defenitions
+        description: Update site with virus definitions
         default: https://hec-mcafee-proxy.intel.com/repository/mcafee-defs/commonupdater # more generic but rate limited http://update.nai.com/products/commonupdater
         required: false
         type: string
@@ -65,7 +79,7 @@ jobs:
           mkdir -p ${{ inputs.report_path }}
           [ -z $SCAN_UID ] && SCAN_UID=$(id -u)
           [ -z $SCAN_GID ] && SCAN_GID=$(id -g)
-          set +e; 
+          set +e;
           if [ "${{ inputs.output_format }}" == "txt" ]; then
             docker run --rm -u "$SCAN_UID:$SCAN_GID" \
                 -e ENV_DEFS_URL="${{ inputs.virus_defs }}" \
