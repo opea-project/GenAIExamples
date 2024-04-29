@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """Parse CSV report. Exit with error code if vulnerabilities are found.
 
 If environment variable IGNORE_TRIAGED is set to "true", exit successfully
@@ -18,25 +31,30 @@ IGNORE_TRIAGED = "IGNORE_TRIAGED"
 def _validate_csv_file(csv_file: pathlib.Path) -> None:
     """Exit with a user-friendly message if the csv_file is not found."""
     if not csv_file.is_file():
-        print(f'Error, CSV file "{csv_file}" not found. Exiting',
-              file=sys.stderr)
+        print(f'Error, CSV file "{csv_file}" not found. Exiting', file=sys.stderr)
         sys.exit(3)
 
 
 def mkdir(directory: pathlib.Path) -> None:
-    """Create directory tree. Abort if non-directory file already exists."""
+    """Create directory tree.
+
+    Abort if non-directory file already exists.
+    """
     try:
         directory.mkdir(parents=True, exist_ok=True)
     except FileExistsError:
-        print(f'Error, the directory "{directory}" could not be created. '
-              'An existing non-directory file already exists with the same '
-              'name.', file=sys.stderr)
+        print(
+            f'Error, the directory "{directory}" could not be created. '
+            "An existing non-directory file already exists with the same "
+            "name.",
+            file=sys.stderr,
+        )
         sys.exit(6)
 
 
 def get_vulnerabilities(csv_file: pathlib.Path) -> pandas.DataFrame:
     """Return vulnerabilities as a pandas DataFrame."""
-    print(f'\n\nParsing results from file: {csv_file}')
+    print(f"\n\nParsing results from file: {csv_file}")
     data: pandas.DataFrame = pandas.read_csv(csv_file)
 
     query = "(CVSS3 != 0 or (CVSS3 == 0 or CVSS3 != CVSS3) and CVSS >= 0)"
@@ -44,10 +62,7 @@ def get_vulnerabilities(csv_file: pathlib.Path) -> pandas.DataFrame:
         print("\n\nIgnoring triaged vulnerabilities")
         query += " and `Triage vectors`.isnull()"
     else:
-        print(
-            f"\n\n{IGNORE_TRIAGED} not set, "
-            "all vulnerabilities with CVSS scores will be considered."
-        )
+        print(f"\n\n{IGNORE_TRIAGED} not set, " "all vulnerabilities with CVSS scores will be considered.")
 
     return data.query(query)
 
@@ -63,9 +78,9 @@ def cli_input() -> argparse.Namespace:
     """Return an argparse object containing values from user CLI input."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
-        'CSV_FILE',
+        "CSV_FILE",
         type=pathlib.Path,
-        help='path to the file to analyze',
+        help="path to the file to analyze",
     )
     cli_args = parser.parse_args()
     _validate_csv_file(cli_args.CSV_FILE)
@@ -79,5 +94,5 @@ def main() -> None:
     exit_(vulns)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

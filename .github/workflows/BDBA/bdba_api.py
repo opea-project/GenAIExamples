@@ -1,5 +1,17 @@
-
 #!/usr/bin/env python3
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """Client for interacting with the BDBA server using its API."""
 
 import argparse
@@ -12,7 +24,6 @@ import sys
 import time
 
 import requests
-
 
 err_logger = logging.getLogger(__name__)
 logger = logging.getLogger(__name__)
@@ -27,8 +38,7 @@ COMPONENTS_TASK_ID = os.environ.get("COMPONENTS_TASK_ID", "CT36")
 CVE_TASK_ID = os.environ.get("CVE_TASK_ID", "CT7")
 MAX_GROUP_ID = 9999
 MAX_PROJECT_ID = 9999999
-WORKSPACE = pathlib.Path(os.environ.get("GITHUB_WORKSPACE",
-                                        pathlib.Path.cwd()))
+WORKSPACE = pathlib.Path(os.environ.get("GITHUB_WORKSPACE", pathlib.Path.cwd()))
 
 
 def _validate_project_id(project_id):
@@ -36,21 +46,19 @@ def _validate_project_id(project_id):
     try:
         project_id_int = int(project_id)
     except (TypeError, ValueError) as exc:
-        err_logger.critical('SDL project ID must be an integer.')
+        err_logger.critical("SDL project ID must be an integer.")
         err_logger.critical(exc)
         sys.exit(1)
     if (project_id_int < 0) or (project_id_int > MAX_PROJECT_ID):
-        err_logger.critical('Project ID must be between 0 and '
-                            '%s.', MAX_PROJECT_ID)
+        err_logger.critical("Project ID must be between 0 and " "%s.", MAX_PROJECT_ID)
         sys.exit(2)
 
 
 def _validate_task_id(task_id):
     """Ensure the SD Elements task ID is formatted correctly."""
-    regex = '^C?T[1-9][0-9]{0,3}$'
+    regex = "^C?T[1-9][0-9]{0,3}$"
     if not re.search(regex, task_id):
-        err_logger.critical('The task ID "%s" must match the '
-                            'regular expression: %s', task_id, regex)
+        err_logger.critical('The task ID "%s" must match the ' "regular expression: %s", task_id, regex)
         sys.exit(3)
 
 
@@ -58,11 +66,11 @@ def _validate_baseurl(url: str) -> None:
     """Ensure the baseurl is a valid Intel HTTPS URL."""
     url = url.strip()
     regex = re.compile(
-        '^https:[/][/]([-a-zA-Z0-9@:%_+~#=]([.](?![.]))*){0,251}[.]intel[.]com'
-        '([/](?![/])([-a-zA-Z0-9@:%_+~#?&=]([./()](?![./?&=%@:()#]))*)*)?$')
+        "^https:[/][/]([-a-zA-Z0-9@:%_+~#=]([.](?![.]))*){0,251}[.]intel[.]com"
+        "([/](?![/])([-a-zA-Z0-9@:%_+~#?&=]([./()](?![./?&=%@:()#]))*)*)?$"
+    )
     if not regex.search(url):
-        print('Error, the supplied URL is not a valid Intel HTTPS URL: '
-              f'"{url}".', file=sys.stderr)
+        print("Error, the supplied URL is not a valid Intel HTTPS URL: " f'"{url}".', file=sys.stderr)
         sys.exit(4)
 
 
@@ -70,30 +78,27 @@ def _validate_file(file_path: pathlib.Path) -> None:
     """Ensure the file_path provided exists and is within the WORKSPACE."""
     sanitized_path = pathlib.Path(file_path).resolve()
     if os.path.commonpath([WORKSPACE, sanitized_path]) != str(WORKSPACE):
-        print(f'Error, {file_path} is not within {WORKSPACE}', file=sys.stderr)
+        print(f"Error, {file_path} is not within {WORKSPACE}", file=sys.stderr)
         sys.exit(5)
     if not sanitized_path.exists():
-        print(f'Error, {file_path} does not exist.', file=sys.stderr)
+        print(f"Error, {file_path} does not exist.", file=sys.stderr)
         sys.exit(6)
 
 
 def _validate_group(group_id: int) -> None:
     """Ensure the group_id is a valid integer."""
     if not isinstance(group_id, int):
-        print(f'Error, group ID ({group_id}) is not an integer.',
-              file=sys.stderr)
+        print(f"Error, group ID ({group_id}) is not an integer.", file=sys.stderr)
         sys.exit(7)
     if (group_id < 0) or (group_id > MAX_GROUP_ID):
-        print(f'Error, group ID ({group_id}) must be between 0 and '
-              f'{MAX_GROUP_ID}', file=sys.stderr)
+        print(f"Error, group ID ({group_id}) must be between 0 and " f"{MAX_GROUP_ID}", file=sys.stderr)
         sys.exit(8)
 
 
 def _validate_outdir(outdir: pathlib.Path) -> None:
     """Ensure the outdir exists and is a directory."""
     if not pathlib.Path(outdir).is_dir():
-        print(f'Error, the output directory ({outdir}) is not a directory.',
-              file=sys.stderr)
+        print(f"Error, the output directory ({outdir}) is not a directory.", file=sys.stderr)
         sys.exit(9)
 
 
@@ -109,7 +114,7 @@ class APITokenNotFoundError(Exception):
 
 
 class NoMoreRetriesError(Exception):
-    """Out of Retries"""
+    """Out of Retries."""
 
 
 # pylint: disable=too-many-instance-attributes
@@ -133,8 +138,7 @@ class BDBA:
         self.outdir = args.outdir
 
         self.session = requests.Session()
-        self.session.headers.update(
-            {"Authorization": f"Bearer {api_token}"})
+        self.session.headers.update({"Authorization": f"Bearer {api_token}"})
 
     def _get_uri(self, end_point, **params):
         """Resolve URI with given API end points."""
@@ -166,11 +170,9 @@ class BDBA:
         uri = self._get_uri("components", product=product)
         response = self._retry(self.session.get, uri)
         response.raise_for_status()
-        components_csv = (f"{self.outdir}/{self.components_task_id}_"
-                          "BDBA-components.csv")
+        components_csv = f"{self.outdir}/{self.components_task_id}_" "BDBA-components.csv"
         if self.sdl_project_id > 0:
-            components_csv = (f"{self.outdir}/{self.components_task_id}_"
-                              f"{self.sdl_project_id}-BDBA-components.csv")
+            components_csv = f"{self.outdir}/{self.components_task_id}_" f"{self.sdl_project_id}-BDBA-components.csv"
         with open(components_csv, "wb") as csv:
             csv.write(response.content)
         logger.info("Components list downloaded to %s", components_csv)
@@ -236,7 +238,7 @@ def configure_logger():
 
 def get_token():
     """Get the API token for login."""
-    api_token = os.environ.get('BDBA_TOKEN')
+    api_token = os.environ.get("BDBA_TOKEN")
     if api_token is not None:
         return api_token
     token = os.path.abspath(os.path.expanduser("~/.bdba/api_token"))
@@ -256,42 +258,46 @@ def cli_arguments() -> argparse.Namespace:
         help="file that will be analyzed",
     )
     parser.add_argument(
-        "-b", "--baseurl",
+        "-b",
+        "--baseurl",
         required=True,
         type=str,
         help="base URL of the BDBA server",
     )
     parser.add_argument(
-        "-g", "--group",
+        "-g",
+        "--group",
         required=True,
         type=int,
         help="BDBA group for your project",
     )
     parser.add_argument(
-        "-o", "--outdir",
+        "-o",
+        "--outdir",
         required=True,
         type=pathlib.Path,
         help="directory where output will be written",
     )
     parser.add_argument(
-        "-c", "--components-task-id",
+        "-c",
+        "--components-task-id",
         default=COMPONENTS_TASK_ID,
         type=str,
-        help=("SDL task ID for listing components "
-              f"(default: {COMPONENTS_TASK_ID})"),
+        help=("SDL task ID for listing components " f"(default: {COMPONENTS_TASK_ID})"),
     )
     parser.add_argument(
-        "-i", "--cve-task-id",
+        "-i",
+        "--cve-task-id",
         default=CVE_TASK_ID,
         type=str,
         help=f"SDL task ID for CVEs (default: {CVE_TASK_ID})",
     )
     parser.add_argument(
-        "-p", "--sdl-project-id",
+        "-p",
+        "--sdl-project-id",
         default=default_project_id(),
         type=int,
-        help=("SD Elements project ID used for evidence "
-              f"(default: {default_project_id()})"),
+        help=("SD Elements project ID used for evidence " f"(default: {default_project_id()})"),
     )
     cli_args: argparse.Namespace = parser.parse_args()
 
@@ -308,8 +314,7 @@ def cli_arguments() -> argparse.Namespace:
 
 def main():
     """This module wraps around Black Duck Binary Analysis' API to analyze a
-    given file for their known vulnerabilities.
-    """
+    given file for their known vulnerabilities."""
     args = cli_arguments()
     configure_error_logger()
     configure_logger()

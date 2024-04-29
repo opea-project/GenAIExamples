@@ -1,34 +1,47 @@
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: BDBA Scan
 on:
   workflow_dispatch:
     inputs:
       org:
-        description: 'Enter Project organizational repo to run BDBA scan (ex: intel-innersource):'
+        description: "Enter Project organizational repo to run BDBA scan (ex: intel-innersource):"
         required: true
         type: string
       repo:
-        description: 'Enter Project repo for which you want to run BDBA scan (ex: frameworks.ai.infrastructure.code-scan-tools):'
+        description: "Enter Project repo for which you want to run BDBA scan (ex: frameworks.ai.infrastructure.code-scan-tools):"
         required: true
         type: string
       refs:
-        description: 'Enter Project branch, tag:'
+        description: "Enter Project branch, tag:"
         required: true
         type: string
       group:
-        description: 'Enter BDBA group (ex: 32):'
+        description: "Enter BDBA group (ex: 32):"
         required: true
         type: string
       runners:
-        description: 'Array of runner labels: '
+        description: "Array of runner labels: "
         required: true
         type: string
         default: "['gasp']"
   pull_request:
-      branches: [main]
-      types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
-      paths-ignore:
-        - "**.md"
-
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths-ignore:
+      - "**.md"
 
 jobs:
   bdba_scan:
