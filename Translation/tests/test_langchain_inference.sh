@@ -126,8 +126,7 @@ function check_response() {
        [[ $(grep -c "我是一名翻译" $LOG_PATH) != 0 ]] && [[ $(grep -c "Hallo Welt" $LOG_PATH) != 0 ]] && \
        [[ $(grep -c "Machine learning" $LOG_PATH) != 0 ]] && [[ $(grep -c "Ég er glöð" $LOG_PATH) != 0 ]] && \
        [[ $(grep -c "Velká jazyková model" $LOG_PATH) != 0 ]] && [[ $(grep -c "I'm glad to see you" $LOG_PATH) != 0 ]] && \
-       [[ $(grep -c "Хотите танцевать" $LOG_PATH) != 0 ]] && [[ $(grep -c "operating system" $LOG_PATH) != 0 ]] && \
-    ; then
+       [[ $(grep -c "Хотите танцевать" $LOG_PATH) != 0 ]] && [[ $(grep -c "operating system" $LOG_PATH) != 0 ]]; then
         status=true
     fi
 
