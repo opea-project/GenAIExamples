@@ -39,13 +39,13 @@ echo "Downloading latest defs from $DEFS_URL/$filename2..." \
  && echo "SUCCESS" || fail
 
 echo "Extracting latest defs..." \
- && unzip $filename2 -d /usr/local/uvscan \
+ && unzip -o $filename2 -d /usr/local/uvscan \
  && echo "SUCCESS" || fail
 
 echo "--- Scanning ---"
 ENV_SCAN_OPTS="--analyze --mime --program --recursive --unzip --threads 4 --summary --verbose --html=${workspace}/.github/workflows/scripts/codeScan/report.html"
 echo "Scan Options: $ENV_SCAN_OPTS"
-uvscan $ENV_SCAN_OPTS /GenAIComps > ${log_dir}/trellix.log
+uvscan $ENV_SCAN_OPTS ${workspace} 2>&1 | tee ${log_dir}/trellix.log
 
 
 if [[ $(grep "Possibly Infected" ${log_dir}/trellix.log | sed 's/[^0-9]//g') != 0 ]]; then
