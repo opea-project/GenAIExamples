@@ -45,10 +45,9 @@ function launch_langchain_service() {
     local port=8875
     cd langchain/docker
     docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -t intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
-
-    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} -e TGI_ENDPOINT=http://localhost:8870 -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
-    -p ${port}:8000 --runtime=habana -e HABANA_VISIBE_DEVILCES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
-
+    
+    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} --net=host -e TGI_ENDPOINT=http://localhost:8870 -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACE_API_TOKEN} \
+    -e SERVER_PORT=${port} -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} --ipc=host intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
     sleep 2m
 }
 
