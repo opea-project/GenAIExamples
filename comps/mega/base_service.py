@@ -16,7 +16,7 @@ import abc
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, Dict, Optional
 
-from logger import CustomLogger
+from .logger import CustomLogger
 
 __all__ = ["BaseService"]
 
@@ -27,7 +27,7 @@ class BaseService:
     def __init__(
         self,
         name: Optional[str] = "Base service",
-        runtime_args: Optional[Dict] = None,
+        runtime_args: Optional[Dict] = {},
         **kwargs,
     ):
         """Initialize the BaseService with a name, runtime arguments, and any additional arguments."""
@@ -41,7 +41,7 @@ class BaseService:
 
     def _process_runtime_args(self):
         """Process the runtime arguments to ensure they are in the correct format."""
-        _runtime_args = self.runtime_args if isinstance(self.runtime_args, dict) else vars(self.runtime_args or {})
+        _runtime_args = self.runtime_args if isinstance(self.runtime_args, dict) else vars(self.runtime_args)
         self.runtime_args = SimpleNamespace(**_runtime_args)
 
     @property
@@ -118,6 +118,8 @@ class BaseService:
         res = False
         if protocol is None or protocol == "http":
             res = HTTPService.check_readiness(ctrl_address)
+        else:
+            raise ValueError(f"Unsupported protocol: {protocol}")
         return res
 
     @staticmethod
@@ -138,4 +140,6 @@ class BaseService:
         res = False
         if protocol is None or protocol == "http":
             res = await HTTPService.async_check_readiness(ctrl_address)
+        else:
+            raise ValueError(f"Unsupported protocol: {protocol}")
         return res

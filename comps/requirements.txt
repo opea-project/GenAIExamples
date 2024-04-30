@@ -1,0 +1,4 @@
+docarray
+httpx
+pyyaml
+requests

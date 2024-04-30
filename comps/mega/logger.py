@@ -63,6 +63,11 @@ class CustomLogger:
         """
         self.logger.log(log_level, msg)
 
+    def close(self):
+        """Close all the handlers."""
+        for handler in self.logger.handlers:
+            handler.close()
+
     # Define type hints for pylint check
     debug: Callable[[str], None]
     info: Callable[[str], None]

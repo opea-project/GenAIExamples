@@ -16,5 +16,6 @@
 from comps.proto.docarray import TextDoc, EmbedDoc768, EmbedDoc1024, GenerateDoc
 
 # Microservice
-from comps.mega.service_builder import BaseService, ServiceBuilder
-from comps.mega.micro_service import MicroService
+from comps.mega.orchestrator import ServiceOrchestrator
+from comps.mega.orchestrator_with_yaml import ServiceOrchestratorWithYaml
+from comps.mega.micro_service import MicroService, register_microservice, opea_microservices
