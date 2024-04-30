@@ -12,6 +12,7 @@ poetry
 pyarrow
 pydantic==1.10.13
 pymupdf
+qdrant-client==1.9.0
 redis
 sentence-transformers
 unstructured

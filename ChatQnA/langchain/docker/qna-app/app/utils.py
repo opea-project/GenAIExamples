@@ -28,9 +28,13 @@ import requests
 from bs4 import BeautifulSoup
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
-from langchain_community.vectorstores import Redis
 from langchain_core.documents import Document
-from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+
+SUPPORTED_VECTOR_DATABASES = ["REDIS", "QDRANT"]
+
+VECTOR_DATABASE = str(os.getenv("VECTOR_DATABASE", "redis")).upper()
+
+assert VECTOR_DATABASE in SUPPORTED_VECTOR_DATABASES, f"Invalid VECTOR_DATABASE: {VECTOR_DATABASE}"
 
 
 def get_current_beijing_time():
@@ -57,7 +61,6 @@ def create_kb_folder(upload_dir):
 
 
 class Crawler:
-
     def __init__(self, pool=None):
         if pool:
             assert isinstance(pool, (str, list, tuple)), "url pool should be str, list or tuple"
@@ -292,16 +295,33 @@ def create_retriever_from_files(doc, embeddings, index_name: str):
     loader = UnstructuredFileLoader(doc, mode="single", strategy="fast")
     chunks = loader.load_and_split(text_splitter)
 
-    rds = Redis.from_texts(
-        texts=[chunk.page_content for chunk in chunks],
-        metadatas=[chunk.metadata for chunk in chunks],
-        embedding=embeddings,
-        index_name=index_name,
-        redis_url=REDIS_URL,
-        index_schema=INDEX_SCHEMA,
-    )
+    if VECTOR_DATABASE == "REDIS":
+        from langchain_community.vectorstores import Redis
+        from rag_redis.config import INDEX_SCHEMA, REDIS_URL
 
-    retriever = rds.as_retriever(search_type="mmr")
+        vdb = Redis.from_texts(
+            texts=[chunk.page_content for chunk in chunks],
+            metadatas=[chunk.metadata for chunk in chunks],
+            embedding=embeddings,
+            index_name=index_name,
+            redis_url=REDIS_URL,
+            index_schema=INDEX_SCHEMA,
+        )
+
+    elif VECTOR_DATABASE == "QDRANT":
+        from langchain_community.vectorstores import Qdrant
+        from rag_qdrant.config import COLLECTION_NAME, QDRANT_HOST, QDRANT_PORT
+
+        vdb = Qdrant.from_texts(
+            texts=[chunk.page_content for chunk in chunks],
+            metadatas=[chunk.metadata for chunk in chunks],
+            embedding=embeddings,
+            collection_name=COLLECTION_NAME,
+            host=QDRANT_HOST,
+            port=QDRANT_PORT,
+        )
+
+    retriever = vdb.as_retriever(search_type="mmr")
     return retriever
 
 
@@ -315,29 +335,63 @@ def create_retriever_from_links(embeddings, link_list: list, index_name):
         texts.append(data)
         metadatas.append(metadata)
 
-    rds = Redis.from_texts(
-        texts=texts,
-        metadatas=metadatas,
-        embedding=embeddings,
-        index_name=index_name,
-        redis_url=REDIS_URL,
-        index_schema=INDEX_SCHEMA,
-    )
+    if VECTOR_DATABASE == "REDIS":
+        from langchain_community.vectorstores import Redis
+        from rag_redis.config import INDEX_SCHEMA, REDIS_URL
 
-    retriever = rds.as_retriever(search_type="mmr")
+        vdb = Redis.from_texts(
+            texts=texts,
+            metadatas=metadatas,
+            embedding=embeddings,
+            index_name=index_name,
+            redis_url=REDIS_URL,
+            index_schema=INDEX_SCHEMA,
+        )
+
+    elif VECTOR_DATABASE == "QDRANT":
+        from langchain_community.vectorstores import Qdrant
+        from rag_qdrant.config import COLLECTION_NAME, QDRANT_HOST, QDRANT_PORT
+
+        vdb = Qdrant.from_texts(
+            texts=texts,
+            metadatas=metadatas,
+            embedding=embeddings,
+            collection_name=COLLECTION_NAME,
+            host=QDRANT_HOST,
+            port=QDRANT_PORT,
+        )
+
+    retriever = vdb.as_retriever(search_type="mmr")
     return retriever
 
 
 def reload_retriever(embeddings, index_name):
     print(f"[rag - reload retriever] reload with index: {index_name}")
-    rds = Redis.from_existing_index(
-        embeddings,
-        index_name=index_name,
-        redis_url=REDIS_URL,
-        schema=INDEX_SCHEMA,
-    )
 
-    retriever = rds.as_retriever(search_type="mmr")
+    if VECTOR_DATABASE == "REDIS":
+        from langchain_community.vectorstores import Redis
+        from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+
+        vdb = Redis.from_existing_index(
+            embeddings,
+            index_name=index_name,
+            redis_url=REDIS_URL,
+            schema=INDEX_SCHEMA,
+        )
+
+    elif VECTOR_DATABASE == "QDRANT":
+        from langchain_community.vectorstores import Qdrant
+        from qdrant_client import QdrantClient
+        from rag_qdrant.config import COLLECTION_NAME, QDRANT_HOST, QDRANT_PORT
+
+        client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+        vdb = Qdrant(
+            embeddings=embeddings,
+            collection_name=COLLECTION_NAME,
+            client=client,
+        )
+
+    retriever = vdb.as_retriever(search_type="mmr")
     return retriever
 
 
