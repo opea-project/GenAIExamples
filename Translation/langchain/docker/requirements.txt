@@ -1,0 +1,4 @@
+fastapi
+huggingface_hub
+langchain
+uvicorn
