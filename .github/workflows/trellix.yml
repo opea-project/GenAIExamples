@@ -23,6 +23,9 @@ jobs:
   Trellix:
     runs-on: trellix
     steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
