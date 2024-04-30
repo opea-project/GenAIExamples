@@ -13,42 +13,33 @@
 # limitations under the License.
 
 services:
-  redis-vector-db:
-    image: redis/redis-stack:7.2.0-v9
-    container_name: redis-vector-db
+  qdrant-vector-db:
+    image: qdrant/qdrant:v1.9.0
+    container_name: qdrant-vector-db
     ports:
-      - "6379:6379"
-      - "8001:8001"
-  qna-rag-redis-server:
+      - "6333:6333"
+      - "6334:6334"
+  qna-rag-qdrant-server:
     build:
       args:
         https_proxy: ${https_proxy}
         http_proxy: ${http_proxy}
       dockerfile: Dockerfile
       context: .
-    image: intel/gen-ai-examples:qna-rag-redis-server
-    container_name: qna-rag-redis-server
+    image: intel/gen-ai-examples:qna-rag-qdrant-server
+    container_name: qna-rag-qdrant-server
     environment:
       - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-      - HTTP_PROXY=${HTTP_PROXY}
-      - HTTPS_PROXY=${HTTPS_PROXY}
-      - no_proxy=${no_proxy}
-      - SOCKS_PROXY=${SOCKS_PROXY}
-      - socks_proxy=${socks_proxy}
-      - FTP_PROXY=${FTP_PROXY}
-      - ftp_proxy=${ftp_proxy}
       - HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-      - CONFLUENCE_ACCESS_TOKEN=${CONFLUENCE_ACCESS_TOKEN}
-      - "REDIS_PORT=6379"
       - "EMBED_MODEL=BAAI/bge-base-en-v1.5"
-      - "REDIS_SCHEMA=schema_dim_768.yml"
-      - "VECTOR_DATABASE=REDIS"
+      - "VECTOR_DATABASE=QDRANT"
+      - "TGI_LLM_ENDPOINT=http://localhost:8080"
+      # "TEI_ENDPOINT="http://xxx.xxx.xxx.xxx:9090" - To use a custom TEI endpoint
     ulimits:
       memlock:
         soft: -1 # Set memlock to unlimited (no soft or hard limit)
         hard: -1
     volumes:
-      - ../redis:/ws
+      - ../qdrant:/ws
       - ../test:/test
     network_mode: "host"

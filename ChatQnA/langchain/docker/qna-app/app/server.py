@@ -23,15 +23,14 @@ from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from guardrails import moderation_prompt_for_chat, unsafe_dict
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
-from langchain_community.vectorstores import Redis
 from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langserve import add_routes
 from prompts import contextualize_q_prompt, prompt, qa_prompt
-from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 from starlette.middleware.cors import CORSMiddleware
 from utils import (
+    VECTOR_DATABASE,
     create_kb_folder,
     create_retriever_from_files,
     create_retriever_from_links,
@@ -39,6 +38,11 @@ from utils import (
     post_process_text,
     reload_retriever,
 )
+
+if VECTOR_DATABASE == "REDIS":
+    from rag_redis.config import INDEX_NAME
+elif VECTOR_DATABASE == "QDRANT":
+    from rag_qdrant.config import COLLECTION_NAME as INDEX_NAME
 
 parser = argparse.ArgumentParser(description="Server Configuration")
 parser.add_argument("--chathistory", action="store_true", help="Enable debug mode")
@@ -52,7 +56,6 @@ app.add_middleware(
 
 
 class RAGAPIRouter(APIRouter):
-
     def __init__(self, upload_dir, entrypoint, safety_guard_endpoint, tei_endpoint=None) -> None:
         super().__init__()
         self.upload_dir = upload_dir
@@ -93,15 +96,31 @@ class RAGAPIRouter(APIRouter):
             self.embeddings = HuggingFaceHubEmbeddings(model=tei_endpoint)
         else:
             # create embeddings using local embedding model
+            EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
             self.embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
 
-        rds = Redis.from_existing_index(
-            self.embeddings,
-            index_name=INDEX_NAME,
-            redis_url=REDIS_URL,
-            schema=INDEX_SCHEMA,
-        )
-        retriever = rds.as_retriever(search_type="mmr")
+        if VECTOR_DATABASE == "REDIS":
+            from langchain_community.vectorstores import Redis
+            from rag_redis.config import INDEX_SCHEMA, REDIS_URL
+
+            vdb = Redis.from_existing_index(
+                self.embeddings,
+                index_name=INDEX_NAME,
+                redis_url=REDIS_URL,
+                schema=INDEX_SCHEMA,
+            )
+        elif VECTOR_DATABASE == "QDRANT":
+            from langchain_community.vectorstores import Qdrant
+            from qdrant_client import QdrantClient
+            from rag_qdrant.config import QDRANT_HOST, QDRANT_PORT
+
+            client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+            vdb = Qdrant(
+                embeddings=self.embeddings,
+                collection_name=INDEX_NAME,
+                client=client,
+            )
+        retriever = vdb.as_retriever(search_type="mmr")
 
         # Define contextualize chain
         self.contextualize_q_chain = contextualize_q_prompt | self.llm | StrOutputParser()
