@@ -154,7 +154,6 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 	</tbody>
 </table>
 
-
 ### Language Translation
 
 [Language Translation](./Translation/README.md) is an example of chatbot for converting a source-language text to an equivalent target-language text.
