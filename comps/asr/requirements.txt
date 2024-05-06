@@ -1,0 +1,6 @@
+datasets
+intel_extension_for_pytorch
+pydub
+torch
+transformers
+zhconv

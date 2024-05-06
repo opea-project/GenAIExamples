@@ -14,13 +14,15 @@
 
 # Document
 from comps.proto.docarray import (
-    TextDoc,
+    Audio2TextDoc,
+    Base64ByteStrDoc,
     EmbedDoc768,
     EmbedDoc1024,
     GeneratedDoc,
     LLMParamsDoc,
-    SearchedDoc,
     RerankedDoc,
+    SearchedDoc,
+    TextDoc,
 )
 
 # Microservice

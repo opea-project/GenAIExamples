@@ -12,20 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import Optional
 
 import numpy as np
 from docarray import BaseDoc, DocList
-from pydantic import conlist
+from docarray.documents import AudioDoc
+from docarray.typing import AudioUrl
+from pydantic import Field, conlist
 
 
 class TextDoc(BaseDoc):
     text: str
 
 
+class Base64ByteStrDoc(BaseDoc):
+    byte_str: str
+
+
 class EmbedDoc768(BaseDoc):
     text: str
     embedding: conlist(float, min_items=768, max_items=768)
+
+
+class Audio2TextDoc(AudioDoc):
+    url: Optional[AudioUrl] = Field(
+        description="The path to the audio.",
+        default=None,
+    )
+    model_name_or_path: Optional[str] = Field(
+        description="The Whisper model name or path.",
+        default="openai/whisper-small",
+    )
+    language: Optional[str] = Field(
+        description="The language that Whisper prefer to detect.",
+        default="auto",
+    )
 
 
 class EmbedDoc1024(BaseDoc):
