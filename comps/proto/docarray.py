@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
+
+import numpy as np
 from docarray import BaseDoc, DocList
-from docarray.typing import NdArray
+from pydantic import conlist
 
 
 class TextDoc(BaseDoc):
@@ -21,11 +24,26 @@ class TextDoc(BaseDoc):
 
 
 class EmbedDoc768(BaseDoc):
-    embedding: NdArray[768]
+    text: str
+    embedding: conlist(float, min_items=768, max_items=768)
 
 
 class EmbedDoc1024(BaseDoc):
-    embedding: NdArray[1024]
+    text: str
+    embedding: conlist(float, min_items=1024, max_items=1024)
+
+
+class SearchedDoc(BaseDoc):
+    retrieved_docs: DocList[TextDoc]
+    initial_query: str
+
+    class Config:
+        json_encoders = {np.ndarray: lambda x: x.tolist()}
+
+
+class RerankedDoc(BaseDoc):
+    query: str
+    doc: TextDoc
 
 
 class GeneratedDoc(BaseDoc):
@@ -41,14 +59,3 @@ class LLMParamsDoc(BaseDoc):
     temperature: float = 0.01
     repetition_penalty: float = 1.03
     streaming: bool = True
-
-
-class RerankingInputDoc(BaseDoc):
-    query: str
-    passages: DocList[TextDoc]
-    top_n: int = 3
-
-
-class RerankingOutputDoc(BaseDoc):
-    query: str
-    doc: TextDoc

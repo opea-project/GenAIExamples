@@ -15,12 +15,14 @@
 import os
 
 from langchain_community.llms import HuggingFaceEndpoint
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 
-from comps import GeneratedDoc, LLMParamsDoc, TextDoc, opea_microservices, register_microservice
+from comps import GeneratedDoc, LLMParamsDoc, RerankedDoc, opea_microservices, register_microservice
 
 
-@register_microservice(name="opea_service@llm_tgi_gaudi", expose_endpoint="/v1/chat/completions", port=8030)
-def llm_generate(input: TextDoc, params: LLMParamsDoc = None) -> GeneratedDoc:
+@register_microservice(name="opea_service@llm_tgi_gaudi", expose_endpoint="/v1/chat/completions", port=9000)
+def llm_generate(input: RerankedDoc, params: LLMParamsDoc = None) -> GeneratedDoc:
     llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
     params = params if params else LLMParamsDoc()
     llm = HuggingFaceEndpoint(
@@ -33,8 +35,15 @@ def llm_generate(input: TextDoc, params: LLMParamsDoc = None) -> GeneratedDoc:
         repetition_penalty=params.repetition_penalty,
         streaming=params.streaming,
     )
-    response = llm(input.text)
-    res = GeneratedDoc(text=response, prompt=input.text)
+    template = """Answer the question based only on the following context:
+    {input.doc.text}
+
+    Question: {input.query}
+    """
+    prompt = ChatPromptTemplate.from_template(template)
+    chain = prompt | llm | StrOutputParser()
+    response = chain.invoke(input.query)
+    res = GeneratedDoc(text=response, prompt=input.query)
     return res
 
 

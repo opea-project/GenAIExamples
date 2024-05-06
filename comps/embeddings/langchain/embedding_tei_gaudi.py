@@ -22,13 +22,13 @@ from comps import EmbedDoc1024, TextDoc, opea_microservices, register_microservi
 @register_microservice(
     name="opea_service@embedding_tgi_gaudi",
     expose_endpoint="/v1/embeddings",
-    port=8020,
+    port=6000,
     input_datatype=TextDoc,
-    output_datatype=TextDoc,
+    output_datatype=EmbedDoc1024,
 )
-def safety_guard(input: TextDoc) -> TextDoc:
+def embedding(input: TextDoc) -> TextDoc:
     embed_vector = embeddings.embed_query(input.text)
-    res = EmbedDoc1024(text=input.text, embedding=embed_vector)
+    res = EmbedDoc1024(query=input.text, embedding=embed_vector)
     return res
 
 

@@ -11,22 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Document
-from comps.proto.docarray import (
-    TextDoc,
-    EmbedDoc768,
-    EmbedDoc1024,
-    GeneratedDoc,
-    LLMParamsDoc,
-    SearchedDoc,
-    RerankedDoc,
-)
-
-# Microservice
-from comps.mega.orchestrator import ServiceOrchestrator
-from comps.mega.orchestrator_with_yaml import ServiceOrchestratorWithYaml
-from comps.mega.micro_service import MicroService, register_microservice, opea_microservices
-
-# Redis config
-from comps.retrievers.langchain.redis_config import INDEX_NAME, REDIS_URL, INDEX_SCHEMA

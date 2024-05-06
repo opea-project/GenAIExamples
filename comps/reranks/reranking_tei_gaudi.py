@@ -17,25 +17,25 @@ import os
 
 import requests
 
-from comps import RerankingInputDoc, RerankingOutputDoc, opea_microservices, register_microservice
+from comps import RerankedDoc, SearchedDoc, opea_microservices, register_microservice
 
 
 @register_microservice(
     name="opea_service@reranking_tgi_gaudi",
     expose_endpoint="/v1/reranking",
-    port=8040,
-    input_datatype=RerankingInputDoc,
-    output_datatype=RerankingOutputDoc,
+    port=8000,
+    input_datatype=SearchedDoc,
+    output_datatype=RerankedDoc,
 )
-def reranking(input: RerankingInputDoc) -> RerankingOutputDoc:
-    docs = [doc.text for doc in input.passages]
+def reranking(input: SearchedDoc) -> RerankedDoc:
+    docs = [doc.text for doc in input.retrieved_docs]
     url = tei_reranking_endpoint + "/rerank"
-    data = {"query": input.query, "texts": docs}
+    data = {"query": input.initial_query, "texts": docs}
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     response_data = response.json()
     best_response = max(response_data, key=lambda response: response["score"])
-    res = RerankingOutputDoc(query=input.query, doc=input.passages[best_response["index"]])
+    res = RerankedDoc(query=input.initial_query, doc=input.retrieved_docs[best_response["index"]])
     return res
 
 

@@ -20,7 +20,7 @@ from comps import EmbedDoc1024, TextDoc, opea_microservices, register_microservi
 @register_microservice(
     name="opea_service@local_embedding",
     expose_endpoint="/v1/embeddings",
-    port=8010,
+    port=6000,
     input_datatype=TextDoc,
     output_datatype=EmbedDoc1024,
 )

@@ -14,21 +14,21 @@
 
 from sentence_transformers import CrossEncoder
 
-from comps import RerankingInputDoc, RerankingOutputDoc, opea_microservices, register_microservice
+from comps import RerankedDoc, SearchedDoc, opea_microservices, register_microservice
 
 
 @register_microservice(
     name="opea_service@local_reranking",
     expose_endpoint="/v1/reranking",
-    port=8040,
-    input_datatype=RerankingInputDoc,
-    output_datatype=RerankingOutputDoc,
+    port=8000,
+    input_datatype=SearchedDoc,
+    output_datatype=RerankedDoc,
 )
-def reranking(input: RerankingInputDoc) -> RerankingOutputDoc:
-    query_and_docs = [(input.query, doc.text) for doc in input.passages]
+def reranking(input: SearchedDoc) -> RerankedDoc:
+    query_and_docs = [(input.initial_query, doc.text) for doc in input.retrieved_docs]
     scores = reranker_model.predict(query_and_docs)
-    first_passage = sorted(list(zip(input.passages, scores)), key=lambda x: x[1], reverse=True)[0][0]
-    res = RerankingOutputDoc(query=input.query, doc=first_passage)
+    first_passage = sorted(list(zip(input.retrieved_docs, scores)), key=lambda x: x[1], reverse=True)[0][0]
+    res = RerankedDoc(query=input.query, doc=first_passage)
     return res
 
 
