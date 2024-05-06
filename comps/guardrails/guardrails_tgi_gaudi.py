@@ -14,9 +14,9 @@
 
 import os
 
-from fastapi import APIRouter, FastAPI, Request
 from langchain_community.llms import HuggingFaceEndpoint
-from starlette.middleware.cors import CORSMiddleware
+
+from comps import TextDoc, opea_microservices, register_microservice
 
 unsafe_categories = """O1: Violence and Hate.
 Should not
@@ -103,55 +103,37 @@ Provide your safety assessment for {role} in the above conversation:
     return prompt
 
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
+@register_microservice(
+    name="opea_service@guardrails_tgi_gaudi",
+    expose_endpoint="/v1/guardrails",
+    port=8020,
+    input_datatype=TextDoc,
+    output_datatype=TextDoc,
 )
-
-
-class GuardRailsRouter(APIRouter):
-
-    def __init__(self, safety_guard_endpoint) -> None:
-        super().__init__()
-        self.safety_guard_endpoint = safety_guard_endpoint
-
-        self.llm_guard = HuggingFaceEndpoint(
-            endpoint_url=safety_guard_endpoint,
-            max_new_tokens=100,
-            top_k=1,
-            top_p=0.95,
-            typical_p=0.95,
-            temperature=0.01,
-            repetition_penalty=1.03,
-        )
-        print("guardrails - router] LLM initialized.")
-
-
-safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT")
-router = GuardRailsRouter(safety_guard_endpoint)
-
-
-@router.post("/v1/guardrails")
-async def safety_guard(request: Request):
-    params = await request.json()
-    print(f"[guardrails - chat] POST request: /v1/guardrails, params:{params}")
-    query = params["query"]
-
+def safety_guard(input: TextDoc) -> TextDoc:
     # prompt guardrails
-    response_input_guard = router.llm_guard(moderation_prompt_for_chat("User", query))
+    response_input_guard = llm_guard(moderation_prompt_for_chat([{"role": "User", "content": input.text}]))
     if "unsafe" in response_input_guard:
         policy_violation_level = response_input_guard.split("\n")[1].strip()
         policy_violations = unsafe_dict[policy_violation_level]
         print(f"Violated policies: {policy_violations}")
-        return f"Violated policies: {policy_violations}, please check your input."
+        res = TextDoc(text=f"Violated policies: {policy_violations}, please check your input.")
     else:
-        return "safe"
+        res = TextDoc(text="safe")
 
+    return res
 
-app.include_router(router)
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=9000)
+    safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT", "http://localhost:8080")
+    llm_guard = HuggingFaceEndpoint(
+        endpoint_url=safety_guard_endpoint,
+        max_new_tokens=100,
+        top_k=1,
+        top_p=0.95,
+        typical_p=0.95,
+        temperature=0.01,
+        repetition_penalty=1.03,
+    )
+    print("guardrails - router] LLM initialized.")
+    opea_microservices["opea_service@guardrails_tgi_gaudi"].start()
