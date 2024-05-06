@@ -154,6 +154,29 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 	</tbody>
 </table>
 
+### Language Translation
+
+[Language Translation](./Translation/README.md) is an example of chatbot for converting a source-language text to an equivalent target-language text.
+
+<table>
+	<tbody>
+		<tr>
+			<td>Framework</td>
+			<td>LLM</td>
+			<td>Serving</td>
+			<td>HW</td>
+			<td>Description</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/haoranxu/ALMA-13B">haoranxu/ALMA-13B</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td>Gaudi2</td>
+			<td>Language Translation</td>
+		</tr>
+	</tbody>
+</table>
+
 ### SearchQnA
 
 [SearchQnA](./SearchQnA/README.md) is an example of chatbot for using search engine to enhance QA quality.
