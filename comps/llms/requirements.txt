@@ -1,0 +1,3 @@
+docarray[full]
+fastapi
+langchain_community
