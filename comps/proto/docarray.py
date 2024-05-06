@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from docarray import BaseDoc
+from docarray import BaseDoc, DocList
 from docarray.typing import NdArray
 
 
@@ -41,3 +41,14 @@ class LLMParamsDoc(BaseDoc):
     temperature: float = 0.01
     repetition_penalty: float = 1.03
     streaming: bool = True
+
+
+class RerankingInputDoc(BaseDoc):
+    query: str
+    passages: DocList[TextDoc]
+    top_n: int = 3
+
+
+class RerankingOutputDoc(BaseDoc):
+    query: str
+    doc: TextDoc

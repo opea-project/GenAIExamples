@@ -13,7 +13,15 @@
 # limitations under the License.
 
 # Document
-from comps.proto.docarray import TextDoc, EmbedDoc768, EmbedDoc1024, GeneratedDoc, LLMParamsDoc
+from comps.proto.docarray import (
+    TextDoc,
+    EmbedDoc768,
+    EmbedDoc1024,
+    GeneratedDoc,
+    LLMParamsDoc,
+    RerankingInputDoc,
+    RerankingOutputDoc,
+)
 
 # Microservice
 from comps.mega.orchestrator import ServiceOrchestrator
