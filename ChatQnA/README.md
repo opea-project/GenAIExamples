@@ -113,25 +113,31 @@ curl 127.0.0.1:9090/embed \
 
 Note: If you want to integrate the TEI service into the LangChain application, you'll need to restart the LangChain backend service after launching the TEI service.
 
-## Launch Redis and LangChain Backend Service
+## Launch Vector Database and LangChain Backend Service
 
 Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose.yml`
+
+By default, Redis is used as the vector store. To use Qdrant, use the `docker-compose-qdrant.yml` file instead.
 
 ```bash
 cd langchain/docker
 docker compose -f docker-compose.yml up -d
+# To use Qdrant, run
+# docker compose -f docker-compose-qdrant.yml up -d
 cd ../../
 ```
 
 > [!NOTE]
 > If you modified any files and want that change introduced in this step, add `--build` to the end of the command to build the container image instead of pulling it from dockerhub.
 
-## Ingest data into Redis
+## Ingest Data Into Vector Database
 
-Each time the Redis container is launched, data should be ingested into the container using the commands:
+Each time the vector database container is launched, data should be ingested into the container using the commands:
 
 ```bash
 docker exec -it qna-rag-redis-server bash
+# To use Qdrant, run
+# docker exec -it qna-rag-qdrant-server bash
 cd /ws
 python ingest.py
 ```

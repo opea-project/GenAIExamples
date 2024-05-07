@@ -1,0 +1,45 @@
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+services:
+  qdrant-vector-db:
+    image: qdrant/qdrant:v1.9.0
+    container_name: qdrant-vector-db
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+  qna-rag-qdrant-server:
+    build:
+      args:
+        https_proxy: ${https_proxy}
+        http_proxy: ${http_proxy}
+      dockerfile: Dockerfile
+      context: .
+    image: intel/gen-ai-examples:qna-rag-qdrant-server
+    container_name: qna-rag-qdrant-server
+    environment:
+      - https_proxy=${https_proxy}
+      - HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+      - "EMBED_MODEL=BAAI/bge-base-en-v1.5"
+      - "VECTOR_DATABASE=QDRANT"
+      - "TGI_LLM_ENDPOINT=http://localhost:8080"
+      # "TEI_ENDPOINT="http://xxx.xxx.xxx.xxx:9090" - To use a custom TEI endpoint
+    ulimits:
+      memlock:
+        soft: -1 # Set memlock to unlimited (no soft or hard limit)
+        hard: -1
+    volumes:
+      - ../qdrant:/ws
+      - ../test:/test
+    network_mode: "host"
