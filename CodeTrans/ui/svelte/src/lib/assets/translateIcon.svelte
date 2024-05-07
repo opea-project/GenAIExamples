@@ -14,19 +14,6 @@
   limitations under the License.
 -->
 
-<script>
-
-</script>
-<header
-  class="sticky top-0 z-40 flex-none w-full mx-auto bg-[#0054ae] border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800"
->
-  <nav
-    class="bg-[#0054ae] dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 divide-gray-200 dark:divide-gray-700 px-2 sm:px-4 w-full py-1.5"
-  >
-    <div class="mx-auto flex flex-wrap justify-center items-center w-full">
-      <span
-        class="whitespace-nowrap py-2 text-3xl font-semibold text-white ml-4">Code Translation</span
-      >
-    </div>
-  </nav>
-</header>
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="text-[#f5ae23] h-5 w-5" aria-hidden="true">
+	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+</svg>

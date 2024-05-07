@@ -2,14 +2,15 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/yT2VDBX.png)
-![project-screenshot](https://imgur.com/8ajC7lE.png)
+![project-screenshot](https://imgur.com/1M4xjok.png)
+![project-screenshot](https://imgur.com/IIbG4HN.png)
+![project-screenshot](https://imgur.com/FbThcUY.png)
 
 <h2>🧐 Features</h2>
 
 Here're some of the project's features:
 
-- Code Translation: It is able to recognize and handle multiple languages, providing translations for individual words, phrases, or even entire sentences.
+- Code Translation: The system is capable of recognizing multiple languages and converting the current code content into the desired language's code format, enabling a set of code to be reused in multiple places, thus alleviating developers' development pressure.
 
 <h2>🛠️ Get it Running:</h2>
 

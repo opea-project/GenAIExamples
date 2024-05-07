@@ -4,7 +4,6 @@ export const languagesList: Language[] = [
 	{ name: 'C' },
 	{ name: 'C++' },
 	{ name: 'C#' },
-	{ name: 'Golang' },
 	{ name: 'Java' },
 	{ name: 'Python' },
 	{ name: 'JavaScript' },
@@ -21,7 +20,5 @@ export const languagesList: Language[] = [
 	{ name: 'R' },
 	{ name: 'Lua' },
 	{ name: 'Bash' },
-	{ name: 'HTML' },
-	{ name: 'CSS' },
 	{ name: 'SQL' },
 ];
