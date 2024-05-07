@@ -14,7 +14,6 @@
 import { env } from "$env/dynamic/public";
 import { SSE } from "sse.js";
 
-
 const BASIC_URL = env.BASIC_URL;
 
 async function fetchPostRes(url, init) {
@@ -28,14 +27,12 @@ async function fetchPostRes(url, init) {
   }
 }
 
-
-export async function fetchLanguageResponse(input: string, transFrom: string, transTo: string) {
+export async function fetchLanguageResponse(input: string, transform: string, transTo: string) {
   const url = `${BASIC_URL}/v1/translation`;
   const transData = {
-    language_from: transFrom,
+    language_from: transform,
     language_to: transTo,
-    source_language: input
-    
+    source_language: input,
   };
 
   const init: RequestInit = {
@@ -50,11 +47,11 @@ export async function fetchTextStream(query: string, langFrom, langTo) {
   const payload = {
     language_from: langFrom,
     language_to: langTo,
-    source_code: query  
-}
-  
+    source_code: query,
+  };
+
   let url = `${BASIC_URL}/v1/code_translation_stream`;
- 
+
   return new SSE(url, {
     headers: { "Content-Type": "application/json" },
     payload: JSON.stringify(payload),
