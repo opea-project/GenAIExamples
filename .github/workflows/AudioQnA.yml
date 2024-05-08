@@ -15,7 +15,7 @@
 name: AudioQnA-test
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -31,7 +31,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  SearchQnA:
+  AudioQnA:
     runs-on: aise-cluster
     strategy:
       matrix:
