@@ -13,21 +13,17 @@
 # limitations under the License.
 
 import os
-from typing import Union
 
 from langchain_community.llms import HuggingFaceEndpoint
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
-from comps import GeneratedDoc, LLMParamsDoc, RerankedDoc, TextDoc, opea_microservices, register_microservice
+from comps import GeneratedDoc, LLMParamsDoc, RerankedDoc, opea_microservices, register_microservice
 
 
-@register_microservice(
-    name="opea_service@llm_tgi_gaudi", expose_endpoint="/v1/chat/completions", host="0.0.0.0", port=9000
-)
-def llm_generate(input: Union[TextDoc, RerankedDoc]) -> GeneratedDoc:
+@register_microservice(name="opea_service@llm_tgi", expose_endpoint="/v1/chat/completions", host="0.0.0.0", port=9000)
+def llm_generate(input: RerankedDoc, params: LLMParamsDoc = None) -> GeneratedDoc:
     llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
-    params = LLMParamsDoc()
+    params = params if params else LLMParamsDoc()
     llm = HuggingFaceEndpoint(
         endpoint_url=llm_endpoint,
         max_new_tokens=params.max_new_tokens,
@@ -38,22 +34,17 @@ def llm_generate(input: Union[TextDoc, RerankedDoc]) -> GeneratedDoc:
         repetition_penalty=params.repetition_penalty,
         streaming=params.streaming,
     )
-    if isinstance(input, RerankedDoc):
-        template = """Answer the question based only on the following context:
-        {context}
+    template = """Answer the question based only on the following context:
+    {context}
 
-        Question: {question}
-        """
-        prompt = ChatPromptTemplate.from_template(template)
-        chain = prompt | llm | StrOutputParser()
-        response = chain.invoke({"question": input.query, "context": input.doc.text})
-    elif isinstance(input, TextDoc):
-        response = llm.invoke(input.text)
-    else:
-        raise TypeError("Invalid input type. Expected TextDoc or RerankedDoc.")
+    Question: {query}
+    """
+    prompt_template = ChatPromptTemplate.from_template(template)
+    prompt = prompt_template.format(context=input.doc.text, query=input.query)
+    response = llm.invoke(prompt)
     res = GeneratedDoc(text=response, prompt=input.query)
     return res
 
 
 if __name__ == "__main__":
-    opea_microservices["opea_service@llm_tgi_gaudi"].start()
+    opea_microservices["opea_service@llm_tgi"].start()
