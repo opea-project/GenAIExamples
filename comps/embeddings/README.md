@@ -70,13 +70,13 @@ python embedding_tei_gaudi.py
 
 ```bash
 cd ../../
-docker build -t genaicomps/microservice/embedding:0.0.1 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/docker/Dockerfile .
+docker build -t intel/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/docker/Dockerfile .
 ```
 
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="embedding_server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_ENDPOINT=$TEI_ENDPOINT  genaicomps/microservice/embedding:0.0.1
+docker run -d --name="embedding-tei-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_ENDPOINT=$TEI_ENDPOINT  intel/gen-ai-comps:embedding-tei-server
 ```
 
 ## Run Docker with Docker Compose

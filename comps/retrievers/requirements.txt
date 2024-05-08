@@ -2,3 +2,4 @@ docarray[full]
 fastapi
 langchain_community
 redis
+sentence_transformers

@@ -15,16 +15,17 @@
 version: "3.8"
 
 services:
-  embedding:
-    image: genaicomps/microservice/embedding:0.0.1
-    container_name: embedding_server
+  retriever:
+    image: intel/gen-ai-comps:retriever-redis-server
+    container_name: retriever-redis-server
     ports:
-      - "6000:6000"
+      - "7000:7000"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TEI_ENDPOINT: ${TEI_ENDPOINT}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
 
 networks:
