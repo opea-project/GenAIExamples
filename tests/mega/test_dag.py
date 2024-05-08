@@ -15,7 +15,7 @@
 import unittest
 from collections import OrderedDict
 
-from comps.mega.dag import DAG
+from comps.cores.mega.dag import DAG
 
 
 class TestDAG(unittest.TestCase):

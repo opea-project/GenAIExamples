@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Document
-from comps.proto.docarray import (
+from comps.cores.proto.docarray import (
     Audio2TextDoc,
     Base64ByteStrDoc,
     EmbedDoc768,
@@ -26,9 +26,9 @@ from comps.proto.docarray import (
 )
 
 # Microservice
-from comps.mega.orchestrator import ServiceOrchestrator
-from comps.mega.orchestrator_with_yaml import ServiceOrchestratorWithYaml
-from comps.mega.micro_service import MicroService, register_microservice, opea_microservices
+from comps.cores.mega.orchestrator import ServiceOrchestrator
+from comps.cores.mega.orchestrator_with_yaml import ServiceOrchestratorWithYaml
+from comps.cores.mega.micro_service import MicroService, register_microservice, opea_microservices
 
 # Redis config
 from comps.retrievers.langchain.redis_config import INDEX_NAME, REDIS_URL, INDEX_SCHEMA
