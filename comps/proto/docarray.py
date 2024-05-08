@@ -34,11 +34,6 @@ class EmbedDoc768(BaseDoc):
     embedding: conlist(float, min_length=768, max_length=768)
 
 
-class EmbedDoc1024(BaseDoc):
-    text: str
-    embedding: conlist(float, min_length=1024, max_length=1024)
-
-
 class Audio2TextDoc(AudioDoc):
     url: Optional[AudioUrl] = Field(
         description="The path to the audio.",
@@ -52,6 +47,11 @@ class Audio2TextDoc(AudioDoc):
         description="The language that Whisper prefer to detect.",
         default="auto",
     )
+
+
+class EmbedDoc1024(BaseDoc):
+    text: str
+    embedding: conlist(float, min_length=1024, max_length=1024)
 
 
 class SearchedDoc(BaseDoc):

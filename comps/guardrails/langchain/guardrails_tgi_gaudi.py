@@ -106,6 +106,7 @@ Provide your safety assessment for {role} in the above conversation:
 @register_microservice(
     name="opea_service@guardrails_tgi_gaudi",
     expose_endpoint="/v1/guardrails",
+    host="0.0.0.0",
     port=9090,
     input_datatype=TextDoc,
     output_datatype=TextDoc,

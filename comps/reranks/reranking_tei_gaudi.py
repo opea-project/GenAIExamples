@@ -23,6 +23,7 @@ from comps import RerankedDoc, SearchedDoc, opea_microservices, register_microse
 @register_microservice(
     name="opea_service@reranking_tgi_gaudi",
     expose_endpoint="/v1/reranking",
+    host="0.0.0.0",
     port=8000,
     input_datatype=SearchedDoc,
     output_datatype=RerankedDoc,
