@@ -31,7 +31,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  SearchQnA:
+  AudioQnA:
     runs-on: aise-cluster
     strategy:
       matrix:
