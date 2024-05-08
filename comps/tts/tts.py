@@ -21,9 +21,10 @@ import numpy as np
 import torch
 from transformers import SpeechT5ForTextToSpeech, SpeechT5HifiGan, SpeechT5Processor
 
-from comps import Base64ByteStrDoc, TextDoc, opea_microservices, register_microservice
+from comps import Base64ByteStrDoc, TextDoc, opea_microservices, opea_telemetry, register_microservice
 
 
+@opea_telemetry
 def text2speech(
     text,
     model_name_or_path="microsoft/speecht5_tts",
@@ -78,6 +79,7 @@ def text2speech(
     input_datatype=TextDoc,
     output_datatype=TextDoc,
 )
+@opea_telemetry
 async def text_to_audio(input: TextDoc):
     text = input.text
     speech = text2speech(text=text)

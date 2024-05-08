@@ -22,9 +22,10 @@ from datasets import Audio, Dataset
 from pydub import AudioSegment
 from transformers import WhisperForConditionalGeneration, WhisperProcessor
 
-from comps import Audio2TextDoc, TextDoc, opea_microservices, register_microservice
+from comps import Audio2TextDoc, TextDoc, opea_microservices, opea_telemetry, register_microservice
 
 
+@opea_telemetry
 def _audiosegment_to_librosawav(audiosegment):
     channel_sounds = audiosegment.split_to_mono()[:1]  # only select the first channel
     samples = [s.get_array_of_samples() for s in channel_sounds]
@@ -36,6 +37,7 @@ def _audiosegment_to_librosawav(audiosegment):
     return fp_arr
 
 
+@opea_telemetry
 def audio2text(
     audio_path,
     model_name_or_path="openai/whisper-small",
@@ -92,6 +94,7 @@ def audio2text(
     input_datatype=Audio2TextDoc,
     output_datatype=TextDoc,
 )
+@opea_telemetry
 async def audio_to_text(audio: Audio2TextDoc):
     audio.tensor, audio.frame_rate = audio.url.load()  # AudioNdArray, fr
     audio_path = f"{audio.id}.wav"
