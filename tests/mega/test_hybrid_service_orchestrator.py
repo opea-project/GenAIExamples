@@ -18,7 +18,7 @@ import unittest
 from comps import RemoteMicroService, ServiceOrchestrator, TextDoc, opea_microservices, register_microservice
 
 
-@register_microservice(name="s1", port=8081, expose_endpoint="/v1/add")
+@register_microservice(name="s1", host="0.0.0.0", port=8086, expose_endpoint="/v1/add")
 async def s1_add(request: TextDoc) -> TextDoc:
     req = request.model_dump_json()
     req_dict = json.loads(req)
