@@ -57,7 +57,7 @@ export LLM_MODEL_ID=${your_hf_llm_model}
 
 ```bash
 cd ../../
-docker build -t intel/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llm/langchain/docker/Dockerfile .
+docker build -t intel/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
 ## Run Docker with CLI

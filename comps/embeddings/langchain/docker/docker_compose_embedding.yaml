@@ -24,7 +24,7 @@ services:
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TEI_ENDPOINT: ${TEI_ENDPOINT}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
 
 networks:

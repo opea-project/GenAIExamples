@@ -1,4 +1,5 @@
 docarray[full]
 fastapi
+huggingface_hub
 langchain
 sentence_transformers

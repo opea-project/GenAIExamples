@@ -56,11 +56,11 @@ curl localhost:$your_port/embed \
     -H 'Content-Type: application/json'
 ```
 
-Start the embedding service with the TEI_ENDPOINT.
+Start the embedding service with the TEI_EMBEDDING_ENDPOINT.
 
 ```bash
 cd langchain
-export TEI_ENDPOINT="http://localhost:$yourport"
+export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
 python embedding_tei_gaudi.py
 ```
 
@@ -76,7 +76,7 @@ docker build -t intel/gen-ai-comps:embedding-tei-server --build-arg https_proxy=
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="embedding-tei-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_ENDPOINT=$TEI_ENDPOINT  intel/gen-ai-comps:embedding-tei-server
+docker run -d --name="embedding-tei-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT  intel/gen-ai-comps:embedding-tei-server
 ```
 
 ## Run Docker with Docker Compose
