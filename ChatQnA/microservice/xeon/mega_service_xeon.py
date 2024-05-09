@@ -16,13 +16,17 @@
 from comps import RemoteMicroService, ServiceOrchestrator
 
 
-class MyServiceOrchestrator():
+class MyServiceOrchestrator:
     def __init__(self, port=8000):
         self.service_builder = ServiceOrchestrator(port=port)
 
     def add_remote_service(self):
-        embedding = RemoteMicroService(name="embedding", host="10.165.57.68", port=6000, expose_endpoint="/v1/embeddings")
-        retriever = RemoteMicroService(name="retriever", host="10.165.57.68", port=7000, expose_endpoint="/v1/retrieval")
+        embedding = RemoteMicroService(
+            name="embedding", host="10.165.57.68", port=6000, expose_endpoint="/v1/embeddings"
+        )
+        retriever = RemoteMicroService(
+            name="retriever", host="10.165.57.68", port=7000, expose_endpoint="/v1/retrieval"
+        )
         rerank = RemoteMicroService(name="rerank", host="10.165.57.68", port=8000, expose_endpoint="/v1/reranking")
         llm = RemoteMicroService(name="llm", host="10.165.57.68", port=9000, expose_endpoint="/v1/chat/completions")
         self.service_builder.add(embedding).add(retriever).add(rerank).add(llm)
