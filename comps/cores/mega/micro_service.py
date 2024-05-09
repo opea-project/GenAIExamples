@@ -25,6 +25,38 @@ from .utils import check_ports_availability
 opea_microservices = {}
 
 
+class RemoteMicroService:
+    """RemoteMicroservice class that stores the metadata of microservice on other hosts.
+
+    This class assumes that you already initialize the microservice and the exposed endpoint is accessible.
+    """
+
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        service_role: ServiceRoleType = ServiceRoleType.MICROSERVICE,
+        protocol: str = "http",
+        host: str = "localhost",
+        port: int = 8080,
+        expose_endpoint: Optional[str] = "/",
+        input_datatype: Type[Any] = TextDoc,
+        output_datatype: Type[Any] = TextDoc,
+    ):
+        """Init the metadata of a remote microservice."""
+        self.name = f"{name}/{self.__class__.__name__}" if name else self.__class__.__name__
+        self.service_role = service_role
+        self.protocol = protocol
+        self.host = host
+        self.port = port
+        self.expose_endpoint = expose_endpoint
+        self.input_datatype = input_datatype
+        self.output_datatype = output_datatype
+
+    @property
+    def endpoint_path(self):
+        return f"{self.protocol}://{self.host}:{self.port}{self.expose_endpoint}"
+
+
 class MicroService:
     """MicroService class to create a microservice."""
 

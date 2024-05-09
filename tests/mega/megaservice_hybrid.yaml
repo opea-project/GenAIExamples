@@ -12,23 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Document
-from comps.cores.proto.docarray import (
-    Audio2TextDoc,
-    Base64ByteStrDoc,
-    EmbedDoc768,
-    EmbedDoc1024,
-    GeneratedDoc,
-    LLMParamsDoc,
-    RerankedDoc,
-    SearchedDoc,
-    TextDoc,
-)
+opea_micro_services:
+  s1:
+    endpoint: http://localhost:8081/v1/add
 
-# Microservice
-from comps.cores.mega.orchestrator import ServiceOrchestrator
-from comps.cores.mega.orchestrator_with_yaml import ServiceOrchestratorWithYaml
-from comps.cores.mega.micro_service import MicroService, RemoteMicroService, register_microservice, opea_microservices
+  s2:
+    endpoint: http://fakehost:8008/v1/add # Here change the host to where your remote service is located
 
-# Telemetry
-from comps.cores.telemetry.opea_telemetry import opea_telemetry
+opea_mega_service:
+  mega_flow:
+    - s1 >> s2

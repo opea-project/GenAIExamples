@@ -18,7 +18,7 @@ import time
 import unittest
 
 from comps import opea_telemetry
-from comps.telemetry.opea_telemetry import in_memory_exporter
+from comps.cores.telemetry.opea_telemetry import in_memory_exporter
 
 
 @opea_telemetry
