@@ -46,72 +46,14 @@ Then run the command `docker images`, you will have the following four Docker Im
 
 ## 🚀 Prepare Related Service Endpoints
 
-In order to run the microservices above, you need to prepare these service endpoints below:
+In order to run the microservices above, you need to prepare the Redis service for Retriever.
 
-- TEI service for Embedding
-- TEI service for Reranking
-- TGI service for LLM
-- Redis service for Retriever
-
-### 1. Start TEI service for Embedding
-
-```bash
-tei_embed_port=8090
-model="BAAI/bge-large-en-v1.5"
-revision="refs/pr/5"
-docker run -p ${tei_embed_port}:80 --name tei_embedding_server -v ./data:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id ${model} --revision ${revision}
-```
-
-Validate with:
-
-```bash
-curl localhost:${tei_embed_port}/embed \
-    -X POST \
-    -d '{"inputs":"What is Deep Learning?"}' \
-    -H 'Content-Type: application/json'
-```
-
-### 2. Start TEI service for Reranking
-
-```bash
-tei_rerank_port=6060
-model="BAAI/bge-reranker-large"
-revision="refs/pr/4"
-docker run -d -p ${tei_rerank_port}:80 --name tei_rerank_server -v ./data:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id ${model} --revision ${revision}
-```
-
-Validate with:
-
-```bash
-curl localhost:${tei_rerank_port}/rerank \
-    -X POST \
-    -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-    -H 'Content-Type: application/json'
-```
-
-### 3. Start TGI service for LLM
-
-```bash
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-tgi_port=8008
-model="m-a-p/OpenCodeInterpreter-DS-6.7B"
-docker run -p ${tgi_port}:80 -v ./data:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:1.4 --model-id ${model}
-```
-
-Validate with:
-
-```bash
-curl http://localhost:${tgi_port}/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
-
-### 4. Start Redis service for Retriever
 
 ```bash
 docker run -d --name="redis-vector-db" -p 6379:6379 -p 8001:8001 redis/redis-stack:7.2.0-v9
 ```
+
+
 
 ## 🚀 Start Microservices
 
@@ -122,9 +64,12 @@ Since the `docker_compose_xeon.yaml` will consume some environment variables, yo
 ```bash
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:${tei_embed_port}"
-export TEI_RERANKING_ENDPOINT="http://${your_ip}:${tei_rerank_port}"
-export TGI_LLM_ENDPOINT="http://${your_ip}:${tgi_port}"
+export EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
+export RERANK_MODEL_ID="BAAI/bge-reranker-large"
+export LLM_MODEL_ID="m-a-p/OpenCodeInterpreter-DS-6.7B"
+export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:8090"
+export TEI_RERANKING_ENDPOINT="http://${your_ip}:6060"
+export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export REDIS_URL="redis://${your_ip}:6379"
 export INDEX_NAME=${your_index_name}
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
@@ -138,7 +83,16 @@ docker compose -f docker_compose_xeon.yaml up -d
 
 ### Validate Microservices
 
-1. Embedding Microservice
+1. TEI Embedding Service
+
+```bash
+curl ${your_ip}:8090/embed \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?"}' \
+    -H 'Content-Type: application/json'
+```
+
+2. Embedding Microservice
 
 ```bash
 curl http://${your_ip}:6000/v1/embeddings\
@@ -147,7 +101,7 @@ curl http://${your_ip}:6000/v1/embeddings\
   -H 'Content-Type: application/json'
 ```
 
-2. Retriever Microservice
+3. Retriever Microservice
 
 ```bash
 curl http://${your_ip}:7000/v1/retrieval\
@@ -156,7 +110,15 @@ curl http://${your_ip}:7000/v1/retrieval\
   -H 'Content-Type: application/json'
 ```
 
-3. Reranking Microservice
+4. TEI Reranking Service
+```bash
+curl http://${your_ip}:6060/rerank \
+    -X POST \
+    -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
+    -H 'Content-Type: application/json'
+```
+
+5. Reranking Microservice
 
 ```bash
 curl http://${your_ip}:8000/v1/reranking\
@@ -165,7 +127,15 @@ curl http://${your_ip}:8000/v1/reranking\
   -H 'Content-Type: application/json'
 ```
 
-4. LLM Microservice
+6. TGI Service
+```bash
+curl http://${your_ip}:8008/generate \
+  -X POST \
+  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+  -H 'Content-Type: application/json'
+```
+
+7. LLM Microservice
 
 ```bash
 curl http://${your_ip}:9000/v1/chat/completions\
