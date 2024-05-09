@@ -10,7 +10,6 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
@@ -59,7 +58,6 @@ Then run the command `docker images`, you will have the following four Docker Im
 3. `opea/gen-ai-comps:reranking-tei-xeon-server`
 4. `opea/gen-ai-comps:llm-tgi-server`
 5. `intel/gen-ai-examples:qna-rag-redis-server`
-
 
 ## 🚀 Start Microservices
 
@@ -153,7 +151,6 @@ curl http://${your_ip}:9000/v1/chat/completions\
 ```
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service. However, before launching the mega-service, it's essential to ingest data into the vector store.
-
 
 ## 🚀 Ingest Data Into Vector Database
 
