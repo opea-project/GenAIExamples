@@ -3,10 +3,12 @@
 This document describes how to deploy a ChatQnA megaservice using Large Language Models (LLM) on an Intel Xeon server. The process involves building Docker images, deploying containers with Docker Compose, and running the service to integrate various microservices like `embedding`, `retriever`, `rerank`, and `llm`.
 
 ## 🚀 Build Docker Images
-First of all, you need to build Docker Images locally.
+First of all, you need to build Docker Images locally and install the python package of it.
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
+pip install -r requirements.txt
+pip install .
 ```
 
 ### 1. Build Embedding Image
