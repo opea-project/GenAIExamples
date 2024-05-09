@@ -2,10 +2,9 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as embedding, retriever, rerank, and llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
-
 ## 🚀 Build Docker Images
 
-First of all, you need to build Docker Images locally. This step can be ingored after the Docker images published to Docker hub.
+First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
 ### 1. Source Code install GenAIComps
 
@@ -73,7 +72,6 @@ Then run the command `docker images`, you will have the following four Docker Im
 5. `tei_gaudi`
 6. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
 7. `intel/gen-ai-examples:qna-rag-redis-server`
-
 
 ## 🚀 Start Microservices
 
