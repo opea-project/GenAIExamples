@@ -1,6 +1,6 @@
 # Build MegaService of ChatQnA on Gaudi
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as embedding, retriever, rerank, and llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as embedding, retriever, rerank, and llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
 
 ## 🚀 Build Docker Images
@@ -47,7 +47,7 @@ Since a TEI Gaudi Docker image hasn't been published, we'll need to build it fro
 cd ..
 git clone https://github.com/huggingface/tei-gaudi
 cd tei-gaudi/
-docker build -f Dockerfile-hpu -t tei_gaudi .
+docker build -f Dockerfile-hpu -t opea/tei_gaudi .
 ```
 
 ### 7. Pull TGI Gaudi Image
@@ -70,7 +70,7 @@ Then run the command `docker images`, you will have the following four Docker Im
 2. `opea/gen-ai-comps:retriever-redis-server`
 3. `opea/gen-ai-comps:reranking-tei-gaudi-server`
 4. `opea/gen-ai-comps:llm-tgi-server`
-5. `tei_gaudi`
+5. `opea/tei_gaudi`
 6. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
 7. `intel/gen-ai-examples:qna-rag-redis-server`
 
