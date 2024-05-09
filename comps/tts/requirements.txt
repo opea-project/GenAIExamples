@@ -1,2 +1,5 @@
+docarray[full]
+fastapi
+sentencepiece
 torch
 transformers

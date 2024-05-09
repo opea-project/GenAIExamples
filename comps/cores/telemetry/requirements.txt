@@ -1,2 +1,3 @@
 opentelemetry-api
+opentelemetry-exporter-otlp
 opentelemetry-sdk

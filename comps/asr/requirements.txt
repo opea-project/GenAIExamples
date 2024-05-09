@@ -1,4 +1,6 @@
 datasets
+docarray[full]
+fastapi
 intel_extension_for_pytorch
 pydub
 torch
