@@ -3,54 +3,65 @@
 This document describes how to deploy a ChatQnA megaservice using Large Language Models (LLM) on an Intel Xeon server. The process involves building Docker images, deploying containers with Docker Compose, and running the service to integrate various microservices like `embedding`, `retriever`, `rerank`, and `llm`.
 
 ## 🚀 Build Docker Images
+
 First of all, you need to build Docker Images locally.
+
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
 ### 1. Build Embedding Image
+
 ```bash
 docker build -t intel/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/docker/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
+
 ```bash
 docker build -t intel/gen-ai-comps:retriever-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
+
 ```bash
 docker build -t intel/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
 ```
 
 ### 4. Build LLM Image
+
 ```bash
 docker build -t intel/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llm/langchain/docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:
+
 1. `intel/gen-ai-comps:embedding-tei-server`
 2. `intel/gen-ai-comps:retriever-redis-server`
 3. `intel/gen-ai-comps:reranking-tei-xeon-server`
 4. `intel/gen-ai-comps:llm-tgi-server`
 
-
 ## 🚀 Prepare Related Service Endpoints
+
 In order to run the microservices above, you need to prepare these service endpoints below:
+
 - TEI service for Embedding
 - TEI service for Reranking
 - TGI service for LLM
 - Redis service for Retriever
 
 ### 1. Start TEI service for Embedding
+
 ```bash
 tei_embed_port=8090
 model="BAAI/bge-large-en-v1.5"
 revision="refs/pr/5"
 docker run -p ${tei_embed_port}:80 --name tei_embedding_server -v ./data:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id ${model} --revision ${revision}
 ```
+
 Validate with:
+
 ```bash
 curl localhost:${tei_embed_port}/embed \
     -X POST \
@@ -59,13 +70,16 @@ curl localhost:${tei_embed_port}/embed \
 ```
 
 ### 2. Start TEI service for Reranking
+
 ```bash
 tei_rerank_port=6060
 model="BAAI/bge-reranker-large"
 revision="refs/pr/4"
 docker run -d -p ${tei_rerank_port}:80 --name tei_rerank_server -v ./data:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id ${model} --revision ${revision}
 ```
+
 Validate with:
+
 ```bash
 curl localhost:${tei_rerank_port}/rerank \
     -X POST \
@@ -74,13 +88,16 @@ curl localhost:${tei_rerank_port}/rerank \
 ```
 
 ### 3. Start TGI service for LLM
+
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 tgi_port=8008
 model="m-a-p/OpenCodeInterpreter-DS-6.7B"
 docker run -p ${tgi_port}:80 -v ./data:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:1.4 --model-id ${model}
 ```
+
 Validate with:
+
 ```bash
 curl http://localhost:${tgi_port}/generate \
   -X POST \
@@ -89,10 +106,10 @@ curl http://localhost:${tgi_port}/generate \
 ```
 
 ### 4. Start Redis service for Retriever
+
 ```bash
 docker run -d --name="redis-vector-db" -p 6379:6379 -p 8001:8001 redis/redis-stack:7.2.0-v9
 ```
-
 
 ## 🚀 Start Microservices
 
@@ -112,12 +129,15 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
 
 ### Start Microservice Docker Containers
+
 ```bash
 docker compose -f docker_compose_xeon.yaml up -d
 ```
 
 ### Validate Microservices
+
 1. Embedding Microservice
+
 ```bash
 curl http://${your_ip}:6000/v1/embeddings\
   -X POST \
@@ -126,6 +146,7 @@ curl http://${your_ip}:6000/v1/embeddings\
 ```
 
 2. Retriever Microservice
+
 ```bash
 curl http://${your_ip}:7000/v1/retrieval\
   -X POST \
@@ -134,6 +155,7 @@ curl http://${your_ip}:7000/v1/retrieval\
 ```
 
 3. Reranking Microservice
+
 ```bash
 curl http://${your_ip}:8000/v1/reranking\
   -X POST \
@@ -142,6 +164,7 @@ curl http://${your_ip}:8000/v1/reranking\
 ```
 
 4. LLM Microservice
+
 ```bash
 curl http://${your_ip}:9000/v1/chat/completions\
   -X POST \
@@ -150,7 +173,6 @@ curl http://${your_ip}:9000/v1/chat/completions\
 ```
 
 After validating all of the microservices above, you are able to construct a mega service now.
-
 
 ## 🚀 Construct Mega Service
 
@@ -161,4 +183,3 @@ All of the intermediate results will be printed for each microservices. Users ca
 ```bash
 python mega_service_xeon.py
 ```
-
