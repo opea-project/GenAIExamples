@@ -35,7 +35,7 @@ curl 127.0.0.1:6060/rerank \
 
 ```bash
 export TEI_RERANKING_ENDPOINT="http://${your_ip}:6060"
-python langchain/reranking_tei_xeon.py
+python reranking_tei_xeon.py
 ```
 
 # 🚀Start Microservice with Docker
@@ -48,19 +48,19 @@ If you start an Reranking microservice with docker, the `docker_compose_rerankin
 
 ```bash
 cd ../../
-docker build -t intel/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
+docker build -t intel/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
 ```
 
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="reranking-tei-server" -p 9090:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN intel/gen-ai-comps:reranking-tei-xeon-server
+docker run -d --name="reranking-tei-server" -p 8000:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN intel/gen-ai-comps:reranking-tei-xeon-server
 ```
 
 ## Run Docker with Docker Compose
 
 ```bash
-cd langchain/docker
+cd docker
 docker compose -f docker_compose_reranking.yaml up -d
 ```
 

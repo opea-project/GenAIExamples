@@ -34,6 +34,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
 
 networks:
