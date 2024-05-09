@@ -15,6 +15,31 @@
 version: "3.8"
 
 services:
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  qna-rag-redis-server:
+    image: intel/gen-ai-examples:qna-rag-redis-server
+    container_name: qna-rag-redis-server
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      REDIS_PORT: 6379
+      EMBED_MODEL: BAAI/bge-base-en-v1.5
+      REDIS_SCHEMA: schema_dim_768.yml
+      VECTOR_DATABASE: REDIS
+    ulimits:
+      memlock:
+        soft: -1 # Set memlock to unlimited (no soft or hard limit)
+        hard: -1
+    volumes:
+      - ../redis:/ws
+      - ../test:/test
+    network_mode: "host"
   tei_embedding_service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei_embedding_server
