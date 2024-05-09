@@ -48,12 +48,9 @@ Then run the command `docker images`, you will have the following four Docker Im
 
 In order to run the microservices above, you need to prepare the Redis service for Retriever.
 
-
 ```bash
 docker run -d --name="redis-vector-db" -p 6379:6379 -p 8001:8001 redis/redis-stack:7.2.0-v9
 ```
-
-
 
 ## 🚀 Start Microservices
 
@@ -111,6 +108,7 @@ curl http://${your_ip}:7000/v1/retrieval\
 ```
 
 4. TEI Reranking Service
+
 ```bash
 curl http://${your_ip}:6060/rerank \
     -X POST \
@@ -128,6 +126,7 @@ curl http://${your_ip}:8000/v1/reranking\
 ```
 
 6. TGI Service
+
 ```bash
 curl http://${your_ip}:8008/generate \
   -X POST \
