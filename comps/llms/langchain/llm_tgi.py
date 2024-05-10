@@ -36,6 +36,7 @@ def llm_generate(input: Union[TextDoc, RerankedDoc]) -> GeneratedDoc:
         repetition_penalty=params.repetition_penalty,
         streaming=params.streaming,
     )
+    final_prompt = None
     if isinstance(input, RerankedDoc):
         template = """Answer the question based only on the following context:
         {context}
@@ -43,12 +44,14 @@ def llm_generate(input: Union[TextDoc, RerankedDoc]) -> GeneratedDoc:
         """
         prompt = ChatPromptTemplate.from_template(template)
         chain = prompt | llm | StrOutputParser()
+        final_prompt = input.query
         response = chain.invoke({"question": input.query, "context": input.doc.text})
     elif isinstance(input, TextDoc):
+        final_prompt = input.text
         response = llm.invoke(input.text)
     else:
         raise TypeError("Invalid input type. Expected TextDoc or RerankedDoc.")
-    res = GeneratedDoc(text=response, prompt=input.query)
+    res = GeneratedDoc(text=response, prompt=final_prompt)
     return res
 
 
