@@ -25,7 +25,7 @@ pip install .
 ### 1. Build LLM Image
 
 ```bash
-docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llm/langchain/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:
@@ -36,7 +36,7 @@ Then run the command `docker images`, you will have the following four Docker Im
 
 ### Setup Environment Variables
 
-Since the `docker_compose_xeon.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
 export http_proxy=${your_http_proxy}
@@ -49,7 +49,7 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ### Start Microservice Docker Containers
 
 ```bash
-docker compose -f docker_compose_xeon.yaml up -d
+docker compose -f docker_compose.yaml up -d
 ```
 
 ### Validate Microservices
@@ -66,17 +66,17 @@ curl http://${your_ip}:8008/generate \
 2. LLM Microservice
 
 ```bash
-curl http://${your_ip}:9000/v1/translation\
+curl http://${your_ip}:9000/v1/translation \
   -X POST \
   -d '{"language_from": "English","language_to": "Chinese","source_language": "I am a translator"}' \
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service. However, before launching the mega-service, it's essential to ingest data into the vector store.
+Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
 ## 🚀 Construct Mega Service
 
-Modify the `initial_inputs` of line 34 in `translation.py`, then you will get the Translation result of this mega service.
+Modify the `initial_inputs` of line 28 in `translation.py`, then you will get the Translation result of this mega service.
 
 All of the intermediate results will be printed for each microservices. Users can check the accuracy of the results to make targeted modifications.
 
