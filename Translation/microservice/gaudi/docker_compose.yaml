@@ -20,6 +20,11 @@ services:
     container_name: tgi_service
     ports:
       - "8008:80"
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
       - "./data:/data"
     command: --model-id ${LLM_MODEL_ID}
