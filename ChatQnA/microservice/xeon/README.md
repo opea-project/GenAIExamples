@@ -42,7 +42,7 @@ docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_pr
 ### 4. Build LLM Image
 
 ```bash
-docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llm/langchain/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
 ### 5. Pull qna-rag-redis-server Image
