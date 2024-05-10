@@ -74,13 +74,13 @@ export LLM_MODEL_ID=${your_hf_llm_model}
 
 ```bash
 cd ../../
-docker build -t intel/gen-ai-comps:guardrails-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/langchain/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:guardrails-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/langchain/docker/Dockerfile .
 ```
 
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="guardrails-tgi-server" -p 9090:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e SAFETY_GUARD_ENDPOINT=$SAFETY_GUARD_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN intel/gen-ai-comps:guardrails-tgi-gauid-server
+docker run -d --name="guardrails-tgi-server" -p 9090:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e SAFETY_GUARD_ENDPOINT=$SAFETY_GUARD_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/gen-ai-comps:guardrails-tgi-gauid-server
 ```
 
 ## Run Docker with Docker Compose

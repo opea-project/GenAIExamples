@@ -45,13 +45,13 @@ python langchain/retriever_redis.py
 
 ```bash
 cd ../../
-docker build -t intel/gen-ai-comps:retriever-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
 ```
 
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="retriever-redis-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME intel/gen-ai-comps:retriever-redis-server
+docker run -d --name="retriever-redis-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME opea/gen-ai-comps:retriever-redis-server
 ```
 
 ## Run Docker with Docker Compose

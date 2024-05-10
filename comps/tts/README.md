@@ -26,13 +26,13 @@ The other way is to start the ASR microservice with Docker.
 
 ```bash
 cd ../../
-docker build -t intel/gen-ai-comps:tts --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/Dockerfile .
+docker build -t opea/gen-ai-comps:tts --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/Dockerfile .
 ```
 
 ## Run Docker with CLI
 
 ```bash
-docker run -p 9999:9999 --network=host --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy intel/gen-ai-comps:tts
+docker run -p 9999:9999 --network=host --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/gen-ai-comps:tts
 ```
 
 # Test

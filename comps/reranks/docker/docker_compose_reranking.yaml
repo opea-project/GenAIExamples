@@ -25,7 +25,7 @@ services:
     shm_size: 1g
     command: --model-id ${RERANK_MODEL_ID}
   reranking:
-    image: intel/gen-ai-comps:reranking-tei-xeon-server
+    image: opea/gen-ai-comps:reranking-tei-xeon-server
     container_name: reranking-tei-xeon-server
     ports:
       - "8000:8000"

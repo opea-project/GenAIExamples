@@ -26,13 +26,13 @@ The other way is to start the ASR microservice with Docker.
 
 ```bash
 cd ../../
-docker build -t intel/gen-ai-comps:asr --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/Dockerfile .
+docker build -t opea/gen-ai-comps:asr --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/Dockerfile .
 ```
 
 ## Run Docker with CLI
 
 ```bash
-docker run -p 9099:9099 --network=host --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy intel/gen-ai-comps:asr
+docker run -p 9099:9099 --network=host --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/gen-ai-comps:asr
 ```
 
 # Test

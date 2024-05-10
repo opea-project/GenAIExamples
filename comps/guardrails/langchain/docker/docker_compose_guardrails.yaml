@@ -25,7 +25,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   guardrails:
-    image: intel/gen-ai-comps:guardrails-tgi-gaudi-server
+    image: opea/gen-ai-comps:guardrails-tgi-gaudi-server
     container_name: guardrails-tgi-gaudi-server
     ports:
       - "9090:9090"
