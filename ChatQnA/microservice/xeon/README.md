@@ -63,7 +63,7 @@ Then run the command `docker images`, you will have the following four Docker Im
 
 ### Setup Environment Variables
 
-Since the `docker_compose_xeon.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
 export http_proxy=${your_http_proxy}
@@ -82,7 +82,7 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ### Start Microservice Docker Containers
 
 ```bash
-docker compose -f docker_compose_xeon.yaml up -d
+docker compose -f docker_compose.yaml up -d
 ```
 
 ### Validate Microservices
