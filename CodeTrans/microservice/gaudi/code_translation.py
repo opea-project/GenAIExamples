@@ -25,7 +25,9 @@ class MyServiceOrchestrator:
         self.service_builder.add(llm)
 
     def schedule(self):
-        self.service_builder.schedule(initial_inputs={"text": """
+        self.service_builder.schedule(
+            initial_inputs={
+                "text": """
     ### System: Please translate the following Golang codes into  Python codes.
 
     ### Original codes:
@@ -36,7 +38,9 @@ class MyServiceOrchestrator:
     '''
 
     ### Translated codes:
-"""})
+"""
+            }
+        )
         self.service_builder.get_all_final_outputs()
         result_dict = self.service_builder.result_dict
         print(result_dict)

@@ -73,7 +73,6 @@ curl http://${your_ip}:9000/v1/chat/completions\
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
-
 ## 🚀 Construct Mega Service
 
 Modify the `initial_inputs` of line 28 in `code_translation.py`, then you will get the code translation result of this mega service.
