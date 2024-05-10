@@ -2,6 +2,9 @@ datasets
 docarray[full]
 fastapi
 intel_extension_for_pytorch
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
 pydub
 torch
 transformers

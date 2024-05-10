@@ -1,5 +1,8 @@
 docarray[full]
 fastapi
 langchain_community
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
 redis
 sentence_transformers

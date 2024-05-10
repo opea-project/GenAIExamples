@@ -1,5 +1,8 @@
 docarray[full]
 fastapi
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
 sentencepiece
 torch
 transformers

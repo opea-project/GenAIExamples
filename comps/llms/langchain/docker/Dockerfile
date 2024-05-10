@@ -34,4 +34,4 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/llms/langchain
 
-ENTRYPOINT ["python", "llm_tgi_gaudi.py"]
+ENTRYPOINT ["python", "llm_tgi.py"]
