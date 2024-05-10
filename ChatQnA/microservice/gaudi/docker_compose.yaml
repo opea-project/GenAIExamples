@@ -22,7 +22,7 @@ services:
       - "6379:6379"
       - "8001:8001"
   qna-rag-redis-server:
-    image: intel/gen-ai-examples:qna-rag-redis-server
+    image: opea/gen-ai-examples:qna-rag-redis-server
     container_name: qna-rag-redis-server
     environment:
       http_proxy: ${http_proxy}
