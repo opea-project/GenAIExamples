@@ -21,12 +21,12 @@ class TranslationService:
         self.service_builder = ServiceOrchestrator(port=port)
 
     def add_remote_service(self):
-        llm = RemoteMicroService(name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/translation")
+        llm = RemoteMicroService(name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/chat/completions")
         self.service_builder.add(llm)
 
     def schedule(self):
         self.service_builder.schedule(
-            initial_inputs={"language_from": "en", "language_to": "de", "source_language": "hello world"}
+            initial_inputs={"text":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}
         )
         self.service_builder.get_all_final_outputs()
         result_dict = self.service_builder.result_dict

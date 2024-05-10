@@ -65,9 +65,9 @@ curl http://${your_ip}:8008/generate \
 2. LLM Microservice
 
 ```bash
-curl http://${your_ip}:9000/v1/translation \
+curl http://${your_ip}:9000/v1/chat/completions \
   -X POST \
-  -d '{"language_from": "English","language_to": "Chinese","source_language": "I am a translator"}' \
+  -d '{"text":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
   -H 'Content-Type: application/json'
 ```
 
