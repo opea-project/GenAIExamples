@@ -28,7 +28,8 @@ USER user
 COPY comps /home/user/comps
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/user/comps/llms/requirements.txt
+    pip install --no-cache-dir -r /home/user/comps/llms/requirements.txt && \
+    pip install --no-cache-dir -r /home/user/comps/cores/telemetry/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 

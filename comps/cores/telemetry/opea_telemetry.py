@@ -25,7 +25,7 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanE
 in_memory_exporter = InMemorySpanExporter()
 trace.set_tracer_provider(TracerProvider())
 trace.get_tracer_provider().add_span_processor(
-    BatchSpanProcessor(HTTPSpanExporter(endpoint="http://localhost:4318/v1/traces"))
+    BatchSpanProcessor(HTTPSpanExporter(endpoint="http://10.165.57.68:4318/v1/traces"))  # change to ip
 )
 trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(in_memory_exporter))
 tracer = trace.get_tracer(__name__)
