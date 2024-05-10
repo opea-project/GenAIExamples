@@ -26,7 +26,7 @@ class TranslationService:
 
     def schedule(self):
         self.service_builder.schedule(
-            initial_inputs={"text":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}
+            initial_inputs={"text": "Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}
         )
         self.service_builder.get_all_final_outputs()
         result_dict = self.service_builder.result_dict
