@@ -16,7 +16,7 @@
 from comps import RemoteMicroService, ServiceOrchestrator
 
 
-class MyServiceOrchestrator:
+class ChatQnAService:
     def __init__(self, port=8000):
         self.service_builder = ServiceOrchestrator(port=port)
 
@@ -38,6 +38,6 @@ class MyServiceOrchestrator:
 
 
 if __name__ == "__main__":
-    service_ochestrator = MyServiceOrchestrator(port=9001)
-    service_ochestrator.add_remote_service()
-    service_ochestrator.schedule()
+    chatqna = ChatQnAService(port=9001)
+    chatqna.add_remote_service()
+    chatqna.schedule()
