@@ -25,7 +25,9 @@ class TranslationService:
         self.service_builder.add(llm)
 
     def schedule(self):
-        self.service_builder.schedule(initial_inputs={"language_from": "en","language_to": "de","source_language": "hello world"})
+        self.service_builder.schedule(
+            initial_inputs={"language_from": "en", "language_to": "de", "source_language": "hello world"}
+        )
         self.service_builder.get_all_final_outputs()
         result_dict = self.service_builder.result_dict
         print(result_dict)

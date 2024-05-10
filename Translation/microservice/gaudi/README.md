@@ -26,12 +26,10 @@ docker build . -t tgi-gaudi-translation:1.2.1 --build-arg https_proxy=$https_pro
 docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
-
 Then run the command `docker images`, you will have the following four Docker Images:
 
 1. `tgi-gaudi-translation:1.2.1`
 2. `opea/gen-ai-comps:llm-tgi-server`
-
 
 ## 🚀 Start Microservices
 
@@ -74,7 +72,6 @@ curl http://${your_ip}:9000/v1/translation \
 ```
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
-
 
 ## 🚀 Construct Mega Service
 
