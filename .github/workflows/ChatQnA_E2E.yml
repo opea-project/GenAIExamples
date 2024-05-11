@@ -38,7 +38,7 @@ jobs:
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
-          cd ${{ github.workspace }}/ChatQnA/tests
+          cd ${{ github.workspace }}/ChatQnA/deprecated/tests
           export TEST_FRONTEND="true"
           bash test_${{ matrix.job_name }}_inference.sh
 
@@ -47,4 +47,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.job_name }}
-          path: ${{ github.workspace }}/ChatQnA/tests/E2E_tests
+          path: ${{ github.workspace }}/ChatQnA/deprecated/tests/E2E_tests
