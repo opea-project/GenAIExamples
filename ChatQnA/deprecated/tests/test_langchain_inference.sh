@@ -135,7 +135,7 @@ function main() {
     run_tests
     check_response
 
-    if [ $CHECK_FRONTEND=="true" ]; then run_e2e_tests; fi
+    if [ $TEST_FRONTEND=="true" ]; then run_e2e_tests; fi
 
     docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME && sleep 5s
     echo y | docker system prune

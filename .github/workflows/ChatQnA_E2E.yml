@@ -39,6 +39,7 @@ jobs:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
+          export TEST_FRONTEND="true"
           bash test_${{ matrix.job_name }}_inference.sh
 
       - name: Publish pipeline artifact
