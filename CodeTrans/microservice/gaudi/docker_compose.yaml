@@ -17,12 +17,12 @@ version: "3.8"
 services:
   tgi_service:
     image: ghcr.io/huggingface/tgi-gaudi:1.2.1
-    container_name: codetrans_tgi_service
+    container_name: codetrans-tgi-service
     ports:
       - "8008:80"
     volumes:
       - type: bind
-        source: /home/jenkins/letong/data
+        source: ./data
         target: /data
     environment:
       - HABANA_VISIBLE_DEVICES=all
