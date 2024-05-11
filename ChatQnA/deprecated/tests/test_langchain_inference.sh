@@ -120,6 +120,7 @@ function run_e2e_tests() {
     conda install -c conda-forge nodejs -y && npm install
     wait
     sudo nohup npm run dev & pid=$!
+    wait
     sleep 20s
 
     node -v && npm -v && pip list
@@ -127,7 +128,7 @@ function run_e2e_tests() {
     echo "E2E test start"
     # cd tests && pytest --tracing=retain-on-failure --output=$LOG_PATH/E2E_tests
     echo "E2E test finished"
-    sudo kill -s 9 $pid
+    sudo kill -s 9 $pid || true
 }
 
 function docker_stop() {
