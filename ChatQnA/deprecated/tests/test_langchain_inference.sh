@@ -116,18 +116,24 @@ function run_e2e_tests() {
     conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
-    pip install pytest-playwright && python -m playwright install --with-deps &
-    conda install -c conda-forge nodejs -y && npm install
-    wait
-    sudo nohup npm run dev & pid=$!
-    wait
+    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+    sudo nohup npm run dev &
+    pid=$!
     sleep 20s
 
     node -v && npm -v && pip list
 
-    echo "E2E test start"
-    # cd tests && pytest --tracing=retain-on-failure --output=$LOG_PATH/E2E_tests
-    echo "E2E test finished"
+    echo "[TEST INFO]: ---------E2E test start---------"
+    exit_status=0
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------E2E test failed---------"
+    else
+        echo "[TEST INFO]: ---------E2E test passed---------"
+    fi
+
+    echo "[TEST INFO]: ---------E2E test finished---------"
     sudo kill -s 9 $pid || true
 }
 
@@ -153,6 +159,8 @@ function main() {
 
     docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME && sleep 5s
     echo y | docker system prune
+
+    exit $exit_status
 }
 
 main

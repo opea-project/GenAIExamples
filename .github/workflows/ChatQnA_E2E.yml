@@ -37,6 +37,7 @@ jobs:
 
       - name: Run E2E Test
         env:
+          CI: 'true'
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/deprecated/tests
@@ -48,4 +49,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.job_name }}
-          path: ${{ github.workspace }}/ChatQnA/deprecated/tests/E2E_tests
+          path: ${{ github.workspace }}/ChatQnA/ui/svelte/playwright-report
