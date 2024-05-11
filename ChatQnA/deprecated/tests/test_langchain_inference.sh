@@ -89,7 +89,7 @@ function check_response() {
     echo "Checking response"
     local status=false
     if [[ -f $LOG_PATH/langchain.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/langchain.log) != 0 ]]; then
-        status=truecuda_visible_devicesu
+        status=true
     fi
 
     if [[ ! -f $LOG_PATH/langchain_stream.log ]] || [[ $(grep -c "billion" $LOG_PATH/langchain_stream.log) == 0 ]]; then
