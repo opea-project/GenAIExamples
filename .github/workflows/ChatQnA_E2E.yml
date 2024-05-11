@@ -37,7 +37,7 @@ jobs:
 
       - name: Run E2E Test
         env:
-          CI: 'true'
+          CI: "true"
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/deprecated/tests
