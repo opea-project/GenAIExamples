@@ -107,11 +107,14 @@ function check_response() {
 function run_e2e_tests() {
     cd $WORKPATH/../ui/svelte
     mkdir -p $LOG_PATH/E2E_tests
+    conda_env_name="ChatQnA_e2e"
 
-    export PATH=${HOME}/miniconda3/bin/:$PATH
-    source activate base
+    conda remove -n ${conda_env_name} --all -y
+    conda create -n ${conda_env_name} python=3.12 -y
+
+    source activate ${conda_env_name}
     pip install pytest-playwright && python -m playwright install &
-    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt update && sudo apt install -y nodejs npm && npm install && nohup npm run dev && sleep 20s
+    conda install -c conda-forge nodejs -y && npm install && nohup npm run dev && sleep 20s
     wait
 
     node -v && npm -v && pip list
