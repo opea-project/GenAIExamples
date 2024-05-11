@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: ChatQnA E2E on Gaudi
+name: ChatQnA E2E test on Gaudi
 
 on:
   pull_request:

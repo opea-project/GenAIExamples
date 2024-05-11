@@ -9,7 +9,6 @@ LOG_PATH="$WORKPATH/tests"
 cd $WORKPATH
 
 function setup_test_env() {
-    pwd
     cd $WORKPATH
     # build conda env
     conda_env_name="test_GenAIExample"
@@ -27,7 +26,6 @@ function setup_test_env() {
 }
 
 function build_docker_image() {
-    pwd
     cd $WORKPATH/GenAIComps
 
     docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
