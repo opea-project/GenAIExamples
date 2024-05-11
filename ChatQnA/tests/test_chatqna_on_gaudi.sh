@@ -61,6 +61,7 @@ function start_microservices() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
     # Start Microservice Docker Containers
+    # TODO: Replace the container name with a test-specific name
     cd microservice/gaudi
     docker compose -f docker_compose.yaml up -d
 
@@ -68,7 +69,8 @@ function start_microservices() {
 }
 
 function check_microservices() {
-    # TEI Embedding Service
+    # Check if the microservices are running correctly.
+    # TODO: Any results check required??
     curl ${ip_address}:8090/embed \
         -X POST \
         -d '{"inputs":"What is Deep Learning?"}' \
@@ -118,7 +120,7 @@ function run_megaservice() {
 }
 
 function check_results() {
-    echo "Checking response"
+    echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/run_megaservice.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/run_megaservice.log) != 0 ]]; then
         status=true
@@ -130,6 +132,9 @@ function check_results() {
     else
         echo "Response check succeed!"
     fi
+
+    echo "Checking response format, make sure the output format is acceptable for UI."
+    # TODO
 }
 
 function stop_docker() {
