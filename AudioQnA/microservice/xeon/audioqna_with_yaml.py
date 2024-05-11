@@ -21,7 +21,11 @@ class MyServiceOrchestrator:
         self.service_builder = ServiceOrchestratorWithYaml(yaml_file_path)
 
     def schedule(self):
-        self.service_builder.schedule(initial_inputs={"url": "https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav"})
+        self.service_builder.schedule(
+            initial_inputs={
+                "url": "https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav"
+            }
+        )
         self.service_builder.get_all_final_outputs()
         result_dict = self.service_builder.result_dict
         print(result_dict.keys())

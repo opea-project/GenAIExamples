@@ -10,7 +10,6 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
@@ -48,7 +47,6 @@ docker run -d -p 8009:80 -v ./data:/data ghcr.io/huggingface/text-generation-inf
 curl http://localhost:8009/generate -X POST -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'
 ```
 
-
 #### 3.2 Launch LLM-TGI component
 
 ```bash
@@ -70,7 +68,6 @@ docker run -p 4317:4317 -p 4318:4318 --rm -v $(pwd)/comps/cores/telemetry/collec
 ## Wrap Up
 
 You can use `docker-compose` to start all the above service with one YamL file, if you have already built the images.
-
 
 ```bash
 export LLM_MODEL_ID="intel/neural-chat-7b-v3-3"

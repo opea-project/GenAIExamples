@@ -21,19 +21,19 @@ class MyServiceOrchestrator:
         self.service_builder = ServiceOrchestrator(port=port)
 
     def add_remote_service(self):
-        asr = RemoteMicroService(
-            name="asr", host="10.165.57.68", port=9099, expose_endpoint="/v1/audio/transcriptions"
-        )
-        tts = RemoteMicroService(
-            name="tts", host="10.165.57.68", port=9999, expose_endpoint="/v1/audio/speech"
-        )
+        asr = RemoteMicroService(name="asr", host="10.165.57.68", port=9099, expose_endpoint="/v1/audio/transcriptions")
+        tts = RemoteMicroService(name="tts", host="10.165.57.68", port=9999, expose_endpoint="/v1/audio/speech")
         llm = RemoteMicroService(name="llm", host="10.165.57.68", port=9001, expose_endpoint="/v1/chat/completions")
         self.service_builder.add(asr).add(tts).add(llm)
         self.service_builder.flow_to(asr, llm)
         self.service_builder.flow_to(llm, tts)
 
     def schedule(self):
-        self.service_builder.schedule(initial_inputs={"url": "https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav"})
+        self.service_builder.schedule(
+            initial_inputs={
+                "url": "https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav"
+            }
+        )
         self.service_builder.get_all_final_outputs()
         result_dict = self.service_builder.result_dict
         # print(result_dict.keys())
