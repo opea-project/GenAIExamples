@@ -17,7 +17,7 @@ version: "3.8"
 services:
   tgi_service:
     image: ghcr.io/huggingface/text-generation-inference:1.4
-    container_name: tgi_service
+    container_name: tgi-service
     ports:
       - "8008:80"
     volumes:

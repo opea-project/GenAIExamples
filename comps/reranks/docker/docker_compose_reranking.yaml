@@ -17,7 +17,7 @@ version: "3.8"
 services:
   tei_xeon_service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-    container_name: tei_xeon_server
+    container_name: tei-xeon-server
     ports:
       - "8808:80"
     volumes:
