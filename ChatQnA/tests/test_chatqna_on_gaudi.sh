@@ -152,7 +152,7 @@ function main() {
 
     setup_test_env
     build_docker_image
-    
+
     start_microservices
     check_microservices
 
