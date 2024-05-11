@@ -9,6 +9,8 @@ LOG_PATH="$WORKPATH/tests"
 cd $WORKPATH
 
 function setup_test_env() {
+    pwd
+    cd $WORKPATH
     # build conda env
     conda_env_name="test_GenAIExample"
     export PATH="${HOME}/miniconda3/bin:$PATH"
