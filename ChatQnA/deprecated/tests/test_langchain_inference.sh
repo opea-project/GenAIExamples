@@ -21,6 +21,7 @@ function test_env_setup() {
     REDIS_CONTAINER_NAME="test-redis-vector-db"
     LANGCHAIN_CONTAINER_NAME="test-qna-rag-redis-server"
     CHATQNA_CONTAINER_NAME="test-ChatQnA_server"
+    exit_status=0
     cd $WORKPATH # go to ChatQnA
 }
 
@@ -124,7 +125,7 @@ function run_e2e_tests() {
     node -v && npm -v && pip list
 
     echo "[TEST INFO]: ---------E2E test start---------"
-    exit_status=0
+
     npx playwright test || exit_status=$?
 
     if [ $exit_status -ne 0 ]; then
