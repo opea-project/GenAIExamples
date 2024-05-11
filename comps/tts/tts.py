@@ -25,10 +25,10 @@ from comps import Base64ByteStrDoc, TextDoc, opea_microservices, opea_telemetry,
 
 
 @opea_telemetry
-def split_long_text_into_batch(text, batch_length=64):
+def split_long_text_into_batch(text, batch_length=128):
     """Batch the long text into sequences of shorter sentences."""
     res = []
-    hitted_ends = [",", ".", "?", "!", "。", ";"]
+    hitted_ends = [",", ".", "?", "!", "。", ";", " "]
     idx = 0
     cur_start = 0
     cur_end = -1
@@ -87,7 +87,7 @@ def text2speech(
             default_speaker_embedding = torch.zeros((1, 512))
 
     all_speech = np.array([])
-    text = split_long_text_into_batch(text, batch_length=64)
+    text = split_long_text_into_batch(text, batch_length=100)
     inputs = processor(text=text, padding=True, max_length=128, return_tensors="pt")
     with torch.no_grad():
         waveforms, waveform_lengths = model.generate_speech(
@@ -99,7 +99,6 @@ def text2speech(
         )
     for i in range(waveforms.size(0)):
         all_speech = np.concatenate([all_speech, waveforms[i][: waveform_lengths[i]].cpu().numpy()])
-        all_speech = np.concatenate([all_speech, np.array([0 for i in range(4000)])])  # pad after each end
 
     print(f"generated speech in {time.time() - start} seconds")
     return all_speech
