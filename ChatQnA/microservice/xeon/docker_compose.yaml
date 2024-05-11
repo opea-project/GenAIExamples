@@ -53,7 +53,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID}
   embedding:
-    image: intel/gen-ai-comps:embedding-tei-server
+    image: opea/gen-ai-comps:embedding-tei-server
     container_name: embedding-tei-server
     ports:
       - "6000:6000"
@@ -64,7 +64,7 @@ services:
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   retriever:
-    image: intel/gen-ai-comps:retriever-redis-server
+    image: opea/gen-ai-comps:retriever-redis-server
     container_name: retriever-redis-server
     ports:
       - "7000:7000"
@@ -79,7 +79,7 @@ services:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei_xeon_server
     ports:
-      - "8808:80"
+      - "6060:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -88,7 +88,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${RERANK_MODEL_ID}
   reranking:
-    image: intel/gen-ai-comps:reranking-tei-xeon-server
+    image: opea/gen-ai-comps:reranking-tei-xeon-server
     container_name: reranking-tei-xeon-server
     ports:
       - "8000:8000"
@@ -109,7 +109,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: intel/gen-ai-comps:llm-tgi-server
+    image: opea/gen-ai-comps:llm-tgi-server
     container_name: llm-tgi-server
     ports:
       - "9000:9000"
