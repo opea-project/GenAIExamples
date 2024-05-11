@@ -118,8 +118,9 @@ function run_e2e_tests() {
 
     pip install pytest-playwright && python -m playwright install --with-deps &
     conda install -c conda-forge nodejs -y && npm install
-    sudo nohup npm run dev && pid=$! && sleep 20s
     wait
+    sudo nohup npm run dev & pid=$!
+    sleep 20s
 
     node -v && npm -v && pip list
 
