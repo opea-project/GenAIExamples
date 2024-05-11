@@ -109,13 +109,16 @@ function run_e2e_tests() {
     mkdir -p $LOG_PATH/E2E_tests
     conda_env_name="ChatQnA_e2e"
 
+    echo "DOC_BASE_URL = 'http://localhost:8888/v1/rag'" > .env
+
     export PATH=${HOME}/miniconda3/bin/:$PATH
     conda remove -n ${conda_env_name} --all -y
     conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
-    pip install pytest-playwright && python -m playwright install &
-    conda install -c conda-forge nodejs -y && npm install && nohup npm run dev && sleep 20s
+    pip install pytest-playwright && sudo playwright install-deps && python -m playwright install &
+    conda install -c conda-forge nodejs -y && npm install
+    nohup npm run dev && pid=$! && sleep 20s
     wait
 
     node -v && npm -v && pip list
@@ -123,6 +126,7 @@ function run_e2e_tests() {
     echo "E2E test start"
     # cd tests && pytest --tracing=retain-on-failure --output=$LOG_PATH/E2E_tests
     echo "E2E test finished"
+    sudo kill -s 9 $pid
 }
 
 function docker_stop() {
