@@ -47,15 +47,15 @@ function start_microservices() {
     cd $WORKPATH
 
     ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
-    IP_NAME=$(eval echo '$'$ip_name)
+    ip_address=$(eval echo '$'$ip_name)
 
     export EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-large"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TEI_EMBEDDING_ENDPOINT="http://${IP_NAME}:8090"
-    export TEI_RERANKING_ENDPOINT="http://${IP_NAME}:6060"
-    export TGI_LLM_ENDPOINT="http://${IP_NAME}:8008"
-    export REDIS_URL="redis://${IP_NAME}:6379"
+    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
+    export TEI_RERANKING_ENDPOINT="http://${ip_address}:6060"
+    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag_redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
