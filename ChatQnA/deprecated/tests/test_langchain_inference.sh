@@ -105,7 +105,7 @@ function check_response() {
 }
 
 function run_e2e_tests() {
-    cd $WORKPATH/../ui/svelte/tests
+    cd $WORKPATH/../ui/svelte
     mkdir -p $LOG_PATH/E2E_tests
 
     pip install pytest-playwright && playwright install &
@@ -113,7 +113,7 @@ function run_e2e_tests() {
     wait
 
     echo "E2E test start"
-    # pytest --tracing=retain-on-failure --output=$LOG_PATH/E2E_tests
+    # cd tests && pytest --tracing=retain-on-failure --output=$LOG_PATH/E2E_tests
     echo "E2E test finished"
 }
 
