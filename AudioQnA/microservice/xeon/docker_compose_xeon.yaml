@@ -56,13 +56,6 @@ services:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
-  telemetry:
-    image: otel/opentelemetry-collector
-    container_name: telemetry
-    ports:
-      - 4317:4317
-      - 4318:4318
-    shm_size: 1g
 
 networks:
   default:
