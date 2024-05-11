@@ -109,10 +109,11 @@ function run_e2e_tests() {
     mkdir -p $LOG_PATH/E2E_tests
     conda_env_name="ChatQnA_e2e"
 
+    export PATH=${HOME}/miniconda3/bin/:$PATH
     conda remove -n ${conda_env_name} --all -y
     conda create -n ${conda_env_name} python=3.12 -y
-
     source activate ${conda_env_name}
+
     pip install pytest-playwright && python -m playwright install &
     conda install -c conda-forge nodejs -y && npm install && nohup npm run dev && sleep 20s
     wait
