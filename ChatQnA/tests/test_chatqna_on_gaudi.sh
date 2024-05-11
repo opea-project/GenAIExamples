@@ -75,37 +75,43 @@ function check_microservices() {
         -X POST \
         -d '{"inputs":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json'
+    sleep 5s
 
     curl http://${ip_address}:6000/v1/embeddings \
         -X POST \
         -d '{"text":"hello"}' \
         -H 'Content-Type: application/json'
+    sleep 5s
 
     curl http://${ip_address}:7000/v1/retrieval \
         -X POST \
         -d '{"text":"test","embedding":[1,1,...1]}' \
         -H 'Content-Type: application/json'
-
+    sleep 5s
 
     curl http://${ip_address}:6060/rerank \
         -X POST \
         -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
         -H 'Content-Type: application/json'
+    sleep 5s
 
     curl http://${ip_address}:8000/v1/reranking \
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
         -H 'Content-Type: application/json'
+    sleep 5s
 
     curl http://${ip_address}:8008/generate \
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
         -H 'Content-Type: application/json'
+    sleep 5s
 
     curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
         -d '{"text":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json'
+    sleep 5s
 }
 
 function ingest_data() {
