@@ -88,7 +88,7 @@ function check_response() {
     echo "Checking response"
     local status=false
     if [[ -f $LOG_PATH/langchain.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/langchain.log) != 0 ]]; then
-        status=true
+        status=truecuda_visible_devicesu
     fi
 
     if [[ ! -f $LOG_PATH/langchain_stream.log ]] || [[ $(grep -c "billion" $LOG_PATH/langchain_stream.log) == 0 ]]; then
@@ -108,8 +108,8 @@ function run_e2e_tests() {
     cd $WORKPATH/../ui/svelte
     mkdir -p $LOG_PATH/E2E_tests
 
-    pip install pytest-playwright && playwright install &
-    sudo apt update && sudo apt install -y nodejs npm && npm install && nohup npm run dev && sleep 20s
+    pip install pytest-playwright && python -m playwright install &
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt update && sudo apt install -y nodejs npm && npm install && nohup npm run dev && sleep 20s
     wait
 
     echo "E2E test start"
