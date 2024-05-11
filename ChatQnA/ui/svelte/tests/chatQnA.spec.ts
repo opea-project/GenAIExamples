@@ -17,12 +17,11 @@ test.describe("New Chat", () => {
 		await newChat.fill(CHAT_ITEMS[0]);
 		await newChat.press("Enter");
 
-     // Wait for the result to appear on the page
-	//  await page.waitForSelector('#msg-time', { timeout: 60000 });
+		// Wait for the result to appear on the page
+		//  await page.waitForSelector('#msg-time', { timeout: 60000 });
 
-	//  // Make sure the result is displayed as expected
-	//  const msgContent = await page.$eval('#msg-time', (element) => element.textContent);
-	//  expect(msgContent).toBeTruthy();
-  });
-
+		//  // Make sure the result is displayed as expected
+		//  const msgContent = await page.$eval('#msg-time', (element) => element.textContent);
+		//  expect(msgContent).toBeTruthy();
+	});
 });
