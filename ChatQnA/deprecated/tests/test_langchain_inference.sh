@@ -108,7 +108,8 @@ function run_e2e_tests() {
     cd $WORKPATH/../ui/svelte
     mkdir -p $LOG_PATH/E2E_tests
 
-    conda activate base
+    export PATH=${HOME}/miniconda3/bin/:$PATH
+    source activate base
     pip install pytest-playwright && python -m playwright install &
     curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt update && sudo apt install -y nodejs npm && npm install && nohup npm run dev && sleep 20s
     wait
