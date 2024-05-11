@@ -33,6 +33,7 @@ jobs:
       - name: Run Test
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          AISE_CLUSTER_01_2_IP: ${{ secrets.AISE_CLUSTER_01_2_IP }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
           bash test_chatqna_on_gaudi.sh
