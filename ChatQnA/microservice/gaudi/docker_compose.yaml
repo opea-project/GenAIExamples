@@ -75,7 +75,7 @@ services:
       INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
   tei_reranking_service:
-    image: tei_gaudi
+    image: opea/tei_gaudi
     container_name: tei_reranking_gaudi_server
     ports:
       - "8808:80"
