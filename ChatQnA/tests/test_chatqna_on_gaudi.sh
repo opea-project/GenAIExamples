@@ -17,7 +17,6 @@ function setup_test_env() {
     source activate ${conda_env_name}
 
     # install comps
-    rm -rf GenAIComps || true
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
     pip install -r requirements.txt
@@ -26,6 +25,7 @@ function setup_test_env() {
 }
 
 function build_docker_image() {
+    pwd
     cd $WORKPATH/GenAIComps
 
     docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
