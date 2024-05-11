@@ -4,19 +4,20 @@
 
 set -xe
 
-function setup_test_env() {
-    WORKPATH=$(dirname "$PWD")
-    LOG_PATH="$WORKPATH/tests"
-    cd $WORKPATH
+WORKPATH=$(dirname "$PWD")
+LOG_PATH="$WORKPATH/tests"
+cd $WORKPATH
 
+function setup_test_env() {
     # build conda env
     conda_env_name="test_GenAIExample"
     export PATH="${HOME}/miniconda3/bin:$PATH"
     conda remove --all -y -n ${conda_env_name}
     conda create python=3.10 -y -n ${conda_env_name}
-    conda activate ${conda_env_name}
+    source activate ${conda_env_name}
 
     # install comps
+    rm -rf GenAIComps || true
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
     pip install -r requirements.txt
@@ -27,10 +28,10 @@ function setup_test_env() {
 function build_docker_image() {
     cd $WORKPATH/GenAIComps
 
-    docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:reranking-tei-gaudi-server -f comps/reranks/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:llm-tgi-server -f comps/llms/langchain/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server -f comps/llms/langchain/docker/Dockerfile .
 
     cd ..
     git clone https://github.com/huggingface/tei-gaudi
@@ -60,16 +61,7 @@ function start_microservices() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
     # Start Microservice Docker Containers
-    REDIS_VECTOR_DB_CONTAINER_NAME="redis-vector-db"
-    QNA_RAG_REDIS_CONTAINER_NAME="qna-rag-redis-server"
-    TEI_EMBEDDING_CONTAINER_NAME="tei_embedding_gaudi_server"
-    EMBEDDING_CONTAINER_NAME="embedding-tei-server"
-    RETRIEVER_CONTAINER_NAME="retriever-redis-server"
-    TEI_RERAN_GAUDI_CONTAINER_NAME="tei_reranking_gaudi_server"
-    RERANK_TEI_CONTAINER_NAME="reranking-tei-gaudi-server"
-    TGI_CONTAINER_NAME="tgi_service"
-    LLM_CONTAINER_NAME="llm-tgi-gaudi-server"
-    cd microservices/gaudi
+    cd microservice/gaudi
     docker compose -f docker_compose.yaml up -d
 
     sleep 3m # Waits 3 minutes
@@ -77,38 +69,38 @@ function start_microservices() {
 
 function check_microservices() {
     # TEI Embedding Service
-    curl ${IP_NAME}:8090/embed \
+    curl ${ip_address}:8090/embed \
         -X POST \
         -d '{"inputs":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json'
 
-    curl http://${IP_NAME}:6000/v1/embeddings \
+    curl http://${ip_address}:6000/v1/embeddings \
         -X POST \
         -d '{"text":"hello"}' \
         -H 'Content-Type: application/json'
 
-    curl http://${IP_NAME}:7000/v1/retrieval \
+    curl http://${ip_address}:7000/v1/retrieval \
         -X POST \
         -d '{"text":"test","embedding":[1,1,...1]}' \
         -H 'Content-Type: application/json'
 
 
-    curl http://${IP_NAME}:6060/rerank \
+    curl http://${ip_address}:6060/rerank \
         -X POST \
         -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
         -H 'Content-Type: application/json'
 
-    curl http://${IP_NAME}:8000/v1/reranking \
+    curl http://${ip_address}:8000/v1/reranking \
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
         -H 'Content-Type: application/json'
 
-    curl http://${IP_NAME}:8008/generate \
+    curl http://${ip_address}:8008/generate \
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
         -H 'Content-Type: application/json'
 
-    curl http://${IP_NAME}:9000/v1/chat/completions \
+    curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
         -d '{"text":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json'
@@ -116,7 +108,7 @@ function check_microservices() {
 
 function ingest_data() {
     cd $WORKPATH
-    docker exec $QNA_RAG_REDIS_CONTAINER_NAME \
+    docker exec qna-rag-redis-server \
         bash -c "cd /ws && python ingest.py > /dev/null"
     sleep 1m
 }
@@ -141,12 +133,18 @@ function check_results() {
 }
 
 function stop_docker() {
-    local container_name=$1
-    cid=$(docker ps -aq --filter "name=$container_name")
-    if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
+    cd $WORKPATH/microservice/gaudi
+    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
+    for container_name in $container_list; do
+        cid=$(docker ps -aq --filter "name=$container_name")
+        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
+    done
 }
 
 function main() {
+
+    stop_docker
+
     setup_test_env
     build_docker_image
     
@@ -156,6 +154,8 @@ function main() {
     ingest_data
     run_megaservice
     check_results
+
+    stop_docker
 
 }
 
