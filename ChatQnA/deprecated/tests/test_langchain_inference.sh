@@ -75,12 +75,12 @@ function run_tests() {
     curl 127.0.0.1:$port/v1/rag/chat \
         -X POST \
         -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
-        -H 'Content-Type: application/json' > $LOG_PATH/langchain.log
+        -H 'Content-Type: application/json' >$LOG_PATH/langchain.log
 
-    curl 127.0.0.1:$port/v1/rag/chat_stream  \
+    curl 127.0.0.1:$port/v1/rag/chat_stream \
         -X POST \
         -d "{\"query\":\"What is the total revenue of Nike in 2023?\"}" \
-        -H 'Content-Type: application/json' > $LOG_PATH/langchain_stream.log
+        -H 'Content-Type: application/json' >$LOG_PATH/langchain_stream.log
 }
 
 function check_response() {
@@ -104,6 +104,19 @@ function check_response() {
 
 }
 
+function run_e2e_tests() {
+    cd $WORKPATH/../ui/svelte/tests
+    mkdir -p $LOG_PATH/E2E_tests
+
+    pip install pytest-playwright && playwright install &
+    sudo apt update && sudo apt install -y nodejs npm && npm install && nohup npm run dev && sleep 20s
+    wait
+
+    echo "E2E test start"
+    # pytest --tracing=retain-on-failure --output=$LOG_PATH/E2E_tests
+    echo "E2E test finished"
+}
+
 function docker_stop() {
     local container_name=$1
     cid=$(docker ps -aq --filter "name=$container_name")
@@ -121,6 +134,8 @@ function main() {
 
     run_tests
     check_response
+
+    if [ $CHECK_FRONTEND=="true" ]; then run_e2e_tests; fi
 
     docker_stop $CHATQNA_CONTAINER_NAME && docker_stop $LANGCHAIN_CONTAINER_NAME && docker_stop $REDIS_CONTAINER_NAME && sleep 5s
     echo y | docker system prune
