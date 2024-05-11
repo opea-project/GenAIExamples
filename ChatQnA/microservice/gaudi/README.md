@@ -1,51 +1,63 @@
-# Build Mega Service of ChatQnA on Xeon
+# Build MegaService of ChatQnA on Gaudi
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
-
-## 🚀 Apply Xeon Server on AWS
-
-To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage the power of 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
-
-For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
-
-After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as embedding, retriever, rerank, and llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
 ## 🚀 Build Docker Images
 
-First of all, you need to build Docker Images locally and install the python package of it.
+First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
+
+### 1. Source Code install GenAIComps
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-pip install -r requirements.txt
-pip install .
+python setup.py install
 ```
 
-### 1. Build Embedding Image
+### 2. Build Embedding Image
 
 ```bash
 docker build -t opea/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/docker/Dockerfile .
 ```
 
-### 2. Build Retriever Image
+### 3. Build Retriever Image
 
 ```bash
 docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
 ```
 
-### 3. Build Rerank Image
+### 4. Build Rerank Image
 
 ```bash
-docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:reranking-tei-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
 ```
 
-### 4. Build LLM Image
+### 5. Build LLM Image
 
 ```bash
 docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
-### 5. Pull qna-rag-redis-server Image
+### 6. Build TEI Gaudi Image
+
+Since a TEI Gaudi Docker image hasn't been published, we'll need to build it from the [tei-guadi](https://github.com/huggingface/tei-gaudi) repository.
+
+```bash
+cd ..
+git clone https://github.com/huggingface/tei-gaudi
+cd tei-gaudi/
+docker build -f Dockerfile-hpu -t opea/tei_gaudi .
+```
+
+### 7. Pull TGI Gaudi Image
+
+As TGI Gaudi has been officially published as a Docker image, we simply need to pull it.
+
+```bash
+docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+```
+
+### 8. Pull qna-rag-redis-server Image
 
 ```bash
 docker pull intel/gen-ai-examples:qna-rag-redis-server
@@ -55,9 +67,11 @@ Then run the command `docker images`, you will have the following four Docker Im
 
 1. `opea/gen-ai-comps:embedding-tei-server`
 2. `opea/gen-ai-comps:retriever-redis-server`
-3. `opea/gen-ai-comps:reranking-tei-xeon-server`
+3. `opea/gen-ai-comps:reranking-tei-gaudi-server`
 4. `opea/gen-ai-comps:llm-tgi-server`
-5. `intel/gen-ai-examples:qna-rag-redis-server`
+5. `opea/tei_gaudi`
+6. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
+7. `intel/gen-ai-examples:qna-rag-redis-server`
 
 ## 🚀 Start Microservices
 
@@ -70,7 +84,7 @@ export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-large"
-export LLM_MODEL_ID="m-a-p/OpenCodeInterpreter-DS-6.7B"
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:8090"
 export TEI_RERANKING_ENDPOINT="http://${your_ip}:6060"
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
@@ -137,7 +151,7 @@ curl http://${your_ip}:8000/v1/reranking\
 ```bash
 curl http://${your_ip}:8008/generate \
   -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -164,7 +178,7 @@ python ingest.py
 
 Modify the `initial_inputs` of line 34 in `chatqna.py`, then you will get the ChatQnA result of this mega service.
 
-All of the intermediate results will be printed for each microservices. Users can check the accuracy of the results to make targeted modifications.
+All of the intermediate results will be printed for each microservice. Users can check the accuracy of the results to make targeted modifications.
 
 ```bash
 python chatqna.py
