@@ -1,37 +1,37 @@
-import { test, expect, type Page } from '@playwright/test';
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+import { test, expect, type Page } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
+	await page.goto("/");
 });
 
-const CHAT_ITEMS = [
-  'What is the total revenue of Nike in 2023?',
-];
+const CHAT_ITEMS = ["What is the total revenue of Nike in 2023?"];
 
-test.describe('New Chat', () => {
-  test('should enter message to chat', async ({ page }) => {
-    const newChat = page.getByPlaceholder('Enter prompt here');
-	console.log('newChat', newChat);
-	
-    await newChat.fill(CHAT_ITEMS[0]);
-    await newChat.press('Enter');
+test.describe("New Chat", () => {
+	test("should enter message to chat", async ({ page }) => {
+		const newChat = page.getByPlaceholder("Enter prompt here");
+		console.log("newChat", newChat);
 
-     // Wait for the result to appear on the page
-	 await page.waitForSelector('#msg-time');
+		await newChat.fill(CHAT_ITEMS[0]);
+		await newChat.press("Enter");
 
-	 // Make sure the result is displayed as expected
-	 const msgContent = await page.$eval('#msg-time', (element) => element.textContent);
-	 expect(msgContent).toBeTruthy();
-  });
+		// Wait for the result to appear on the page
+		await page.waitForSelector("#msg-time");
 
-//   test('should clear text input field when click Clear', async ({ page }) => {
-//     const newTodo = page.getByPlaceholder('What needs to be done?');
+		// Make sure the result is displayed as expected
+		const msgContent = await page.$eval("#msg-time", (element) => element.textContent);
+		expect(msgContent).toBeTruthy();
+	});
 
-//     await newTodo.fill(TODO_ITEMS[0]);
-//     await newTodo.press('Enter');
+	//   test('should clear text input field when click Clear', async ({ page }) => {
+	//     const newTodo = page.getByPlaceholder('What needs to be done?');
 
-//     // Check that input is empty.
-//     await expect(newTodo).toBeEmpty();
-//   });
+	//     await newTodo.fill(TODO_ITEMS[0]);
+	//     await newTodo.press('Enter');
 
+	//     // Check that input is empty.
+	//     await expect(newTodo).toBeEmpty();
+	//   });
 });
