@@ -79,6 +79,8 @@ export INDEX_NAME=${your_index_name}
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
 
+Note: Please replace with `your_ip` with you external IP address, do not use localhost.
+
 ### Start Microservice Docker Containers
 
 ```bash
