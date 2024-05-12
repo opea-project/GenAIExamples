@@ -15,10 +15,9 @@
 
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_community.vectorstores import Redis
+from redis_config import INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 
 from comps import EmbedDoc768, SearchedDoc, TextDoc, opea_microservices, register_microservice
-
-from .redis_config import INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 
 
 @register_microservice(name="opea_service@retriever_redis", expose_endpoint="/v1/retrieval", host="0.0.0.0", port=7000)
