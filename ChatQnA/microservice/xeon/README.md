@@ -107,7 +107,7 @@ embedding = [random.uniform(-1, 1) for _ in range(768)]
 print(embedding)
 ```
 
-Then substitute the `${your_embedding}` into your mock embedding vector in the following cURL command:
+Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
 
 ```bash
 curl http://${your_ip}:7000/v1/retrieval\
