@@ -126,10 +126,20 @@ curl http://${host_ip}:6000/v1/embeddings\
 
 3. Retriever Microservice
 
+To consume the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+
+```python
+import random
+embedding = [random.uniform(-1, 1) for _ in range(768)]
+print(embedding)
+```
+
+Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
+
 ```bash
 curl http://${host_ip}:7000/v1/retrieval\
   -X POST \
-  -d '{"text":"test", "embedding":[1,1,...1]}' \
+  -d '{"text":"test", "embedding":${your_embedding}}' \
   -H 'Content-Type: application/json'
 ```
 
