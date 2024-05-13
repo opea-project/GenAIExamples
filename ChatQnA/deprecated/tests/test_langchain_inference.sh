@@ -123,7 +123,7 @@ function run_e2e_tests() {
     source activate ${conda_env_name}
 
     conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
-    sudo nohup npm run dev &
+    nohup npm run dev &
     local pid=$!
     sleep 20s
 
