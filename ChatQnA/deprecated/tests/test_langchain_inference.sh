@@ -150,7 +150,7 @@ function docker_stop() {
 
 function kill_port() {
     local port=$1
-    pid=$(lsof -t -i:$port)
+    pid=$(lsof -t -i:$port) || true
     if [[ "x$pid" != "x" ]]; then sudo kill -9 $pid; fi
 }
 
