@@ -21,28 +21,9 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
-  qna-rag-redis-server:
-    image: intel/gen-ai-examples:qna-rag-redis-server
-    container_name: qna-rag-redis-server
-    environment:
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      REDIS_PORT: 6379
-      EMBED_MODEL: BAAI/bge-base-en-v1.5
-      REDIS_SCHEMA: schema_dim_768.yml
-      VECTOR_DATABASE: REDIS
-    ulimits:
-      memlock:
-        soft: -1 # Set memlock to unlimited (no soft or hard limit)
-        hard: -1
-    volumes:
-      - ../redis:/ws
-      - ../test:/test
-    network_mode: "host"
   tei_embedding_service:
-    image: opea/tei_gaudi
-    container_name: tei_embedding_gaudi_server
+    image: opea/tei-gaudi
+    container_name: tei-embedding-gaudi-server
     ports:
       - "8090:80"
     volumes:
@@ -50,6 +31,9 @@ services:
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      RUNTIME: habana
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
     command: --model-id ${EMBEDDING_MODEL_ID}
   embedding:
     image: opea/gen-ai-comps:embedding-tei-server
@@ -74,13 +58,14 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
-  tei_reranking_service:
-    image: tei_gaudi
-    container_name: tei_reranking_gaudi_server
+  tei_xeon_service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    container_name: tei-xeon-server
     ports:
       - "8808:80"
     volumes:
       - "./data:/data"
+    shm_size: 1g
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
@@ -99,11 +84,17 @@ services:
     restart: unless-stopped
   tgi_service:
     image: ghcr.io/huggingface/tgi-gaudi:1.2.1
-    container_name: tgi_service
+    container_name: tgi-gaudi-server
     ports:
       - "8008:80"
     volumes:
       - "./data:/data"
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      RUNTIME: habana
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
     command: --model-id ${LLM_MODEL_ID}
   llm:
     image: opea/gen-ai-comps:llm-tgi-gaudi-server
