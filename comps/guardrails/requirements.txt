@@ -5,3 +5,4 @@ langchain_community
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+shortuuid

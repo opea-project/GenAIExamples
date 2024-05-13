@@ -18,8 +18,6 @@ from typing import Dict, List
 import requests
 from fastapi import Request
 
-from comps import MicroService
-
 from ..proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -29,6 +27,7 @@ from ..proto.api_protocol import (
 )
 from .constants import MegaServiceEndpoint
 from .dag import DAG
+from .micro_service import MicroService
 
 
 class ServiceOrchestrator(DAG):

@@ -23,9 +23,11 @@ RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/
 
-USER user
-
 COPY comps /home/user/comps
+
+RUN chmod +x /home/user/comps/retrievers/langchain/run.sh
+
+USER user
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/comps/retrievers/requirements.txt
@@ -34,6 +36,4 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/retrievers/langchain
 
-ENTRYPOINT ["python", "retriever_redis.py"]
-
-
+ENTRYPOINT ["/home/user/comps/retrievers/langchain/run.sh"]

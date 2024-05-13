@@ -8,3 +8,4 @@ opentelemetry-sdk
 pymupdf
 redis
 sentence_transformers
+shortuuid
