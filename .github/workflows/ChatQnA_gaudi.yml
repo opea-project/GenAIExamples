@@ -1,17 +1,16 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: ChatQnA-test
+name: ChatQnA E2E test on Gaudi
 
 on:
   pull_request_target:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - ChatQnA/**
+      - ChatQnA/microservice/gaudi/**
       - "!**.md"
-      - "!**/ui/**"
-      - .github/workflows/ChatQnA.yml
+      - .github/workflows/ChatQnA_gaudi.yml
   workflow_dispatch:
 
 # If there is a new commit, the previous jobs will be canceled
@@ -22,10 +21,6 @@ concurrency:
 jobs:
   ChatQnA:
     runs-on: aise-cluster
-    strategy:
-      matrix:
-        job_name: ["langchain"]
-      fail-fast: false
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
@@ -38,13 +33,13 @@ jobs:
       - name: Run Test
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          AISE_CLUSTER_01_2_IP: ${{ secrets.AISE_CLUSTER_01_2_IP }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
-          bash test_${{ matrix.job_name }}_inference.sh
+          bash test_chatqna_on_gaudi.sh
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.job_name }}
           path: ${{ github.workspace }}/ChatQnA/tests/*.log
