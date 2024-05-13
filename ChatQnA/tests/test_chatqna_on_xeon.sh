@@ -21,7 +21,7 @@ function setup_test_env() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
     pip install -r requirements.txt
-    python setup.py install
+    pip install .
     pip list
 }
 
@@ -30,16 +30,8 @@ function build_docker_image() {
 
     docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:reranking-tei-server -f comps/reranks/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server -f comps/llms/langchain/docker/Dockerfile .
-
-    cd ..
-    git clone https://github.com/huggingface/tei-gaudi
-    cd tei-gaudi/
-    docker build -f Dockerfile-hpu -t opea/tei-gaudi .
-
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    docker build -t opea/gen-ai-comps:reranking-tei-xeon-server -f comps/reranks/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:llm-tgi-server -f comps/llms/langchain/docker/Dockerfile .
 
     docker images
 }
@@ -53,16 +45,16 @@ function start_microservices() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-large"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
+    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export TGI_LLM_ENDPOINT="http://${ip_address}:9009"
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
     # Start Microservice Docker Containers
     # TODO: Replace the container name with a test-specific name
-    cd microservice/gaudi
+    cd microservice/xeon
     docker compose -f docker_compose.yaml up -d
 
     sleep 1m # Waits 1 minutes
@@ -71,7 +63,7 @@ function start_microservices() {
 function check_microservices() {
     # Check if the microservices are running correctly.
     # TODO: Any results check required??
-    curl ${ip_address}:8090/embed \
+    curl ${ip_address}:6006/embed \
         -X POST \
         -d '{"inputs":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/embed.log
@@ -83,9 +75,10 @@ function check_microservices() {
         -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
     sleep 5s
 
+    test_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     curl http://${ip_address}:7000/v1/retrieval \
         -X POST \
-        -d '{"text":"test","embedding":[1,1,...1]}' \
+        -d '{"text":"What is the revenue of Nike in 2023?","embedding":${test_embedding}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/retrieval.log
     sleep 5s
 
@@ -95,15 +88,15 @@ function check_microservices() {
         -H 'Content-Type: application/json' > ${LOG_PATH}/rerank.log
     sleep 5s
 
-    curl http://${ip_address}:8000/v1/reranking \
+    curl http://${ip_address}:8000/v1/reranking\
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/reranking.log
     sleep 1m
 
-    curl http://${ip_address}:8008/generate \
+    curl http://${ip_address}:9009/generate \
         -X POST \
-        -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
+        -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
     sleep 5s
 
@@ -137,7 +130,7 @@ function check_results() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/microservice/gaudi
+    cd $WORKPATH/microservice/xeon
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
