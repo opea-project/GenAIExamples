@@ -112,7 +112,7 @@ Then substitute your mock embedding vector for the `${your_embedding}` in the fo
 ```bash
 curl http://${your_ip}:7000/v1/retrieval\
   -X POST \
-  -d '{"text":"What is the revenue of Nike in 2024?","embedding":${your_embedding}' \
+  -d '{"text":"What is the revenue of Nike in 2023?","embedding":${your_embedding}' \
   -H 'Content-Type: application/json'
 ```
 
