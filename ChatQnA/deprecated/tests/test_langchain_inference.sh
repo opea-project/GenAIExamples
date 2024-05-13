@@ -121,6 +121,7 @@ function run_e2e_tests() {
     source activate ${conda_env_name}
 
     conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+    kill_port 5173
     nohup npm run dev &
     local pid=$!
     sleep 20s
@@ -145,6 +146,12 @@ function docker_stop() {
     local container_name=$1
     local cid=$(docker ps -aq --filter "name=$container_name")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
+}
+
+function kill_port() {
+    local port=$1
+    pid=$(lsof -t -i:$port)
+    if [[ ! -z "$pid" ]]; then sudo kill -9 $pid; fi
 }
 
 function main() {
