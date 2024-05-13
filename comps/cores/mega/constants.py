@@ -20,3 +20,40 @@ class ServiceRoleType(Enum):
 
     MICROSERVICE = 0
     MEGASERVICE = 1
+
+
+class MegaServiceEndpoint(Enum):
+    """The enum of an MegaService endpoint."""
+
+    # OPEA Exclusive
+    CHAT_QNA = "/v1/chatqna"
+    AUDIO_QNA = "/v1/audioqna"
+    VISUAL_QNA = "/v1/visualqna"
+    CODE_GEN = "/v1/codegen"
+    CODE_TRANS = "/v1/codetrans"
+    DOC_SUMMARY = "/v1/docsum"
+    SEARCH_QNA = "/v1/searchqna"
+    TRANSLATION = "/v1/translation"
+    # Follow OPENAI
+    EMBEDDINGS = "/v1/embeddings"
+    TTS = "/v1/audio/speech"
+    ASR = "/v1/audio/transcriptions"
+    CHAT = "/v1/chat/completions"
+    RETRIEVAL = "/v1/retrieval"
+    RERANKING = "/v1/reranking"
+    GUARDRAILS = "/v1/guardrails"
+    # COMMON
+    LIST_SERVICE = "/v1/list_service"
+    LIST_PARAMETERS = "/v1/list_parameters"
+
+
+class MicroServiceType(Enum):
+    """The enum of an MicroService endpoint."""
+
+    EMBEDDINGS = "/v1/microservice/embeddings"
+    TTS = "/v1/microservice/tts"
+    ASR = "/v1/microservice/asr"
+    CHAT = "/v1/microservice/chat"
+    RETRIEVAL = "/v1/microservice/retrieval"
+    RERANKING = "/v1/microservice/reranking"
+    GUARDRAILS = "/v1/microservice/guardrails"
