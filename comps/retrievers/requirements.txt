@@ -1,8 +1,10 @@
 docarray[full]
+easyocr
 fastapi
 langchain_community
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+pymupdf
 redis
 sentence_transformers
