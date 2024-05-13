@@ -141,7 +141,7 @@ function stop_docker() {
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
+        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
     done
 }
 
@@ -159,6 +159,7 @@ function main() {
     check_results
 
     stop_docker
+    echo y | docker system prune
 
 }
 
