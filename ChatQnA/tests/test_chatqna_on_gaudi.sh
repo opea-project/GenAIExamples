@@ -99,10 +99,8 @@ function check_microservices() {
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/reranking.log
-    sleep 5s
+    sleep 1m
 
-    # for debug
-    sleep 3m
     curl http://${ip_address}:8008/generate \
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
