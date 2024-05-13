@@ -1,5 +1,7 @@
 **/node_modules
 **/.svelte-kit
 **/package-lock.json
+**/playwright-report/
+**/playwright/.cache/
 
 __pycache__/

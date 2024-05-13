@@ -58,7 +58,8 @@
 				/></svg
 			>
 		</div>
-		<div class="flex items-center space-x-1 text-base text-gray-800">
+		<div class="flex items-center space-x-1 text-base text-gray-800" id='msg-time'
+		>
 			<strong>End to End Time: </strong>
 			<p>{time}s</p>
 		</div>

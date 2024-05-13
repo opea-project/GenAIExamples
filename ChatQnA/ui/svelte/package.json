@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "vite dev --port 80 --host 0.0.0.0",
+    "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -12,6 +12,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@playwright/test": "^1.33.0",
     "@fortawesome/free-solid-svg-icons": "6.2.0",
     "@sveltejs/adapter-auto": "1.0.0-next.75",
     "@sveltejs/kit": "^1.30.4",
@@ -53,6 +54,7 @@
     "ramda": "^0.29.0",
     "sse.js": "^0.6.1",
     "svelte-notifications": "^0.9.98",
+    "playwright": "^1.44.0",
     "svrollbar": "^0.12.0"
   }
 }
