@@ -17,7 +17,7 @@ set -xe
 function test_env_setup() {
     WORKPATH=$(dirname "$PWD")
     LOG_PATH="$WORKPATH/tests"
-    kill_port $8001
+    kill_port 8001
 
     REDIS_CONTAINER_NAME="test-redis-vector-db"
     LANGCHAIN_CONTAINER_NAME="test-qna-rag-redis-server"
