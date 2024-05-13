@@ -61,12 +61,22 @@ class ServiceOrchestrator(DAG):
 
     def define_routes(self):
         self.gateway.app.router.add_api_route(self.endpoint, self.endpoint_func, methods=["POST"])
+        self.gateway.app.router.add_api_route(str(MegaServiceEndpoint.LIST_SERVICE), self.list_service, methods=["GET"])
         self.gateway.app.router.add_api_route(
-            str(MegaServiceEndpoint.LIST_SERVICE), self.endpoint_func, methods=["GET"]
+            str(MegaServiceEndpoint.LIST_PARAMETERS), self.list_parameter, methods=["GET"]
         )
-        self.gateway.app.router.add_api_route(
-            str(MegaServiceEndpoint.LIST_PARAMETERS), self.endpoint_func, methods=["GET"]
-        )
+
+    def start_server(self):
+        self.gateway.start()
+
+    def list_service(self):
+        response = {}
+        for node in self.all_leaves():
+            response = {self.services[node].description: self.services[node].endpoint_path}
+        return response
+
+    def list_parameter(self):
+        pass
 
     async def handle_chat_qna(self, request: Request):
         data = await request.json()
@@ -78,14 +88,15 @@ class ServiceOrchestrator(DAG):
                 text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
                 prompt = "\n".join(text_list)
         self.schedule(initial_inputs={"text": prompt})
-        response = self.get_all_final_outputs()
+        last_node = self.all_leaves()[-1]
+        response = self.result_dict[last_node]["text"]
         choices = []
         usage = UsageInfo()
         choices.append(
             ChatCompletionResponseChoice(
                 index=0,
                 message=ChatMessage(role="assistant", content=response),
-                finish_reason=response.get("finish_reason", "stop"),
+                finish_reason="stop",
             )
         )
         return ChatCompletionResponse(model="chatqna", choices=choices, usage=usage)
@@ -108,14 +119,15 @@ class ServiceOrchestrator(DAG):
                 text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
                 prompt = "\n".join(text_list)
         self.schedule(initial_inputs={"text": prompt})
-        response = self.get_all_final_outputs()
+        last_node = self.all_leaves()[-1]
+        response = self.result_dict[last_node]["text"]
         choices = []
         usage = UsageInfo()
         choices.append(
             ChatCompletionResponseChoice(
                 index=0,
                 message=ChatMessage(role="assistant", content=response),
-                finish_reason=response.get("finish_reason", "stop"),
+                finish_reason="stop",
             )
         )
         return ChatCompletionResponse(model="chatqna", choices=choices, usage=usage)
@@ -130,14 +142,15 @@ class ServiceOrchestrator(DAG):
                 text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
                 prompt = "\n".join(text_list)
         self.schedule(initial_inputs={"text": prompt})
-        response = self.get_all_final_outputs()
+        last_node = self.all_leaves()[-1]
+        response = self.result_dict[last_node]["text"]
         choices = []
         usage = UsageInfo()
         choices.append(
             ChatCompletionResponseChoice(
                 index=0,
                 message=ChatMessage(role="assistant", content=response),
-                finish_reason=response.get("finish_reason", "stop"),
+                finish_reason="stop",
             )
         )
         return ChatCompletionResponse(model="chatqna", choices=choices, usage=usage)
