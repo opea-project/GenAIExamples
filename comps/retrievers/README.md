@@ -31,6 +31,7 @@ docker run -d --name="redis-vector-db" -p 6379:6379 -p 8001:8001 redis/redis-sta
 ```bash
 export REDIS_URL="redis://${your_ip}:6379"
 export INDEX_NAME=${your_index_name}
+export TEI_EMBEDDING_ENDPOINT=${your_embedding_endpoint}
 ```
 
 ## Start Retriever Service with Local Model
@@ -73,9 +74,19 @@ curl http://localhost:7000/v1/health_check\
 
 ## Consume Embedding Service
 
+To consume the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+
+```Python
+import random
+embedding = [random.uniform(-1, 1) for _ in range(768)]
+print(embedding)
+```
+
+Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
+
 ```bash
-curl http://localhost:7000/v1/retrieval\
+curl http://${your_ip}:7000/v1/retrieval\
   -X POST \
-  -d '{"text":"Hello, world!", "embedding": [1,1,...,1]}' \
+  -d '{"text":"What is the revenue of Nike in 2023?","embedding":${your_embedding}}' \
   -H 'Content-Type: application/json'
 ```

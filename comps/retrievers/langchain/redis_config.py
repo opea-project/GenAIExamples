@@ -52,7 +52,7 @@ if DEBUG:
 
 
 # Embedding model
-EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-large-en-v1.5")
+EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-base-en-v1.5")
 
 
 # Redis Connection Information
