@@ -64,11 +64,11 @@ export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-large"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:6006"
-export TEI_RERANKING_ENDPOINT="http://${your_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${your_ip}:9009"
-export REDIS_URL="redis://${your_ip}:6379"
-export INDEX_NAME=${your_index_name}
+export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
+export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
+export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
+export REDIS_URL="redis://${host_ip}:6379"
+export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
 
@@ -83,7 +83,7 @@ docker compose -f docker_compose.yaml up -d
 1. TEI Embedding Service
 
 ```bash
-curl ${your_ip}:6006/embed \
+curl ${host_ip}:6006/embed \
     -X POST \
     -d '{"inputs":"What is Deep Learning?"}' \
     -H 'Content-Type: application/json'
@@ -92,13 +92,13 @@ curl ${your_ip}:6006/embed \
 2. Embedding Microservice
 
 ```bash
-curl http://${your_ip}:6000/v1/embeddings\
+curl http://${host_ip}:6000/v1/embeddings\
   -X POST \
   -d '{"text":"hello"}' \
   -H 'Content-Type: application/json'
 ```
 
-3. Retriever Microservice
+3. Retriever Microservice  
    To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
 
 ```Python
@@ -110,16 +110,16 @@ print(embedding)
 Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
 
 ```bash
-curl http://${your_ip}:7000/v1/retrieval\
+curl http://${host_ip}:7000/v1/retrieval\
   -X POST \
-  -d '{"text":"What is the revenue of Nike in 2023?","embedding":${your_embedding}' \
+  -d '{"text":"What is the revenue of Nike in 2023?","embedding":${your_embedding}}' \
   -H 'Content-Type: application/json'
 ```
 
 4. TEI Reranking Service
 
 ```bash
-curl http://${your_ip}:8808/rerank \
+curl http://${host_ip}:8808/rerank \
     -X POST \
     -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
     -H 'Content-Type: application/json'
@@ -128,7 +128,7 @@ curl http://${your_ip}:8808/rerank \
 5. Reranking Microservice
 
 ```bash
-curl http://${your_ip}:8000/v1/reranking\
+curl http://${host_ip}:8000/v1/reranking\
   -X POST \
   -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
   -H 'Content-Type: application/json'
@@ -137,7 +137,7 @@ curl http://${your_ip}:8000/v1/reranking\
 6. TGI Service
 
 ```bash
-curl http://${your_ip}:9009/generate \
+curl http://${host_ip}:9009/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
@@ -146,7 +146,7 @@ curl http://${your_ip}:9009/generate \
 7. LLM Microservice
 
 ```bash
-curl http://${your_ip}:9000/v1/chat/completions\
+curl http://${host_ip}:9000/v1/chat/completions\
   -X POST \
   -d '{"text":"What is Deep Learning?"}' \
   -H 'Content-Type: application/json'

@@ -1,17 +1,17 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: ChatQnA E2E test on Gaudi
+name: ChatQnA E2E test on Xeon
 
 on:
   pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - ChatQnA/microservice/gaudi/**
+      - ChatQnA/microservice/xeon/**
       - "!**.md"
       - "!**/ui/**"
-      - .github/workflows/ChatQnA_gaudi.yml
+      - .github/workflows/ChatQnA_xeon.yml
   workflow_dispatch:
 
 # If there is a new commit, the previous jobs will be canceled
@@ -37,7 +37,7 @@ jobs:
           AISE_CLUSTER_01_2_IP: ${{ secrets.AISE_CLUSTER_01_2_IP }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
-          bash test_chatqna_on_gaudi.sh
+          bash test_chatqna_on_xeon.sh
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
