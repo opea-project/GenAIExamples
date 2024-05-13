@@ -46,6 +46,9 @@ class MegaServiceEndpoint(Enum):
     LIST_SERVICE = "/v1/list_service"
     LIST_PARAMETERS = "/v1/list_parameters"
 
+    def __str__(self):
+        return self.value
+
 
 class MicroServiceType(Enum):
     """The enum of an MicroService endpoint."""
@@ -57,3 +60,6 @@ class MicroServiceType(Enum):
     RETRIEVAL = "/v1/microservice/retrieval"
     RERANKING = "/v1/microservice/reranking"
     GUARDRAILS = "/v1/microservice/guardrails"
+
+    def __str__(self):
+        return self.value

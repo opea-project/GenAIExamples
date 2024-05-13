@@ -6,3 +6,4 @@ opentelemetry-exporter-otlp
 opentelemetry-sdk
 pyyaml
 requests
+shortuuid

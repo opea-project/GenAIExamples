@@ -28,7 +28,7 @@ from comps.cores.proto.docarray import (
 # Microservice
 from comps.cores.mega.orchestrator import ServiceOrchestrator
 from comps.cores.mega.orchestrator_with_yaml import ServiceOrchestratorWithYaml
-from comps.cores.mega.micro_service import MicroService, RemoteMicroService, register_microservice, opea_microservices
+from comps.cores.mega.micro_service import MicroService, register_microservice, opea_microservices
 
 # Telemetry
 from comps.cores.telemetry.opea_telemetry import opea_telemetry

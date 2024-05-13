@@ -43,7 +43,7 @@ class TestServiceOrchestrator(unittest.TestCase):
         self.s1.start()
         self.s2.start()
 
-        self.service_builder = ServiceOrchestrator(port=8000, hostfile=None)
+        self.service_builder = ServiceOrchestrator(port=8000)
 
         self.service_builder.add(opea_microservices["s1"]).add(opea_microservices["s2"])
         self.service_builder.flow_to(self.s1, self.s2)
