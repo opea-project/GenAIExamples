@@ -152,7 +152,7 @@ curl http://${your_ip}:9000/v1/chat/completions\
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service. However, before launching the mega-service, it's essential to ingest data into the vector store.
+Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
 ## 🚀 Construct Mega Service
 
