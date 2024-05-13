@@ -29,6 +29,7 @@ services:
     container_name: llm-tgi-server
     ports:
       - "9000:9000"
+      - "9001:9001"
     ipc: host
     environment:
       http_proxy: ${http_proxy}

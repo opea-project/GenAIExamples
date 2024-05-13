@@ -15,6 +15,7 @@
 import os
 from typing import Union
 
+from fastapi.responses import StreamingResponse
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -55,5 +56,65 @@ def llm_generate(input: Union[TextDoc, RerankedDoc]) -> GeneratedDoc:
     return res
 
 
+def post_process_text(text: str):
+    if text == " ":
+        return "data: @#$\n\n"
+    if text == "\n":
+        return "data: <br/>\n\n"
+    if text.isspace():
+        return None
+    new_text = text.replace(" ", "@#$")
+    return f"data: {new_text}\n\n"
+
+
+@register_microservice(
+    name="opea_service@llm_tgi_stream", expose_endpoint="/v1/chat/completions_stream", host="0.0.0.0", port=9001
+)
+def llm_generate_stream(input: Union[TextDoc, RerankedDoc]):
+    llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
+    params = LLMParamsDoc()
+    llm = HuggingFaceEndpoint(
+        endpoint_url=llm_endpoint,
+        max_new_tokens=params.max_new_tokens,
+        top_k=params.top_k,
+        top_p=params.top_p,
+        typical_p=params.typical_p,
+        temperature=params.temperature,
+        repetition_penalty=params.repetition_penalty,
+        streaming=params.streaming,
+    )
+    if isinstance(input, RerankedDoc):
+        template = """Answer the question based only on the following context:
+        {context}
+        Question: {question}
+        """
+        prompt = ChatPromptTemplate.from_template(template)
+        chain = prompt | llm | StrOutputParser()
+        final_input = {"question": input.query, "context": input.doc.text}
+    elif isinstance(input, TextDoc):
+        chain = llm
+        final_input = input.text
+    else:
+        raise TypeError("Invalid input type. Expected TextDoc or RerankedDoc.")
+
+    def stream_generator():
+        chat_response = ""
+        for text in chain.stream(final_input):
+            chat_response += text
+            processed_text = post_process_text(text)
+            if text and processed_text:
+                if "</s>" in text:
+                    res = text.split("</s>")[0]
+                    if res != "":
+                        yield res
+                    break
+                yield processed_text
+        print(f"[llm - chat_stream] stream response: {chat_response}")
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(stream_generator(), media_type="text/event-stream")
+
+
 if __name__ == "__main__":
     opea_microservices["opea_service@llm_tgi"].start()
+    opea_microservices["opea_service@llm_tgi_stream"].start()
