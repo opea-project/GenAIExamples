@@ -101,10 +101,12 @@ function check_microservices() {
         -H 'Content-Type: application/json' > ${LOG_PATH}/reranking.log
     sleep 5s
 
+    # for debug
+    sleep 3m
     curl http://${ip_address}:8008/generate \
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
+        -H 'Content-Type: application/json' || docker logs tgi-gaudi-server > ${LOG_PATH}/generate.log
     sleep 5s
 
     curl http://${ip_address}:9000/v1/chat/completions \
