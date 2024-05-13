@@ -45,7 +45,6 @@ docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_pr
 docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
-
 Then run the command `docker images`, you will have the following four Docker Images:
 
 1. `opea/gen-ai-comps:embedding-tei-server`
@@ -145,7 +144,6 @@ curl http://${your_ip}:9000/v1/chat/completions\
 ```
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service. However, before launching the mega-service, it's essential to ingest data into the vector store.
-
 
 ## 🚀 Construct Mega Service
 
