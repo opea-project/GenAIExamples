@@ -68,7 +68,7 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 ```bash
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
+export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-large"
 export LLM_MODEL_ID="m-a-p/OpenCodeInterpreter-DS-6.7B"
 export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:8090"
@@ -78,6 +78,8 @@ export REDIS_URL="redis://${your_ip}:6379"
 export INDEX_NAME=${your_index_name}
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
+
+Note: Please replace with `your_ip` with you external IP address, do not use localhost.
 
 ### Start Microservice Docker Containers
 
@@ -148,16 +150,6 @@ curl http://${your_ip}:9000/v1/chat/completions\
   -X POST \
   -d '{"text":"What is Deep Learning?"}' \
   -H 'Content-Type: application/json'
-```
-
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service. However, before launching the mega-service, it's essential to ingest data into the vector store.
-
-## 🚀 Ingest Data Into Vector Database
-
-```bash
-docker exec -it qna-rag-redis-server bash
-cd /ws
-python ingest.py
 ```
 
 ## 🚀 Construct Mega Service

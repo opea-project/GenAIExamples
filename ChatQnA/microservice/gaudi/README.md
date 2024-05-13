@@ -17,7 +17,7 @@ python setup.py install
 ### 2. Build Embedding Image
 
 ```bash
-docker build -t opea/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
 ```
 
 ### 3. Build Retriever Image
@@ -29,7 +29,7 @@ docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy
 ### 4. Build Rerank Image
 
 ```bash
-docker build -t opea/gen-ai-comps:reranking-tei-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:reranking-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
 ```
 
 ### 5. Build LLM Image
@@ -46,7 +46,7 @@ Since a TEI Gaudi Docker image hasn't been published, we'll need to build it fro
 cd ..
 git clone https://github.com/huggingface/tei-gaudi
 cd tei-gaudi/
-docker build -f Dockerfile-hpu -t opea/tei_gaudi .
+docker build -f Dockerfile-hpu -t opea/tei-gaudi .
 ```
 
 ### 7. Pull TGI Gaudi Image
@@ -57,21 +57,23 @@ As TGI Gaudi has been officially published as a Docker image, we simply need to 
 docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 ```
 
-### 8. Pull qna-rag-redis-server Image
+### 8. Pull TEI Xeon Image
+
+Since TEI Gaudi doesn't support reranking models, we'll deploy TEI CPU serving instead. TEI CPU has been officially released as a Docker image, so we can easily pull it.
 
 ```bash
-docker pull intel/gen-ai-examples:qna-rag-redis-server
+docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 ```
 
-Then run the command `docker images`, you will have the following four Docker Images:
+Then run the command `docker images`, you will have the following 7 Docker Images:
 
 1. `opea/gen-ai-comps:embedding-tei-server`
 2. `opea/gen-ai-comps:retriever-redis-server`
-3. `opea/gen-ai-comps:reranking-tei-gaudi-server`
+3. `opea/gen-ai-comps:reranking-tei-server`
 4. `opea/gen-ai-comps:llm-tgi-server`
-5. `opea/tei_gaudi`
+5. `opea/tei-gaudi`
 6. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
-7. `intel/gen-ai-examples:qna-rag-redis-server`
+7. `ghcr.io/huggingface/text-embeddings-inference:cpu-1.2`
 
 ## 🚀 Start Microservices
 
@@ -82,16 +84,18 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 ```bash
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
+export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-large"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:8090"
-export TEI_RERANKING_ENDPOINT="http://${your_ip}:6060"
-export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
-export REDIS_URL="redis://${your_ip}:6379"
-export INDEX_NAME=${your_index_name}
+export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
+export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
+export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
+export REDIS_URL="redis://${host_ip}:6379"
+export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
+
+Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start Microservice Docker Containers
 
@@ -104,7 +108,7 @@ docker compose -f docker_compose.yaml up -d
 1. TEI Embedding Service
 
 ```bash
-curl ${your_ip}:8090/embed \
+curl ${host_ip}:8090/embed \
     -X POST \
     -d '{"inputs":"What is Deep Learning?"}' \
     -H 'Content-Type: application/json'
@@ -113,7 +117,7 @@ curl ${your_ip}:8090/embed \
 2. Embedding Microservice
 
 ```bash
-curl http://${your_ip}:6000/v1/embeddings\
+curl http://${host_ip}:6000/v1/embeddings\
   -X POST \
   -d '{"text":"hello"}' \
   -H 'Content-Type: application/json'
@@ -122,16 +126,16 @@ curl http://${your_ip}:6000/v1/embeddings\
 3. Retriever Microservice
 
 ```bash
-curl http://${your_ip}:7000/v1/retrieval\
+curl http://${host_ip}:7000/v1/retrieval\
   -X POST \
-  -d '{"text":"test","embedding":[1,1,...1]}' \
+  -d '{"text":"test", "embedding":[1,1,...1]}' \
   -H 'Content-Type: application/json'
 ```
 
 4. TEI Reranking Service
 
 ```bash
-curl http://${your_ip}:6060/rerank \
+curl http://${host_ip}:8808/rerank \
     -X POST \
     -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
     -H 'Content-Type: application/json'
@@ -140,7 +144,7 @@ curl http://${your_ip}:6060/rerank \
 5. Reranking Microservice
 
 ```bash
-curl http://${your_ip}:8000/v1/reranking\
+curl http://${host_ip}:8000/v1/reranking\
   -X POST \
   -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
   -H 'Content-Type: application/json'
@@ -149,7 +153,7 @@ curl http://${your_ip}:8000/v1/reranking\
 6. TGI Service
 
 ```bash
-curl http://${your_ip}:8008/generate \
+curl http://${host_ip}:8008/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
   -H 'Content-Type: application/json'
@@ -158,21 +162,13 @@ curl http://${your_ip}:8008/generate \
 7. LLM Microservice
 
 ```bash
-curl http://${your_ip}:9000/v1/chat/completions\
+curl http://${host_ip}:9000/v1/chat/completions\
   -X POST \
   -d '{"text":"What is Deep Learning?"}' \
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service. However, before launching the mega-service, it's essential to ingest data into the vector store.
-
-## 🚀 Ingest Data Into Vector Database
-
-```bash
-docker exec -it qna-rag-redis-server bash
-cd /ws
-python ingest.py
-```
+Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
 ## 🚀 Construct Mega Service
 
