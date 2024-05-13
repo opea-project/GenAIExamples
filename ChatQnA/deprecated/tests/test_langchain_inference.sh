@@ -17,7 +17,6 @@ set -xe
 function test_env_setup() {
     WORKPATH=$(dirname "$PWD")
     LOG_PATH="$WORKPATH/tests"
-    kill_port 8001
 
     REDIS_CONTAINER_NAME="test-redis-vector-db"
     LANGCHAIN_CONTAINER_NAME="test-qna-rag-redis-server"
@@ -58,6 +57,7 @@ function launch_redis_and_langchain_service() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     local port=8890
     kill_port $port
+    kill_port 8001
 
     sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
     docker compose -f langchain/docker/docker-compose.yml up -d --build
