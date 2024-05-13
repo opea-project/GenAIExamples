@@ -74,7 +74,6 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-
 ### Start Microservice Docker Containers
 
 ```bash
