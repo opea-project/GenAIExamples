@@ -21,30 +21,11 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
-  qna-rag-redis-server:
-    image: intel/gen-ai-examples:qna-rag-redis-server
-    container_name: qna-rag-redis-server
-    environment:
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      REDIS_PORT: 6379
-      EMBED_MODEL: BAAI/bge-base-en-v1.5
-      REDIS_SCHEMA: schema_dim_768.yml
-      VECTOR_DATABASE: REDIS
-    ulimits:
-      memlock:
-        soft: -1 # Set memlock to unlimited (no soft or hard limit)
-        hard: -1
-    volumes:
-      - ../redis:/ws
-      - ../test:/test
-    network_mode: "host"
   tei_embedding_service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-    container_name: tei_embedding_server
+    container_name: tei-embedding-server
     ports:
-      - "8090:80"
+      - "6006:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -53,18 +34,19 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID}
   embedding:
-    image: intel/gen-ai-comps:embedding-tei-server
+    image: opea/gen-ai-comps:embedding-tei-server
     container_name: embedding-tei-server
     ports:
       - "6000:6000"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
+
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   retriever:
-    image: intel/gen-ai-comps:retriever-redis-server
+    image: opea/gen-ai-comps:retriever-redis-server
     container_name: retriever-redis-server
     ports:
       - "7000:7000"
@@ -74,10 +56,11 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   tei_xeon_service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-    container_name: tei_xeon_server
+    container_name: tei-xeon-server
     ports:
       - "8808:80"
     volumes:
@@ -88,7 +71,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${RERANK_MODEL_ID}
   reranking:
-    image: intel/gen-ai-comps:reranking-tei-xeon-server
+    image: opea/gen-ai-comps:reranking-tei-xeon-server
     container_name: reranking-tei-xeon-server
     ports:
       - "8000:8000"
@@ -101,15 +84,15 @@ services:
     restart: unless-stopped
   tgi_service:
     image: ghcr.io/huggingface/text-generation-inference:1.4
-    container_name: tgi_service
+    container_name: tgi-service
     ports:
-      - "8008:80"
+      - "9009:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: intel/gen-ai-comps:llm-tgi-server
+    image: opea/gen-ai-comps:llm-tgi-server
     container_name: llm-tgi-server
     ports:
       - "9000:9000"

@@ -31,7 +31,7 @@ class MyServiceOrchestrator:
         self.service_builder.flow_to(rerank, llm)
 
     def schedule(self):
-        self.service_builder.schedule(initial_inputs={"text": "What is the revenue of Nike?"})
+        self.service_builder.schedule(initial_inputs={"text": "What is the revenue of Nike in 2023?"})
         self.service_builder.get_all_final_outputs()
         result_dict = self.service_builder.result_dict
         print(result_dict)
