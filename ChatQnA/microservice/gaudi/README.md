@@ -94,6 +94,7 @@ export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
+
 Note: Please replace with `your_ip` with you external IP address, do not use localhost.
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -130,6 +131,7 @@ To consume the retriever microservice, you need to generate a mock embedding vec
 
 ```python
 import random
+
 embedding = [random.uniform(-1, 1) for _ in range(768)]
 print(embedding)
 ```
