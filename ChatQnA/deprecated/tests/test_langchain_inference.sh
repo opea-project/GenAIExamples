@@ -56,12 +56,9 @@ function launch_redis_and_langchain_service() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     local port=8890
     local ci_port=8889
-    local redis_port=6380
 
     sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
     sed -i "s/8001:8001/$ci_port:$ci_port/g" langchain/docker/docker-compose.yml
-    sed -i "s/6379:6379/$redis_port:$redis_port/g" langchain/docker/docker-compose.yml
-    sed -i "s/REDIS_PORT=6379/REDIS_PORT=$redis_port/g" langchain/docker/docker-compose.yml
     docker compose -f langchain/docker/docker-compose.yml up -d --build
 
     # Ingest data into redis
