@@ -115,7 +115,7 @@ function run_e2e_tests() {
     mkdir -p $LOG_PATH/E2E_tests
     conda_env_name="ChatQnA_e2e"
 
-    echo "DOC_BASE_URL = 'http://localhost:8890/v1/rag'" >.env
+    echo "DOC_BASE_URL = '127.0.0.1:8890/v1/rag'" >.env
 
     export PATH=${HOME}/miniconda3/bin/:$PATH
     conda remove -n ${conda_env_name} --all -y
