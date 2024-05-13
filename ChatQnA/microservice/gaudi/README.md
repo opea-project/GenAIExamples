@@ -84,7 +84,7 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 ```bash
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
+export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-large"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
@@ -127,7 +127,7 @@ curl http://${host_ip}:6000/v1/embeddings\
 ```bash
 curl http://${host_ip}:7000/v1/retrieval\
   -X POST \
-  -d '{"text":"test","embedding":[1,1,...1]}' \
+  -d '{"text":"test", "embedding":[1,1,...1]}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -167,15 +167,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service. However, before launching the mega-service, it's essential to ingest data into the vector store.
-
-## 🚀 Ingest Data Into Vector Database
-
-```bash
-docker exec -it qna-rag-redis-server bash
-cd /ws
-python ingest.py
-```
+Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
 ## 🚀 Construct Mega Service
 
