@@ -99,13 +99,16 @@ curl http://${your_ip}:6000/v1/embeddings\
 ```
 
 3. Retriever Microservice
-To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+   To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+
 ```Python
 import random
 embedding = [random.uniform(-1, 1) for _ in range(768)]
 print(embedding)
 ```
-Then substitude the `${your_embedding}` into your mock embedding vector in the following cURL command:
+
+Then substitute the `${your_embedding}` into your mock embedding vector in the following cURL command:
+
 ```bash
 curl http://${your_ip}:7000/v1/retrieval\
   -X POST \
