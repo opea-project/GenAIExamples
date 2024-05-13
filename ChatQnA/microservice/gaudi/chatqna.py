@@ -21,10 +21,18 @@ class ChatQnAService:
         self.service_builder = ServiceOrchestrator(host="0.0.0.0", port=port, endpoint="/v1/chatqna")
 
     def add_remote_service(self):
-        embedding = MicroService(name="embedding", host="0.0.0.0", port=6000, expose_endpoint="/v1/embeddings", use_remote_service=True)
-        retriever = MicroService(name="retriever", host="0.0.0.0", port=7000, expose_endpoint="/v1/retrieval", use_remote_service=True)
-        rerank = MicroService(name="rerank", host="0.0.0.0", port=8000, expose_endpoint="/v1/reranking", use_remote_service=True)
-        llm = MicroService(name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/chat/completions", use_remote_service=True)
+        embedding = MicroService(
+            name="embedding", host="0.0.0.0", port=6000, expose_endpoint="/v1/embeddings", use_remote_service=True
+        )
+        retriever = MicroService(
+            name="retriever", host="0.0.0.0", port=7000, expose_endpoint="/v1/retrieval", use_remote_service=True
+        )
+        rerank = MicroService(
+            name="rerank", host="0.0.0.0", port=8000, expose_endpoint="/v1/reranking", use_remote_service=True
+        )
+        llm = MicroService(
+            name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/chat/completions", use_remote_service=True
+        )
         self.service_builder.add(embedding).add(retriever).add(rerank).add(llm)
         self.service_builder.flow_to(embedding, retriever)
         self.service_builder.flow_to(retriever, rerank)
@@ -41,4 +49,3 @@ if __name__ == "__main__":
     chatqna = ChatQnAService(port=8888)
     chatqna.add_remote_service()
     chatqna.schedule()
-
