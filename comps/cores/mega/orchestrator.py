@@ -33,7 +33,7 @@ from .micro_service import MicroService
 class ServiceOrchestrator(DAG):
     """Manage 1 or N micro services in a DAG through Python API."""
 
-    def __init__(self, host="0.0.0.0", port=8000, endpoint=MegaServiceEndpoint.CHAT_QNA) -> None:
+    def __init__(self, host="0.0.0.0", port=8000, endpoint=str(MegaServiceEndpoint.CHAT_QNA)) -> None:
         self.services = {}  # all services, id -> service
         self.result_dict = {}
         self.host = host

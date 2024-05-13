@@ -9,10 +9,10 @@ on:
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - .github/workflows/mega-test.yml
-      - comps/mega/**
+      - comps/cores/**
       - requirements.txt
       - setup.py
-      - tests/mega/**
+      - tests/cores/**
   workflow_dispatch:
 
 # If there is a new commit, the previous jobs will be canceled
@@ -29,7 +29,14 @@ jobs:
     runs-on: aise-cluster
     steps:
       - name: Clean Up Working Directory
-        run: sudo rm -rf ${{github.workspace}}/*
+        run: |
+          sudo rm -rf ${{github.workspace}}/*
+          if [[ $(docker ps -a | grep -i '${{ env.CONTAINER_NAME }}'$) ]]; then
+              docker start ${{ env.CONTAINER_NAME }}
+              echo "remove left files through container ..."
+              docker exec ${{ env.CONTAINER_NAME }} bash -c "rm -fr /GenAIComps || true"
+              docker stop ${{ env.CONTAINER_NAME }} && docker rm -vf ${{ env.CONTAINER_NAME }} || true
+          fi
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
@@ -42,10 +49,6 @@ jobs:
 
       - name: Docker Run
         run: |
-          if [[ $(docker ps -a | grep -i '${{ env.CONTAINER_NAME }}'$) ]]; then
-            docker stop ${{ env.CONTAINER_NAME }}
-            docker rm -vf ${{ env.CONTAINER_NAME }} || true
-          fi
           docker run -dit --memory="4g" --memory-reservation="1g" --disable-content-trust --privileged --name=${{ env.CONTAINER_NAME }} --shm-size="1g" \
           -v ${{ github.workspace }}:/GenAIComps ut-test:1.0
 

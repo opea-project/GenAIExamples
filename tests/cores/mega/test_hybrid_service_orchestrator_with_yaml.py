@@ -15,10 +15,10 @@
 import json
 import unittest
 
-from comps import MicroService, ServiceOrchestrator, TextDoc, opea_microservices, register_microservice
+from comps import ServiceOrchestratorWithYaml, TextDoc, opea_microservices, register_microservice
 
 
-@register_microservice(name="s1", host="0.0.0.0", port=8086, expose_endpoint="/v1/add")
+@register_microservice(name="s1", host="0.0.0.0", port=8085, expose_endpoint="/v1/add")
 async def s1_add(request: TextDoc) -> TextDoc:
     req = request.model_dump_json()
     req_dict = json.loads(req)
@@ -27,26 +27,18 @@ async def s1_add(request: TextDoc) -> TextDoc:
     return {"text": text}
 
 
-class TestServiceOrchestrator(unittest.TestCase):
-    def setUp(self):
+class TestYAMLOrchestrator(unittest.TestCase):
+    def setUp(self) -> None:
         self.s1 = opea_microservices["s1"]
         self.s1.start()
-
-        self.service_builder = ServiceOrchestrator(port=8000)
 
     def tearDown(self):
         self.s1.stop()
 
     def test_add_remote_service(self):
-        s2 = MicroService(name="s2", host="fakehost", port=8008, expose_endpoint="/v1/add", use_remote_service=True)
-        self.service_builder.add(opea_microservices["s1"]).add(s2)
-        self.service_builder.flow_to(self.s1, s2)
-        self.assertEqual(s2.endpoint_path, "http://fakehost:8008/v1/add")
-        # Check whether the right exception is raise when init/stop remote service
-        try:
-            s2.start()
-        except Exception as e:
-            self.assertTrue("Method not allowed" in str(e))
+        service_builder = ServiceOrchestratorWithYaml(yaml_file_path="megaservice_hybrid.yaml")
+        self.assertEqual(service_builder.all_leaves()[0], "s2")
+        self.assertEqual(service_builder.docs["opea_micro_services"]["s2"]["endpoint"], "http://fakehost:8008/v1/add")
 
 
 if __name__ == "__main__":

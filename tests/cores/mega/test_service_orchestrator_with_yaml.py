@@ -48,7 +48,7 @@ class TestYAMLOrchestrator(unittest.TestCase):
         self.s2.stop()
 
     def test_schedule(self):
-        service_builder = ServiceOrchestratorWithYaml(yaml_file_path="./megaservice.yaml")
+        service_builder = ServiceOrchestratorWithYaml(yaml_file_path="megaservice.yaml")
         service_builder.schedule(initial_inputs={"text": "Hello, "})
         service_builder.get_all_final_outputs()
         result_dict = service_builder.result_dict
