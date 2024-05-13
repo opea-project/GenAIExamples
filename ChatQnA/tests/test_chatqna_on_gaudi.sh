@@ -30,16 +30,16 @@ function build_docker_image() {
 
     docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:reranking-tei-gaudi-server -f comps/reranks/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:reranking-tei-server -f comps/reranks/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server -f comps/llms/langchain/docker/Dockerfile .
 
     cd ..
     git clone https://github.com/huggingface/tei-gaudi
     cd tei-gaudi/
-    docker build -f Dockerfile-hpu -t opea/tei_gaudi .
+    docker build -f Dockerfile-hpu -t opea/tei-gaudi .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
-    docker pull intel/gen-ai-examples:qna-rag-redis-server
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 
     docker images
 }
@@ -50,14 +50,14 @@ function start_microservices() {
     ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
     ip_address=$(eval echo '$'$ip_name)
 
-    export EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
+    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-large"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
-    export TEI_RERANKING_ENDPOINT="http://${ip_address}:6060"
+    export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export REDIS_URL="redis://${ip_address}:6379"
-    export INDEX_NAME="rag_redis"
+    export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
     # Start Microservice Docker Containers
@@ -89,7 +89,7 @@ function check_microservices() {
         -H 'Content-Type: application/json' > ${LOG_PATH}/retrieval.log
     sleep 5s
 
-    curl http://${ip_address}:6060/rerank \
+    curl http://${ip_address}:8808/rerank \
         -X POST \
         -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/rerank.log
@@ -112,13 +112,6 @@ function check_microservices() {
         -d '{"text":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
     sleep 5s
-}
-
-function ingest_data() {
-    cd $WORKPATH
-    docker exec qna-rag-redis-server \
-        bash -c "cd /ws && python ingest.py > /dev/null"
-    sleep 1m
 }
 
 function run_megaservice() {
@@ -162,7 +155,6 @@ function main() {
     start_microservices
     check_microservices
 
-    ingest_data
     run_megaservice
     check_results
 
