@@ -40,7 +40,6 @@ function launch_tgi_gaudi_service() {
     local model_name="Intel/neural-chat-7b-v3-3"
 
     cd ${WORKPATH}
-    kill_port $port
 
     # Reset the tgi port
     sed -i "s/8080/$port/g" langchain/redis/rag_redis/config.py
@@ -57,10 +56,12 @@ function launch_redis_and_langchain_service() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     local port=8890
     local ci_port=8889
-    kill_port $port
+    local redis_port=6380
 
     sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
     sed -i "s/8001:8001/$ci_port:$ci_port/g" langchain/docker/docker-compose.yml
+    sed -i "s/6379:6379/$redis_port:$redis_port/g" langchain/docker/docker-compose.yml
+    sed -i "s/REDIS_PORT=6379/REDIS_PORT=$redis_port/g" langchain/docker/docker-compose.yml
     docker compose -f langchain/docker/docker-compose.yml up -d --build
 
     # Ingest data into redis
@@ -112,10 +113,10 @@ function check_response() {
 
 function run_e2e_tests() {
     cd $WORKPATH/../ui/svelte
-    mkdir -p $LOG_PATH/E2E_tests
-    conda_env_name="ChatQnA_e2e"
+    local conda_env_name="ChatQnA_e2e"
+    local port=8890
 
-    echo "DOC_BASE_URL = '127.0.0.1:8890/v1/rag'" >.env
+    echo "DOC_BASE_URL = '127.0.0.1:$port/v1/rag'" >.env
 
     export PATH=${HOME}/miniconda3/bin/:$PATH
     conda remove -n ${conda_env_name} --all -y
@@ -147,12 +148,6 @@ function docker_stop() {
     local container_name=$1
     local cid=$(docker ps -aq --filter "name=$container_name")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
-}
-
-function kill_port() {
-    local port=$1
-    local pid=$(sudo lsof -t -i:$port)
-    if [[ "x$pid" != "x" ]]; then sudo kill -9 $pid; fi
 }
 
 function main() {
