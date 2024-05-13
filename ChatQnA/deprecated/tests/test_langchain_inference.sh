@@ -17,6 +17,7 @@ set -xe
 function test_env_setup() {
     WORKPATH=$(dirname "$PWD")
     LOG_PATH="$WORKPATH/tests"
+    kill_port $8001
 
     REDIS_CONTAINER_NAME="test-redis-vector-db"
     LANGCHAIN_CONTAINER_NAME="test-qna-rag-redis-server"
@@ -40,6 +41,7 @@ function launch_tgi_gaudi_service() {
     local model_name="Intel/neural-chat-7b-v3-3"
 
     cd ${WORKPATH}
+    kill_port $port
 
     # Reset the tgi port
     sed -i "s/8080/$port/g" langchain/redis/rag_redis/config.py
@@ -55,6 +57,8 @@ function launch_redis_and_langchain_service() {
     cd $WORKPATH
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     local port=8890
+    kill_port $port
+
     sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
     docker compose -f langchain/docker/docker-compose.yml up -d --build
 
@@ -135,13 +139,19 @@ function run_e2e_tests() {
     fi
 
     echo "[TEST INFO]: ---------E2E test finished---------"
-    sudo kill -s 9 $pid || true
+    sudo kill -9 $pid || true
 }
 
 function docker_stop() {
     local container_name=$1
     cid=$(docker ps -aq --filter "name=$container_name")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
+}
+
+function kill_port() {
+    local port=$1
+    pid=$(lsof -t -i:$port)
+    if [[ ! -z "$pid" ]]; then sudo kill -9 $pid; fi
 }
 
 function main() {
