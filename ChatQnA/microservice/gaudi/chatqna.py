@@ -13,31 +13,39 @@
 # limitations under the License.
 
 
-from comps import RemoteMicroService, ServiceOrchestrator
+from comps import MicroService, ServiceOrchestrator
 
 
 class ChatQnAService:
     def __init__(self, port=8000):
-        self.service_builder = ServiceOrchestrator(port=port)
+        self.service_builder = ServiceOrchestrator(host="0.0.0.0", port=port, endpoint="/v1/chatqna")
 
     def add_remote_service(self):
-        embedding = RemoteMicroService(name="embedding", host="0.0.0.0", port=6000, expose_endpoint="/v1/embeddings")
-        retriever = RemoteMicroService(name="retriever", host="0.0.0.0", port=7000, expose_endpoint="/v1/retrieval")
-        rerank = RemoteMicroService(name="rerank", host="0.0.0.0", port=8000, expose_endpoint="/v1/reranking")
-        llm = RemoteMicroService(name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/chat/completions")
+        embedding = MicroService(
+            name="embedding", host="0.0.0.0", port=6000, expose_endpoint="/v1/embeddings", use_remote_service=True
+        )
+        retriever = MicroService(
+            name="retriever", host="0.0.0.0", port=7000, expose_endpoint="/v1/retrieval", use_remote_service=True
+        )
+        rerank = MicroService(
+            name="rerank", host="0.0.0.0", port=8000, expose_endpoint="/v1/reranking", use_remote_service=True
+        )
+        llm = MicroService(
+            name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/chat/completions", use_remote_service=True
+        )
         self.service_builder.add(embedding).add(retriever).add(rerank).add(llm)
         self.service_builder.flow_to(embedding, retriever)
         self.service_builder.flow_to(retriever, rerank)
         self.service_builder.flow_to(rerank, llm)
 
     def schedule(self):
-        self.service_builder.schedule(initial_inputs={"text": "What is the revenue of Nike?"})
+        self.service_builder.schedule(initial_inputs={"text": "What is the revenue of Nike in 2023?"})
         self.service_builder.get_all_final_outputs()
         result_dict = self.service_builder.result_dict
         print(result_dict)
 
 
 if __name__ == "__main__":
-    chatqna = ChatQnAService(port=9001)
+    chatqna = ChatQnAService(port=8888)
     chatqna.add_remote_service()
     chatqna.schedule()
