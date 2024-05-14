@@ -13,8 +13,10 @@
 # limitations under the License.
 
 
+import os
 from comps import MicroService, ServiceOrchestrator
 
+SERVICE_HOST_IP = os.getenv("SERVICE_SERVICE_HOST_IP", "0.0.0.0")
 
 class ChatQnAService:
     def __init__(self, port=8000):
@@ -22,16 +24,16 @@ class ChatQnAService:
 
     def add_remote_service(self):
         embedding = MicroService(
-            name="embedding", host="0.0.0.0", port=6000, expose_endpoint="/v1/embeddings", use_remote_service=True
+            name="embedding", host=SERVICE_HOST_IP, port=6000, expose_endpoint="/v1/embeddings", use_remote_service=True
         )
         retriever = MicroService(
-            name="retriever", host="0.0.0.0", port=7000, expose_endpoint="/v1/retrieval", use_remote_service=True
+            name="retriever", host=SERVICE_HOST_IP, port=7000, expose_endpoint="/v1/retrieval", use_remote_service=True
         )
         rerank = MicroService(
-            name="rerank", host="0.0.0.0", port=8000, expose_endpoint="/v1/reranking", use_remote_service=True
+            name="rerank", host=SERVICE_HOST_IP, port=8000, expose_endpoint="/v1/reranking", use_remote_service=True
         )
         llm = MicroService(
-            name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/chat/completions", use_remote_service=True
+            name="llm", host=SERVICE_HOST_IP, port=9000, expose_endpoint="/v1/chat/completions", use_remote_service=True
         )
         self.service_builder.add(embedding).add(retriever).add(rerank).add(llm)
         self.service_builder.flow_to(embedding, retriever)

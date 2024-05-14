@@ -17,8 +17,6 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-pip install -r requirements.txt
-pip install .
 ```
 
 ### 1. Build Embedding Image
@@ -36,7 +34,7 @@ docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy
 ### 3. Build Rerank Image
 
 ```bash
-docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
 ```
 
 ### 4. Build LLM Image
@@ -146,9 +144,9 @@ curl http://${host_ip}:9009/generate \
 7. LLM Microservice
 
 ```bash
-curl http://${host_ip}:9000/v1/chat/completions\
+curl http://${your_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"text":"What is Deep Learning?"}' \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -160,6 +158,27 @@ Modify the `initial_inputs` of line 34 in `chatqna.py`, then you will get the Ch
 
 All of the intermediate results will be printed for each microservices. Users can check the accuracy of the results to make targeted modifications.
 
+### Run Mega Service with Python
+
 ```bash
+# install packages
+cd /GenAIComps
+pip install -r requirements.txt
+pip install .
+# run chatqna service
+cd /GenAIExamples/ChatQnA/microservice/xeon
 python chatqna.py
+```
+
+### Run Mega Service with Docker
+To run ChatQnA service with Docker, remember to pass the `${micro_service_host_ip}` variable into docker container, which is the real host ip of your microservices.
+```bash
+docker build -t opea/gen-ai-comps:chatqna-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+docker run -d --name="chatqna-xeon-server" -p 8888:8888 --ipc=host -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e SERVICE_SERVICE_HOST_IP=${micro_service_host_ip} opea/gen-ai-comps:chatqna-xeon-server
+```
+
+Then you can check the result of your chatqna service with the command below.
+
+```bash
+docker logs chatqna-xeon-server
 ```
