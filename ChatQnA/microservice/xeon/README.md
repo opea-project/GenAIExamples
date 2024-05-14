@@ -36,7 +36,7 @@ docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy
 ### 3. Build Rerank Image
 
 ```bash
-docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
 ```
 
 ### 4. Build LLM Image

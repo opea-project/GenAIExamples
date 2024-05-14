@@ -9,6 +9,7 @@ on:
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - ChatQnA/microservice/gaudi/**
+      - ChatQnA/tests/test_chatqna_on_gaudi.sh
       - "!**.md"
       - "!**/ui/**"
       - .github/workflows/ChatQnA_gaudi.yml
