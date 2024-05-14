@@ -20,7 +20,6 @@ from comps.cores.proto.docarray import (
     EmbedDoc1024,
     GeneratedDoc,
     LLMParamsDoc,
-    RerankedDoc,
     SearchedDoc,
     TextDoc,
 )

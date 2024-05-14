@@ -13,47 +13,11 @@
 # limitations under the License.
 
 import os
-from typing import Union
 
 from fastapi.responses import StreamingResponse
 from langchain_community.llms import HuggingFaceEndpoint
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
 
-from comps import GeneratedDoc, LLMParamsDoc, RerankedDoc, TextDoc, opea_microservices, register_microservice
-
-
-@register_microservice(name="opea_service@llm_tgi", expose_endpoint="/v1/chat/completions", host="0.0.0.0", port=9000)
-def llm_generate(input: Union[TextDoc, RerankedDoc]) -> GeneratedDoc:
-    llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
-    params = LLMParamsDoc()
-    llm = HuggingFaceEndpoint(
-        endpoint_url=llm_endpoint,
-        max_new_tokens=params.max_new_tokens,
-        top_k=params.top_k,
-        top_p=params.top_p,
-        typical_p=params.typical_p,
-        temperature=params.temperature,
-        repetition_penalty=params.repetition_penalty,
-        streaming=params.streaming,
-    )
-    final_prompt = None
-    if isinstance(input, RerankedDoc):
-        template = """Answer the question based only on the following context:
-        {context}
-        Question: {question}
-        """
-        prompt = ChatPromptTemplate.from_template(template)
-        chain = prompt | llm | StrOutputParser()
-        final_prompt = input.query
-        response = chain.invoke({"question": input.query, "context": input.doc.text})
-    elif isinstance(input, TextDoc):
-        final_prompt = input.text
-        response = llm.invoke(input.text)
-    else:
-        raise TypeError("Invalid input type. Expected TextDoc or RerankedDoc.")
-    res = GeneratedDoc(text=response, prompt=final_prompt)
-    return res
+from comps import GeneratedDoc, LLMParamsDoc, opea_microservices, register_microservice
 
 
 def post_process_text(text: str):
@@ -67,54 +31,42 @@ def post_process_text(text: str):
     return f"data: {new_text}\n\n"
 
 
-@register_microservice(
-    name="opea_service@llm_tgi_stream", expose_endpoint="/v1/chat/completions_stream", host="0.0.0.0", port=9001
-)
-def llm_generate_stream(input: Union[TextDoc, RerankedDoc]):
+@register_microservice(name="opea_service@llm_tgi", expose_endpoint="/v1/chat/completions", host="0.0.0.0", port=9000)
+def llm_generate(input: LLMParamsDoc):
     llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
-    params = LLMParamsDoc()
     llm = HuggingFaceEndpoint(
         endpoint_url=llm_endpoint,
-        max_new_tokens=params.max_new_tokens,
-        top_k=params.top_k,
-        top_p=params.top_p,
-        typical_p=params.typical_p,
-        temperature=params.temperature,
-        repetition_penalty=params.repetition_penalty,
-        streaming=params.streaming,
+        max_new_tokens=input.max_new_tokens,
+        top_k=input.top_k,
+        top_p=input.top_p,
+        typical_p=input.typical_p,
+        temperature=input.temperature,
+        repetition_penalty=input.repetition_penalty,
+        streaming=input.streaming,
     )
-    if isinstance(input, RerankedDoc):
-        template = """Answer the question based only on the following context:
-        {context}
-        Question: {question}
-        """
-        prompt = ChatPromptTemplate.from_template(template)
-        chain = prompt | llm | StrOutputParser()
-        final_input = {"question": input.query, "context": input.doc.text}
-    elif isinstance(input, TextDoc):
-        chain = llm
-        final_input = input.text
+
+    if input.streaming:
+
+        def stream_generator():
+            chat_response = ""
+            for text in llm.stream(input.query):
+                chat_response += text
+                processed_text = post_process_text(text)
+                if text and processed_text:
+                    if "</s>" in text:
+                        res = text.split("</s>")[0]
+                        if res != "":
+                            yield res
+                        break
+                    yield processed_text
+            print(f"[llm - chat_stream] stream response: {chat_response}")
+            yield "data: [DONE]\n\n"
+
+        return StreamingResponse(stream_generator(), media_type="text/event-stream")
     else:
-        raise TypeError("Invalid input type. Expected TextDoc or RerankedDoc.")
-
-    def stream_generator():
-        chat_response = ""
-        for text in chain.stream(final_input):
-            chat_response += text
-            processed_text = post_process_text(text)
-            if text and processed_text:
-                if "</s>" in text:
-                    res = text.split("</s>")[0]
-                    if res != "":
-                        yield res
-                    break
-                yield processed_text
-        print(f"[llm - chat_stream] stream response: {chat_response}")
-        yield "data: [DONE]\n\n"
-
-    return StreamingResponse(stream_generator(), media_type="text/event-stream")
+        response = llm.invoke(input.query)
+        return GeneratedDoc(text=response, prompt=input.query)
 
 
 if __name__ == "__main__":
     opea_microservices["opea_service@llm_tgi"].start()
-    opea_microservices["opea_service@llm_tgi_stream"].start()

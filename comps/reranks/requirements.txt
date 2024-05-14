@@ -1,5 +1,6 @@
 docarray[full]
 fastapi
+langchain
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk

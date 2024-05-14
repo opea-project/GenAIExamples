@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import json
 import os
 
 import requests
+from langchain_core.prompts import ChatPromptTemplate
 
-from comps import RerankedDoc, SearchedDoc, opea_microservices, register_microservice
+from comps import LLMParamsDoc, SearchedDoc, opea_microservices, register_microservice
 
 
 @register_microservice(
@@ -26,9 +28,9 @@ from comps import RerankedDoc, SearchedDoc, opea_microservices, register_microse
     host="0.0.0.0",
     port=8000,
     input_datatype=SearchedDoc,
-    output_datatype=RerankedDoc,
+    output_datatype=LLMParamsDoc,
 )
-def reranking(input: SearchedDoc) -> RerankedDoc:
+def reranking(input: SearchedDoc) -> LLMParamsDoc:
     docs = [doc.text for doc in input.retrieved_docs]
     url = tei_reranking_endpoint + "/rerank"
     data = {"query": input.initial_query, "texts": docs}
@@ -36,8 +38,14 @@ def reranking(input: SearchedDoc) -> RerankedDoc:
     response = requests.post(url, data=json.dumps(data), headers=headers)
     response_data = response.json()
     best_response = max(response_data, key=lambda response: response["score"])
-    res = RerankedDoc(query=input.initial_query, doc=input.retrieved_docs[best_response["index"]])
-    return res
+    template = """Answer the question based only on the following context:
+    {context}
+    Question: {question}
+    """
+    prompt = ChatPromptTemplate.from_template(template)
+    doc = input.retrieved_docs[best_response["index"]]
+    final_prompt = prompt.format(context=doc.text, question=input.initial_query)
+    return LLMParamsDoc(query=final_prompt.strip())
 
 
 if __name__ == "__main__":

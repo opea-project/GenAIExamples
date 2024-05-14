@@ -62,17 +62,13 @@ class SearchedDoc(BaseDoc):
         json_encoders = {np.ndarray: lambda x: x.tolist()}
 
 
-class RerankedDoc(BaseDoc):
-    query: str
-    doc: TextDoc
-
-
 class GeneratedDoc(BaseDoc):
     text: str
     prompt: str
 
 
 class LLMParamsDoc(BaseDoc):
+    query: str
     max_new_tokens: int = 1024
     top_k: int = 10
     top_p: float = 0.95

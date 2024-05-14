@@ -63,7 +63,7 @@ docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="llm-tgi-server" -p 9000:9000 -p 9001:9001 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/gen-ai-comps:llm-tgi-server
+docker run -d --name="llm-tgi-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/gen-ai-comps:llm-tgi-server
 ```
 
 ## Run Docker with Docker Compose
@@ -81,26 +81,24 @@ docker compose -f docker_compose_llm.yaml up -d
 curl http://${your_ip}:9000/v1/health_check\
   -X GET \
   -H 'Content-Type: application/json'
-
-curl http://${your_ip}:9001/v1/health_check\
-  -X GET \
-  -H 'Content-Type: application/json'
 ```
 
 ## Consume LLM Service
 
+You can set the following model parameters according to your actual needs, such as `max_new_tokens`, `streaming`.
+
+The `streaming` parameter determines the format of the data returned by the API. It will return text string with `streaming=false`, return text streaming flow with `streaming=true`.
+
 ```bash
+# non-streaming mode
 curl http://${your_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"query":"What is Deep Learning?","doc":{"text":"Deep Learning is a subset of machine learning in artificial intelligence (AI) that has networks capable of learning unsupervised from data that is unstructured or unlabeled."}}' \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":false}' \
   -H 'Content-Type: application/json'
-```
 
-## Consume LLM Stream Service
-
-```bash
-curl http://${your_ip}:9001/v1/chat/completions_stream\
+# streaming mode
+curl http://${your_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"query":"What is Deep Learning?","doc":{"text":"Deep Learning is a subset of machine learning in artificial intelligence (AI) that has networks capable of learning unsupervised from data that is unstructured or unlabeled."}}' \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
 ```
