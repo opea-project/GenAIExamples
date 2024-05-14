@@ -9,8 +9,7 @@ RUN apt-get update \
 COPY comps /home/comps
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/comps/asr/requirements.txt && \
-    pip install --no-cache-dir -r /home/comps/cores/telemetry/requirements.txt
+    pip install --no-cache-dir -r /home/comps/asr/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home
 

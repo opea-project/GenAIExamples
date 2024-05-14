@@ -11,8 +11,7 @@ RUN apt-get update \
 COPY comps /home/comps
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/comps/tts/requirements.txt && \
-    pip install --no-cache-dir -r /home/comps/cores/telemetry/requirements.txt
+    pip install --no-cache-dir -r /home/comps/tts/requirements.txt
 
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libiomp5.so:/usr/lib/x86_64-linux-gnu/libtcmalloc.so.4
 ENV MALLOC_CONF="oversize_threshold:1,background_thread:true,metadata_thp:auto,dirty_decay_ms:9000000000,muzzy_decay_ms:9000000000"

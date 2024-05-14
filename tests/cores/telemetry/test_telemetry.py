@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import asyncio
-import subprocess
 import time
 import unittest
 
@@ -22,51 +21,61 @@ from comps.cores.telemetry.opea_telemetry import in_memory_exporter
 
 
 @opea_telemetry
+def dummy_func_child():
+    return
+
+
+@opea_telemetry
 def dummy_func():
     time.sleep(1)
+    dummy_func_child()
+
+
+@opea_telemetry
+async def dummy_async_func_child():
+    return
 
 
 @opea_telemetry
 async def dummy_async_func():
     await asyncio.sleep(2)
+    await dummy_async_func_child()
 
 
 class TestTelemetry(unittest.TestCase):
-    def setUp(self):
-        self.p = subprocess.Popen(
-            "docker run -d -p 4317:4317 -p 4318:4318 --rm -v $(pwd)/collector-config.yaml:/etc/otelcol/config.yaml otel/opentelemetry-collector",
-            shell=True,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        raw_output, raw_err = self.p.communicate()
-        self.cid = raw_output.decode().replace("\n", "")
-
-    def tearDown(self):
-        rp = subprocess.Popen(
-            f"docker rm -f {self.cid}",
-            shell=True,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        _, _ = rp.communicate()
-        rp.kill()
-        self.p.kill()
 
     def test_time_tracing(self):
         dummy_func()
         asyncio.run(dummy_async_func())
         time.sleep(2)  # wait until all telemetries are finished
-        self.assertEqual(len(in_memory_exporter.get_finished_spans()), 2)
+        self.assertEqual(len(in_memory_exporter.get_finished_spans()), 4)
+
         for i in in_memory_exporter.get_finished_spans():
             if i.name == "dummy_func":
                 self.assertTrue(int((i.end_time - i.start_time) / 1e9) == 1)
             elif i.name == "dummy_async_func":
                 self.assertTrue(int((i.end_time - i.start_time) / 1e9) == 2)
+        in_memory_exporter.clear()
+
+    def test_call_tracing(self):
+        dummy_func()
+        asyncio.run(dummy_async_func())
+        time.sleep(2)  # wait until all telemetries are finished
+        self.assertEqual(len(in_memory_exporter.get_finished_spans()), 4)
+        for i in in_memory_exporter.get_finished_spans():
+            if i.name == "dummy_func":
+                dummy_func_trace_id = i.get_span_context().trace_id
+            elif i.name == "dummy_func_child":
+                dummy_func_child_parent_id = i.parent.trace_id
+            elif i.name == "dummy_async_func":
+                dummy_async_func_id = i.get_span_context().trace_id
+            elif i.name == "dummy_async_func_child":
+                dummy_async_func_child_parent_id = i.parent.trace_id
             else:
                 self.assertTrue(False)
+        self.assertEqual(dummy_func_trace_id, dummy_func_child_parent_id)
+        self.assertEqual(dummy_async_func_id, dummy_async_func_child_parent_id)
+        in_memory_exporter.clear()
 
 
 if __name__ == "__main__":

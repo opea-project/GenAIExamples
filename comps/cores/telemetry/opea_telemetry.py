@@ -18,16 +18,21 @@ from functools import wraps
 
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter as HTTPSpanExporter
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
-in_memory_exporter = InMemorySpanExporter()
-trace.set_tracer_provider(TracerProvider())
-trace.get_tracer_provider().add_span_processor(
+resource = Resource.create({SERVICE_NAME: "opea"})
+traceProvider = TracerProvider(resource=resource)
+
+traceProvider.add_span_processor(
     BatchSpanProcessor(HTTPSpanExporter(endpoint="http://10.165.57.68:4318/v1/traces"))  # change to ip
 )
-trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(in_memory_exporter))
+in_memory_exporter = InMemorySpanExporter()
+traceProvider.add_span_processor(BatchSpanProcessor(in_memory_exporter))
+trace.set_tracer_provider(traceProvider)
+
 tracer = trace.get_tracer(__name__)
 
 
