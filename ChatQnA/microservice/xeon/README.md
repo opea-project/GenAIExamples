@@ -17,8 +17,6 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-pip install -r requirements.txt
-pip install .
 ```
 
 ### 1. Build Embedding Image
@@ -36,7 +34,7 @@ docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy
 ### 3. Build Rerank Image
 
 ```bash
-docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
 ```
 
 ### 4. Build LLM Image
@@ -151,7 +149,7 @@ curl http://${host_ip}:9009/generate \
 ```bash
 curl http://${host_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"text":"What is Deep Learning?"}' \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -163,10 +161,19 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 To launch the Mega Service, simply run the following command:
 
+### Run Mega Service with Python
+
 ```bash
+# install packages
+cd /GenAIComps
+pip install -r requirements.txt
+pip install .
+# run chatqna service
+cd /GenAIExamples/ChatQnA/microservice/xeon
 python chatqna.py
 ```
 
+<<<<<<< HEAD
 ## 🚀 Access the Mega Service
 
 Once the script is executed, a FastAPI server will be initiated. Users can interact with the service through the `/v1/chatqna` endpoint. Here's an example using `curl`:
@@ -177,3 +184,19 @@ curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
     "messages": "What is the revenue of Nike in 2023?"
     }'
 ```
+=======
+### Run Mega Service with Docker
+
+To run ChatQnA service with Docker, remember to pass the `${micro_service_host_ip}` variable into docker container, which is the real host ip of your microservices.
+
+```bash
+docker build -t opea/gen-ai-comps:chatqna-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+docker run -d --name="chatqna-xeon-server" -p 8888:8888 --ipc=host -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e SERVICE_SERVICE_HOST_IP=${micro_service_host_ip} opea/gen-ai-comps:chatqna-xeon-server
+```
+
+Then you can check the result of your chatqna service with the command below.
+
+```bash
+docker logs chatqna-xeon-server
+```
+>>>>>>> f46cae8a3a5d1022cc831dc9686e71413e3f19db
