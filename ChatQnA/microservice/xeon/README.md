@@ -171,7 +171,9 @@ python chatqna.py
 ```
 
 ### Run Mega Service with Docker
+
 To run ChatQnA service with Docker, remember to pass the `${micro_service_host_ip}` variable into docker container, which is the real host ip of your microservices.
+
 ```bash
 docker build -t opea/gen-ai-comps:chatqna-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 docker run -d --name="chatqna-xeon-server" -p 8888:8888 --ipc=host -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e SERVICE_SERVICE_HOST_IP=${micro_service_host_ip} opea/gen-ai-comps:chatqna-xeon-server

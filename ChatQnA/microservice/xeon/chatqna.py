@@ -14,9 +14,11 @@
 
 
 import os
+
 from comps import MicroService, ServiceOrchestrator
 
 SERVICE_HOST_IP = os.getenv("SERVICE_SERVICE_HOST_IP", "0.0.0.0")
+
 
 class ChatQnAService:
     def __init__(self, port=8000):
