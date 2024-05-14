@@ -173,18 +173,6 @@ cd /GenAIExamples/ChatQnA/microservice/xeon
 python chatqna.py
 ```
 
-<<<<<<< HEAD
-## 🚀 Access the Mega Service
-
-Once the script is executed, a FastAPI server will be initiated. Users can interact with the service through the `/v1/chatqna` endpoint. Here's an example using `curl`:
-
-```bash
-curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-    "model": "Intel/neural-chat-7b-v3-3",
-    "messages": "What is the revenue of Nike in 2023?"
-    }'
-```
-=======
 ### Run Mega Service with Docker
 
 To run ChatQnA service with Docker, remember to pass the `${micro_service_host_ip}` variable into docker container, which is the real host ip of your microservices.
@@ -199,4 +187,12 @@ Then you can check the result of your chatqna service with the command below.
 ```bash
 docker logs chatqna-xeon-server
 ```
->>>>>>> f46cae8a3a5d1022cc831dc9686e71413e3f19db
+
+## 🚀 Access the Mega Service
+Once the mega service docker is launched, a FastAPI server will be initiated. Users can interact with the service through the `/v1/chatqna` endpoint. Here's an example using `curl`:
+
+```bash
+curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+     "model": "Intel/neural-chat-7b-v3-3",
+     "messages": "What is the revenue of Nike in 2023?"
+     }
