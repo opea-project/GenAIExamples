@@ -72,7 +72,6 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-
 ### Start Microservice Docker Containers
 
 ```bash
@@ -189,6 +188,7 @@ docker logs chatqna-xeon-server
 ```
 
 ## 🚀 Access the Mega Service
+
 Once the mega service docker is launched, a FastAPI server will be initiated. Users can interact with the service through the `/v1/chatqna` endpoint. Here's an example using `curl`:
 
 ```bash
@@ -196,3 +196,4 @@ curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
      "model": "Intel/neural-chat-7b-v3-3",
      "messages": "What is the revenue of Nike in 2023?"
      }
+```
