@@ -1,6 +1,6 @@
-# vLLM Endpoint Serive
+# vLLM Endpoint Serve
 
-[vLLM](https://github.com/vllm-project/vllm) is a RESTful service that provides a simple way to interact with the vLLM API, which is eerie to use for LLM inference and serving on [Intel products](https://www.intel.com/content/www/us/en/products/overview.html). Currently, the vLLM is supporting Intel CPU, and will be extended to Intel Gaudi accelerators soon.
+[vLLM](https://github.com/vllm-project/vllm) is a fast and easy-to-use library for LLM inference and serving, it delivers state-of-the-art serving throughput with a set of advanced features such as PagedAttention, Continuous batching and etc.. Besides GPUs, vLLM already supported [Intel CPUs](https://www.intel.com/content/www/us/en/products/overview.html), Gaudi accelerators support will be added soon. This guide provides an example on how to launch vLLM serving endpoint on CPU.
 
 ## Getting Started
 
@@ -35,12 +35,12 @@ curl http://127.0.0.1::8080/v1/completions \
 
 #### Customize vLLM CPU Service
 
-The ./serving/vllm/launch_vllm_service.sh script accepts two parameters:
+The `./serving/vllm/launch_vllm_service.sh` script accepts two parameters:
 
 - port_number: The port number assigned to the vLLM CPU endpoint, with the default being 8080.
 - model_name: The model name utilized for LLM, with the default set to "mistralai/Mistral-7B-v0.1".
 
-You have the flexibility to customize twp parameters according to your specific needs. Additionally, you can set the vLLM CPU endpoint by exporting the environment variable `vLLM_LLM_ENDPOINT`:
+You have the flexibility to customize two parameters according to your specific needs. Additionally, you can set the vLLM CPU endpoint by exporting the environment variable `vLLM_LLM_ENDPOINT`:
 
 ```bash
 export vLLM_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
