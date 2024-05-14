@@ -37,7 +37,7 @@ jobs:
           AISE_CLUSTER_01_2_IP: ${{ secrets.AISE_CLUSTER_01_2_IP }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
-          timeout 60s bash test_chatqna_on_gaudi.sh
+          timeout 20m bash test_chatqna_on_gaudi.sh
 
       - name: Clean Up Container
         if: cancelled() || failure()

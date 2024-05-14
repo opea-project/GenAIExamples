@@ -158,9 +158,6 @@ function main() {
     run_megaservice
     check_results
 
-    # for test
-    exit 1
-
     stop_docker
     echo y | docker system prune
 
