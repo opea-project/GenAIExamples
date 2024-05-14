@@ -81,7 +81,7 @@ function check_microservices() {
         -X POST \
         -d '{"text":"hello"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
-    sleep 5s
+    sleep 10s
 
     curl http://${ip_address}:7000/v1/retrieval \
         -X POST \
