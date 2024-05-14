@@ -30,7 +30,7 @@ function build_docker_image() {
 
     docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:reranking-tei-server -f comps/reranks/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:reranking-tei-server -f comps/reranks/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server -f comps/llms/langchain/docker/Dockerfile .
 
     cd ..
