@@ -23,7 +23,6 @@ export async function fetchTextStream(query: string, knowledge_base_id: string) 
 
 	payload = {
 		query: query,
-		knowledge_base_id: knowledge_base_id,
 	};
 	url = `${DOC_BASE_URL}/chat_stream`;
 
