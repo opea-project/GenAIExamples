@@ -90,6 +90,9 @@ services:
     volumes:
       - "./data:/data"
     shm_size: 1g
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
     command: --model-id ${LLM_MODEL_ID}
   llm:
     image: opea/gen-ai-comps:llm-tgi-server
