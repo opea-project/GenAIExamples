@@ -70,6 +70,8 @@ export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
 
+Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+
 ### Start Microservice Docker Containers
 
 ```bash
@@ -154,9 +156,9 @@ Following the validation of all aforementioned microservices, we are now prepare
 
 ## 🚀 Construct Mega Service
 
-Modify the `initial_inputs` of line 34 in `chatqna.py`, then you will get the ChatQnA result of this mega service.
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Upon executing the script, each microservice's intermediate results will be displayed, allowing users to verify the accuracy of the outcomes and make targeted modifications if necessary.
 
-All of the intermediate results will be printed for each microservices. Users can check the accuracy of the results to make targeted modifications.
+To launch the Mega Service, simply run the following command:
 
 ### Run Mega Service with Python
 
@@ -183,4 +185,15 @@ Then you can check the result of your chatqna service with the command below.
 
 ```bash
 docker logs chatqna-xeon-server
+```
+
+## 🚀 Access the Mega Service
+
+Once the mega service docker is launched, a FastAPI server will be initiated. Users can interact with the service through the `/v1/chatqna` endpoint. Here's an example using `curl`:
+
+```bash
+curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+     "model": "Intel/neural-chat-7b-v3-3",
+     "messages": "What is the revenue of Nike in 2023?"
+     }
 ```

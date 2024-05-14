@@ -41,6 +41,7 @@ class ChatQnAService:
         self.service_builder.flow_to(embedding, retriever)
         self.service_builder.flow_to(retriever, rerank)
         self.service_builder.flow_to(rerank, llm)
+        self.service_builder.start_server()
 
     def schedule(self):
         self.service_builder.schedule(initial_inputs={"text": "What is the revenue of Nike in 2023?"})

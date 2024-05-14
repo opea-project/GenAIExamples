@@ -108,14 +108,24 @@ function check_microservices() {
 }
 
 function run_megaservice() {
+    # Construct Mega Service
     python chatqna.py > ${LOG_PATH}/run_megaservice.log
+    # Access the Mega Service
+    curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+        "model": "Intel/neural-chat-7b-v3-3",
+        "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
 }
 
 function check_results() {
+
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/run_megaservice.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/run_megaservice.log) != 0 ]]; then
         status=true
+    fi
+
+    if [[ -f $LOG_PATH/curl_megaservice.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/curl_megaservice.log) == 0 ]]; then
+        status=false
     fi
 
     if [ $status == false ]; then
