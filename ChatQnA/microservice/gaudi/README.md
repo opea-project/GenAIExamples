@@ -214,6 +214,6 @@ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
 
 ## 🚀 Launch the UI
 
-Open this URL `http://{host_ip}:5173` in the brower to access the frontend.
+Open this URL `http://{host_ip}:5173` in the browser to access the frontend.
 
 ![project-screenshot](https://i.imgur.com/26zMnEr.png)
