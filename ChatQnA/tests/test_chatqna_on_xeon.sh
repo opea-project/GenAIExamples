@@ -65,6 +65,8 @@ function validate_microservices() {
         -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
     sleep 10s
 
+    export PATH="${HOME}/miniconda3/bin:$PATH"
+    source activate
     test_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     curl http://${ip_address}:7000/v1/retrieval \
         -X POST \
