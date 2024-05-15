@@ -107,7 +107,7 @@ function validate_megaservice() {
 
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
-    if [[ -f $LOG_PATH/run_megaservice.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
+    if [[ -f $LOG_PATH/curl_megaservice.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
         status=true
     fi
 
