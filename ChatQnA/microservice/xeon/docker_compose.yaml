@@ -113,7 +113,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   chaqna-xeon-backend-server:
-    image: opea/gen-ai-comps:chatqna-xeon-server
+    image: opea/gen-ai-comps:chatqna-megaservice-server
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
@@ -133,7 +133,7 @@ services:
     ipc: host
     restart: always
   chaqna-xeon-ui-server:
-    image: opea/gen-ai-comps:chatqna-xeon-ui-server
+    image: opea/gen-ai-comps:chatqna-ui-server
     container_name: chatqna-xeon-ui-server
     depends_on:
       - chaqna-xeon-backend-server

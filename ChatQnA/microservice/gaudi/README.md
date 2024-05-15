@@ -96,6 +96,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 8. `opea/gen-ai-comps:chatqna-megaservice-server`
 9. `opea/gen-ai-comps:chatqna-ui-server`
 
+
 ## 🚀 Start MicroServices and MegaService
 
 ### Setup Environment Variables
@@ -115,11 +116,12 @@ export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-### Start Microservice Docker Containers
+### Start all the services Docker Containers
 
 ```bash
 docker compose -f docker_compose.yaml up -d
