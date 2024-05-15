@@ -22,12 +22,14 @@ from fastapi import APIRouter, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from guardrails import moderation_prompt_for_chat, unsafe_dict
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
-from langchain_community.llms import HuggingFaceEndpoint
+from langchain_community.llms import HuggingFaceEndpoint, VLLMOpenAI
+from langchain_community.vectorstores import Redis
 from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langserve import add_routes
 from prompts import contextualize_q_prompt, prompt, qa_prompt
+from rag_redis.config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, LLM_MODEL, REDIS_URL
 from starlette.middleware.cors import CORSMiddleware
 from utils import (
     VECTOR_DATABASE,
@@ -56,7 +58,8 @@ app.add_middleware(
 
 
 class RAGAPIRouter(APIRouter):
-    def __init__(self, upload_dir, entrypoint, safety_guard_endpoint, tei_endpoint=None) -> None:
+
+    def __init__(self, upload_dir, entrypoint, endpoint_type, safety_guard_endpoint, tei_endpoint=None) -> None:
         super().__init__()
         self.upload_dir = upload_dir
         self.entrypoint = entrypoint
@@ -67,16 +70,27 @@ class RAGAPIRouter(APIRouter):
         )
 
         # Define LLM
-        self.llm = HuggingFaceEndpoint(
-            endpoint_url=entrypoint,
-            max_new_tokens=1024,
-            top_k=10,
-            top_p=0.95,
-            typical_p=0.95,
-            temperature=0.01,
-            repetition_penalty=1.03,
-            streaming=True,
-        )
+        if endpoint_type == "TGI":
+            self.llm = HuggingFaceEndpoint(
+                endpoint_url=entrypoint,
+                max_new_tokens=1024,
+                top_k=10,
+                top_p=0.95,
+                typical_p=0.95,
+                temperature=0.01,
+                repetition_penalty=1.03,
+                streaming=True,
+            )
+        elif endpoint_type == "vLLM":
+            self.llm = VLLMOpenAI(
+                openai_api_key="EMPTY",
+                openai_api_base=entrypoint + "/v1",
+                model_name=LLM_MODEL,
+                max_tokens=1024,
+                top_p=0.95,
+                temperature=0.01,
+                streaming=True,
+            )
 
         if self.safety_guard_endpoint:
             self.llm_guard = HuggingFaceEndpoint(
@@ -168,11 +182,20 @@ class RAGAPIRouter(APIRouter):
         return result
 
 
+endpoint_type = "TGI"
+
+if os.getenv("TGI_LLM_ENDPOINT") is not None:
+    llm_endpoint = os.getenv("TGI_LLM_ENDPOINT")
+elif os.getenv("vLLM_LLM_ENDPOINT") is not None:
+    llm_endpoint = os.getenv("vLLM_LLM_ENDPOINT")
+    endpoint_type = "vLLM"
+else:
+    llm_endpoint = "http://localhost:8080"
+
 upload_dir = os.getenv("RAG_UPLOAD_DIR", "./upload_dir")
-tgi_llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
 safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT")
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
-router = RAGAPIRouter(upload_dir, tgi_llm_endpoint, safety_guard_endpoint, tei_embedding_endpoint)
+router = RAGAPIRouter(upload_dir, llm_endpoint, endpoint_type, safety_guard_endpoint, tei_embedding_endpoint)
 
 
 @router.post("/v1/rag/chat")
