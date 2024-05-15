@@ -149,13 +149,11 @@ function check_results() {
 function stop_docker() {
     cd $WORKPATH/microservice/xeon
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
+    container_list+=" chatqna-xeon-server"
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
         if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
     done
-
-    cid=$(docker ps -aq --filter "name=chatqna-xeon-server")
-    if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 }
 
 function main() {
