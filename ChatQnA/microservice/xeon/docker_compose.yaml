@@ -36,6 +36,8 @@ services:
   embedding:
     image: opea/gen-ai-comps:embedding-tei-server
     container_name: embedding-tei-server
+    depends_on:
+      - tei_embedding_service
     ports:
       - "6000:6000"
     ipc: host
@@ -73,6 +75,8 @@ services:
   reranking:
     image: opea/gen-ai-comps:reranking-tei-xeon-server
     container_name: reranking-tei-xeon-server
+    depends_on:
+      - tei_xeon_service
     ports:
       - "8000:8000"
     ipc: host
@@ -97,6 +101,8 @@ services:
   llm:
     image: opea/gen-ai-comps:llm-tgi-server
     container_name: llm-tgi-server
+    depends_on:
+      - tgi_service
     ports:
       - "9000:9000"
     ipc: host
@@ -106,6 +112,39 @@ services:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
+  chaqna-xeon-backend-server:
+    image: opea/gen-ai-comps:chatqna-megaservice-server
+    container_name: chatqna-xeon-backend-server
+    depends_on:
+      - redis-vector-db
+      - tei_embedding_service
+      - embedding
+      - retriever
+      - tei_xeon_service
+      - reranking
+      - tgi_service
+      - llm
+    ports:
+      - "8888:8888"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  chaqna-xeon-ui-server:
+    image: opea/gen-ai-comps:chatqna-ui-server
+    container_name: chatqna-xeon-ui-server
+    depends_on:
+      - chaqna-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
 
 networks:
   default:
