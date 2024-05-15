@@ -108,10 +108,17 @@ function check_microservices() {
 }
 
 function run_megaservice() {
+    cd $WORKPATH/microservice/xeon
     # Construct Mega Service
-    python chatqna.py > ${LOG_PATH}/run_megaservice.log
+    ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
+    ip_address=$(eval echo '$'$ip_name)
+    docker build -t opea/gen-ai-comps:chatqna-xeon-server -f docker/Dockerfile .
+    docker run -d --name="chatqna-xeon-server" -p 8888:8888 --ipc=host -e SERVICE_SERVICE_HOST_IP=${ip_address} opea/gen-ai-comps:chatqna-xeon-server
+    sleep 1m
+    docker logs chatqna-xeon-server > $LOG_PATH/run_megaservice.log
+
     # Access the Mega Service
-    curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+    curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
         "model": "Intel/neural-chat-7b-v3-3",
         "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
 }
@@ -146,6 +153,9 @@ function stop_docker() {
         cid=$(docker ps -aq --filter "name=$container_name")
         if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
     done
+
+    cid=$(docker ps -aq --filter "name=chatqna-xeon-server")
+    if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 }
 
 function main() {
