@@ -96,7 +96,6 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 8. `opea/gen-ai-comps:chatqna-megaservice-server`
 9. `opea/gen-ai-comps:chatqna-ui-server`
 
-
 ## 🚀 Start MicroServices and MegaService
 
 ### Setup Environment Variables
