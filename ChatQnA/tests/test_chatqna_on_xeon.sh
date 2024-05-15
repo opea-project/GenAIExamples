@@ -30,7 +30,7 @@ function build_docker_image() {
 
     docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:reranking-tei-xeon-server -f comps/reranks/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:reranking-tei-xeon-server -f comps/reranks/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:llm-tgi-server -f comps/llms/langchain/docker/Dockerfile .
 
     docker images
@@ -73,7 +73,7 @@ function check_microservices() {
         -X POST \
         -d '{"text":"hello"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
-    sleep 5s
+    sleep 10s
 
     test_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     curl http://${ip_address}:7000/v1/retrieval \
@@ -108,14 +108,24 @@ function check_microservices() {
 }
 
 function run_megaservice() {
+    # Construct Mega Service
     python chatqna.py > ${LOG_PATH}/run_megaservice.log
+    # Access the Mega Service
+    curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+        "model": "Intel/neural-chat-7b-v3-3",
+        "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
 }
 
 function check_results() {
+
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/run_megaservice.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/run_megaservice.log) != 0 ]]; then
         status=true
+    fi
+
+    if [[ -f $LOG_PATH/curl_megaservice.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/curl_megaservice.log) == 0 ]]; then
+        status=false
     fi
 
     if [ $status == false ]; then
