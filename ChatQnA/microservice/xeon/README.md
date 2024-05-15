@@ -178,7 +178,7 @@ To run ChatQnA service with Docker, remember to pass the `${micro_service_host_i
 
 ```bash
 docker build -t opea/gen-ai-comps:chatqna-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-docker run -d --name="chatqna-xeon-server" -p 8888:8888 --ipc=host -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e SERVICE_SERVICE_HOST_IP=${micro_service_host_ip} opea/gen-ai-comps:chatqna-xeon-server
+docker run -d --name="chatqna-xeon-server" -p 8888:8888 --ipc=host -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e MEGA_SERVICE_HOST_IP=${micro_service_host_ip} opea/gen-ai-comps:chatqna-xeon-server
 ```
 
 Then you can check the result of your chatqna service with the command below.
