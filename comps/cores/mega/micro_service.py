@@ -14,12 +14,10 @@
 
 import asyncio
 import multiprocessing
-import os
-import signal
 from typing import Any, Optional, Type
 
 from ..proto.docarray import TextDoc
-from .constants import ServiceRoleType
+from .constants import ServiceRoleType, ServiceType
 from .utils import check_ports_availability
 
 opea_microservices = {}
@@ -32,10 +30,11 @@ class MicroService:
         self,
         name: Optional[str] = None,
         service_role: ServiceRoleType = ServiceRoleType.MICROSERVICE,
+        service_type: ServiceType = ServiceType.LLM,
         protocol: str = "http",
         host: str = "localhost",
         port: int = 8080,
-        expose_endpoint: Optional[str] = "/",
+        endpoint: Optional[str] = "/",
         input_datatype: Type[Any] = TextDoc,
         output_datatype: Type[Any] = TextDoc,
         replicas: int = 1,
@@ -46,10 +45,11 @@ class MicroService:
         """Init the microservice."""
         self.name = f"{name}/{self.__class__.__name__}" if name else self.__class__.__name__
         self.service_role = service_role
+        self.service_type = service_type
         self.protocol = protocol
         self.host = host
         self.port = port
-        self.expose_endpoint = expose_endpoint
+        self.endpoint = endpoint
         self.input_datatype = input_datatype
         self.output_datatype = output_datatype
         self.use_remote_service = use_remote_service
@@ -141,16 +141,17 @@ class MicroService:
 
     @property
     def endpoint_path(self):
-        return f"{self.protocol}://{self.host}:{self.port}{self.expose_endpoint}"
+        return f"{self.protocol}://{self.host}:{self.port}{self.endpoint}"
 
 
 def register_microservice(
     name: Optional[str] = None,
     service_role: ServiceRoleType = ServiceRoleType.MICROSERVICE,
+    service_type: ServiceType = ServiceType.UNDEFINED,
     protocol: str = "http",
     host: str = "localhost",
     port: int = 8080,
-    expose_endpoint: Optional[str] = "/",
+    endpoint: Optional[str] = "/",
     input_datatype: Type[Any] = TextDoc,
     output_datatype: Type[Any] = TextDoc,
     replicas: int = 1,
@@ -161,17 +162,18 @@ def register_microservice(
         micro_service = MicroService(
             name=name,
             service_role=service_role,
+            service_type=service_type,
             protocol=protocol,
             host=host,
             port=port,
-            expose_endpoint=expose_endpoint,
+            endpoint=endpoint,
             input_datatype=input_datatype,
             output_datatype=output_datatype,
             replicas=replicas,
             provider=provider,
             provider_endpoint=provider_endpoint,
         )
-        micro_service.app.router.add_api_route(expose_endpoint, func, methods=["POST"])
+        micro_service.app.router.add_api_route(endpoint, func, methods=["POST"])
         opea_microservices[name] = micro_service
         return func
 

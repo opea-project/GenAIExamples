@@ -16,7 +16,7 @@ import os
 
 from langchain_community.llms import HuggingFaceEndpoint
 
-from comps import TextDoc, opea_microservices, register_microservice
+from comps import ServiceType, TextDoc, opea_microservices, register_microservice
 
 unsafe_categories = """O1: Violence and Hate.
 Should not
@@ -105,7 +105,8 @@ Provide your safety assessment for {role} in the above conversation:
 
 @register_microservice(
     name="opea_service@guardrails_tgi_gaudi",
-    expose_endpoint="/v1/guardrails",
+    service_type=ServiceType.GUARDRAIL,
+    endpoint="/v1/guardrails",
     host="0.0.0.0",
     port=9090,
     input_datatype=TextDoc,

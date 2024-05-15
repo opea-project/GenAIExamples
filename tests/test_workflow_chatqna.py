@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import asyncio
 import json
 import os
 from typing import Union
@@ -44,7 +46,7 @@ embeddings = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
 
 @register_microservice(
     name="opea_service@embedding_tgi_gaudi",
-    expose_endpoint="/v1/embeddings",
+    endpoint="/v1/embeddings",
     port=6000,
     input_datatype=TextDoc,
     output_datatype=EmbedDoc768,
@@ -59,7 +61,7 @@ def embedding(input: TextDoc) -> EmbedDoc768:
 opea_microservices["opea_service@embedding_tgi_gaudi"].start()
 
 
-@register_microservice(name="opea_service@retriever_redis", expose_endpoint="/v1/retrieval", port=7000)
+@register_microservice(name="opea_service@retriever_redis", endpoint="/v1/retrieval", port=7000)
 def retrieve(input: EmbedDoc768) -> SearchedDoc:
     embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-large-en-v1.5")
     vector_db = Redis.from_existing_index(
@@ -81,7 +83,7 @@ opea_microservices["opea_service@retriever_redis"].start()
 
 @register_microservice(
     name="opea_service@reranking_tgi_gaudi",
-    expose_endpoint="/v1/reranking",
+    endpoint="/v1/reranking",
     port=8000,
     input_datatype=SearchedDoc,
     output_datatype=RerankedDoc,
@@ -101,7 +103,7 @@ def reranking(input: SearchedDoc) -> RerankedDoc:
 opea_microservices["opea_service@reranking_tgi_gaudi"].start()
 
 
-@register_microservice(name="opea_service@llm_tgi_gaudi", expose_endpoint="/v1/chat/completions", port=9000)
+@register_microservice(name="opea_service@llm_tgi_gaudi", endpoint="/v1/chat/completions", port=9000)
 def llm_generate(input: Union[TextDoc, RerankedDoc]) -> GeneratedDoc:
     llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
     params = LLMParamsDoc()
@@ -149,5 +151,4 @@ if __name__ == "__main__":
     service_builder.flow_to(
         opea_microservices["opea_service@reranking_tgi_gaudi"], opea_microservices["opea_service@llm_tgi_gaudi"]
     )
-    service_builder.schedule(initial_inputs={"text": "What's the total revenue of Nike in 2023?"})
-    service_builder.get_all_final_outputs()
+    asyncio.run(service_builder.schedule(initial_inputs={"text": "What's the total revenue of Nike in 2023?"}))

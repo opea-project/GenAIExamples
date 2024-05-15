@@ -14,12 +14,13 @@
 
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 
-from comps import EmbedDoc1024, TextDoc, opea_microservices, register_microservice
+from comps import EmbedDoc1024, ServiceType, TextDoc, opea_microservices, register_microservice
 
 
 @register_microservice(
     name="opea_service@local_embedding",
-    expose_endpoint="/v1/embeddings",
+    service_type=ServiceType.EMBEDDING,
+    endpoint="/v1/embeddings",
     host="0.0.0.0",
     port=6000,
     input_datatype=TextDoc,

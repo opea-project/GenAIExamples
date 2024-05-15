@@ -17,7 +17,7 @@ import os
 from fastapi.responses import StreamingResponse
 from langchain_community.llms import HuggingFaceEndpoint
 
-from comps import GeneratedDoc, LLMParamsDoc, opea_microservices, register_microservice
+from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
 
 
 def post_process_text(text: str):
@@ -31,7 +31,13 @@ def post_process_text(text: str):
     return f"data: {new_text}\n\n"
 
 
-@register_microservice(name="opea_service@llm_tgi", expose_endpoint="/v1/chat/completions", host="0.0.0.0", port=9000)
+@register_microservice(
+    name="opea_service@llm_tgi",
+    service_type=ServiceType.LLM,
+    endpoint="/v1/chat/completions",
+    host="0.0.0.0",
+    port=9000,
+)
 def llm_generate(input: LLMParamsDoc):
     llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
     llm = HuggingFaceEndpoint(

@@ -19,12 +19,13 @@ import os
 import requests
 from langchain_core.prompts import ChatPromptTemplate
 
-from comps import LLMParamsDoc, SearchedDoc, opea_microservices, register_microservice
+from comps import LLMParamsDoc, SearchedDoc, ServiceType, opea_microservices, register_microservice
 
 
 @register_microservice(
     name="opea_service@reranking_tgi_gaudi",
-    expose_endpoint="/v1/reranking",
+    service_type=ServiceType.RERANK,
+    endpoint="/v1/reranking",
     host="0.0.0.0",
     port=8000,
     input_datatype=SearchedDoc,

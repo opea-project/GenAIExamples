@@ -22,6 +22,21 @@ class ServiceRoleType(Enum):
     MEGASERVICE = 1
 
 
+class ServiceType(Enum):
+    """The enum of a service type."""
+
+    GATEWAY = 0
+    EMBEDDING = 1
+    RETRIEVER = 2
+    RERANK = 3
+    LLM = 4
+    ASR = 5
+    TTS = 6
+    GUARDRAIL = 7
+    VECTORSTORE = 8
+    UNDEFINED = 9
+
+
 class MegaServiceEndpoint(Enum):
     """The enum of an MegaService endpoint."""
 
@@ -50,7 +65,7 @@ class MegaServiceEndpoint(Enum):
         return self.value
 
 
-class MicroServiceType(Enum):
+class MicroServiceEndpoint(Enum):
     """The enum of an MicroService endpoint."""
 
     EMBEDDINGS = "/v1/microservice/embeddings"

@@ -28,6 +28,10 @@ from comps.cores.proto.docarray import (
 from comps.cores.mega.orchestrator import ServiceOrchestrator
 from comps.cores.mega.orchestrator_with_yaml import ServiceOrchestratorWithYaml
 from comps.cores.mega.micro_service import MicroService, register_microservice, opea_microservices
+from comps.cores.mega.gateway import Gateway, ChatQnAGateway
 
 # Telemetry
 from comps.cores.telemetry.opea_telemetry import opea_telemetry
+
+# Constants
+from comps.cores.mega.constants import MegaServiceEndpoint, ServiceRoleType, ServiceType
