@@ -113,7 +113,7 @@ function run_megaservice() {
     ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
     ip_address=$(eval echo '$'$ip_name)
     docker build -t opea/gen-ai-comps:chatqna-xeon-server -f docker/Dockerfile .
-    docker run -d --name="chatqna-xeon-server" -p 8888:8888 --ipc=host -e SERVICE_SERVICE_HOST_IP=${ip_address} opea/gen-ai-comps:chatqna-xeon-server
+    docker run -d --name="chatqna-xeon-server" -p 8888:8888 --ipc=host -e MEGA_SERVICE_HOST_IP=${ip_address} opea/gen-ai-comps:chatqna-xeon-server
     sleep 1m
     docker logs chatqna-xeon-server > $LOG_PATH/run_megaservice.log
 
