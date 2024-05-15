@@ -28,11 +28,11 @@ RUN cd /home/user/ && \
     git clone https://github.com/opea-project/GenAIComps.git
 
 RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
-    pip install -r requirements.txt && pip install .
+    pip install -r /home/user/GenAIComps/requirements.txt
 
 COPY ../chatqna.py /home/user/chatqna.py
 
-ENV PYTHONPATH=$PYTHONPATH:/home/user
+ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
 USER user
 

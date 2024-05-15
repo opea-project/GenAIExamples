@@ -43,12 +43,33 @@ docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_pr
 docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
+### 5. Build MegaService Docker Image
+
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/ChatQnA/microservice/xeon/
+docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+### 6. Build UI Docker Image
+
+Build frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/ChatQnA/ui/
+docker build -t opea/gen-ai-comps:chatqna-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
+
 Then run the command `docker images`, you will have the following four Docker Images:
 
 1. `opea/gen-ai-comps:embedding-tei-server`
 2. `opea/gen-ai-comps:retriever-redis-server`
 3. `opea/gen-ai-comps:reranking-tei-xeon-server`
 4. `opea/gen-ai-comps:llm-tgi-server`
+5. `opea/gen-ai-comps:chatqna-megaservice-server`
+6. `opea/gen-ai-comps:chatqna-ui-server`
 
 ## 🚀 Start Microservices
 
@@ -68,11 +89,13 @@ export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-### Start Microservice Docker Containers
+### Start all the services Docker Containers
 
 ```bash
 docker compose -f docker_compose.yaml up -d
@@ -152,48 +175,17 @@ curl http://${host_ip}:9000/v1/chat/completions\
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
-
-## 🚀 Construct Mega Service
-
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Upon executing the script, each microservice's intermediate results will be displayed, allowing users to verify the accuracy of the outcomes and make targeted modifications if necessary.
-
-To launch the Mega Service, simply run the following command:
-
-### Run Mega Service with Python
+8. MegaService
 
 ```bash
-# install packages
-cd /GenAIComps
-pip install -r requirements.txt
-pip install .
-# run chatqna service
-cd /GenAIExamples/ChatQnA/microservice/xeon
-python chatqna.py
-```
-
-### Run Mega Service with Docker
-
-To run ChatQnA service with Docker, remember to pass the `${micro_service_host_ip}` variable into docker container, which is the real host ip of your microservices.
-
-```bash
-docker build -t opea/gen-ai-comps:chatqna-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-docker run -d --name="chatqna-xeon-server" -p 8888:8888 --ipc=host -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e MEGA_SERVICE_HOST_IP=${micro_service_host_ip} opea/gen-ai-comps:chatqna-xeon-server
-```
-
-Then you can check the result of your chatqna service with the command below.
-
-```bash
-docker logs chatqna-xeon-server
-```
-
-## 🚀 Access the Mega Service
-
-Once the mega service docker is launched, a FastAPI server will be initiated. Users can interact with the service through the `/v1/chatqna` endpoint. Here's an example using `curl`:
-
-```bash
-curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
      "model": "Intel/neural-chat-7b-v3-3",
      "messages": "What is the revenue of Nike in 2023?"
-     }
+     }'
 ```
+
+## 🚀 Launch the UI
+
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+
+![project-screenshot](https://i.imgur.com/26zMnEr.png)
