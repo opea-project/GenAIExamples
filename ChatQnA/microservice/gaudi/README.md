@@ -175,7 +175,7 @@ curl http://${host_ip}:8008/generate \
 ```bash
 curl http://${host_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"text":"What is Deep Learning?"}' \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -187,17 +187,40 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 To launch the Mega Service, simply run the following command:
 
+### Run Mega Service with Python
+
 ```bash
+# install packages
+cd /GenAIComps
+pip install -r requirements.txt
+pip install .
+# run chatqna service
+cd /GenAIExamples/ChatQnA/microservice/gaudi/
 python chatqna.py
+```
+
+### Run Mega Service with Docker
+
+To run ChatQnA service with Docker, remember to pass the `${micro_service_host_ip}` variable into docker container, which is the real host ip of your microservices.
+
+```bash
+docker build -t opea/gen-ai-comps:chatqna-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+docker run -d --name="chatqna-gaudi-server" -p 8888:8888 --ipc=host -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e MEGA_SERVICE_HOST_IP=${micro_service_host_ip} opea/gen-ai-comps:chatqna-gaudi-server
+```
+
+Then you can check the result of your chatqna service with the command below.
+
+```bash
+docker logs chatqna-gaudi-server
 ```
 
 ## 🚀 Access the Mega Service
 
-Once the script is executed, a FastAPI server will be initiated. Users can interact with the service through the `/v1/chatqna` endpoint. Here's an example using `curl`:
+Once the mega service docker is launched, a FastAPI server will be initiated. Users can interact with the service through the `/v1/chatqna` endpoint. Here's an example using `curl`:
 
 ```bash
 curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-    "model": "Intel/neural-chat-7b-v3-3",
-    "messages": "What is the revenue of Nike in 2023?"
-    }'
+     "model": "Intel/neural-chat-7b-v3-3",
+     "messages": "What is the revenue of Nike in 2023?"
+     }
 ```
