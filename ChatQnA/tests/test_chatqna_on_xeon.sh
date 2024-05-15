@@ -19,12 +19,11 @@ function build_docker_images() {
     docker build -t opea/gen-ai-comps:reranking-tei-xeon-server -f comps/reranks/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:llm-tgi-server -f comps/llms/langchain/docker/Dockerfile .
 
-
     cd $WORKPATH/microservice/xeon
-    docker build -t opea/gen-ai-comps:chatqna-megaservice-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server -f docker/Dockerfile .
 
     cd $WORKPATH/ui
-    docker build -t opea/gen-ai-comps:chatqna-ui-server --build-arg -f ./docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:chatqna-ui-server -f docker/Dockerfile .
 
     docker images
 }
