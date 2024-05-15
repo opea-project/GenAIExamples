@@ -9,7 +9,6 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 ### 1. Source Code install GenAIComps
 
 ```bash
-cd ~
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 python setup.py install
@@ -44,7 +43,6 @@ docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$
 Since a TEI Gaudi Docker image hasn't been published, we'll need to build it from the [tei-guadi](https://github.com/huggingface/tei-gaudi) repository.
 
 ```bash
-cd ~
 git clone https://github.com/huggingface/tei-gaudi
 cd tei-gaudi/
 docker build -f Dockerfile-hpu -t opea/tei-gaudi .
@@ -68,19 +66,20 @@ docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 
 ### 9. Build MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
 
 ```bash
-cd ~/GenAIExamples/ChatQnA/microservice/gaudi/
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/ChatQnA/microservice/gaudi/
 docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
 ### 10. Build UI Docker Image
 
-Build frontend Docker image via below command:
+Construct the frontend Docker image using the command below:
 
 ```bash
-cd ~/GenAIExamples/ChatQnA/ui/
+cd GenAIExamples/ChatQnA/ui/
 docker build -t opea/gen-ai-comps:chatqna-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -209,11 +208,11 @@ curl http://${host_ip}:9000/v1/chat/completions\
 curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
      "model": "Intel/neural-chat-7b-v3-3",
      "messages": "What is the revenue of Nike in 2023?"
-     }
+     }'
 ```
 
 ## 🚀 Launch the UI
 
-Open this URL `http://{host_ip}:5173` in the browser to access the frontend.
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
 ![project-screenshot](https://i.imgur.com/26zMnEr.png)

@@ -48,7 +48,8 @@ docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
 
 ```bash
-cd ~/GenAIExamples/ChatQnA/microservice/xeon/
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/ChatQnA/microservice/xeon/
 docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
@@ -57,7 +58,7 @@ docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_p
 Build frontend Docker image via below command:
 
 ```bash
-cd ~/GenAIExamples/ChatQnA/ui/
+cd GenAIExamples/ChatQnA/ui/
 docker build -t opea/gen-ai-comps:chatqna-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -180,11 +181,11 @@ curl http://${host_ip}:9000/v1/chat/completions\
 curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
      "model": "Intel/neural-chat-7b-v3-3",
      "messages": "What is the revenue of Nike in 2023?"
-     }
+     }'
 ```
 
 ## 🚀 Launch the UI
 
-Open this URL `http://{host_ip}:5173` in the browser to access the frontend.
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
 ![project-screenshot](https://i.imgur.com/26zMnEr.png)
