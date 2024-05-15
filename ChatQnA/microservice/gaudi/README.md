@@ -9,6 +9,7 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 ### 1. Source Code install GenAIComps
 
 ```bash
+cd ~
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 python setup.py install
@@ -43,7 +44,7 @@ docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$
 Since a TEI Gaudi Docker image hasn't been published, we'll need to build it from the [tei-guadi](https://github.com/huggingface/tei-gaudi) repository.
 
 ```bash
-cd ..
+cd ~
 git clone https://github.com/huggingface/tei-gaudi
 cd tei-gaudi/
 docker build -f Dockerfile-hpu -t opea/tei-gaudi .
@@ -65,6 +66,24 @@ Since TEI Gaudi doesn't support reranking models, we'll deploy TEI CPU serving i
 docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 ```
 
+### 9. Build MegaService Docker Image
+
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+
+```bash
+cd ~/GenAIExamples/ChatQnA/microservice/gaudi/
+docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+### 10. Build UI Docker Image
+
+Build frontend Docker image via below command:
+
+```bash
+cd ~/GenAIExamples/ChatQnA/ui/
+docker build -t opea/gen-ai-comps:chatqna-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
+
 Then run the command `docker images`, you will have the following 7 Docker Images:
 
 1. `opea/gen-ai-comps:embedding-tei-server`
@@ -74,8 +93,10 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 5. `opea/tei-gaudi`
 6. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
 7. `ghcr.io/huggingface/text-embeddings-inference:cpu-1.2`
+8. `opea/gen-ai-comps:chatqna-megaservice-server`
+9. `opea/gen-ai-comps:chatqna-ui-server`
 
-## 🚀 Start Microservices
+## 🚀 Start MicroServices and MegaService
 
 ### Setup Environment Variables
 
@@ -93,6 +114,7 @@ export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export MEGA_SERVICE_HOST_IP=${host_ip}
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -103,7 +125,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 docker compose -f docker_compose.yaml up -d
 ```
 
-### Validate Microservices
+### Validate MicroServices and MegaService
 
 1. TEI Embedding Service
 
@@ -179,48 +201,17 @@ curl http://${host_ip}:9000/v1/chat/completions\
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
-
-## 🚀 Construct Mega Service
-
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Upon executing the script, each microservice's intermediate results will be displayed, allowing users to verify the accuracy of the outcomes and make targeted modifications if necessary.
-
-To launch the Mega Service, simply run the following command:
-
-### Run Mega Service with Python
+8. MegaService
 
 ```bash
-# install packages
-cd /GenAIComps
-pip install -r requirements.txt
-pip install .
-# run chatqna service
-cd /GenAIExamples/ChatQnA/microservice/gaudi/
-python chatqna.py
-```
-
-### Run Mega Service with Docker
-
-To run ChatQnA service with Docker, remember to pass the `${micro_service_host_ip}` variable into docker container, which is the real host ip of your microservices.
-
-```bash
-docker build -t opea/gen-ai-comps:chatqna-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-docker run -d --name="chatqna-gaudi-server" -p 8888:8888 --ipc=host -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e MEGA_SERVICE_HOST_IP=${micro_service_host_ip} opea/gen-ai-comps:chatqna-gaudi-server
-```
-
-Then you can check the result of your chatqna service with the command below.
-
-```bash
-docker logs chatqna-gaudi-server
-```
-
-## 🚀 Access the Mega Service
-
-Once the mega service docker is launched, a FastAPI server will be initiated. Users can interact with the service through the `/v1/chatqna` endpoint. Here's an example using `curl`:
-
-```bash
-curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
      "model": "Intel/neural-chat-7b-v3-3",
      "messages": "What is the revenue of Nike in 2023?"
      }
 ```
+
+## 🚀 Launch the UI
+
+Open this URL `http://{host_ip}:5173` in the brower to access the frontend.
+
+![project-screenshot](https://i.imgur.com/26zMnEr.png)
