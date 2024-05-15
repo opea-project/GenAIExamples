@@ -113,7 +113,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   chaqna-xeon-backend-server:
-    image: opea/gen-ai-comps:chatqna-xeon-backend-server
+    image: opea/gen-ai-comps:chatqna-xeon-server
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
@@ -137,9 +137,9 @@ services:
       "wait-for-it.sh", "retriever:7000", "--", 
       "wait-for-it.sh", "reranking:8000", "--", 
       "wait-for-it.sh", "llm:9000"]
-  chaqna-xeon-frontend-server:
-    image: opea/gen-ai-comps:chatqna-xeon-frontend-server
-    container_name: chatqna-xeon-frontend-server
+  chaqna-xeon-ui-server:
+    image: opea/gen-ai-comps:chatqna-xeon-ui-server
+    container_name: chatqna-xeon-ui-server
     depends_on:
       - chaqna-xeon-backend-server
     ports:
