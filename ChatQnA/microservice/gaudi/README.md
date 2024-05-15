@@ -11,7 +11,6 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-python setup.py install
 ```
 
 ### 2. Build Embedding Image
