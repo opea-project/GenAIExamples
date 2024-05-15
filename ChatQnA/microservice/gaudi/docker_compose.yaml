@@ -134,11 +134,6 @@ services:
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
     ipc: host
     restart: always
-    command: [
-      "wait-for-it.sh", "embedding:6000", "--", 
-      "wait-for-it.sh", "retriever:7000", "--", 
-      "wait-for-it.sh", "reranking:8000", "--", 
-      "wait-for-it.sh", "llm:9000"]
   chaqna-gaudi-ui-server:
     image: opea/gen-ai-comps:chatqna-gaudi-ui-server
     container_name: chatqna-gaudi-ui-server
@@ -149,10 +144,9 @@ services:
     environment:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
-    command: ["wait-for-it.sh", "chaqna-gaudi-backend-server:8888"]
 
 networks:
   default:

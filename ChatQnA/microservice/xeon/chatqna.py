@@ -62,7 +62,7 @@ class ChatQnAService:
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, rerank)
         self.megaservice.flow_to(rerank, llm)
-        self.gateway = ChatQnAGateway(megaservice=self.megaservice, host=SERVICE_HOST_IP, port=self.port)
+        self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
     async def schedule(self):
         await self.megaservice.schedule(initial_inputs={"text": "What is the revenue of Nike in 2023?"})
