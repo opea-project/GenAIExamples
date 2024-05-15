@@ -32,7 +32,7 @@ RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
 
 COPY ../chatqna.py /home/user/chatqna.py
 
-ENV PYTHONPATH=$PYTHONPATH:/home/user:/home/user/GenAIComps
+ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
 USER user
 
