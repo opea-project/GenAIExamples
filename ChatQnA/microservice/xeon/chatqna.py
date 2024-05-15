@@ -15,7 +15,7 @@
 import asyncio
 import os
 
-from comps import MicroService, ServiceOrchestrator, ChatQnAGateway, ServiceType
+from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
 
 SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 
@@ -27,20 +27,36 @@ class ChatQnAService:
 
     def add_remote_service(self):
         embedding = MicroService(
-            name="embedding", host=SERVICE_HOST_IP, port=6000, endpoint="/v1/embeddings", use_remote_service=True,
-            service_type=ServiceType.EMBEDDING
+            name="embedding",
+            host=SERVICE_HOST_IP,
+            port=6000,
+            endpoint="/v1/embeddings",
+            use_remote_service=True,
+            service_type=ServiceType.EMBEDDING,
         )
         retriever = MicroService(
-            name="retriever", host=SERVICE_HOST_IP, port=7000, endpoint="/v1/retrieval", use_remote_service=True,
-            service_type=ServiceType.RETRIEVER
+            name="retriever",
+            host=SERVICE_HOST_IP,
+            port=7000,
+            endpoint="/v1/retrieval",
+            use_remote_service=True,
+            service_type=ServiceType.RETRIEVER,
         )
         rerank = MicroService(
-            name="rerank", host=SERVICE_HOST_IP, port=8000, endpoint="/v1/reranking", use_remote_service=True,
-            service_type=ServiceType.RERANK
+            name="rerank",
+            host=SERVICE_HOST_IP,
+            port=8000,
+            endpoint="/v1/reranking",
+            use_remote_service=True,
+            service_type=ServiceType.RERANK,
         )
         llm = MicroService(
-            name="llm", host=SERVICE_HOST_IP, port=9000, endpoint="/v1/chat/completions", use_remote_service=True,
-            service_type=ServiceType.LLM
+            name="llm",
+            host=SERVICE_HOST_IP,
+            port=9000,
+            endpoint="/v1/chat/completions",
+            use_remote_service=True,
+            service_type=ServiceType.LLM,
         )
         self.megaservice.add(embedding).add(retriever).add(rerank).add(llm)
         self.megaservice.flow_to(embedding, retriever)
