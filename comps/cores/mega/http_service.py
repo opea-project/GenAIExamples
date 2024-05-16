@@ -29,7 +29,7 @@ class HTTPService(BaseService):
     def __init__(
         self,
         uvicorn_kwargs: Optional[dict] = None,
-        cors: Optional[bool] = False,
+        cors: Optional[bool] = True,
         **kwargs,
     ):
         """Initialize the HTTPService
