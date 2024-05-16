@@ -22,7 +22,8 @@ export async function fetchTextStream(query: string, knowledge_base_id: string) 
 	let url = "";
 
 	payload = {
-		query: query,
+		model: "Intel/neural-chat-7b-v3-3",
+		messages: query,
 	};
 	url = `${CHAT_BASE_URL}`;
 
