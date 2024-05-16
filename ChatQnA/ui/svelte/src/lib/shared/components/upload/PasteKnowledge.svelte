@@ -37,10 +37,13 @@
 			name="text"
 			placeholder="URL"
 			bind:value={urlValue}
+			data-testid="paste-link"
 		/>
 		<Button
 			type="submit"
 			class="w-full rounded-none rounded-r-lg bg-blue-700"
+			data-testid="paste-click"
+
 			on:click={() => handelPasteURL()}>Confirm</Button
 		>
 	</div>

@@ -42,6 +42,7 @@
 		bind:value
 		on:change={handleInput}
 		class="focus:border-blue-700 focus:ring-0"
+		data-testid="file-upload"
 	  />
 	</Label>
   </div>

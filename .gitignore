@@ -3,5 +3,6 @@
 **/package-lock.json
 **/playwright-report/
 **/playwright/.cache/
+**/test-results/
 
 __pycache__/
