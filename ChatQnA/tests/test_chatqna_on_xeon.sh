@@ -128,7 +128,7 @@ function validate_megaservice() {
 }
 
 function run_e2e_tests() {
-    cd $WORKPATH/../ui/svelte
+    cd $WORKPATH/ui/svelte
     local conda_env_name="ChatQnA_e2e"
     export PATH=${HOME}/miniconda3/bin/:$PATH
     conda remove -n ${conda_env_name} --all -y
