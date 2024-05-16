@@ -17,8 +17,6 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-pip install -r requirements.txt
-pip install .
 ```
 
 ### 1. Build Embedding Image
@@ -36,7 +34,7 @@ docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy
 ### 3. Build Rerank Image
 
 ```bash
-docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
 ```
 
 ### 4. Build LLM Image
@@ -45,12 +43,33 @@ docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_pr
 docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
+### 5. Build MegaService Docker Image
+
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/ChatQnA/microservice/xeon/
+docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+### 6. Build UI Docker Image
+
+Build frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/ChatQnA/ui/
+docker build -t opea/gen-ai-comps:chatqna-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
+
 Then run the command `docker images`, you will have the following four Docker Images:
 
 1. `opea/gen-ai-comps:embedding-tei-server`
 2. `opea/gen-ai-comps:retriever-redis-server`
 3. `opea/gen-ai-comps:reranking-tei-xeon-server`
 4. `opea/gen-ai-comps:llm-tgi-server`
+5. `opea/gen-ai-comps:chatqna-megaservice-server`
+6. `opea/gen-ai-comps:chatqna-ui-server`
 
 ## 🚀 Start Microservices
 
@@ -70,9 +89,13 @@ export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 ```
 
-### Start Microservice Docker Containers
+Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+
+### Start all the services Docker Containers
 
 ```bash
 docker compose -f docker_compose.yaml up -d
@@ -148,18 +171,21 @@ curl http://${host_ip}:9009/generate \
 ```bash
 curl http://${host_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"text":"What is Deep Learning?"}' \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
-
-## 🚀 Construct Mega Service
-
-Modify the `initial_inputs` of line 34 in `chatqna.py`, then you will get the ChatQnA result of this mega service.
-
-All of the intermediate results will be printed for each microservices. Users can check the accuracy of the results to make targeted modifications.
+8. MegaService
 
 ```bash
-python chatqna.py
+curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+     "model": "Intel/neural-chat-7b-v3-3",
+     "messages": "What is the revenue of Nike in 2023?"
+     }'
 ```
+
+## 🚀 Launch the UI
+
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+
+![project-screenshot](https://i.imgur.com/26zMnEr.png)
