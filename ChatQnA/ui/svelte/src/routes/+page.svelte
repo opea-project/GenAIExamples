@@ -73,7 +73,7 @@
 		);
 	}
 
-	const callTextStream = async (query: string) => {
+	const callTextStream = async (query: string, startSendTime: number) => {
 		const eventSource = await fetchTextStream(query, knowledge_1);
 
 		eventSource.addEventListener("message", (e: any) => {
@@ -108,7 +108,7 @@
 							role: MessageRole.Assistant,
 							type: MessageType.Text,
 							content: currentMsg,
-							time: getCurrentTimeStamp(),
+							time: startSendTime,
 						},
 					];
 					console.log("? chatMessages", chatMessages);
@@ -138,7 +138,7 @@
 		storeMessages();
 		query = "";
 
-		await callTextStream(newMessage.content);
+		await callTextStream(newMessage.content, getCurrentTimeStamp());
 
 		scrollToBottom(scrollToDiv);
 		storeMessages();
