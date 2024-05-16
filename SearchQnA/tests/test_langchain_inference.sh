@@ -35,7 +35,7 @@ function launch_tgi_gaudi_service() {
 
     cd ${WORKPATH}
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.0
     bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
     sleep 2m
 }

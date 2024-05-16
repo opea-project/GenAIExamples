@@ -52,7 +52,7 @@ docker build -f Dockerfile-hpu -t opea/tei-gaudi .
 As TGI Gaudi has been officially published as a Docker image, we simply need to pull it.
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+docker pull ghcr.io/huggingface/tgi-gaudi:2.0.0
 ```
 
 ### 8. Pull TEI Xeon Image
@@ -87,9 +87,9 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 1. `opea/gen-ai-comps:embedding-tei-server`
 2. `opea/gen-ai-comps:retriever-redis-server`
 3. `opea/gen-ai-comps:reranking-tei-server`
-4. `opea/gen-ai-comps:llm-tgi-server`
+4. `opea/gen-ai-comps:llm-tgi-gaudi-server`
 5. `opea/tei-gaudi`
-6. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
+6. `ghcr.io/huggingface/tgi-gaudi:2.0.0`
 7. `ghcr.io/huggingface/text-embeddings-inference:cpu-1.2`
 8. `opea/gen-ai-comps:chatqna-megaservice-server`
 9. `opea/gen-ai-comps:chatqna-ui-server`
