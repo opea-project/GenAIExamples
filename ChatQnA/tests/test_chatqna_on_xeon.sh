@@ -135,6 +135,8 @@ function run_e2e_tests() {
     conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
     conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
