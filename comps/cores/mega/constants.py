@@ -34,7 +34,8 @@ class ServiceType(Enum):
     TTS = 6
     GUARDRAIL = 7
     VECTORSTORE = 8
-    UNDEFINED = 9
+    DATAPREP = 9
+    UNDEFINED = 10
 
 
 class MegaServiceEndpoint(Enum):

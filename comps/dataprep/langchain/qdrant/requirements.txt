@@ -1,3 +1,4 @@
+beautifulsoup4
 docarray[full]
 easyocr
 fastapi
@@ -5,6 +6,11 @@ fitz
 huggingface_hub
 langchain
 numpy
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
 Pillow
+pymupdf
+redis
 sentence_transformers
 shortuuid

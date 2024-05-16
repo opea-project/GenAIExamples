@@ -15,7 +15,8 @@
 import os
 
 # Embedding model
-EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+
+EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-base-en-v1.5")
 
 # Redis Connection Information
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
@@ -72,6 +73,6 @@ INDEX_NAME = os.getenv("INDEX_NAME", "rag-redis")
 
 current_file_path = os.path.abspath(__file__)
 parent_dir = os.path.dirname(current_file_path)
-REDIS_SCHEMA = os.getenv("REDIS_SCHEMA", "schema.yml")
+REDIS_SCHEMA = os.getenv("REDIS_SCHEMA", "schema_dim_768.yml")
 schema_path = os.path.join(parent_dir, REDIS_SCHEMA)
 INDEX_SCHEMA = schema_path

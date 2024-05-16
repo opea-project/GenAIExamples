@@ -24,9 +24,12 @@ services:
     image: opea/gen-ai-comps:dataprep-redis-xeon-server
     container_name: dataprep-redis-server
     ports:
-      - "8000:8000"
+      - "6007:6007"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_ENDPOINT}
     restart: unless-stopped
