@@ -6,27 +6,13 @@ set -xe
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
-cd $WORKPATH
+ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
+ip_address=$(eval echo '$'$ip_name)
 
-function setup_test_env() {
+function build_docker_images() {
     cd $WORKPATH
-    # build conda env
-    conda_env_name="test_GenAIExample"
-    export PATH="${HOME}/miniconda3/bin:$PATH"
-    conda remove --all -y -n ${conda_env_name}
-    conda create python=3.10 -y -n ${conda_env_name}
-    source activate ${conda_env_name}
-
-    # install comps
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
-    pip install -r requirements.txt
-    python setup.py install
-    pip list
-}
-
-function build_docker_image() {
-    cd $WORKPATH/GenAIComps
 
     docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
@@ -36,19 +22,22 @@ function build_docker_image() {
     cd ..
     git clone https://github.com/huggingface/tei-gaudi
     cd tei-gaudi/
-    docker build -f Dockerfile-hpu -t opea/tei-gaudi .
+    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 
+    cd $WORKPATH/microservice/gaudi
+    docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server -f docker/Dockerfile .
+
+    cd $WORKPATH/ui
+    docker build --no-cache -t opea/gen-ai-comps:chatqna-ui-server -f docker/Dockerfile .
+
     docker images
 }
 
-function start_microservices() {
-    cd $WORKPATH
-
-    ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
-    ip_address=$(eval echo '$'$ip_name)
+function start_services() {
+    cd $WORKPATH/microservice/gaudi
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-large"
@@ -59,16 +48,17 @@ function start_microservices() {
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export MEGA_SERVICE_HOST_IP=${ip_address}
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
 
-    # Start Microservice Docker Containers
+    # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
-    cd microservice/gaudi
     docker compose -f docker_compose.yaml up -d
 
     sleep 1m # Waits 1 minutes
 }
 
-function check_microservices() {
+function validate_microservices() {
     # Check if the microservices are running correctly.
     # TODO: Any results check required??
     curl ${ip_address}:8090/embed \
@@ -83,9 +73,12 @@ function check_microservices() {
         -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
     sleep 10s
 
+    export PATH="${HOME}/miniconda3/bin:$PATH"
+    source activate
+    test_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     curl http://${ip_address}:7000/v1/retrieval \
         -X POST \
-        -d '{"text":"test","embedding":[1,1,...1]}' \
+        -d '{"text":"test","embedding":${your_embedding}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/retrieval.log
     sleep 5s
 
@@ -114,24 +107,20 @@ function check_microservices() {
     sleep 5s
 }
 
-function run_megaservice() {
-    # Construct Mega Service
-    python chatqna.py > ${LOG_PATH}/run_megaservice.log
-    # Access the Mega Service
-    curl http://127.0.0.1:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+function validate_megaservice() {
+    # Curl the Mega Service
+    curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
         "model": "Intel/neural-chat-7b-v3-3",
         "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
-}
 
-function check_results() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
-    if [[ -f $LOG_PATH/run_megaservice.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/run_megaservice.log) != 0 ]]; then
+    if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
+    [[ $(grep -c "data: 5" $LOG_PATH/curl_megaservice.log) != 0 ]] && \
+    [[ $(grep -c "data: 1" $LOG_PATH/curl_megaservice.log) != 0 ]] && \
+    [[ $(grep -c "data: ." $LOG_PATH/curl_megaservice.log) != 0 ]] && \
+    [[ $(grep -c "data: 2" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
         status=true
-    fi
-
-    if [[ -f $LOG_PATH/curl_megaservice.log ]] && [[ $(grep -c "\$51.2 billion" $LOG_PATH/curl_megaservice.log) == 0 ]]; then
-        status=false
     fi
 
     if [ $status == false ]; then
@@ -158,14 +147,11 @@ function main() {
 
     stop_docker
 
-    setup_test_env
-    build_docker_image
+    build_docker_images
+    start_services
 
-    start_microservices
-    check_microservices
-
-    run_megaservice
-    check_results
+    validate_microservices
+    validate_megaservice
 
     stop_docker
     echo y | docker system prune
