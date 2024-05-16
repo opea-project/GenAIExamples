@@ -142,7 +142,7 @@ services:
     environment:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 
