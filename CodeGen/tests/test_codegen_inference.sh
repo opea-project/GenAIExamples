@@ -40,7 +40,7 @@ function docker_setup() {
     # Reset the tgi port
     sed -i "s/8080/$port/g" codegen/codegen-app/server.py
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.0
+    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
     sleep 3m # Waits 3 minutes
 }

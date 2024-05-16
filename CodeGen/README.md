@@ -27,7 +27,7 @@ To use [🤗 text-generation-inference](https://github.com/huggingface/text-gene
 Getting started is straightforward with the official Docker container. Simply pull the image using:
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.0
+docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 ```
 
 Alternatively, you can build the Docker image yourself with:

@@ -66,7 +66,7 @@ http_proxy= curl --location 'localhost:9880/v1/audio/speech' \
 Getting started is straightforward with the official Docker container. Simply pull the image using:
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.0
+docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 ```
 
 Alternatively, you can build the Docker image yourself using latest [TGI-Gaudi](https://github.com/huggingface/tgi-gaudi) code with the below command:
@@ -255,7 +255,7 @@ Then modify the `dump_stats_path` to "/data/hqt_output/measure" and update `dump
 ### Restart the TGI Gaudi server within all the metadata mapped
 
 ```bash
-docker run -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.0 --model-id Intel/neural-chat-7b-v3-3
+docker run -p 8080:80 -e QUANT_CONFIG=/data/maxabs_quant.json -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:1.2.1 --model-id Intel/neural-chat-7b-v3-3
 ```
 
 Now the TGI Gaudi will launch the FP8 model by default and you can make requests like below to check the service status:

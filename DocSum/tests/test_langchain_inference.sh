@@ -40,7 +40,7 @@ function docker_setup() {
     sed -i "s/8080/$port/g" langchain/docker/summarize-app/app/server.py
     sed -i "s/8080/$port/g" langchain/docker/summarize-app/Dockerfile
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.0
+    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     bash serving/tgi_gaudi/launch_tgi_service.sh $card_num $port $model_name
     sleep 3m # Waits 3 minutes
 }
