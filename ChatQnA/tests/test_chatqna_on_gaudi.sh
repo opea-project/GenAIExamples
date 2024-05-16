@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -65,6 +65,12 @@ function validate_microservices() {
         -X POST \
         -d '{"inputs":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/embed.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Embedding service failed to start, please check the logs in artifacts!"
+        docker logs tei-embedding-gaudi-server >> ${LOG_PATH}/embed.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:6000/v1/embeddings \
