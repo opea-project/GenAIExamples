@@ -14,10 +14,11 @@
 
 import { env } from "$env/dynamic/public";
 
-const DOC_BASE_URL = env.DOC_BASE_URL;
+const UPLOAD_FILE_BASE_URL = env.UPLOAD_FILE_BASE_URL;
+const PASTE_LINK_BASE_URL = env.PASTE_LINK_BASE_URL;
 
 export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
-	const url = `${DOC_BASE_URL}/create`;
+	const url = `${UPLOAD_FILE_BASE_URL}`;
 	const formData = new FormData();
 	formData.append("file", file, fileName);
 	const init: RequestInit = {
@@ -36,7 +37,7 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 }
 
 export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: string | undefined) {
-	const url = `${DOC_BASE_URL}/upload_link`;
+	const url = `${PASTE_LINK_BASE_URL}`;
 	const data = {
 		link_list: pasteUrlList,
 	};
