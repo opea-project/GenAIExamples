@@ -4,14 +4,13 @@
 name: ChatQnA E2E test on Gaudi
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - ChatQnA/microservice/gaudi/**
       - ChatQnA/tests/test_chatqna_on_gaudi.sh
       - "!**.md"
-      - "!**/ui/**"
       - .github/workflows/ChatQnA_gaudi.yml
   workflow_dispatch:
 
@@ -36,6 +35,7 @@ jobs:
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
           AISE_CLUSTER_01_2_IP: ${{ secrets.AISE_CLUSTER_01_2_IP }}
+          CI: true
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
           timeout 20m bash test_chatqna_on_gaudi.sh
@@ -55,3 +55,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: ${{ github.workspace }}/ChatQnA/tests/*.log
+
+      - name: Publish E2E test artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ github.workspace }}/ChatQnA/ui/svelte/playwright-report
+          name: ChatQnA_Gaudi_E2E_test_report

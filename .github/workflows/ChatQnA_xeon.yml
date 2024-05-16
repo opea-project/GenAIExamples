@@ -61,3 +61,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: ${{ github.workspace }}/ChatQnA/ui/svelte/playwright-report
+          name: ChatQnA_Xeon_E2E_test_report

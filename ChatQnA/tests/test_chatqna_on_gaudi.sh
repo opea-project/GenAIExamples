@@ -134,6 +134,32 @@ function validate_megaservice() {
     # TODO
 }
 
+function run_e2e_tests() {
+    cd $WORKPATH/ui/svelte
+    local conda_env_name="ChatQnA_e2e"
+    export PATH=${HOME}/miniconda3/bin/:$PATH
+    conda remove -n ${conda_env_name} --all -y
+    conda create -n ${conda_env_name} python=3.12 -y
+    source activate ${conda_env_name}
+
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
+
+    echo "[TEST INFO]: ---------E2E test start---------"
+
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------E2E test failed---------"
+    else
+        echo "[TEST INFO]: ---------E2E test passed---------"
+    fi
+
+    echo "[TEST INFO]: ---------E2E test finished---------"
+}
+
 function stop_docker() {
     cd $WORKPATH/microservice/gaudi
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
@@ -152,6 +178,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
+    run_e2e_tests
 
     stop_docker
     echo y | docker system prune
