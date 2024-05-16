@@ -22,6 +22,7 @@ from comps.cores.proto.docarray import (
     LLMParamsDoc,
     SearchedDoc,
     TextDoc,
+    DocPath,
 )
 
 # Microservice

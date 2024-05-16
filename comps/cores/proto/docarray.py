@@ -29,6 +29,10 @@ class Base64ByteStrDoc(BaseDoc):
     byte_str: str
 
 
+class DocPath(BaseDoc):
+    path: str
+
+
 class EmbedDoc768(BaseDoc):
     text: str
     embedding: conlist(float, min_length=768, max_length=768)
