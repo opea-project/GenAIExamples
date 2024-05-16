@@ -153,11 +153,10 @@ function run_e2e_tests() {
 
     if [ $exit_status -ne 0 ]; then
         echo "[TEST INFO]: ---------E2E test failed---------"
+        exit $exit_status
     else
         echo "[TEST INFO]: ---------E2E test passed---------"
     fi
-
-    echo "[TEST INFO]: ---------E2E test finished---------"
 }
 
 function stop_docker() {
