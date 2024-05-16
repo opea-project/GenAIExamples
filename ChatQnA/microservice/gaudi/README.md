@@ -87,7 +87,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 1. `opea/gen-ai-comps:embedding-tei-server`
 2. `opea/gen-ai-comps:retriever-redis-server`
 3. `opea/gen-ai-comps:reranking-tei-server`
-4. `opea/gen-ai-comps:llm-tgi-server`
+4. `opea/gen-ai-comps:llm-tgi-gaudi-server`
 5. `opea/tei-gaudi`
 6. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
 7. `ghcr.io/huggingface/text-embeddings-inference:cpu-1.2`
@@ -211,6 +211,14 @@ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
 
 ## 🚀 Launch the UI
 
-Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  chaqna-gaudi-ui-server:
+    image: opea/gen-ai-comps:chatqna-ui-server
+    ...
+    ports:
+      - "80:5173"
+```
 
 ![project-screenshot](https://i.imgur.com/26zMnEr.png)

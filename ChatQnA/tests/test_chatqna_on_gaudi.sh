@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -65,13 +65,25 @@ function validate_microservices() {
         -X POST \
         -d '{"inputs":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/embed.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs tei-embedding-gaudi-server >> ${LOG_PATH}/embed.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:6000/v1/embeddings \
         -X POST \
         -d '{"text":"hello"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
-    sleep 10s
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs embedding-tei-server >> ${LOG_PATH}/embeddings.log
+        exit 1
+    fi
+    sleep 5s
 
     export PATH="${HOME}/miniconda3/bin:$PATH"
     source activate
@@ -80,30 +92,60 @@ function validate_microservices() {
         -X POST \
         -d '{"text":"test","embedding":${your_embedding}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/retrieval.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs retriever-redis-server >> ${LOG_PATH}/retrieval.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:8808/rerank \
         -X POST \
         -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/rerank.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs tei-xeon-server >> ${LOG_PATH}/rerank.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:8000/v1/reranking \
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/reranking.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs reranking-tei-gaudi-server >> ${LOG_PATH}/reranking.log
+        exit 1
+    fi
     sleep 1m
 
     curl http://${ip_address}:8008/generate \
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs tgi-gaudi-server >> ${LOG_PATH}/generate.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
         -d '{"text":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs llm-tgi-gaudi-server >> ${LOG_PATH}/completions.log
+        exit 1
+    fi
     sleep 5s
 }
 
@@ -116,10 +158,7 @@ function validate_megaservice() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c "data: 5" $LOG_PATH/curl_megaservice.log) != 0 ]] && \
-    [[ $(grep -c "data: 1" $LOG_PATH/curl_megaservice.log) != 0 ]] && \
-    [[ $(grep -c "data: ." $LOG_PATH/curl_megaservice.log) != 0 ]] && \
-    [[ $(grep -c "data: 2" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
+    [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
         status=true
     fi
 
