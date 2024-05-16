@@ -14,7 +14,7 @@
 
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 
-from comps import EmbedDoc1024, ServiceType, TextDoc, opea_microservices, register_microservice
+from comps import EmbedDoc1024, ServiceType, TextDoc, opea_microservices, opea_telemetry, register_microservice
 
 
 @register_microservice(
@@ -26,6 +26,7 @@ from comps import EmbedDoc1024, ServiceType, TextDoc, opea_microservices, regist
     input_datatype=TextDoc,
     output_datatype=EmbedDoc1024,
 )
+@opea_telemetry
 def embedding(input: TextDoc) -> EmbedDoc1024:
     embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-large-en-v1.5")
     embed_vector = embeddings.embed_query(input.text)

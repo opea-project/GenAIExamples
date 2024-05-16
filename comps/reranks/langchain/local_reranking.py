@@ -14,7 +14,7 @@
 
 from sentence_transformers import CrossEncoder
 
-from comps import RerankedDoc, SearchedDoc, ServiceType, opea_microservices, register_microservice
+from comps import RerankedDoc, SearchedDoc, ServiceType, opea_microservices, opea_telemetry, register_microservice
 
 
 @register_microservice(
@@ -26,6 +26,7 @@ from comps import RerankedDoc, SearchedDoc, ServiceType, opea_microservices, reg
     input_datatype=SearchedDoc,
     output_datatype=RerankedDoc,
 )
+@opea_telemetry
 def reranking(input: SearchedDoc) -> RerankedDoc:
     query_and_docs = [(input.initial_query, doc.text) for doc in input.retrieved_docs]
     scores = reranker_model.predict(query_and_docs)

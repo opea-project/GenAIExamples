@@ -19,7 +19,7 @@ import os
 import requests
 from langchain_core.prompts import ChatPromptTemplate
 
-from comps import LLMParamsDoc, SearchedDoc, ServiceType, opea_microservices, register_microservice
+from comps import LLMParamsDoc, SearchedDoc, ServiceType, opea_microservices, opea_telemetry, register_microservice
 
 
 @register_microservice(
@@ -31,6 +31,7 @@ from comps import LLMParamsDoc, SearchedDoc, ServiceType, opea_microservices, re
     input_datatype=SearchedDoc,
     output_datatype=LLMParamsDoc,
 )
+@opea_telemetry
 def reranking(input: SearchedDoc) -> LLMParamsDoc:
     docs = [doc.text for doc in input.retrieved_docs]
     url = tei_reranking_endpoint + "/rerank"
