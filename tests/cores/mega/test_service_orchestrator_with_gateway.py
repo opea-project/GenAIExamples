@@ -36,7 +36,7 @@ async def s2_add(request: TextDoc) -> TextDoc:
     return {"text": text}
 
 
-class TestServiceOrchestrator(unittest.TestCase):
+class TestServiceOrchestrator(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.s1 = opea_microservices["s1"]
         self.s2 = opea_microservices["s2"]

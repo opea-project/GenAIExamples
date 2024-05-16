@@ -56,7 +56,7 @@ class ServiceOrchestratorWithYaml(DAG):
             all_outputs.update(self.result_dict[prev_node])
         return all_outputs
 
-    def schedule(self, initial_inputs: Dict):
+    async def schedule(self, initial_inputs: Dict):
         for node in self.topological_sort():
             if node in self.ind_nodes():
                 inputs = initial_inputs
