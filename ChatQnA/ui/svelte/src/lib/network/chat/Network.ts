@@ -15,7 +15,7 @@
 import { env } from "$env/dynamic/public";
 import { SSE } from "sse.js";
 
-const DOC_BASE_URL = env.DOC_BASE_URL;
+const CHAT_BASE_URL = env.CHAT_BASE_URL;
 
 export async function fetchTextStream(query: string, knowledge_base_id: string) {
 	let payload = {};
@@ -24,7 +24,7 @@ export async function fetchTextStream(query: string, knowledge_base_id: string) 
 	payload = {
 		query: query,
 	};
-	url = `${DOC_BASE_URL}/chat_stream`;
+	url = `${CHAT_BASE_URL}`;
 
 	return new SSE(url, {
 		headers: { "Content-Type": "application/json" },
