@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script lang="ts">
   import PaperAirplane from "$lib/assets/PaperAirplane.svelte";
   import { createEventDispatcher } from "svelte";
@@ -12,7 +17,7 @@
   class="fixed relative flex w-full flex-col items-center justify-between  p-2"
 >
   <div class="relative my-4 flex w-full flex-row justify-center">
-    <div class="foucs:border-none relative w-full">
+    <div class="focus:border-none relative w-full">
       <input
         class="text-md block w-full border-0 border-b-2 border-gray-300  px-1 py-4
 						text-white placeholder-white focus:border-gray-300 focus:ring-0"

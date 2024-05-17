@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <svg
   aria-hidden="true"
   class="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"

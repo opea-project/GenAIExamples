@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script lang="ts">
 	export let overrideClasses = "";
 
@@ -18,7 +23,7 @@
 		/></g
 	></svg
 > -->
-<!-- 
+<!--
 <svg
 	class={classes}
 	xmlns="http://www.w3.org/2000/svg"

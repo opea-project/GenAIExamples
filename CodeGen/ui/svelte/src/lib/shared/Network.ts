@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { SSE } from "sse.js";
 import { env } from "$env/dynamic/public";
 
@@ -27,11 +30,7 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
   return fetchPostRes(url, init);
 }
 
-export async function fetchTextStream(
-  query: string,
-  urlSuffix: string,
-  params: string
-) {
+export async function fetchTextStream(query: string, urlSuffix: string, params: string) {
   let payload = {};
   if (params === "doc_id") {
     payload = { doc_id: query };

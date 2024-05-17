@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <div
 	class="mb-6 flex items-center justify-center self-center bg-black text-sm text-gray-500"
 />

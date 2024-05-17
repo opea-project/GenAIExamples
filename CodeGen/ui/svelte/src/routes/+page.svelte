@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script lang="ts">
   import Header from "$lib/header.svelte";
   import InputAirPlane from "$lib/InputAirPlane.svelte";
