@@ -73,7 +73,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${RERANK_MODEL_ID}
   reranking:
-    image: opea/gen-ai-comps:reranking-tei-gaudi-server
+    image: opea/gen-ai-comps:reranking-tei-server
     container_name: reranking-tei-gaudi-server
     depends_on:
       - tei_xeon_service
