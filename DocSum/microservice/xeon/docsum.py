@@ -15,9 +15,10 @@
 import asyncio
 import os
 
-from comps import MicroService, ServiceOrchestrator, ServiceType, DocSumGateway
+from comps import DocSumGateway, MicroService, ServiceOrchestrator, ServiceType
 
 SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
+
 
 class DocSumService:
     def __init__(self, port=8000):
@@ -26,19 +27,21 @@ class DocSumService:
 
     def add_remote_service(self):
         llm = MicroService(
-            name="llm", 
+            name="llm",
             host=SERVICE_HOST_IP,
-            port=9000, 
+            port=9000,
             endpoint="/v1/chat/docsum",
             use_remote_service=True,
             service_type=ServiceType.LLM,
-            )
+        )
         self.megaservice.add(llm)
         self.gateway = DocSumGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
     async def schedule(self):
         await self.megaservice.schedule(
-            initial_inputs={"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}
+            initial_inputs={
+                "text": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+            }
         )
         result_dict = self.megaservice.result_dict
         print(result_dict)
