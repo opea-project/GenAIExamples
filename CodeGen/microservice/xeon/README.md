@@ -116,3 +116,76 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 ```
 
 ![project-screenshot](https://imgur.com/d1SmaRb.png)
+
+## Install Copilot VSCode extension from Plugin Marketplace as the frontend
+
+In addition to the Svelte UI, users can also install the Copilot VSCode extension from the Plugin Marketplace as the frontend.
+
+Install `Neural Copilot` in VSCode as below.
+
+![Install-screenshot](https://i.imgur.com/cnHRAdD.png)
+
+### How to use
+
+#### Service URL setting
+
+Please adjust the service URL in the extension settings based on the endpoint of the code generation backend service.
+
+![Setting-screenshot](https://i.imgur.com/4hjvKPu.png)
+![Setting-screenshot](https://i.imgur.com/AQZuzqd.png)
+
+#### Customize
+
+The Copilot enables users to input their corresponding sensitive information and tokens in the user settings according to their own needs. This customization enhances the accuracy and output content to better meet individual requirements.
+
+![Customize](https://i.imgur.com/PkObak9.png)
+
+#### Code Suggestion
+
+To trigger inline completion, you'll need to type # {your keyword} (start with your programming language's comment keyword, like // in C++ and # in python). Make sure Inline Suggest is enabled from the VS Code Settings.
+For example:
+
+![code suggestion](https://i.imgur.com/sH5UoTO.png)
+
+To provide programmers with a smooth experience, the Copilot supports multiple ways to trigger inline code suggestions. If you are interested in the details, they are summarized as follows:
+
+- Generate code from single-line comments: The simplest way introduced before.
+- Generate code from consecutive single-line comments:
+
+![codegen from single-line comments](https://i.imgur.com/GZsQywX.png)
+
+- Generate code from multi-line comments, which will not be triggered until there is at least one `space` outside the multi-line comment):
+
+![codegen from multi-line comments](https://i.imgur.com/PzhiWrG.png)
+
+- Automatically complete multi-line comments:
+
+![auto complete](https://i.imgur.com/cJO3PQ0.jpg)
+
+### Chat with AI assistant
+
+You can start a conversation with the AI programming assistant by clicking on the robot icon in the plugin bar on the left:
+
+![icon](https://i.imgur.com/f7rzfCQ.png)
+
+Then you can see the conversation window on the left, where you can chat with AI assistant:
+
+![dialog](https://i.imgur.com/aiYzU60.png)
+
+There are 4 areas worth noting:
+
+- Enter and submit your question
+- Your previous questions
+- Answers from AI assistant (Code will be highlighted properly according to the programming language it is written in, also support streaming output)
+- Copy or replace code with one click (Note that you need to select the code in the editor first and then click "replace", otherwise the code will be inserted)
+
+You can also select the code in the editor and ask AI assistant question about it.
+For example:
+
+- Select code
+
+![select code](https://i.imgur.com/grvrtY6.png)
+
+- Ask question and get answer
+
+![qna](https://i.imgur.com/8Kdpld7.png)
