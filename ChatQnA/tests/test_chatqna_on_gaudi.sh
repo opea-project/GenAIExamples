@@ -216,7 +216,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    run_e2e_tests
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
