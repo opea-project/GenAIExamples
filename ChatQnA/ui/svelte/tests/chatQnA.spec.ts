@@ -25,7 +25,7 @@ async function enterMessageToChat(page, message) {
 	await newChat.press("Enter");
 	// Adding timeout and debug information
 	const msgTime = await page.waitForSelector("[data-testid='msg-time']", { timeout: 10000 });
-	await expect(msgTime).toBeVisible
+	await expect(msgTime).toBeVisible;
 	console.log("Message time is visible.");
 }
 
@@ -53,8 +53,11 @@ test.describe("New Chat", () => {
 		const clearChat = page.getByTestId("clear-chat");
 		await clearChat.click();
 		// Verify the chat is cleared
-        const chatMessageContent = await page.$eval("[data-testid='chat-message']", message => message?.textContent?.trim() || "");
-        expect(chatMessageContent).toBe("");
+		const chatMessageContent = await page.$eval(
+			"[data-testid='chat-message']",
+			(message) => message?.textContent?.trim() || "",
+		);
+		expect(chatMessageContent).toBe("");
 	});
 });
 
