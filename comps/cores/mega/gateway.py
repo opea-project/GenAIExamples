@@ -133,7 +133,7 @@ class CodeGenGateway(Gateway):
             for message in chat_request.messages:
                 text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
                 prompt = "\n".join(text_list)
-        await self.megaservice.schedule(initial_inputs={"text": prompt})
+        await self.megaservice.schedule(initial_inputs={"query": prompt})
         for node, response in self.megaservice.result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
             if (
@@ -171,7 +171,7 @@ class CodeTransGateway(Gateway):
             for message in chat_request.messages:
                 text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
                 prompt = "\n".join(text_list)
-        await self.megaservice.schedule(initial_inputs={"text": prompt})
+        await self.megaservice.schedule(initial_inputs={"query": prompt})
         for node, response in self.megaservice.result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
             if (
@@ -192,3 +192,41 @@ class CodeTransGateway(Gateway):
             )
         )
         return ChatCompletionResponse(model="codetrans", choices=choices, usage=usage)
+
+
+class DocSumGateway(Gateway):
+    def __init__(self, megaservice, host="0.0.0.0", port=8888):
+        super().__init__(
+            megaservice, host, port, str(MegaServiceEndpoint.DOC_SUMMARY), ChatCompletionRequest, ChatCompletionResponse
+        )
+
+    async def handle_request(self, request: Request):
+        data = await request.json()
+        chat_request = ChatCompletionRequest.parse_obj(data)
+        if isinstance(chat_request.messages, str):
+            prompt = chat_request.messages
+        else:
+            for message in chat_request.messages:
+                text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
+                prompt = "\n".join(text_list)
+        await self.megaservice.schedule(initial_inputs={"query": prompt})
+        for node, response in self.megaservice.result_dict.items():
+            # Here it suppose the last microservice in the megaservice is LLM.
+            if (
+                isinstance(response, StreamingResponse)
+                and node == list(self.megaservice.services.keys())[-1]
+                and self.megaservice.services[node].service_type == ServiceType.LLM
+            ):
+                return response
+        last_node = self.megaservice.all_leaves()[-1]
+        response = self.megaservice.result_dict[last_node]["text"]
+        choices = []
+        usage = UsageInfo()
+        choices.append(
+            ChatCompletionResponseChoice(
+                index=0,
+                message=ChatMessage(role="assistant", content=response),
+                finish_reason="stop",
+            )
+        )
+        return ChatCompletionResponse(model="docsum", choices=choices, usage=usage)
