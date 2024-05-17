@@ -15,7 +15,6 @@
 import { env } from "$env/dynamic/public";
 
 const UPLOAD_FILE_BASE_URL = env.UPLOAD_FILE_BASE_URL;
-const PASTE_LINK_BASE_URL = env.PASTE_LINK_BASE_URL;
 
 export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 	const url = `${UPLOAD_FILE_BASE_URL}`;
@@ -37,7 +36,7 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 }
 
 export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: string | undefined) {
-	const url = `${PASTE_LINK_BASE_URL}`;
+	const url = `${UPLOAD_FILE_BASE_URL}`;
 	const data = {
 		link_list: pasteUrlList,
 	};

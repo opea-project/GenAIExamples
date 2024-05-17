@@ -102,6 +102,8 @@
 	<Button
 		on:click={() => (hidden6 = false)}
 		class="bg-transparent focus-within:ring-gray-300 hover:bg-transparent focus:ring-0"
+		data-testid="open-upload"
+
 	>
 		<svg
 			aria-hidden="true"

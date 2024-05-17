@@ -13,7 +13,8 @@ const FILE_PATH = "./test_file.txt";
 
 // Helper function to check notification text
 async function checkNotificationText(page, expectedText) {
-	const notificationText = await page.textContent(".notification");
+	const notification = await page.waitForSelector(".notification");
+	const notificationText = await notification.textContent();
 	expect(notificationText).toContain(expectedText);
 }
 
@@ -22,7 +23,10 @@ async function enterMessageToChat(page, message) {
 	const newChat = page.getByTestId("chat-input");
 	await newChat.fill(message);
 	await newChat.press("Enter");
-	await expect(page.getByTestId("msg-time")).toBeVisible();
+	// Adding timeout and debug information
+	const msgTime = await page.waitForSelector("[data-testid='msg-time']", { timeout: 10000 });
+	await expect(msgTime).toBeVisible;
+	console.log("Message time is visible.");
 }
 
 // Helper function to upload a file
@@ -43,25 +47,32 @@ async function pasteLink(page, link) {
 
 test.describe("New Chat", () => {
 	// chat
-	test("should enter message to chat", async ({ page }) => {
+	test("should enter message to chat and clear chat", async ({ page }) => {
 		await enterMessageToChat(page, CHAT_ITEMS[0]);
-	});
 
-	// clear chat
-	test("should clear chat", async ({ page }) => {
 		const clearChat = page.getByTestId("clear-chat");
 		await clearChat.click();
+		// Verify the chat is cleared
+		const chatMessageContent = await page.$eval(
+			"[data-testid='chat-message']",
+			(message) => message?.textContent?.trim() || "",
+		);
+		expect(chatMessageContent).toBe("");
 	});
 });
 
 test.describe("Upload file and create new Chat", () => {
 	// upload file
 	test("should upload a file", async ({ page }) => {
+		const openUpload = page.getByTestId("open-upload");
+		await openUpload.click();
 		await uploadFile(page, FILE_PATH);
 	});
 
 	// paste link
 	test("should paste link", async ({ page }) => {
+		const openUpload = page.getByTestId("open-upload");
+		await openUpload.click();
 		await pasteLink(page, UPLOAD_LINK[0]);
 	});
 
