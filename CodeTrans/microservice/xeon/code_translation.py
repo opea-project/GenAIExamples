@@ -13,9 +13,10 @@
 # limitations under the License.
 
 
-from comps import MicroService, ServiceOrchestrator, ChatQnAGateway
 import asyncio
 import os
+
+from comps import ChatQnAGateway, MicroService, ServiceOrchestrator
 
 SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 
@@ -26,7 +27,9 @@ class MyServiceOrchestrator:
         self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
-        llm = MicroService(name="llm", host=SERVICE_HOST_IP, port=9000, endpoint="/v1/chat/completions", use_remote_service=True)
+        llm = MicroService(
+            name="llm", host=SERVICE_HOST_IP, port=9000, endpoint="/v1/chat/completions", use_remote_service=True
+        )
         self.megaservice.add(llm)
         self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
