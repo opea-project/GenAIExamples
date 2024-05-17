@@ -4,16 +4,16 @@ This document outlines the deployment process for a CodeTrans application utiliz
 
 ## 🚀 Build Docker Images
 
-First of all, you need to build Docker Images locally and install the python package of it.
+First of all, you need to build Docker Images locally and install the python package of it. This step can be ignored after the Docker images published to Docker hub.
+
+### 1. Source Code install GenAIComps
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-pip install -r requirements.txt
-pip install .
 ```
 
-Build the LLM Docker Image with the following command.
+### 2. Build the LLM Docker Image with the following command
 
 ```bash
 docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
@@ -22,6 +22,19 @@ docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --no-cache --build-arg ht
 Then run the command `docker images`, you will have the following Docker Image:
 
 - `opea/gen-ai-comps:llm-tgi-server`
+
+### 3. Build MegaService Docker Image
+
+```bash
+docker build -t opea/gen-ai-comps:codetrans-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+### 4. Build UI Docker Image
+
+```bash
+cd ../../ui
+docker build -t opea/gen-ai-comps:codetrans-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
 
 ## 🚀 Start Microservices
 
@@ -35,6 +48,8 @@ export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="HuggingFaceH4/mistral-7b-grok"
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/codetrans"
 ```
 
 ### Start Microservice Docker Containers
