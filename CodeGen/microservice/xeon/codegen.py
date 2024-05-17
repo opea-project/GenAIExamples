@@ -38,8 +38,9 @@ class ChatQnAService:
         self.gateway = CodeGenGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
     async def schedule(self):
-        await self.megaservice.schedule(initial_inputs=
-                         {"text": "Write a function that checks if a year is a leap year in Python."})
+        await self.megaservice.schedule(
+            initial_inputs={"text": "Write a function that checks if a year is a leap year in Python."}
+        )
         result_dict = self.megaservice.result_dict
         print(result_dict)
 

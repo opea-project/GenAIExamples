@@ -111,7 +111,6 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 ![project-screenshot](https://imgur.com/d1SmaRb.png)
 
-
 ## Install Copilot VSCode extension from Plugin Marketplace as the frontend
 
 In addition to the Svelte UI, users can also install the Copilot VSCode extension from the Plugin Marketplace as the frontend.
