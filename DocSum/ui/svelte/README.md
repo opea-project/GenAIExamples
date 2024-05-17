@@ -1,19 +1,21 @@
-<h1 align="center" id="title">Doc Summary</h1>
+<h1 align="center" id="title"> ChatQnA Customized UI</h1>
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/oRuDrGX.png)
-![project-screenshot](https://imgur.com/j6vo4gl.png)
-![project-screenshot](https://imgur.com/LPBvBmM.png)
-![project-screenshot](https://imgur.com/yHryOQS.png)
+![project-screenshot](https://i.imgur.com/26zMnEr.png)
+![project-screenshot](https://i.imgur.com/fZbOiTk.png)
+![project-screenshot](https://i.imgur.com/FnY3MuU.png)
 
 <h2>🧐 Features</h2>
 
 Here're some of the project's features:
 
-- Summarizing Uploaded Files: Upload files from their local device, then click 'Generate Summary' to summarize the content of the uploaded file. The summary will be displayed on the 'Summary' box.
-- Summarizing Text via Pasting: Paste the text to be summarized into the text box, then click 'Generate Summary' to produce a condensed summary of the content, which will be displayed in the 'Summary' box on the right.
-- Scroll to Bottom: The summarized content will automatically scroll to the bottom.
+- Start a Text Chat：Initiate a text chat with the ability to input written conversations, where the dialogue content can also be customized based on uploaded files.
+- Upload File: The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
+- Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
+- Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
+- Scroll to Bottom / Top: The chat automatically slides to the bottom. Users can also click the top icon to slide to the top of the chat record.
+- End to End Time: Shows the time spent on the current conversation.
 
 <h2>🛠️ Get it Running:</h2>
 
@@ -23,7 +25,7 @@ Here're some of the project's features:
 
 3. Modify the required .env variables.
    ```
-   BASIC_URL = ''
+   DOC_BASE_URL = ''
    ```
 4. Execute `npm install` to install the corresponding dependencies.
 

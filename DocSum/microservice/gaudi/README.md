@@ -6,32 +6,52 @@ This document outlines the deployment process for a Document Summarization appli
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-### 1. Source Code install GenAIComps
-
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-python setup.py install
 ```
 
-### 2. Build TGI Gaudi Image
+### 1. Pull TGI Gaudi Image
+
+As TGI Gaudi has been officially published as a Docker image, we simply need to pull it.
 
 ```bash
-docker build . -t tgi-gaudi:1.2.1 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy 
+docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 ```
 
-### 3. Build LLM Image
+### 2. Build LLM Image
 
 ```bash
-docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:llm-docsum-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following four Docker Images:
+### 3. Build MegaService Docker Image
+
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `docsum.py` Python script. Build the MegaService Docker image using the command below:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/DocSum/microservice/gaudi/
+docker build -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+### 4. Build UI Docker Image
+
+Construct the frontend Docker image using the command below:
+
+```bash
+cd GenAIExamples/DocSum/ui/
+docker build -t opea/gen-ai-comps:docsum-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following Docker Images:
 
 1. `tgi-gaudi:1.2.1`
 2. `opea/gen-ai-comps:llm-tgi-server`
+3. `opea/gen-ai-comps:docsum-megaservice-server`
+4. `opea/gen-ai-comps:docsum-ui-server`
 
-## 🚀 Start Microservices
+## 🚀 Start Microservices and MegaService
 
 ### Setup Environment Variables
 
@@ -43,7 +63,11 @@ export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 ```
+
+Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start Microservice Docker Containers
 
@@ -65,20 +89,23 @@ curl http://${your_ip}:8008/generate \
 2. LLM Microservice
 
 ```bash
-curl http://${your_ip}:9000/v1/chat/completions \
+curl http://${your_ip}:9000/v1/chat/docsum \
   -X POST \
   -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
-
-## 🚀 Construct Mega Service
-
-Modify the `initial_inputs` of line 28 in `docsum.py`, then you will get the Document Summarization result of this mega service.
-
-All of the intermediate results will be printed for each microservice. Users can check the accuracy of the results to make targeted modifications.
+3. MegaService
 
 ```bash
-python docsum.py
+curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
+     "model": "Intel/neural-chat-7b-v3-3",
+     "messages": "What is the revenue of Nike in 2023?"
+     }'
 ```
+
+## 🚀 Launch the UI
+
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+
+![project-screenshot](https://i.imgur.com/26zMnEr.png)

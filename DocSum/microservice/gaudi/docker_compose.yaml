@@ -29,8 +29,10 @@ services:
       - "./data:/data"
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/gen-ai-comps:llm-tgi-gaudi-server
-    container_name: llm-tgi-gaudi-server
+    image: opea/gen-ai-comps:llm-docsum-gaudi-server
+    container_name: llm-docsum-gaudi-server
+    depends_on:
+      - tgi_service
     ports:
       - "9000:9000"
     ipc: host
@@ -40,6 +42,33 @@ services:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
+  docsum-gaudi-backend-server:
+    image: opea/gen-ai-comps:docsum-megaservice-server
+    container_name: docsum-gaudi-backend-server
+    depends_on:
+      - tgi_service
+      - llm
+    ports:
+      - "8888:8888"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  docsum-gaudi-ui-server:
+    image: opea/gen-ai-comps:docsum-ui-server
+    container_name: docsum-gaudi-ui-server
+    depends_on:
+      - docsum-gaudi-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
 
 networks:
   default:

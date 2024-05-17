@@ -12,28 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
+import os
 
-from comps import MicroService, ServiceOrchestrator
+from comps import MicroService, ServiceOrchestrator, ServiceType
 
+SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 
-class MyServiceOrchestrator:
+class DocSumService:
     def __init__(self, port=8000):
-        self.service_builder = ServiceOrchestrator(port=port)
+        self.port = port
+        self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
-        llm = MicroService(name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/chat/docsum")
-        self.service_builder.add(llm)
+        llm = MicroService(
+            name="llm", 
+            host=SERVICE_HOST_IP,
+            port=9000, 
+            endpoint="/v1/chat/docsum",
+            use_remote_service=True,
+            service_type=ServiceType.LLM,
+            )
+        self.megaservice.add(llm)
 
     def schedule(self):
-        self.service_builder.schedule(
+        self.megaservice.schedule(
             initial_inputs={"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}
         )
-        self.service_builder.get_all_final_outputs()
-        result_dict = self.service_builder.result_dict
+        result_dict = self.megaservice.result_dict
         print(result_dict)
 
 
 if __name__ == "__main__":
-    service_ochestrator = MyServiceOrchestrator(port=9001)
-    service_ochestrator.add_remote_service()
-    service_ochestrator.schedule()
+    docsum = DocSumService(port=9001)
+    docsum.add_remote_service()
+    asyncio.run(docsum.schedule())

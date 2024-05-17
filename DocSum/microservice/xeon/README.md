@@ -17,21 +17,42 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-pip install -r requirements.txt
-pip install .
 ```
 
 ### 1. Build LLM Image
 
 ```bash
-docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:llm-docsum-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:
 
-1. `opea/gen-ai-comps:llm-tgi-server`
+### 2. Build MegaService Docker Image
 
-## 🚀 Start Microservices
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `docsum.py` Python script. Build MegaService Docker image via below command:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/DocSum/microservice/xeon/
+docker build -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+### 3. Build UI Docker Image
+
+Build frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/ui/
+docker build -t opea/gen-ai-comps:docsum-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+1. `opea/gen-ai-comps:llm-docsum-server`
+2. `opea/gen-ai-comps:docsum-megaservice-server`
+3. `opea/gen-ai-comps:docsum-ui-server`
+
+## 🚀 Start Microservices and MegaService
 
 ### Setup Environment Variables
 
@@ -43,7 +64,11 @@ export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 ```
+
+Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start Microservice Docker Containers
 
@@ -65,20 +90,25 @@ curl http://${your_ip}:8008/generate \
 2. LLM Microservice
 
 ```bash
-curl http://${your_ip}:9000/v1/chat/completions \
+curl http://${your_ip}:9000/v1/chat/docsum \
   -X POST \
   -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
-
-## 🚀 Construct Mega Service
-
-Modify the `initial_inputs` of line 28 in `docsum.py`, then you will get the Document Summarization result of this mega service.
-
-All of the intermediate results will be printed for each microservices. Users can check the accuracy of the results to make targeted modifications.
+3. MegaService
 
 ```bash
-python docsum.py
+curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
+     "model": "Intel/neural-chat-7b-v3-3",
+     "messages": "What is the revenue of Nike in 2023?"
+     }'
 ```
+
+Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
+
+## 🚀 Launch the UI
+
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+
+![project-screenshot](https://i.imgur.com/26zMnEr.png)
