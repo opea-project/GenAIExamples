@@ -61,6 +61,9 @@ class Gateway:
             str(MegaServiceEndpoint.LIST_PARAMETERS), self.list_parameter, methods=["GET"]
         )
 
+    def add_route(self, endpoint, handler, methods=["POST"]):
+        self.service.app.router.add_api_route(endpoint, handler, methods=methods)
+
     def stop(self):
         self.service.stop()
 
@@ -68,10 +71,13 @@ class Gateway:
         raise NotImplementedError("Subclasses must implement this method")
 
     def list_service(self):
-        raise NotImplementedError("Subclasses must implement this method")
+        response = {}
+        for node in self.all_leaves():
+            response = {self.services[node].description: self.services[node].endpoint_path}
+        return response
 
     def list_parameter(self):
-        raise NotImplementedError("Subclasses must implement this method")
+        pass
 
 
 class ChatQnAGateway(Gateway):
@@ -111,11 +117,78 @@ class ChatQnAGateway(Gateway):
         )
         return ChatCompletionResponse(model="chatqna", choices=choices, usage=usage)
 
-    def list_service(self):
-        response = {}
-        for node in self.all_leaves():
-            response = {self.services[node].description: self.services[node].endpoint_path}
-        return response
 
-    def list_parameter(self):
-        pass
+class CodeGenGateway(Gateway):
+    def __init__(self, megaservice, host="0.0.0.0", port=8888):
+        super().__init__(
+            megaservice, host, port, str(MegaServiceEndpoint.CODE_GEN), ChatCompletionRequest, ChatCompletionResponse
+        )
+
+    async def handle_request(self, request: Request):
+        data = await request.json()
+        chat_request = ChatCompletionRequest.parse_obj(data)
+        if isinstance(chat_request.messages, str):
+            prompt = chat_request.messages
+        else:
+            for message in chat_request.messages:
+                text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
+                prompt = "\n".join(text_list)
+        await self.megaservice.schedule(initial_inputs={"text": prompt})
+        for node, response in self.megaservice.result_dict.items():
+            # Here it suppose the last microservice in the megaservice is LLM.
+            if (
+                isinstance(response, StreamingResponse)
+                and node == list(self.megaservice.services.keys())[-1]
+                and self.megaservice.services[node].service_type == ServiceType.LLM
+            ):
+                return response
+        last_node = self.megaservice.all_leaves()[-1]
+        response = self.megaservice.result_dict[last_node]["text"]
+        choices = []
+        usage = UsageInfo()
+        choices.append(
+            ChatCompletionResponseChoice(
+                index=0,
+                message=ChatMessage(role="assistant", content=response),
+                finish_reason="stop",
+            )
+        )
+        return ChatCompletionResponse(model="codegen", choices=choices, usage=usage)
+
+
+class CodeTransGateway(Gateway):
+    def __init__(self, megaservice, host="0.0.0.0", port=8888):
+        super().__init__(
+            megaservice, host, port, str(MegaServiceEndpoint.CODE_TRANS), ChatCompletionRequest, ChatCompletionResponse
+        )
+
+    async def handle_request(self, request: Request):
+        data = await request.json()
+        chat_request = ChatCompletionRequest.parse_obj(data)
+        if isinstance(chat_request.messages, str):
+            prompt = chat_request.messages
+        else:
+            for message in chat_request.messages:
+                text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
+                prompt = "\n".join(text_list)
+        await self.megaservice.schedule(initial_inputs={"text": prompt})
+        for node, response in self.megaservice.result_dict.items():
+            # Here it suppose the last microservice in the megaservice is LLM.
+            if (
+                isinstance(response, StreamingResponse)
+                and node == list(self.megaservice.services.keys())[-1]
+                and self.megaservice.services[node].service_type == ServiceType.LLM
+            ):
+                return response
+        last_node = self.megaservice.all_leaves()[-1]
+        response = self.megaservice.result_dict[last_node]["text"]
+        choices = []
+        usage = UsageInfo()
+        choices.append(
+            ChatCompletionResponseChoice(
+                index=0,
+                message=ChatMessage(role="assistant", content=response),
+                finish_reason="stop",
+            )
+        )
+        return ChatCompletionResponse(model="codetrans", choices=choices, usage=usage)
