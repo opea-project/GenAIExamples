@@ -50,15 +50,16 @@ jobs:
               if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
           done
 
-      - name: Publish pipeline artifact
+      - name: Publish backend test artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           path: ${{ github.workspace }}/ChatQnA/tests/*.log
+          name: ChatQnA_Gaudi_backend_test_report
 
-      - name: Publish E2E test artifact
+      - name: Publish frontend test artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           path: ${{ github.workspace }}/ChatQnA/ui/svelte/playwright-report
-          name: ChatQnA_Gaudi_E2E_test_report
+          name: ChatQnA_Gaudi_frontend_test_report
