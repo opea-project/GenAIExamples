@@ -21,30 +21,11 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
-  qna-rag-redis-server:
-    image: intel/gen-ai-examples:qna-rag-redis-server
-    container_name: qna-rag-redis-server
-    environment:
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      REDIS_PORT: 6379
-      EMBED_MODEL: BAAI/bge-base-en-v1.5
-      REDIS_SCHEMA: schema_dim_768.yml
-      VECTOR_DATABASE: REDIS
-    ulimits:
-      memlock:
-        soft: -1 # Set memlock to unlimited (no soft or hard limit)
-        hard: -1
-    volumes:
-      - ../redis:/ws
-      - ../test:/test
-    network_mode: "host"
   tei_embedding_service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-    container_name: tei_embedding_server
+    container_name: tei-embedding-server
     ports:
-      - "8090:80"
+      - "6006:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -55,11 +36,14 @@ services:
   embedding:
     image: opea/gen-ai-comps:embedding-tei-server
     container_name: embedding-tei-server
+    depends_on:
+      - tei_embedding_service
     ports:
       - "6000:6000"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
+
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
@@ -74,10 +58,11 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   tei_xeon_service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-    container_name: tei_xeon_server
+    container_name: tei-xeon-server
     ports:
       - "8808:80"
     volumes:
@@ -90,6 +75,8 @@ services:
   reranking:
     image: opea/gen-ai-comps:reranking-tei-xeon-server
     container_name: reranking-tei-xeon-server
+    depends_on:
+      - tei_xeon_service
     ports:
       - "8000:8000"
     ipc: host
@@ -101,9 +88,9 @@ services:
     restart: unless-stopped
   tgi_service:
     image: ghcr.io/huggingface/text-generation-inference:1.4
-    container_name: tgi_service
+    container_name: tgi-service
     ports:
-      - "8008:80"
+      - "9009:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -114,6 +101,8 @@ services:
   llm:
     image: opea/gen-ai-comps:llm-tgi-server
     container_name: llm-tgi-server
+    depends_on:
+      - tgi_service
     ports:
       - "9000:9000"
     ipc: host
@@ -123,6 +112,39 @@ services:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
+  chaqna-xeon-backend-server:
+    image: opea/gen-ai-comps:chatqna-megaservice-server
+    container_name: chatqna-xeon-backend-server
+    depends_on:
+      - redis-vector-db
+      - tei_embedding_service
+      - embedding
+      - retriever
+      - tei_xeon_service
+      - reranking
+      - tgi_service
+      - llm
+    ports:
+      - "8888:8888"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  chaqna-xeon-ui-server:
+    image: opea/gen-ai-comps:chatqna-ui-server
+    container_name: chatqna-xeon-ui-server
+    depends_on:
+      - chaqna-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
 
 networks:
   default:

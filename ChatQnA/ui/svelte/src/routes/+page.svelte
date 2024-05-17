@@ -73,7 +73,7 @@
 		);
 	}
 
-	const callTextStream = async (query: string) => {
+	const callTextStream = async (query: string, startSendTime: number) => {
 		const eventSource = await fetchTextStream(query, knowledge_1);
 
 		eventSource.addEventListener("message", (e: any) => {
@@ -108,7 +108,7 @@
 							role: MessageRole.Assistant,
 							type: MessageType.Text,
 							content: currentMsg,
-							time: getCurrentTimeStamp(),
+							time: startSendTime,
 						},
 					];
 					console.log("? chatMessages", chatMessages);
@@ -138,7 +138,7 @@
 		storeMessages();
 		query = "";
 
-		await callTextStream(newMessage.content);
+		await callTextStream(newMessage.content, getCurrentTimeStamp());
 
 		scrollToBottom(scrollToDiv);
 		storeMessages();
@@ -177,6 +177,7 @@
 						class="text-md block w-full border-0 border-b-2 border-gray-300 px-1 py-4
 						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
 						type="text"
+						data-testid="chat-input"
 						placeholder="Enter prompt here"
 						disabled={loading}
 						maxlength="1200"
@@ -195,6 +196,7 @@
 							}
 						}}
 						type="submit"
+						id="send"
 						class="absolute bottom-2.5 end-2.5 px-4 py-2 text-sm font-medium text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 						><PaperAirplane /></button
 					>
@@ -209,6 +211,7 @@
 					<button
 						class="bg-primary text-primary-foreground hover:bg-primary/90 group flex items-center justify-center space-x-2 p-2"
 						type="button"
+						data-testid='clear-chat'
 						on:click={() => handelClearHistory()}
 						><svg
 							xmlns="http://www.w3.org/2000/svg"

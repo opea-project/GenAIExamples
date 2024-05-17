@@ -67,7 +67,7 @@ curl http://${your_ip}:8008/generate \
 ```bash
 curl http://${your_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"text":"What is Deep Learning?"}' \
+  -d '{"query":"What is Deep Learning?"}' \
   -H 'Content-Type: application/json'
 ```
 
