@@ -27,7 +27,7 @@ tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 
 @register_microservice(
     name="opea_service@prepare_doc_qdrant",
-    expose_endpoint="/v1/dataprep",
+    endpoint="/v1/dataprep",
     host="0.0.0.0",
     port=6000,
     input_datatype=DocPath,

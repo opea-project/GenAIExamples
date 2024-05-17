@@ -33,3 +33,7 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_ENDPOINT}
     restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

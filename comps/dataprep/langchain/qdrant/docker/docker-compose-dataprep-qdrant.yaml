@@ -20,3 +20,20 @@ services:
     ports:
       - "6333:6333"
       - "6334:6334"
+  dataprep-qdrant:
+    image: opea/gen-ai-comps:dataprep-qdrant-xeon-server
+    container_name: dataprep-qdrant-server
+    ports:
+      - "6000:6000"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      QDRANT: ${QDRANT}
+      QDRANT_PORT: ${QDRANT_PORT}
+      COLLECTION_NAME: ${COLLECTION_NAME}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

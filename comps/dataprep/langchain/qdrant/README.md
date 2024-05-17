@@ -10,6 +10,16 @@ pip install -r requirements.txt
 
 Please refer to this [readme](../../../vectorstores/langchain/qdrant/README.md).
 
+## Setup Environment Variables
+
+```bash
+export http_proxy=${your_http_proxy}
+export https_proxy=${your_http_proxy}
+export QDRANT=${host_ip}
+export QDRANT_PORT=6333
+export COLLECTION_NAME=${your_collection_name}
+```
+
 ## Start document preparation microservice for Qdrant with Python Script
 
 Start document preparation microservice for Qdrant with below command.
@@ -23,20 +33,30 @@ python prepare_doc_qdrant.py
 ## Build Docker Image
 
 ```bash
-cd ../../
+cd ../../../../
 docker build -t opea/gen-ai-comps:dataprep-qdrant-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/langchain/qdrant/docker/Dockerfile .
 ```
 
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="dataprep-qdrant-server" -p 8000:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/gen-ai-comps:dataprep-qdrant-xeon-server
+docker run -d --name="dataprep-qdrant-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/gen-ai-comps:dataprep-qdrant-xeon-server
+```
+
+## Setup Environment Variables
+
+```bash
+export http_proxy=${your_http_proxy}
+export https_proxy=${your_http_proxy}
+export QDRANT=${host_ip}
+export QDRANT_PORT=6333
+export COLLECTION_NAME=${your_collection_name}
 ```
 
 ## Run Docker with Docker Compose
 
 ```bash
-cd docker
+cd comps/dataprep/langchain/qdrant/docker
 docker compose -f docker-compose-dataprep-qdrant.yaml up -d
 ```
 
