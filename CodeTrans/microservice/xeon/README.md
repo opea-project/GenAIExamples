@@ -13,6 +13,7 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it. This step can be ignored after the Docker images published to Docker hub.
+
 ### 1. Source Code install GenAIComps
 
 ```bash
