@@ -100,7 +100,6 @@
 				storeMessages();
 			} else {
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-					console.log("?", getCurrentTimeStamp());
 
 					chatMessages = [
 						...chatMessages,
@@ -229,7 +228,8 @@
 		{/if}
 		<!-- clear -->
 
-		<div class="mx-auto flex h-full w-full flex-col">
+		<div class="mx-auto flex h-full w-full flex-col" data-testid='chat-message'
+		>
 			<Scrollbar
 				classLayout="flex flex-col gap-1 mr-4"
 				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 mr-5"
