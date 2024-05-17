@@ -43,6 +43,8 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
 
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
+
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
     docker compose -f docker_compose.yaml up -d
@@ -56,13 +58,13 @@ function validate_microservices() {
     curl ${ip_address}:6006/embed \
         -X POST \
         -d '{"inputs":"What is Deep Learning?"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/embed.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/embed.log
     sleep 5s
 
     curl http://${ip_address}:6000/v1/embeddings \
         -X POST \
         -d '{"text":"hello"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/embeddings.log
     sleep 10s
 
     export PATH="${HOME}/miniconda3/bin:$PATH"
@@ -71,31 +73,30 @@ function validate_microservices() {
     curl http://${ip_address}:7000/v1/retrieval \
         -X POST \
         -d '{"text":"What is the revenue of Nike in 2023?","embedding":${test_embedding}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/retrieval.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/retrieval.log
     sleep 5s
 
     curl http://${ip_address}:8808/rerank \
         -X POST \
         -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/rerank.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/rerank.log
     sleep 10s
 
-    curl http://${ip_address}:8000/v1/reranking\
-        -X POST \
+    curl http://${ip_address}:8000/v1/reranking -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/reranking.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/reranking.log
     sleep 30s
 
     curl http://${ip_address}:9009/generate \
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/generate.log
     sleep 5s
 
     curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
         -d '{"text":"What is Deep Learning?"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/completions.log
     sleep 5s
 }
 
@@ -103,12 +104,12 @@ function validate_megaservice() {
     # Curl the Mega Service
     curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
         "model": "Intel/neural-chat-7b-v3-3",
-        "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
+        "messages": "What is the revenue of Nike in 2023?"}' >${LOG_PATH}/curl_megaservice.log
 
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
-    if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
+    if [[ -f $LOG_PATH/curl_megaservice.log ]] &&
+        [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
         status=true
     fi
 
