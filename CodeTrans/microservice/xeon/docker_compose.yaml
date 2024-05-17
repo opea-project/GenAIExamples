@@ -46,7 +46,7 @@ services:
       - tgi_service
       - llm
     ports:
-      - "8888:8888"
+      - "7777:7777"
     environment:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
@@ -63,7 +63,7 @@ services:
     environment:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 networks:

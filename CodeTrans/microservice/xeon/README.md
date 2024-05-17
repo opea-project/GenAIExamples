@@ -53,10 +53,10 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="HuggingFaceH4/mistral-7b-grok"
-export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
+export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/codetrans"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7777/v1/codetrans"
 ```
 
 ### Start Microservice Docker Containers
@@ -70,7 +70,7 @@ docker compose -f docker_compose.yaml up -d
 1. TGI Service
 
 ```bash
-curl http://${your_ip}:8008/generate \
+curl http://${host_ip}:8008/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
@@ -79,20 +79,17 @@ curl http://${your_ip}:8008/generate \
 2. LLM Microservice
 
 ```bash
-curl http://${your_ip}:9000/v1/chat/completions\
+curl http://${host_ip}:9000/v1/chat/completions\
   -X POST \
   -d '{"query":"What is Deep Learning?"}' \
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
-
-## 🚀 Construct Mega Service
-
-Modify the `initial_inputs` of line 28 in `code_translation.py`, then you will get the code translation result of this mega service.
-
-All of the intermediate results will be printed for each microservices. Users can check the accuracy of the results to make targeted modifications.
+3. MegaService
 
 ```bash
-python code_translation.py
+curl http://${host_ip}:7777/v1/codetrans -H "Content-Type: application/json" -d '{
+     "model": "Intel/neural-chat-7b-v3-3",
+     "messages": "What is the revenue of Nike in 2023?"
+     }'
 ```
