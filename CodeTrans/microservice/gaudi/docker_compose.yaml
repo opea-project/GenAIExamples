@@ -45,6 +45,33 @@ services:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
+  codetrans-gaudi-backend-server:
+    image: opea/gen-ai-comps:codetrans-megaservice-server
+    container_name: codetrans-gaudi-backend-server
+    depends_on:
+      - tgi_service
+      - llm
+    ports:
+      - "8888:8888"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  codetrans-gaudi-ui-server:
+    image: opea/gen-ai-comps:codetrans-ui-server
+    container_name: codetrans-gaudi-ui-server
+    depends_on:
+      - codetrans-gaudi-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
 
 networks:
   default:

@@ -13,20 +13,25 @@
 # limitations under the License.
 
 
-from comps import RemoteMicroService, ServiceOrchestrator
+from comps import MicroService, ServiceOrchestrator, ChatQnAGateway
+import asyncio
+import os
+
+SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 
 
 class MyServiceOrchestrator:
     def __init__(self, port=8000):
-        self.service_builder = ServiceOrchestrator(port=port)
+        self.port = port
+        self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
-        llm = RemoteMicroService(name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/chat/completions")
-        self.service_builder.add(llm)
+        llm = MicroService(name="llm", host=SERVICE_HOST_IP, port=9000, endpoint="/v1/chat/completions", use_remote_service=True)
+        self.megaservice.add(llm)
+        self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
-    def schedule(self):
-        print("xxxxxx")
-        self.service_builder.schedule(
+    async def schedule(self):
+        await self.megaservice.schedule(
             initial_inputs={
                 "query": """
     ### System: Please translate the following Golang codes into  Python codes.
@@ -42,14 +47,11 @@ class MyServiceOrchestrator:
 """
             }
         )
-        print("yyyyyy")
-        self.service_builder.get_all_final_outputs()
-        breakpoint()
-        result_dict = self.service_builder.result_dict
+        result_dict = self.megaservice.result_dict
         print(result_dict)
 
 
 if __name__ == "__main__":
     service_ochestrator = MyServiceOrchestrator(port=9007)
     service_ochestrator.add_remote_service()
-    service_ochestrator.schedule()
+    asyncio.run(service_ochestrator.schedule())
