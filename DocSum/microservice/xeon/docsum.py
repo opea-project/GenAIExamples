@@ -15,7 +15,7 @@
 import asyncio
 import os
 
-from comps import MicroService, ServiceOrchestrator, ServiceType
+from comps import MicroService, ServiceOrchestrator, ServiceType, DocSumGateway
 
 SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 
@@ -34,9 +34,10 @@ class DocSumService:
             service_type=ServiceType.LLM,
             )
         self.megaservice.add(llm)
+        self.gateway = DocSumGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
-    def schedule(self):
-        self.megaservice.schedule(
+    async def schedule(self):
+        await self.megaservice.schedule(
             initial_inputs={"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}
         )
         result_dict = self.megaservice.result_dict
