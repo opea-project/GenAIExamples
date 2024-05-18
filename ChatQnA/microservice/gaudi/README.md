@@ -16,70 +16,60 @@ cd GenAIComps
 ### 2. Build Embedding Image
 
 ```bash
-docker build -t opea/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
 ```
 
 ### 3. Build Retriever Image
 
 ```bash
-docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
 ```
 
 ### 4. Build Rerank Image
 
 ```bash
-docker build -t opea/gen-ai-comps:reranking-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/gen-ai-comps:reranking-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
 ```
 
 ### 5. Build LLM Image
 
 ```bash
-docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
-### 6. Build TEI Gaudi Image
+### 6. Build Dataprep Image
+
+```bash
+docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/langchain/redis/docker/Dockerfile .
+```
+
+### 7. Build TEI Gaudi Image
 
 Since a TEI Gaudi Docker image hasn't been published, we'll need to build it from the [tei-guadi](https://github.com/huggingface/tei-gaudi) repository.
 
 ```bash
 git clone https://github.com/huggingface/tei-gaudi
 cd tei-gaudi/
-docker build -f Dockerfile-hpu -t opea/tei-gaudi .
+docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi .
 ```
 
-### 7. Pull TGI Gaudi Image
-
-As TGI Gaudi has been officially published as a Docker image, we simply need to pull it.
-
-```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
-```
-
-### 8. Pull TEI Xeon Image
-
-Since TEI Gaudi doesn't support reranking models, we'll deploy TEI CPU serving instead. TEI CPU has been officially released as a Docker image, so we can easily pull it.
-
-```bash
-docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-```
-
-### 9. Build MegaService Docker Image
+### 8. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
 cd GenAIExamples/ChatQnA/microservice/gaudi/
-docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
-### 10. Build UI Docker Image
+### 9. Build UI Docker Image
 
 Construct the frontend Docker image using the command below:
 
 ```bash
 cd GenAIExamples/ChatQnA/ui/
-docker build -t opea/gen-ai-comps:chatqna-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+docker build --no-cache -t opea/gen-ai-comps:chatqna-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 7 Docker Images:
@@ -89,10 +79,9 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 3. `opea/gen-ai-comps:reranking-tei-server`
 4. `opea/gen-ai-comps:llm-tgi-gaudi-server`
 5. `opea/tei-gaudi`
-6. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
-7. `ghcr.io/huggingface/text-embeddings-inference:cpu-1.2`
-8. `opea/gen-ai-comps:chatqna-megaservice-server`
-9. `opea/gen-ai-comps:chatqna-ui-server`
+6. `opea/gen-ai-comps:dataprep-redis-xeon-server`
+7. `opea/gen-ai-comps:chatqna-megaservice-server`
+8. `opea/gen-ai-comps:chatqna-ui-server`
 
 ## 🚀 Start MicroServices and MegaService
 
