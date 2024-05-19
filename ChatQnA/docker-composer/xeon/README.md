@@ -132,17 +132,20 @@ Then run the command `docker images`, you will have the following four Docker Im
 Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
+
 > Change the External_Public_IP below with the actual IPV4 value
+
 ```
 export host_ip="External_Public_IP"
 ```
 
 **Export the value of your Huggingface API token to the `your_hf_api_token` environment variable**
+
 > Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
+
 ```
 export your_hf_api_token="Your_Huggingface_API_Token"
 ```
-
 
 ```bash
 export http_proxy=${your_http_proxy}
@@ -167,7 +170,8 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start all the services Docker Containers
-> Before running the docker compose command, you need to be in the correct folder that has the docker_compose.yaml file
+
+> Before running the docker compose command, you need to be in the `/home/ubuntu/GenAIComps/GenAIExamples/ChatQnA/microservice/xeon` folder
 
 
 ```bash
