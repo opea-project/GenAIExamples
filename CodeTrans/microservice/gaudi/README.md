@@ -82,7 +82,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
 
 ```bash
 curl http://${host_ip}:7777/v1/codetrans -H "Content-Type: application/json" -d '{
-     "model": "Intel/neural-chat-7b-v3-3",
-     "messages": "What is the revenue of Nike in 2023?"
+     "model": "HuggingFaceH4/mistral-7b-grok",
+     "messages": "    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"
      }'
 ```
