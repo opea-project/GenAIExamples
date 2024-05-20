@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -50,12 +50,24 @@ function validate_microservices() {
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs tgi-gaudi-server >> ${LOG_PATH}/generate.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:9000/v1/chat/docsum \
         -X POST \
         -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs docsum-gaudi-backend-server >> ${LOG_PATH}/completions.log
+        exit 1
+    fi
     sleep 5s
 }
 
