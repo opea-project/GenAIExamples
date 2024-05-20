@@ -38,7 +38,7 @@ function start_services() {
     # TODO: Replace the container name with a test-specific name
     docker compose -f docker_compose.yaml up -d
 
-    sleep 1m # Waits 1 minutes
+    sleep 2m # Waits 2 minutes
 }
 
 function validate_microservices() {
