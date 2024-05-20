@@ -16,7 +16,7 @@
 import asyncio
 import os
 
-from comps import ChatQnAGateway, MicroService, ServiceOrchestrator
+from comps import CodeTransGateway, MicroService, ServiceOrchestrator
 
 SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 
@@ -31,7 +31,7 @@ class MyServiceOrchestrator:
             name="llm", host=SERVICE_HOST_IP, port=9000, endpoint="/v1/chat/completions", use_remote_service=True
         )
         self.megaservice.add(llm)
-        self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+        self.gateway = CodeTransGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
     async def schedule(self):
         await self.megaservice.schedule(
