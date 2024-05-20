@@ -14,7 +14,6 @@
 
 from fastapi import Request
 from fastapi.responses import StreamingResponse
-from langchain.prompts import PromptTemplate
 
 from ..proto.api_protocol import (
     ChatCompletionRequest,
@@ -168,7 +167,7 @@ class CodeTransGateway(Gateway):
         language_from = data["language_from"]
         language_to = data["language_to"]
         source_code = data["source_code"]
-        template = """
+        prompt_template = """
             ### System: Please translate the following {language_from} codes into {language_to} codes.
 
             ### Original codes:
@@ -180,7 +179,6 @@ class CodeTransGateway(Gateway):
 
             ### Translated codes:
         """
-        prompt_template = PromptTemplate.from_template(template)
         prompt = prompt_template.format(language_from=language_from, language_to=language_to, source_code=source_code)
         await self.megaservice.schedule(initial_inputs={"query": prompt})
         for node, response in self.megaservice.result_dict.items():
