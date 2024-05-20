@@ -27,7 +27,7 @@ services:
     depends_on:
       - redis-vector-db
     ports:
-      - "5000:5000"
+      - "6007:6007"
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
@@ -100,7 +100,7 @@ services:
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
-  tgi_service:
+  tgi-service:
     image: ghcr.io/huggingface/tgi-gaudi:1.2.1
     container_name: tgi-gaudi-server
     ports:
@@ -118,7 +118,7 @@ services:
     image: opea/gen-ai-comps:llm-tgi-gaudi-server
     container_name: llm-tgi-gaudi-server
     depends_on:
-      - tgi_service
+      - tgi-service
     ports:
       - "9000:9000"
     ipc: host

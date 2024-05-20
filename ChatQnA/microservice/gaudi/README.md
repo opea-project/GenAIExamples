@@ -40,7 +40,7 @@ docker build --no-cache -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg ht
 ### 6. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/langchain/redis/docker/Dockerfile .
+docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
 ```
 
 ### 7. Build TEI Gaudi Image
@@ -197,6 +197,28 @@ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
      "messages": "What is the revenue of Nike in 2023?"
      }'
 ```
+
+9. Dataprep Microservice（Optional）
+
+If you want to update the default knowledge base, you can use the following commands:
+
+Update Knowledge Base via Local File Upload:
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
+```
+This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+
+
+Add Knowledge Base via HTTP Links:
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
+This command updates a knowledge base by submitting a list of HTTP links for processing.
+
 
 ## 🚀 Launch the UI
 
