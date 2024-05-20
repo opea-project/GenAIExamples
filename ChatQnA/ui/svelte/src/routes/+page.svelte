@@ -73,7 +73,7 @@
 		);
 	}
 
-	const callTextStream = async (query: string) => {
+	const callTextStream = async (query: string, startSendTime: number) => {
 		const eventSource = await fetchTextStream(query, knowledge_1);
 
 		eventSource.addEventListener("message", (e: any) => {
@@ -100,7 +100,6 @@
 				storeMessages();
 			} else {
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-					console.log("?", getCurrentTimeStamp());
 
 					chatMessages = [
 						...chatMessages,
@@ -108,7 +107,7 @@
 							role: MessageRole.Assistant,
 							type: MessageType.Text,
 							content: currentMsg,
-							time: getCurrentTimeStamp(),
+							time: startSendTime,
 						},
 					];
 					console.log("? chatMessages", chatMessages);
@@ -138,7 +137,7 @@
 		storeMessages();
 		query = "";
 
-		await callTextStream(newMessage.content);
+		await callTextStream(newMessage.content, getCurrentTimeStamp());
 
 		scrollToBottom(scrollToDiv);
 		storeMessages();
@@ -229,7 +228,8 @@
 		{/if}
 		<!-- clear -->
 
-		<div class="mx-auto flex h-full w-full flex-col">
+		<div class="mx-auto flex h-full w-full flex-col" data-testid='chat-message'
+		>
 			<Scrollbar
 				classLayout="flex flex-col gap-1 mr-4"
 				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 mr-5"

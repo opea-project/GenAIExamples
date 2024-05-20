@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ChatQnA:
+  ChatQnA-Xeon:
     runs-on: aise-cluster
     steps:
       - name: Clean Up Working Directory
