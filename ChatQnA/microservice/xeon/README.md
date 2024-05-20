@@ -54,7 +54,7 @@ docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-xeon-server --build-
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
 
 ```bash
-git clone https://github.com/opea-project/GenAIExamples
+git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/microservice/xeon/
 docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
