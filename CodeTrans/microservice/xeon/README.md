@@ -1,0 +1,99 @@
+# Build Mega Service of CodeTrans on Xeon
+
+This document outlines the deployment process for a CodeTrans application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution using microservices `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+
+## 🚀 Apply Xeon Server on AWS
+
+To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage the power of 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
+
+For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
+
+After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
+
+## 🚀 Build Docker Images
+
+First of all, you need to build Docker Images locally and install the python package of it. This step can be ignored after the Docker images published to Docker hub.
+
+### 1. Source Code install GenAIComps
+
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+```
+
+### 2. Build the LLM Docker Image with the following command
+
+```bash
+docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
+```
+
+### 3. Build MegaService Docker Image
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/CodeTrans/microservice/xeon/
+docker build -t opea/gen-ai-comps:codetrans-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+### 4. Build UI Docker Image
+
+```bash
+cd GenAIExamples/CodeTrans/ui
+docker build -t opea/gen-ai-comps:codetrans-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+- `opea/gen-ai-comps:llm-tgi-server`
+- `opea/gen-ai-comps:codetrans-megaservice-server`
+- `opea/gen-ai-comps:codetrans-ui-server`
+
+## 🚀 Start Microservices
+
+### Setup Environment Variables
+
+Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below. Notice that the `LLM_MODEL_ID` indicates the LLM model used for TGI service.
+
+```bash
+export http_proxy=${your_http_proxy}
+export https_proxy=${your_http_proxy}
+export LLM_MODEL_ID="HuggingFaceH4/mistral-7b-grok"
+export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7777/v1/codetrans"
+```
+
+### Start Microservice Docker Containers
+
+```bash
+docker compose -f docker_compose.yaml up -d
+```
+
+### Validate Microservices
+
+1. TGI Service
+
+```bash
+curl http://${host_ip}:8008/generate \
+  -X POST \
+  -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+  -H 'Content-Type: application/json'
+```
+
+2. LLM Microservice
+
+```bash
+curl http://${host_ip}:9000/v1/chat/completions\
+  -X POST \
+  -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' \
+  -H 'Content-Type: application/json'
+```
+
+3. MegaService
+
+```bash
+curl http://${host_ip}:7777/v1/codetrans \
+    -H "Content-Type: application/json" \
+    -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+```

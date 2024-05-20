@@ -6,8 +6,7 @@ set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
-ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
-ip_address=$(eval echo '$'$ip_name)
+ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH
