@@ -14,13 +14,13 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/gen-ai-comps:llm-docsum-server -f comps/llms/docsum/langchain/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:llm-docsum-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
 
     cd $WORKPATH/microservice/xeon
-    docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
     cd $WORKPATH/ui
-    docker build --no-cache -t opea/gen-ai-comps:docsum-ui-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:docsum-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
     docker images
 }
@@ -44,7 +44,7 @@ function start_services() {
 function validate_microservices() {
     # Check if the microservices are running correctly.
     # TODO: Any results check required??
-    curl http://${ip_address}:9009/generate \
+    curl http://${ip_address}:8008/generate \
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
@@ -59,7 +59,7 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
-    curl http://${ip_address}:8888/v1/docsum -H "Content-Type: application/json" -d '{
+    curl http://${ip_address}:8890/v1/docsum -H "Content-Type: application/json" -d '{
         "model": "Intel/neural-chat-7b-v3-3",
         "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
 

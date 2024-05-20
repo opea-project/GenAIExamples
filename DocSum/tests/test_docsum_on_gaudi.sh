@@ -14,15 +14,15 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/gen-ai-comps:llm-docsum-gaudi-server -f comps/llms/docsum/langchain/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:llm-docsum-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
     cd $WORKPATH/microservice/gaudi
-    docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
     cd $WORKPATH/ui
-    docker build --no-cache -t opea/gen-ai-comps:docsum-ui-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:docsum-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
     docker images
 }

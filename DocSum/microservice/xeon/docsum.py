@@ -48,6 +48,6 @@ class DocSumService:
 
 
 if __name__ == "__main__":
-    docsum = DocSumService(port=9001)
+    docsum = DocSumService(port=8888)
     docsum.add_remote_service()
     asyncio.run(docsum.schedule())
