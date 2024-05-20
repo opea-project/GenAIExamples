@@ -68,7 +68,7 @@ docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
 
 ```bash
-git clone https://github.com/opea-project/GenAIExamples
+git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/microservice/gaudi/
 docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
