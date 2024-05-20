@@ -19,10 +19,10 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
     cd $WORKPATH/microservice/gaudi
-    docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:codetrans-megaservice-server -f docker/Dockerfile .
 
     cd $WORKPATH/ui
-    docker build --no-cache -t opea/gen-ai-comps:chatqna-ui-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:codetrans-ui-server -f docker/Dockerfile .
 
     docker images
 }
