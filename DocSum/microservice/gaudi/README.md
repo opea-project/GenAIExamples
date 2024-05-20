@@ -46,7 +46,7 @@ docker build -t opea/gen-ai-comps:docsum-ui-server --build-arg https_proxy=$http
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `tgi-gaudi:1.2.1`
+1. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
 2. `opea/gen-ai-comps:llm-tgi-server`
 3. `opea/gen-ai-comps:docsum-megaservice-server`
 4. `opea/gen-ai-comps:docsum-ui-server`
