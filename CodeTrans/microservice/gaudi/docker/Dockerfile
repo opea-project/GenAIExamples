@@ -31,7 +31,7 @@ RUN cd /home/user/ && \
 RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
-COPY ../chatqna.py /home/user/chatqna.py
+COPY ../code_translation.py /home/user/code_translation.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
@@ -39,4 +39,4 @@ USER user
 
 WORKDIR /home/user
 
-ENTRYPOINT ["python", "chatqna.py"]
+ENTRYPOINT ["python", "code_translation.py"]
