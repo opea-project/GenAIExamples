@@ -21,14 +21,13 @@ services:
     ports:
       - "8008:80"
     volumes:
-      - type: bind
-        source: ./data
-        target: /data
+      - "./data:/data"
     environment:
-      - HABANA_VISIBLE_DEVICES=all
-      - OMPI_MCA_btl_vader_single_copy_mechanism=none
-      - http_proxy=${https_proxy}
-      - https_proxy=${https_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      RUNTIME: habana
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
     cap_add:
       - SYS_NICE
     ipc: host
