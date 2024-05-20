@@ -1,17 +1,18 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: DocSum-test
+name: DocSum E2E test on Gaudi
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - DocSum/**
+      - DocSum/microservice/gaudi/**
+      - DocSum/tests/test_docsum_on_gaudi.sh
       - "!**.md"
       - "!**/ui/**"
-      - .github/workflows/DocSum.yml
+      - .github/workflows/DocSum_gaudi.yml
   workflow_dispatch:
 
 # If there is a new commit, the previous jobs will be canceled
@@ -20,12 +21,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  DocSum:
+  DocSum-Gaudi:
     runs-on: aise-cluster
-    strategy:
-      matrix:
-        job_name: ["langchain"]
-      fail-fast: false
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
@@ -38,13 +35,23 @@ jobs:
       - name: Run Test
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          AISE_CLUSTER_01_2_IP: ${{ secrets.AISE_CLUSTER_01_2_IP }}
         run: |
           cd ${{ github.workspace }}/DocSum/tests
-          bash test_${{ matrix.job_name }}_inference.sh
+          timeout 20m bash test_docsum_on_gaudi.sh
+
+      - name: Clean Up Container
+        if: cancelled() || failure()
+        run: |
+          cd ${{ github.workspace }}/DocSum/microservice/gaudi
+          container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
+          for container_name in $container_list; do
+              cid=$(docker ps -aq --filter "name=$container_name")
+              if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          done
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.job_name }}
           path: ${{ github.workspace }}/DocSum/tests/*.log
