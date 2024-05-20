@@ -19,7 +19,7 @@ services:
     image: ghcr.io/huggingface/tgi-gaudi:1.2.1
     container_name: tgi-gaudi-server
     ports:
-      - "8008:80"
+      - "8028:80"
     volumes:
       - "./data:/data"
     environment:
@@ -36,7 +36,7 @@ services:
     depends_on:
       - tgi_service
     ports:
-      - "9000:9000"
+      - "9029:9000"
     ipc: host
     environment:
       http_proxy: ${http_proxy}

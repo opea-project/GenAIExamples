@@ -60,7 +60,7 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="ise-uiuc/Magicoder-S-DS-6.7B"
-export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
+export TGI_LLM_ENDPOINT="http://${host_ip}:8028"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:6666/v1/codegen"
@@ -79,18 +79,18 @@ docker compose -f docker_compose.yaml up -d
 1. TGI Service
 
 ```bash
-curl http://${host_ip}:9009/generate \
+curl http://${host_ip}:8028/generate \
   -X POST \
-  -d '{"inputs":"Write a function that checks if a year is a leap year in Python.","parameters":{"max_new_tokens":128, "do_sample": true}}' \
+  -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":1024, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 ```
 
 2. LLM Microservice
 
 ```bash
-curl http://${host_ip}:9000/v1/chat/completions\
+curl http://${host_ip}:9029/v1/chat/completions\
   -X POST \
-  -d '{"query":"Write a function that checks if a year is a leap year in Python.","max_new_tokens":128,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+  -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_new_tokens":1024,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -99,7 +99,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
 ```bash
 curl http://${host_ip}:6666/v1/codegen -H "Content-Type: application/json" -d '{
      "model": "ise-uiuc/Magicoder-S-DS-6.7B",
-     "messages": "Write a function that checks if a year is a leap year in Python."
+     "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
      }'
 ```
 

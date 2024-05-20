@@ -19,7 +19,7 @@ services:
     image: ghcr.io/huggingface/text-generation-inference:1.4
     container_name: tgi-service
     ports:
-      - "9009:80"
+      - "8028:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -34,7 +34,7 @@ services:
     depends_on:
       - tgi_service
     ports:
-      - "9000:9000"
+      - "9029:9000"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
@@ -48,7 +48,7 @@ services:
     depends_on:
       - llm
     ports:
-      - "8888:8888"
+      - "6666:6666"
     environment:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
