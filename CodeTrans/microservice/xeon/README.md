@@ -27,10 +27,6 @@ cd GenAIComps
 docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following Docker Image:
-
-- `opea/gen-ai-comps:llm-tgi-server`
-
 ### 3. Build MegaService Docker Image
 
 ```bash
@@ -43,6 +39,12 @@ docker build -t opea/gen-ai-comps:codetrans-megaservice-server --build-arg https
 cd ../../ui
 docker build -t opea/gen-ai-comps:codetrans-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+- `opea/gen-ai-comps:llm-tgi-server`
+- `opea/gen-ai-comps:codetrans-megaservice-server`
+- `opea/gen-ai-comps:codetrans-ui-server`
 
 ## 🚀 Start Microservices
 
