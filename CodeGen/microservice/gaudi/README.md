@@ -38,7 +38,7 @@ cd GenAIExamples/CodeGen/ui/
 docker build -t opea/gen-ai-comps:codegen-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 7 Docker Images:
+Then run the command `docker images`, you will have the following 3 Docker Images:
 
 1. `opea/gen-ai-comps:llm-tgi-server`
 2. `opea/gen-ai-comps:codegen-megaservice-server`
@@ -75,16 +75,16 @@ docker compose -f docker_compose.yaml up -d
 ```bash
 curl http://${host_ip}:8028/generate \
   -X POST \
-  -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":1024, "do_sample": true}}' \
+  -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":256, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 ```
 
 2. LLM Microservice
 
 ```bash
-curl http://${host_ip}:9029/v1/chat/completions\
+curl http://${host_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_new_tokens":1024,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+  -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_new_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
 ```
 

@@ -34,7 +34,7 @@ services:
     depends_on:
       - tgi_service
     ports:
-      - "9029:9000"
+      - "9000:9000"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
