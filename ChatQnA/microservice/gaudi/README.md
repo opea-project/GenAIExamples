@@ -40,7 +40,7 @@ docker build --no-cache -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg ht
 ### 6. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
+docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
 ```
 
 ### 7. Build TEI Gaudi Image
@@ -79,7 +79,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 3. `opea/gen-ai-comps:reranking-tei-server`
 4. `opea/gen-ai-comps:llm-tgi-gaudi-server`
 5. `opea/tei-gaudi`
-6. `opea/gen-ai-comps:dataprep-redis-xeon-server`
+6. `opea/gen-ai-comps:dataprep-redis-server`
 7. `opea/gen-ai-comps:chatqna-megaservice-server`
 8. `opea/gen-ai-comps:chatqna-ui-server`
 

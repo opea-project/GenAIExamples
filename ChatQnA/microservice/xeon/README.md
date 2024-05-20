@@ -46,7 +46,7 @@ docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_
 ### 5. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
+docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
 ```
 
 ### 6. Build MegaService Docker Image

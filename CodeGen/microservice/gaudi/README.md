@@ -40,7 +40,7 @@ docker build -t opea/gen-ai-comps:codegen-ui-server --build-arg https_proxy=$htt
 
 Then run the command `docker images`, you will have the following 3 Docker Images:
 
-1. `opea/gen-ai-comps:llm-tgi-server`
+1. `opea/gen-ai-comps:llm-tgi-gaudi-server`
 2. `opea/gen-ai-comps:codegen-megaservice-server`
 3. `opea/gen-ai-comps:codegen-ui-server`
 

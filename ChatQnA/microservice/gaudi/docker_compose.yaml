@@ -22,8 +22,8 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: opea/gen-ai-comps:dataprep-redis-xeon-server
-    container_name: dataprep-redis-xeon-server
+    image: opea/gen-ai-comps:dataprep-redis-server
+    container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
     ports:
