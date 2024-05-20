@@ -22,13 +22,15 @@ docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --no-cache --build-arg ht
 ### 3. Build MegaService Docker Image
 
 ```bash
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/CodeTrans/microservice/gaudi/
 docker build -t opea/gen-ai-comps:codetrans-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
 ### 4. Build UI Docker Image
 
 ```bash
-cd ../../ui
+cd GenAIExamples/CodeTrans/ui
 docker build -t opea/gen-ai-comps:codetrans-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
