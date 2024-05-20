@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
 # Copyright (c) 2024 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +19,17 @@
 from comps.cores.proto.docarray import (
     Audio2TextDoc,
     Base64ByteStrDoc,
+    DocPath,
     EmbedDoc768,
     EmbedDoc1024,
     GeneratedDoc,
     LLMParamsDoc,
     SearchedDoc,
     TextDoc,
-    DocPath,
 )
+
+# Constants
+from comps.cores.mega.constants import MegaServiceEndpoint, ServiceRoleType, ServiceType
 
 # Microservice
 from comps.cores.mega.orchestrator import ServiceOrchestrator
@@ -33,6 +39,3 @@ from comps.cores.mega.gateway import Gateway, ChatQnAGateway, CodeGenGateway, Co
 
 # Telemetry
 from comps.cores.telemetry.opea_telemetry import opea_telemetry
-
-# Constants
-from comps.cores.mega.constants import MegaServiceEndpoint, ServiceRoleType, ServiceType
