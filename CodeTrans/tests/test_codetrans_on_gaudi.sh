@@ -85,6 +85,7 @@ function validate_megaservice() {
 
     if [ $status == false ]; then
         echo "Response check failed, please check the logs in artifacts!"
+        docker logs codetrans-gaudi-backend-server >> ${LOG_PATH}/curl_megaservice.log
         exit 1
     else
         echo "Response check succeed!"
