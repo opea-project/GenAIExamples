@@ -1,0 +1,10 @@
+docarray[full]
+fastapi
+huggingface_hub
+langchain==0.1.16
+langserve
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+shortuuid
+transformers
