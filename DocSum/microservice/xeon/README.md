@@ -92,7 +92,7 @@ curl http://${your_ip}:8008/generate \
 ```bash
 curl http://${your_ip}:9000/v1/chat/docsum \
   -X POST \
-  -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -101,7 +101,7 @@ curl http://${your_ip}:9000/v1/chat/docsum \
 ```bash
 curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
      "model": "Intel/neural-chat-7b-v3-3",
-     "messages": "What is the revenue of Nike in 2023?"
+     "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
      }'
 ```
 

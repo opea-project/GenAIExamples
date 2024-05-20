@@ -54,7 +54,7 @@ function validate_microservices() {
 
     curl http://${ip_address}:9000/v1/chat/docsum \
         -X POST \
-        -d '{"text":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+        -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
     sleep 5s
 }
