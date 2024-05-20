@@ -19,7 +19,6 @@ cd GenAIComps
 docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
-
 ### 3. Build MegaService Docker Image
 
 ```bash
