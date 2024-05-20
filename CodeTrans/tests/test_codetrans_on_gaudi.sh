@@ -41,7 +41,7 @@ function start_services() {
     # TODO: Replace the container name with a test-specific name
     docker compose -f docker_compose.yaml up -d
 
-    sleep 1m # Waits 1 minutes
+    sleep 2m # Waits 2 minutes
 }
 
 function validate_microservices() {
@@ -51,12 +51,24 @@ function validate_microservices() {
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs tgi-gaudi-server >> ${LOG_PATH}/generate.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
         -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs llm-tgi-gaudi-server >> ${LOG_PATH}/completions.log
+        exit 1
+    fi
     sleep 5s
 }
 
