@@ -6,8 +6,7 @@ set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
-ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
-ip_address=$(eval echo '$'$ip_name)
+ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH
@@ -19,10 +18,10 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
     cd $WORKPATH/microservice/gaudi
-    docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:codetrans-megaservice-server -f docker/Dockerfile .
 
     cd $WORKPATH/ui
-    docker build --no-cache -t opea/gen-ai-comps:chatqna-ui-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/gen-ai-comps:codetrans-ui-server -f docker/Dockerfile .
 
     docker images
 }
@@ -63,9 +62,7 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
-    curl http://${ip_address}:7777/v1/codetrans -H "Content-Type: application/json" -d '{
-        "model": "HuggingFaceH4/mistral-7b-grok",
-        "messages": "    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' > ${LOG_PATH}/curl_megaservice.log
+    curl http://${ip_address}:7777/v1/codetrans -H "Content-Type: application/json" -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}' > ${LOG_PATH}/curl_megaservice.log
 
     echo "Checking response results, make sure the output is reasonable. "
     local status=false

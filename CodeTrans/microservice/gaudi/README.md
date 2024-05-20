@@ -16,12 +16,8 @@ cd GenAIComps
 ### 2. Build the LLM Docker Image with the following command
 
 ```bash
-docker build -t opea/gen-ai-comps:llm-tgi-server --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
-
-Then run the command `docker images`, you will have the following Docker Image:
-
-- `opea/gen-ai-comps:llm-tgi-server`
 
 ### 3. Build MegaService Docker Image
 
@@ -35,6 +31,12 @@ docker build -t opea/gen-ai-comps:codetrans-megaservice-server --build-arg https
 cd ../../ui
 docker build -t opea/gen-ai-comps:codetrans-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+- `opea/gen-ai-comps:llm-tgi-gaudi-server`
+- `opea/gen-ai-comps:codetrans-megaservice-server`
+- `opea/gen-ai-comps:codetrans-ui-server`
 
 ## 🚀 Start Microservices
 
@@ -81,8 +83,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
 3. MegaService
 
 ```bash
-curl http://${host_ip}:7777/v1/codetrans -H "Content-Type: application/json" -d '{
-     "model": "HuggingFaceH4/mistral-7b-grok",
-     "messages": "    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"
-     }'
+curl http://${host_ip}:7777/v1/codetrans \
+    -H "Content-Type: application/json" \
+    -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 ```
