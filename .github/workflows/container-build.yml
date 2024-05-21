@@ -7,11 +7,11 @@ on:
   push:
   workflow_dispatch:
 jobs:
-  # https://github.com/intel/ai-containers/.github/action.yml
+  # https://github.com/intel/ai-containers/blob/main/.github/action.yml
   build-containers:
-    runs-on: docker
+    runs-on: docker # does not support node20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3.6.0
       - uses: docker/login-action@v3
         with:
           registry: ${{ secrets.REGISTRY }}
