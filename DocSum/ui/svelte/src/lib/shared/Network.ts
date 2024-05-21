@@ -15,7 +15,7 @@
 import { SSE } from "sse.js";
 import { env } from "$env/dynamic/public";
 
-const BASIC_URL = env.BASIC_URL;
+const DOC_BASE_URL = env.DOC_BASE_URL;
 
 async function fetchPostRes(url, init) {
   try {
@@ -29,7 +29,7 @@ async function fetchPostRes(url, init) {
 }
 
 export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
-  const url = `${BASIC_URL}/doc_upload`;
+  const url = `${DOC_BASE_URL}/doc_upload`;
   const formData = new FormData();
   formData.append("file", file, fileName);
 
@@ -46,10 +46,10 @@ export async function fetchTextStream(query: string, urlSuffix: string, params: 
   if (params === "doc_id") {
     payload = { doc_id: query };
   } else if (params === "text") {
-    payload = { text: query };
+    payload = { query: query };
   }
 
-  let url = `${BASIC_URL}${urlSuffix}`;
+  let url = `${DOC_BASE_URL}`;
   console.log("url", url);
 
   return new SSE(url, {
