@@ -138,7 +138,7 @@ services:
       - retriever
       - tei-xeon-service
       - reranking
-      - tgi_service
+      - tgi-service
       - llm
     ports:
       - "8888:8888"
