@@ -21,7 +21,19 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
-  tei_embedding_service:
+  dataprep-redis-service:
+    image: opea/gen-ai-comps:dataprep-redis-server
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "6007:6007"
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+  tei-embedding-service:
     image: opea/tei-gaudi
     container_name: tei-embedding-gaudi-server
     ports:
@@ -39,7 +51,7 @@ services:
     image: opea/gen-ai-comps:embedding-tei-server
     container_name: embedding-tei-server
     depends_on:
-      - tei_embedding_service
+      - tei-embedding-service
     ports:
       - "6000:6000"
     ipc: host
@@ -51,6 +63,8 @@ services:
   retriever:
     image: opea/gen-ai-comps:retriever-redis-server
     container_name: retriever-redis-server
+    depends_on:
+      - redis-vector-db
     ports:
       - "7000:7000"
     ipc: host
@@ -60,7 +74,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
-  tei_xeon_service:
+  tei-xeon-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-xeon-server
     ports:
@@ -76,7 +90,7 @@ services:
     image: opea/gen-ai-comps:reranking-tei-server
     container_name: reranking-tei-gaudi-server
     depends_on:
-      - tei_xeon_service
+      - tei-xeon-service
     ports:
       - "8000:8000"
     ipc: host
@@ -86,7 +100,7 @@ services:
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
-  tgi_service:
+  tgi-service:
     image: ghcr.io/huggingface/tgi-gaudi:1.2.1
     container_name: tgi-gaudi-server
     ports:
@@ -104,7 +118,7 @@ services:
     image: opea/gen-ai-comps:llm-tgi-gaudi-server
     container_name: llm-tgi-gaudi-server
     depends_on:
-      - tgi_service
+      - tgi-service
     ports:
       - "9000:9000"
     ipc: host
@@ -119,12 +133,12 @@ services:
     container_name: chatqna-gaudi-backend-server
     depends_on:
       - redis-vector-db
-      - tei_embedding_service
+      - tei-embedding-service
       - embedding
       - retriever
-      - tei_xeon_service
+      - tei-xeon-service
       - reranking
-      - tgi_service
+      - tgi-service
       - llm
     ports:
       - "8888:8888"
