@@ -67,9 +67,9 @@ export default defineConfig({
 		//   use: { channel: 'msedge' },
 		// },
 		{
-			name: 'webkit',
-			use: { ...devices['Desktop Safari'] },
-		  },
+			name: "webkit",
+			use: { ...devices["Desktop Safari"] },
+		},
 		// {
 		//   name: 'Google Chrome',
 		//   use: { channel: 'chrome' },
