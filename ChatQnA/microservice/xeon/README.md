@@ -43,7 +43,13 @@ docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_pr
 docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
-### 5. Build MegaService Docker Image
+### 5. Build Dataprep Image
+
+```bash
+docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
+```
+
+### 6. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
 
@@ -53,7 +59,7 @@ cd GenAIExamples/ChatQnA/microservice/xeon/
 docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
-### 6. Build UI Docker Image
+### 7. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -183,6 +189,30 @@ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
      "messages": "What is the revenue of Nike in 2023?"
      }'
 ```
+
+9. Dataprep Microservice（Optional）
+
+If you want to update the default knowledge base, you can use the following commands:
+
+Update Knowledge Base via Local File Upload:
+
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
+```
+
+This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+
+Add Knowledge Base via HTTP Links:
+
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
+
+This command updates a knowledge base by submitting a list of HTTP links for processing.
 
 ## 🚀 Launch the UI
 
