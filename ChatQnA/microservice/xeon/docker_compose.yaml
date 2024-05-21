@@ -21,7 +21,19 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
-  tei_embedding_service:
+  dataprep-redis-service:
+    image: opea/gen-ai-comps:dataprep-redis-server
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "6007:6007"
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+  tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-embedding-server
     ports:
@@ -37,19 +49,20 @@ services:
     image: opea/gen-ai-comps:embedding-tei-server
     container_name: embedding-tei-server
     depends_on:
-      - tei_embedding_service
+      - tei-embedding-service
     ports:
       - "6000:6000"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
-
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   retriever:
     image: opea/gen-ai-comps:retriever-redis-server
     container_name: retriever-redis-server
+    depends_on:
+      - redis-vector-db
     ports:
       - "7000:7000"
     ipc: host
@@ -60,7 +73,7 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
-  tei_xeon_service:
+  tei-xeon-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-xeon-server
     ports:
@@ -76,7 +89,7 @@ services:
     image: opea/gen-ai-comps:reranking-tei-xeon-server
     container_name: reranking-tei-xeon-server
     depends_on:
-      - tei_xeon_service
+      - tei-xeon-service
     ports:
       - "8000:8000"
     ipc: host
@@ -117,10 +130,10 @@ services:
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
-      - tei_embedding_service
+      - tei-embedding-service
       - embedding
       - retriever
-      - tei_xeon_service
+      - tei-xeon-service
       - reranking
       - tgi_service
       - llm
