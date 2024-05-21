@@ -17,6 +17,7 @@ function build_docker_images() {
     docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:reranking-tei-server -f comps/reranks/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server -f comps/llms/langchain/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:dataprep-redis-server -f comps/dataprep/redis/docker/Dockerfile .
 
     cd ..
     git clone https://github.com/huggingface/tei-gaudi

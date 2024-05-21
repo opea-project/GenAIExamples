@@ -18,6 +18,7 @@ function build_docker_images() {
     docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:reranking-tei-xeon-server -f comps/reranks/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:llm-tgi-server -f comps/llms/langchain/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:dataprep-redis-server -f comps/dataprep/redis/docker/Dockerfile .
 
     cd $WORKPATH/microservice/xeon
     docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server -f docker/Dockerfile .
