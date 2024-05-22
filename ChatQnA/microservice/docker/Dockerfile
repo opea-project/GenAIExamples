@@ -31,7 +31,7 @@ RUN cd /home/user/ && \
 RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
-COPY ./chatqna.py /home/user/chatqna.py
+COPY ./docker/chatqna.py /home/user/chatqna.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 

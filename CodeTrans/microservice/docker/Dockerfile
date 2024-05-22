@@ -31,7 +31,7 @@ RUN cd /home/user/ && \
 RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
-COPY ./code_translation.py /home/user/code_translation.py
+COPY ./docker/code_translation.py /home/user/code_translation.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 

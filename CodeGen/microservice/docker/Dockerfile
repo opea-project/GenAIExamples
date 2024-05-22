@@ -33,7 +33,7 @@ RUN cd /home/user/ && \
 RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
-COPY ./codegen.py /home/user/codegen.py
+COPY ./docker/codegen.py /home/user/codegen.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 

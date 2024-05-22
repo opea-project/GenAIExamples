@@ -30,7 +30,7 @@ RUN cd /home/user/ && \
 RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
-COPY ./docsum.py /home/user/docsum.py
+COPY ./docker/docsum.py /home/user/docsum.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
