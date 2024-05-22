@@ -58,13 +58,24 @@ function validate_microservices() {
         -X POST \
         -d '{"inputs":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/embed.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs tei-embedding-server >> ${LOG_PATH}/embed.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:6000/v1/embeddings \
         -X POST \
         -d '{"text":"hello"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
-    sleep 10s
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs embedding-tei-server >> ${LOG_PATH}/embeddings.log
+        exit 1
+    fi
+    sleep 5s
 
     export PATH="${HOME}/miniconda3/bin:$PATH"
     source activate
@@ -73,30 +84,58 @@ function validate_microservices() {
         -X POST \
         -d '{"text":"What is the revenue of Nike in 2023?","embedding":${test_embedding}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/retrieval.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs retriever-redis-server >> ${LOG_PATH}/retrieval.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:8808/rerank \
         -X POST \
         -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/rerank.log
-    sleep 10s
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs tei-xeon-server >> ${LOG_PATH}/rerank.log
+        exit 1
+    fi
+    sleep 5s
 
     curl http://${ip_address}:8000/v1/reranking\
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/reranking.log
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs reranking-tei-xeon-server >> ${LOG_PATH}/reranking.log
+        exit 1
+    fi
     sleep 30s
 
     curl http://${ip_address}:9009/generate \
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs tgi-service >> ${LOG_PATH}/generate.log
+        exit 1
+    fi
     sleep 5s
 
     curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
         -d '{"text":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Microservice failed, please check the logs in artifacts!"
+        docker logs llm-tgi-server >> ${LOG_PATH}/completions.log
+        exit 1
+    fi
     sleep 5s
 }
 
@@ -105,6 +144,12 @@ function validate_megaservice() {
     curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
         "model": "Intel/neural-chat-7b-v3-3",
         "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Megaservice failed, please check the logs in artifacts!"
+        docker logs chatqna-xeon-backend-server >> ${LOG_PATH}/curl_megaservice.log
+        exit 1
+    fi
 
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
