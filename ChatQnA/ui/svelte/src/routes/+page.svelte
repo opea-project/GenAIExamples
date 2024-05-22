@@ -203,6 +203,18 @@
 			</div>
 		</div>
 
+		<button
+						on:click={() => {
+							if (query) {
+								handleTextSubmit();
+							}
+						}}
+						type="submit"
+						data-testid="send-chat"
+						class="absolute bottom-2.5 end-2.5 px-4 py-2 text-sm font-medium text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+						><PaperAirplane /></button
+					>
+
 		<!-- clear -->
 		{#if Array.isArray(chatMessages) && chatMessages.length > 0 && !loading}
 			<div class="flex w-full justify-between pr-5">
