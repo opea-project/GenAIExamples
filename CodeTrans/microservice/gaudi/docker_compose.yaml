@@ -56,6 +56,7 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
   codetrans-gaudi-ui-server:
