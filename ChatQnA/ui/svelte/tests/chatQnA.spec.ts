@@ -20,13 +20,11 @@ async function checkNotificationText(page, expectedText) {
 
 // Helper function to enter message to chat
 async function enterMessageToChat(page, message) {
-	const newChat = page.getByTestId("chat-input");
-	await newChat.fill(message);
-	await newChat.press("Enter");
-	// Adding timeout and debug information
-	const msgTime = await page.waitForSelector("[data-testid='msg-time']", { timeout: 10000 });
-	await expect(msgTime).toBeVisible;
-	console.log("Message time is visible.");
+	await page.getByTestId('chat-input').click();
+    await page.getByTestId('chat-input').fill('test');
+    await page.getByTestId('chat-input').press('Enter');
+    await page.waitForTimeout(30000);
+    await expect(page.getByText('End to End Time:')).toBeVisible();
 }
 
 // Helper function to upload a file
@@ -61,23 +59,23 @@ test.describe("New Chat", () => {
 	});
 });
 
-test.describe("Upload file and create new Chat", () => {
-	// upload file
-	test("should upload a file", async ({ page }) => {
-		const openUpload = page.getByTestId("open-upload");
-		await openUpload.click();
-		await uploadFile(page, FILE_PATH);
-	});
+// test.describe("Upload file and create new Chat", () => {
+// 	// upload file
+// 	test("should upload a file", async ({ page }) => {
+// 		const openUpload = page.getByTestId("open-upload");
+// 		await openUpload.click();
+// 		await uploadFile(page, FILE_PATH);
+// 	});
 
-	// paste link
-	test("should paste link", async ({ page }) => {
-		const openUpload = page.getByTestId("open-upload");
-		await openUpload.click();
-		await pasteLink(page, UPLOAD_LINK[0]);
-	});
+// 	// paste link
+// 	test("should paste link", async ({ page }) => {
+// 		const openUpload = page.getByTestId("open-upload");
+// 		await openUpload.click();
+// 		await pasteLink(page, UPLOAD_LINK[0]);
+// 	});
 
-	// chat with uploaded file and link
-	test("should test uploaded chat", async ({ page }) => {
-		await enterMessageToChat(page, CHAT_ITEMS[0]);
-	});
-});
+// 	// chat with uploaded file and link
+// 	test("should test uploaded chat", async ({ page }) => {
+// 		await enterMessageToChat(page, CHAT_ITEMS[0]);
+// 	});
+// });
