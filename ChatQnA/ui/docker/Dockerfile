@@ -13,8 +13,11 @@ WORKDIR /home/user/svelte
 # Install front-end dependencies
 RUN npm install
 
+# Build the front-end application
+RUN npm run build
+
 # Expose the port of the front-end application
 EXPOSE 5173
 
-# Run the front-end application
-CMD ["npm", "run", "dev", "--", "--host=0.0.0.0"]
+# Run the front-end application in preview mode
+CMD ["npm", "run", "preview", "--", "--port", "5173"]
