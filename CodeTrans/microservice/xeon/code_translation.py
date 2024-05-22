@@ -19,9 +19,9 @@ import os
 from comps import CodeTransGateway, MicroService, ServiceOrchestrator
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
-MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", "7777")
+MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 7777)
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
-LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", "9000")
+LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
 
 class MyServiceOrchestrator:
     def __init__(self, host="0.0.0.0", port=8000):
