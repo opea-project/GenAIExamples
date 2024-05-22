@@ -102,6 +102,10 @@ export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
+export EMBEDDING_SERVICE_HOST_IP=${host_ip}
+export RETRIEVER_SERVICE_HOST_IP=${host_ip}
+export RERANK_SERVICE_HOST_IP=${host_ip}
+export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 ```
 

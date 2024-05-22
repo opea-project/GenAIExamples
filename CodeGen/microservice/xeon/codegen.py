@@ -23,7 +23,7 @@ LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
 
 
-class ChatQnAService:
+class CodeGenService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
@@ -50,6 +50,6 @@ class ChatQnAService:
 
 
 if __name__ == "__main__":
-    chatqna = ChatQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    chatqna = CodeGenService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     chatqna.add_remote_service()
     asyncio.run(chatqna.schedule())

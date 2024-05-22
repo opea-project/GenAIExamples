@@ -63,6 +63,7 @@ export LLM_MODEL_ID="ise-uiuc/Magicoder-S-DS-6.7B"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8028"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
+export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:6666/v1/codegen"
 ```
 
