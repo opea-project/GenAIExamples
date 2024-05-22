@@ -10,6 +10,11 @@ jobs:
   # https://github.com/intel/ai-containers/blob/main/.github/action.yml
   build-containers:
     runs-on: docker # does not support node20
+    env:
+      http_proxy: ${{ secrets.HTTP_PROXY }}
+      https_proxy: ${{ secrets.HTTPS_PROXY }}
+      REGISTRY: ${{ secrets.REGISTRY }}
+      REPO: ${{ secrets.REPO }}
     steps:
       - uses: actions/checkout@v3.6.0
       - uses: docker/login-action@v2.2.0
@@ -19,25 +24,17 @@ jobs:
           password: ${{ secrets.REGISTRY_TOKEN }}
       - name: Build Containers
         run: |
-          REGISTRY=${{ secrets.REGISTRY }}
-          REPO=${{ secrets.REPO }}
           docker compose -p ${GITHUB_RUN_NUMBER} up --build --no-start
         working-directory: .github/workflows/docker
       - name: Print Containers to Summary
         run: |
-          REGISTRY=${{ secrets.REGISTRY }}
-          REPO=${{ secrets.REPO }}
           docker compose -p ${GITHUB_RUN_NUMBER} images --format json | jq -r --arg registry "$REGISTRY" '.[] | select(.Repository | contains($registry)) | .Tag' >> $GITHUB_STEP_SUMMARY
       - name: Push Containers
         run: |
-          REGISTRY=${{ secrets.REGISTRY }}
-          REPO=${{ secrets.REPO }}
           docker compose -p ${GITHUB_RUN_NUMBER} push
         working-directory: .github/workflows/docker
       - name: Un-Tag Containers
         run: |
-          REGISTRY=${{ secrets.REGISTRY }}
-          REPO=${{ secrets.REPO }}
           docker compose -p ${GITHUB_RUN_NUMBER} down --rmi all
         working-directory: .github/workflows/docker
       - name: Remove Containers
