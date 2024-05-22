@@ -154,6 +154,12 @@ function validate_megaservice() {
     curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
         "model": "Intel/neural-chat-7b-v3-3",
         "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Megaservice failed, please check the logs in artifacts!"
+        docker logs chatqna-gaudi-backend-server >> ${LOG_PATH}/curl_megaservice.log
+        exit 1
+    fi
 
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
