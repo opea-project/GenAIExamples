@@ -73,7 +73,7 @@ class ServiceOrchestrator(DAG):
 
             def generate():
                 if response:
-                    for chunk in response.iter_lines(decode_unicode=False, delimiter=b"\0"):
+                    for chunk in response.iter_content(chunk_size=None):
                         if chunk:
                             yield chunk
 

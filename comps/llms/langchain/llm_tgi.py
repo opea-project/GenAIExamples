@@ -55,9 +55,9 @@ def llm_generate(input: LLMParamsDoc):
 
     if input.streaming:
 
-        def stream_generator():
+        async def stream_generator():
             chat_response = ""
-            for text in llm.stream(input.query):
+            async for text in llm.astream(input.query):
                 chat_response += text
                 processed_text = post_process_text(text)
                 if text and processed_text:
