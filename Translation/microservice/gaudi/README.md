@@ -6,7 +6,6 @@ This document outlines the deployment process for a Translation application util
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
@@ -44,6 +43,7 @@ Construct the frontend Docker image using the command below:
 cd GenAIExamples/Translation/ui/
 docker build -t opea/gen-ai-comps:translation-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
+
 Then run the command `docker images`, you will have the following four Docker Images:
 
 1. `tgi-gaudi-translation:1.2.1`
@@ -66,6 +66,7 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 ```
+
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start Microservice Docker Containers

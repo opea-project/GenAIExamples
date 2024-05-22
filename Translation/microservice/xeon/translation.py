@@ -35,9 +35,7 @@ class TranslationService:
 
     async def schedule(self):
         await self.megaservice.schedule(
-            initial_inputs={
-                "query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"
-            }
+            initial_inputs={"query": "Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}
         )
         result_dict = self.megaservice.result_dict
         print(result_dict)
