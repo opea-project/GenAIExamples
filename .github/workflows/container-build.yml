@@ -10,6 +10,9 @@ jobs:
   # https://github.com/intel/ai-containers/blob/main/.github/action.yml
   build-containers:
     runs-on: docker
+    env:
+      REGISTRY: ${{ secrets.REGISTRY }}
+      REPO: ${{ secrets.REPO }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/login-action@v3
