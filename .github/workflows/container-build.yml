@@ -4,7 +4,6 @@
 name: Container Build
 permissions: read-all
 on:
-  push:
   workflow_dispatch:
 jobs:
   # https://github.com/intel/ai-containers/blob/main/.github/action.yml
