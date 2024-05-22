@@ -39,7 +39,7 @@ class DocSumService:
             service_type=ServiceType.LLM,
         )
         self.megaservice.add(llm)
-        self.gateway = DocSumGateway(megaservice=self.megaservice, host=self.host, port=self.port)
+        self.gateway = DocSumGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
     async def schedule(self):
         await self.megaservice.schedule(

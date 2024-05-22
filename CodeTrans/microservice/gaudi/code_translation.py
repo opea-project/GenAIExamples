@@ -39,7 +39,7 @@ class MyServiceOrchestrator:
             use_remote_service=True,
         )
         self.megaservice.add(llm)
-        self.gateway = CodeTransGateway(megaservice=self.megaservice, host=self.host, port=self.port)
+        self.gateway = CodeTransGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
     async def schedule(self):
         await self.megaservice.schedule(
