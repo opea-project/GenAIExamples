@@ -20,13 +20,11 @@ async function checkNotificationText(page, expectedText) {
 
 // Helper function to enter message to chat
 async function enterMessageToChat(page, message) {
-	const newChat = page.getByTestId("chat-input");
-	await newChat.fill(message);
-	await newChat.press("Enter");
-	// Adding timeout and debug information
-	const msgTime = await page.waitForSelector("[data-testid='msg-time']", { timeout: 10000 });
-	await expect(msgTime).toBeVisible;
-	console.log("Message time is visible.");
+	await page.getByTestId('chat-input').click();
+    await page.getByTestId('chat-input').fill('test');
+    await page.getByTestId('chat-input').press('Enter');
+    await page.waitForTimeout(10000);
+    await expect(page.getByText('End to End Time:')).toBeVisible();
 }
 
 // Helper function to upload a file
