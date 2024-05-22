@@ -20,11 +20,11 @@ async function checkNotificationText(page, expectedText) {
 
 // Helper function to enter message to chat
 async function enterMessageToChat(page, message) {
-	await page.getByTestId('chat-input').click();
-    await page.getByTestId('chat-input').fill('test');
-    await page.getByTestId('chat-input').press('Enter');
-    await page.waitForTimeout(10000);
-    await expect(page.getByText('End to End Time:')).toBeVisible();
+	await page.getByTestId("chat-input").click();
+	await page.getByTestId("chat-input").fill("test");
+	await page.getByTestId("chat-input").press("Enter");
+	await page.waitForTimeout(10000);
+	await expect(page.getByText("End to End Time:")).toBeVisible();
 }
 
 // Helper function to upload a file
