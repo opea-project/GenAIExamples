@@ -171,7 +171,7 @@ function main() {
     validate_megaservice
     validate_frontend
 
-    stop_docker
+    # stop_docker
     echo y | docker system prune
 
 }
