@@ -44,7 +44,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://redis.io/">Redis</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
 			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
@@ -53,7 +53,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://www.trychroma.com/">Chroma</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
 			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
@@ -62,7 +62,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://redis.io/">Redis</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
 			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
@@ -71,7 +71,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://qdrant.tech/">Qdrant</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
 			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
