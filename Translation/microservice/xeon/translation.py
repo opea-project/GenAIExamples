@@ -13,27 +13,37 @@
 # limitations under the License.
 
 
-from comps import RemoteMicroService, ServiceOrchestrator
+from comps import DocSumGateway, MicroService, ServiceOrchestrator, ServiceType
 
 
-class MyServiceOrchestrator:
+class TranslationService:
     def __init__(self, port=8000):
-        self.service_builder = ServiceOrchestrator(port=port)
+        self.port = port
+        self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
-        llm = RemoteMicroService(name="llm", host="0.0.0.0", port=9000, expose_endpoint="/v1/chat/completions")
-        self.service_builder.add(llm)
-
-    def schedule(self):
-        self.service_builder.schedule(
-            initial_inputs={"text":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}
+        llm = MicroService(
+            name="llm",
+            host=SERVICE_HOST_IP,
+            port=9000,
+            endpoint="/v1/chat/completions",
+            use_remote_service=True,
+            service_type=ServiceType.LLM,
         )
-        self.service_builder.get_all_final_outputs()
-        result_dict = self.service_builder.result_dict
+        self.megaservice.add(llm)
+        self.gateway = DocSumGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+
+    async def schedule(self):
+        await self.megaservice.schedule(
+            initial_inputs={
+                "query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"
+            }
+        )
+        result_dict = self.megaservice.result_dict
         print(result_dict)
 
 
 if __name__ == "__main__":
-    service_ochestrator = MyServiceOrchestrator(port=9001)
-    service_ochestrator.add_remote_service()
-    service_ochestrator.schedule()
+    docsum = TranslationService(port=8888)
+    docsum.add_remote_service()
+    asyncio.run(docsum.schedule())

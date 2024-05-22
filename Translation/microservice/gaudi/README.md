@@ -1,35 +1,55 @@
-# Build MegaService of Translaion on Gaudi
+# Build MegaService of Translation on Gaudi
 
-This document outlines the deployment process for a Translaion application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
+This document outlines the deployment process for a Translation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-### 1. Source Code install GenAIComps
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-python setup.py install
 ```
 
-### 2. Build TGI Gaudi Image
+### 1. Build TGI Gaudi Image
 
 ```bash
-docker build . -t tgi-gaudi-translation:1.2.1 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+cd GenAIExamples/Translation
+docker build . -t tgi-gaudi-translation:1.2.1 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f microservice/gaudi/Dockerfile
 ```
 
-### 3. Build LLM Image
+### 2. Build LLM Image
 
 ```bash
+cd GenAIExamples/Translation
 docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
+### 3. Build MegaService Docker Image
+
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `translation.py` Python script. Build the MegaService Docker image using the command below:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/Translation/microservice/gaudi/
+docker build -t opea/gen-ai-comps:translation-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+### 4. Build UI Docker Image
+
+Construct the frontend Docker image using the command below:
+
+```bash
+cd GenAIExamples/Translation/ui/
+docker build -t opea/gen-ai-comps:translation-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
 Then run the command `docker images`, you will have the following four Docker Images:
 
 1. `tgi-gaudi-translation:1.2.1`
-2. `opea/gen-ai-comps:llm-tgi-server`
+2. `opea/gen-ai-comps:llm-tgi-gaudi-server`
+3. `opea/gen-ai-comps:translation-megaservice-server`
+4. `opea/gen-ai-comps:translation-ui-server`
 
 ## 🚀 Start Microservices
 
@@ -43,7 +63,10 @@ export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="haoranxu/ALMA-13B"
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 ```
+Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start Microservice Docker Containers
 
@@ -67,18 +90,22 @@ curl http://${your_ip}:8008/generate \
 ```bash
 curl http://${your_ip}:9000/v1/chat/completions \
   -X POST \
-  -d '{"text":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
+  -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
   -H 'Content-Type: application/json'
+```
+
+3. MegaService
+
+```bash
+curl http://${host_ip}:8888/v1/translation -H "Content-Type: application/json" -d '{
+     "model": "Intel/neural-chat-7b-v3-3",
+     "messages": "Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:."}'
 ```
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
-## 🚀 Construct Mega Service
+## 🚀 Launch the UI
 
-Modify the `initial_inputs` of line 28 in `translation.py`, then you will get the Translation result of this mega service.
-
-All of the intermediate results will be printed for each microservice. Users can check the accuracy of the results to make targeted modifications.
-
-```bash
-python translation.py
-```
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+![project-screenshot](https://imgur.com/yT2VDBX.png)
+![project-screenshot](https://imgur.com/8ajC7lE.png)
