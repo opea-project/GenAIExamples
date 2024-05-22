@@ -13,13 +13,12 @@
 # limitations under the License.
 
 
-FROM python:3.11-slim
+FROM langchain/langchain:latest
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
     libjemalloc-dev \
-    vim \
-    git
+    vim
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
@@ -31,7 +30,7 @@ RUN cd /home/user/ && \
 RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
-COPY ../code_translation.py /home/user/code_translation.py
+COPY ./docsum.py /home/user/docsum.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
@@ -39,4 +38,4 @@ USER user
 
 WORKDIR /home/user
 
-ENTRYPOINT ["python", "code_translation.py"]
+ENTRYPOINT ["python", "docsum.py"]

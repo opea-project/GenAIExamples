@@ -16,7 +16,7 @@ function build_docker_images() {
 
     docker build -t opea/gen-ai-comps:llm-docsum-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
 
-    cd $WORKPATH/microservice/xeon
+    cd $WORKPATH/microservice
     docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
     cd $WORKPATH/ui

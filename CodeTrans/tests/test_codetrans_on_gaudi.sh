@@ -17,7 +17,7 @@ function build_docker_images() {
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
-    cd $WORKPATH/microservice/gaudi
+    cd $WORKPATH/microservice
     docker build --no-cache -t opea/gen-ai-comps:codetrans-megaservice-server -f docker/Dockerfile .
 
     cd $WORKPATH/ui

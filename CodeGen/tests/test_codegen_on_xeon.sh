@@ -16,7 +16,7 @@ function build_docker_images() {
 
     docker build -t opea/gen-ai-comps:llm-tgi-server -f comps/llms/langchain/docker/Dockerfile .
 
-    cd $WORKPATH/microservice/xeon
+    cd $WORKPATH/microservice
     docker build --no-cache -t opea/gen-ai-comps:codegen-megaservice-server -f docker/Dockerfile .
 
     cd $WORKPATH/ui

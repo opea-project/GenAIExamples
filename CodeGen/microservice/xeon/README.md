@@ -31,7 +31,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/CodeGen/microservice/xeon/
+cd GenAIExamples/CodeGen/microservice/
 docker build -t opea/gen-ai-comps:codegen-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 

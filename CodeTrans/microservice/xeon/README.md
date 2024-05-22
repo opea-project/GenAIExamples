@@ -31,7 +31,7 @@ docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/CodeTrans/microservice/xeon/
+cd GenAIExamples/CodeTrans/microservice/
 docker build -t opea/gen-ai-comps:codetrans-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 

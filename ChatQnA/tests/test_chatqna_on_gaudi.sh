@@ -27,7 +27,7 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 
-    cd $WORKPATH/microservice/gaudi
+    cd $WORKPATH/microservice
     docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server -f docker/Dockerfile .
 
     cd $WORKPATH/ui
