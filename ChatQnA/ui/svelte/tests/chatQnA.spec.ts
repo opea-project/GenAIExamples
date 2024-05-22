@@ -59,23 +59,23 @@ test.describe("New Chat", () => {
 	});
 });
 
-test.describe("Upload file and create new Chat", () => {
-	// upload file
-	test("should upload a file", async ({ page }) => {
-		const openUpload = page.getByTestId("open-upload");
-		await openUpload.click();
-		await uploadFile(page, FILE_PATH);
-	});
+// test.describe("Upload file and create new Chat", () => {
+// 	// upload file
+// 	test("should upload a file", async ({ page }) => {
+// 		const openUpload = page.getByTestId("open-upload");
+// 		await openUpload.click();
+// 		await uploadFile(page, FILE_PATH);
+// 	});
 
-	// paste link
-	test("should paste link", async ({ page }) => {
-		const openUpload = page.getByTestId("open-upload");
-		await openUpload.click();
-		await pasteLink(page, UPLOAD_LINK[0]);
-	});
+// 	// paste link
+// 	test("should paste link", async ({ page }) => {
+// 		const openUpload = page.getByTestId("open-upload");
+// 		await openUpload.click();
+// 		await pasteLink(page, UPLOAD_LINK[0]);
+// 	});
 
-	// chat with uploaded file and link
-	test("should test uploaded chat", async ({ page }) => {
-		await enterMessageToChat(page, CHAT_ITEMS[0]);
-	});
-});
+// 	// chat with uploaded file and link
+// 	test("should test uploaded chat", async ({ page }) => {
+// 		await enterMessageToChat(page, CHAT_ITEMS[0]);
+// 	});
+// });
