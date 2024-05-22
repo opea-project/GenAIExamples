@@ -17,25 +17,29 @@ import os
 
 from comps import DocSumGateway, MicroService, ServiceOrchestrator, ServiceType
 
-SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
+MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
+MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", "8888")
+LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
+LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", "9000")
 
 
 class DocSumService:
-    def __init__(self, port=8000):
+    def __init__(self, host="0.0.0.0", port=8000):
+        self.host = host
         self.port = port
         self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
         llm = MicroService(
             name="llm",
-            host=SERVICE_HOST_IP,
-            port=9000,
+            host=LLM_SERVICE_HOST_IP,
+            port=LLM_SERVICE_PORT,
             endpoint="/v1/chat/docsum",
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )
         self.megaservice.add(llm)
-        self.gateway = DocSumGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+        self.gateway = DocSumGateway(megaservice=self.megaservice, host=self.host, port=self.port)
 
     async def schedule(self):
         await self.megaservice.schedule(
@@ -48,6 +52,6 @@ class DocSumService:
 
 
 if __name__ == "__main__":
-    docsum = DocSumService(port=8888)
+    docsum = DocSumService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     docsum.add_remote_service()
     asyncio.run(docsum.schedule())
