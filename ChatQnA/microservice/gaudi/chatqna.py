@@ -28,6 +28,7 @@ RERANK_SERVICE_PORT = os.getenv("RERANK_SERVICE_PORT", "8000")
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", "9000")
 
+
 class ChatQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
