@@ -16,8 +16,8 @@ function build_docker_images() {
 
     docker build -t opea/gen-ai-comps:llm-docsum-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
 
-    cd $WORKPATH/microservice
-    docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+    cd $WORKPATH
+    docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
     cd $WORKPATH/ui
     docker build --no-cache -t opea/gen-ai-comps:docsum-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
@@ -26,7 +26,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/microservice/xeon
+    cd $WORKPATH/docker-composer/xeon
 
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
@@ -98,7 +98,7 @@ function validate_megaservice() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/microservice/xeon
+    cd $WORKPATH/docker-composer/xeon
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
