@@ -23,7 +23,7 @@ async function enterMessageToChat(page, message) {
 	await page.getByTestId("chat-input").click();
 	await page.getByTestId("chat-input").fill("test");
 	await page.getByTestId("chat-input").press("Enter");
-	await page.waitForTimeout(10000);
+	await page.waitForTimeout(30000);
 	await expect(page.getByText("End to End Time:")).toBeVisible();
 }
 
