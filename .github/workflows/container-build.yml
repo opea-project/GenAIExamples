@@ -1,0 +1,42 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Container Build
+permissions: read-all
+on:
+  workflow_dispatch:
+jobs:
+  # https://github.com/intel/ai-containers/blob/main/.github/action.yml
+  build-containers:
+    runs-on: docker
+    env:
+      REGISTRY: ${{ secrets.REGISTRY }}
+      REPO: ${{ secrets.REPO }}
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+      - name: Build Containers
+        run: |
+          docker compose -p ${GITHUB_RUN_NUMBER} up --build --no-start
+        working-directory: .github/workflows/docker
+      - name: Print Containers to Summary
+        run: |
+          docker compose -p ${GITHUB_RUN_NUMBER} images --format json | jq -r --arg registry "$REGISTRY" '.[] | select(.Repository | contains($registry)) | .Tag' >> $GITHUB_STEP_SUMMARY
+      - name: Push Containers
+        run: |
+          docker compose -p ${GITHUB_RUN_NUMBER} push
+        working-directory: .github/workflows/docker
+      - name: Un-Tag Containers
+        run: |
+          docker compose -p ${GITHUB_RUN_NUMBER} down --rmi all
+        working-directory: .github/workflows/docker
+      - name: Remove Containers
+        if: always()
+        run: docker system prune --force
