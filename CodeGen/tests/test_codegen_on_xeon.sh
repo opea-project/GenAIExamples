@@ -50,13 +50,13 @@ function validate_microservices() {
 
     curl http://${ip_address}:8028/generate \
         -X POST \
-        -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":256, "do_sample": true}}' \
+        -d '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
     sleep 5s
 
     curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
-        -d '{"text":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}' \
+        -d '{"text":"def print_hello_world():"}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
     sleep 5s
 }
@@ -65,7 +65,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     curl http://${ip_address}:6666/v1/codegen -H "Content-Type: application/json" -d '{
         "model": "ise-uiuc/Magicoder-S-DS-6.7B",
-        "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}' > ${LOG_PATH}/curl_megaservice.log
+        "messages": "def print_hello_world():"}' > ${LOG_PATH}/curl_megaservice.log
 
     sleep 5s
     echo "Checking response results, make sure the output is reasonable. "
