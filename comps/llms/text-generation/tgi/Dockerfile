@@ -11,3 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+FROM langchain/langchain:latest
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    libgl1-mesa-glx \
+    libjemalloc-dev \
+    vim
+
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
+
+USER user
+
+COPY comps /home/user/comps
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /home/user/comps/llms/text-generation/tgi/requirements.txt
+
+ENV PYTHONPATH=$PYTHONPATH:/home/user
+
+WORKDIR /home/user/comps/llms/text-generation/tgi
+
+ENTRYPOINT ["python", "llm_tgi.py"]

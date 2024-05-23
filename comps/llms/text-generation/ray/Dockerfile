@@ -5,7 +5,7 @@ ENV LANG=en_US.UTF-8
 WORKDIR /root/rayllm
 
 # copy the source code to the package directory
-COPY ../../rayllm/ /root/rayllm
+COPY ../ray/ /root/rayllm
 
 RUN pip install -r /root/rayllm/docker/requirements.txt && \
     pip install --upgrade-strategy eager optimum[habana]
