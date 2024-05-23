@@ -9,7 +9,7 @@ services:
         https_proxy: ${https_proxy}
       context: ../../../ChatQnA/microservice/xeon
       dockerfile: docker/Dockerfile
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-chatqna-megaservice-server
+    image: ${REGISTRY}/${REPO}:chatqna-megaservice-server
     pull_policy: always
   chatqna-ui-server:
     build:
@@ -18,7 +18,7 @@ services:
         https_proxy: ${https_proxy}
       context: ../../../ChatQnA/ui
     extends: chatqna-megaservice-server
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-chatqna-ui-server
+    image: ${REGISTRY}/${REPO}:chatqna-ui-server
   codegen-megaservice-server:
     build:
       args:
@@ -26,7 +26,7 @@ services:
         https_proxy: ${https_proxy}
       context: ../../../CodeGen/microservice/xeon
     extends: chatqna-megaservice-server
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-codegen-megaservice-server
+    image: ${REGISTRY}/${REPO}:codegen-megaservice-server
   codegen-ui-server:
     build:
       args:
@@ -34,4 +34,4 @@ services:
         https_proxy: ${https_proxy}
       context: ../../../CodeGen/ui
     extends: chatqna-megaservice-server
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-codegen-ui-server
+    image: ${REGISTRY}/${REPO}:codegen-ui-server
