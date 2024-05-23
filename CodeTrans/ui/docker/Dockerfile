@@ -4,17 +4,20 @@ FROM node:20.11.1
 # Update package manager and install Git
 RUN apt-get update -y && apt-get install -y git
 
-# Clone the front-end code repository
-RUN git clone https://github.com/opea-project/GenAIExamples.git /home/user/GenAIExamples
+# Copy the front-end code repository
+COPY ../svelte /home/user/svelte
 
 # Set the working directory
-WORKDIR /home/user/GenAIExamples/CodeTrans/ui/svelte
+WORKDIR /home/user/svelte
 
 # Install front-end dependencies
 RUN npm install
 
+# Build the front-end application
+RUN npm run build
+
 # Expose the port of the front-end application
 EXPOSE 5173
 
-# Run the front-end application
-CMD ["npm", "run", "dev", "--", "--host=0.0.0.0"]
+# Run the front-end application in preview mode
+CMD ["npm", "run", "preview", "--", "--port", "5173", "--host", "0.0.0.0"]
