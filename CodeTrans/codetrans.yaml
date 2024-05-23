@@ -44,7 +44,6 @@ opea_micro_services:
       - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     image: opea/gen-ai-comps:codetrans-ui-server
 
-
 opea_mega_service:
   host: ${MEGA_SERVICE_HOST_IP}
   ports: ${MEGA_SERVICE_PORT}
