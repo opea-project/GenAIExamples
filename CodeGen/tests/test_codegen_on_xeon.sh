@@ -67,6 +67,7 @@ function validate_megaservice() {
         "model": "ise-uiuc/Magicoder-S-DS-6.7B",
         "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}' > ${LOG_PATH}/curl_megaservice.log
 
+    sleep 5s
     echo "Checking response results, make sure the output is reasonable. "
     local status=true
     if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
