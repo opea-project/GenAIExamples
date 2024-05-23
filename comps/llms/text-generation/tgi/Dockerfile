@@ -34,4 +34,4 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/llms/text-generation/tgi
 
-ENTRYPOINT ["python", "llm_tgi.py"]
+ENTRYPOINT ["python", "llm.py"]
