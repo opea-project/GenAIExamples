@@ -16,9 +16,6 @@ RUN npm install
 # Build the front-end application
 RUN npm run build
 
-# Build the front-end application
-RUN npm run build
-
 # Expose the port of the front-end application
 EXPOSE 5173
 
