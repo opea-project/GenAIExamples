@@ -5,6 +5,8 @@ name: Container Build
 permissions: read-all
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "35 1 * * 5"
 jobs:
   # https://github.com/intel/ai-containers/blob/main/.github/action.yml
   build-containers:
@@ -24,7 +26,7 @@ jobs:
           password: ${{ secrets.REGISTRY_TOKEN }}
       - name: Build Containers
         run: |
-          docker compose -p ${GITHUB_RUN_NUMBER} up --build --no-start
+          docker compose -p ${GITHUB_RUN_NUMBER} build --no-cache
         working-directory: .github/workflows/docker
       - name: Print Containers to Summary
         run: |
