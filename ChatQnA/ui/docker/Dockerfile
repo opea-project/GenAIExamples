@@ -6,12 +6,18 @@ RUN apt-get update -y && apt-get install -y git
 
 # Copy the front-end code repository
 COPY ../svelte /home/user/svelte
+# Copy the front-end code repository
+COPY ../svelte /home/user/svelte
 
 # Set the working directory
+WORKDIR /home/user/svelte
 WORKDIR /home/user/svelte
 
 # Install front-end dependencies
 RUN npm install
+
+# Build the front-end application
+RUN npm run build
 
 # Build the front-end application
 RUN npm run build
