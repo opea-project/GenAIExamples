@@ -10,31 +10,31 @@ services:
         no_proxy: ${no_proxy}
       context: ../../..
       dockerfile: comps/embeddings/langchain/docker/Dockerfile
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-embedding-tei-server
+    image: ${REGISTRY}/${REPO}:embedding-tei-server
     pull_policy: always
   retriever-redis-server:
     build:
       dockerfile: comps/retrievers/langchain/docker/Dockerfile
     extends: embedding-tei-server
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-retriever-redis-server
+    image: ${REGISTRY}/${REPO}:retriever-redis-server
   reranking-tei-server:
     build:
       dockerfile: comps/reranks/langchain/docker/Dockerfile
     extends: embedding-tei-server
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-reranking-tei-server
+    image: ${REGISTRY}/${REPO}:reranking-tei-server
   llm-tgi-server:
     build:
       dockerfile: comps/llms/langchain/docker/Dockerfile
     extends: embedding-tei-server
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-llm-tgi-server
+    image: ${REGISTRY}/${REPO}:llm-tgi-server
   dataprep-redis-server:
     build:
       dockerfile: comps/dataprep/redis/docker/Dockerfile
     extends: embedding-tei-server
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-dataprep-redis-server
+    image: ${REGISTRY}/${REPO}:dataprep-redis-server
   tei-gaudi:
     build:
       context: ../../../tei-gaudi
       dockerfile: Dockerfile-hpu
     extends: embedding-tei-server
-    image: ${REGISTRY}/${REPO}:b-${GITHUB_RUN_NUMBER:-0}-tei-gaudi
+    image: ${REGISTRY}/${REPO}:tei-gaudi
