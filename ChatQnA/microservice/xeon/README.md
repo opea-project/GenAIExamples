@@ -17,14 +17,12 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-pip install -r requirements.txt
-pip install .
 ```
 
 ### 1. Build Embedding Image
 
 ```bash
-docker build -t opea/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
@@ -36,7 +34,7 @@ docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy
 ### 3. Build Rerank Image
 
 ```bash
-docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/docker/Dockerfile .
+docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
 ```
 
 ### 4. Build LLM Image
@@ -45,10 +43,29 @@ docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_pr
 docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
 ```
 
-### 5. Pull qna-rag-redis-server Image
+### 5. Build Dataprep Image
 
 ```bash
-docker pull intel/gen-ai-examples:qna-rag-redis-server
+docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
+```
+
+### 6. Build MegaService Docker Image
+
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA/microservice/xeon/
+docker build -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+### 7. Build UI Docker Image
+
+Build frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/ChatQnA/ui/
+docker build -t opea/gen-ai-comps:chatqna-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:
@@ -57,7 +74,8 @@ Then run the command `docker images`, you will have the following four Docker Im
 2. `opea/gen-ai-comps:retriever-redis-server`
 3. `opea/gen-ai-comps:reranking-tei-xeon-server`
 4. `opea/gen-ai-comps:llm-tgi-server`
-5. `intel/gen-ai-examples:qna-rag-redis-server`
+5. `opea/gen-ai-comps:chatqna-megaservice-server`
+6. `opea/gen-ai-comps:chatqna-ui-server`
 
 ## 🚀 Start Microservices
 
@@ -68,18 +86,22 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 ```bash
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
+export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-large"
-export LLM_MODEL_ID="m-a-p/OpenCodeInterpreter-DS-6.7B"
-export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:8090"
-export TEI_RERANKING_ENDPOINT="http://${your_ip}:6060"
-export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
-export REDIS_URL="redis://${your_ip}:6379"
-export INDEX_NAME=${your_index_name}
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
+export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
+export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
+export REDIS_URL="redis://${host_ip}:6379"
+export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 ```
 
-### Start Microservice Docker Containers
+Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+
+### Start all the services Docker Containers
 
 ```bash
 docker compose -f docker_compose.yaml up -d
@@ -90,7 +112,7 @@ docker compose -f docker_compose.yaml up -d
 1. TEI Embedding Service
 
 ```bash
-curl ${your_ip}:8090/embed \
+curl ${host_ip}:6006/embed \
     -X POST \
     -d '{"inputs":"What is Deep Learning?"}' \
     -H 'Content-Type: application/json'
@@ -99,25 +121,34 @@ curl ${your_ip}:8090/embed \
 2. Embedding Microservice
 
 ```bash
-curl http://${your_ip}:6000/v1/embeddings\
+curl http://${host_ip}:6000/v1/embeddings\
   -X POST \
   -d '{"text":"hello"}' \
   -H 'Content-Type: application/json'
 ```
 
-3. Retriever Microservice
+3. Retriever Microservice  
+   To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+
+```Python
+import random
+embedding = [random.uniform(-1, 1) for _ in range(768)]
+print(embedding)
+```
+
+Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
 
 ```bash
-curl http://${your_ip}:7000/v1/retrieval\
+curl http://${host_ip}:7000/v1/retrieval\
   -X POST \
-  -d '{"text":"test","embedding":[1,1,...1]}' \
+  -d '{"text":"What is the revenue of Nike in 2023?","embedding":${your_embedding}}' \
   -H 'Content-Type: application/json'
 ```
 
 4. TEI Reranking Service
 
 ```bash
-curl http://${your_ip}:6060/rerank \
+curl http://${host_ip}:8808/rerank \
     -X POST \
     -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
     -H 'Content-Type: application/json'
@@ -126,7 +157,7 @@ curl http://${your_ip}:6060/rerank \
 5. Reranking Microservice
 
 ```bash
-curl http://${your_ip}:8000/v1/reranking\
+curl http://${host_ip}:8000/v1/reranking\
   -X POST \
   -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
   -H 'Content-Type: application/json'
@@ -135,7 +166,7 @@ curl http://${your_ip}:8000/v1/reranking\
 6. TGI Service
 
 ```bash
-curl http://${your_ip}:8008/generate \
+curl http://${host_ip}:9009/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
@@ -144,28 +175,55 @@ curl http://${your_ip}:8008/generate \
 7. LLM Microservice
 
 ```bash
-curl http://${your_ip}:9000/v1/chat/completions\
+curl http://${host_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"text":"What is Deep Learning?"}' \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
 ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service. However, before launching the mega-service, it's essential to ingest data into the vector store.
-
-## 🚀 Ingest Data Into Vector Database
+8. MegaService
 
 ```bash
-docker exec -it qna-rag-redis-server bash
-cd /ws
-python ingest.py
+curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+     "model": "Intel/neural-chat-7b-v3-3",
+     "messages": "What is the revenue of Nike in 2023?"
+     }'
 ```
 
-## 🚀 Construct Mega Service
+9. Dataprep Microservice（Optional）
 
-Modify the `initial_inputs` of line 34 in `chatqna.py`, then you will get the ChatQnA result of this mega service.
+If you want to update the default knowledge base, you can use the following commands:
 
-All of the intermediate results will be printed for each microservices. Users can check the accuracy of the results to make targeted modifications.
+Update Knowledge Base via Local File Upload:
 
 ```bash
-python chatqna.py
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
 ```
+
+This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+
+Add Knowledge Base via HTTP Links:
+
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
+
+This command updates a knowledge base by submitting a list of HTTP links for processing.
+
+## 🚀 Launch the UI
+
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  chaqna-gaudi-ui-server:
+    image: opea/gen-ai-comps:chatqna-ui-server
+    ...
+    ports:
+      - "80:5173"
+```
+
+![project-screenshot](https://i.imgur.com/26zMnEr.png)
