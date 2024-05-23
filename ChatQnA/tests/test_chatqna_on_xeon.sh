@@ -185,15 +185,9 @@ function validate_frontend() {
     node -v && npm -v && pip list
 
     echo "[TEST INFO]: ---------frontend test start---------"
+    npx playwright test
+    echo "[TEST INFO]: ---------frontend test passed---------"
 
-    npx playwright test || exit_status=$?
-
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
 }
 
 function stop_docker() {
@@ -216,7 +210,7 @@ function main() {
     validate_megaservice
     validate_frontend
 
-    # stop_docker
+    stop_docker
     echo y | docker system prune
 
 }
