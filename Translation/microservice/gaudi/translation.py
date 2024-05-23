@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
+import os
 
 from comps import DocSumGateway, MicroService, ServiceOrchestrator, ServiceType
+
+SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 
 
 class TranslationService:
