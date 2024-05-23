@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -xe
+set -x
 
 function test_env_setup() {
     WORKPATH=$(dirname "$PWD")
@@ -75,6 +75,13 @@ function run_tests() {
         -X POST \
         -H "Content-Type: application/json" \
         -d '{"prompt": "def print_hello_world():", "max_new_tokens": 128, "stream": true}' > $LOG_PATH
+    exit_code=$?
+
+    if [ $exit_code -ne 0 ]; then
+        echo "Code generation failed, please check the logs in artifacts!"
+        docker logs $CODEGEN_CONTAINER_NAME >> $LOG_PATH
+        exit 1
+    fi
 
 }
 

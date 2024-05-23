@@ -1,13 +1,1 @@
-{
-	"pluginSearchDirs": [
-		"."
-	],
-	"overrides": [
-		{
-			"files": "*.svelte",
-			"options": {
-				"parser": "svelte"
-			}
-		}
-	]
-}
+{"pluginSearchDirs": ["."], "overrides": [{"files": "*.svelte", "options": {"parser": "svelte"}}]}
