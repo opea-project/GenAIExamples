@@ -8,7 +8,7 @@ on:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - ChatQnA/microservice/xeon/**
+      - ChatQnA/docker-composer/xeon/**
       - ChatQnA/tests/test_chatqna_on_xeon.sh
       - "!**.md"
       - .github/workflows/ChatQnA_xeon.yml
@@ -51,6 +51,7 @@ jobs:
       #     done
 
       - name: Publish backend test artifact
+
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:

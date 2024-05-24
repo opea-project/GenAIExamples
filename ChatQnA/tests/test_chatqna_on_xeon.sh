@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -17,11 +17,11 @@ function build_docker_images() {
     docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
     docker build -t opea/gen-ai-comps:reranking-tei-xeon-server -f comps/reranks/langchain/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:llm-tgi-server -f comps/llms/langchain/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:llm-tgi-server -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/gen-ai-comps:dataprep-redis-server -f comps/dataprep/redis/docker/Dockerfile .
 
-    cd $WORKPATH/microservice/xeon
-    docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server -f docker/Dockerfile .
+    cd $WORKPATH
+    docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server -f Dockerfile .
 
     cd $WORKPATH/ui
     docker build --no-cache -t opea/gen-ai-comps:chatqna-ui-server -f docker/Dockerfile .
@@ -30,7 +30,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/microservice/xeon
+    cd $WORKPATH/docker-composer/xeon
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-large"
@@ -42,6 +42,10 @@ function start_services() {
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
+    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
+    export RETRIEVER_SERVICE_HOST_IP=${ip_address}
+    export RERANK_SERVICE_HOST_IP=${ip_address}
+    export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
@@ -51,6 +55,7 @@ function start_services() {
     docker compose -f docker_compose.yaml up -d
 
     sleep 2m # Waits 2 minutes
+
 }
 
 function validate_microservices() {
@@ -191,7 +196,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/microservice/xeon
+    cd $WORKPATH/docker-composer/xeon
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")

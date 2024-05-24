@@ -8,7 +8,7 @@ on:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - DocSum/microservice/gaudi/**
+      - DocSum/docker-composer/gaudi/**
       - DocSum/tests/test_docsum_on_gaudi.sh
       - "!**.md"
       - "!**/ui/**"
@@ -43,7 +43,7 @@ jobs:
       - name: Clean Up Container
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/DocSum/microservice/gaudi
+          cd ${{ github.workspace }}/DocSum/docker-composer/gaudi
           container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
           for container_name in $container_list; do
               cid=$(docker ps -aq --filter "name=$container_name")
