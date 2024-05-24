@@ -15,8 +15,9 @@
 import os
 
 from langchain_community.embeddings import HuggingFaceHubEmbeddings
+from langsmith import traceable
 
-from comps import EmbedDoc768, ServiceType, TextDoc, opea_microservices, opea_telemetry, register_microservice
+from comps import EmbedDoc768, ServiceType, TextDoc, opea_microservices, register_microservice
 
 
 @register_microservice(
@@ -28,7 +29,7 @@ from comps import EmbedDoc768, ServiceType, TextDoc, opea_microservices, opea_te
     input_datatype=TextDoc,
     output_datatype=EmbedDoc768,
 )
-@opea_telemetry
+@traceable(run_type="embedding")
 def embedding(input: TextDoc) -> EmbedDoc768:
     embed_vector = embeddings.embed_query(input.text)
     embed_vector = embed_vector[:768]  # Keep only the first 768 elements

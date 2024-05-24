@@ -18,8 +18,9 @@ import os
 
 import requests
 from langchain_core.prompts import ChatPromptTemplate
+from langsmith import traceable
 
-from comps import LLMParamsDoc, SearchedDoc, ServiceType, opea_microservices, opea_telemetry, register_microservice
+from comps import LLMParamsDoc, SearchedDoc, ServiceType, opea_microservices, register_microservice
 
 
 @register_microservice(
@@ -31,7 +32,7 @@ from comps import LLMParamsDoc, SearchedDoc, ServiceType, opea_microservices, op
     input_datatype=SearchedDoc,
     output_datatype=LLMParamsDoc,
 )
-@opea_telemetry
+@traceable(run_type="llm")
 def reranking(input: SearchedDoc) -> LLMParamsDoc:
     docs = [doc.text for doc in input.retrieved_docs]
     url = tei_reranking_endpoint + "/rerank"

@@ -23,6 +23,7 @@ from fastapi import File, Form, HTTPException, UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
+from langsmith import traceable
 
 from comps import DocPath, opea_microservices, register_microservice
 from comps.dataprep.utils import docment_loader, parse_html
@@ -107,6 +108,7 @@ def ingest_link_to_redis(link_list: List[str]):
 
 
 @register_microservice(name="opea_service@prepare_doc_redis", endpoint="/v1/dataprep", host="0.0.0.0", port=6007)
+@traceable(run_type="tool")
 async def ingest_documents(
     files: Optional[Union[UploadFile, List[UploadFile]]] = File(None), link_list: Optional[str] = Form(None)
 ):

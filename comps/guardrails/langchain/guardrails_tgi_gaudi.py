@@ -15,8 +15,9 @@
 import os
 
 from langchain_community.llms import HuggingFaceEndpoint
+from langsmith import traceable
 
-from comps import ServiceType, TextDoc, opea_microservices, opea_telemetry, register_microservice
+from comps import ServiceType, TextDoc, opea_microservices, register_microservice
 
 unsafe_categories = """O1: Violence and Hate.
 Should not
@@ -75,7 +76,6 @@ unsafe_dict = {
 }
 
 
-@opea_telemetry
 def moderation_prompt_for_chat(chat):
     # For simplicity, we assume the chat dictionary correctly alternates "user" and "assistant" roles
     # Feel free to include error checking if needed
@@ -113,7 +113,7 @@ Provide your safety assessment for {role} in the above conversation:
     input_datatype=TextDoc,
     output_datatype=TextDoc,
 )
-@opea_telemetry
+@traceable(run_type="llm")
 def safety_guard(input: TextDoc) -> TextDoc:
     # prompt guardrails
     response_input_guard = llm_guard(moderation_prompt_for_chat([{"role": "User", "content": input.text}]))

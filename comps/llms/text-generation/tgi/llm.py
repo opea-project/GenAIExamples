@@ -16,11 +16,12 @@ import os
 
 from fastapi.responses import StreamingResponse
 from langchain_community.llms import HuggingFaceEndpoint
+from langsmith import traceable
 
-from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, opea_telemetry, register_microservice
+from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
 
 
-@opea_telemetry
+@traceable(run_type="tool")
 def post_process_text(text: str):
     if text == " ":
         return "data: @#$\n\n"
@@ -39,7 +40,7 @@ def post_process_text(text: str):
     host="0.0.0.0",
     port=9000,
 )
-@opea_telemetry
+@traceable(run_type="llm")
 def llm_generate(input: LLMParamsDoc):
     llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
     llm = HuggingFaceEndpoint(

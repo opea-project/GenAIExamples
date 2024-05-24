@@ -61,6 +61,9 @@ Start the embedding service with the TEI_EMBEDDING_ENDPOINT.
 ```bash
 cd langchain
 export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=${your_langchain_api_key}
+export LANGCHAIN_PROJECT="opea/gen-ai-comps:embeddings"
 python embedding_tei_gaudi.py
 ```
 

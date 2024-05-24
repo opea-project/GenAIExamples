@@ -16,6 +16,9 @@ pip install -r requirements.txt
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=${your_langchain_api_key}
+export LANGCHAIN_PROJECT="opea/gen-ai-comps:reranks"
 model=BAAI/bge-reranker-large
 revision=refs/pr/4
 volume=$PWD/data

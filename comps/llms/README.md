@@ -20,6 +20,9 @@ pip install -r requirements.txt
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=${your_langchain_api_key}
+export LANGCHAIN_PROJECT="opea/gen-ai-comps:llms"
 docker run -p 8008:80 -v ./data:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:1.4 --model-id ${your_hf_llm_model}
 ```
 
@@ -51,6 +54,9 @@ In order to start TGI and LLM services, you need to setup the following environm
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export LLM_MODEL_ID=${your_hf_llm_model}
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=${your_langchain_api_key}
+export LANGCHAIN_PROJECT="opea/gen-ai-comps:llms"
 ```
 
 ## Build Docker Image

@@ -34,6 +34,9 @@ pip install -r requirements.txt
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=${your_langchain_api_key}
+export LANGCHAIN_PROJECT="opea/gen-ai-comps:gaurdrails"
 volume=$PWD/data
 model_id="meta-llama/LlamaGuard-7b"
 docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
@@ -68,6 +71,9 @@ In order to start TGI and LLM services, you need to setup the following environm
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export SAFETY_GUARD_ENDPOINT="http://${your_ip}:8088"
 export LLM_MODEL_ID=${your_hf_llm_model}
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=${your_langchain_api_key}
+export LANGCHAIN_PROJECT="opea/gen-ai-comps:gaurdrails"
 ```
 
 ## Build Docker Image

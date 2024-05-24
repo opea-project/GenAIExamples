@@ -34,6 +34,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       SAFETY_GUARD_ENDPOINT: ${SAFETY_GUARD_ENDPOINT}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
     restart: unless-stopped
 
 networks:

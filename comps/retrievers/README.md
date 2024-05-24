@@ -32,6 +32,9 @@ docker run -d --name="redis-vector-db" -p 6379:6379 -p 8001:8001 redis/redis-sta
 export REDIS_URL="redis://${your_ip}:6379"
 export INDEX_NAME=${your_index_name}
 export TEI_EMBEDDING_ENDPOINT=${your_embedding_endpoint}
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=${your_langchain_api_key}
+export LANGCHAIN_PROJECT="opea/gen-ai-comps:retrievers"
 ```
 
 ## Start Retriever Service with Local Model

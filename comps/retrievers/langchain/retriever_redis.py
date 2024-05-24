@@ -16,17 +16,10 @@ import os
 
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
+from langsmith import traceable
 from redis_config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 
-from comps import (
-    EmbedDoc768,
-    SearchedDoc,
-    ServiceType,
-    TextDoc,
-    opea_microservices,
-    opea_telemetry,
-    register_microservice,
-)
+from comps import EmbedDoc768, SearchedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
 
 tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
 
@@ -38,7 +31,7 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
     host="0.0.0.0",
     port=7000,
 )
-@opea_telemetry
+@traceable(run_type="retriever")
 def retrieve(input: EmbedDoc768) -> SearchedDoc:
     # Create vectorstore
     if tei_embedding_endpoint:
