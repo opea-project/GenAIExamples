@@ -14,17 +14,17 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/gen-ai-comps:embedding-tei-server -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:retriever-redis-server -f comps/retrievers/langchain/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:reranking-tei-xeon-server -f comps/reranks/langchain/docker/Dockerfile .
-    docker build -t opea/gen-ai-comps:llm-tgi-server -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/gen-ai-comps:dataprep-redis-server -f comps/dataprep/redis/docker/Dockerfile .
+    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
+    docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/docker/Dockerfile .
+    docker build -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
+    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/docker/Dockerfile .
 
     cd $WORKPATH
-    docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server -f Dockerfile .
+    docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
 
     cd $WORKPATH/ui
-    docker build --no-cache -t opea/gen-ai-comps:chatqna-ui-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
     docker images
 }

@@ -29,7 +29,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/gen-ai-comps:llm-tgi-server
+    image: opea/llm-tgi:latest
     container_name: llm-tgi-server
     depends_on:
       - tgi_service
@@ -43,7 +43,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codegen-xeon-backend-server:
-    image: opea/gen-ai-comps:codegen-megaservice-server
+    image: opea/codegen:latest
     container_name: codegen-xeon-backend-server
     depends_on:
       - llm
@@ -57,7 +57,7 @@ services:
     ipc: host
     restart: always
   codegen-xeon-ui-server:
-    image: opea/gen-ai-comps:codegen-ui-server
+    image: opea/codegen-ui:latest
     container_name: codegen-xeon-ui-server
     depends_on:
       - codegen-xeon-backend-server
