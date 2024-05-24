@@ -29,7 +29,7 @@ services:
       - "./data:/data"
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-docsum:latest
+    image: opea/llm-docsum-tgi:latest
     container_name: llm-docsum-gaudi-server
     depends_on:
       - tgi_service

@@ -22,7 +22,7 @@ docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 ### 2. Build LLM Image
 
 ```bash
-docker build -t opea/llm-docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
+docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
 ```
 
 ### 3. Build MegaService Docker Image
@@ -47,7 +47,7 @@ docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --bui
 Then run the command `docker images`, you will have the following Docker Images:
 
 1. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
-2. `opea/llm-docsum:latest`
+2. `opea/llm-docsum-tgi:latest`
 3. `opea/docsum:latest`
 4. `opea/docsum-ui:latest`
 

@@ -30,7 +30,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-docsum:latest
+    image: opea/llm-docsum-tgi:latest
     container_name: llm-docsum-server
     depends_on:
       - tgi_service
