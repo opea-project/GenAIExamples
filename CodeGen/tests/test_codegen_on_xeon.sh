@@ -66,12 +66,17 @@ function validate_megaservice() {
     curl --max-time 600 http://${ip_address}:6666/v1/codegen -H "Content-Type: application/json" -d '{
         "model": "ise-uiuc/Magicoder-S-DS-6.7B",
         "messages": "def print_hello_world():"}' > ${LOG_PATH}/curl_megaservice.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        docker logs codegen-megaservice-server
+        exit 1
+    fi
 
     sleep 2s
     echo "Checking response results, make sure the output is reasonable. "
-    local status=true
+    local status=false
     if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
+    [[ $(grep -c "Hello" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
         status=true
     fi
 

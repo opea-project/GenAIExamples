@@ -92,9 +92,9 @@ function validate_megaservice() {
         "messages": "def print_hello_world():"}' > ${LOG_PATH}/curl_megaservice.log
 
     echo "Checking response results, make sure the output is reasonable. "
-    local status=true
+    local status=false
     if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
+    [[ $(grep -c "Hello" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
         status=true
     fi
 
