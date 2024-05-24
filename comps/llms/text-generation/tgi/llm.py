@@ -51,6 +51,7 @@ def llm_generate(input: LLMParamsDoc):
         temperature=input.temperature,
         repetition_penalty=input.repetition_penalty,
         streaming=input.streaming,
+        timeout=600,
     )
 
     if input.streaming:
