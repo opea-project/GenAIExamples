@@ -1,0 +1,75 @@
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+version: "3.8"
+
+services:
+  tgi_service:
+    image: ghcr.io/huggingface/text-generation-inference:1.4
+    container_name: tgi-service
+    ports:
+      - "8028:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    command: --model-id ${LLM_MODEL_ID}
+  llm:
+    image: opea/gen-ai-comps:llm-tgi-server
+    container_name: llm-tgi-server
+    depends_on:
+      - tgi_service
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  codegen-xeon-backend-server:
+    image: opea/gen-ai-comps:codegen-megaservice-server
+    container_name: codegen-xeon-backend-server
+    depends_on:
+      - llm
+    ports:
+      - "6666:6666"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  codegen-xeon-ui-server:
+    image: opea/gen-ai-comps:codegen-ui-server
+    container_name: codegen-xeon-ui-server
+    depends_on:
+      - codegen-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BASIC_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

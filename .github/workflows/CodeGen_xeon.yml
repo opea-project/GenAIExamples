@@ -8,7 +8,7 @@ on:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - CodeGen/microservice/xeon/**
+      - CodeGen/docker-composer/xeon/**
       - CodeGen/tests/test_codegen_on_xeon.sh
       - "!**.md"
       - "!**/ui/**"
@@ -43,7 +43,7 @@ jobs:
       - name: Clean Up Container
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/CodeGen/microservice/xeon
+          cd ${{ github.workspace }}/CodeGen/docker-composer/xeon
           container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
           for container_name in $container_list; do
               cid=$(docker ps -aq --filter "name=$container_name")

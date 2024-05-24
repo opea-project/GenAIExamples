@@ -13,12 +13,12 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server -f comps/llms/langchain/docker/Dockerfile .
+    docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server -f comps/llms/text-generation/tgi/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
-    cd $WORKPATH/microservice/gaudi
-    docker build --no-cache -t opea/gen-ai-comps:codetrans-megaservice-server -f docker/Dockerfile .
+    cd $WORKPATH
+    docker build --no-cache -t opea/gen-ai-comps:codetrans-megaservice-server -f Dockerfile .
 
     cd $WORKPATH/ui
     docker build --no-cache -t opea/gen-ai-comps:codetrans-ui-server -f docker/Dockerfile .
@@ -27,7 +27,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/microservice/gaudi
+    cd $WORKPATH/docker-composer/gaudi
 
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
@@ -35,6 +35,7 @@ function start_services() {
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
+    export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"
 
     # Start Docker Containers
@@ -96,7 +97,7 @@ function validate_megaservice() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/microservice/gaudi
+    cd $WORKPATH/docker-composer/gaudi
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")

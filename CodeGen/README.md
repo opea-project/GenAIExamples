@@ -24,8 +24,8 @@ The CodeGen service can be effortlessly deployed on either Intel Gaudi2 or Intel
 
 ## Deploy CodeGen on Gaudi
 
-Refer to the [Gaudi Guide](./microservice/gaudi/README.md) for instructions on deploying CodeGen on Gaudi.
+Refer to the [Gaudi Guide](./docker-composer/gaudi/README.md) for instructions on deploying CodeGen on Gaudi.
 
 ## Deploy CodeGen on Xeon
 
-Refer to the [Xeon Guide](./microservice/xeon/README.md) for instructions on deploying CodeGen on Xeon.
+Refer to the [Xeon Guide](./docker-composer/xeon/README.md) for instructions on deploying CodeGen on Xeon.

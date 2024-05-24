@@ -16,8 +16,8 @@ The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel
 
 ## Deploy ChatQnA on Gaudi
 
-Refer to the [Gaudi Guide](./microservice/gaudi/README.md) for instructions on deploying ChatQnA on Gaudi.
+Refer to the [Gaudi Guide](./docker-composer/gaudi/README.md) for instructions on deploying ChatQnA on Gaudi.
 
 ## Deploy ChatQnA on Xeon
 
-Refer to the [Xeon Guide](./microservice/xeon/README.md) for instructions on deploying ChatQnA on Xeon.
+Refer to the [Xeon Guide](./docker-composer/xeon/README.md) for instructions on deploying ChatQnA on Xeon.

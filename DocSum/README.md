@@ -17,8 +17,8 @@ The Document Summarization service can be effortlessly deployed on either Intel 
 
 ## Deploy Document Summarization on Gaudi
 
-Refer to the [Gaudi Guide](./microservice/gaudi/README.md) for instructions on deploying Document Summarization on Gaudi.
+Refer to the [Gaudi Guide](./docker-composer/gaudi/README.md) for instructions on deploying Document Summarization on Gaudi.
 
 ## Deploy Document Summarization on Xeon
 
-Refer to the [Xeon Guide](./microservice/xeon/README.md) for instructions on deploying Document Summarization on Xeon.
+Refer to the [Xeon Guide](./docker-composer/xeon/README.md) for instructions on deploying Document Summarization on Xeon.
