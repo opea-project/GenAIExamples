@@ -198,9 +198,13 @@ function validate_frontend() {
     conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
-    echo "[TEST INFO]: ---------frontend test start---------"
-    npx playwright test
-    echo "[TEST INFO]: ---------frontend test passed---------"
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------E2E test failed---------"
+    else
+        echo "[TEST INFO]: ---------E2E test passed---------"
+    fi
 }
 
 function stop_docker() {
