@@ -5,7 +5,7 @@ name: DocSum E2E test on Gaudi
 
 on:
   pull_request:
-    branches: [main]
+    branches: [test]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - DocSum/docker-composer/gaudi/**
