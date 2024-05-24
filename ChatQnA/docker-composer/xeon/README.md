@@ -167,11 +167,8 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start all the services Docker Containers
-> Before running the docker compose command, you need to be in the `/home/ubuntu/GenAIComps/GenAIExamples/ChatQnA/microservice/xeon` folder
+> Before running the docker compose command, you need to be in the correct folder that has the docker_compose.yaml file
 
-```
-cd /home/ubuntu/GenAIComps/GenAIExamples/ChatQnA/microservice/xeon
-```
 
 ```bash
 cd GenAIExamples/ChatQnA/docker-composer/xeon/
