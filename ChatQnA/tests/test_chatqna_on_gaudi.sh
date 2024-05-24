@@ -202,6 +202,7 @@ function validate_frontend() {
 
     if [ $exit_status -ne 0 ]; then
         echo "[TEST INFO]: ---------E2E test failed---------"
+        exit $exit_status
     else
         echo "[TEST INFO]: ---------E2E test passed---------"
     fi
