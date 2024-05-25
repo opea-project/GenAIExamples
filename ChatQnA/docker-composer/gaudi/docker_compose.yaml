@@ -22,7 +22,7 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: opea/gen-ai-comps:dataprep-redis-server
+    image: opea/dataprep-redis:latest
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
@@ -34,21 +34,24 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
   tei-embedding-service:
-    image: opea/tei-gaudi
+    image: opea/tei-gaudi:latest
     container_name: tei-embedding-gaudi-server
     ports:
       - "8090:80"
     volumes:
       - "./data:/data"
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      RUNTIME: habana
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
     command: --model-id ${EMBEDDING_MODEL_ID}
   embedding:
-    image: opea/gen-ai-comps:embedding-tei-server
+    image: opea/embedding-tei:latest
     container_name: embedding-tei-server
     depends_on:
       - tei-embedding-service
@@ -61,7 +64,7 @@ services:
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   retriever:
-    image: opea/gen-ai-comps:retriever-redis-server
+    image: opea/retriever-redis:latest
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -87,7 +90,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${RERANK_MODEL_ID}
   reranking:
-    image: opea/gen-ai-comps:reranking-tei-server
+    image: opea/reranking-tei:latest
     container_name: reranking-tei-gaudi-server
     depends_on:
       - tei-xeon-service
@@ -118,7 +121,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/gen-ai-comps:llm-tgi-gaudi-server
+    image: opea/llm-tgi:latest
     container_name: llm-tgi-gaudi-server
     depends_on:
       - tgi-service
@@ -132,7 +135,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   chaqna-gaudi-backend-server:
-    image: opea/gen-ai-comps:chatqna-megaservice-server
+    image: opea/chatqna:latest
     container_name: chatqna-gaudi-backend-server
     depends_on:
       - redis-vector-db
@@ -156,7 +159,7 @@ services:
     ipc: host
     restart: always
   chaqna-gaudi-ui-server:
-    image: opea/gen-ai-comps:chatqna-ui-server
+    image: opea/chatqna-ui:latest
     container_name: chatqna-gaudi-ui-server
     depends_on:
       - chaqna-gaudi-backend-server

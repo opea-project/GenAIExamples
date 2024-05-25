@@ -22,7 +22,7 @@ docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 ### 2. Build LLM Image
 
 ```bash
-docker build -t opea/gen-ai-comps:llm-docsum-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
+docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
 ```
 
 ### 3. Build MegaService Docker Image
@@ -32,7 +32,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
 cd GenAIExamples/DocSum
-docker build -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 ### 4. Build UI Docker Image
@@ -41,15 +41,15 @@ Construct the frontend Docker image using the command below:
 
 ```bash
 cd GenAIExamples/DocSum/ui/
-docker build -t opea/gen-ai-comps:docsum-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
 
 1. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
-2. `opea/gen-ai-comps:llm-docsum-gaudi-server`
-3. `opea/gen-ai-comps:docsum-megaservice-server`
-4. `opea/gen-ai-comps:docsum-ui-server`
+2. `opea/llm-docsum-tgi:latest`
+3. `opea/docsum:latest`
+4. `opea/docsum-ui:latest`
 
 ## 🚀 Start Microservices and MegaService
 
