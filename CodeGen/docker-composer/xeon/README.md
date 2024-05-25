@@ -22,7 +22,7 @@ cd GenAIComps
 ### 1. Build LLM Image
 
 ```bash
-docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -32,7 +32,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
 cd GenAIExamples/CodeGen
-docker build -t opea/gen-ai-comps:codegen-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 ### 6. Build UI Docker Image
@@ -41,14 +41,14 @@ Build frontend Docker image via below command:
 
 ```bash
 cd GenAIExamples/CodeGen/ui/
-docker build -t opea/gen-ai-comps:codegen-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 3 Docker Images:
 
-1. `opea/gen-ai-comps:llm-tgi-server`
-2. `opea/gen-ai-comps:codegen-megaservice-server`
-3. `opea/gen-ai-comps:codegen-ui-server`
+1. `opea/llm-tgi:latest`
+2. `opea/codegen:latest`
+3. `opea/codegen-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -111,7 +111,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 ```yaml
   chaqna-gaudi-ui-server:
-    image: opea/gen-ai-comps:codegen-ui-server
+    image: opea/codegen-ui:latest
     ...
     ports:
       - "80:5173"
