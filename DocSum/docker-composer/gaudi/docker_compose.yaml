@@ -33,7 +33,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/gen-ai-comps:llm-docsum-gaudi-server
+    image: opea/llm-docsum-tgi:latest
     container_name: llm-docsum-gaudi-server
     depends_on:
       - tgi_service
@@ -47,7 +47,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   docsum-gaudi-backend-server:
-    image: opea/gen-ai-comps:docsum-megaservice-server
+    image: opea/docsum:latest
     container_name: docsum-gaudi-backend-server
     depends_on:
       - tgi_service
@@ -62,7 +62,7 @@ services:
     ipc: host
     restart: always
   docsum-gaudi-ui-server:
-    image: opea/gen-ai-comps:docsum-ui-server
+    image: opea/docsum-ui:latest
     container_name: docsum-gaudi-ui-server
     depends_on:
       - docsum-gaudi-backend-server

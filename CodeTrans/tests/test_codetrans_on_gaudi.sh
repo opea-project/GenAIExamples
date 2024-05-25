@@ -13,15 +13,15 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
     cd $WORKPATH
-    docker build --no-cache -t opea/gen-ai-comps:codetrans-megaservice-server -f Dockerfile .
+    docker build --no-cache -t opea/codetrans:latest -f Dockerfile .
 
     cd $WORKPATH/ui
-    docker build --no-cache -t opea/gen-ai-comps:codetrans-ui-server -f docker/Dockerfile .
+    docker build --no-cache -t opea/codetrans-ui:latest -f docker/Dockerfile .
 
     docker images
 }

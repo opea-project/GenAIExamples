@@ -31,7 +31,7 @@ opea_micro_services:
   llm:
     host: ${LLM_SERVICE_HOST_IP}
     ports: ${LLM_SERVICE_PORT}
-    image: opea/gen-ai-comps:llm-tgi-gaudi-server
+    image: opea/llm-tgi:latest
     endpoint: /v1/chat/completions
     environment:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
@@ -40,14 +40,14 @@ opea_micro_services:
     host: ${UI_SERVICE_HOST_IP}
     ports:
       - "5173:5173"
+    image: opea/codetrans-ui:latest
     environment:
       - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
-    image: opea/gen-ai-comps:codetrans-ui-server
 
 opea_mega_service:
   host: ${MEGA_SERVICE_HOST_IP}
   ports: ${MEGA_SERVICE_PORT}
   endpoint: /v1/codetrans
-  image: opea/gen-ai-comps:codetrans-ui-server
+  image: opea/codetrans:latest
   mega_flow:
     - llm

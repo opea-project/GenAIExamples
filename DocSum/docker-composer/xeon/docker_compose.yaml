@@ -30,7 +30,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/gen-ai-comps:llm-docsum-server
+    image: opea/llm-docsum-tgi:latest
     container_name: llm-docsum-server
     depends_on:
       - tgi_service
@@ -44,7 +44,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   docsum-xeon-backend-server:
-    image: opea/gen-ai-comps:docsum-megaservice-server
+    image: opea/docsum:latest
     container_name: docsum-xeon-backend-server
     depends_on:
       - tgi_service
@@ -59,7 +59,7 @@ services:
     ipc: host
     restart: always
   docsum-xeon-ui-server:
-    image: opea/gen-ai-comps:docsum-ui-server
+    image: opea/docsum-ui:latest
     container_name: docsum-xeon-ui-server
     depends_on:
       - docsum-xeon-backend-server

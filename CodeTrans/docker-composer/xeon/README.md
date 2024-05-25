@@ -24,7 +24,7 @@ cd GenAIComps
 ### 2. Build the LLM Docker Image with the following command
 
 ```bash
-docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
 ### 3. Build MegaService Docker Image
@@ -32,21 +32,21 @@ docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/CodeTrans
-docker build -t opea/gen-ai-comps:codetrans-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+docker build -t opea/codetrans:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 ### 4. Build UI Docker Image
 
 ```bash
 cd GenAIExamples/CodeTrans/ui
-docker build -t opea/gen-ai-comps:codetrans-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-- `opea/gen-ai-comps:llm-tgi-server`
-- `opea/gen-ai-comps:codetrans-megaservice-server`
-- `opea/gen-ai-comps:codetrans-ui-server`
+- `opea/llm-tgi:latest`
+- `opea/codetrans:latest`
+- `opea/codetrans-ui:latest`
 
 ## 🚀 Start Microservices
 

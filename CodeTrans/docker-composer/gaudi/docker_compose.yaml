@@ -33,7 +33,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/gen-ai-comps:llm-tgi-gaudi-server
+    image: opea/llm-tgi:latest
     container_name: llm-tgi-gaudi-server
     ports:
       - "9000:9000"
@@ -45,7 +45,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codetrans-gaudi-backend-server:
-    image: opea/gen-ai-comps:codetrans-megaservice-server
+    image: opea/codetrans:latest
     container_name: codetrans-gaudi-backend-server
     depends_on:
       - tgi_service
@@ -60,7 +60,7 @@ services:
     ipc: host
     restart: always
   codetrans-gaudi-ui-server:
-    image: opea/gen-ai-comps:codetrans-ui-server
+    image: opea/codetrans-ui:latest
     container_name: codetrans-gaudi-ui-server
     depends_on:
       - codetrans-gaudi-backend-server

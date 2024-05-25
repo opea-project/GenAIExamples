@@ -22,31 +22,31 @@ cd GenAIComps
 ### 1. Build Embedding Image
 
 ```bash
-docker build --no-cache -t opea/gen-ai-comps:embedding-tei-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
 ```
 
 ### 4. Build LLM Image
 
 ```bash
-docker build --no-cache -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/gen-ai-comps:dataprep-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
+docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
 ```
 
 ### 6. Build MegaService Docker Image
@@ -56,7 +56,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA
-docker build --no-cache -t opea/gen-ai-comps:chatqna-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 ### 7. Build UI Docker Image
@@ -65,17 +65,18 @@ Build frontend Docker image via below command:
 
 ```bash
 cd GenAIExamples/ChatQnA/ui/
-docker build --no-cache -t opea/gen-ai-comps:chatqna-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:
 
-1. `opea/gen-ai-comps:embedding-tei-server`
-2. `opea/gen-ai-comps:retriever-redis-server`
-3. `opea/gen-ai-comps:reranking-tei-xeon-server`
-4. `opea/gen-ai-comps:llm-tgi-server`
-5. `opea/gen-ai-comps:chatqna-megaservice-server`
-6. `opea/gen-ai-comps:chatqna-ui-server`
+1. `opea/dataprep-redis:latest`
+2. `opea/embedding-tei:latest`
+3. `opea/retriever-redis:latest`
+4. `opea/reranking-tei:latest`
+5. `opea/llm-tgi:latest`
+6. `opea/chatqna:latest`
+7. `opea/chatqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -225,7 +226,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 ```yaml
   chaqna-gaudi-ui-server:
-    image: opea/gen-ai-comps:chatqna-ui-server
+    image: opea/chatqna-ui:latest
     ...
     ports:
       - "80:5173"
