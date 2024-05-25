@@ -171,7 +171,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ### Start all the services Docker Containers
 
-> Before running the docker compose command, you need to be in the `/home/ubuntu/GenAIComps/GenAIExamples/ChatQnA/microservice/xeon` folder
+> Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 
 ```bash
