@@ -27,6 +27,10 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
       - "./data:/data"
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
     command: --model-id ${LLM_MODEL_ID}
   llm:
     image: opea/gen-ai-comps:llm-docsum-gaudi-server
