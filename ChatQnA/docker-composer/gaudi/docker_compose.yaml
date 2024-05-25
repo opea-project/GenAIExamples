@@ -110,9 +110,12 @@ services:
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      RUNTIME: habana
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
     command: --model-id ${LLM_MODEL_ID}
   llm:
     image: opea/gen-ai-comps:llm-tgi-gaudi-server
