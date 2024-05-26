@@ -30,6 +30,8 @@ jobs:
     steps:
       - name: Checkout out Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Get Test Matrix
         id: get-changed-files
