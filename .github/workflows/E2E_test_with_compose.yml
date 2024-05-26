@@ -30,10 +30,9 @@ jobs:
     steps:
       - name: Checkout out Repo
         uses: actions/checkout@v4
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
 
-      - id: get-changed-files
+      - name: Get Test Matrix
+        id: get-changed-files
         run: |
           changed_files=$(git diff --name-only ${{ github.base_ref }} ${{ github.head_ref }}  | grep -vE '.github|README.md|deprecate|kubernetes')
           echo "changed_files=${changed_files}" >> $GITHUB_OUTPUT
