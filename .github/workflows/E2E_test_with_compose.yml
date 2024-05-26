@@ -58,38 +58,43 @@ jobs:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     runs-on: ${{ matrix.hardware }}
     steps:
-      - name: Test examples
+      - name: Test example
         run: |
           echo "Matrix - example ${{ matrix.example }}, hardware ${{ matrix.hardware }}"
 
-#      - name: Clean Up Working Directory
-#        run: sudo rm -rf ${{github.workspace}}/*
-#
-#      - name: Checkout out Repo
-#        uses: actions/checkout@v4
-#        with:
-#          ref: "refs/pull/${{ github.event.number }}/merge"
-#
-#      - name: Run Test
-#        env:
-#          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
-#          AISE_CLUSTER_01_2_IP: ${{ secrets.AISE_CLUSTER_01_2_IP }}
-#        run: |
-#          cd ${{ github.workspace }}/DocSum/tests
-#          timeout 20m bash test_docsum_on_gaudi.sh
-#
-#      - name: Clean Up Container
-#        if: cancelled() || failure()
-#        run: |
-#          cd ${{ github.workspace }}/DocSum/docker-composer/gaudi
-#          container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-#          for container_name in $container_list; do
-#              cid=$(docker ps -aq --filter "name=$container_name")
-#              if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-#          done
-#
-#      - name: Publish pipeline artifact
-#        if: ${{ !cancelled() }}
-#        uses: actions/upload-artifact@v4
-#        with:
-#          path: ${{ github.workspace }}/DocSum/tests/*.log
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+
+      - name: Run test
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          example: ${{ matrix.example }}
+          hardware: ${{ matrix.hardware }}
+        run: |
+          cd ${{ github.workspace }}/$example/tests
+          example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
+          timeout 20m bash test_${example_l}_on_${hardware}.sh
+
+      - name: Clean up container
+        env:
+          example: ${{ matrix.example }}
+          hardware: ${{ matrix.hardware }}
+        if: cancelled() || failure()
+        run: |
+          cd ${{ github.workspace }}/$example/docker-composer/$hardware
+          container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
+          for container_name in $container_list; do
+              cid=$(docker ps -aq --filter "name=$container_name")
+              if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          done
+
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ github.workspace }}/${{ matrix.example }}/tests/*.log
