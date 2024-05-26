@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: E2E test with Docker Compose
+name: E2E Test with Docker Compose
 
 on:
   pull_request:
@@ -36,8 +36,9 @@ jobs:
         id: get-test-matrix
         run: |
           set -xe
-          examples=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.head_ref }} | \
-          grep -vE '.github|README.md|*.txt|deprecate|kubernetes' | grep '/' | cut -d'/' -f1 | sort -u)
+          changed_files=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.head_ref }} | \
+          grep -vE '.github|README.md|*.txt|deprecate|kubernetes')
+          examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
           for example in ${examples}; do
               run_hardware=""
