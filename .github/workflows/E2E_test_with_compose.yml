@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   job1:
+    name: Get-Test-Matrix
     runs-on: ubuntu-latest
     outputs:
       run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
