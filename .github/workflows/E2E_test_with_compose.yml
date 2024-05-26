@@ -12,7 +12,7 @@ on:
       - "**/tests/**"
       - "**/ui/**"
       - "!**.md"
-      - .github/workflows/CodeTrans_gaudi.yml
+      - .github/workflows/E2E_test_with_compose.yml
   workflow_dispatch:
 
 
