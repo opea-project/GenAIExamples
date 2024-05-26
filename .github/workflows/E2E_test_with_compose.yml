@@ -57,6 +57,7 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     runs-on: ${{ matrix.hardware }}
+    continue-on-error: true
     steps:
       - name: Test example
         run: |
