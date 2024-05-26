@@ -1,0 +1,91 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: E2E test with Docker Compose
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths:
+      - "**/docker-composer/**"
+      - "**/tests/**"
+      - "**/ui/**"
+      - "!**.md"
+      - .github/workflows/CodeTrans_gaudi.yml
+  workflow_dispatch:
+
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    outputs:
+      changed_files: ${{ steps.get-changed-files.outputs.changed_files }}
+      examples: ${{ steps.get-changed-files.outputs.examples }}
+      run_matrix: ${{ steps.get-changed-files.outputs.run_matrix }}
+    steps:
+      - id: get-changed-files
+        run: |
+          changed_files=$(git diff --name-only ${{ github.base_ref }} ${{ github.head_ref }}  | grep -vE '.github|README.md|deprecate|kubernetes')
+          echo "changed_files=${changed_files}" >> $GITHUB_OUTPUT
+          examples=$(echo ${changed_files} | grep '*/' | cut -d'/' -f1 | sort -u)
+          echo "examples=${examples}" >> $GITHUB_OUTPUT
+          run_matrix="{\"include\":["
+          for example in ${examples}; do
+              run_hardware=""
+              if [ $(echo ${changed_files} | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; else run_hardware="xeon"; fi
+              if [ $(echo ${changed_files} | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="${run_hardware} xeon"; fi
+              for hw in ${run_hardware}; do
+                  run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hw}\"},"
+              done
+          done
+          run_matrix=$run_matrix"]}"
+          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+
+  Example-test:
+    needs: job1
+    strategy:
+      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+    runs-on: ${{ matrix.hardware }}
+    steps:
+      - name: Test Examples
+        run: |
+          echo "Matrix - example ${{ matrix.example }}, hardware ${{ matrix.hardware }}"
+
+#      - name: Clean Up Working Directory
+#        run: sudo rm -rf ${{github.workspace}}/*
+#
+#      - name: Checkout out Repo
+#        uses: actions/checkout@v4
+#        with:
+#          ref: "refs/pull/${{ github.event.number }}/merge"
+#
+#      - name: Run Test
+#        env:
+#          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+#          AISE_CLUSTER_01_2_IP: ${{ secrets.AISE_CLUSTER_01_2_IP }}
+#        run: |
+#          cd ${{ github.workspace }}/DocSum/tests
+#          timeout 20m bash test_docsum_on_gaudi.sh
+#
+#      - name: Clean Up Container
+#        if: cancelled() || failure()
+#        run: |
+#          cd ${{ github.workspace }}/DocSum/docker-composer/gaudi
+#          container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
+#          for container_name in $container_list; do
+#              cid=$(docker ps -aq --filter "name=$container_name")
+#              if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+#          done
+#
+#      - name: Publish pipeline artifact
+#        if: ${{ !cancelled() }}
+#        uses: actions/upload-artifact@v4
+#        with:
+#          path: ${{ github.workspace }}/DocSum/tests/*.log
