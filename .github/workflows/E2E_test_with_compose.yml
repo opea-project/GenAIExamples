@@ -12,6 +12,7 @@ on:
       - "**/tests/**"
       - "**/ui/**"
       - "!**.md"
+      - "!**.txt"
       - .github/workflows/E2E_test_with_compose.yml
   workflow_dispatch:
 
@@ -35,8 +36,8 @@ jobs:
         id: get-test-matrix
         run: |
           set -xe
-          changed_files=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.head_ref }}  | grep -vE '.github|README.md|deprecate|kubernetes')
-          examples=$(echo ${changed_files} | grep '*/' | cut -d'/' -f1 | sort -u)
+          examples=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.head_ref }} | \
+          grep -vE '.github|README.md|*.txt|deprecate|kubernetes' | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
           for example in ${examples}; do
               run_hardware=""
