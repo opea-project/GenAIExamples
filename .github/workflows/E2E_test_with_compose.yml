@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: E2E Test with Docker Compose
+name: E2E test with docker compose
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   job1:
-    name: Get-Test-Matrix
+    name: Get-test-matrix
     runs-on: ubuntu-latest
     outputs:
       run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
@@ -33,11 +33,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get Test Matrix
+      - name: Get test matrix
         id: get-test-matrix
         run: |
           set -xe
-          changed_files=$(git diff --name-only origin/${{ github.base_ref }} origin/${{ github.head_ref }} | \
+          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | \
           grep -vE '.github|README.md|*.txt|deprecate|kubernetes')
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
@@ -58,7 +58,7 @@ jobs:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     runs-on: ${{ matrix.hardware }}
     steps:
-      - name: Test Examples
+      - name: Test examples
         run: |
           echo "Matrix - example ${{ matrix.example }}, hardware ${{ matrix.hardware }}"
 
