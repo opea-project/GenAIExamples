@@ -43,8 +43,9 @@ jobs:
           run_matrix="{\"include\":["
           for example in ${examples}; do
               run_hardware=""
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; else run_hardware="xeon"; fi
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="${run_hardware} xeon"; fi
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
+              if [ $run_hardware = "" ]; then run_hardware="xeon"; fi
               for hw in ${run_hardware}; do
                   run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hw}\"},"
               done
