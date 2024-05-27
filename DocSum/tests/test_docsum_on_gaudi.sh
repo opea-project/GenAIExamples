@@ -18,8 +18,8 @@ function build_docker_images() {
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
-    cd $WORKPATH/microservice/gaudi
-    docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+    cd $WORKPATH
+    docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
     cd $WORKPATH/ui
     docker build --no-cache -t opea/gen-ai-comps:docsum-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
@@ -28,12 +28,13 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/microservice/gaudi
+    cd $WORKPATH/docker-composer/gaudi
 
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
+    export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 
     # Start Docker Containers
@@ -98,7 +99,7 @@ function validate_megaservice() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/microservice/gaudi
+    cd $WORKPATH/docker-composer/gaudi
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
