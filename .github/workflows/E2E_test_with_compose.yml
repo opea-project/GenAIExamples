@@ -1,0 +1,104 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: E2E test with docker compose
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths:
+      - "**/docker-composer/**"
+      - "**/tests/**"
+      - "**/ui/**"
+      - "!**.md"
+      - "!**.txt"
+      - .github/workflows/E2E_test_with_compose.yml
+  workflow_dispatch:
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  job1:
+    name: Get-test-matrix
+    runs-on: ubuntu-latest
+    outputs:
+      run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get test matrix
+        id: get-test-matrix
+        run: |
+          set -xe
+          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | \
+          grep -vE '.github|README.md|*.txt|deprecate|kubernetes')
+          examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
+          run_matrix="{\"include\":["
+          for example in ${examples}; do
+              run_hardware=""
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
+              if [ $run_hardware = "" ]; then run_hardware="xeon"; fi
+              for hw in ${run_hardware}; do
+                  run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hw}\"},"
+              done
+          done
+          run_matrix=$run_matrix"]}"
+          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+
+  Example-test:
+    needs: job1
+    strategy:
+      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+    runs-on: ${{ matrix.hardware }}
+    continue-on-error: true
+    steps:
+      - name: Test example
+        run: |
+          echo "Matrix - example ${{ matrix.example }}, hardware ${{ matrix.hardware }}"
+
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+
+      - name: Run test
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          example: ${{ matrix.example }}
+          hardware: ${{ matrix.hardware }}
+        run: |
+          cd ${{ github.workspace }}/$example/tests
+          example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
+          timeout 20m bash test_${example_l}_on_${hardware}.sh
+
+      - name: Clean up container
+        env:
+          example: ${{ matrix.example }}
+          hardware: ${{ matrix.hardware }}
+        if: cancelled() || failure()
+        run: |
+          cd ${{ github.workspace }}/$example/docker-composer/$hardware
+          container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
+          for container_name in $container_list; do
+              cid=$(docker ps -aq --filter "name=$container_name")
+              if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          done
+          echo y | docker system prune
+
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.example }}-${{ matrix.hardware }}
+          path: ${{ github.workspace }}/${{ matrix.example }}/tests/*.log
