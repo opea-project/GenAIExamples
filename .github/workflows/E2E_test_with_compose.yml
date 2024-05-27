@@ -31,6 +31,7 @@ jobs:
       - name: Checkout out Repo
         uses: actions/checkout@v4
         with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
           fetch-depth: 0
 
       - name: Get test matrix
