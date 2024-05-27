@@ -109,7 +109,6 @@ curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
-
 ## Enable LangSmith for Monotoring Application (Optional)
 
 LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
@@ -128,7 +127,6 @@ pip install -U langsmith
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=ls_...
 ```
-
 
 ## 🚀 Launch the UI
 

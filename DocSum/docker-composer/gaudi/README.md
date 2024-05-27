@@ -125,7 +125,6 @@ export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=ls_...
 ```
 
-
 ## 🚀 Launch the UI
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
