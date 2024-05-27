@@ -10,8 +10,10 @@ numpy
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+pandas
 Pillow
 pymupdf
+python-docx
 redis
 sentence_transformers
 shortuuid

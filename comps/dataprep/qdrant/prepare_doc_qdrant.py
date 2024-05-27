@@ -20,7 +20,7 @@ from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFace
 from langchain_community.vectorstores import Qdrant
 
 from comps import DocPath, opea_microservices, opea_telemetry, register_microservice
-from comps.dataprep.utils import docment_loader
+from comps.dataprep.utils import document_loader
 
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 
@@ -40,7 +40,7 @@ def ingest_documents(doc_path: DocPath):
     print(f"Parsing document {doc_path}.")
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
-    content = docment_loader(doc_path)
+    content = document_loader(doc_path)
     chunks = text_splitter.split_text(content)
 
     print("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")

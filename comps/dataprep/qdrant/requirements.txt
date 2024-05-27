@@ -9,8 +9,10 @@ numpy
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+pandas
 Pillow
 pymupdf
+python-docx
 qdrant-client
 sentence_transformers
 shortuuid

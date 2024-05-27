@@ -13,34 +13,43 @@
 # limitations under the License.
 
 import io
+import json
 import multiprocessing
+import os
 import re
 import unicodedata
 from urllib.parse import urlparse, urlunparse
 
+import easyocr
+import fitz
 import numpy as np
+import pandas as pd
 import requests
+import yaml
 from bs4 import BeautifulSoup
+from docx import Document as DDocument
+from langchain_community.document_loaders import (
+    UnstructuredImageLoader,
+    UnstructuredMarkdownLoader,
+    UnstructuredPowerPointLoader,
+    UnstructuredXMLLoader,
+)
 from PIL import Image
 
 
-def pdf_loader(file_path):
-    try:
-        import easyocr
-        import fitz
-    except ImportError:
-        raise ImportError(
-            "`PyMuPDF` or 'easyocr' package is not found, please install it with " "`pip install pymupdf easyocr.`"
-        )
-
-    doc = fitz.open(file_path)
-    reader = easyocr.Reader(["en"])
+def load_pdf(pdf_path):
+    """Load the pdf file."""
+    doc = fitz.open(pdf_path)
+    reader = easyocr.Reader(["en"], gpu=False)
     result = ""
     for i in range(doc.page_count):
         page = doc.load_page(i)
         pagetext = page.get_text().strip()
         if pagetext:
-            result = result + pagetext
+            if pagetext.endswith("!") or pagetext.endswith("?") or pagetext.endswith("."):
+                result = result + pagetext
+            else:
+                result = result + pagetext + "."
         if len(doc.get_page_images(i)) > 0:
             for img in doc.get_page_images(i):
                 if img:
@@ -60,11 +69,145 @@ def pdf_loader(file_path):
     return result
 
 
-def docment_loader(doc_path):
+def load_html(html_path):
+    """Load the html file."""
+    with open(html_path, "r", encoding="utf-8") as file:
+        html = file.read()
+    soup = BeautifulSoup(html, "html.parser")
+    text = soup.get_text(strip=True)
+    return text
+
+
+def load_txt(txt_path):
+    """Load txt file."""
+    with open(txt_path, "r") as file:
+        text = file.read()
+    return text
+
+
+def load_doc(doc_path):
+    """Load doc file."""
+    txt_path = doc_path.replace(".doc", ".txt")
+    try:
+        os.system(f'antiword "{doc_path}" > "{txt_path}"')
+    except:
+        raise AssertionError(
+            "antiword failed or not installed, if not installed,"
+            + 'use "apt-get update && apt-get install -y antiword" to install it.'
+        )
+    text = load_txt(txt_path)
+    os.remove(txt_path)
+    return text
+
+
+def load_docx(docx_path):
+    """Load docx file."""
+    doc = DDocument(docx_path)
+    text = ""
+    for paragraph in doc.paragraphs:
+        text += paragraph.text
+    return text
+
+
+def load_pptx(pptx_path):
+    """Load pptx file."""
+    loader = UnstructuredPowerPointLoader(pptx_path)
+    text = loader.load()[0].page_content
+    return text
+
+
+def load_md(md_path):
+    """Load md file."""
+    loader = UnstructuredMarkdownLoader(md_path)
+    text = loader.load()[0].page_content
+    return text
+
+
+def load_xml(xml_path):
+    """Load xml file."""
+    loader = UnstructuredXMLLoader(xml_path)
+    text = loader.load()[0].page_content
+    return text
+
+
+def load_json(json_path):
+    """Load and process json file."""
+    with open(json_path, "r") as file:
+        data = json.load(file)
+    return json.dumps(data)
+
+
+def load_yaml(yaml_path):
+    """Load and process yaml file."""
+    with open(yaml_path, "r") as file:
+        data = yaml.safe_load(file)
+    return yaml.dump(data)
+
+
+def load_xlsx(input_path):
+    """Load and process xlsx file."""
+    df = pd.read_excel(input_path)
+    return df.to_string()
+
+
+def load_csv(input_path):
+    """Load the csv file."""
+    df = pd.read_csv(input_path)
+    return df.to_string()
+
+
+def load_image(image_path):
+    """Load the image file."""
+    loader = UnstructuredImageLoader(image_path)
+    text = loader.load()[0].page_content
+    return text
+
+
+def load_svg(svg_path):
+    """Load the svg file."""
+    import cairosvg
+
+    png_path = svg_path.replace(".svg", ".png")
+    cairosvg.svg2png(url=svg_path, write_to=png_path)
+    text = load_image(png_path)
+    os.remove(png_path)
+    return text
+
+
+def document_loader(doc_path):
     if doc_path.endswith(".pdf"):
-        return pdf_loader(doc_path)
+        return load_pdf(doc_path)
+    elif doc_path.endswith(".html"):
+        return load_html(doc_path)
+    elif doc_path.endswith(".txt"):
+        return load_txt(doc_path)
+    elif doc_path.endswith(".doc"):
+        return load_doc(doc_path)
+    elif doc_path.endswith(".docx"):
+        return load_docx(doc_path)
+    elif doc_path.endswith(".pptx") or doc_path.endswith(".ppt"):
+        return load_pptx(doc_path)
+    elif doc_path.endswith(".md"):
+        return load_md(doc_path)
+    elif doc_path.endswith(".xml"):
+        return load_xml(doc_path)
+    elif doc_path.endswith(".json") or doc_path.endswith(".jsonl"):
+        return load_json(doc_path)
+    elif doc_path.endswith(".yaml"):
+        return load_yaml(doc_path)
+    elif doc_path.endswith(".xlsx") or doc_path.endswith(".xls"):
+        return load_xlsx(doc_path)
+    elif doc_path.endswith(".csv"):
+        return load_csv(doc_path)
+    elif doc_path.endswith(".tiff"):
+        return load_image(doc_path)
+    elif doc_path.endswith(".svg"):
+        return load_image(doc_path)
     else:
-        raise NotImplementedError("Current only support pdf format.")
+        raise NotImplementedError(
+            "Current only support pdf, html, txt, doc, docx, pptx, ppt, md, xml"
+            + ", json, jsonl, yaml, xlsx, xls, csv, tiff and svg format."
+        )
 
 
 class Crawler:
