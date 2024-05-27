@@ -34,7 +34,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/guardrails
+WORKDIR /home/user/comps/guardrails/langchain
 
 ENTRYPOINT ["python", "guardrails_tgi_gaudi.py"]
 
