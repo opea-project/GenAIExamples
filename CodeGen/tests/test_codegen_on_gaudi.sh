@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -x
+set -xe
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
-ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
-ip_address=$(eval echo '$'$ip_name)
+ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH
@@ -58,7 +57,7 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
     # TODO: Any results check required??
 
-    export PATH="${HOME}/miniconda3/bin:$PATH"
+    export PATH="${HOME}/miniforge3/bin:$PATH"
 
     curl http://${ip_address}:8028/generate \
         -X POST \
