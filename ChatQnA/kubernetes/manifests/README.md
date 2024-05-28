@@ -15,6 +15,7 @@ You should have all the images
 - chaqna-xeon-backend-server: opea/chatqna:latest
 
 For Gaudi:
+
 - tei-embedding-service: opea/tei-gaudi:latest
 - tgi-service: ghcr.io/huggingface/tgi-gaudi:1.2.1
 
@@ -24,10 +25,12 @@ For Gaudi:
 ## Deploy Services with Xeon
 
 > [NOTE]
-- Be sure to modify HUGGINGFACEHUB_API_TOKEN and other important values in qna_configmap_guadi.yaml and qna_configmap_xeon.yaml 
-- Be sure the node has path /mnt/models to store all the models 
 
-### Deploy 
+- Be sure to modify HUGGINGFACEHUB_API_TOKEN and other important values in qna_configmap_guadi.yaml and qna_configmap_xeon.yaml
+- Be sure the node has path /mnt/models to store all the models
+
+### Deploy
+
 ```
 # Deploy Services with Xeon
 
@@ -36,30 +39,32 @@ $ ./install_all_xeon.sh
 ```
 
 ### Undeploy
+
 ```
 # Remove Services with Xeon
 
 $ ./remove_all_xeon.sh
 ```
 
-
 ## Deploy Services with Gaudi
 
 > [NOTE]
 > Be sure to modify the all the important value in qna_configmap.yaml
-> Be sure the node has path /mnt/models to store all the models 
+> Be sure the node has path /mnt/models to store all the models
 
-### Deploy 
+### Deploy
+
 ```
 $ cd ${RepoPath}/ChatQnA/kubernetes/manifests/
 $ ./install_all_gaudi.sh
 ```
+
 ### Undeploy
+
 ```
 # Remove Services with Xeon
 $ ./remove_all_gaudi.sh
 ```
-
 
 ## Verify Services
 
@@ -70,4 +75,3 @@ $ curl http://${chaqna_backend_svc_ip}:8888/v1/chatqna -H "Content-Type: applica
      "messages": "What is the revenue of Nike in 2023?"
      }'
 ```
-
