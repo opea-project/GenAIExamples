@@ -124,7 +124,7 @@ export LANGCHAIN_API_KEY=ls_...
 To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
 
 ```yaml
-  chaqna-gaudi-ui-server:
+  codegen-xeon-ui-server:
     image: opea/codegen-ui:latest
     ...
     ports:
