@@ -82,7 +82,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/$example/tests
           example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
-          timeout 20m bash test_${example_l}_on_${hardware}.sh
+          timeout 20m bash test_${example_l}_on_xeon.sh
 
       - name: Clean up container
         env:
@@ -90,7 +90,7 @@ jobs:
           hardware: ${{ matrix.hardware }}
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/$example/docker-composer/$hardware
+          cd ${{ github.workspace }}/$example/docker-composer/xeon
           container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
           for container_name in $container_list; do
               cid=$(docker ps -aq --filter "name=$container_name")
