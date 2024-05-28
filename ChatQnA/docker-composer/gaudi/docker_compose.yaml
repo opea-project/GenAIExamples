@@ -62,6 +62,9 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-embedding-service"
     restart: unless-stopped
   retriever:
     image: opea/retriever-redis:latest
@@ -76,6 +79,9 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-retriever-service"
     restart: unless-stopped
   tei-xeon-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
@@ -102,6 +108,9 @@ services:
       https_proxy: ${https_proxy}
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   tgi-service:
     image: ghcr.io/huggingface/tgi-gaudi:1.2.1
@@ -133,6 +142,9 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
   chaqna-gaudi-backend-server:
     image: opea/chatqna:latest

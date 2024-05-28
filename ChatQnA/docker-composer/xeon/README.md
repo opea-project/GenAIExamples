@@ -220,6 +220,25 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep" \
 
 This command updates a knowledge base by submitting a list of HTTP links for processing.
 
+## Enable LangSmith for Monotoring Application (Optional)
+
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+
+Here's how you can do it:
+
+1. Install the latest version of LangSmith:
+
+```bash
+pip install -U langsmith
+```
+
+2. Set the necessary environment variables:
+
+```bash
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=ls_...
+```
+
 ## 🚀 Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
