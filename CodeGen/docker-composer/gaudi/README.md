@@ -1,6 +1,6 @@
 # Build MegaService of CodeGen on Gaudi
 
-This document outlines the deployment process for a CodeGen application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi2 server. The steps include Docker images creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to the Docker Hub, further simplifying the deployment process for this service.
+This document outlines the deployment process for a CodeGen application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi2 server. The steps include Docker images creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to the Docker Hub soon, further simplifying the deployment process for this service.
 
 ## 🚀 Build Docker Images
 
@@ -21,7 +21,7 @@ docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build
 
 ### 3. Build the MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build the MegaService Docker image using the command below:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build the MegaService Docker image via the command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
@@ -31,7 +31,7 @@ docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build
 
 ### 4. Build the UI Docker Image
 
-Construct the frontend Docker image using the command below:
+Construct the frontend Docker image via the command below:
 
 ```bash
 cd GenAIExamples/CodeGen/ui/
@@ -62,7 +62,7 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:6666/v1/codegen"
 ```
 
 > [!NOTE]
-> Please replace the `host_ip` with you external IP address, do not use localhost.
+> Please replace the `host_ip` with you external IP address, do not use `localhost`.
 
 ### Start the Docker Containers for All Services
 
@@ -143,7 +143,7 @@ Install `Neural Copilot` in VSCode as below.
 
 ### How to Use
 
-#### Service URL setting
+#### Service URL Setting
 
 Please adjust the service URL in the extension settings based on the endpoint of the CodeGen backend service.
 
@@ -195,7 +195,7 @@ There are 4 areas worth noting as shown in the screenshot above:
 3. Answers from AI assistant (Code will be highlighted properly according to the programming language it is written in, also support streaming output)
 4. Copy or replace code with one click (Note that you need to select the code in the editor first and then click "replace", otherwise the code will be inserted)
 
-You can also select the code in the editor and ask the AI assistant about the code directly.
+You can also select the code in the editor and ask the AI assistant questions about the code directly.
 For example:
 
 - Select code
