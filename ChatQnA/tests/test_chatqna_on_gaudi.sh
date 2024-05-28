@@ -13,11 +13,11 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build --no-cache -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build --no-cache -t opea/retriever-redis:latest -f comps/retrievers/langchain/docker/Dockerfile .
-    docker build --no-cache -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
-    docker build --no-cache -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build --no-cache -t opea/dataprep-redis:latest -f comps/dataprep/redis/docker/Dockerfile .
+    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
+    docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/docker/Dockerfile .
+    docker build -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
+    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/docker/Dockerfile .
 
     cd ..
     git clone https://github.com/huggingface/tei-gaudi
