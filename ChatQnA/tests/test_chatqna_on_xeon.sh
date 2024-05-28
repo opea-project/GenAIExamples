@@ -60,8 +60,6 @@ function start_services() {
         sleep 1s
         n=$((n+1))
     done
-
-    export http_proxy=""  # unset proxy for internal network connect
 }
 
 function validate_microservices() {
@@ -154,7 +152,7 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
-    curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+    http_proxy="" curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
         "model": "Intel/neural-chat-7b-v3-3",
         "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
     exit_code=$?
