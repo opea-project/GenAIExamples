@@ -38,7 +38,8 @@ jobs:
         id: get-test-matrix
         run: |
           set -xe
-          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | \
+          merged_commit=$(git log -1 --format='%H')
+          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} | \
           grep -vE '.github|README.md|*.txt|deprecate|kubernetes')
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
@@ -46,7 +47,7 @@ jobs:
               run_hardware=""
               if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
               if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
-              if [ $run_hardware = "" ]; then run_hardware="xeon"; fi
+              if [ "$run_hardware" = "" ]; then run_hardware="xeon"; fi
               for hw in ${run_hardware}; do
                   run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hw}\"},"
               done
@@ -81,7 +82,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/$example/tests
           example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
-          timeout 20m bash test_${example_l}_on_${hardware}.sh
+          if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 20m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
 
       - name: Clean up container
         env:
