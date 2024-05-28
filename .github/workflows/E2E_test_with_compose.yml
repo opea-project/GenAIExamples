@@ -38,7 +38,8 @@ jobs:
         id: get-test-matrix
         run: |
           set -xe
-          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.merge_commit_sha }} | \
+          merged_commit=$(git log -1 --format='%H')
+          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} | \
           grep -vE '.github|README.md|*.txt|deprecate|kubernetes')
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
