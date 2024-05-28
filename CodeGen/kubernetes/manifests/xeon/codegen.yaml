@@ -100,8 +100,7 @@ spec:
         app.kubernetes.io/name: tgi
         app.kubernetes.io/instance: codegen
     spec:
-      securityContext:
-        {}
+      securityContext: {}
       containers:
         - name: tgi
           env:
@@ -109,8 +108,7 @@ spec:
               value: ise-uiuc/Magicoder-S-DS-6.7B
             - name: PORT
               value: "80"
-          securityContext:
-            {}
+          securityContext: {}
           image: "ghcr.io/huggingface/text-generation-inference:1.4"
           imagePullPolicy: IfNotPresent
           volumeMounts:
@@ -120,8 +118,7 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          resources:
-            {}
+          resources: {}
       volumes:
         - name: model-volume
           hostPath:
@@ -154,8 +151,7 @@ spec:
         app.kubernetes.io/name: llm-uservice
         app.kubernetes.io/instance: codegen
     spec:
-      securityContext:
-        {}
+      securityContext: {}
       containers:
         - name: codegen
           env:
@@ -170,8 +166,7 @@ spec:
             - name: no_proxy
               value:
 
-          securityContext:
-            {}
+          securityContext: {}
           image: "opea/llm-tgi:latest"
           imagePullPolicy: IfNotPresent
           ports:
@@ -181,13 +176,12 @@ spec:
           startupProbe:
             exec:
               command:
-              - curl
-              - http://codegen-tgi:80
+                - curl
+                - http://codegen-tgi:80
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 120
-          resources:
-            {}
+          resources: {}
 ---
 # Source: codegen/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -215,20 +209,17 @@ spec:
         app.kubernetes.io/name: codegen
         app.kubernetes.io/instance: codegen
     spec:
-      securityContext:
-        null
+      securityContext: null
       containers:
         - name: codegen
           env:
             - name: LLM_SERVICE_HOST_IP
               value: codegen-llm-uservice
-          securityContext:
-            null
+          securityContext: null
           image: "opea/codegen:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - name: codegen
               containerPort: 6666
               protocol: TCP
-          resources:
-            null
+          resources: null
