@@ -12,7 +12,7 @@ The capabilities of CodeGen LLMs include:
 - AI-Assisted Testing: Assist in creating test cases, ensuring code robustness and accelerating development cycles.
 - Error Detection and Debugging: Detect errors in code and provide detailed descriptions and potential fixes, expediting debugging processes.
 
-In this example, we present a Code Copilot application to showcase how code generation can be executed on either Intel Gaudi2 platform or Intel Xeon Processor platform. This CodeGen use case involves code generation utilizing open-source models such as "m-a-p/OpenCodeInterpreter-DS-6.7B" and "deepseek-ai/deepseek-coder-33b-instruct" with Text Generation Inference (TGI) for serving deployment.
+In this example, we present a Code Copilot application to showcase how code generation can be executed on either Intel Gaudi2 platform or Intel Xeon Processor platform. This CodeGen use case involves code generation utilizing open-source models such as `m-a-p/OpenCodeInterpreter-DS-6.7B` and `deepseek-ai/deepseek-coder-33b-instruct` with Text Generation Inference (TGI) for serving deployment.
 
 The workflow falls into the following architecture:
 
