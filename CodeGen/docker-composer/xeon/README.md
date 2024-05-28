@@ -59,7 +59,7 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 ```bash
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export LLM_MODEL_ID="ise-uiuc/Magicoder-S-DS-6.7B"
+export LLM_MODEL_ID="meta-llama/CodeLlama-7b-hf"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8028"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
@@ -100,7 +100,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
 
 ```bash
 curl http://${host_ip}:6666/v1/codegen -H "Content-Type: application/json" -d '{
-     "model": "ise-uiuc/Magicoder-S-DS-6.7B",
+     "model": "meta-llama/CodeLlama-7b-hf",
      "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
      }'
 ```
