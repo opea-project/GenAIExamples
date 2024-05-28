@@ -38,7 +38,7 @@ jobs:
         id: get-test-matrix
         run: |
           set -xe
-          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | \
+          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.merge_commit_sha }} | \
           grep -vE '.github|README.md|*.txt|deprecate|kubernetes')
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
@@ -46,7 +46,7 @@ jobs:
               run_hardware=""
               if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
               if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="srf ${run_hardware}"; fi
-              if [ $run_hardware = "" ]; then run_hardware="srf"; fi
+              if [ "$run_hardware" = "" ]; then run_hardware="srf"; fi
               for hw in ${run_hardware}; do
                   run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hw}\"},"
               done
