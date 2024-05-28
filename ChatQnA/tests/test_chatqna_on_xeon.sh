@@ -86,7 +86,7 @@ function validate_microservices() {
         docker logs embedding-tei-server >> ${LOG_PATH}/embeddings.log
         exit 1
     fi
-    sleep 1m # embedding can't curl as expected, try to wait for more time
+    sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     export PATH="${HOME}/miniforge3/bin:$PATH"
     source activate
