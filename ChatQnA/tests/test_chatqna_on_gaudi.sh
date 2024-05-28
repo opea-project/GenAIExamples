@@ -59,9 +59,17 @@ function start_services() {
 
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
-    docker compose -f docker_compose.yaml up -d
 
-    sleep 1m # Waits 1 minutes
+    docker compose -f docker_compose.yaml up -d
+    n=0
+    until [[ "$n" -ge 200 ]]; do
+        docker logs tgi-gaudi-server > tgi_service_start.log
+        if grep -q Connected tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 function validate_microservices() {
@@ -77,7 +85,7 @@ function validate_microservices() {
         docker logs tei-embedding-gaudi-server >>${LOG_PATH}/embed.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 
     curl http://${ip_address}:6000/v1/embeddings \
         -X POST \
@@ -89,7 +97,7 @@ function validate_microservices() {
         docker logs embedding-tei-server >>${LOG_PATH}/embeddings.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 
     export PATH="${HOME}/miniforge3/bin:$PATH"
     source activate
@@ -104,7 +112,7 @@ function validate_microservices() {
         docker logs retriever-redis-server >>${LOG_PATH}/retrieval.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 
     curl http://${ip_address}:8808/rerank \
         -X POST \
@@ -116,7 +124,7 @@ function validate_microservices() {
         docker logs tei-xeon-server >>${LOG_PATH}/rerank.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 
     curl http://${ip_address}:8000/v1/reranking \
         -X POST \
@@ -128,7 +136,7 @@ function validate_microservices() {
         docker logs reranking-tei-gaudi-server >>${LOG_PATH}/reranking.log
         exit 1
     fi
-    sleep 1m
+    sleep 1s
 
     curl http://${ip_address}:8008/generate \
         -X POST \
@@ -140,7 +148,7 @@ function validate_microservices() {
         docker logs tgi-gaudi-server >>${LOG_PATH}/generate.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 
     curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
@@ -152,7 +160,7 @@ function validate_microservices() {
         docker logs llm-tgi-gaudi-server >>${LOG_PATH}/completions.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 }
 
 function validate_megaservice() {
@@ -220,9 +228,14 @@ function stop_docker() {
 function main() {
 
     stop_docker
-
+    begin_time=$(date +%s)
     build_docker_images
+    start_time=$(date +%s)
     start_services
+    end_time=$(date +%s)
+    minimal_duration=$((end_time-start_time))
+    maximal_duration=$((end_time-begin_time))
+    echo "Mega service start minimal duration is "$minimal_duration"s, maximal duration(including docker image build) is "$maximal_duration"s"
 
     validate_microservices
     validate_megaservice

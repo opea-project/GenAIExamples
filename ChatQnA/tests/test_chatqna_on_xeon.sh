@@ -51,10 +51,17 @@ function start_services() {
 
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
+
     docker compose -f docker_compose.yaml up -d
-
-    sleep 2m # Waits 2 minutes
-
+    n=0
+    until [[ "$n" -ge 200 ]]; do
+        docker logs tgi-service > tgi_service_start.log
+        if grep -q Connected tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 function validate_microservices() {
@@ -70,7 +77,7 @@ function validate_microservices() {
         docker logs tei-embedding-server >> ${LOG_PATH}/embed.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 
     curl http://${ip_address}:6000/v1/embeddings \
         -X POST \
@@ -81,7 +88,7 @@ function validate_microservices() {
         docker logs embedding-tei-server >> ${LOG_PATH}/embeddings.log
         exit 1
     fi
-    sleep 5s
+    sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     export PATH="${HOME}/miniforge3/bin:$PATH"
     source activate
@@ -96,7 +103,7 @@ function validate_microservices() {
         docker logs retriever-redis-server >> ${LOG_PATH}/retrieval.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 
     curl http://${ip_address}:8808/rerank \
         -X POST \
@@ -108,7 +115,7 @@ function validate_microservices() {
         docker logs tei-xeon-server >> ${LOG_PATH}/rerank.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 
     curl http://${ip_address}:8000/v1/reranking -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
@@ -118,7 +125,7 @@ function validate_microservices() {
         docker logs reranking-tei-xeon-server >> ${LOG_PATH}/reranking.log
         exit 1
     fi
-    sleep 30s
+    sleep 1s
 
     curl http://${ip_address}:9009/generate \
         -X POST \
@@ -129,7 +136,7 @@ function validate_microservices() {
         docker logs tgi-service >> ${LOG_PATH}/generate.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 
     curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
@@ -141,12 +148,12 @@ function validate_microservices() {
         docker logs llm-tgi-server >> ${LOG_PATH}/completions.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
-    curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+    http_proxy="" curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
         "model": "Intel/neural-chat-7b-v3-3",
         "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
     exit_code=$?
@@ -212,8 +219,14 @@ function main() {
 
     stop_docker
 
+    begin_time=$(date +%s)
     build_docker_images
+    start_time=$(date +%s)
     start_services
+    end_time=$(date +%s)
+    minimal_duration=$((end_time-start_time))
+    maximal_duration=$((end_time-begin_time))
+    echo "Mega service start minimal duration is "$minimal_duration"s, maximal duration(including docker image build) is "$maximal_duration"s"
 
     validate_microservices
     validate_megaservice
