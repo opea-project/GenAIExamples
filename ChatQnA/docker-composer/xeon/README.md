@@ -10,6 +10,53 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
+**Certain ports in the EC2 instance need to opened up in the security group, for the microservices to work with the curl commands**
+
+> See one example below. Please open up these ports in the EC2 instance based on the IP addresses you want to allow
+
+```
+redis-vector-db
+===============
+Port 6379 - Open to 0.0.0.0/0
+Port 8001 - Open to 0.0.0.0/0
+
+tei_embedding_service
+=====================
+Port 6006 - Open to 0.0.0.0/0
+
+embedding
+=========
+Port 6000 - Open to 0.0.0.0/0
+
+retriever
+=========
+Port 7000 - Open to 0.0.0.0/0
+
+tei_xeon_service
+================
+Port 8808 - Open to 0.0.0.0/0
+
+reranking
+=========
+Port 8000 - Open to 0.0.0.0/0
+
+tgi_service
+===========
+Port 9009 - Open to 0.0.0.0/0
+
+llm
+===
+Port 9000 - Open to 0.0.0.0/0
+
+chaqna-xeon-backend-server
+==========================
+Port 8888 - Open to 0.0.0.0/0
+
+chaqna-xeon-ui-server
+=====================
+Port 5173 - Open to 0.0.0.0/0
+```
+
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
@@ -84,6 +131,22 @@ Then run the command `docker images`, you will have the following four Docker Im
 
 Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
+**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
+
+> Change the External_Public_IP below with the actual IPV4 value
+
+```
+export host_ip="External_Public_IP"
+```
+
+**Export the value of your Huggingface API token to the `your_hf_api_token` environment variable**
+
+> Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
+
+```
+export your_hf_api_token="Your_Huggingface_API_Token"
+```
+
 ```bash
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
@@ -107,6 +170,8 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start all the services Docker Containers
+
+> Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
 cd GenAIExamples/ChatQnA/docker-composer/xeon/
@@ -145,9 +210,9 @@ print(embedding)
 Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
 
 ```bash
-curl http://${host_ip}:7000/v1/retrieval\
+curl http://${host_ip}:7000/v1/retrieval \
   -X POST \
-  -d '{"text":"What is the revenue of Nike in 2023?","embedding":${your_embedding}}' \
+  -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
   -H 'Content-Type: application/json'
 ```
 
