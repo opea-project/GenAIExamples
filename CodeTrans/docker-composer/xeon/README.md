@@ -2,9 +2,9 @@
 
 This document outlines the deployment process for a CodeTrans application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution using microservices `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
-## 🚀 Apply Xeon Server on AWS
+## 🚀 Apply a Xeon Server on AWS
 
-To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage the power of 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
+To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage the power of 4th Generation Intel Xeon Scalable processor. These instances are optimized for high-performance computing and demanding workloads.
 
 For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
 
@@ -14,14 +14,14 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 First of all, you need to build Docker Images locally and install the python package of it. This step can be ignored after the Docker images published to Docker hub.
 
-### 1. Source Code install GenAIComps
+### 1. Install GenAIComps from Source Code
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 2. Build the LLM Docker Image with the following command
+### 2. Build the LLM Docker Image
 
 ```bash
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
@@ -100,7 +100,7 @@ curl http://${host_ip}:7777/v1/codetrans \
     -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 ```
 
-## Enable LangSmith for Monotoring Application (Optional)
+## Enable LangSmith for Monitoring Application (Optional)
 
 LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
