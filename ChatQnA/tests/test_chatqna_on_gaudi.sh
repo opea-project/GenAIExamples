@@ -27,17 +27,17 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 
-    cd $WORKPATH
+    cd $WORKPATH/docker
     docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
 
-    cd $WORKPATH/ui
+    cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
     docker images
 }
 
 function start_services() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-large"
@@ -56,7 +56,7 @@ function start_services() {
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
@@ -194,7 +194,7 @@ function validate_megaservice() {
 }
 
 function validate_frontend() {
-    cd $WORKPATH/ui/svelte
+    cd $WORKPATH/docker/ui/svelte
     local conda_env_name="ChatQnA_e2e"
     export PATH=${HOME}/miniconda3/bin/:$PATH
     conda remove -n ${conda_env_name} --all -y
@@ -218,7 +218,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
