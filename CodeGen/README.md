@@ -29,3 +29,7 @@ Refer to the [Gaudi Guide](./docker-composer/gaudi/README.md) for instructions o
 ## Deploy CodeGen on Xeon
 
 Refer to the [Xeon Guide](./docker-composer/xeon/README.md) for instructions on deploying CodeGen on Xeon.
+
+## Deploy CodeGen into Kubernetes on Xeon & Gaudi
+
+Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
