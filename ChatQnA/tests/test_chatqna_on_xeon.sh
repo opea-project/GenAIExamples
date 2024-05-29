@@ -19,17 +19,17 @@ function build_docker_images() {
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/docker/Dockerfile .
 
-    cd $WORKPATH
+    cd $WORKPATH/docker
     docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
 
-    cd $WORKPATH/ui
+    cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
     docker images
 }
 
 function start_services() {
-    cd $WORKPATH/docker-composer/xeon
+    cd $WORKPATH/docker/xeon
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-large"
@@ -208,7 +208,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker-composer/xeon
+    cd $WORKPATH/docker/xeon
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
