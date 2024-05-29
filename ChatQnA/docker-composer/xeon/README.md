@@ -165,6 +165,7 @@ export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.

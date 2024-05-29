@@ -54,6 +54,7 @@ function start_services() {
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
+    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
 
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
