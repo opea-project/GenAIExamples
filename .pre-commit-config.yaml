@@ -12,7 +12,7 @@ repos:
         exclude: |
           (?x)^(
               ChatQnA/docker/ui/svelte/tsconfig.json|
-              SearchQnA/docker/ui/svelte/tsconfig.json|
+              SearchQnA/ui/svelte/tsconfig.json|
               DocSum/docker/ui/svelte/tsconfig.json
           )$
       - id: check-yaml
