@@ -16,6 +16,7 @@ repos:
               DocSum/ui/svelte/tsconfig.json
           )$
       - id: check-yaml
+        args: [--allow-multiple-documents]
       - id: debug-statements
       - id: requirements-txt-fixer
       - id: trailing-whitespace
