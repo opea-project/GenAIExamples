@@ -21,3 +21,7 @@ Refer to the [Gaudi Guide](./docker-composer/gaudi/README.md) for instructions o
 ## Deploy ChatQnA on Xeon
 
 Refer to the [Xeon Guide](./docker-composer/xeon/README.md) for instructions on deploying ChatQnA on Xeon.
+
+## Deploy ChatQnA into Kubernetes on Xeon & Gaudi
+
+Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
