@@ -33,12 +33,10 @@ function validate_microservice() {
     retriever_port=5009
     export PATH="${HOME}/miniforge3/bin:$PATH"
     source activate
-    sleep 1s
     test_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-    sleep 1s
     http_proxy='' curl http://${ip_address}:$retriever_port/v1/retrieval \
         -X POST \
-        -d '{"text":"test","embedding":${test_embedding}}' \
+        -d "{\"text\":\"test\",\"embedding\":${test_embedding}}" \
         -H 'Content-Type: application/json'
 }
 
