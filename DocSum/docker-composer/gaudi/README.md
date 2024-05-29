@@ -106,7 +106,7 @@ curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
      }'
 ```
 
-## Enable LangSmith for Monitoring Application (Optional)
+## Enable LangSmith to Monitor an Application (Optional)
 
 LangSmith offers a suite of tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
