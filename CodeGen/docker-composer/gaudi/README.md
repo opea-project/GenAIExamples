@@ -6,7 +6,7 @@ This document outlines the deployment process for a CodeGen application utilizin
 
 First of all, you need to build the Docker images locally. This step can be ignored after the Docker images published to the Docker Hub.
 
-### 1. Install GenAIComps from Source Code
+### 1. Git Clone GenAIComps
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git

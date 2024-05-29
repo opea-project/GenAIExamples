@@ -4,7 +4,7 @@ This document outlines the deployment process for a CodeGen application utilizin
 
 ## 🚀 Create an AWS Xeon Instance
 
-To run the example on a AWS Xeon instance, start by creating an AWS account if you don't have one already. Then, get started with the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home). AWS EC2 M7i, C7i, C7i-flex and M7i-flex instances are next-generation compute optimized instances powered by custom 4th Generation Intel Xeon Scalable processors (code named Sapphire Rapids). These instances are optimized for high-performance computing and demanding workloads.
+To run the example on an AWS Xeon instance, start by creating an AWS account if you don't have one already. Then, get started with the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home). AWS EC2 M7i, C7i, C7i-flex and M7i-flex instances are next-generation compute optimized instances powered by custom 4th Generation Intel Xeon Scalable processors (code named Sapphire Rapids). These instances are optimized for high-performance computing and demanding workloads.
 
 For detailed information about these instance types, you can refer to [m7i](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
 
@@ -14,7 +14,7 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 First of all, you need to build the Docker images locally. This step can be ignored after the Docker images published to the Docker Hub.
 
-### 1. Install GenAIComps from Source Code
+### 1. Git Clone GenAIComps
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
