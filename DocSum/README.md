@@ -1,11 +1,10 @@
 # Document Summarization Application
 
-In a world where data, information, and legal complexities is prevalent, the volume of legal documents is growing rapidly. Law firms, legal professionals, and businesses are dealing with an ever-increasing number of legal texts, including contracts, court rulings, statutes, and regulations.
-These documents contain important insights, but understanding them can be overwhelming. This is where the demand for legal document summarization comes in.
+In a world where data, information, and legal complexities are prevalent, the volume of legal documents is growing rapidly. Law firms, legal professionals, and businesses are dealing with an ever-increasing number of legal texts, including contracts, court rulings, statutes, and regulations. These documents contain important insights, but understanding them can be overwhelming. This is where the demand for legal document summarization comes in.
 
-Large Language Models (LLMs) have revolutionized the way we interact with text, LLMs can be used to create summaries of news articles, research papers, technical documents, and other types of text. Suppose you have a set of documents (PDFs, Notion pages, customer questions, etc.) and you want to summarize the content. In this example use case, we use LangChain to apply some summarization strategies and run LLM inference using Text Generation Inference on Intel Xeon and Gaudi2.
+Large Language Models (LLMs) have revolutionized the way we interact with text. These models can be used to create summaries of news articles, research papers, technical documents, and other types of text. Suppose you have a set of documents (PDFs, Notion pages, customer questions, etc.) and you want to summarize the content. In this example use case, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.
 
-The document summarization architecture shows below:
+The architecture for document summarization will be illustrated/described below:
 
 ![Architecture](https://i.imgur.com/XT0YUhu.png)
 

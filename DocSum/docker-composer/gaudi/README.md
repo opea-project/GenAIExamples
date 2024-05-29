@@ -1,10 +1,10 @@
 # Build MegaService of Document Summarization on Gaudi
 
-This document outlines the deployment process for a Document Summarization application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
+This document outlines the deployment process for a Document Summarization application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as llm. We will publish the Docker images to Docker Hub, which will simplify the deployment process for this service.
 
 ## 🚀 Build Docker Images
 
-First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
+First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
@@ -13,7 +13,7 @@ cd GenAIComps
 
 ### 1. Pull TGI Gaudi Image
 
-As TGI Gaudi has been officially published as a Docker image, we simply need to pull it.
+As TGI Gaudi has been officially published as a Docker image, we simply need to pull it:
 
 ```bash
 docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
@@ -68,7 +68,7 @@ export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 ```
 
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+Note: Please replace with `host_ip` with your external IP address, do not use localhost.
 
 ### Start Microservice Docker Containers
 
@@ -101,14 +101,13 @@ curl http://${your_ip}:9000/v1/chat/docsum \
 
 ```bash
 curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
-     "model": "Intel/neural-chat-7b-v3-3",
      "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
      }'
 ```
 
-## Enable LangSmith for Monotoring Application (Optional)
+## Enable LangSmith to Monitor an Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers a suite of tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 

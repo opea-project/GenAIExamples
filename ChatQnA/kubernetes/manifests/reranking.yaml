@@ -1,0 +1,45 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reranking-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reranking-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      labels:
+        app: reranking-deploy
+    spec:
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: opea/reranking-tei:latest
+        imagePullPolicy: IfNotPresent
+        name: reranking-deploy
+        args:
+        ports:
+        - containerPort: 8000
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: reranking-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: reranking-deploy
+  ports:
+    - name: service
+      port: 8000
+      targetPort: 8000

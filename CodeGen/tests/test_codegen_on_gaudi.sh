@@ -87,7 +87,6 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     curl http://${ip_address}:6666/v1/codegen -H "Content-Type: application/json" -d '{
-        "model": "meta-llama/CodeLlama-7b-hf",
         "messages": "def print_hello_world():"}' > ${LOG_PATH}/curl_megaservice.log
 
     echo "Checking response results, make sure the output is reasonable. "
