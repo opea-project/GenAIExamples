@@ -72,7 +72,7 @@ cd GenAIExamples/ChatQnA/ui/
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 7 Docker Images:
+Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/embedding-tei:latest`
 2. `opea/retriever-redis:latest`
@@ -109,7 +109,7 @@ export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 ```
 
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+Note: Please replace with `host_ip` with you external IP address, do **NOT** use localhost.
 
 ### Start all the services Docker Containers
 
@@ -132,7 +132,7 @@ curl ${host_ip}:8090/embed \
 2. Embedding Microservice
 
 ```bash
-curl http://${host_ip}:6000/v1/embeddings\
+curl http://${host_ip}:6000/v1/embeddings \
   -X POST \
   -d '{"text":"hello"}' \
   -H 'Content-Type: application/json'
@@ -149,10 +149,10 @@ embedding = [random.uniform(-1, 1) for _ in range(768)]
 print(embedding)
 ```
 
-Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
+Then substitute your mock embedding vector for the `${your_embedding}` in the following `curl` command:
 
 ```bash
-curl http://${host_ip}:7000/v1/retrieval\
+curl http://${host_ip}:7000/v1/retrieval \
   -X POST \
   -d '{"text":"test", "embedding":${your_embedding}}' \
   -H 'Content-Type: application/json'
@@ -170,7 +170,7 @@ curl http://${host_ip}:8808/rerank \
 5. Reranking Microservice
 
 ```bash
-curl http://${host_ip}:8000/v1/reranking\
+curl http://${host_ip}:8000/v1/reranking \
   -X POST \
   -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
   -H 'Content-Type: application/json'
@@ -188,7 +188,7 @@ curl http://${host_ip}:8008/generate \
 7. LLM Microservice
 
 ```bash
-curl http://${host_ip}:9000/v1/chat/completions\
+curl http://${host_ip}:9000/v1/chat/completions \
   -X POST \
   -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
