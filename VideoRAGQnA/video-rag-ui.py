@@ -3,26 +3,25 @@ import os
 from embedding.vector_stores import db
 import time
 import torch
-import streamlit as st
 
 import torch
 import streamlit as st
 from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
+from transformers import set_seed
 
-from transformers import TextIteratorStreamer
 from typing import Any, List, Mapping, Optional
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from langchain.llms.base import LLM
 import threading
-from transformers import set_seed
 from utils import config_reader as reader
 from utils import prompt_handler as ph
 # from vector_stores import db
+HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN", "")
 
 set_seed(22)
 
 if 'config' not in st.session_state.keys():
-    st.session_state.config = reader.read_config('VideoRAGQnA/docs/config.yaml')
+    st.session_state.config = reader.read_config('docs/config.yaml')
 
 config = st.session_state.config
 
@@ -51,11 +50,12 @@ st.markdown(title_alignment, unsafe_allow_html=True)
 
 @st.cache_resource       
 def load_models():
+    #print("HF Token: ", HUGGINGFACEHUB_API_TOKEN)
     model = AutoModelForCausalLM.from_pretrained(
-        model_path, torch_dtype=torch.float32, device_map='auto', trust_remote_code=True,
+        model_path, torch_dtype=torch.float32, device_map='auto', trust_remote_code=True, token=HUGGINGFACEHUB_API_TOKEN
     )
     
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True, token=HUGGINGFACEHUB_API_TOKEN)
     tokenizer.padding_size = 'right'
     streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
     
@@ -248,22 +248,12 @@ with col1:
             'Find similar videos', 
             'Man wearing glasses', 
             'People reading item description',
-            'Man wearing khaki pants',
-            'Man laughing',
-            'Black tshirt guy holding red basket',
             'Man holding red shopping basket',
-            'Man wearing blue shirt',
-            'Man putting object into his pocket',
-            'Was there any shoplifting reported?',
-            'Was there any shoplifting reported today?',
-            'Was there any shoplifting reported in the last 6 hours?',
-            'Was there any shoplifting reported last Sunday?',
-            'Was there any shoplifting reported last Monday?',
-            'Have there been instances of shoplifting?',
-            'Have there been instances of shoplifting last Friday?',
-            'Have there been any instances of theft or shoplifting in the last 30 minutes?',
-            'Have there been any instances of theft or shoplifting in the last 48 hours?',
-            'Have there been any instances of theft or shoplifting in the last 72 hours?',
+            'Was there any person wearing a blue shirt seen today?',
+            'Was there any person wearing a blue shirt seen in the last 6 hours?',
+            'Was there any person wearing a blue shirt seen last Sunday?',
+            'Was a person wearing glasses seen in the last 30 minutes?',
+            'Was a person wearing glasses seen in the last 72 hours?',
         ),
         key='example_video'
     )
