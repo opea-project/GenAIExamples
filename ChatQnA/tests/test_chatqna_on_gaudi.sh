@@ -206,13 +206,14 @@ function validate_frontend() {
     conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
+    exit_status=0
     npx playwright test || exit_status=$?
 
     if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------E2E test failed---------"
+        echo "[TEST INFO]: ---------frontend test failed---------"
         exit $exit_status
     else
-        echo "[TEST INFO]: ---------E2E test passed---------"
+        echo "[TEST INFO]: ---------frontend test passed---------"
     fi
 }
 
