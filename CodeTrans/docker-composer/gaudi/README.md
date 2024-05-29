@@ -92,7 +92,7 @@ curl http://${host_ip}:7777/v1/codetrans \
     -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 ```
 
-## Enable LangSmith for Monotoring Application (Optional)
+## Enable LangSmith to Monitor an Application (Optional)
 
 LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
