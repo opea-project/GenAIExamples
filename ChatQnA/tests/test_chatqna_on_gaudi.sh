@@ -54,6 +54,7 @@ function start_services() {
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
+    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
 
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
@@ -164,7 +165,6 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "model": "Intel/neural-chat-7b-v3-3",
         "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
