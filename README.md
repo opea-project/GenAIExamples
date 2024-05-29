@@ -34,7 +34,7 @@ The initially supported microservices are described in the below table. More mic
 			<td><a href="./comps/embeddings/README.md">Embedding</a></td>
             <td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-large-en-v1.5">BAAI/bge-large-en-v1.5</a></td>
-			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Habana</a></td>
+			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
 			<td>Gaudi2</td>
 			<td>Embedding on Gaudi2</td>
 		</tr>
@@ -58,7 +58,7 @@ The initially supported microservices are described in the below table. More mic
 			<td><a href="./comps/reranks/README.md">Reranking</a></td>
             <td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-reranker-large">BAAI/bge-reranker-large</a></td>
-			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Habana</a></td>
+			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
 			<td>Gaudi2</td>
 			<td>Reranking on Gaudi2</td>
 		</tr>

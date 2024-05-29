@@ -1,14 +1,14 @@
 # Retriever Microservice
 
-This retriever microservice is a highly efficient search service designed for handling and retrieving embedding vectors. It operates by receiving an embedding vector as input and conducting a similarity search against vectors stored in a vectordb database. Users must specify the vectordb's URL and the index name, and the service searches within that index to find documents with the highest similarity to the input vector.
+This retriever microservice is a highly efficient search service designed for handling and retrieving embedding vectors. It operates by receiving an embedding vector as input and conducting a similarity search against vectors stored in a VectorDB database. Users must specify the VectorDB's URL and the index name, and the service searches within that index to find documents with the highest similarity to the input vector.
 
-The service primarily utilizes measures of similarity in vector space to rapidly retrieve documents that are contentually similar. This vector-based retrieval approach is particularly suited for handling large datasets, offering fast and accurate search results that significantly enhance the efficiency and quality of information retrieval.
+The service primarily utilizes similarity measures in vector space to rapidly retrieve contentually similar documents. The vector-based retrieval approach is particularly suited for handling large datasets, offering fast and accurate search results that significantly enhance the efficiency and quality of information retrieval.
 
 Overall, this microservice provides robust backend support for applications requiring efficient similarity searches, playing a vital role in scenarios such as recommendation systems, information retrieval, or any other context where precise measurement of document similarity is crucial.
 
 # 🚀Start Microservice with Python
 
-To start the retriever microservice, you need to install python packages first.
+To start the retriever microservice, you must first install the required python packages.
 
 ## Install Requirements
 
@@ -16,11 +16,12 @@ To start the retriever microservice, you need to install python packages first.
 pip install -r requirements.txt
 ```
 
-## Setup Vectordb Service
+## Setup VectorDB Service
 
-You need to setup your own vectordb service (Redis in this example), and ingest your knowledge documents into the vector database.
+You need to setup your own VectorDB service (Redis in this example), and ingest your knowledge documents into the vector database.
 
-As for Redis, you could start a docker container using the following commands. Remember to ingest data into it manually.
+As for Redis, you could start a docker container using the following commands.
+Remember to ingest data into it manually.
 
 ```bash
 docker run -d --name="redis-vector-db" -p 6379:6379 -p 8001:8001 redis/redis-stack:7.2.0-v9
@@ -77,7 +78,7 @@ curl http://localhost:7000/v1/health_check \
 
 ## Consume Embedding Service
 
-To consume the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+To consume the Retriever Microservice, you need to generate a mock embedding vector of length 768 in Python script:
 
 ```Python
 import random
