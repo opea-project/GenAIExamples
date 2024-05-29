@@ -20,10 +20,7 @@
 	import { sineIn } from "svelte/easing";
 	import UploadFile from "./upload-knowledge.svelte";
 	import PasteURL from "./PasteKnowledge.svelte";
-	import {
-		knowledge1,
-		knowledgeName,
-	} from "$lib/shared/stores/common/Store";
+	import { knowledge1, knowledgeName } from "$lib/shared/stores/common/Store";
 	import DeleteIcon from "$lib/assets/avatar/svelte/Delete.svelte";
 	import { getNotificationsContext } from "svelte-notifications";
 	import {
@@ -45,49 +42,45 @@
 	async function handleKnowledgePaste(
 		e: CustomEvent<{ pasteUrlList: string[] }>
 	) {
-		let knowledge_id = "";
-		// let knowledge_id2 = "";
 		try {
 			const pasteUrlList = e.detail.pasteUrlList;
 			const res = await fetchKnowledgeBaseIdByPaste(pasteUrlList, "url1");
-			// sihan
-			knowledge_id = res.knowledge_base_id ? res.knowledge_base_id : "default";
+			handleUploadResult(res, "knowledge_base");
 		} catch {
-			knowledge_id = "default";
+			handleUploadError();
 		}
-		knowledge1.set({ id: knowledge_id });
-		knowledgeName.set('knowledge_base');
-
-		addNotification({
-			text: "Uploaded successfully",
-			position: "top-left",
-			type: "success",
-			removeAfter: 3000,
-		});
 	}
 
 	async function handleKnowledgeUpload(e: CustomEvent<any>) {
-		let knowledge_id = "";
-		// let knowledge_id2 = "";
 		try {
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
 			const fileName = e.detail.fileName;
-			// letong
 			const res = await fetchKnowledgeBaseId(blob, fileName);
-			// sihan
-			knowledge_id = res.knowledge_base_id ? res.knowledge_base_id : "default";
-			// knowledge_id2 = res2.knowledge_base_id ? res2.knowledge_base_id : "default";
-			console.log("knowledge_id", knowledge_id);
+			handleUploadResult(res, fileName);
 		} catch {
-			knowledge_id = "default";
-			// knowledge_id2 = "default";
+			handleUploadError();
 		}
-		knowledge1.set({ id: knowledge_id });
-		knowledgeName.set(e.detail.fileName);
+	}
+
+	function handleUploadResult(res: Response, fileName: string) {
+		if (res.status === 200) {
+			knowledge1.set({ id: "default" });
+			knowledgeName.set(fileName);
+			showNotification("Uploaded successfully", "success");
+		} else {
+			showNotification("Uploaded failed", "error");
+		}
+	}
+
+	function handleUploadError() {
+		showNotification("Uploaded failed", "error");
+	}
+
+	function showNotification(text: string, type: string) {
 		addNotification({
-			text: "Uploaded successfully",
+			text: text,
 			position: "top-left",
-			type: "success",
+			type: type,
 			removeAfter: 3000,
 		});
 	}
@@ -103,7 +96,6 @@
 		on:click={() => (hidden6 = false)}
 		class="bg-transparent focus-within:ring-gray-300 hover:bg-transparent focus:ring-0"
 		data-testid="open-upload"
-
 	>
 		<svg
 			aria-hidden="true"
@@ -128,7 +120,7 @@
 	transitionType="fly"
 	transitionParams={transitionParamsRight}
 	bind:hidden={hidden6}
-	class=" shadow border-2 border-r-0 border-b-0"
+	class=" border-2 border-b-0 border-r-0 shadow"
 	id="sidebar6"
 >
 	<div class="flex items-center">
@@ -160,7 +152,7 @@
 			<PasteURL on:paste={handleKnowledgePaste} />
 		</TabItem>
 	</Tabs>
-	{#if ($knowledgeName) && ($knowledgeName !== "")}
+	{#if $knowledgeName && $knowledgeName !== ""}
 		<div class="relative">
 			<p class="border-b p-6 pb-2">{$knowledgeName}</p>
 			<DeleteIcon on:DeleteAvatar={() => handleKnowledgeDelete()} />
