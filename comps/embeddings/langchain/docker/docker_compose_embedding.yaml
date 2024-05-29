@@ -16,7 +16,7 @@ version: "3.8"
 
 services:
   embedding:
-    image: opea/gen-ai-comps:embedding-tei-server
+    image: opea/embedding-tei:latest
     container_name: embedding-tei-server
     ports:
       - "6000:6000"

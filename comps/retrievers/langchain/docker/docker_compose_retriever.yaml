@@ -16,7 +16,7 @@ version: "3.8"
 
 services:
   retriever:
-    image: opea/gen-ai-comps:retriever-redis-server
+    image: opea/retriever-redis:latest
     container_name: retriever-redis-server
     ports:
       - "7000:7000"

@@ -57,7 +57,7 @@ docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_pr
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="reranking-tei-server" -p 8000:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/gen-ai-comps:reranking-tei-xeon-server
+docker run -d --name="reranking-tei-server" -p 8000:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/reranking-tei:latest
 ```
 
 ## Run Docker with Docker Compose
@@ -72,7 +72,7 @@ docker compose -f docker_compose_reranking.yaml up -d
 ## Check Service Status
 
 ```bash
-curl http://localhost:8000/v1/health_check\
+curl http://localhost:8000/v1/health_check \
   -X GET \
   -H 'Content-Type: application/json'
 ```
@@ -80,7 +80,7 @@ curl http://localhost:8000/v1/health_check\
 ## Consume Reranking Service
 
 ```bash
-curl http://localhost:8000/v1/reranking\
+curl http://localhost:8000/v1/reranking \
   -X POST \
   -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
   -H 'Content-Type: application/json'

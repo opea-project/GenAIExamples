@@ -49,13 +49,13 @@ python langchain/retriever_redis.py
 
 ```bash
 cd ../../
-docker build -t opea/gen-ai-comps:retriever-redis-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
+docker build -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/docker/Dockerfile .
 ```
 
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="retriever-redis-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME opea/gen-ai-comps:retriever-redis-server
+docker run -d --name="retriever-redis-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME opea/retriever-redis:latest
 ```
 
 ## Run Docker with Docker Compose
@@ -70,7 +70,7 @@ docker compose -f docker_compose_retriever.yaml up -d
 ## Check Service Status
 
 ```bash
-curl http://localhost:7000/v1/health_check\
+curl http://localhost:7000/v1/health_check \
   -X GET \
   -H 'Content-Type: application/json'
 ```
@@ -85,10 +85,10 @@ embedding = [random.uniform(-1, 1) for _ in range(768)]
 print(embedding)
 ```
 
-Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
+Then substitute your mock embedding vector for the `${your_embedding}` in the following `curl` command:
 
 ```bash
-curl http://${your_ip}:7000/v1/retrieval\
+curl http://${your_ip}:7000/v1/retrieval \
   -X POST \
   -d '{"text":"What is the revenue of Nike in 2023?","embedding":${your_embedding}}' \
   -H 'Content-Type: application/json'
