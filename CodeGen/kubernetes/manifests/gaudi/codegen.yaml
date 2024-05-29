@@ -24,10 +24,6 @@ spec:
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: codegen
 ---
-# Source: codegen/charts/llm-uservice/templates/service.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -49,10 +45,6 @@ spec:
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: codegen
 ---
-# Source: codegen/templates/service.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -74,10 +66,6 @@ spec:
     app.kubernetes.io/name: codegen
     app.kubernetes.io/instance: codegen
 ---
-# Source: codegen/charts/llm-uservice/charts/tgi/templates/deployment.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -127,10 +115,6 @@ spec:
             path: /mnt
             type: Directory
 ---
-# Source: codegen/charts/llm-uservice/templates/deployment.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -185,10 +169,6 @@ spec:
             failureThreshold: 120
           resources: {}
 ---
-# Source: codegen/templates/deployment.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
