@@ -95,7 +95,6 @@ curl http://${host_ip}:9000/v1/chat/completions\
 
 ```bash
 curl http://${host_ip}:6666/v1/codegen -H "Content-Type: application/json" -d '{
-     "model": "ise-uiuc/Magicoder-S-DS-6.7B",
      "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
      }'
 ```

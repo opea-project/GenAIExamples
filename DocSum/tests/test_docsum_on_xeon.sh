@@ -72,7 +72,6 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     curl http://${ip_address}:8888/v1/docsum -H "Content-Type: application/json" -d '{
-        "model": "Intel/neural-chat-7b-v3-3",
         "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' > ${LOG_PATH}/curl_megaservice.log
 
     echo "Checking response results, make sure the output is reasonable. "

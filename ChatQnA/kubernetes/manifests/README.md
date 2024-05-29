@@ -71,7 +71,6 @@ $ ./remove_all_gaudi.sh
 ```
 $ chaqna_backend_svc_ip=`kubectl get svc|grep '^chaqna-xeon-backend-server-svc'|awk '{print $3}'` && echo ${chaqna_backend_svc_ip}
 $ curl http://${chaqna_backend_svc_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-     "model": "Intel/neural-chat-7b-v3-3",
      "messages": "What is the revenue of Nike in 2023?"
      }'
 ```
