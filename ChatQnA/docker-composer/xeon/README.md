@@ -64,7 +64,6 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-pip install -e .
 ```
 
 ### 1. Build Embedding Image
