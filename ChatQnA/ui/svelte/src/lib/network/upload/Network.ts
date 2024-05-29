@@ -16,10 +16,10 @@ import { env } from "$env/dynamic/public";
 
 const UPLOAD_FILE_BASE_URL = env.UPLOAD_FILE_BASE_URL;
 
-export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
+export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {	
 	const url = `${UPLOAD_FILE_BASE_URL}`;
 	const formData = new FormData();
-	formData.append("file", file, fileName);
+	formData.append("files", file, fileName);
 	const init: RequestInit = {
 		method: "POST",
 		body: formData,
@@ -35,15 +35,13 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 	}
 }
 
-export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: string | undefined) {
+export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: string | undefined) {	
 	const url = `${UPLOAD_FILE_BASE_URL}`;
-	const data = {
-		link_list: pasteUrlList,
-	};
+	const formData = new FormData();
+	formData.append("link_list", JSON.stringify(pasteUrlList));
 	const init: RequestInit = {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(data),
+		method: "POST",	 
+		body: formData,
 	};
 
 	try {
