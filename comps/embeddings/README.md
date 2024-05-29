@@ -14,7 +14,7 @@ Key Features:
 
 Users are albe to configure and build embedding-related services according to their actual needs.
 
-# 🚀Start Microservice with Python
+# 🚀1. Start Microservice with Python (Option 1)
 
 Currently, we provide two ways to implement the embedding service:
 
@@ -24,19 +24,17 @@ Currently, we provide two ways to implement the embedding service:
 
 For both of the implementations, you need to install requirements first.
 
-## Install Requirements
+## 1.1 Install Requirements
 
 ```bash
 pip install -r langchain/requirements.txt
 ```
 
-## Start Embedding Service with Local Model
+## 1.2 Start Embedding Service
 
-```bash
-python local_embedding.py
-```
+You can select one of following ways to start the embedding service:
 
-## Start Embedding Service with TEI
+### Start Embedding Service with TEI
 
 First, you need to start a TEI service.
 
@@ -67,31 +65,64 @@ export LANGCHAIN_PROJECT="opea/gen-ai-comps:embeddings"
 python embedding_tei_gaudi.py
 ```
 
-# 🚀Start Microservice with Docker
+### Start Embedding Service with Local Model
 
-## Build Docker Image
+```bash
+cd langchain
+python local_embedding.py
+```
+
+# 🚀2. Start Microservice with Docker (Optional 2)
+
+## 2.1 Start Embedding Service with TEI
+
+First, you need to start a TEI service.
+
+```bash
+your_port=8090
+model="BAAI/bge-large-en-v1.5"
+revision="refs/pr/5"
+docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
+```
+
+Then you need to test your TEI service using the following commands:
+
+```bash
+curl localhost:$your_port/embed \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?"}' \
+    -H 'Content-Type: application/json'
+```
+
+Export the `TEI_EMBEDDING_ENDPOINT` for later usage:
+
+```bash
+export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
+```
+
+## 2.2 Build Docker Image
 
 ```bash
 cd ../../
 docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
 ```
 
-## Run Docker with CLI
+## 2.3 Run Docker with CLI
 
 ```bash
 docker run -d --name="embedding-tei-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT opea/embedding-tei:latest
 ```
 
-## Run Docker with Docker Compose
+## 2.4 Run Docker with Docker Compose
 
 ```bash
 cd docker
-docker compose -f docker_compose.yaml up -d
+docker compose -f docker_compose_embedding.yaml up -d
 ```
 
-# 🚀Consume Embedding Service
+# 🚀3. Consume Embedding Service
 
-## Check Service Status
+## 3.1 Check Service Status
 
 ```bash
 curl http://localhost:6000/v1/health_check\
@@ -99,7 +130,7 @@ curl http://localhost:6000/v1/health_check\
   -H 'Content-Type: application/json'
 ```
 
-## Consume Embedding Service
+## 3.2 Consume Embedding Service
 
 ```bash
 curl http://localhost:6000/v1/embeddings\
