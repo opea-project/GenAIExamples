@@ -48,6 +48,8 @@ function start_services() {
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
 
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
+
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
 
@@ -116,8 +118,7 @@ function validate_microservices() {
     fi
     sleep 1s
 
-    curl http://${ip_address}:8000/v1/reranking\
-        -X POST \
+    curl http://${ip_address}:8000/v1/reranking -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
         -H 'Content-Type: application/json' > ${LOG_PATH}/reranking.log
     if [ $exit_code -ne 0 ]; then
@@ -164,8 +165,8 @@ function validate_megaservice() {
 
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
-    if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
+    if [[ -f $LOG_PATH/curl_megaservice.log ]] &&
+        [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
         status=true
     fi
 
@@ -178,6 +179,31 @@ function validate_megaservice() {
 
     echo "Checking response format, make sure the output format is acceptable for UI."
     # TODO
+
+}
+
+function validate_frontend() {
+    cd $WORKPATH/ui/svelte
+    local conda_env_name="ChatQnA_e2e"
+    export PATH=${HOME}/miniconda3/bin/:$PATH
+    conda remove -n ${conda_env_name} --all -y
+    conda create -n ${conda_env_name} python=3.12 -y
+    source activate ${conda_env_name}
+
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
+
+    exit_status=0
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------frontend test failed---------"
+        exit $exit_status
+    else
+        echo "[TEST INFO]: ---------frontend test passed---------"
+    fi
 
 }
 
@@ -205,6 +231,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
+    validate_frontend
 
     stop_docker
     echo y | docker system prune

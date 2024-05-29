@@ -88,7 +88,7 @@ jobs:
         env:
           example: ${{ matrix.example }}
           hardware: ${{ matrix.hardware }}
-        if: cancelled() || failure()
+        if: always()
         run: |
           cd ${{ github.workspace }}/$example/docker-composer/$hardware
           container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
