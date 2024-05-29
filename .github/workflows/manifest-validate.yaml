@@ -1,0 +1,54 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Manifests Validate
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths:
+      - "**/kubernetes/manifests/**"
+      - .github/workflows/manifest-validate.yaml
+  workflow_dispatch:
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  MANIFEST_DIR: "manifests"
+
+jobs:
+  manifests-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: changed files
+        id: changed_files
+        run: |
+          set -xe
+          changed_folder=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | \
+          grep "kubernetes/manifests" | grep -vE '.github|README.md|*.txt|*.sh' | cut -d'/' -f1 | sort -u )
+          echo "changed_folder: $changed_folder"
+          if [ -z "$changed_folder" ]; then
+              echo "No changes in manifests folder"
+              echo "SKIP=true" >> $GITHUB_OUTPUT
+              exit 0
+          fi
+          echo "SKIP=false" >> $GITHUB_OUTPUT
+          for folder in $changed_folder; do
+              folder_str="$folder_str $folder/kubernetes/manifests/"
+          done
+          echo "folder_str=$folder_str"
+          echo "folder_str=$folder_str" >> $GITHUB_ENV
+
+      - uses: docker://ghcr.io/yannh/kubeconform:latest
+        if: steps.changed_files.outputs.SKIP == 'false'
+        with:
+          args: "-summary -output json ${{env.folder_str}}"
