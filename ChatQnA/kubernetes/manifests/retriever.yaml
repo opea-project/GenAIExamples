@@ -6,7 +6,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: retriever-deploy
-  namespace: default
 spec:
   replicas: 1
   selector:
