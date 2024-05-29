@@ -16,6 +16,7 @@ repos:
               DocSum/ui/svelte/tsconfig.json
           )$
       - id: check-yaml
+        args: [--allow-multiple-documents]
       - id: debug-statements
       - id: requirements-txt-fixer
       - id: trailing-whitespace
@@ -82,7 +83,7 @@ repos:
     hooks:
       - id: prettier
         args: [--print-width=120]
-        types_or: [yaml, markdown, html, css, scss, javascript, json, ts, shell, sh]
+        types_or: [markdown, html, css, scss, javascript, json, ts, shell, sh]
         additional_dependencies:
           - prettier@3.2.5
 
