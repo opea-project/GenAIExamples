@@ -61,7 +61,7 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 ```bash
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export LLM_MODEL_ID="ise-uiuc/Magicoder-S-DS-6.7B"
+export LLM_MODEL_ID="meta-llama/CodeLlama-7b-hf"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8028"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
