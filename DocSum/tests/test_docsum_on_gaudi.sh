@@ -17,17 +17,17 @@ function build_docker_images() {
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
-    cd $WORKPATH
+    cd $WORKPATH/docker
     docker build --no-cache -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
-    cd $WORKPATH/ui
+    cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
     docker images
 }
 
 function start_services() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
 
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
@@ -97,7 +97,7 @@ function validate_megaservice() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")

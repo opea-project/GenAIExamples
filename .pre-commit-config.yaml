@@ -11,9 +11,9 @@ repos:
       - id: check-json
         exclude: |
           (?x)^(
-              ChatQnA/ui/svelte/tsconfig.json|
+              ChatQnA/docker/ui/svelte/tsconfig.json|
               SearchQnA/ui/svelte/tsconfig.json|
-              DocSum/ui/svelte/tsconfig.json
+              DocSum/docker/ui/svelte/tsconfig.json
           )$
       - id: check-yaml
         args: [--allow-multiple-documents]
