@@ -64,6 +64,7 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
+pip install -e .
 ```
 
 ### 1. Build Embedding Image
@@ -256,7 +257,6 @@ curl http://${host_ip}:9000/v1/chat/completions\
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-     "model": "Intel/neural-chat-7b-v3-3",
      "messages": "What is the revenue of Nike in 2023?"
      }'
 ```
