@@ -51,7 +51,7 @@ If you start an Reranking microservice with docker, the `docker_compose_rerankin
 
 ```bash
 cd ../../
-docker build -t opea/gen-ai-comps:reranking-tei-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
+docker build -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
 ```
 
 ## Run Docker with CLI

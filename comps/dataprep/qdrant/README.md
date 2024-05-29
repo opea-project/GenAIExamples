@@ -36,13 +36,13 @@ python prepare_doc_qdrant.py
 
 ```bash
 cd ../../../../
-docker build -t opea/gen-ai-comps:dataprep-qdrant-xeon-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/docker/Dockerfile .
+docker build -t opea/dataprep-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/docker/Dockerfile .
 ```
 
 ## Run Docker with CLI
 
 ```bash
-docker run -d --name="dataprep-qdrant-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/gen-ai-comps:dataprep-qdrant-xeon-server
+docker run -d --name="dataprep-qdrant-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/dataprep-qdrant:latest
 ```
 
 ## Setup Environment Variables

@@ -63,7 +63,7 @@ export LANGCHAIN_PROJECT="opea/gen-ai-comps:llms"
 
 ```bash
 cd ../../
-docker build -t opea/gen-ai-comps:llm-tgi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
+docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
 ## Run Docker with CLI
@@ -75,7 +75,7 @@ docker run -d --name="llm-tgi-server" -p 9000:9000 --ipc=host -e http_proxy=$htt
 ## Run Docker with Docker Compose
 
 ```bash
-cd langchain/docker
+cd text-generation/tgi
 docker compose -f docker_compose_llm.yaml up -d
 ```
 
