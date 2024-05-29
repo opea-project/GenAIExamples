@@ -29,7 +29,7 @@ def post_process_text(text: str):
         return "data: <br/>\n\n"
     if text.isspace():
         return None
-    new_text = text.replace(" ", "@#$")
+    new_text = text.replace("Answer: ", "").replace("Human: ", "").replace(" ", "@#$")
     return f"data: {new_text}\n\n"
 
 

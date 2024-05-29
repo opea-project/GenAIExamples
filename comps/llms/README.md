@@ -39,7 +39,7 @@ curl http://${your_ip}:8008/generate \
 
 ```bash
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
-python langchain/llm.py
+python text-generation/tgi/llm.py
 ```
 
 # 🚀Start Microservice with Docker
