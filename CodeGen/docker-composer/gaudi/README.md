@@ -1,27 +1,27 @@
 # Build MegaService of CodeGen on Gaudi
 
-This document outlines the deployment process for a CodeGen application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
+This document outlines the deployment process for a CodeGen application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi2 server. The steps include Docker images creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to the Docker Hub soon, further simplifying the deployment process for this service.
 
 ## 🚀 Build Docker Images
 
-First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
+First of all, you need to build the Docker images locally. This step can be ignored after the Docker images published to the Docker Hub.
 
-### 1. Git clone GenAIComps
+### 1. Git Clone GenAIComps
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 2. Build LLM Image
+### 2. Build the LLM Docker Image
 
 ```bash
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 3. Build MegaService Docker Image
+### 3. Build the MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build the MegaService Docker image using the command below:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build the MegaService Docker image via the command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
@@ -29,20 +29,20 @@ cd GenAIExamples/CodeGen
 docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-### 4. Build UI Docker Image
+### 4. Build the UI Docker Image
 
-Construct the frontend Docker image using the command below:
+Construct the frontend Docker image via the command below:
 
 ```bash
 cd GenAIExamples/CodeGen/ui/
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 3 Docker Images:
+Then run the command `docker images`, you will have the following 3 Docker images:
 
-1. `opea/llm-tgi:latest`
-2. `opea/codegen:latest`
-3. `opea/codegen-ui:latest`
+- `opea/llm-tgi:latest`
+- `opea/codegen:latest`
+- `opea/codegen-ui:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -61,16 +61,17 @@ export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:6666/v1/codegen"
 ```
 
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+> [!NOTE]
+> Please replace the `host_ip` with you external IP address, do not use `localhost`.
 
-### Start all the services Docker Containers
+### Start the Docker Containers for All Services
 
 ```bash
 cd GenAIExamples/CodeGen/docker-composer/gaudi
 docker compose -f docker_compose.yaml up -d
 ```
 
-### Validate MicroServices and MegaService
+### Validate the MicroServices and MegaService
 
 1. TGI Service
 
@@ -81,7 +82,7 @@ curl http://${host_ip}:8028/generate \
   -H 'Content-Type: application/json'
 ```
 
-2. LLM Microservice
+2. LLM Microservices
 
 ```bash
 curl http://${host_ip}:9000/v1/chat/completions\
@@ -99,7 +100,7 @@ curl http://${host_ip}:6666/v1/codegen -H "Content-Type: application/json" -d '{
      }'
 ```
 
-## Enable LangSmith for Monotoring Application (Optional)
+## Enable LangSmith to Monitor Application (Optional)
 
 LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
@@ -120,10 +121,10 @@ export LANGCHAIN_API_KEY=ls_...
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
 
 ```yaml
-  chaqna-gaudi-ui-server:
+  codegen-xeon-ui-server:
     image: opea/codegen-ui:latest
     ...
     ports:
@@ -140,11 +141,11 @@ Install `Neural Copilot` in VSCode as below.
 
 ![Install-screenshot](https://i.imgur.com/cnHRAdD.png)
 
-### How to use
+### How to Use
 
-#### Service URL setting
+#### Service URL Setting
 
-Please adjust the service URL in the extension settings based on the endpoint of the code generation backend service.
+Please adjust the service URL in the extension settings based on the endpoint of the CodeGen backend service.
 
 ![Setting-screenshot](https://i.imgur.com/4hjvKPu.png)
 ![Setting-screenshot](https://i.imgur.com/AQZuzqd.png)
@@ -157,7 +158,7 @@ The Copilot enables users to input their corresponding sensitive information and
 
 #### Code Suggestion
 
-To trigger inline completion, you'll need to type # {your keyword} (start with your programming language's comment keyword, like // in C++ and # in python). Make sure Inline Suggest is enabled from the VS Code Settings.
+To trigger inline completion, you'll need to type `# {your keyword} (start with your programming language's comment keyword, like // in C++ and # in python)`. Make sure the `Inline Suggest` is enabled from the VS Code Settings.
 For example:
 
 ![code suggestion](https://i.imgur.com/sH5UoTO.png)
@@ -183,18 +184,18 @@ You can start a conversation with the AI programming assistant by clicking on th
 
 ![icon](https://i.imgur.com/f7rzfCQ.png)
 
-Then you can see the conversation window on the left, where you can chat with AI assistant:
+Then you can see the conversation window on the left, where you can chat with the AI assistant:
 
 ![dialog](https://i.imgur.com/aiYzU60.png)
 
-There are 4 areas worth noting:
+There are 4 areas worth noting as shown in the screenshot above:
 
-- Enter and submit your question
-- Your previous questions
-- Answers from AI assistant (Code will be highlighted properly according to the programming language it is written in, also support streaming output)
-- Copy or replace code with one click (Note that you need to select the code in the editor first and then click "replace", otherwise the code will be inserted)
+1. Enter and submit your question
+2. Your previous questions
+3. Answers from AI assistant (Code will be highlighted properly according to the programming language it is written in, also support streaming output)
+4. Copy or replace code with one click (Note that you need to select the code in the editor first and then click "replace", otherwise the code will be inserted)
 
-You can also select the code in the editor and ask AI assistant question about it.
+You can also select the code in the editor and ask the AI assistant questions about the code directly.
 For example:
 
 - Select code
