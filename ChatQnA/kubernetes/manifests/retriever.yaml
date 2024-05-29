@@ -1,0 +1,46 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: retriever-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: retriever-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      labels:
+        app: retriever-deploy
+    spec:
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: opea/retriever-redis:latest
+        imagePullPolicy: IfNotPresent
+        name: retriever-deploy
+        args:
+        ports:
+        - containerPort: 7000
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: retriever-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: retriever-deploy
+  ports:
+    - name: service
+      port: 7000
+      targetPort: 7000
