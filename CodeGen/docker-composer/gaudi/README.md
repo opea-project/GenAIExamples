@@ -6,7 +6,7 @@ This document outlines the deployment process for a CodeGen application utilizin
 
 First of all, you need to build the Docker images locally. This step can be ignored after the Docker images published to the Docker Hub.
 
-### 1. Clone the GenAIComps Source Code
+### 1. Install GenAIComps from Source Code
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
@@ -100,7 +100,7 @@ curl http://${host_ip}:6666/v1/codegen -H "Content-Type: application/json" -d '{
      }'
 ```
 
-## Enable LangSmith for Monitoring Application (Optional)
+## Enable LangSmith to Monitor Application (Optional)
 
 LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
