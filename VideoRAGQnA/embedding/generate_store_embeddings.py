@@ -9,6 +9,7 @@ import os
 
 # Add the parent directory of the current script to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+VECTORDB_SERVICE_HOST_IP = os.getenv("VECTORDB_SERVICE_HOST_IP", "0.0.0.0")
 
 
 # sys.path.append(os.path.abspath('../utils'))
@@ -150,16 +151,17 @@ if __name__ == '__main__':
     meta_output_dir = config['meta_output_dir']
     N = config['number_of_frames_per_second']
     
-    host = config['vector_db']['host']
+    host = VECTORDB_SERVICE_HOST_IP
     port = int(config['vector_db']['port'])
     selected_db = config['vector_db']['choice_of_db']
     
     # Creating DB
     print ('Creating DB with text and image embedding support, \nIt may take few minutes to download and load all required models if you are running for first time.')
+    print('Connect to {} at {}:{}'.format(selected_db, host, port))
     
     vs = db.VS(host, port, selected_db)
     
     generate_image_embeddings(selected_db)
     
     retrieval_testing()
-    
+

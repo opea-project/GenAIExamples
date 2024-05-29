@@ -7,3 +7,5 @@ metafunctions
 sentence-transformers
 accelerate
 vdms
+tzlocal
+dateparser
