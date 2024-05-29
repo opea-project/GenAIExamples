@@ -1,6 +1,6 @@
 # Dataprep Microservice
 
-The Dataprep Microservice aims to preprocess the data from various sources, either structured or unstructured data, to text data, and convert the text data to embedding vectors then store them in the database.
+The Dataprep Microservice aims to preprocess the data from various sources (either structured or unstructured data) to text data, and convert the text data to embedding vectors then store them in the database.
 
 # Dataprep Microservice with Redis
 

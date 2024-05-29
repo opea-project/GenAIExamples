@@ -58,7 +58,7 @@ cd comps/dataprep/redis/docker
 docker compose -f docker-compose-dataprep-redis.yaml up -d
 ```
 
-# Invoke Microservices
+# Invoke Microservice
 
 Once document preparation microservice for Redis is started, user can use below command to invoke the microservice to convert the document to embedding and save to the database.
 

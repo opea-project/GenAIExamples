@@ -3,7 +3,7 @@
 # Generative AI Components (GenAIComps)
 
 <p align="center">
-<b>Build Enterprise-grade Generative AI applications with microservice architecture</b>
+<b>Build Enterprise-grade Generative AI Applications with Microservice Architecture</b>
 </p>
 
 <div align="left">

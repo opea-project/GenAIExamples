@@ -8,7 +8,7 @@
 pip install -r requirements.txt
 ```
 
-## Start Qdrant server
+## Start Qdrant Server
 
 Please refer to this [readme](../../../vectorstores/langchain/qdrant/README.md).
 
@@ -22,7 +22,7 @@ export QDRANT_PORT=6333
 export COLLECTION_NAME=${your_collection_name}
 ```
 
-## Start document preparation microservice for Qdrant with Python Script
+## Start Document Preparation Microservice for Qdrant with Python Script
 
 Start document preparation microservice for Qdrant with below command.
 
@@ -62,7 +62,7 @@ cd comps/dataprep/qdrant/docker
 docker compose -f docker-compose-dataprep-qdrant.yaml up -d
 ```
 
-# Invoke Microservices
+# Invoke Microservice
 
 Once document preparation microservice for Qdrant is started, user can use below command to invoke the microservice to convert the document to embedding and save to the database.
 

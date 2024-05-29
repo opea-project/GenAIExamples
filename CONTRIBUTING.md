@@ -11,7 +11,7 @@ If you have improvements to Generative AI Examples, send your pull requests for
 [review](https://github.com/opea-project/GenAIExamples/pulls).
 If you are new to GitHub, view the pull request [How To](https://help.github.com/articles/using-pull-requests/).
 
-### Step-by-Step guidelines
+### Step-by-Step Guidelines
 
 - Star this repository using the button `Star` in the top right corner.
 - Fork this Repository using the button `Fork` in the top right corner.
