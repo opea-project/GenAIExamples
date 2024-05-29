@@ -18,6 +18,7 @@ from typing import Dict, List
 import requests
 from fastapi.responses import StreamingResponse
 
+from ..proto.docarray import LLMParams
 from .constants import ServiceType
 from .dag import DAG
 
@@ -46,13 +47,13 @@ class ServiceOrchestrator(DAG):
             print(e)
             return False
 
-    async def schedule(self, initial_inputs: Dict):
+    async def schedule(self, initial_inputs: Dict, llm_parameters: LLMParams = LLMParams()):
         for node in self.topological_sort():
             if node in self.ind_nodes():
                 inputs = initial_inputs
             else:
                 inputs = self.process_outputs(self.predecessors(node))
-            response = await self.execute(node, inputs)
+            response = await self.execute(node, inputs, llm_parameters)
             self.dump_outputs(node, response)
 
     def process_outputs(self, prev_nodes: List) -> Dict:
@@ -63,10 +64,14 @@ class ServiceOrchestrator(DAG):
             all_outputs.update(self.result_dict[prev_node])
         return all_outputs
 
-    async def execute(self, cur_node: str, inputs: Dict):
+    async def execute(self, cur_node: str, inputs: Dict, llm_parameters: LLMParams = LLMParams()):
         # send the cur_node request/reply
         endpoint = self.services[cur_node].endpoint_path
-        if self.services[cur_node].service_type == ServiceType.LLM:
+        llm_parameters_dict = llm_parameters.dict()
+        for field, value in llm_parameters_dict.items():
+            if inputs.get(field) != value:
+                inputs[field] = value
+        if self.services[cur_node].service_type == ServiceType.LLM and llm_parameters.streaming:
             response = requests.post(
                 url=endpoint, data=json.dumps(inputs), proxies={"http": None}, stream=True, timeout=1000
             )

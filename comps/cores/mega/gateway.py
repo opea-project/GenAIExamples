@@ -22,6 +22,7 @@ from ..proto.api_protocol import (
     ChatMessage,
     UsageInfo,
 )
+from ..proto.docarray import LLMParams
 from .constants import MegaServiceEndpoint, ServiceRoleType, ServiceType
 from .micro_service import MicroService
 
@@ -79,6 +80,35 @@ class Gateway:
     def list_parameter(self):
         pass
 
+    def _handle_message(self, messages):
+        if isinstance(messages, str):
+            prompt = messages
+        else:
+            messages_dict = {}
+            for message in messages:
+                msg_role = message["role"]
+                if msg_role == "system":
+                    system_prompt = message["content"]
+                elif msg_role == "user":
+                    if type(message["content"]) == list:
+                        text = ""
+                        text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
+                        text += "\n".join(text_list)
+                        messages_dict[msg_role] = text
+                    else:
+                        messages_dict[msg_role] = message["content"]
+                elif msg_role == "assistant":
+                    messages_dict[msg_role] = message["content"]
+                else:
+                    raise ValueError(f"Unknown role: {msg_role}")
+            prompt = system_prompt + "\n"
+            for role, message in messages_dict:
+                if message:
+                    prompt += role + ": " + message + "\n"
+                else:
+                    prompt += role + ":"
+        return prompt
+
 
 class ChatQnAGateway(Gateway):
     def __init__(self, megaservice, host="0.0.0.0", port=8888):
@@ -89,13 +119,16 @@ class ChatQnAGateway(Gateway):
     async def handle_request(self, request: Request):
         data = await request.json()
         chat_request = ChatCompletionRequest.parse_obj(data)
-        if isinstance(chat_request.messages, str):
-            prompt = chat_request.messages
-        else:
-            for message in chat_request.messages:
-                text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
-                prompt = "\n".join(text_list)
-        await self.megaservice.schedule(initial_inputs={"text": prompt})
+        prompt = self._handle_message(chat_request.messages)
+        parameters = LLMParams(
+            max_new_tokens=chat_request.max_tokens,
+            top_k=chat_request.top_k,
+            top_p=chat_request.top_p,
+            temperature=chat_request.temperature,
+            repetition_penalty=chat_request.repetition_penalty,
+            streaming=chat_request.stream,
+        )
+        await self.megaservice.schedule(initial_inputs={"text": prompt}, llm_parameters=parameters)
         for node, response in self.megaservice.result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
             if (
@@ -127,13 +160,16 @@ class CodeGenGateway(Gateway):
     async def handle_request(self, request: Request):
         data = await request.json()
         chat_request = ChatCompletionRequest.parse_obj(data)
-        if isinstance(chat_request.messages, str):
-            prompt = chat_request.messages
-        else:
-            for message in chat_request.messages:
-                text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
-                prompt = "\n".join(text_list)
-        await self.megaservice.schedule(initial_inputs={"query": prompt})
+        prompt = self._handle_message(chat_request.messages)
+        parameters = LLMParams(
+            max_new_tokens=chat_request.max_tokens,
+            top_k=chat_request.top_k,
+            top_p=chat_request.top_p,
+            temperature=chat_request.temperature,
+            repetition_penalty=chat_request.repetition_penalty,
+            streaming=chat_request.stream,
+        )
+        await self.megaservice.schedule(initial_inputs={"query": prompt}, llm_parameters=parameters)
         for node, response in self.megaservice.result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
             if (
@@ -212,13 +248,16 @@ class DocSumGateway(Gateway):
     async def handle_request(self, request: Request):
         data = await request.json()
         chat_request = ChatCompletionRequest.parse_obj(data)
-        if isinstance(chat_request.messages, str):
-            prompt = chat_request.messages
-        else:
-            for message in chat_request.messages:
-                text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
-                prompt = "\n".join(text_list)
-        await self.megaservice.schedule(initial_inputs={"query": prompt})
+        prompt = self._handle_message(chat_request.messages)
+        parameters = LLMParams(
+            max_new_tokens=chat_request.max_tokens,
+            top_k=chat_request.top_k,
+            top_p=chat_request.top_p,
+            temperature=chat_request.temperature,
+            repetition_penalty=chat_request.repetition_penalty,
+            streaming=chat_request.stream,
+        )
+        await self.megaservice.schedule(initial_inputs={"query": prompt}, llm_parameters=parameters)
         for node, response in self.megaservice.result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
             if (
