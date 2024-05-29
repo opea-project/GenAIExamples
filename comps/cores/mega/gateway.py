@@ -102,7 +102,7 @@ class Gateway:
                 else:
                     raise ValueError(f"Unknown role: {msg_role}")
             prompt = system_prompt + "\n"
-            for role, message in messages_dict:
+            for role, message in messages_dict.items():
                 if message:
                     prompt += role + ": " + message + "\n"
                 else:
@@ -121,12 +121,12 @@ class ChatQnAGateway(Gateway):
         chat_request = ChatCompletionRequest.parse_obj(data)
         prompt = self._handle_message(chat_request.messages)
         parameters = LLMParams(
-            max_new_tokens=chat_request.max_tokens,
-            top_k=chat_request.top_k,
-            top_p=chat_request.top_p,
-            temperature=chat_request.temperature,
-            repetition_penalty=chat_request.repetition_penalty,
-            streaming=chat_request.stream,
+            max_new_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
+            top_k=chat_request.top_k if chat_request.top_k else 10,
+            top_p=chat_request.top_p if chat_request.top_p else 0.95,
+            temperature=chat_request.temperature if chat_request.temperature else 0.01,
+            repetition_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 1.03,
+            streaming=chat_request.stream if chat_request.stream else True,
         )
         await self.megaservice.schedule(initial_inputs={"text": prompt}, llm_parameters=parameters)
         for node, response in self.megaservice.result_dict.items():
@@ -162,12 +162,12 @@ class CodeGenGateway(Gateway):
         chat_request = ChatCompletionRequest.parse_obj(data)
         prompt = self._handle_message(chat_request.messages)
         parameters = LLMParams(
-            max_new_tokens=chat_request.max_tokens,
-            top_k=chat_request.top_k,
-            top_p=chat_request.top_p,
-            temperature=chat_request.temperature,
-            repetition_penalty=chat_request.repetition_penalty,
-            streaming=chat_request.stream,
+            max_new_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
+            top_k=chat_request.top_k if chat_request.top_k else 10,
+            top_p=chat_request.top_p if chat_request.top_p else 0.95,
+            temperature=chat_request.temperature if chat_request.temperature else 0.01,
+            repetition_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 1.03,
+            streaming=chat_request.stream if chat_request.stream else True,
         )
         await self.megaservice.schedule(initial_inputs={"query": prompt}, llm_parameters=parameters)
         for node, response in self.megaservice.result_dict.items():
@@ -250,12 +250,12 @@ class DocSumGateway(Gateway):
         chat_request = ChatCompletionRequest.parse_obj(data)
         prompt = self._handle_message(chat_request.messages)
         parameters = LLMParams(
-            max_new_tokens=chat_request.max_tokens,
-            top_k=chat_request.top_k,
-            top_p=chat_request.top_p,
-            temperature=chat_request.temperature,
-            repetition_penalty=chat_request.repetition_penalty,
-            streaming=chat_request.stream,
+            max_new_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
+            top_k=chat_request.top_k if chat_request.top_k else 10,
+            top_p=chat_request.top_p if chat_request.top_p else 0.95,
+            temperature=chat_request.temperature if chat_request.temperature else 0.01,
+            repetition_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 1.03,
+            streaming=chat_request.stream if chat_request.stream else True,
         )
         await self.megaservice.schedule(initial_inputs={"query": prompt}, llm_parameters=parameters)
         for node, response in self.megaservice.result_dict.items():

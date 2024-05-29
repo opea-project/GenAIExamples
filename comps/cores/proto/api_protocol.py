@@ -49,14 +49,14 @@ class ChatCompletionRequest(BaseModel):
         List[Dict[str, Union[str, List[Dict[str, Union[str, Dict[str, str]]]]]]],
     ]
     model: Optional[str] = "Intel/neural-chat-7b-v3-3"
-    temperature: Optional[float] = 0.7
-    top_p: Optional[float] = 1.0
-    top_k: Optional[int] = -1
+    temperature: Optional[float] = 0.01
+    top_p: Optional[float] = 0.95
+    top_k: Optional[int] = 10
     n: Optional[int] = 1
-    max_tokens: Optional[int] = None
+    max_tokens: Optional[int] = 1024
     stop: Optional[Union[str, List[str]]] = None
     stream: Optional[bool] = False
-    presence_penalty: Optional[float] = 0.0
+    presence_penalty: Optional[float] = 1.03
     frequency_penalty: Optional[float] = 0.0
     user: Optional[str] = None
 

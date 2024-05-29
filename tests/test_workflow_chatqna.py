@@ -16,142 +16,74 @@
 # limitations under the License.
 
 import asyncio
-import json
 import os
-from typing import Union
 
-import requests
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
-from langchain_community.llms import HuggingFaceEndpoint
-from langchain_community.vectorstores import Redis
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
 
-from comps import (
-    INDEX_NAME,
-    INDEX_SCHEMA,
-    REDIS_URL,
-    EmbedDoc768,
-    GeneratedDoc,
-    LLMParamsDoc,
-    RerankedDoc,
-    SearchedDoc,
-    ServiceOrchestrator,
-    TextDoc,
-    opea_microservices,
-    register_microservice,
-)
-
-tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT", "http://localhost:8080")
-tei_reranking_endpoint = os.getenv("TEI_RERANKING_ENDPOINT", "http://localhost:8080")
-embeddings = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
+MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
+MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8888)
+EMBEDDING_SERVICE_HOST_IP = os.getenv("EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
+EMBEDDING_SERVICE_PORT = os.getenv("EMBEDDING_SERVICE_PORT", 6000)
+RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
+RETRIEVER_SERVICE_PORT = os.getenv("RETRIEVER_SERVICE_PORT", 7000)
+RERANK_SERVICE_HOST_IP = os.getenv("RERANK_SERVICE_HOST_IP", "0.0.0.0")
+RERANK_SERVICE_PORT = os.getenv("RERANK_SERVICE_PORT", 8000)
+LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
+LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
 
 
-@register_microservice(
-    name="opea_service@embedding_tgi_gaudi",
-    endpoint="/v1/embeddings",
-    port=6000,
-    input_datatype=TextDoc,
-    output_datatype=EmbedDoc768,
-)
-def embedding(input: TextDoc) -> EmbedDoc768:
-    embed_vector = embeddings.embed_query(input.text)
-    embed_vector = embed_vector[:768]  # Keep only the first 768 elements
-    res = EmbedDoc768(text=input.text, embedding=embed_vector)
-    return res
+class ChatQnAService:
+    def __init__(self, host="0.0.0.0", port=8000):
+        self.host = host
+        self.port = port
+        self.megaservice = ServiceOrchestrator()
 
+    def add_remote_service(self):
+        embedding = MicroService(
+            name="embedding",
+            host=EMBEDDING_SERVICE_HOST_IP,
+            port=EMBEDDING_SERVICE_PORT,
+            endpoint="/v1/embeddings",
+            use_remote_service=True,
+            service_type=ServiceType.EMBEDDING,
+        )
+        retriever = MicroService(
+            name="retriever",
+            host=RETRIEVER_SERVICE_HOST_IP,
+            port=RETRIEVER_SERVICE_PORT,
+            endpoint="/v1/retrieval",
+            use_remote_service=True,
+            service_type=ServiceType.RETRIEVER,
+        )
+        rerank = MicroService(
+            name="rerank",
+            host=RERANK_SERVICE_HOST_IP,
+            port=RERANK_SERVICE_PORT,
+            endpoint="/v1/reranking",
+            use_remote_service=True,
+            service_type=ServiceType.RERANK,
+        )
+        llm = MicroService(
+            name="llm",
+            host=LLM_SERVICE_HOST_IP,
+            port=LLM_SERVICE_PORT,
+            endpoint="/v1/chat/completions",
+            use_remote_service=True,
+            service_type=ServiceType.LLM,
+        )
+        self.megaservice.add(embedding).add(retriever).add(rerank).add(llm)
+        self.megaservice.flow_to(embedding, retriever)
+        self.megaservice.flow_to(retriever, rerank)
+        self.megaservice.flow_to(rerank, llm)
+        self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
-opea_microservices["opea_service@embedding_tgi_gaudi"].start()
-
-
-@register_microservice(name="opea_service@retriever_redis", endpoint="/v1/retrieval", port=7000)
-def retrieve(input: EmbedDoc768) -> SearchedDoc:
-    embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-large-en-v1.5")
-    vector_db = Redis.from_existing_index(
-        embedding=embeddings,
-        index_name=INDEX_NAME,
-        redis_url=REDIS_URL,
-        schema=INDEX_SCHEMA,
-    )
-    search_res = vector_db.similarity_search_by_vector(embedding=input.embedding)
-    searched_docs = []
-    for r in search_res:
-        searched_docs.append(TextDoc(text=r.page_content))
-    result = SearchedDoc(retrieved_docs=searched_docs, initial_query=input.text)
-    return result
-
-
-opea_microservices["opea_service@retriever_redis"].start()
-
-
-@register_microservice(
-    name="opea_service@reranking_tgi_gaudi",
-    endpoint="/v1/reranking",
-    port=8000,
-    input_datatype=SearchedDoc,
-    output_datatype=RerankedDoc,
-)
-def reranking(input: SearchedDoc) -> RerankedDoc:
-    docs = [doc.text for doc in input.retrieved_docs]
-    url = tei_reranking_endpoint + "/rerank"
-    data = {"query": input.initial_query, "texts": docs}
-    headers = {"Content-Type": "application/json"}
-    response = requests.post(url, data=json.dumps(data), headers=headers)
-    response_data = response.json()
-    best_response = max(response_data, key=lambda response: response["score"])
-    res = RerankedDoc(query=input.initial_query, doc=input.retrieved_docs[best_response["index"]])
-    return res
-
-
-opea_microservices["opea_service@reranking_tgi_gaudi"].start()
-
-
-@register_microservice(name="opea_service@llm_tgi_gaudi", endpoint="/v1/chat/completions", port=9000)
-def llm_generate(input: Union[TextDoc, RerankedDoc]) -> GeneratedDoc:
-    llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
-    params = LLMParamsDoc()
-    llm = HuggingFaceEndpoint(
-        endpoint_url=llm_endpoint,
-        max_new_tokens=params.max_new_tokens,
-        top_k=params.top_k,
-        top_p=params.top_p,
-        typical_p=params.typical_p,
-        temperature=params.temperature,
-        repetition_penalty=params.repetition_penalty,
-        streaming=params.streaming,
-    )
-    if isinstance(input, RerankedDoc):
-        template = """Answer the question based only on the following context:
-        {context}
-
-        Question: {question}
-        """
-        prompt = ChatPromptTemplate.from_template(template)
-        chain = prompt | llm | StrOutputParser()
-        response = chain.invoke({"question": input.query, "context": input.doc.text})
-    elif isinstance(input, TextDoc):
-        response = llm.invoke(input.text)
-    else:
-        raise TypeError("Invalid input type. Expected TextDoc or RerankedDoc.")
-    res = GeneratedDoc(text=response, prompt=input.query)
-    return res
-
-
-opea_microservices["opea_service@llm_tgi_gaudi"].start()
+    async def schedule(self):
+        await self.megaservice.schedule(initial_inputs={"text": "What is the revenue of Nike in 2023?"})
+        result_dict = self.megaservice.result_dict
+        print(result_dict)
 
 
 if __name__ == "__main__":
-    service_builder = ServiceOrchestrator()
-    service_builder.add(opea_microservices["opea_service@embedding_tgi_gaudi"]).add(
-        opea_microservices["opea_service@retriever_redis"]
-    ).add(opea_microservices["opea_service@reranking_tgi_gaudi"]).add(opea_microservices["opea_service@llm_tgi_gaudi"])
-    service_builder.flow_to(
-        opea_microservices["opea_service@embedding_tgi_gaudi"], opea_microservices["opea_service@retriever_redis"]
-    )
-    service_builder.flow_to(
-        opea_microservices["opea_service@retriever_redis"], opea_microservices["opea_service@reranking_tgi_gaudi"]
-    )
-    service_builder.flow_to(
-        opea_microservices["opea_service@reranking_tgi_gaudi"], opea_microservices["opea_service@llm_tgi_gaudi"]
-    )
-    asyncio.run(service_builder.schedule(initial_inputs={"text": "What's the total revenue of Nike in 2023?"}))
+    chatqna = ChatQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    chatqna.add_remote_service()
+    asyncio.run(chatqna.schedule())
