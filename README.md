@@ -230,6 +230,8 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 	</tbody>
 </table>
 
+> **_NOTE:_** The `Language Translation`, `SearchQnA`, `VisualQnA` and other use cases not listing here are in active development. The code structure of these use cases are subject to change.
+
 ## Additional Content
 
 - [Contribution](/CONTRIBUTING.md)
