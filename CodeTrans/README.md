@@ -6,11 +6,11 @@ The workflow falls into the following architecture:
 
 ![architecture](https://i.imgur.com/ums0brC.png)
 
-This Code Translation use case uses Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
+This Code Translation use case uses Text Generation Inference on Intel Gaudi2 or Intel Xeon Scalable Processor. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
 # Deploy Code Translation Service
 
-The Code Translation service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
+The Code Translation service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
 
 ## Deploy Code Translation on Gaudi
 
