@@ -1,10 +1,10 @@
 # TTS Microservice
 
-TTS (Text-To-Speech) micro-service helps users convert text to speech. When building a talkingbot with LLM, users may need to get the LLM dgenerated answer in audio. This microservice is built for that conversion stage.
+TTS (Text-To-Speech) microservice helps users convert text to speech. When building a talking bot with LLM, users might need an LLM generated answer in audio format. This microservice is built for that conversion stage.
 
 # 🚀Start Microservice with Python
 
-To start the TTS microservice, you need to install python packages first.
+To start the TTS microservice, you need to first install python packages.
 
 ## Install Requirements
 
@@ -20,7 +20,7 @@ python tts.py
 
 # 🚀Start Microservice with Docker
 
-The other way is to start the ASR microservice with Docker.
+Alternatively, you can start the ASR microservice with Docker.
 
 ## Build Docker Image
 
@@ -37,7 +37,7 @@ docker run -p 9999:9999 --network=host --ipc=host -e http_proxy=$http_proxy -e h
 
 # Test
 
-You can use the following `curl` command to test whether the service is up. Notice that the first request can be slow because it need to pre-download the models.
+You can use the following `curl` command to test whether the service is up. Notice that the first request can be slow because it needs to download the models.
 
 ```bash
 curl http://localhost:9999/v1/audio/speech -H "Content-Type: application/json"   -d '{"text":"Hello there."}'
