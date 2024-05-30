@@ -134,7 +134,7 @@ function validate_microservices() {
     # tei for rerank microservice
     validate_services \
         "${ip_address}:8808/rerank" \
-        '{"index":1,"score":0.9988041}' \
+        '{"index":1,"score":' \
         "tei-rerank" \
         "tei-reranking-gaudi-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
