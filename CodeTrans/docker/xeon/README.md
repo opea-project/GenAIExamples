@@ -31,7 +31,7 @@ docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/CodeTrans
+cd GenAIExamples/CodeTrans/docker
 docker build -t opea/codetrans:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
