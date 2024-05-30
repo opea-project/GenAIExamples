@@ -33,7 +33,7 @@ function start_services() {
     export https_proxy=${http_proxy}
     export LLM_MODEL_ID="HuggingFaceH4/mistral-7b-grok"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
-    export HF_TOKEN=${HF_TOKEN}
+    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"

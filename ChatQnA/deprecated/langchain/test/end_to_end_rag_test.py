@@ -242,7 +242,7 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
     os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
     os.environ["LANGCHAIN_API_KEY"] = args.langchain_token
-    os.environ["HF_TOKEN"] = args.huggingface_token
+    os.environ["HUGGINGFACEHUB_API_TOKEN"] = args.huggingface_token
 
     chain = buildchain(args)
     run_test(args, chain)
