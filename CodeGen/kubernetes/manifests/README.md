@@ -2,15 +2,15 @@
 
 > [NOTE]
 > The following values must be set before you can deploy:
-> HUGGINGFACEHUB_API_TOKEN
+> HF_TOKEN
 > You can also customize the "MODEL_ID" and "model-volume"
 
 ## Deploy On Xeon
 
 ```
 cd GenAIExamples/CodeGen/kubernetes/manifests/xeon
-export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
-sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" codegen.yaml
+export HF_TOKEN="YourOwnToken"
+sed -i "s/insert-your-huggingface-token-here/${HF_TOKEN}/g" codegen.yaml
 kubectl apply -f codegen.yaml
 ```
 
@@ -18,8 +18,8 @@ kubectl apply -f codegen.yaml
 
 ```
 cd GenAIExamples/CodeGen/kubernetes/manifests/gaudi
-export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
-sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" codegen.yaml
+export HF_TOKEN="YourOwnToken"
+sed -i "s/insert-your-huggingface-token-here/${HF_TOKEN}/g" codegen.yaml
 kubectl apply -f codegen.yaml
 ```
 

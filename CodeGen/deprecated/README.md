@@ -86,10 +86,10 @@ docker run -it -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} --net=h
 
 Make sure TGI-Gaudi service is running and also make sure data is populated into Redis. Launch the backend service:
 
-Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
+Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HF_TOKEN` environment with the token.
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=<token>
+export HF_TOKEN=<token>
 nohup python server.py &
 ```
 
