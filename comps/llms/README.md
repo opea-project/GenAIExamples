@@ -115,3 +115,14 @@ curl http://${your_ip}:9000/v1/chat/completions \
   -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
 ```
+
+## Validated Model
+
+| Model                     | TGI-Gaudi | vLLM-CPU | Ray |
+| ------------------------- | --------- | -------- | --- |
+| Intel/neural-chat-7b-v3-3 | ✓         | ✓        | ✓   |
+| Llama-2-7b-chat-hf        | ✓         | ✓        | ✓   |
+| Llama-2-70b-chat-hf       | ✓         | -        | x   |
+| Meta-Llama-3-8B-Instruct  | ✓         | ✓        | ✓   |
+| Meta-Llama-3-70B-Instruct | ✓         | -        | x   |
+| Phi-3                     | x         | Limit 4K | ✓   |
