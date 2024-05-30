@@ -15,8 +15,8 @@
 from typing import Dict
 
 from fastapi import HTTPException
-from rayllm.api_openai_backend.openai_protocol import ModelCard, Prompt
-from rayllm.api_openai_backend.request_handler import handle_request
+from ray_serve.api_openai_backend.openai_protocol import ModelCard, Prompt
+from ray_serve.api_openai_backend.request_handler import handle_request
 
 
 class RouterQueryClient:

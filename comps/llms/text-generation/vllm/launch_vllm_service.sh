@@ -32,4 +32,4 @@ fi
 volume=$PWD/data
 
 # Build the Docker run command based on the number of cards
-docker run -it --rm --name="ChatQnA_server" -p $port_number:$port_number --network=host -v $volume:/data -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy vllm-cpu-env /bin/bash -c "cd / && export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --model $model_name --port $port_number"
+docker run -it --rm --name="ChatQnA_server" -p $port_number:$port_number --network=host -v $volume:/data -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} vllm:cpu /bin/bash -c "cd / && export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --model $model_name --port $port_number"

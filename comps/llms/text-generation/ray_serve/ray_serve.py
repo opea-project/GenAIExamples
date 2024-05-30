@@ -25,8 +25,8 @@ import torch
 from fastapi import HTTPException
 from pydantic import BaseModel
 from ray import serve
-from rayllm.api_openai_backend.openai_protocol import ChatMessage, ErrorResponse, ModelResponse
-from rayllm.api_openai_backend.tools import ChatPromptCapture, OpenAIToolsPrompter
+from ray_serve.api_openai_backend.openai_protocol import ChatMessage, ErrorResponse, ModelResponse
+from ray_serve.api_openai_backend.tools import ChatPromptCapture, OpenAIToolsPrompter
 from starlette.requests import Request
 from starlette.responses import JSONResponse, StreamingResponse
 from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer

@@ -23,7 +23,7 @@ export HUGGINGFACEHUB_API_TOKEN=<token>
 And then you can make requests like below to check the service status:
 
 ```bash
-curl http://127.0.0.1::8080/v1/completions \
+curl http://127.0.0.1:8080/v1/completions \
   -H "Content-Type: application/json" \
   -d '{
   "model": <model_name>,

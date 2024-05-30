@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Copyright (c) 2024 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-git clone https://github.com/vllm-project/vllm.git
-cd ./vllm/
-docker build -f Dockerfile.cpu -t vllm:cpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+FROM langchain/langchain:latest
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    libgl1-mesa-glx \
+    libjemalloc-dev \
+    vim
+
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
+
+USER user
+
+COPY comps /home/user/comps
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /home/user/comps/llms/text-generation/vllm/requirements.txt
+
+ENV PYTHONPATH=$PYTHONPATH:/home/user
+
+WORKDIR /home/user/comps/llms/text-generation/vllm
+
+ENTRYPOINT ["python", "llm.py"]

@@ -18,7 +18,7 @@ from typing import AsyncIterator, List
 
 from fastapi import HTTPException, Request, status
 from pydantic import ValidationError as PydanticValidationError
-from rayllm.api_openai_backend.openai_protocol import ErrorResponse, FinishReason, ModelResponse, Prompt
+from ray_serve.api_openai_backend.openai_protocol import ErrorResponse, FinishReason, ModelResponse, Prompt
 from starlette.responses import JSONResponse
 
 

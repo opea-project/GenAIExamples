@@ -21,7 +21,7 @@ from fastapi import FastAPI
 from fastapi import Response as FastAPIResponse
 from fastapi import status
 from fastapi.middleware.cors import CORSMiddleware
-from rayllm.api_openai_backend.openai_protocol import (
+from ray_serve.api_openai_backend.openai_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
     ChatCompletionResponseChoice,
@@ -39,8 +39,8 @@ from rayllm.api_openai_backend.openai_protocol import (
     Prompt,
     UsageInfo,
 )
-from rayllm.api_openai_backend.query_client import RouterQueryClient
-from rayllm.api_openai_backend.request_handler import OpenAIHTTPException, openai_exception_handler
+from ray_serve.api_openai_backend.query_client import RouterQueryClient
+from ray_serve.api_openai_backend.request_handler import OpenAIHTTPException, openai_exception_handler
 from starlette.responses import Response, StreamingResponse
 
 # timeout in 10 minutes. Streaming can take longer than 3 min

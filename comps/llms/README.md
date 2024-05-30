@@ -2,9 +2,9 @@
 
 This microservice, designed for Language Model Inference (LLM), processes input consisting of a query string and associated reranked documents. It constructs a prompt based on the query and documents, which is then used to perform inference with a large language model. The service delivers the inference results as output.
 
-A prerequisite for using this microservice is that users must have a Text Generation Inference (TGI) service already running. Users need to set the TGI service's endpoint into an environment variable. The microservice utilizes this endpoint to create an LLM object, enabling it to communicate with the TGI service for executing language model operations.
+A prerequisite for using this microservice is that users must have a LLM text generation service (etc., TGI, vLLM and Ray) already running. Users need to set the LLM service's endpoint into an environment variable. The microservice utilizes this endpoint to create an LLM object, enabling it to communicate with the LLM service for executing language model operations.
 
-Overall, this microservice offers a streamlined way to integrate large language model inference into applications, requiring minimal setup from the user beyond initiating a TGI service and configuring the necessary environment variables. This allows for the seamless processing of queries and documents to generate intelligent, context-aware responses.
+Overall, this microservice offers a streamlined way to integrate large language model inference into applications, requiring minimal setup from the user beyond initiating a TGI/vLLM/Ray service and configuring the necessary environment variables. This allows for the seamless processing of queries and documents to generate intelligent, context-aware responses.
 
 # 🚀1. Start Microservice with Python (Option 1)
 
@@ -16,7 +16,9 @@ To start the LLM microservice, you need to install python packages first.
 pip install -r requirements.txt
 ```
 
-## 1.2 Start TGI Service
+## 1.2 Start LLM Service
+
+### 1.2.1 Start TGI Service
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
@@ -26,7 +28,24 @@ export LANGCHAIN_PROJECT="opea/gen-ai-comps:llms"
 docker run -p 8008:80 -v ./data:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:1.4 --model-id ${your_hf_llm_model}
 ```
 
-## 1.3 Verify the TGI Service
+### 1.2.2 Start vLLM Service
+
+```bash
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+docker run -it --name vllm_service -p 8008:80 -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -v ./data:/data vllm:cpu /bin/bash -c "cd / && export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --model ${your_hf_llm_model} --port 80"
+```
+
+## 1.2.3 Start Ray Service
+
+```bash
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export TRUST_REMOTE_CODE=True
+docker run -it --runtime=habana --name ray_serve_service -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -p 8008:80 -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e TRUST_REMOTE_CODE=$TRUST_REMOTE_CODE ray_serve:habana /bin/bash -c "ray start --head && python api_server_openai.py --port_number 80 --model_id_or_path ${your_hf_llm_model} --chat_processor ${your_hf_chatprocessor}"
+```
+
+## 1.3 Verify the LLM Service
+
+### 1.3.1 Verify the TGI Service
 
 ```bash
 curl http://${your_ip}:8008/generate \
@@ -35,16 +54,54 @@ curl http://${your_ip}:8008/generate \
   -H 'Content-Type: application/json'
 ```
 
-## 1.4 Start LLM Service
+### 1.3.2 Verify the vLLM Service
+
+```bash
+curl http://${your_ip}:8008/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": ${your_hf_llm_model},
+  "prompt": "What is Deep Learning?",
+  "max_tokens": 32,
+  "temperature": 0
+  }'
+```
+
+### 1.3.3 Verify the Ray Service
+
+```bash
+curl http://${your_ip}:8008/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": ${your_hf_llm_model},
+  "messages": [
+        {"role": "assistant", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What is Deep Learning?"},
+    ],
+  "max_tokens": 32,
+  "stream": True
+  }'
+```
+
+## 1.4 Start LLM Service with Python Script
+
+### 1.4.1 Start the TGI Service
 
 ```bash
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 python text-generation/tgi/llm.py
 ```
 
+### 1.4.2 Start the vLLM Service
+
+```bash
+export vLLM_LLM_ENDPOINT="http://${your_ip}:8008"
+python text-generation/vllm/llm.py
+```
+
 # 🚀2. Start Microservice with Docker (Option 2)
 
-If you start an LLM microservice with docker, the `docker_compose_llm.yaml` file will automatically start a TGI service with docker.
+If you start an LLM microservice with docker, the `docker_compose_llm.yaml` file will automatically start a TGI/vLLM service with docker.
 
 ## 2.1 Setup Environment Variables
 
@@ -59,11 +116,31 @@ export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/llms"
 ```
 
+In order to start vLLM and LLM services, you need to setup the following environment variables first.
+
+```bash
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export vLLM_LLM_ENDPOINT="http://${your_ip}:8008"
+export LLM_MODEL_ID=${your_hf_llm_model}
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=${your_langchain_api_key}
+export LANGCHAIN_PROJECT="opea/llms"
+```
+
 ## 2.2 Build Docker Image
+
+### 2.2.1 TGI
 
 ```bash
 cd ../../
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+```
+
+### 2.2.2 vLLM
+
+```bash
+cd ../../
+docker build -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/Dockerfile .
 ```
 
 To start a docker container, you have two options:
@@ -75,14 +152,31 @@ You can choose one as needed.
 
 ## 2.3 Run Docker with CLI (Option A)
 
+### 2.3.1 TGI
+
 ```bash
 docker run -d --name="llm-tgi-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/llm-tgi:latest
 ```
 
+### 2.3.2 vLLM
+
+```bash
+docker run -d --name="llm-vllm-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e vLLM_LLM_ENDPOINT=$vLLM_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e LLM_MODEL_ID=$LLM_MODEL_ID opea/llm-vllm:latest
+```
+
 ## 2.4 Run Docker with Docker Compose (Option B)
+
+### 2.4.1 TGI
 
 ```bash
 cd text-generation/tgi
+docker compose -f docker_compose_llm.yaml up -d
+```
+
+### 2.4.2 vLLM
+
+```bash
+cd text-generation/vllm
 docker compose -f docker_compose_llm.yaml up -d
 ```
 

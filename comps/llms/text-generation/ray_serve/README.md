@@ -21,13 +21,13 @@ export HUGGINGFACEHUB_API_TOKEN=<token>
 And then you can make requests with the OpenAI-compatible APIs like below to check the service status:
 
 ```bash
-curl http://127.0.0.1::8080/v1/chat/completions \
+curl http://127.0.0.1:8080/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
   "model": <model_name>,
   "messages": [
         {"role": "assistant", "content": "You are a helpful assistant."},
-        {"role": "user", "content": args.input_text},
+        {"role": "user", "content": "What is Deep Learning?"},
     ],
   "max_tokens": 32,
   "stream": True

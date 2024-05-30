@@ -19,7 +19,7 @@ from enum import Enum
 from typing import List, Union
 
 import jinja2
-from rayllm.api_openai_backend.openai_protocol import ChatMessage, FunctionCall, ToolCall
+from ray_serve.api_openai_backend.openai_protocol import ChatMessage, FunctionCall, ToolCall
 
 
 class ToolsCallsTemplateContext(Enum):
