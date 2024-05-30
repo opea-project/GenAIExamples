@@ -29,12 +29,12 @@ bash ./serving/tgi_gaudi/build_docker.sh
 bash ./serving/tgi_gaudi/launch_tgi_service.sh
 ```
 
-For gated models such as `LLAMA-2`, you will have to pass -e HF_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
+For gated models such as `LLAMA-2`, you will have to pass -e HUGGING_FACE_HUB_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
 
-Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HF_TOKEN` environment with the token.
+Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
 
 ```bash
-export HF_TOKEN=<token>
+export HUGGINGFACEHUB_API_TOKEN=<token>
 ```
 
 ### Launch a local server instance on 8 Gaudi cards:
@@ -80,7 +80,7 @@ docker run -it --net=host --ipc=host -e http_proxy=${http_proxy} -e https_proxy=
 Make sure TGI-Gaudi service is running. Launch the backend service:
 
 ```bash
-export HF_TOKEN=<token>
+export HUGGINGFACEHUB_API_TOKEN=<token>
 nohup python app/server.py &
 ```
 
