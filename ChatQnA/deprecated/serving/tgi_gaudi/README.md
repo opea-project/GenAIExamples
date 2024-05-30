@@ -79,11 +79,11 @@ For the System Management Interface Tool please check [hl-smi](https://docs.haba
 ## Docker command for 70B model
 
 ```bash
-docker run -p 8080:80 -v $volume:/data --runtime=habana -e HF_TOKEN=$HF_TOKEN -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e HABANA_VISIBLE_DEVICES="6,7,4,5" -e HABANA_VISIBLE_MODULES="0,1,2,3" -e BATCH_BUCKET_SIZE=22 -e PREFILL_BATCH_BUCKET_SIZE=1 -e MAX_BATCH_PREFILL_TOKENS=5102 -e MAX_BATCH_TOTAL_TOKENS=32256 -e MAX_INPUT_LENGTH=1024 -e PAD_SEQUENCE_TO_MULTIPLE_OF=1024 -e MAX_WAITING_TOKENS=5 -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --model-id $model --sharded true --num-shard 4
+docker run -p 8080:80 -v $volume:/data --runtime=habana -e HUGGING_FACE_HUB_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e HABANA_VISIBLE_DEVICES="6,7,4,5" -e HABANA_VISIBLE_MODULES="0,1,2,3" -e BATCH_BUCKET_SIZE=22 -e PREFILL_BATCH_BUCKET_SIZE=1 -e MAX_BATCH_PREFILL_TOKENS=5102 -e MAX_BATCH_TOTAL_TOKENS=32256 -e MAX_INPUT_LENGTH=1024 -e PAD_SEQUENCE_TO_MULTIPLE_OF=1024 -e MAX_WAITING_TOKENS=5 -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --model-id $model --sharded true --num-shard 4
 ```
 
 ## Docker command for 13B model
 
 ```bash
-docker run -p 8080:80 -v $volume:/data --runtime=habana -e HF_TOKEN=$HF_TOKEN -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e PAD_SEQUENCE_TO_MULTIPLE_OF=128  -e HABANA_VISIBLE_DEVICES="4" -e BATCH_BUCKET_SIZE=16 -e PREFILL_BATCH_BUCKET_SIZE=1 -e MAX_BATCH_PREFILL_TOKENS=4096 -e MAX_BATCH_TOTAL_TOKENS=18432 -e PAD_SEQUENCE_TO_MULTIPLE_OF=1024 -e MAX_INPUT_LENGTH=1024 -e MAX_TOTAL_TOKENS=1152  -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --model-id $model
+docker run -p 8080:80 -v $volume:/data --runtime=habana -e HUGGING_FACE_HUB_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e PAD_SEQUENCE_TO_MULTIPLE_OF=128  -e HABANA_VISIBLE_DEVICES="4" -e BATCH_BUCKET_SIZE=16 -e PREFILL_BATCH_BUCKET_SIZE=1 -e MAX_BATCH_PREFILL_TOKENS=4096 -e MAX_BATCH_TOTAL_TOKENS=18432 -e PAD_SEQUENCE_TO_MULTIPLE_OF=1024 -e MAX_INPUT_LENGTH=1024 -e MAX_TOTAL_TOKENS=1152  -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --model-id $model
 ```

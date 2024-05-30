@@ -141,7 +141,7 @@ spec:
           env:
             - name: TGI_LLM_ENDPOINT
               value: "http://codegen-tgi:80"
-            - name: HF_TOKEN
+            - name: HUGGINGFACEHUB_API_TOKEN
               value: "insert-your-huggingface-token-here"
             - name: http_proxy
               value:
