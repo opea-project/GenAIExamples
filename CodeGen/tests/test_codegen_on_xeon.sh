@@ -64,6 +64,13 @@ function validate_megaservice() {
     # Curl the Mega Service
     curl http://${ip_address}:6666/v1/codegen -H "Content-Type: application/json" -d '{
         "messages": "def print_hello_world():"}' > ${LOG_PATH}/curl_megaservice.log
+    exit_code=$?
+    docker logs codegen-xeon-backend-server
+    if [ $exit_code -ne 0 ]; then
+        echo "Megaservice failed, please check the logs in artifacts!"
+        docker logs codegen-xeon-backend-server >> ${LOG_PATH}/curl_megaservice.log
+        exit 1
+    fi
 
     sleep 2s
     echo "Checking response results, make sure the output is reasonable. "
