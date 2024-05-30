@@ -93,7 +93,7 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export RERANK_MODEL_ID="BAAI/bge-reranker-large"
+export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"

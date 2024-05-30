@@ -7,7 +7,7 @@ metadata:
   name: qna-config
 data:
   EMBEDDING_MODEL_ID: "BAAI/bge-base-en-v1.5"
-  RERANK_MODEL_ID: "BAAI/bge-reranker-large"
+  RERANK_MODEL_ID: "BAAI/bge-reranker-base"
   LLM_MODEL_ID: "Intel/neural-chat-7b-v3-3"
   TEI_EMBEDDING_ENDPOINT: "http://tei-embedding-gaudi-svc.default.svc.cluster.local:6006"
   TEI_RERANKING_ENDPOINT: "http://tei-reranking-svc.default.svc.cluster.local:8808"
