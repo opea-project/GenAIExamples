@@ -320,6 +320,7 @@ def read_clean_buffer(audio_bytes):
 
 
 def cut_text(text, punc):
+    text = re.escape(text)
     punc_list = [p for p in punc if p in {",", ".", ";", "?", "!", "、", "，", "。", "？", "！", ";", "：", "…"}]
     if len(punc_list) > 0:
         punds = r"[" + "".join(punc_list) + r"]"
