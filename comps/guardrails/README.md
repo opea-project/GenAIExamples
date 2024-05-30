@@ -86,7 +86,7 @@ docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy 
 ## 2.3 Run Docker with CLI
 
 ```bash
-docker run -d --name="guardrails-tgi-server" -p 9090:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e SAFETY_GUARD_ENDPOINT=$SAFETY_GUARD_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/guardrails-tgi:latest
+docker run -d --name="guardrails-tgi-server" -p 9090:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e SAFETY_GUARD_ENDPOINT=$SAFETY_GUARD_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/guardrails-tgi:latest
 ```
 
 ## 2.4 Run Docker with Docker Compose
@@ -111,6 +111,6 @@ curl http://localhost:9090/v1/health_check\
 ```bash
 curl http://localhost:9090/v1/guardrails\
   -X POST \
-  -d '{"inputs":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
+  -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
   -H 'Content-Type: application/json'
 ```
