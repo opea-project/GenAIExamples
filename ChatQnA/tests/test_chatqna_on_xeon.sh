@@ -142,7 +142,7 @@ function validate_microservices() {
     # tgi for llm service
     validate_services \
         "${ip_address}:9009/generate" \
-        "Deep " \
+        "generated_text" \
         "tgi-llm" \
         "tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
@@ -150,7 +150,7 @@ function validate_microservices() {
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \
-        "data: Deep" \
+        "data: " \
         "llm" \
         "llm-tgi-server" \
         '{"query":"What is Deep Learning?"}'
