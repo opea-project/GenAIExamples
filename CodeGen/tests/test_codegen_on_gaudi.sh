@@ -27,17 +27,17 @@ function build_docker_images() {
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
-    cd $WORKPATH
+    cd $WORKPATH/docker
     docker build --no-cache -t opea/codegen:latest -f Dockerfile .
 
-    cd $WORKPATH/ui
+    cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/codegen-ui:latest -f docker/Dockerfile .
 
     docker images
 }
 
 function start_services() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
 
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8028"
@@ -87,7 +87,6 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     curl http://${ip_address}:6666/v1/codegen -H "Content-Type: application/json" -d '{
-        "model": "ise-uiuc/Magicoder-S-DS-6.7B",
         "messages": "def print_hello_world():"}' > ${LOG_PATH}/curl_megaservice.log
 
     echo "Checking response results, make sure the output is reasonable. "
@@ -109,7 +108,7 @@ function validate_megaservice() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")

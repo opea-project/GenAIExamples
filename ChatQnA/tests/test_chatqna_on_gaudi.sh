@@ -27,17 +27,17 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 
-    cd $WORKPATH
+    cd $WORKPATH/docker
     docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
 
-    cd $WORKPATH/ui
+    cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
     docker images
 }
 
 function start_services() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-large"
@@ -54,6 +54,9 @@ function start_services() {
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
+    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
+
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
@@ -76,11 +79,11 @@ function validate_microservices() {
     curl ${ip_address}:8090/embed \
         -X POST \
         -d '{"inputs":"What is Deep Learning?"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/embed.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/embed.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tei-embedding-gaudi-server >> ${LOG_PATH}/embed.log
+        docker logs tei-embedding-gaudi-server >>${LOG_PATH}/embed.log
         exit 1
     fi
     sleep 1s
@@ -88,11 +91,11 @@ function validate_microservices() {
     curl http://${ip_address}:6000/v1/embeddings \
         -X POST \
         -d '{"text":"hello"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/embeddings.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Microservice failed, please check the logs in artifacts!"
-        docker logs embedding-tei-server >> ${LOG_PATH}/embeddings.log
+        docker logs embedding-tei-server >>${LOG_PATH}/embeddings.log
         exit 1
     fi
     sleep 1s
@@ -107,7 +110,7 @@ function validate_microservices() {
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Microservice failed, please check the logs in artifacts!"
-        docker logs retriever-redis-server >> ${LOG_PATH}/retrieval.log
+        docker logs retriever-redis-server >>${LOG_PATH}/retrieval.log
         exit 1
     fi
     sleep 1s
@@ -115,11 +118,11 @@ function validate_microservices() {
     curl http://${ip_address}:8808/rerank \
         -X POST \
         -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/rerank.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/rerank.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tei-xeon-server >> ${LOG_PATH}/rerank.log
+        docker logs tei-xeon-server >>${LOG_PATH}/rerank.log
         exit 1
     fi
     sleep 1s
@@ -127,11 +130,11 @@ function validate_microservices() {
     curl http://${ip_address}:8000/v1/reranking \
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/reranking.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/reranking.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Microservice failed, please check the logs in artifacts!"
-        docker logs reranking-tei-gaudi-server >> ${LOG_PATH}/reranking.log
+        docker logs reranking-tei-gaudi-server >>${LOG_PATH}/reranking.log
         exit 1
     fi
     sleep 1s
@@ -139,11 +142,11 @@ function validate_microservices() {
     curl http://${ip_address}:8008/generate \
         -X POST \
         -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/generate.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tgi-gaudi-server >> ${LOG_PATH}/generate.log
+        docker logs tgi-gaudi-server >>${LOG_PATH}/generate.log
         exit 1
     fi
     sleep 1s
@@ -151,11 +154,11 @@ function validate_microservices() {
     curl http://${ip_address}:9000/v1/chat/completions \
         -X POST \
         -d '{"text":"What is Deep Learning?"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
+        -H 'Content-Type: application/json' >${LOG_PATH}/completions.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Microservice failed, please check the logs in artifacts!"
-        docker logs llm-tgi-gaudi-server >> ${LOG_PATH}/completions.log
+        docker logs llm-tgi-gaudi-server >>${LOG_PATH}/completions.log
         exit 1
     fi
     sleep 1s
@@ -164,7 +167,6 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "model": "Intel/neural-chat-7b-v3-3",
         "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
@@ -175,8 +177,8 @@ function validate_megaservice() {
 
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
-    if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
+    if [[ -f $LOG_PATH/curl_megaservice.log ]] &&
+        [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
         status=true
     fi
 
@@ -191,8 +193,32 @@ function validate_megaservice() {
     # TODO
 }
 
+function validate_frontend() {
+    cd $WORKPATH/docker/ui/svelte
+    local conda_env_name="ChatQnA_e2e"
+    export PATH=${HOME}/miniconda3/bin/:$PATH
+    conda remove -n ${conda_env_name} --all -y
+    conda create -n ${conda_env_name} python=3.12 -y
+    source activate ${conda_env_name}
+
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
+
+    exit_status=0
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------frontend test failed---------"
+        exit $exit_status
+    else
+        echo "[TEST INFO]: ---------frontend test passed---------"
+    fi
+}
+
 function stop_docker() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
@@ -214,6 +240,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
+    validate_frontend
 
     stop_docker
     echo y | docker system prune

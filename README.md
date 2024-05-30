@@ -93,7 +93,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 		</tr>
 		<tr>
 			<td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/deepseek-ai/deepseek-coder-33b-instruct">Deepseek-Coder-33B</a></td>
+			<td><a href="https://huggingface.co/meta-llama/CodeLlama-7b-hf">meta-llama/CodeLlama-7b-hf</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
 			<td>Copilot</td>
@@ -229,6 +229,8 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 		</tr>
 	</tbody>
 </table>
+
+> **_NOTE:_** The `Language Translation`, `SearchQnA`, `VisualQnA` and other use cases not listing here are in active development. The code structure of these use cases are subject to change.
 
 ## Additional Content
 
