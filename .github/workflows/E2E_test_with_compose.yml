@@ -4,7 +4,7 @@
 name: E2E test with docker compose
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -76,7 +76,7 @@ jobs:
 
       - name: Run test
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
           example: ${{ matrix.example }}
           hardware: ${{ matrix.hardware }}
         run: |
