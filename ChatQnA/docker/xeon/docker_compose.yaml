@@ -145,7 +145,7 @@ services:
       - tei-embedding-service
       - embedding
       - retriever
-      - tei-xeon-service
+      - tei-reranking-service
       - reranking
       - tgi_service
       - llm
