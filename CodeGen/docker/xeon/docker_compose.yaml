@@ -26,7 +26,7 @@ services:
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
     command: --model-id ${LLM_MODEL_ID}
   llm:
     image: opea/llm-tgi:latest
@@ -40,7 +40,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"

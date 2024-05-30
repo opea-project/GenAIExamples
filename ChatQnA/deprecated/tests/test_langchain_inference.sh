@@ -52,7 +52,7 @@ function launch_tgi_gaudi_service() {
 
 function launch_redis_and_langchain_service() {
     cd $WORKPATH
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export HF_TOKEN=${HF_TOKEN}
     local port=8890
     sed -i "s/port=8000/port=$port/g" langchain/docker/qna-app/app/server.py
     docker compose -f langchain/docker/docker-compose.yml up -d --build

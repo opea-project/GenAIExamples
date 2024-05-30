@@ -29,7 +29,7 @@ function start_services() {
 
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export HF_TOKEN=${HF_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
