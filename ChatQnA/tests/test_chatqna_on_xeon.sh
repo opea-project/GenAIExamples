@@ -75,7 +75,7 @@ function validate_services() {
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-    
+
         local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${SERVICE_NAME}.log)
 
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
@@ -130,7 +130,7 @@ function validate_microservices() {
         "tei-rerank" \
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
-    
+
     # rerank microservice
     validate_services \
         "${ip_address}:8000/v1/reranking" \
