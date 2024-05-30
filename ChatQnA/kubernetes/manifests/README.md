@@ -26,7 +26,7 @@ For Gaudi:
 
 > [NOTE]
 
-- Be sure to modify HUGGINGFACEHUB_API_TOKEN and other important values in qna_configmap_guadi.yaml and qna_configmap_xeon.yaml
+- Be sure to modify HF_TOKEN and other important values in qna_configmap_guadi.yaml and qna_configmap_xeon.yaml
 - Be sure the node has path /mnt/models to store all the models
 
 ### Deploy

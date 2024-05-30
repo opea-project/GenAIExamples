@@ -66,7 +66,7 @@ opea_micro_services:
       - SYS_NICE
     ipc: host
     environment:
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
     model-id: ${LLM_MODEL_ID}
