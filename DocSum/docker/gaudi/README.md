@@ -31,7 +31,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/DocSum
+cd GenAIExamples/DocSum/docker
 docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
