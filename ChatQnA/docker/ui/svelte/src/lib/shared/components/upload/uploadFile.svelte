@@ -147,7 +147,7 @@
 			<span slot="title">Upload File</span>
 			<UploadFile on:upload={handleKnowledgeUpload} />
 		</TabItem>
-		<TabItem class="w-full">
+		<TabItem class="w-full" data-testid="exchange-paste">
 			<span slot="title">Paste Link</span>
 			<PasteURL on:paste={handleKnowledgePaste} />
 		</TabItem>

@@ -12,12 +12,13 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@playwright/test": "^1.33.0",
     "@fortawesome/free-solid-svg-icons": "6.2.0",
+    "@playwright/test": "^1.33.0",
     "@sveltejs/adapter-auto": "1.0.0-next.75",
     "@sveltejs/kit": "^1.30.4",
     "@tailwindcss/typography": "0.5.7",
     "@types/debug": "4.1.7",
+    "@types/node": "^20.12.13",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
     "autoprefixer": "^10.4.7",
@@ -51,10 +52,10 @@
     "flowbite-svelte-icons": "^1.4.0",
     "fuse.js": "^6.6.2",
     "lodash": "^4.17.21",
+    "playwright": "^1.44.0",
     "ramda": "^0.29.0",
     "sse.js": "^0.6.1",
     "svelte-notifications": "^0.9.98",
-    "playwright": "^1.44.0",
     "svrollbar": "^0.12.0"
   }
 }
