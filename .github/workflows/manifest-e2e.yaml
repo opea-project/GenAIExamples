@@ -1,0 +1,127 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: E2E test with manifests
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths:
+      - "**/kubernetes/manifests/**"
+      - "**/tests/**"
+      - "!**.md"
+      - "!**.txt"
+      - .github/workflows/manifest-e2e.yml
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  job1:
+    name: Get-test-matrix
+    runs-on: ubuntu-latest
+    outputs:
+      run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get test matrix
+        id: get-test-matrix
+        run: |
+          set -xe
+          changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | \
+          grep "/kubernetes/manifests/" | \
+          grep -vE '.github|deprecated|docker')" || true
+          examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
+          run_matrix="{\"include\":["
+          for example in ${examples}; do
+              run_hardware=""
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
+              if [[ -z "$run_hardware" ]]; then run_hardware="xeon"; fi
+              for hw in ${run_hardware}; do
+                  if [ $hw = "gaudi" ]; then
+                      continue # skip gaudi for K8s test temporarily
+                  else
+                      #lower_example=$(echo "${example}" | tr '[:upper:]' '[:lower:]')
+                      run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"inspur-icx-1\"},"
+                  fi
+              done
+          done
+          run_matrix=$run_matrix"]}"
+          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+
+  manifest-test:
+    needs: job1
+    if: always() && ${{ needs.job1.outputs.run_matrix.include.length }} > 0
+    strategy:
+      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+    runs-on: ${{ matrix.hardware }}
+    continue-on-error: true
+    steps:
+      - name: E2e test manifest
+        run: |
+          echo "Matrix - manifest: ${{ matrix.example }}"
+
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set variables
+        run: |
+          lower_example=$(echo "${{ matrix.example }}" | tr '[:upper:]' '[:lower:]')
+          echo "NAMESPACE=$lower_example-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+          echo "ROLLOUT_TIMEOUT_SECONDS=1800s" >> $GITHUB_ENV
+          echo "KUBECTL_TIMEOUT_SECONDS=60s" >> $GITHUB_ENV
+          echo "should_cleanup=false" >> $GITHUB_ENV
+          echo "skip_validate=false" >> $GITHUB_ENV
+          echo "NAMESPACE=$NAMESPACE"
+
+      - name: Initialize manifest testing
+        run: |
+          ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_xeon.sh init_${{ matrix.example }}
+
+      - name: Kubectl install
+        id: install
+        run: |
+          echo "should_cleanup=true" >> $GITHUB_ENV
+          kubectl create ns $NAMESPACE
+          ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_xeon.sh install_${{ matrix.example }} $NAMESPACE
+          echo "Testing ${{ matrix.example }}, waiting for pod ready..."
+          if kubectl rollout status deployment --namespace "$NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
+            echo "Testing manifests ${{ matrix.example }}, waiting for pod ready done!"
+          else
+            echo "Timeout waiting for pods in namespace $NAMESPACE to be ready!"
+            echo "skip_validate=true" >> $GITHUB_ENV
+            exit 1
+          fi
+          sleep 60
+
+      - name: Validate e2e test
+        if: always()
+        run: |
+          if $skip_validate; then
+            echo "Skip validate"
+          else
+            ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_xeon.sh validate_${{ matrix.example }} $NAMESPACE
+          fi
+
+      - name: Kubectl uninstall
+        if: always()
+        run: |
+          if $should_cleanup; then
+            if ! kubectl delete ns $NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
+              kubectl delete pods --namespace $NAMESPACE --force --grace-period=0 --all
+              kubectl delete ns $NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
+            fi
+          fi
