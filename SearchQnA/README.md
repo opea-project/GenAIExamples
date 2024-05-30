@@ -37,7 +37,7 @@ bash launch_tgi_service.sh
 ```sh
 cd langchain/docker
 docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy}  -t intel/gen-ai-examples:searchqna-gaudi --no-cache
-docker run -e TGI_ENDPOINT=<TGI ENDPOINT> -e GOOGLE_CSE_ID=<GOOGLE CSE ID> -e GOOGLE_API_KEY=<GOOGLE API KEY> -e HF_TOKEN=<HUGGINGFACE API TOKEN> -p 8085:8000 -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBE_DEVILCES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:searchqna-gaudi
+docker run -e TGI_ENDPOINT=<TGI ENDPOINT> -e GOOGLE_CSE_ID=<GOOGLE CSE ID> -e GOOGLE_API_KEY=<GOOGLE API KEY> -e HUGGINGFACEHUB_API_TOKEN=<HUGGINGFACE API TOKEN> -p 8085:8000 -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBE_DEVILCES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:searchqna-gaudi
 ```
 
 Here is the explanation of some of the above parameters:
@@ -45,7 +45,7 @@ Here is the explanation of some of the above parameters:
 - `TGI_ENDPOINT`: the endpoint of your TGI service, usually equal to `<ip of your machine>:<port of your TGI service>`
 - `GOOGLE_CSE_ID`: your CSE ID for Google Search Engine, usually generated [here](https://programmablesearchengine.google.com/controlpanel/all)
 - `GOOGLE_API_KEY`: your API key for Google Search Engine, usually generated [here](https://console.cloud.google.com/apis/credentials)
-- `HF_TOKEN`: your HuggingFace hub API token, usually generated [here](https://huggingface.co/settings/tokens)
+- `HUGGINGFACEHUB_API_TOKEN`: your HuggingFace hub API token, usually generated [here](https://huggingface.co/settings/tokens)
 - `-p 8085:8000`: This will map the 8000 port of the SearchQnA service inside the container to the 8085 port on the host
 
 3. Quick test

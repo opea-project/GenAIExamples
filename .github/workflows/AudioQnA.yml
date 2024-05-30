@@ -37,21 +37,21 @@ jobs:
 
       - name: Run Test ASR
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
           cd ${{ github.workspace }}/AudioQnA/tests
           bash test_asr.sh
 
       - name: Run Test TTS
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
           cd ${{ github.workspace }}/AudioQnA/tests
           bash test_tts.sh
 
       - name: Run Test LLM engine
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
           cd ${{ github.workspace }}/AudioQnA/tests
           bash test_${{ matrix.job_name }}_inference.sh
