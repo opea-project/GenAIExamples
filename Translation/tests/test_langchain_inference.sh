@@ -46,7 +46,7 @@ function launch_langchain_service() {
     cd langchain/docker
     docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -t intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
 
-    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} --net=host -e TGI_ENDPOINT=http://localhost:8870 -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
+    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} --net=host -e TGI_ENDPOINT=http://localhost:8870 -e HF_TOKEN=${HF_TOKEN} \
     -e SERVER_PORT=${port} -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} --ipc=host intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
     sleep 2m
 }
