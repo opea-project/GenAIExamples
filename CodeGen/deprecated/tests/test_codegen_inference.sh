@@ -63,7 +63,7 @@ function launch_server() {
 
     # Start the Backend Service
     docker exec $COPILOT_CONTAINER_NAME \
-        bash -c "export HF_TOKEN=$HF_TOKEN;nohup python server.py &"
+        bash -c "export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN;nohup python server.py &"
     sleep 1m
 }
 

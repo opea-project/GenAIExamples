@@ -23,13 +23,13 @@ bash launch_tgi_service.sh
 ```sh
 cd langchain/docker
 bash build_docker.sh
-docker run -it --name code_trans_server --net=host --ipc=host -e TGI_ENDPOINT=${TGI ENDPOINT} -e HF_TOKEN=${HUGGINGFACE_API_TOKEN} -e SERVER_PORT=8000 -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} intel/gen-ai-examples:code-translation bash
+docker run -it --name code_trans_server --net=host --ipc=host -e TGI_ENDPOINT=${TGI ENDPOINT} -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACE_API_TOKEN} -e SERVER_PORT=8000 -e http_proxy=${http_proxy} -e https_proxy=${https_proxy} intel/gen-ai-examples:code-translation bash
 ```
 
 Here is the explanation of some of the above parameters:
 
 - `TGI_ENDPOINT`: The endpoint of your TGI service, usually equal to `<ip of your machine>:<port of your TGI service>`.
-- `HF_TOKEN`: Your HuggingFace hub API token, usually generated [here](https://huggingface.co/settings/tokens).
+- `HUGGINGFACEHUB_API_TOKEN`: Your HuggingFace hub API token, usually generated [here](https://huggingface.co/settings/tokens).
 - `SERVER_PORT`: The port of the CodeTranslation service on the host.
 
 3. Quick test

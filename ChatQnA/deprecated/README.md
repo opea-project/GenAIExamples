@@ -51,12 +51,12 @@ bash ./serving/tgi_gaudi/build_docker.sh
 bash ./serving/tgi_gaudi/launch_tgi_service.sh
 ```
 
-For gated models such as `LLAMA-2`, you will have to pass -e HF_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
+For gated models such as `LLAMA-2`, you will have to pass -e HUGGING_FACE_HUB_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
 
-Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HF_TOKEN` environment with the token.
+Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
 
 ```bash
-export HF_TOKEN=<token>
+export HUGGINGFACEHUB_API_TOKEN=<token>
 ```
 
 ### Launch a local server instance on 8 Gaudi cards:
@@ -115,7 +115,7 @@ Note: If you want to integrate the TEI service into the LangChain application, y
 
 ## Launch Vector Database and LangChain Backend Service
 
-Update the `HF_TOKEN` environment variable with your huggingface token in the `docker-compose.yml`
+Update the `HUGGINGFACEHUB_API_TOKEN` environment variable with your huggingface token in the `docker-compose.yml`
 
 By default, Redis is used as the vector store. To use Qdrant, use the `docker-compose-qdrant.yml` file instead.
 
@@ -153,7 +153,7 @@ We offer content moderation support utilizing Meta's [Llama Guard](https://huggi
 ```bash
 volume=$PWD/data
 model_id="meta-llama/LlamaGuard-7b"
-docker run -p 8088:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HF_TOKEN=<your HuggingFace token> -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy tgi_gaudi --model-id $model_id
+docker run -p 8088:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HUGGING_FACE_HUB_TOKEN=<your HuggingFace token> -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy tgi_gaudi --model-id $model_id
 export SAFETY_GUARD_ENDPOINT="http://xxx.xxx.xxx.xxx:8088"
 ```
 

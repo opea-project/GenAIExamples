@@ -47,7 +47,7 @@ function start_services() {
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
-    export HF_TOKEN=${HF_TOKEN}
+    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export EMBEDDING_SERVICE_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}

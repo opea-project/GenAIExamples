@@ -48,7 +48,7 @@ function launch_langchain_service() {
 
     tgi_ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
     tgi_ip=$(eval echo '$'$tgi_ip_name)
-    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} -e TGI_ENDPOINT=http://${tgi_ip}:8870 -e GOOGLE_CSE_ID=${GOOGLE_CSE_ID} -e GOOGLE_API_KEY=${GOOGLE_API_KEY} -e HF_TOKEN=${HF_TOKEN} \
+    docker run -d --name=${LANGCHAIN_CONTAINER_NAME} -e TGI_ENDPOINT=http://${tgi_ip}:8870 -e GOOGLE_CSE_ID=${GOOGLE_CSE_ID} -e GOOGLE_API_KEY=${GOOGLE_API_KEY} -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
     -p ${port}:8000 --runtime=habana -e HABANA_VISIBE_DEVILCES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:${LANGCHAIN_CONTAINER_NAME}
 
     sleep 2m

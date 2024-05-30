@@ -28,7 +28,7 @@ services:
     container_name: qna-rag-redis-server
     environment:
       - https_proxy=${https_proxy}
-      - HF_TOKEN=${HF_TOKEN}
+      - HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
       - "REDIS_PORT=6379"
       - "EMBED_MODEL=BAAI/bge-base-en-v1.5"
       - "REDIS_SCHEMA=schema_dim_768.yml"
