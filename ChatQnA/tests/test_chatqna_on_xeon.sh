@@ -72,13 +72,12 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    # URL="${ip_address}:8090/embed"
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     
         local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${SERVICE_NAME}.log)
-        # if echo "$CONTENT" | grep -q "0.00093409064"; then
+
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
