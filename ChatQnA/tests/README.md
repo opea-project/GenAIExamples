@@ -1,4 +1,5 @@
 # Bash Script for running the ChatQnA Example
+
 This script file contains all the components together and error handling and logging
 
 ## Test ChatQnA on Gaudi
@@ -15,10 +16,10 @@ This script will perform all the steps for setting up of the Gen AI example for 
 
 This script will perform all the steps for setting up of the Gen AI example for ChatQnA on Xeon. Please note the considerations below before running this script.
 
-***Specific instructions to be added, coming soon***
+**_Specific instructions to be added, coming soon_**
 
 ## Test ChatQnA on Kubernetes
 
 This script will perform all the steps for setting up of the Gen AI example for ChatQnA on a kubernetes cluster running on either Xeon or Gaudi. Please note the considerations below before running this script.
 
-***Specific instructions to be added, coming soon***
+**_Specific instructions to be added, coming soon_**

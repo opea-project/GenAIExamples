@@ -117,7 +117,7 @@ function validate_microservices() {
 
 
 #######################################################################
-#    Instead of pyhton3 in the command below, you can also use python 
+#    Instead of pyhton3 in the command below, you can also use python
 #    in the command, if your environment PATH is running Python 3.10+
 #    by default.
 ######################################################################
