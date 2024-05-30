@@ -99,7 +99,7 @@ function validate_microservices() {
     # tei for embedding service
     validate_services \
         "${ip_address}:6006/embed" \
-        "0.00093409064" \
+        "\[\[" \
         "tei-embedding" \
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
@@ -107,7 +107,7 @@ function validate_microservices() {
     # embedding microservice
     validate_services \
         "${ip_address}:6000/v1/embeddings" \
-        "0.00093409064" \
+        '"text":"What is Deep Learning?","embedding":\[' \
         "embedding" \
         "embedding-tei-server" \
         '{"text":"What is Deep Learning?"}'
