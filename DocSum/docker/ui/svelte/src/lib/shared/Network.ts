@@ -43,15 +43,13 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 
 export async function fetchTextStream(query: string, urlSuffix: string, params: string) {
   let payload = {};
-  let url = "";
   if (params === "doc_id") {
     payload = { doc_id: query };
-    url = ``;
   } else if (params === "text") {
-    payload = { messages: query };
-    url = `${DOC_BASE_URL}`;
+    payload = { query: query };
   }
 
+  let url = `${DOC_BASE_URL}`;
   console.log("url", url);
 
   return new SSE(url, {
