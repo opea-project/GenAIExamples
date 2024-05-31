@@ -14,19 +14,35 @@
   limitations under the License.
 -->
 
-<script>
-	import "tailwindcss/tailwind.css";
-	import "../app.postcss";
-	import Notifications from "svelte-notifications";
-	import Header from "$lib/modules/frame/header.svelte";
-  import atomOneDark from "svelte-highlight/styles/atom-one-dark";
+<script lang="ts">
+	import { Svroller } from "svrollbar";
+    export let className: string = "";
+    export let classLayout: string = "";
+    export let alwaysVisible = true;
 </script>
 
-<svelte:head>
-	{@html atomOneDark}
-</svelte:head>
+<div class={className}>
+    <Svroller height="100%" width="100%" {alwaysVisible}>
+        <div class={classLayout}>
+            <slot></slot>
+        </div>
+    </Svroller>
+</div>
 
-<Notifications>
-		<Header />
-		<slot />
-</Notifications>
+<style>
+    :global(.svlr-contents) {
+        height: 100%;
+    }
+
+    .row::-webkit-scrollbar {
+		display: none;
+	}
+
+	.row {
+		scrollbar-width: none;
+	}
+
+	.row {
+		-ms-overflow-style: none;
+	}
+</style>
