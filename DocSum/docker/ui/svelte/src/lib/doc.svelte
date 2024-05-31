@@ -61,6 +61,7 @@
   }
 
   function generateSummary() {
+    console.log("generateSummary");
     if ($kb_id === "" && message === "") {
       addNotification({
         text: "Please upload content first",
@@ -94,7 +95,7 @@
             aria-controls={`accordion-open-body-${panelIndex}`}
           >
             <span class="flex items-center"
-              >{panelIndex === 1 ? "Paste Text" : "Upload File" }</span
+              >{panelIndex === 1 ? "Upload File" : "Paste Text"}</span
             >
             <svg
               data-accordion-icon
@@ -123,8 +124,9 @@
       >
         {#if panelIndex === activePanel}
           {#if panelIndex === 1}
+            <DropFile />
+          {:else}
             <Textarea
-              data-testid="sum-input"
               id="textarea-id"
               class="xl:h-[30rem] xl:my-4"
               placeholder="Copy the text information you need to summarize."
@@ -132,8 +134,6 @@
               name="message"
               bind:value={message}
             />
-          {:else}
-            <DropFile />
           {/if}
         {/if}
       </div>
@@ -150,7 +150,6 @@
   {:else}
     <button
       type="submit"
-      data-testid="sum-click"
       class="xl:my-12 inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 mt-2 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
       on:click={() => generateSummary()}
     >
