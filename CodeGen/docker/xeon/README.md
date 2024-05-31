@@ -66,7 +66,7 @@ export TGI_LLM_ENDPOINT="http://${host_ip}:8028"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:6666/v1/codegen"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7778/v1/codegen"
 ```
 
 Note: Please replace the `host_ip` with you external IP address, do not use `localhost`.
@@ -101,7 +101,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
 3. MegaService
 
 ```bash
-curl http://${host_ip}:6666/v1/codegen -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
      "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
      }'
 ```
