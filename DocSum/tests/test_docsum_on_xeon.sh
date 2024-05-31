@@ -41,58 +41,62 @@ function start_services() {
     sleep 2m # Waits 2 minutes
 }
 
+function validate_services() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local INPUT_DATA="$5"
+
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
+}
+
 function validate_microservices() {
     # Check if the microservices are running correctly.
-    # TODO: Any results check required??
-    curl http://${ip_address}:8008/generate \
-        -X POST \
-        -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tgi_service >> ${LOG_PATH}/generate.log
-        exit 1
-    fi
-    sleep 5s
 
-    curl http://${ip_address}:9000/v1/chat/docsum \
-        -X POST \
-        -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs llm-docsum-server >> ${LOG_PATH}/completions.log
-        exit 1
-    fi
-    sleep 5s
+    # tgi for llm service
+    validate_services \
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi-llm" \
+        "tgi_service" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
+    # llm microservice
+    validate_services \
+        "${ip_address}:9000/v1/chat/docsum" \
+        "data: " \
+        "llm" \
+        "llm-docsum-server" \
+        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
-    curl http://${ip_address}:8888/v1/docsum -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' > ${LOG_PATH}/curl_megaservice.log
-
-    echo "Checking response results, make sure the output is reasonable. "
-    local status=false
-    if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c " flexible" $LOG_PATH/curl_megaservice.log) != 0 ]] && \
-    [[ $(grep -c " tool" $LOG_PATH/curl_megaservice.log) != 0 ]] && \
-    [[ $(grep -c "kit" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
-        status=true
-    fi
-
-    if [ $status == false ]; then
-        echo "Response check failed, please check the logs in artifacts!"
-        exit 1
-    else
-        echo "Response check succeed!"
-    fi
-
-    echo "Checking response format, make sure the output format is acceptable for UI."
-    # TODO
-
+    validate_services \
+    "${ip_address}:8888/v1/docsum" \
+    "versatile toolkit" \
+    "mega-docsum" \
+    "docsum-xeon-backend-server" \
+    '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function stop_docker() {
