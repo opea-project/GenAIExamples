@@ -84,7 +84,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${ip_address}:9000/v1/chat/completions
+        "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
         "llm-tgi-gaudi-server" \
