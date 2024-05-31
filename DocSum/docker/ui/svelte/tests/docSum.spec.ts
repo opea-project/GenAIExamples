@@ -10,6 +10,7 @@ test.beforeEach(async ({ page }) => {
 
 // Constants definition
 const CHAT_ITEMS = ["What is the total revenue of Nike in 2023?"];
+const placeholderText = "Upload or paste content on the left.";
 
 // Helper function: Enter message to chat
 async function enterMessageToChat(page: Page, message: string) {
@@ -17,6 +18,7 @@ async function enterMessageToChat(page: Page, message: string) {
   await page.getByTestId("sum-input").fill(message);
   await page.waitForTimeout(10000);
   await page.getByTestId("sum-click").click();
+  await page.waitForTimeout(10000);
   await expect(page.getByTestId("display-answer")).not.toBeEmpty();
 }
 
