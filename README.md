@@ -4,7 +4,7 @@
 
 This project provides a collective list of Generative AI (GenAI) and Retrieval-Augmented Generation (RAG) examples such as chatbot with question and answering (ChatQnA), code generation (CodeGen), document summary (DocSum), etc.
 
-[![version](https://img.shields.io/badge/release-0.1-green)](https://github.com/opea-project/GenAIExamples/releases)
+[![version](https://img.shields.io/badge/release-0.6-green)](https://github.com/opea-project/GenAIExamples/releases)
 [![license](https://img.shields.io/badge/license-Apache%202-blue)](https://github.com/intel/neural-compressor/blob/master/LICENSE)
 
 ---
