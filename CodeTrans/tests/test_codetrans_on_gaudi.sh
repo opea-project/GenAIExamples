@@ -88,8 +88,7 @@ function validate_microservices() {
         "data: " \
         "llm" \
         "llm-tgi-gaudi-server" \
-        '{"query":"### System: Please translate the following Golang codes into  Python codes.\n### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
-
+        '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
 }
 
 function validate_megaservice() {
