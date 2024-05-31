@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -e
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -213,7 +213,7 @@ function main() {
     end_time=$(date +%s)
     minimal_duration=$((end_time-start_time))
     maximal_duration=$((end_time-begin_time))
-    echo "Mega service start minimal duration is "$minimal_duration"s, maximal duration(including docker image build) is "$maximal_duration"s"
+    echo "Mega service start minimal duration is "$minimal_duration"s, maximal duration(including docker image build) is "$maximal_duration"s" && sleep 1s
 
     validate_microservices
     validate_megaservice

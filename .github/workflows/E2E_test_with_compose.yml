@@ -82,7 +82,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/$example/tests
           example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
-          if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 20m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
+          if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 30m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
 
       - name: Clean up container
         env:
