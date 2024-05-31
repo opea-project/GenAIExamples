@@ -25,6 +25,7 @@
     "svelte": "^4.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.44.1",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/package": "^2.0.0",
@@ -47,6 +48,7 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "dependencies": {
+    "playwright": "^1.44.0",
     "sse.js": "^0.6.1",
     "svelte-notifications": "^0.9.98"
   }
