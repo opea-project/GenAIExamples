@@ -70,8 +70,8 @@
 
   let copyText = "copy";
   // Set default language
-  let langFrom: string = "Go";
-  let langTo: string = "Python";
+  let langFrom: string = "Python";
+  let langTo: string = "Go";
   let languages: Language[] = languagesList;
   // Initialize disabled state of input
   let inputDisabled: boolean = false;
@@ -103,6 +103,7 @@
 
     eventSource.addEventListener("message", (e: any) => {
       let Msg = e.data;
+      console.log('Msg', Msg);
 
       if (Msg.startsWith("b")) {
         const trimmedData = Msg.slice(2, -1);
@@ -176,6 +177,7 @@
             rows="25"
             placeholder="Input"
             bind:value={input}
+            data-testid="code-input"
           />
         {:else}
           <div
@@ -196,6 +198,7 @@
 
         <div
           class="h-[40rem] bg-[#011627] rounded overflow-auto code-format-style divide-y hiddenScroll"
+          data-testid="code-output"
         >
           {#if output !== ""}
             <div class="bg-[#282c34] p-2 px-6 text-white flex justify-end border-2 border-none border-b-gray-800">
