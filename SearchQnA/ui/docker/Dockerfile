@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Use node 20.11.1 as the base image
 FROM node:20.11.1
 
