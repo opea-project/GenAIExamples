@@ -104,7 +104,7 @@
     eventSource.addEventListener("message", (e: any) => {
       let Msg = e.data;
       console.log('Msg', Msg);
-      
+
       if (Msg.startsWith("b")) {
         const trimmedData = Msg.slice(2, -1);
         if (trimmedData.includes("'''")) {

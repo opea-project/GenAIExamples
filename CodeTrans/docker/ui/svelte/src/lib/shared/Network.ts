@@ -16,7 +16,6 @@ import { SSE } from "sse.js";
 
 const BASE_URL = env.BASE_URL;
 
-
 export async function fetchTextStream(query: string, langFrom, langTo) {
   const payload = {
     language_from: langFrom,
