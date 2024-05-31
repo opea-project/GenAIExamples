@@ -43,7 +43,7 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 
 export async function fetchTextStream(query: string, urlSuffix: string, params: string) {
   let payload = {};
-  let url = '';
+  let url = "";
   if (params === "doc_id") {
     payload = { doc_id: query };
     url = ``;
