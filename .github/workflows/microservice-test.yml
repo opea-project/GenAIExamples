@@ -35,8 +35,8 @@ jobs:
         run: |
           set -xe
           changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} \
-          | grep 'comps/' | grep -vE '*.md|*.txt')
-          services=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f2 | sort -u)
+          | grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')
+          services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u)
           run_matrix="{\"include\":["
           for service in ${services}; do
               hardware="gaudi" # default hardware, set based on the changed files
