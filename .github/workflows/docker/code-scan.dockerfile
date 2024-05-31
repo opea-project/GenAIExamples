@@ -1,4 +1,5 @@
-#
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
 ARG UBUNTU_VER=22.04
 FROM ubuntu:${UBUNTU_VER} as devel
