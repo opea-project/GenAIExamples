@@ -16,6 +16,22 @@ GenAIComps provides a suite of microservices, leveraging a service composer to a
 
 ![Architecture](https://i.imgur.com/r5J0i8j.png)
 
+### Installation
+
+- Install from Pypi
+
+```bash
+pip install opea-comps
+```
+
+- Build from Source
+
+```bash
+git clone https://github.com/opea-project/GenAIComps
+cd GenAIComps
+pip install -e .
+```
+
 ## MicroService
 
 `Microservices` are akin to building blocks, offering the fundamental services for constructing `RAG (Retrieval-Augmented Generation)` applications.
