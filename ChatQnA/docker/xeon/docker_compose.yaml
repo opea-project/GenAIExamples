@@ -119,6 +119,7 @@ services:
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${LLM_MODEL_ID}
   llm:
     image: opea/llm-tgi:latest
