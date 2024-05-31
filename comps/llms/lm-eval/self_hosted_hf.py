@@ -19,7 +19,7 @@ from typing import List
 import lm_eval.api.registry
 import torch
 from docarray import BaseDoc
-from GenAIEval.evaluation.lm_evaluation_harness.lm_eval.models.huggingface import HFLM, GaudiHFModelAdapter
+from evals.evaluation.lm_evaluation_harness.lm_eval.models.huggingface import HFLM, GaudiHFModelAdapter
 
 from comps import ServiceType, opea_microservices, opea_telemetry, register_microservice
 
