@@ -65,7 +65,6 @@
 	}
 
 	function storeMessages() {
-		console.log('localStorage', chatMessages);
 
 		localStorage.setItem(
 			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
@@ -77,30 +76,10 @@
 		const eventSource = await fetchTextStream(query, knowledge_1);
 
 		eventSource.addEventListener("message", (e: any) => {
-			let currentMsg = e.data;
-            currentMsg = currentMsg.replace("@#$", " ")
-			console.log("currentMsg", currentMsg);
-			if (currentMsg == "[DONE]") {
-				console.log("done getCurrentTimeStamp", getCurrentTimeStamp);
-				let startTime = chatMessages[chatMessages.length - 1].time;
-
-				loading = false;
-				let totalTime = parseFloat(((getCurrentTimeStamp() - startTime) / 1000).toFixed(2));
-				console.log("done totalTime", totalTime);
-				console.log(
-					"chatMessages[chatMessages.length - 1]",
-					chatMessages[chatMessages.length - 1]
-				);
-
-				if (chatMessages.length - 1 !== -1) {
-					chatMessages[chatMessages.length - 1].time = totalTime;
-				}
-				console.log("done chatMessages", chatMessages);
-
-				storeMessages();
-			} else {
+			let Msg = e.data;
+			if (Msg.startsWith("b")) {
+				const currentMsg = Msg.slice(2, -1);
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-
 					chatMessages = [
 						...chatMessages,
 						{
@@ -110,13 +89,24 @@
 							time: startSendTime,
 						},
 					];
-					console.log("? chatMessages", chatMessages);
 				} else {
 					let content = chatMessages[chatMessages.length - 1].content as string;
-					chatMessages[chatMessages.length - 1].content =
-						content + currentMsg;
+					chatMessages[chatMessages.length - 1].content = content + currentMsg;
 				}
 				scrollToBottom(scrollToDiv);
+			} else if (Msg === "[DONE]") {
+				let startTime = chatMessages[chatMessages.length - 1].time;
+
+				loading = false;
+				let totalTime = parseFloat(
+					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
+				);
+
+				if (chatMessages.length - 1 !== -1) {
+					chatMessages[chatMessages.length - 1].time = totalTime;
+				}
+
+				storeMessages();
 			}
 		});
 		eventSource.stream();
@@ -171,7 +161,7 @@
 			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0"
 		>
 			<div class="relative my-4 flex w-full flex-row justify-center">
-				<div class="focus:border-none relative w-full">
+				<div class="relative w-full focus:border-none">
 					<input
 						class="text-md block w-full border-0 border-b-2 border-gray-300 px-1 py-4
 						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
@@ -210,7 +200,7 @@
 					<button
 						class="bg-primary text-primary-foreground hover:bg-primary/90 group flex items-center justify-center space-x-2 p-2"
 						type="button"
-						data-testid='clear-chat'
+						data-testid="clear-chat"
 						on:click={() => handelClearHistory()}
 						><svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -228,8 +218,7 @@
 		{/if}
 		<!-- clear -->
 
-		<div class="mx-auto flex h-full w-full flex-col" data-testid='chat-message'
-		>
+		<div class="mx-auto flex h-full w-full flex-col" data-testid="chat-message">
 			<Scrollbar
 				classLayout="flex flex-col gap-1 mr-4"
 				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 mr-5"
