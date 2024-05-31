@@ -1,5 +1,8 @@
 
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # SCRIPT USAGE NOTICE:  By downloading and using any script file included
 # with the associated software package (such as files with .bat, .cmd, or 
 # .JS extensions, Docker files, or any other type of file that, when executed,

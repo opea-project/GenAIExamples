@@ -1,4 +1,7 @@
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # FROM nginx
 
 # RUN rm /etc/nginx/conf.d/default.conf
