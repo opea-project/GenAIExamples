@@ -45,6 +45,7 @@
     {/if}
     <textarea
       id="editor"
+      data-testid="display-answer"
       rows="15"
       class="xl:h-[50rem] tracking-tighter leading-loose block w-full px-2 font-medium text-sm text-gray-600 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
       placeholder={chatMessage === "" && $loading
