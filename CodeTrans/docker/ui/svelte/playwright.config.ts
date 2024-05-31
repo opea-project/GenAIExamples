@@ -45,12 +45,10 @@ export default defineConfig({
   },
 
   /* Configure projects for major browsers */
-  projects: [ 
+  projects: [
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
     },
-
   ],
-
 });
