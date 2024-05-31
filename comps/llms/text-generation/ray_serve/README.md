@@ -25,12 +25,8 @@ curl http://127.0.0.1:8080/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
   "model": <model_name>,
-  "messages": [
-        {"role": "assistant", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What is Deep Learning?"},
-    ],
+  "messages": [{"role": "user", "content": "What is deep learning?"}],
   "max_tokens": 32,
-  "stream": True
   }'
 ```
 

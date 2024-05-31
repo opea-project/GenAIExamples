@@ -22,7 +22,7 @@ from easydict import EasyDict as edict
 from ray import serve
 from ray_serve.api_openai_backend.query_client import RouterQueryClient
 from ray_serve.api_openai_backend.router_app import Router, router_app
-from ray_serve.ray_serve import LLMServe
+from ray_serve.serve import LLMServe
 
 
 def router_application(deployments, max_concurrent_queries):
@@ -102,14 +102,14 @@ def main(argv=None):
 
     ray.init(address="auto")
 
-    host_port = os.environ.get("RAY_Serve_ENDPOINT", "http://127.0.0.1:8080")
+    host_port = os.environ.get("RAY_Serve_ENDPOINT", "http://0.0.0.0:8080")
     host = re.search(r"([\d\.]+)", host_port).group(1)
     port = args.port_number
     model_name = args.model_id_or_path.split("/")[-1] if args.model_id_or_path else ""
     route_prefix = "/"
 
     infer_conf = {}
-    infer_conf["use_auth_token"] = os.environ.get("HUGGINGFACEHUB_API_TOKEN", None)
+    infer_conf["use_auth_token"] = os.environ.get("HF_TOKEN", None)
     infer_conf["trust_remote_code"] = os.environ.get("TRUST_REMOTE_CODE", None)
     infer_conf["model_id_or_path"] = args.model_id_or_path
     infer_conf["chat_processor"] = args.chat_processor

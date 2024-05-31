@@ -41,4 +41,4 @@ if [ "$#" -lt 0 ] || [ "$#" -gt 5 ]; then
 fi
 
 # Build the Docker run command based on the number of cards
-docker run -it --runtime=habana --name="ChatQnA_server" -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host --network=host -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e TRUST_REMOTE_CODE=$TRUST_REMOTE_CODE ray_serve:habana /bin/bash -c "ray start --head && python api_server_openai.py --port_number $port_number --model_id_or_path $model_name --chat_processor $chat_processor --num_cpus_per_worker $num_cpus_per_worker --num_hpus_per_worker $num_hpus_per_worker"
+docker run -it --runtime=habana --name="ChatQnA_server" -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -p $port_number:$port_number -e HF_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e TRUST_REMOTE_CODE=$TRUST_REMOTE_CODE ray_serve:habana /bin/bash -c "ray start --head && python api_server_openai.py --port_number $port_number --model_id_or_path $model_name --chat_processor $chat_processor --num_cpus_per_worker $num_cpus_per_worker --num_hpus_per_worker $num_hpus_per_worker"

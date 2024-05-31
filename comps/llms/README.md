@@ -99,6 +99,13 @@ export vLLM_LLM_ENDPOINT="http://${your_ip}:8008"
 python text-generation/vllm/llm.py
 ```
 
+### 1.4.3 Start the Ray Service
+
+```bash
+export RAY_Serve_ENDPOINT="http://${your_ip}:8008"
+python text-generation/ray_serve/llm.py
+```
+
 # 🚀2. Start Microservice with Docker (Option 2)
 
 If you start an LLM microservice with docker, the `docker_compose_llm.yaml` file will automatically start a TGI/vLLM service with docker.
@@ -127,6 +134,17 @@ export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/llms"
 ```
 
+In order to start Ray serve and LLM services, you need to setup the following environment variables first.
+
+```bash
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export RAY_Serve_ENDPOINT="http://${your_ip}:8008"
+export LLM_MODEL=${your_hf_llm_model}
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_API_KEY=${your_langchain_api_key}
+export LANGCHAIN_PROJECT="opea/llms"
+```
+
 ## 2.2 Build Docker Image
 
 ### 2.2.1 TGI
@@ -141,6 +159,13 @@ docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build
 ```bash
 cd ../../
 docker build -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/Dockerfile .
+```
+
+### 2.2.3 Ray Serve
+
+```bash
+cd ../../
+docker built -t opeas/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/Dockerfile .
 ```
 
 To start a docker container, you have two options:
@@ -164,6 +189,12 @@ docker run -d --name="llm-tgi-server" -p 9000:9000 --ipc=host -e http_proxy=$htt
 docker run -d --name="llm-vllm-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e vLLM_LLM_ENDPOINT=$vLLM_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e LLM_MODEL_ID=$LLM_MODEL_ID opea/llm-vllm:latest
 ```
 
+### 2.3.3 Ray Serve
+
+```bash
+docker run -d --name="llm-ray-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e RAY_Serve_ENDPOINT=$RAY_Serve_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e LLM_MODEL=$LLM_MODEL opea/llm-ray:latest
+```
+
 ## 2.4 Run Docker with Docker Compose (Option B)
 
 ### 2.4.1 TGI
@@ -177,6 +208,13 @@ docker compose -f docker_compose_llm.yaml up -d
 
 ```bash
 cd text-generation/vllm
+docker compose -f docker_compose_llm.yaml up -d
+```
+
+### 2.4.3 Ray Serve
+
+```bash
+cd text-genetation/ray_serve
 docker compose -f docker_compose_llm.yaml up -d
 ```
 
@@ -210,7 +248,7 @@ curl http://${your_ip}:9000/v1/chat/completions \
   -H 'Content-Type: application/json'
 ```
 
-## Validated Model
+## 4. Validated Model
 
 | Model                     | TGI-Gaudi | vLLM-CPU | Ray |
 | ------------------------- | --------- | -------- | --- |
