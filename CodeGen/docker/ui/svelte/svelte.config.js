@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import adapter from '@sveltejs/adapter-auto';
-import preprocess from 'svelte-preprocess';
-import postcssPresetEnv from 'postcss-preset-env';
-
+import adapter from "@sveltejs/adapter-auto";
+import preprocess from "svelte-preprocess";
+import postcssPresetEnv from "postcss-preset-env";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -24,16 +23,16 @@ const config = {
 	preprocess: preprocess({
 		sourceMap: true,
 		postcss: {
-			plugins: [postcssPresetEnv({ features: { 'nesting-rules': true } })]
-		}
+			plugins: [postcssPresetEnv({ features: { "nesting-rules": true } })],
+		},
 	}),
 
 	kit: {
 		adapter: adapter(),
 		env: {
-			publicPrefix: ''
-		}
-	}
+			publicPrefix: "",
+		},
+	},
 };
 
 export default config;
