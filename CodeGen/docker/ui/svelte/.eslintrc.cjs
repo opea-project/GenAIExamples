@@ -12,27 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import adapter from "@sveltejs/adapter-auto";
-import preprocess from "svelte-preprocess";
-import postcssPresetEnv from "postcss-preset-env";
-
-/** @type {import('@sveltejs/kit').Config} */
-const config = {
-	// Consult https://github.com/sveltejs/svelte-preprocess
-	// for more information about preprocessors
-	preprocess: preprocess({
-		sourceMap: true,
-		postcss: {
-			plugins: [postcssPresetEnv({ features: { "nesting-rules": true } })],
-		},
-	}),
-
-	kit: {
-		adapter: adapter(),
-		env: {
-			publicPrefix: "",
-		},
+module.exports = {
+	root: true,
+	parser: "@typescript-eslint/parser",
+	extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+	plugins: ["svelte3", "@typescript-eslint", "neverthrow"],
+	ignorePatterns: ["*.cjs"],
+	overrides: [{ files: ["*.svelte"], processor: "svelte3/svelte3" }],
+	settings: {
+		"svelte3/typescript": () => require("typescript"),
+	},
+	parserOptions: {
+		sourceType: "module",
+		ecmaVersion: 2020,
+	},
+	env: {
+		browser: true,
+		es2017: true,
+		node: true,
 	},
 };
-
-export default config;

@@ -12,27 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import adapter from "@sveltejs/adapter-auto";
-import preprocess from "svelte-preprocess";
-import postcssPresetEnv from "postcss-preset-env";
+import { env } from "$env/dynamic/public";
+import { SSE } from "sse.js";
 
-/** @type {import('@sveltejs/kit').Config} */
-const config = {
-	// Consult https://github.com/sveltejs/svelte-preprocess
-	// for more information about preprocessors
-	preprocess: preprocess({
-		sourceMap: true,
-		postcss: {
-			plugins: [postcssPresetEnv({ features: { "nesting-rules": true } })],
-		},
-	}),
+const BASE_URL = env.BASIC_URL;
 
-	kit: {
-		adapter: adapter(),
-		env: {
-			publicPrefix: "",
-		},
-	},
-};
+export async function fetchTextStream(query: string) {
+	let payload = {};
+	let url = "";
 
-export default config;
+	payload = {
+		messages: query,
+	};
+	url = `${BASE_URL}`;
+
+	return new SSE(url, {
+		headers: { "Content-Type": "application/json" },
+		payload: JSON.stringify(payload),
+	});
+}
