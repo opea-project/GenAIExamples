@@ -1,4 +1,7 @@
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 set -xe
 
 WORKPATH=$(dirname "$PWD")

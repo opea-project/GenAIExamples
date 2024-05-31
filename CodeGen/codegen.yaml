@@ -1,4 +1,7 @@
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 opea_micro_services:
   tgi_service:
     host: ${TGI_SERVICE_IP}

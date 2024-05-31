@@ -1,4 +1,7 @@
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 services:
   qdrant-vector-db:
     image: qdrant/qdrant:v1.9.0

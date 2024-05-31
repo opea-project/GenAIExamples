@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Set default values
 default_port=8080
 default_model="Intel/neural-chat-7b-v3-3"

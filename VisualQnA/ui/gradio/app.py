@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Some code adapted from https://github.com/haotian-liu/LLaVA/blob/main/llava/serve/gradio_web_server.py
 # and https://github.com/haotian-liu/LLaVA/blob/main/llava/conversation.py
 

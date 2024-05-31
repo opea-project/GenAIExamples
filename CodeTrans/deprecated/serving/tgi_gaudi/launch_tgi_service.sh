@@ -1,6 +1,9 @@
 #!/bin/bash
 
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Set default values
 default_port=8080
 default_model="HuggingFaceH4/mistral-7b-grok"

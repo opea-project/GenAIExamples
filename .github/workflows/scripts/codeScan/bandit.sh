@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 source /GenAIExamples/.github/workflows/scripts/change_color
 log_dir=/GenAIExamples/.github/workflows/scripts/codeScan
 python -m bandit -r -lll -iii /GenAIExamples >${log_dir}/bandit.log

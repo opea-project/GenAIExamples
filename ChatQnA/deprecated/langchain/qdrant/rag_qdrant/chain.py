@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Qdrant

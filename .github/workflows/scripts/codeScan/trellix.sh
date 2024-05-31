@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 source ${workspace}/.github/workflows/scripts/change_color
 log_dir=${workspace}/.github/workflows/scripts/codeScan
 
