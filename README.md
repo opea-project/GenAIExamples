@@ -18,7 +18,13 @@ GenAIComps provides a suite of microservices, leveraging a service composer to a
 
 ## MicroService
 
-The initially supported microservices are described in the below table. More microservices are on the way.
+`Microservices` are akin to building blocks, offering the fundamental services for constructing `RAG (Retrieval-Augmented Generation)` applications.
+
+Each `Microservice` is designed to perform a specific function or task within the application architecture. By breaking down the system into smaller, self-contained services, `Microservices` promote modularity, flexibility, and scalability.
+
+This modular approach allows developers to independently develop, deploy, and scale individual components of the application, making it easier to maintain and evolve over time. Additionally, `Microservices` facilitate fault isolation, as issues in one service are less likely to impact the entire system.
+
+The initially supported `Microservices` are described in the below table. More `Microservices` are on the way.
 
 <table>
 	<tbody>
@@ -89,7 +95,89 @@ The initially supported microservices are described in the below table. More mic
 	</tbody>
 </table>
 
-## MegaService (under construction)
+A `Microservices` can be created by using the decorator `register_microservice`. Taking the `embedding microservice` as an example:
+
+```python
+from langchain_community.embeddings import HuggingFaceHubEmbeddings
+from langsmith import traceable
+
+from comps import register_microservice, EmbedDoc768, ServiceType, TextDoc
+
+
+@register_microservice(
+    name="opea_service@embedding_tgi_gaudi",
+    service_type=ServiceType.EMBEDDING,
+    endpoint="/v1/embeddings",
+    host="0.0.0.0",
+    port=6000,
+    input_datatype=TextDoc,
+    output_datatype=EmbedDoc768,
+)
+@traceable(run_type="embedding")
+def embedding(input: TextDoc) -> EmbedDoc768:
+    embed_vector = embeddings.embed_query(input.text)
+    embed_vector = embed_vector[:768]  # Keep only the first 768 elements
+    res = EmbedDoc768(text=input.text, embedding=embed_vector)
+    return res
+```
+
+## MegaService
+
+A `Megaservice` is a higher-level architectural construct composed of one or more `Microservices`, providing the capability to assemble end-to-end applications. Unlike individual `Microservices`, which focus on specific tasks or functions, a `Megaservice` orchestrates multiple `Microservices` to deliver a comprehensive solution.
+
+`Megaservices` encapsulate complex business logic and workflow orchestration, coordinating the interactions between various `Microservices` to fulfill specific application requirements. This approach enables the creation of modular yet integrated applications, where each `Microservice` contributes to the overall functionality of the `Megaservice`.
+
+Here is a simple example of building `Megaservice`:
+
+```python
+from comps import MicroService, ServiceOrchestrator
+
+EMBEDDING_SERVICE_HOST_IP = os.getenv("EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
+EMBEDDING_SERVICE_PORT = os.getenv("EMBEDDING_SERVICE_PORT", 6000)
+LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
+LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
+
+
+class ExampleService:
+    def __init__(self, host="0.0.0.0", port=8000):
+        self.host = host
+        self.port = port
+        self.megaservice = ServiceOrchestrator()
+
+    def add_remote_service(self):
+        embedding = MicroService(
+            name="embedding",
+            host=EMBEDDING_SERVICE_HOST_IP,
+            port=EMBEDDING_SERVICE_PORT,
+            endpoint="/v1/embeddings",
+            use_remote_service=True,S
+            service_type=ServiceType.EMBEDDING,
+        )
+        llm = MicroService(
+            name="llm",
+            host=LLM_SERVICE_HOST_IP,
+            port=LLM_SERVICE_PORT,
+            endpoint="/v1/chat/completions",
+            use_remote_service=True,
+            service_type=ServiceType.LLM,
+        )
+        self.megaservice.add(embedding).add(llm)
+        self.megaservice.flow_to(embedding, llm)
+```
+
+## Gateway
+
+The `Gateway` serves as the interface for users to access the `Megaservice`, providing customized access based on user requirements. It acts as the entry point for incoming requests, routing them to the appropriate `Microservices` within the `Megaservice` architecture.
+
+`Gateways` support API definition, API versioning, rate limiting, and request transformation, allowing for fine-grained control over how users interact with the underlying `Microservices`. By abstracting the complexity of the underlying infrastructure, `Gateways` provide a seamless and user-friendly experience for interacting with the `Megaservice`.
+
+For example, the `Gateway` for `ChatQnA` can be built like this:
+
+```python
+from comps import ChatQnAGateway
+
+self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+```
 
 ## Additional Content
 
