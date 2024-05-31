@@ -78,7 +78,7 @@ function validate_microservices() {
         "tgi" \
         "codetrans-tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-    
+
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions
