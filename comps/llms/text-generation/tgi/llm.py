@@ -21,18 +21,6 @@ from langsmith import traceable
 from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
 
 
-@traceable(run_type="tool")
-def post_process_text(text: str):
-    if text == " ":
-        return "data: @#$\n\n"
-    if text == "\n":
-        return "data: <br/>\n\n"
-    if text.isspace():
-        return None
-    new_text = text.replace("Answer: ", "").replace("Human: ", "").replace(" ", "@#$")
-    return f"data: {new_text}\n\n"
-
-
 @register_microservice(
     name="opea_service@llm_tgi",
     service_type=ServiceType.LLM,
@@ -61,14 +49,9 @@ def llm_generate(input: LLMParamsDoc):
             chat_response = ""
             async for text in llm.astream(input.query):
                 chat_response += text
-                processed_text = post_process_text(text)
-                if text and processed_text:
-                    if "</s>" in text:
-                        res = text.split("</s>")[0]
-                        if res != "":
-                            yield res
-                        break
-                    yield processed_text
+                chunk_repr = repr(text.encode("utf-8"))
+                print(f"[llm - chat_stream] chunk:{chunk_repr}")
+                yield f"data: {chunk_repr}\n\n"
             print(f"[llm - chat_stream] stream response: {chat_response}")
             yield "data: [DONE]\n\n"
 
