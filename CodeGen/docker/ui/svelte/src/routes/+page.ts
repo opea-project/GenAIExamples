@@ -12,8 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// See: https://kit.svelte.dev/docs/types#app
-// import { Result} from "neverthrow";
-interface Window {
-	deviceType: string;
-}
+

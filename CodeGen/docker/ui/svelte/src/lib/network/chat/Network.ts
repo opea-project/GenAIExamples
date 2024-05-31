@@ -12,8 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// See: https://kit.svelte.dev/docs/types#app
-// import { Result} from "neverthrow";
-interface Window {
-	deviceType: string;
+import { env } from "$env/dynamic/public";
+import { SSE } from "sse.js";
+
+const BASE_URL = env.BASIC_URL;
+
+export async function fetchTextStream(query: string) {
+	let payload = {};
+	let url = "";
+
+	payload = {
+		messages: query,
+	};
+	url = `${BASE_URL}`;
+
+	return new SSE(url, {
+		headers: { "Content-Type": "application/json" },
+		payload: JSON.stringify(payload),
+	});
 }

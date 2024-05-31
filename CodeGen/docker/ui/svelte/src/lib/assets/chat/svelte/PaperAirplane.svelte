@@ -1,12 +1,12 @@
 <!--
   Copyright (c) 2024 Intel Corporation
- 
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,21 +14,25 @@
   limitations under the License.
 -->
 
-<script>
-	import "tailwindcss/tailwind.css";
-	import "../app.postcss";
-	import Notifications from "svelte-notifications";
-	import Header from "$lib/modules/frame/header.svelte";
-  import atomOneDark from "svelte-highlight/styles/atom-one-dark";
+<script lang="ts">
+	export let overrideClasses = "";
+
+	const classes = overrideClasses ? overrideClasses : `w-5 h-5 text-gray-400`;
 </script>
 
-<svelte:head>
-	{@html atomOneDark}
-</svelte:head>
-
-<Notifications>
-		<Header />
-		<slot />
-</Notifications>
-
-
+<svg
+	t="1708926517502"
+	class={classes}
+	viewBox="0 0 1024 1024"
+	version="1.1"
+	xmlns="http://www.w3.org/2000/svg"
+	p-id="4586"
+	id="mx_n_1708926517503"
+	width="200"
+	height="200"
+	><path
+		d="M0 1024l106.496-474.112 588.8-36.864-588.8-39.936-106.496-473.088 1024 512z"
+		p-id="4587"
+		fill="#0068b5"
+	/></svg
+>
