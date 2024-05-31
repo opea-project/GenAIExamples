@@ -32,7 +32,7 @@ function start_services() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:6666/v1/codegen"
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7778/v1/codegen"
 
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
@@ -91,7 +91,7 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-        "${ip_address}:6666/v1/codegen" \
+        "${ip_address}:7778/v1/codegen" \
         "print" \
         "mega-codegen" \
         "codegen-xeon-backend-server" \
