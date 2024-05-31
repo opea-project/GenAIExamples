@@ -69,13 +69,18 @@ Running VDMS DB as docker container
 docker run -d -p 55555:55555 intellabs/vdms:latest
 ```
 
-**Note:** If you are not using file structure similar to what is described above, consider changing it in ```config.yaml```.
+**Note-1:** If you are not using file structure similar to what is described above, consider changing it in ```docs/config.yaml```.
 
-Update your choice of db and port in ```config.yaml```.
+**Note-2:** Update your choice of db and port in ```docs/config.yaml```.
 
 Generating Image embeddings and store them into selected db, specify config file location and video input location
 ```bash
 python3 embedding/generate_store_embeddings.py docs/config.yaml video_ingest/videos/
+```
+
+**Troubleshooting:** If using chromadb, and getting this error ```ValueError: Could not connect to tenant default_tenant```, then: 
+```bash
+export no_proxy="enter.your.ip.here"
 ```
 
 **Web UI Video RAG**

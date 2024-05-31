@@ -2,13 +2,133 @@ import chromadb
 from langchain_community.vectorstores import VDMS
 from langchain_community.vectorstores.vdms import VDMS_Client
 from langchain_experimental.open_clip import OpenCLIPEmbeddings
-
+from langchain.pydantic_v1 import BaseModel, root_validator
+from langchain_core.embeddings import Embeddings
+from decord import VideoReader, cpu
+import numpy as np
 from langchain_community.vectorstores import Chroma
-from typing import List, Optional, Iterable
+from typing import List, Optional, Iterable, Dict, Any
 from langchain_core.runnables import ConfigurableField
 from dateparser.search import search_dates
 import datetime
 from tzlocal import get_localzone
+from embedding.adaclip_modeling.simple_tokenizer import SimpleTokenizer
+from embedding.adaclip_datasets.preprocess import get_transforms
+from einops import rearrange
+from PIL import Image
+import torch
+
+class AdaCLIPEmbeddings(BaseModel, Embeddings):
+    """AdaCLIP Embeddings model."""
+
+    model: Any
+    preprocess: Any
+    tokenizer: Any
+    # Select model: https://github.com/mlfoundations/open_clip
+    model_name: str = "ViT-H-14"
+    checkpoint: str = "laion2b_s32b_b79k"
+
+    @root_validator()
+    def validate_environment(cls, values: Dict) -> Dict:
+        """Validate that open_clip and torch libraries are installed."""
+        try:
+            # Use the provided model if present
+            if "model" not in values:
+                raise ValueError("Model must be provided during initialization.")
+            values["preprocess"] = get_transforms
+            values["tokenizer"] = SimpleTokenizer()
+
+        except ImportError:
+            raise ImportError(
+                "Please ensure AdaCLIP model is loaded"
+            )
+        return values
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        model_device = next(self.model.clip.parameters()).device
+        text_features = []
+        for text in texts:
+            # Tokenize the text
+            if isinstance(text, str):
+                text = [text]
+
+            sot_token = self.tokenizer.encoder["<|startoftext|>"]
+            eot_token = self.tokenizer.encoder["<|endoftext|>"]
+            tokens = [[sot_token] + self.tokenizer.encode(text) + [eot_token] for text in texts]
+            tokenized_text = torch.zeros((len(tokens), 64), dtype=torch.int64)
+            for i in range(len(tokens)):
+                if len(tokens[i]) > 64:
+                    tokens[i] = tokens[i][:64-1] + tokens[i][-1:]
+                tokenized_text[i, :len(tokens[i])] = torch.tensor(tokens[i])
+            text_embd, word_embd = self.model.get_text_output(tokenized_text.unsqueeze(0).to(model_device), return_hidden=False)
+
+            # Normalize the embeddings
+            print(" --->>>> text_embd.shape:", text_embd.shape)
+            text_embd = rearrange(text_embd, "b n d -> (b n) d")
+            text_embd = text_embd / text_embd.norm(dim=-1, keepdim=True)
+
+            # Convert normalized tensor to list and add to the text_features list
+            embeddings_list = text_embd.squeeze(0).tolist()
+            text_features.append(embeddings_list)
+
+        return text_features
+
+
+    def embed_query(self, text: str) -> List[float]:
+        return self.embed_documents([text])[0]
+
+
+    def embed_video(self, uris: List[str]) -> List[List[float]]:
+        # Open images directly as PIL images
+
+        video_features = []
+        for vid_path in uris:
+            # Preprocess the video for the model
+            videos_tensor, policy_images_tensor = load_video_for_adaclip(vid_path, num_frm=64, no_policy=False, policy_backbone='mobilenet_v3_large', max_img_size=224)
+            # Encode the video to get the embeddings
+            model_device = next(embedding_model.parameters()).device
+            embeddings_tensor = self.model.get_video_embeddings(videos_tensor.unsqueeze(0).to(model_device), policy_images_tensor.unsqueeze(0).to(model_device))
+            
+            # Convert tensor to list and add to the video_features list
+            embeddings_list = embeddings_tensor.squeeze(0).tolist()
+
+            video_features.append(embeddings_list)
+
+        return video_features
+
+
+    def load_video_for_adaclip(self, vis_path, num_frm=64, no_policy=False, policy_backbone='mobilenet_v3_large', max_img_size=224):
+        # Load video with VideoReader
+        vr = VideoReader(vis_path, ctx=cpu(0))
+        num_frames = len(vr)
+
+        frame_idx = np.linspace(0, num_frames, num=num_frm, endpoint=False, dtype=int) # Uniform sampling
+
+        clip_images = []
+        policy_images = []
+        
+        # Extract frames as numpy array
+        img_array = vr.get_batch(frame_idx).asnumpy() # img_array = [T,H,W,C]
+        clip_imgs = [Image.fromarray(img_array[j]) for j in range(img_array.shape[0])]
+
+        # preprocess images
+        for i in range(len(clip_imgs)):
+            im = clip_imgs[i]
+            clip_images.append(get_transforms("clip", max_img_size)(im)) # 3, 224, 224
+            if not no_policy:
+                policy_images.append(get_transforms(policy_backbone, 256)(im))
+        
+        clip_images_tensor = torch.zeros((num_frm,) + clip_images[0].shape)
+        clip_images_tensor[:num_frm] = torch.stack(clip_images)
+        if policy_images is not None:
+            policy_images_tensor = torch.zeros((num_frm,) + policy_images[0].shape)
+            policy_images_tensor[:num_frm] = torch.stack(policy_images)
+
+        if policy_images:
+            return clip_images_tensor, policy_images_tensor
+        else:
+            return clip_images_tensor, None
+
 
 class VS:
     
@@ -212,3 +332,47 @@ class VS:
             print("images:", r.metadata['video'], '\t',r.metadata['date'], '\t',r.metadata['time'], '\n')
             
         return image_results 
+
+
+class VideoVS(VS):
+    def __init__(self, host, port, selected_db, video_retriever_model):
+        super().__init__(host, port, selected_db)
+        self.video_collection = 'video-test'
+        self.video_embedder = AdaCLIPEmbeddings(model=video_retriever_model)
+
+        if self.selected_db == 'chroma':
+            self.video_db = Chroma(
+                client=self.client,
+                embedding_function=self.video_embedder,
+                collection_name=self.video_collection,
+            )
+        elif self.selected_db == 'vdms':
+            self.video_db = VDMS(
+                client=self.client,
+                embedding=self.video_embedder,
+                collection_name=self.video_collection,
+                engine="FaissFlat",
+            )
+
+        self.video_retriever = self.video_db.as_retriever(search_type="mmr").configurable_fields(
+            search_kwargs=ConfigurableField(
+                id="k_video_docs",
+                name="Search Kwargs",
+                description="The search kwargs to use",
+            )
+        )
+
+    def add_videos(self, uris: List[str], metadatas: Optional[List[dict]] = None):
+        self.video_db.add_videos(uris, metadatas)
+
+    def get_video_embedding(self, video_path):
+        return self.video_embedder.get_video_embeddings(video_path)
+
+    def MultiModalRetrieval(self, query: str, n_videos: Optional[int] = 3):
+        self.update_db(query, n_videos)
+        video_results = self.video_retriever.invoke(query)
+
+        for r in video_results:
+            print("videos:", r.metadata['video'], '\t', r.metadata['date'], '\t', r.metadata['time'], '\n')
+
+        return video_results

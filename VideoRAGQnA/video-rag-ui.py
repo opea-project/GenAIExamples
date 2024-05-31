@@ -74,9 +74,14 @@ class CustomLLM(LLM):
             streamer: Optional[TextIteratorStreamer] = None,  # Add streamer as an argument
         ) -> str:
         
-        tokens = tokenizer.encode(prompt, return_tensors='pt')
+        tokens = tokenizer.encode(prompt, return_tensors='pt').to(model.device)
+        print(" - - ")
+        print("  prompt:", prompt)
+        print(" - - ")
         
         with torch.no_grad():
+            print(model.device)
+            print(tokens.device)
             output = model.generate(input_ids = tokens,
                                     max_new_tokens = 100,
                                     num_return_sequences = 1,
@@ -164,9 +169,10 @@ def RAG(prompt):
         st.write('Retrieving 3 image docs') #1 text doc and 
         results = st.session_state.vs.MultiModalRetrieval(prompt, n_images = 3) #n_texts = 1, n_images = 3)
         status.update(label="Retrived Top matching video!", state="complete", expanded=False)
-    
-    print (f'promt={prompt}\n')
-                
+    print("---___---")
+    print (f'RAG prompt={prompt}\n')
+    print("---___---")
+      
     top_doc = get_top_doc(results, st.session_state['qcnt'])
     print ('TOP DOC = ', top_doc)
     if top_doc == None:

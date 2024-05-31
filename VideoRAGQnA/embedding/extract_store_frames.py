@@ -1,4 +1,5 @@
 import os
+import time as t
 import cv2
 import json
 import datetime
@@ -6,10 +7,17 @@ import random
 from tzlocal import get_localzone
 
     
-def process_all_videos(path, image_output_dir, meta_output_dir, N, selected_db):
+def process_all_videos(config):
+    path = config['videos']
+    image_output_dir = config['image_output_dir'] 
+    meta_output_dir = config['meta_output_dir']
+    N = config['number_of_frames_per_second']
+    selected_db = config['vector_db']['choice_of_db']
+    emb_path = config['embeddings']['path']
+    emb_type = config['embeddings']['type']
 
     def extract_frames(video_path, image_output_dir, meta_output_dir, N, date_time, local_timezone):
-        video = video_path.split('/')[-1]
+        video = os.path.splitext(os.path.basename(video_path))[0]
         # Create a directory to store frames and metadata
         os.makedirs(image_output_dir, exist_ok=True)
         os.makedirs(meta_output_dir, exist_ok=True)
@@ -78,27 +86,60 @@ def process_all_videos(path, image_output_dir, meta_output_dir, N, selected_db):
         print(f"{frame_count/mod} Frames extracted and metadata saved successfully.") 
         return fps, total_frames, metadata_file
 
-    videos = [file for file in os.listdir(path) if file.endswith('.mp4')]
+    videos = [file for file in os.listdir(path) if file.endswith('.mp4')] # TODO: increase supported video formats
 
     # print (f'Total {len(videos)} videos will be processed')
     metadata = {}
 
     for i, each_video in enumerate(videos):
+        metadata[each_video] = {}
         video_path = os.path.join(path, each_video)
-        date_time = datetime.datetime.now() 
-        print("date_time : ",date_time)
+        #date_time = datetime.datetime.now()  # FIXME CHECK: is this correct? 
+        date_time = t.ctime(os.stat(video_path).st_ctime)
+        print(f"date_time of {video_path} being created : ",date_time)
         # Get the local timezone of the machine
         local_timezone = get_localzone()
-        fps, total_frames, metadata_file = extract_frames(video_path, image_output_dir, meta_output_dir, N, date_time, local_timezone)
-        metadata[each_video] = {
+        if emb_type == 'frame':
+            fps, total_frames, metadata_file = extract_frames(video_path, image_output_dir, meta_output_dir, N, date_time, local_timezone)
+            metadata[each_video].update({
+                'extracted_frame_metadata_file': metadata_file,
+            })
+        elif emb_type == 'video':
+            time_format = "%a %b %d %H:%M:%S %Y"
+            date_time = datetime.datetime.strptime(date_time, time_format)
+            time = date_time.strftime("%H:%M:%S")
+            hours, minutes, seconds = map(float, time.split(":"))
+            date = date_time.strftime("%Y-%m-%d")
+            year, month, day = map(int, date.split("-"))
+            
+            metadata[each_video].update({"date": date, "year": year, "month": month, "day": day, 
+                "time": time, "hours": hours, "minutes": minutes, "seconds": seconds})
+            if selected_db == 'vdms':
+                # Localize the current time to the local timezone of the machine
+                #Tahani might not need this
+                current_time_local = date_time.replace(tzinfo=datetime.timezone.utc).astimezone(local_timezone)
+
+                # Convert the localized time to ISO 8601 format with timezone offset
+                iso_date_time = current_time_local.isoformat()
+                metadata[each_video]['date_time'] = {"_date": str(iso_date_time)}
+
+            # Open the video file
+            cap = cv2.VideoCapture(video_path)
+
+            if int(cv2.__version__.split('.')[0]) < 3:
+                fps = cap.get(cv2.cv.CV_CAP_PROP_FPS)
+            else:
+                fps = cap.get(cv2.CAP_PROP_FPS)
+        
+            total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        metadata[each_video].update({
                 'fps': fps, 
                 'total_frames': total_frames, 
-                'extracted_frame_metadata_file': metadata_file,
-                'embedding_path': f'embeddings/{each_video}.pt',
+                'embedding_path': os.path.join(emb_path, each_video+".pt"),
                 'video_path': f'{path}/{each_video}',
-            }
+            })
         print (f'✅  {i+1}/{len(videos)}')
-
+    os.makedirs(meta_output_dir, exist_ok=True)
     metadata_file = os.path.join(meta_output_dir, f"metadata.json")
     with open(metadata_file, "w") as f:
         json.dump(metadata, f, indent=4)

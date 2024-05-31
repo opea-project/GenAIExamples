@@ -4,8 +4,10 @@ videos: video_ingest/videos/
 description: video_ingest/scene_description/
 # Do you want to extract frames of videos (True if not done already, else False)
 generate_frames: True
-# Do you wnat to generate image embeddings?
-embed_frames: True
+# How do you want to generate feature embeddings?
+embeddings:
+  type: 'video' # ['video', 'frame']
+  path: 'video_ingest/embeddings'
 # Path to store extracted frames
 image_output_dir: video_ingest/frames/
 # Path to store metadata files
@@ -18,6 +20,9 @@ vector_db:
   choice_of_db: 'vdms' #'chroma' # #Supported databases [vdms, chroma]
   host: 0.0.0.0
   port: 55555 #8000 #
+
+adaclip_cfg_path: embedding/adaclip_config/activitynet_filtered.json
+adaclip_model_path: embedding/adaclip_weights/activitynet/2024-04-19_13-57-38/trained_model.pth
 
 # LLM path
 model_path: meta-llama/Llama-2-7b-chat-hf
