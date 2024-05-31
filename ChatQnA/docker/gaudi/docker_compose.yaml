@@ -83,9 +83,9 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-retriever-service"
     restart: unless-stopped
-  tei-xeon-service:
+  tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-    container_name: tei-xeon-server
+    container_name: tei-reranking-gaudi-server
     ports:
       - "8808:80"
     volumes:
@@ -99,7 +99,7 @@ services:
     image: opea/reranking-tei:latest
     container_name: reranking-tei-gaudi-server
     depends_on:
-      - tei-xeon-service
+      - tei-reranking-service
     ports:
       - "8000:8000"
     ipc: host
@@ -154,7 +154,7 @@ services:
       - tei-embedding-service
       - embedding
       - retriever
-      - tei-xeon-service
+      - tei-reranking-service
       - reranking
       - tgi-service
       - llm

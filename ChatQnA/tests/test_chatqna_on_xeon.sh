@@ -65,127 +65,113 @@ function start_services() {
     done
 }
 
-function validate_microservices() {
-    # Check if the microservices are running correctly.
-    # TODO: Any results check required??
-    curl ${ip_address}:6006/embed \
-        -X POST \
-        -d '{"inputs":"What is Deep Learning?"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/embed.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tei-embedding-server >> ${LOG_PATH}/embed.log
-        exit 1
-    fi
-    sleep 1s
+function validate_services() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local INPUT_DATA="$5"
 
-    curl http://${ip_address}:6000/v1/embeddings \
-        -X POST \
-        -d '{"text":"hello"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/embeddings.log
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs embedding-tei-server >> ${LOG_PATH}/embeddings.log
-        exit 1
-    fi
-    sleep 1m # retrieval can't curl as expected, try to wait for more time
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
-    export PATH="${HOME}/miniforge3/bin:$PATH"
-    source activate
-    test_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-    curl http://${ip_address}:7000/v1/retrieval \
-        -X POST \
-        -d '{"text":"What is the revenue of Nike in 2023?","embedding":${test_embedding}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/retrieval.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs retriever-redis-server >> ${LOG_PATH}/retrieval.log
-        exit 1
-    fi
-    sleep 1s
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
 
-    curl http://${ip_address}:8808/rerank \
-        -X POST \
-        -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/rerank.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tei-xeon-server >> ${LOG_PATH}/rerank.log
-        exit 1
-    fi
-    sleep 1s
-
-    curl http://${ip_address}:8000/v1/reranking -X POST \
-        -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/reranking.log
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs reranking-tei-xeon-server >> ${LOG_PATH}/reranking.log
-        exit 1
-    fi
-    sleep 1s
-
-    curl http://${ip_address}:9009/generate \
-        -X POST \
-        -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tgi-service >> ${LOG_PATH}/generate.log
-        exit 1
-    fi
-    sleep 1s
-
-    curl http://${ip_address}:9000/v1/chat/completions \
-        -X POST \
-        -d '{"text":"What is Deep Learning?"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs llm-tgi-server >> ${LOG_PATH}/completions.log
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
     fi
     sleep 1s
 }
 
+function validate_microservices() {
+    # Check if the microservices are running correctly.
+
+    # tei for embedding service
+    validate_services \
+        "${ip_address}:6006/embed" \
+        "\[\[" \
+        "tei-embedding" \
+        "tei-embedding-server" \
+        '{"inputs":"What is Deep Learning?"}'
+
+    # embedding microservice
+    validate_services \
+        "${ip_address}:6000/v1/embeddings" \
+        '"text":"What is Deep Learning?","embedding":\[' \
+        "embedding" \
+        "embedding-tei-server" \
+        '{"text":"What is Deep Learning?"}'
+
+    sleep 1m # retrieval can't curl as expected, try to wait for more time
+
+    # retrieval microservice
+    test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+    validate_services \
+        "${ip_address}:7000/v1/retrieval" \
+        " " \
+        "retrieval" \
+        "retriever-redis-server" \
+        "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
+
+    # tei for rerank microservice
+    validate_services \
+        "${ip_address}:8808/rerank" \
+        '{"index":1,"score":' \
+        "tei-rerank" \
+        "tei-reranking-server" \
+        '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
+
+    # rerank microservice
+    validate_services \
+        "${ip_address}:8000/v1/reranking" \
+        "Deep learning is..." \
+        "rerank" \
+        "reranking-tei-xeon-server" \
+        '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}'
+
+    # tgi for llm service
+    validate_services \
+        "${ip_address}:9009/generate" \
+        "generated_text" \
+        "tgi-llm" \
+        "tgi-service" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
+    # llm microservice
+    validate_services \
+        "${ip_address}:9000/v1/chat/completions" \
+        "data: " \
+        "llm" \
+        "llm-tgi-server" \
+        '{"query":"What is Deep Learning?"}'
+
+}
+
 function validate_megaservice() {
     # Curl the Mega Service
-    http_proxy="" curl http://${ip_address}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Megaservice failed, please check the logs in artifacts!"
-        docker logs chatqna-xeon-backend-server >> ${LOG_PATH}/curl_megaservice.log
-        exit 1
-    fi
-
-    echo "Checking response results, make sure the output is reasonable. "
-    local status=false
-    if [[ -f $LOG_PATH/curl_megaservice.log ]] &&
-        [[ $(grep -c "billion" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
-        status=true
-    fi
-
-    if [ $status == false ]; then
-        echo "Response check failed, please check the logs in artifacts!"
-        exit 1
-    else
-        echo "Response check succeed!"
-    fi
-
-    echo "Checking response format, make sure the output format is acceptable for UI."
-    # TODO
+    validate_services \
+        "${ip_address}:8888/v1/chatqna" \
+        "billion" \
+        "mega-chatqna" \
+        "chatqna-xeon-backend-server" \
+        '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
 
 function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
     local conda_env_name="ChatQnA_e2e"
-    export PATH=${HOME}/miniconda3/bin/:$PATH
+    export PATH=${HOME}/miniforge3/bin/:$PATH
     conda remove -n ${conda_env_name} --all -y
     conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
