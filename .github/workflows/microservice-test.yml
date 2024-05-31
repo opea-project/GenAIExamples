@@ -62,7 +62,7 @@ jobs:
 
       - name: Run microservice test
         env:
-          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
           service: ${{ matrix.service }}
           hardware: ${{ matrix.hardware }}
         run: |

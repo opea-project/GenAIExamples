@@ -13,8 +13,8 @@ function build_docker_images() {
 
 function start_service() {
     tei_endpoint=5006
-    # Remember to set HUGGINGFACEHUB_API_TOKEN before invoking this test!
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    # Remember to set HF_TOKEN before invoking this test!
+    export HF_TOKEN=${HF_TOKEN}
     model=BAAI/bge-reranker-large
     revision=refs/pr/4
     volume=$PWD/data
@@ -23,7 +23,7 @@ function start_service() {
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:${tei_endpoint}"
     tei_service_port=5007
     unset http_proxy
-    docker run -d --name="test-comps-reranking-tei-server" -p ${tei_service_port}:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/reranking-tei:comps
+    docker run -d --name="test-comps-reranking-tei-server" -p ${tei_service_port}:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HF_TOKEN=$HF_TOKEN opea/reranking-tei:comps
     sleep 1m
 }
 

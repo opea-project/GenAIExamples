@@ -15,7 +15,7 @@ pip install -r requirements.txt
 ## 1.2 Start TEI Service
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/reranks"
@@ -48,7 +48,7 @@ If you start an Reranking microservice with docker, the `docker_compose_rerankin
 ## 2.1 Setup Environment Variables
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/reranks"
@@ -72,7 +72,7 @@ You can choose one as needed.
 ## 2.3 Run Docker with CLI (Option A)
 
 ```bash
-docker run -d --name="reranking-tei-server" -p 8000:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e LANGCHAIN_API_KEY=$LANGCHAIN_API_KEY opea/reranking-tei:latest
+docker run -d --name="reranking-tei-server" -p 8000:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HF_TOKEN=$HF_TOKEN -e LANGCHAIN_API_KEY=$LANGCHAIN_API_KEY opea/reranking-tei:latest
 ```
 
 ## 2.4 Run Docker with Docker Compose (Option B)

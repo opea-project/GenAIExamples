@@ -33,7 +33,7 @@ pip install -r requirements.txt
 ## 1.2 Start TGI Gaudi Service
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/gaurdrails"

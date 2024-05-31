@@ -15,14 +15,14 @@ function build_docker_images() {
 function start_service() {
     tgi_endpoint_port=5004
     export your_hf_llm_model="Intel/neural-chat-7b-v3-3"
-    # Remember to set HUGGINGFACEHUB_API_TOKEN before invoking this test!
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    # Remember to set HF_TOKEN before invoking this test!
+    export HF_TOKEN=${HF_TOKEN}
     docker run -d --name="test-comps-llm-tgi-endpoint" -p $tgi_endpoint_port:80 -v ./data:/data --shm-size 1g ghcr.io/huggingface/text-generation-inference:1.4 --model-id ${your_hf_llm_model}
     export TGI_LLM_ENDPOINT="http://${ip_address}:${tgi_endpoint_port}"
 
     tei_service_port=5005
     unset http_proxy
-    docker run -d --name="test-comps-llm-tgi-server" -p ${tei_service_port}:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/llm-tgi:comps
+    docker run -d --name="test-comps-llm-tgi-server" -p ${tei_service_port}:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e HF_TOKEN=$HF_TOKEN opea/llm-tgi:comps
 
     # check whether tgi is fully ready
     n=0

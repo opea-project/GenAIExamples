@@ -12,12 +12,12 @@
 bash ./serving/vllm/launch_vllm_service.sh
 ```
 
-For gated models such as `LLAMA-2`, you will have to pass -e HUGGING_FACE_HUB_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
+For gated models such as `LLAMA-2`, you will have to pass -e HF_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
 
-Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HUGGINGFACEHUB_API_TOKEN` environment with the token.
+Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access token and export `HF_TOKEN` environment with the token.
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=<token>
+export HF_TOKEN=<token>
 ```
 
 And then you can make requests like below to check the service status:
