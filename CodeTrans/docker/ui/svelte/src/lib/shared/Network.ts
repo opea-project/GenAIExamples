@@ -14,34 +14,7 @@
 import { env } from "$env/dynamic/public";
 import { SSE } from "sse.js";
 
-const BASIC_URL = env.BASIC_URL;
-
-async function fetchPostRes(url, init) {
-  try {
-    const response = await fetch(url, init);
-    if (!response.ok) throw response.status;
-    return await response.json();
-  } catch (error) {
-    console.error("network error: ", error);
-    return undefined;
-  }
-}
-
-export async function fetchLanguageResponse(input: string, transform: string, transTo: string) {
-  const url = `${BASIC_URL}/v1/translation`;
-  const transData = {
-    language_from: transform,
-    language_to: transTo,
-    source_language: input,
-  };
-
-  const init: RequestInit = {
-    method: "POST",
-    body: JSON.stringify(transData),
-  };
-
-  return fetchPostRes(url, init);
-}
+const BASE_URL = env.BASE_URL;
 
 export async function fetchTextStream(query: string, langFrom, langTo) {
   const payload = {
@@ -50,7 +23,7 @@ export async function fetchTextStream(query: string, langFrom, langTo) {
     source_code: query,
   };
 
-  let url = `${BASIC_URL}/v1/code_translation_stream`;
+  let url = `${BASE_URL}`;
 
   return new SSE(url, {
     headers: { "Content-Type": "application/json" },
