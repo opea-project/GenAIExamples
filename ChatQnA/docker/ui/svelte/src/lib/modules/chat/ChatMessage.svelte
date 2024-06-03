@@ -24,7 +24,6 @@
 
 	export let msg: Message;
 	export let time: string = "";
-	console.log("msg", msg);
 </script>
 
 <div

@@ -29,7 +29,7 @@ Make sure all the pods are running, and restart the codegen-xxxx pod if necessar
 
 ```
 kubectl get pods
-curl http://codegen:6666/v1/codegen -H "Content-Type: application/json" -d '{
+curl http://codegen:7778/v1/codegen -H "Content-Type: application/json" -d '{
      "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
      }'
 ```

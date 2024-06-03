@@ -58,8 +58,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 6666
-      targetPort: 6666
+    - port: 7778
+      targetPort: 7778
       protocol: TCP
       name: codegen
   selector:
@@ -202,6 +202,6 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: codegen
-              containerPort: 6666
+              containerPort: 7778
               protocol: TCP
           resources: null

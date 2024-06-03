@@ -1,16 +1,6 @@
-# Copyright (c) 2024 Intel Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
 set -xe
 
@@ -44,7 +34,9 @@ function start_services() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:6666/v1/codegen"
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7778/v1/codegen"
+
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
@@ -53,58 +45,87 @@ function start_services() {
     sleep 2m # Waits 2 minutes
 }
 
-function validate_microservices() {
-    # Check if the microservices are running correctly.
-    # TODO: Any results check required??
+function validate_services() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local INPUT_DATA="$5"
 
-    export PATH="${HOME}/miniforge3/bin:$PATH"
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
-    curl http://${ip_address}:8028/generate \
-        -X POST \
-        -d '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":1024, "do_sample": true}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tgi-gaudi-server >> ${LOG_PATH}/generate.log
-        exit 1
-    fi
-    sleep 5s
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
 
-    curl http://${ip_address}:9000/v1/chat/completions \
-        -X POST \
-        -d '{"text":"def print_hello_world():"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs llm-tgi-gaudi-server >> ${LOG_PATH}/completions.log
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
     fi
     sleep 5s
 }
 
+function validate_microservices() {
+    # tgi for llm service
+    validate_services \
+        "${ip_address}:8028/generate" \
+        "generated_text" \
+        "tgi-llm" \
+        "tgi-gaudi-server" \
+        '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}'
+
+    # llm microservice
+    validate_services \
+        "${ip_address}:9000/v1/chat/completions" \
+        "data: " \
+        "llm" \
+        "llm-tgi-gaudi-server" \
+        '{"query":"def print_hello_world():"}'
+
+}
+
 function validate_megaservice() {
     # Curl the Mega Service
-    curl http://${ip_address}:6666/v1/codegen -H "Content-Type: application/json" -d '{
-        "messages": "def print_hello_world():"}' > ${LOG_PATH}/curl_megaservice.log
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "print" \
+        "mega-codegen" \
+        "codegen-gaudi-backend-server" \
+        '{"messages": "def print_hello_world():"}'
 
-    echo "Checking response results, make sure the output is reasonable. "
-    local status=false
-    if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c "Hello" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
-        status=true
-    fi
+}
 
-    if [ $status == false ]; then
-        echo "Response check failed, please check the logs in artifacts!"
-        exit 1
+function validate_frontend() {
+    cd $WORKPATH/docker/ui/svelte
+    local conda_env_name="CodeGen_e2e"
+    export PATH=${HOME}/miniforge3/bin/:$PATH
+    conda remove -n ${conda_env_name} --all -y
+    conda create -n ${conda_env_name} python=3.12 -y
+    source activate ${conda_env_name}
+
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
+
+    exit_status=0
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------frontend test failed---------"
+        exit $exit_status
     else
-        echo "Response check succeed!"
+        echo "[TEST INFO]: ---------frontend test passed---------"
     fi
 
-    echo "Checking response format, make sure the output format is acceptable for UI."
-    # TODO
 }
 
 function stop_docker() {
@@ -125,6 +146,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
