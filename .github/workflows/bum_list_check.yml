@@ -1,0 +1,51 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Check Requirements
+
+on: [pull_request]
+
+jobs:
+  check-requirements:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Save PR requirements
+        run: |
+          find . -name "requirements.txt" -exec cat {} \; | \
+              grep -v '^\s*#' | \
+              grep -v '^\s*$' | \
+              grep -v '^\s*-' | \
+              sed 's/^\s*//' | \
+              awk -F'[>=<]' '{print $1}' | \
+              sort -u > pr-requirements.txt
+          cat pr-requirements.txt
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-branch
+
+      - name: Save main branch requirements
+        run: |
+          find ./main-branch -name "requirements.txt" -exec cat {} \; | \
+              grep -v '^\s*#' | \
+              grep -v '^\s*$' | \
+              grep -v '^\s*-' | \
+              sed 's/^\s*//' | \
+              awk -F'[>=<]' '{print $1}' | \
+              sort -u > main-requirements.txt
+          cat main-requirements.txt
+
+      - name: Compare requirements
+        run: |
+          comm -23 pr-requirements.txt main-requirements.txt > added-packages.txt
+          if [ -s added-packages.txt ]; then
+            echo "New packages found in PR:" && cat added-packages.txt
+            exit 1
+          else
+            echo "No new packages found😊."
+          fi
