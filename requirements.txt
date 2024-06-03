@@ -1,3 +1,4 @@
+aiohttp
 docarray
 fastapi
 httpx
