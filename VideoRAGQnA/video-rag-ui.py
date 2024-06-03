@@ -181,6 +181,11 @@ def get_description(vn):
     with open(des_path, 'r') as file:
         content = file.read()
     return content
+
+
+def get_history():
+    messages = st.session_state.messages
+    return messages[-3:]
     
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
@@ -216,8 +221,11 @@ def handle_message():
                 with col2:
                     play_video(video_name)
                 
+                
                 scene_des = get_description(video_name)
-                formatted_prompt = ph.get_formatted_prompt(scene=scene_des, prompt=prompt)
+                formatted_prompt = ph.get_formatted_prompt(scene=scene_des, 
+                                                           prompt=prompt,
+                                                           history = get_history())
                 
                 full_response = ''
                 full_response = f"Most relevant retrived video is **{video_name}** \n\n"
@@ -260,10 +268,11 @@ with col1:
 
     st.write('You selected:', st.session_state.example_video)
 
+
 if st.session_state.example_video == 'Enter Text':
     if prompt := st.chat_input(disabled=False):
         st.session_state['prompt'] = prompt
-        st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+        # st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
         if prompt == 'Find similar videos':            
             st.session_state.messages.append({"role": "assistant", "content": "Not supported"})
         else:
@@ -271,7 +280,7 @@ if st.session_state.example_video == 'Enter Text':
 else:
     prompt = st.session_state.example_video
     st.session_state['prompt'] = prompt
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+    # st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
     st.chat_input(disabled=True)
     if prompt == 'Find similar videos':
         st.session_state.messages.append({"role": "user", "content": prompt+': '+st.session_state['prevprompt']})
