@@ -1,0 +1,127 @@
+diff --git a/examples/text-generation/run_lm_eval.py b/examples/text-generation/run_lm_eval.py
+index b086c80..e0e5a9f 100644
+--- a/examples/text-generation/run_lm_eval.py
++++ b/examples/text-generation/run_lm_eval.py
+@@ -75,13 +75,13 @@ class HabanaModelAdapter(lm_eval.base.BaseLM):
+         self.options = options
+         self._device = args.device
+         self.model_inputs = {"use_cache": self.options.use_cache}
+-        if self.model.config.model_type in ["llama", "falcon"]:
++        if self.model.config.model_type in ["llama", "falcon", "qwen2"]:
+             self.model_inputs.update(
+                 {
+                     "reuse_cache": self.options.reuse_cache,
+                 }
+             )
+-        if self.model.config.model_type == "llama":
++        if self.model.config.model_type in ["llama","mistral","qwen2"]:
+             self.model_inputs.update(
+                 {
+                     "attn_softmax_bf16": self.options.attn_softmax_bf16,
+diff --git a/examples/text-generation/utils.py b/examples/text-generation/utils.py
+index 8bce0ae..c29f458 100644
+--- a/examples/text-generation/utils.py
++++ b/examples/text-generation/utils.py
+@@ -234,7 +234,7 @@ def setup_distributed_model(args, model_dtype, model_kwargs, logger):
+ 
+     model = deepspeed.init_inference(model, **ds_inference_kwargs)
+     model = model.module
+-    if model.config.model_type in ["llama", "falcon"]:
++    if model.config.model_type in ["llama", "falcon","qwen2"]:
+         patch_scoped_linear_all_reduce(model)
+ 
+     if args.quant_config:
+diff --git a/optimum/habana/transformers/generation/utils.py b/optimum/habana/transformers/generation/utils.py
+index 0d50470..94cc7eb 100755
+--- a/optimum/habana/transformers/generation/utils.py
++++ b/optimum/habana/transformers/generation/utils.py
+@@ -740,7 +740,7 @@ class GaudiGenerationMixin(GenerationMixin):
+                     )
+                     model_kwargs["kv_cache_len"] = calculated_max_length
+ 
+-            if self.config.model_type in ["llama", "falcon"]:
++            if self.config.model_type in ["llama", "falcon","qwen2"]:
+                 if self.config.max_position_embeddings < calculated_max_length:
+                     unwrap_deepspeed_model(self).update_sincos_cache(seq_len=calculated_max_length)
+ 
+diff --git a/optimum/habana/transformers/modeling_utils.py b/optimum/habana/transformers/modeling_utils.py
+index 6dc40a7..b5044af 100644
+--- a/optimum/habana/transformers/modeling_utils.py
++++ b/optimum/habana/transformers/modeling_utils.py
+@@ -55,6 +55,9 @@ from .models import (
+     GaudiOPTForCausalLM,
+     GaudiOPTLearnedPositionalEmbedding,
+     GaudiPhiForCausalLM,
++    GaudiQwen2Model,
++    GaudiQwen2Attention,
++    GaudiQwen2MLP,
+     _gaudi_wav2vec2_compute_mask_indices,
+     _gaudi_wav2vec2_mask_hidden_states,
+     gaudi_albert_forward,
+@@ -118,6 +121,7 @@ from .models import (
+     gaudi_phi_attention_forward,
+     gaudi_phi_decoder_layer_forward,
+     gaudi_phi_model_forward,
++    gaudi_qwen2_rmsnorm_forward,
+     gaudi_rot_matmul,
+     gaudi_rot_vec_mul,
+     gaudi_SpeechT5Attention_forward,
+@@ -367,3 +371,11 @@ def adapt_transformers_to_gaudi():
+     transformers.models.speecht5.modeling_speecht5.SpeechT5SpeechDecoderPrenet.forward = (
+         gaudi_SpeechT5SpeechDecoderPrenet_forward
+     )
++
++    # Optimization for qwen2 on Gaudi
++    transformers.models.qwen2.modeling_qwen2.Qwen2ForCausalLM = GaudiQwen2ForCausalLM
++    transformers.models.qwen2.modeling_qwen2.Qwen2Model = GaudiQwen2Model
++    transformers.models.qwen2.modeling_qwen2.Qwen2Attention = GaudiQwen2Attention
++    transformers.models.qwen2.modeling_qwen2.Qwen2MLP = GaudiQwen2MLP
++    transformers.models.qwen2.modeling_qwen2.Qwen2DecoderLayer = GaudiQwen2DecoderLayer
++    transformers.models.qwen2.modeling_qwen2.Qwen2RMSNorm.forward = gaudi_qwen2_rmsnorm_forward
+diff --git a/optimum/habana/transformers/models/__init__.py b/optimum/habana/transformers/models/__init__.py
+index 1582d3f..41fdfdc 100644
+--- a/optimum/habana/transformers/models/__init__.py
++++ b/optimum/habana/transformers/models/__init__.py
+@@ -122,6 +122,14 @@ from .phi import (
+     gaudi_phi_decoder_layer_forward,
+     gaudi_phi_model_forward,
+ )
++from .qwen2 import (
++    GaudiQwen2Attention,
++    GaudiQwen2DecoderLayer,
++    GaudiQwen2ForCausalLM,
++    GaudiQwen2MLP,
++    GaudiQwen2Model,
++    gaudi_qwen2_rmsnorm_forward,
++)
+ from .speecht5 import (
+     gaudi_generate_speech,
+     gaudi_SpeechT5Attention_forward,
+diff --git a/optimum/habana/transformers/trainer.py b/optimum/habana/transformers/trainer.py
+index dc6e136..7dfebaa 100644
+--- a/optimum/habana/transformers/trainer.py
++++ b/optimum/habana/transformers/trainer.py
+@@ -916,9 +916,9 @@ class GaudiTrainer(Trainer):
+                 if step % args.gradient_accumulation_steps == 0:
+                     self.control = self.callback_handler.on_step_begin(args, self.state, self.control)
+ 
+-                # attn_softmax_bf16 and use_flash_attention is enabled only for llama
++                # attn_softmax_bf16 and use_flash_attention is enabled only for llama and qwen2
+                 if hasattr(self.model, "generation_config") and self.model.generation_config is not None:
+-                    if self.model.config.model_type == "llama":
++                    if self.model.config.model_type in ["llama", "qwen2"]:
+                         if self.model.generation_config.attn_softmax_bf16:
+                             inputs["attn_softmax_bf16"] = True
+                         if self.model.generation_config.use_flash_attention:
+@@ -1799,9 +1799,9 @@ class GaudiTrainer(Trainer):
+                 if batch_size is None:
+                     batch_size = observed_batch_size
+ 
+-            # attn_softmax_bf16 and use_flash_attention are enabled only for llama
++            # attn_softmax_bf16 and use_flash_attention are enabled only for llama and qwen2
+             if hasattr(self.model, "generation_config") and self.model.generation_config is not None:
+-                if self.model.config.model_type == "llama":
++                if self.model.config.model_type in ["llama", "qwen2"]:
+                     if self.model.generation_config.attn_softmax_bf16:
+                         inputs["attn_softmax_bf16"] = True
+                     if self.model.generation_config.use_flash_attention:

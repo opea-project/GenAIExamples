@@ -1,0 +1,8 @@
+docarray[full]
+fastapi
+langsmith
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+shortuuid
+transformers
