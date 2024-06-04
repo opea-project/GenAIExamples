@@ -75,6 +75,15 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Qwen/Qwen2-7B">Qwen2-7B</a></td>
+			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
+			<td><a href="https://redis.io/">Redis</a></td>
+			<td><a href=<a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
+			<td>Xeon/Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
 	</tbody>
 </table>
 
