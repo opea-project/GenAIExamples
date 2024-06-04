@@ -42,7 +42,7 @@ docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build
 Build the frontend Docker image via the command below:
 
 ```bash
-cd GenAIExamples/CodeGen/ui/
+cd GenAIExamples/CodeGen/docker/ui/
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -74,7 +74,7 @@ Note: Please replace the `host_ip` with you external IP address, do not use `loc
 ### Start the Docker Containers for All Services
 
 ```bash
-cd GenAIExamples/CodeGen/docker-composer/xeon
+cd GenAIExamples/CodeGen/docker/xeon
 docker compose -f docker_compose.yaml up -d
 ```
 
