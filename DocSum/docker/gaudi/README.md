@@ -131,3 +131,7 @@ Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 ![project-screenshot](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/93b1ed4b-4b76-4875-927e-cc7818b4825b)
 
 
+Here is an example for summarizing a article.  
+
+![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/67ecb2ec-408d-4e81-b124-6ded6b833f55)
+
