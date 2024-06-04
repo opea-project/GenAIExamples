@@ -108,6 +108,30 @@ The initially supported `Microservices` are described in the below table. More `
 			<td>Xeon</td>
 			<td>LLM on Xeon CPU</td>
 		</tr>
+		<tr>
+			<td><a href="./comps/llms/README.md">LLM</a></td>
+            <td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
+			<td><a href="https://github.com/vllm-project/vllm/">vLLM</a></td>
+			<td>Xeon</td>
+			<td>LLM on Xeon CPU</td>
+		</tr>
+		<tr>
+			<td><a href="./comps/llms/README.md">LLM</a></td>
+            <td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
+			<td><a href="https://github.com/ray-project/ray">Ray Serve</a></td>
+			<td>Gaudi2</td>
+			<td>LLM on Gaudi2</td>
+		</tr>
+		<tr>
+			<td><a href="./comps/llms/README.md">LLM</a></td>
+            <td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
+			<td><a href="https://github.com/ray-project/ray">Ray Serve</a></td>
+			<td>Xeon</td>
+			<td>LLM on Xeon CPU</td>
+		</tr>
 	</tbody>
 </table>
 
