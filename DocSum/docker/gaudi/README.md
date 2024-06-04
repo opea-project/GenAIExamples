@@ -128,4 +128,6 @@ export LANGCHAIN_API_KEY=ls_...
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
-![project-screenshot](https://i.imgur.com/26zMnEr.png)
+![project-screenshot](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/93b1ed4b-4b76-4875-927e-cc7818b4825b)
+
+
