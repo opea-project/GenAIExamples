@@ -156,7 +156,7 @@ cd ../../
 ```
 
 > [!NOTE]
-> If you modified any files and wanted that change to be introduced in this step, add `--build` to the end of the command to build the container image instead of pulling it from dockerhub.
+> If you have modified any files and want that change to be introduced in this step, add `--build` to the end of the command to build the container image instead of pulling it from dockerhub.
 
 ## Ingest data into Redis (Optional)
 
