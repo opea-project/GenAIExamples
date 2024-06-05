@@ -16,12 +16,12 @@ function init_chatqna() {
     # replace the repository "image: opea/*" with "image: $IMAGE_REPO/opea/"
     find . -name '*.yaml' -type f -exec sed -i "s#image: opea/*#image: $IMAGE_REPO/opea/#g" {} \;
     # set huggingface token
-    find . -name '*.yaml' -type f -exec sed -i "s#insert-your-huggingface-token-here#$(cat /home/$USER_ID/.cache/huggingface/token)#g" {} \;
+    find . -name '*.yaml' -type f -exec sed -i "s#\${HUGGINGFACEHUB_API_TOKEN}#$(cat /home/$USER_ID/.cache/huggingface/token)#g" {} \;
 }
 
 function install_chatqna {
     # replace namespace "default" with real namespace
-    find . -name '*.yaml' -type f -exec sed -i "s#svc.default#svc.$NAMESPACE#g" {} \;
+    find . -name '*.yaml' -type f -exec sed -i "s#default.svc#$NAMESPACE.svc#g" {} \;
     # for very yaml file in yaml_files, apply it to the k8s cluster
     yaml_files=("qna_configmap_xeon" "redis-vector-db"  "tei_embedding_service" "tei_reranking_service" "tgi_service" "retriever" "embedding" "reranking" "llm")
     for yaml_file in ${yaml_files[@]}; do
@@ -43,28 +43,28 @@ function validate_chatqna() {
     -H 'Content-Type: application/json'; do sleep 10; done
 
     # check megaservice works
+    # generate a random logfile name to avoid conflict among multiple runners
+    LOGFILE=$LOG_PATH/curlmega_$NAMESPACE.log
     curl http://chaqna-xeon-backend-server-svc.$NAMESPACE:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "messages": "What is the revenue of Nike in 2023?"}' > ${LOG_PATH}/curl_megaservice.log
+        "messages": "What is the revenue of Nike in 2023?"}' > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-        echo "Megaservice failed, please check the logs in ${LOG_PATH}!"
+        echo "Megaservice failed, please check the logs in $LOGFILE!"
         exit 1
     fi
-    echo "Response check succeed!"
 
-    # Temporarily disable response check
-    # echo "Checking response results, make sure the output is reasonable. "
-    # local status=false
-    # if [[ -f $LOG_PATH/curl_megaservice.log ]] &&
-    #     [[ $(grep -c "algorithms" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
-    #     status=true
-    # fi
-    # if [ $status == false ]; then
-    #     echo "Response check failed, please check the logs in artifacts!"
-    #     exit 1
-    # else
-    #     echo "Response check succeed!"
-    # fi
+    echo "Checking response results, make sure the output is reasonable. "
+    local status=false
+    if [[ -f $LOGFILE ]] &&
+        [[ $(grep -c "billion" $LOGFILE) != 0 ]]; then
+        status=true
+    fi
+    if [ $status == false ]; then
+        echo "Response check failed, please check the logs in artifacts!"
+        exit 1
+    else
+        echo "Response check succeed!"
+    fi
 }
 
 if [ $# -eq 0 ]; then
