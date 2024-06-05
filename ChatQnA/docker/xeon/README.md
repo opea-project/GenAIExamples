@@ -111,7 +111,7 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/ChatQnA/ui/
+cd GenAIExamples/ChatQnA/docker/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -175,7 +175,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ChatQnA/docker-composer/xeon/
+cd GenAIExamples/ChatQnA/docker/xeon
 docker compose -f docker_compose.yaml up -d
 ```
 
