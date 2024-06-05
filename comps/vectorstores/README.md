@@ -9,3 +9,7 @@ For details, please refer to this [readme](langchain/redis/README.md)
 # Vectorstores Microservice with Qdrant
 
 For details, please refer to this [readme](langchain/qdrant/README.md)
+
+# Vectorstores Microservice with PGVector
+
+For details, please refer to this [readme](langchain/pgvector/README.md)
