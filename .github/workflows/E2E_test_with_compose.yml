@@ -39,8 +39,8 @@ jobs:
         run: |
           set -xe
           merged_commit=$(git log -1 --format='%H')
-          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} | \
-          grep -vE '.github|README.md|*.txt|deprecate|kubernetes|manifest')
+          changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} | \
+          grep -vE '.github|README.md|*.txt|deprecate|kubernetes|manifest')" || true
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
           for example in ${examples}; do

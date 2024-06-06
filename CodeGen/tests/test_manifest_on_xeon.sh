@@ -28,15 +28,22 @@ function validate_codegen() {
     ip_address=$(kubectl get svc $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.spec.clusterIP}')
     port=$(kubectl get svc $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.spec.ports[0].port}')
     echo "try to curl http://${ip_address}:${port}/v1/codegen..."
+
+    # generate a random logfile name to avoid conflict among multiple runners
+    LOGFILE=$LOG_PATH/curlmega_$NAMESPACE.log
     # Curl the Mega Service
-    curl http://${ip_address}:${port}/v1/codegen -H "Content-Type: application/json" -d '{
-        "model": "ise-uiuc/Magicoder-S-DS-6.7B",
-        "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}' > curl_megaservice.log
+    curl http://${ip_address}:${port}/v1/codegen -H "Content-Type: application/json" \
+    -d '{"messages": "def print_hello_world():"}' > $LOGFILE
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Megaservice codegen failed, please check the logs in $LOGFILE!"
+        exit 1
+    fi
 
     echo "Checking response results, make sure the output is reasonable. "
-    local status=true
-    if [[ -f curl_megaservice.log ]] && \
-    [[ $(grep -c "billion" curl_megaservice.log) != 0 ]]; then
+    local status=false
+    if [[ -f $LOGFILE ]] && \
+    [[ $(grep -c "print" $LOGFILE) != 0 ]]; then
         status=true
     fi
 

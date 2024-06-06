@@ -36,7 +36,7 @@ jobs:
         run: |
           set -xe
           changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | \
-          grep "/kubernetes/manifests/" | \
+          grep -E "/kubernetes/manifests/|test_manifest" | \
           grep -vE '.github|deprecated|docker')" || true
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
@@ -50,7 +50,7 @@ jobs:
                       continue # skip gaudi for K8s test temporarily
                   else
                       #lower_example=$(echo "${example}" | tr '[:upper:]' '[:lower:]')
-                      run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"inspur-icx-1\"},"
+                      run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"k8s\"},"
                   fi
               done
           done
