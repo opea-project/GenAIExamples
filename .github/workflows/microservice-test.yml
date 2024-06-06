@@ -11,7 +11,7 @@ on:
       - comps/**
       - "!**.md"
       - "!**.txt"
-      - .github/workflows/microservice.yml
+      - .github/workflows/microservice-test.yml
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
@@ -34,8 +34,9 @@ jobs:
         id: get-test-matrix
         run: |
           set -xe
-          changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} \
-          | grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} \
+          | grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')" || true
           services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u)
           run_matrix="{\"include\":["
           for service in ${services}; do

@@ -26,7 +26,7 @@ function start_service() {
 
     # check whether tgi is fully ready
     n=0
-    until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs test-comps-llm-tgi-endpoint > test-comps-llm-tgi-endpoint.log
         n=$((n+1))
         if grep -q Connected test-comps-llm-tgi-endpoint.log; then
@@ -34,7 +34,6 @@ function start_service() {
         fi
         sleep 5s
     done
-    # rm -f test-comps-llm-tgi-endpoint.log
     sleep 5s
 }
 
