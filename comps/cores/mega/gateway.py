@@ -127,7 +127,7 @@ class ChatQnAGateway(Gateway):
                 and self.megaservice.services[node].service_type == ServiceType.LLM
             ):
                 return response
-        last_node = self.megaservice.get_all_final_outputs()[-1]
+        last_node = self.megaservice.all_leaves()[-1]
         response = result_dict[last_node]["text"]
         choices = []
         usage = UsageInfo()
@@ -169,7 +169,7 @@ class CodeGenGateway(Gateway):
                 and self.megaservice.services[node].service_type == ServiceType.LLM
             ):
                 return response
-        last_node = self.megaservice.get_all_final_outputs()[-1]
+        last_node = self.megaservice.all_leaves()[-1]
         response = result_dict[last_node]["text"]
         choices = []
         usage = UsageInfo()
@@ -216,7 +216,7 @@ class CodeTransGateway(Gateway):
                 and self.megaservice.services[node].service_type == ServiceType.LLM
             ):
                 return response
-        last_node = self.megaservice.get_all_final_outputs()[-1]
+        last_node = self.megaservice.all_leaves()[-1]
         response = result_dict[last_node]["text"]
         choices = []
         usage = UsageInfo()
@@ -258,7 +258,7 @@ class DocSumGateway(Gateway):
                 and self.megaservice.services[node].service_type == ServiceType.LLM
             ):
                 return response
-        last_node = self.megaservice.get_all_final_outputs()[-1]
+        last_node = self.megaservice.all_leaves()[-1]
         response = result_dict[last_node]["text"]
         choices = []
         usage = UsageInfo()
