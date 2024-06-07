@@ -14,9 +14,10 @@ services:
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    command: cd / && export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --model $LLM_MODEL_ID --port 80
+    command: /bin/sh -c "cd / && export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --host 0.0.0.0 --model $LLM_MODEL_ID --port 80"
   llm:
     image: opea/gen-ai-comps:llm-vllm-server
     container_name: llm-vllm-server
@@ -26,6 +27,7 @@ services:
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
       vLLM_LLM_ENDPOINT: ${vLLM_LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
