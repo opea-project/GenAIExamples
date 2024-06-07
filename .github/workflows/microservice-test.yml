@@ -38,10 +38,26 @@ jobs:
           changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} \
           | grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')" || true
           services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u)
+          path_level_1=("asr" "tts")
+          path_level_3=("llms")
           run_matrix="{\"include\":["
           for service in ${services}; do
               hardware="gaudi" # default hardware, set based on the changed files
-              run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
+              if [[ "${path_level_1[@]}" =~ "${service}" ]]; then
+                  run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
+              else
+                  vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | cut -d'/' -f3 | grep -vE '*.py' | sort -u)
+                  for vendor in ${vendors}; do
+                      if [[ "${path_level_3[@]}" =~ "${service}" ]]; then
+                          sub_vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | grep ${vendor} | cut -d'/' -f4 | grep -vE '*.py' | sort -u)
+                          for sub_vendor in ${sub_vendors}; do
+                              run_matrix="${run_matrix}{\"service\":\"${service}_${vendor}_${sub_vendor}\",\"hardware\":\"${hardware}\"},"
+                          done
+                      else
+                          run_matrix="${run_matrix}{\"service\":\"${service}_${vendor}\",\"hardware\":\"${hardware}\"},"
+                      fi
+                  done
+              fi
           done
           run_matrix=$run_matrix"]}"
           echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
