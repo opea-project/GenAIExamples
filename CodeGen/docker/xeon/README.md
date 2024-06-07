@@ -74,7 +74,7 @@ Note: Please replace the `host_ip` with you external IP address, do not use `loc
 ### Start the Docker Containers for All Services
 
 ```bash
-cd GenAIExamples/CodeGen/docker-composer/xeon
+cd GenAIExamples/CodeGen/docker/xeon
 docker compose -f docker_compose.yaml up -d
 ```
 
