@@ -8,7 +8,6 @@ The architecture for document summarization will be illustrated/described below:
 
 ![Architecture](./assets/img/docsum_architecture.png)
 
-
 ![Workflow](./assets/img/docsum_workflow.png)
 
 # Deploy Document Summarization Service
