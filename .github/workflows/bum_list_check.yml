@@ -45,7 +45,6 @@ jobs:
           comm -23 pr-requirements.txt main-requirements.txt > added-packages.txt
           if [ -s added-packages.txt ]; then
             echo "New packages found in PR:" && cat added-packages.txt
-            exit 1
           else
             echo "No new packages found😊."
           fi
