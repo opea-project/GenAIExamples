@@ -150,7 +150,13 @@ export host_ip="External_Public_IP"
 export your_hf_api_token="Your_Huggingface_API_Token"
 ```
 
+**Append the value of the public IP address to the no_proxy list**
+```
+export your_no_proxy=${your_no_proxy},"External_Public_IP"
+```
+
 ```bash
+export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
