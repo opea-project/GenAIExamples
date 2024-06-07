@@ -130,7 +130,7 @@ To access the frontend, open the following URL in your browser: `http://{host_ip
       - "80:5173"
 ```
 
-![project-screenshot](https://imgur.com/d1SmaRb.png)
+![project-screenshot](../../assets/img/codeGen_ui_init.jpg)
 
 ## Install Copilot VSCode extension from Plugin Marketplace as the frontend
 
@@ -138,7 +138,7 @@ In addition to the Svelte UI, users can also install the Copilot VSCode extensio
 
 Install `Neural Copilot` in VSCode as below.
 
-![Install-screenshot](https://i.imgur.com/cnHRAdD.png)
+![Install-screenshot](../../assets/img/codegen_copilot.png)
 
 ### How to Use
 
@@ -146,46 +146,46 @@ Install `Neural Copilot` in VSCode as below.
 
 Please adjust the service URL in the extension settings based on the endpoint of the CodeGen backend service.
 
-![Setting-screenshot](https://i.imgur.com/4hjvKPu.png)
-![Setting-screenshot](https://i.imgur.com/AQZuzqd.png)
+![Setting-screenshot](../../assets/img/codegen_settings.png)
+![Setting-screenshot](../../assets/img/codegen_endpoint.png)
 
 #### Customize
 
 The Copilot enables users to input their corresponding sensitive information and tokens in the user settings according to their own needs. This customization enhances the accuracy and output content to better meet individual requirements.
 
-![Customize](https://i.imgur.com/PkObak9.png)
+![Customize](../../assets/img/codegen_customize.png)
 
 #### Code Suggestion
 
 To trigger inline completion, you'll need to type `# {your keyword} (start with your programming language's comment keyword, like // in C++ and # in python)`. Make sure the `Inline Suggest` is enabled from the VS Code Settings.
 For example:
 
-![code suggestion](https://i.imgur.com/sH5UoTO.png)
+![code suggestion](../../assets/img/codegen_suggestion.png)
 
 To provide programmers with a smooth experience, the Copilot supports multiple ways to trigger inline code suggestions. If you are interested in the details, they are summarized as follows:
 
 - Generate code from single-line comments: The simplest way introduced before.
 - Generate code from consecutive single-line comments:
 
-![codegen from single-line comments](https://i.imgur.com/GZsQywX.png)
+![codegen from single-line comments](../../assets/img/codegen_single_line.png)
 
 - Generate code from multi-line comments, which will not be triggered until there is at least one `space` outside the multi-line comment):
 
-![codegen from multi-line comments](https://i.imgur.com/PzhiWrG.png)
+![codegen from multi-line comments](../../assets/img/codegen_multi_line.png)
 
 - Automatically complete multi-line comments:
 
-![auto complete](https://i.imgur.com/cJO3PQ0.jpg)
+![auto complete](../../assets/img/codegen_auto_complete.jpg)
 
 ### Chat with AI assistant
 
 You can start a conversation with the AI programming assistant by clicking on the robot icon in the plugin bar on the left:
 
-![icon](https://i.imgur.com/f7rzfCQ.png)
+![icon](../../assets/img/codegen_icon.png)
 
 Then you can see the conversation window on the left, where you can chat with the AI assistant:
 
-![dialog](https://i.imgur.com/aiYzU60.png)
+![dialog](../../assets/img/codegen_dialog.png)
 
 There are 4 areas worth noting as shown in the screenshot above:
 
@@ -199,8 +199,8 @@ For example:
 
 - Select code
 
-![select code](https://i.imgur.com/grvrtY6.png)
+![select code](../../assets/img/codegen_select_code.png)
 
 - Ask question and get answer
 
-![qna](https://i.imgur.com/8Kdpld7.png)
+![qna](../../assets/img/codegen_qna.png)
