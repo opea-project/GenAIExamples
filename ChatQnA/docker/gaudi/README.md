@@ -51,6 +51,7 @@ Since a TEI Gaudi Docker image hasn't been published, we'll need to build it fro
 git clone https://github.com/huggingface/tei-gaudi
 cd tei-gaudi/
 docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+cd ../..
 ```
 
 ### 8. Build MegaService Docker Image
@@ -61,6 +62,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/docker
 docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd ../../..
 ```
 
 ### 9. Build UI Docker Image
@@ -68,8 +70,9 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/ChatQnA/ui/
+cd GenAIExamples/ChatQnA/docker/ui/
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd ../../../..
 ```
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
@@ -115,7 +118,7 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 ### Start all the services Docker Containers
 
 ```bash
-cd GenAIExamples/ChatQnA/docker-composer/gaudi/
+cd GenAIExamples/ChatQnA/docker/gaudi/
 docker compose -f docker_compose.yaml up -d
 ```
 
