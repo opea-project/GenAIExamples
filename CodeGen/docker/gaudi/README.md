@@ -67,7 +67,7 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7778/v1/codegen"
 ### Start the Docker Containers for All Services
 
 ```bash
-cd GenAIExamples/CodeGen/docker-composer/gaudi
+cd GenAIExamples/CodeGen/docker/gaudi
 docker compose -f docker_compose.yaml up -d
 ```
 

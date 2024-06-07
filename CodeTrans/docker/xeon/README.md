@@ -38,7 +38,7 @@ docker build -t opea/codetrans:latest --build-arg https_proxy=$https_proxy --bui
 ### 4. Build UI Docker Image
 
 ```bash
-cd GenAIExamples/CodeTrans/ui
+cd GenAIExamples/CodeTrans/docker/ui
 docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -68,7 +68,7 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7777/v1/codetrans"
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/CodeTrans/docker-composer/xeon
+cd GenAIExamples/CodeTrans/docker/xeon
 docker compose -f docker_compose.yaml up -d
 ```
 
