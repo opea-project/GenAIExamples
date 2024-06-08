@@ -49,8 +49,6 @@ def get_unsafe_dict(model_id="meta-llama/LlamaGuard-7b"):
 )
 @traceable(run_type="llm")
 def safety_guard(input: TextDoc) -> TextDoc:
-    # chat engine for server-side prompt templating
-    llm_engine_hf = ChatHuggingFace(llm=llm_guard)
     response_input_guard = llm_engine_hf.invoke([{"role": "user", "content": input.text}]).content
     if "unsafe" in response_input_guard:
         unsafe_dict = get_unsafe_dict(llm_engine_hf.model_id)
@@ -75,5 +73,7 @@ if __name__ == "__main__":
         temperature=0.01,
         repetition_penalty=1.03,
     )
+    # chat engine for server-side prompt templating
+    llm_engine_hf = ChatHuggingFace(llm=llm_guard)
     print("guardrails - router] LLM initialized.")
     opea_microservices["opea_service@guardrails_tgi_gaudi"].start()

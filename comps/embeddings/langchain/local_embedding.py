@@ -17,11 +17,11 @@ from comps import EmbedDoc1024, ServiceType, TextDoc, opea_microservices, opea_t
 )
 @opea_telemetry
 def embedding(input: TextDoc) -> EmbedDoc1024:
-    embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-large-en-v1.5")
     embed_vector = embeddings.embed_query(input.text)
     res = EmbedDoc1024(text=input.text, embedding=embed_vector)
     return res
 
 
 if __name__ == "__main__":
+    embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-large-en-v1.5")
     opea_microservices["opea_service@local_embedding"].start()
