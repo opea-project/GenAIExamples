@@ -79,3 +79,17 @@ class LLMParams(BaseDoc):
     temperature: float = 0.01
     repetition_penalty: float = 1.03
     streaming: bool = True
+
+
+class RAGASParams(BaseDoc):
+    questions: DocList[TextDoc]
+    answers: DocList[TextDoc]
+    docs: DocList[TextDoc]
+    ground_truths: DocList[TextDoc]
+
+
+class RAGASScores(BaseDoc):
+    answer_relevancy: float
+    faithfulness: float
+    context_recallL: float
+    context_precision: float

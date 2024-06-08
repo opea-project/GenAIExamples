@@ -14,6 +14,8 @@ from comps.cores.proto.docarray import (
     LLMParamsDoc,
     SearchedDoc,
     TextDoc,
+    RAGASParams,
+    RAGASScores,
 )
 
 # Constants
