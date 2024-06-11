@@ -8,6 +8,11 @@ generate_frames: True
 embeddings:
   type: 'video' # ['video', 'frame']
   path: 'video_ingest/embeddings'
+# VL-branch config
+vl_branch:
+  cfg_path: embedding/video_llama_config/video_llama_eval_only_vl.yaml
+  gpu_id: 0
+  model_type: 'llama_v2'
 # Path to store extracted frames
 image_output_dir: video_ingest/frames/
 # Path to store metadata files

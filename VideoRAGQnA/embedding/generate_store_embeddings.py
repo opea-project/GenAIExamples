@@ -217,15 +217,15 @@ def store_into_vectordb(vs, metadata_file_path, embedding_model, config):
                 metadatas=metadata_list
             )
         elif config['embeddings']['type'] == 'video':
-            model_device = next(embedding_model.parameters()).device
-            videos_tensor, policy_images_tensor = load_video_for_adaclip(os.path.join(config['videos'],video), num_frm=64, no_policy=False, policy_backbone='mobilenet', max_img_size=224)
-            embedding_list.extend(embedding_model.get_video_embeddings(videos_tensor.unsqueeze(0).to(model_device), policy_images_tensor.unsqueeze(0).to(model_device))) #.to(torch.float16))
-            vs.add_videos(
-                uris=[os.path.join(config['videos'],video)],
-                metadatas=[read_json(os.path.join(config['meta_output_dir'],'metadata.json'))]
+            data['video'] = video
+            image_name_list = [data["video_path"]]
+            metadata_list = [data]
+            vs.video_db.add_videos(
+                paths=image_name_list,
+                metadatas=metadata_list
             )
         print (f'✅ {_+1}/{total_videos} video {video}, len {len(image_name_list)}, {len(metadata_list)}, {len(embedding_list)}')
-    
+
 def generate_embeddings(config, embedding_model, vs):
     if not os.path.exists(config['image_output_dir']):
         print ('Processing all videos, Generated frames will be stored at')
@@ -233,23 +233,22 @@ def generate_embeddings(config, embedding_model, vs):
         print (f'frames output folder = {config["image_output_dir"]}')
         print (f'metadata files output folder = {config["meta_output_dir"]}')
         process_all_videos(config)
-    global_metadata_file_path = config["meta_output_dir"] + 'metadata.json'
+    global_metadata_file_path = os.path.join(config["meta_output_dir"], 'metadata.json')
     print(f'global metadata file available at {global_metadata_file_path}')
     store_into_vectordb(vs, global_metadata_file_path, embedding_model, config)
 
-    
-def retrieval_testing():
+def retrieval_testing(vs):
     Q = 'man holding red basket'
     print (f'Testing Query {Q}')
     results = vs.MultiModalRetrieval(Q)
-    
-    ##print (results)
-    
+
+    print(results)
+
 def main():
     # read config yaml
     print ('Reading config file')
     # config = reader.read_config('../docs/config.yaml')
-    
+
     # Create argument parser
     parser = argparse.ArgumentParser(description='Process configuration file for generating and storing embeddings.')
     parser.add_argument('config_file', type=str, help='Path to configuration file (e.g., config.yaml)')
@@ -264,7 +263,7 @@ def main():
     adaclip_cfg_json["resume"] = config['adaclip_model_path']
     adaclip_cfg = argparse.Namespace(**adaclip_cfg_json)
 
-    
+
     print ('Config file data \n', yaml.dump(config, default_flow_style=False, sort_keys=False))
 
     generate_frames = config['generate_frames']
@@ -274,15 +273,15 @@ def main():
     meta_output_dir = config['meta_output_dir']
     N = config['number_of_frames_per_second']
     emb_path = config['embeddings']['path']
-    
+
     host = VECTORDB_SERVICE_HOST_IP
     port = int(config['vector_db']['port'])
     selected_db = config['vector_db']['choice_of_db']
-    
+
     # Creating DB
     print ('Creating DB with text and image embedding support, \nIt may take few minutes to download and load all required models if you are running for first time.')
     print('Connect to {} at {}:{}'.format(selected_db, host, port))
-    
+
     if config['embeddings']['type'] == 'frame':
         vs = db.VS(host, port, selected_db)
         # EMBEDDING MODEL
@@ -296,7 +295,7 @@ def main():
         print(f"ERROR: Selected embedding type in config.yaml {config['embeddings']['type']} is not in [\'video\', \'frame\']")
         return
     generate_embeddings(config, model, vs)
-    retrieval_testing()
+    retrieval_testing(vs)
 
 if __name__ == '__main__':
     main()

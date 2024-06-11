@@ -6,7 +6,7 @@ import torch
 
 import torch
 import streamlit as st
-from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
+from transformers import AutoTokenizer, LlamaTokenizer, AutoModelForCausalLM, TextIteratorStreamer
 from transformers import set_seed
 
 from typing import Any, List, Mapping, Optional
@@ -17,6 +17,21 @@ from utils import config_reader as reader
 from utils import prompt_handler as ph
 # from vector_stores import db
 HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN", "")
+from embedding.extract_vl_embedding import VLEmbeddingExtractor as VL
+from embedding.video_llama.common.config import Config
+from embedding.video_llama.common.dist_utils import get_rank
+from embedding.video_llama.common.registry import registry
+from embedding.video_llama.conversation.conversation_video import Chat, Conversation, default_conversation,SeparatorStyle,conv_llava_llama_2
+import decord
+decord.bridge.set_bridge('torch')
+
+#%%
+# imports modules for registration
+from embedding.video_llama.datasets.builders import *
+from embedding.video_llama.models import *
+from embedding.video_llama.processors import *
+from embedding.video_llama.runners import *
+from embedding.video_llama.tasks import *
 
 set_seed(22)
 
@@ -51,17 +66,78 @@ st.markdown(title_alignment, unsafe_allow_html=True)
 @st.cache_resource       
 def load_models():
     #print("HF Token: ", HUGGINGFACEHUB_API_TOKEN)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_path, torch_dtype=torch.float32, device_map='auto', trust_remote_code=True, token=HUGGINGFACEHUB_API_TOKEN
-    )
+    #model = AutoModelForCausalLM.from_pretrained(
+    #    model_path, torch_dtype=torch.float32, device_map='auto', trust_remote_code=True, token=HUGGINGFACEHUB_API_TOKEN
+    #)
+
+    #tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True, token=HUGGINGFACEHUB_API_TOKEN)
+    #tokenizer.padding_size = 'right'
+
+    # Load video-llama model
+    video_llama = VL(**config['vl_branch'])
+    tokenizer = video_llama.model.llama_tokenizer
     
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True, token=HUGGINGFACEHUB_API_TOKEN)
-    tokenizer.padding_size = 'right'
     streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
     
-    return model, tokenizer, streamer
+    return video_llama, tokenizer, streamer
 
-model, tokenizer, streamer = load_models()
+video_llama, tokenizer, streamer = load_models()
+vis_processor_cfg = video_llama.cfg.datasets_cfg.webvid.vis_processor.train
+vis_processor = registry.get_processor_class(vis_processor_cfg.name).from_config(vis_processor_cfg)
+
+chat = Chat(video_llama.model, vis_processor, device='cuda:{}'.format(config['vl_branch']['gpu_id']))
+
+def chat_reset(chat_state, img_list):
+    if chat_state is not None:
+        chat_state.messages = []
+    if img_list is not None:
+        img_list = []
+    return chat_state, img_list
+
+#img_list = []
+#chat_state = conv_llava_llama_2.copy()
+#chat.upload_video_without_audio(video_path, chat_state, img_list)
+#_, chat_state = chat.ask(text_input, chat_state)
+#answer, chat_state, img_list = chat.answer(chat_state, img_list, max_new_tokens=300, num_beams=1, min_length=1, top_p=0.9, repetition_penalty=1.0, length_penalty=1, temperature=0.1, max_length=2000, keep_conv_hist=True)
+#chat_state, img_list = chat_reset(chat_state, img_list)
+
+class VideoLLM(LLM):
+        
+    @torch.inference_mode()
+    def _call(
+            self, 
+            video_path,
+            text_input,
+            chat,
+            #chat_state,
+            #img_list,
+            streamer = None,  # Add streamer as an argument
+        ):
+        
+        print(" - - ")
+        print("  text_input:", text_input)
+        print(" - - ")
+        
+        chat.upload_video_without_audio(video_path)#, chat_state, img_list)
+        chat.ask(text_input)#, chat_state)
+        #answer = chat.answer(chat_state, img_list, max_new_tokens=300, num_beams=1, min_length=1, top_p=0.9, repetition_penalty=1.0, length_penalty=1, temperature=0.1, max_length=2000, keep_conv_hist=True, streamer=streamer)
+        answer = chat.answer(max_new_tokens=300, num_beams=1, min_length=1, top_p=0.9, repetition_penalty=1.0, length_penalty=1, temperature=0.1, max_length=2000, keep_conv_hist=True, streamer=streamer)
+
+    def stream_res(self, video_path, text_input, chat):
+        #thread = threading.Thread(target=self._call, args=(video_path, text_input, chat, chat_state, img_list, streamer))  # Pass streamer to _call
+        thread = threading.Thread(target=self._call, args=(video_path, "<rag_prompt>"+text_input, chat, streamer))  # Pass streamer to _call
+        thread.start()
+        
+        for text in streamer:
+            yield text
+
+    @property
+    def _identifying_params(self) -> Mapping[str, Any]:
+        return model_path # {"name_of_model": model_path}
+
+    @property
+    def _llm_type(self) -> str:
+        return "custom"
 
 class CustomLLM(LLM):
         
@@ -142,7 +218,8 @@ def play_video(x):
 if 'llm' not in st.session_state.keys():
     with st.spinner('Loading Models . . .'):
         time.sleep(1)
-        st.session_state['llm'] = CustomLLM()
+        #st.session_state['llm'] = CustomLLM()
+        st.session_state['llm'] = VideoLLM()
         
 if 'vs' not in st.session_state.keys():
     with st.spinner('Preparing RAG pipeline'):
@@ -162,6 +239,7 @@ if "messages" not in st.session_state.keys():
 def clear_chat_history():
     st.session_state.example_video = 'Enter Text'
     st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+    chat.clear()
         
 def RAG(prompt):
     
@@ -221,19 +299,23 @@ def handle_message():
             else:
                 with col2:
                     play_video(video_name)
-                
+                """
                 scene_des = get_description(video_name)
                 formatted_prompt = ph.get_formatted_prompt(scene=scene_des, prompt=prompt)
+                """
                 
                 full_response = ''
                 full_response = f"Most relevant retrived video is **{video_name}** \n\n"
                 
-                for new_text in st.session_state.llm.stream_res(formatted_prompt):
+                #for new_text in st.session_state.llm.stream_res(formatted_prompt):
+                for new_text in st.session_state.llm.stream_res(os.path.join(video_dir,video_name), prompt, chat):
                     full_response += new_text
                     placeholder.markdown(full_response)
-                
+
                 end = time.time()
-                full_response += f'\n\n🚀 Generated in {end - start} seconds.'
+                full_response += f'\n\n🚀 Generated in {(end - start):.4f} seconds.'
+                #chat_state, img_list = chat_reset(chat_state, img_list)
+                #chat.clear()
                 placeholder.markdown(full_response)
         message = {"role": "assistant", "content": full_response}
         st.session_state.messages.append(message)

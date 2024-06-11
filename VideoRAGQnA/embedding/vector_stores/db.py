@@ -17,6 +17,13 @@ from embedding.adaclip_datasets.preprocess import get_transforms
 from einops import rearrange
 from PIL import Image
 import torch
+import uuid
+
+# 'similarity', 'similarity_score_threshold' (needs threshold), 'mmr'
+chosen_video_search_type = "similarity"
+
+#'mobilenet_v3_large', 'mobilenet'
+backbone = 'mobilenet_v3_large'
 
 class AdaCLIPEmbeddings(BaseModel, Embeddings):
     """AdaCLIP Embeddings model."""
@@ -78,17 +85,20 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
         return self.embed_documents([text])[0]
 
 
-    def embed_video(self, uris: List[str]) -> List[List[float]]:
+    def embed_video(self, paths: List[str]) -> List[List[float]]:
         # Open images directly as PIL images
 
         video_features = []
-        for vid_path in uris:
-            # Preprocess the video for the model
-            videos_tensor, policy_images_tensor = load_video_for_adaclip(vid_path, num_frm=64, no_policy=False, policy_backbone='mobilenet_v3_large', max_img_size=224)
+        for vid_path in paths:
             # Encode the video to get the embeddings
-            model_device = next(embedding_model.parameters()).device
+            model_device = next(self.model.parameters()).device
+            # Preprocess the video for the model
+            videos_tensor, policy_images_tensor = self.load_video_for_adaclip(vid_path, num_frm=64,
+                                                                              no_policy=False,
+                                                                              policy_backbone=backbone,
+                                                                              max_img_size=224)
             embeddings_tensor = self.model.get_video_embeddings(videos_tensor.unsqueeze(0).to(model_device), policy_images_tensor.unsqueeze(0).to(model_device))
-            
+
             # Convert tensor to list and add to the video_features list
             embeddings_list = embeddings_tensor.squeeze(0).tolist()
 
@@ -106,7 +116,7 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
 
         clip_images = []
         policy_images = []
-        
+
         # Extract frames as numpy array
         img_array = vr.get_batch(frame_idx).asnumpy() # img_array = [T,H,W,C]
         clip_imgs = [Image.fromarray(img_array[j]) for j in range(img_array.shape[0])]
@@ -117,7 +127,7 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
             clip_images.append(get_transforms("clip", max_img_size)(im)) # 3, 224, 224
             if not no_policy:
                 policy_images.append(get_transforms(policy_backbone, 256)(im))
-        
+
         clip_images_tensor = torch.zeros((num_frm,) + clip_images[0].shape)
         clip_images_tensor[:num_frm] = torch.stack(clip_images)
         if policy_images is not None:
@@ -131,12 +141,12 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
 
 
 class VS:
-    
+
     def __init__(self, host, port, selected_db):
         self.host = host
         self.port = port
         self.selected_db = selected_db
-        
+
         # initializing important variables
         self.client = None
         self.image_db = None
@@ -144,17 +154,17 @@ class VS:
         self.image_collection = 'image-test'
         self.text_retriever = None
         self.image_retriever = None
-        
+
         # initialize_db
         self.get_db_client()
         self.init_db()
-        
+
     def get_db_client(self):
-        
+
         if self.selected_db == 'chroma':
             print ('Connecting to Chroma db server . . .')
             self.client = chromadb.HttpClient(host=self.host, port=self.port)
-        
+
         if self.selected_db == 'vdms':
             print ('Connecting to VDMS db server . . .')
             self.client = VDMS_Client(host=self.host, port=self.port)
@@ -183,9 +193,9 @@ class VS:
                 description="The search kwargs to use",
             )
         )
-        
-    
-    def update_db(self, prompt, n_images): 
+
+
+    def update_db(self, prompt, n_images):
         print ('Update DB')
 
         base_date = datetime.datetime.today()
@@ -202,7 +212,7 @@ class VS:
                 time_out = str(parsed_date.time())
                 hours, minutes, seconds = map(float, time_out.split(":"))
                 year, month, day_out = map(int, date_out.split("-"))
-            
+
             # print("today's date", base_date)
             rounded_seconds = min(round(parsed_date.second + 0.5),59)
             parsed_date = parsed_date.replace(second=rounded_seconds, microsecond=0)
@@ -213,30 +223,30 @@ class VS:
 
             if self.selected_db == 'vdms':
                 if date_string == 'today':
-                    constraints = {"date": [ "==", date_out]} 
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, "filter":constraints})          
+                    constraints = {"date": [ "==", date_out]}
+                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, "filter":constraints})
                 elif date_out != str(today_date) and time_out =='00:00:00': ## exact day (example last firday)
-                    constraints = {"date": [ "==", date_out]} 
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, "filter":constraints}) 
-               
+                    constraints = {"date": [ "==", date_out]}
+                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, "filter":constraints})
+
                 elif date_out == str(today_date) and time_out =='00:00:00': ## when search_date interprates words as dates output is todays date + time 00:00:00
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images})    
+                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images})
                 else: ## Interval  of time:last 48 hours, last 2 days,..
-                    constraints = {"date_time": [ ">=", {"_date":iso_date_time}]}                
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, "filter":constraints})    
+                    constraints = {"date_time": [ ">=", {"_date":iso_date_time}]}
+                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, "filter":constraints})
             if self.selected_db == 'chroma':
                 if date_string == 'today':
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, 'filter': {'date': {'$eq': date_out}}})               
+                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, 'filter': {'date': {'$eq': date_out}}})
                 elif date_out != str(today_date) and time_out =='00:00:00': ## exact day (example last firday)
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, 'filter': {'date': {'$eq': date_out}}})                
+                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, 'filter': {'date': {'$eq': date_out}}})
                 elif date_out == str(today_date) and time_out =='00:00:00': ## when search_date interprates words as dates output is todays date + time 00:00:00
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images})             
+                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images})
                 else: ## Interval  of time:last 48 hours, last 2 days,..
-                    constraints = {"date_time": [ ">=", {"_date":iso_date_time}]}                
+                    constraints = {"date_time": [ ">=", {"_date":iso_date_time}]}
                     self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'filter': {
                             "$or": [
                                 {
-                                    "$and": [ 
+                                    "$and": [
                                         {
                                             'date': {
                                                 '$eq': date_out
@@ -264,7 +274,7 @@ class VS:
                                                     ]
                                                 }
                                             ]
-                                                
+
                                         }
                                     ]
                                 },
@@ -291,25 +301,25 @@ class VS:
                                         }
                                     ]
                                 }
-                            ]   
+                            ]
                         },
-                        'k':n_images})     
+                        'k':n_images})
         else:
-            self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images}) 
-               
+            self.update_image_retriever = self.image_db.as_retriever(search_type=chosen_video_search_type, search_kwargs={'k':n_images})
+
     def length(self):
         if self.selected_db == 'chroma':
             images = self.image_db.__len__()
             return (texts, images)
-        
+
         if self.selected_db == 'vdms':
             pass
-        
+
         return (None, None)
-        
+
     def delete_collection(self, collection_name):
         self.client.delete_collection(collection_name=collection_name)
-        
+
     def add_images(
             self,
             uris: List[str],
@@ -324,14 +334,14 @@ class VS:
             query: str,
             n_images: Optional[int] = 3,
         ):
-        
+
         self.update_db(query, n_images)
         image_results = self.update_image_retriever.invoke(query)
 
         for r in image_results:
             print("images:", r.metadata['video'], '\t',r.metadata['date'], '\t',r.metadata['time'], '\n')
-            
-        return image_results 
+
+        return image_results
 
 
 class VideoVS(VS):
@@ -354,7 +364,7 @@ class VideoVS(VS):
                 engine="FaissFlat",
             )
 
-        self.video_retriever = self.video_db.as_retriever(search_type="mmr").configurable_fields(
+        self.video_retriever = self.video_db.as_retriever(search_type=chosen_video_search_type).configurable_fields(
             search_kwargs=ConfigurableField(
                 id="k_video_docs",
                 name="Search Kwargs",
@@ -362,17 +372,12 @@ class VideoVS(VS):
             )
         )
 
-    def add_videos(self, uris: List[str], metadatas: Optional[List[dict]] = None):
-        self.video_db.add_videos(uris, metadatas)
-
-    def get_video_embedding(self, video_path):
-        return self.video_embedder.get_video_embeddings(video_path)
-
+    
     def MultiModalRetrieval(self, query: str, n_videos: Optional[int] = 3):
         self.update_db(query, n_videos)
         video_results = self.video_retriever.invoke(query)
 
         for r in video_results:
-            print("videos:", r.metadata['video'], '\t', r.metadata['date'], '\t', r.metadata['time'], '\n')
+            print("videos:", r.metadata['video_path'], '\t', r.metadata['date'], '\t', r.metadata['time'], '\n')
 
         return video_results
