@@ -30,7 +30,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/gen-ai-comps:llm-tgi-server
+    image: opea/llm-tgi:latest
     container_name: llm-tgi-server
     depends_on:
       - tgi_service
@@ -42,9 +42,12 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
   translation-xeon-backend-server:
-    image: opea/gen-ai-comps:translation-megaservice-server
+    image: opea/translation:latest
     container_name: translation-xeon-backend-server
     depends_on:
       - tgi_service
@@ -55,10 +58,11 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
   translation-xeon-ui-server:
-    image: opea/gen-ai-comps:translation-ui-server
+    image: opea/translation-ui:latest
     container_name: translation-xeon-ui-server
     depends_on:
       - translation-xeon-backend-server

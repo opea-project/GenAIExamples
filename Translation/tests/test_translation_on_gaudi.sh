@@ -13,21 +13,22 @@ function build_docker_images() {
     cd $WORKPATH
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
+    docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 
-    docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
+    cd $WORKPATH/docker
+    docker build --no-cache -t opea/translation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
-    cd $WORKPATH/microservice/gaudi
-    docker build . -t tgi-gaudi-translation:1.2.1 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile
-    docker build --no-cache -t opea/gen-ai-comps:translation-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+    cd $WORKPATH/docker/gaudi
+    docker build . --no-cache -t tgi-gaudi-translation:1.2.1 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile
 
-    cd $WORKPATH/ui
-    docker build --no-cache -t opea/gen-ai-comps:translation-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+    cd $WORKPATH/docker/ui
+    docker build --no-cache -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
     docker images
 }
 
 function start_services() {
-    cd $WORKPATH/microservice/gaudi
+    cd $WORKPATH/docker/gaudi
 
     export LLM_MODEL_ID="haoranxu/ALMA-13B"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
@@ -128,7 +129,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/microservice/gaudi
+    cd $WORKPATH/docker/gaudi
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")

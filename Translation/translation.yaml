@@ -31,14 +31,14 @@ opea_micro_services:
     host: ${UI_SERVICE_HOST_IP}
     ports:
       - "5173:5173"
-    image: opea/docsum-ui:latest
+    image: opea/translation-ui:latest
     environment:
       - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
 
 opea_mega_service:
   host: ${MEGA_SERVICE_HOST_IP}
   ports: ${MEGA_SERVICE_PORT}
-  image: opea/docsum:latest
-  endpoint: /v1/docsum
+  image: opea/translation:latest
+  endpoint: /v1/translation
   mega_flow:
     - llm

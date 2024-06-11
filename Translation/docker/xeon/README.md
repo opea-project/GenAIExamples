@@ -63,7 +63,7 @@ export LLM_MODEL_ID="haoranxu/ALMA-13B"
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/translation"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.

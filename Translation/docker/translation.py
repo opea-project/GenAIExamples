@@ -15,7 +15,7 @@
 import asyncio
 import os
 
-from comps import DocSumGateway, MicroService, ServiceOrchestrator, ServiceType
+from comps import TranslationGateway, MicroService, ServiceOrchestrator, ServiceType
 
 SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 
@@ -35,7 +35,7 @@ class TranslationService:
             service_type=ServiceType.LLM,
         )
         self.megaservice.add(llm)
-        self.gateway = DocSumGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+        self.gateway = TranslationGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
     async def schedule(self):
         await self.megaservice.schedule(
@@ -46,6 +46,6 @@ class TranslationService:
 
 
 if __name__ == "__main__":
-    docsum = TranslationService(port=8888)
-    docsum.add_remote_service()
-    asyncio.run(docsum.schedule())
+    translation = TranslationService(port=8888)
+    translation.add_remote_service()
+    asyncio.run(translation.schedule())
