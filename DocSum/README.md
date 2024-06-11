@@ -6,9 +6,9 @@ Large Language Models (LLMs) have revolutionized the way we interact with text. 
 
 The architecture for document summarization will be illustrated/described below:
 
-![Architecture](https://i.imgur.com/XT0YUhu.png)
+![Architecture](./assets/img/docsum_architecture.png)
 
-![Workflow](https://i.imgur.com/m9Ac9wy.png)
+![Workflow](./assets/img/docsum_workflow.png)
 
 # Deploy Document Summarization Service
 

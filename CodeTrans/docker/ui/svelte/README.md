@@ -2,9 +2,9 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/1M4xjok.png)
-![project-screenshot](https://imgur.com/IIbG4HN.png)
-![project-screenshot](https://imgur.com/FbThcUY.png)
+![project-screenshot](../../../assets/img/codeTrans_ui_init.png)
+![project-screenshot](../../../assets/img/codeTrans_ui_select.png)
+![project-screenshot](../../../assets/img/codeTrans_ui_response.png)
 
 <h2>🧐 Features</h2>
 

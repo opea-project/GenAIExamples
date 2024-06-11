@@ -16,7 +16,7 @@ In this example, we present a Code Copilot application to showcase how code gene
 
 The workflow falls into the following architecture:
 
-![architecture](https://i.imgur.com/G9ozwFX.png)
+![architecture](./assets/img/codegen_architecture.png)
 
 # Deploy CodeGen Service
 

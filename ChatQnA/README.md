@@ -6,7 +6,7 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 
 ChatQnA architecture shows below:
 
-![architecture](https://i.imgur.com/lLOnQio.png)
+![architecture](./assets/img/chatqna_architecture.png)
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 

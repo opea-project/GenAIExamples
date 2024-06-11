@@ -319,4 +319,4 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
-![project-screenshot](https://i.imgur.com/26zMnEr.png)
+![project-screenshot](../../assets/img/chat_ui_init.png)

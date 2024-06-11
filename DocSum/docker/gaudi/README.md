@@ -128,4 +128,4 @@ export LANGCHAIN_API_KEY=ls_...
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
-![project-screenshot](https://i.imgur.com/26zMnEr.png)
+![project-screenshot](../../assets/img/docSum_ui_text.png)

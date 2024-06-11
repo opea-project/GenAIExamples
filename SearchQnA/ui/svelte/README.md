@@ -3,7 +3,7 @@ Neural Chat</h1>
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/YFakQ7J.png)
+![project-screenshot](../../assets/img/search_ui_init.png)
 
 <h2>🧐 Features</h2>
 

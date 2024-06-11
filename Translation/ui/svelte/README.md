@@ -2,8 +2,8 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/yT2VDBX.png)
-![project-screenshot](https://imgur.com/8ajC7lE.png)
+![project-screenshot](../../assets/img/trans_ui_init.png)
+![project-screenshot](../../assets/img/trans_ui_select.png)
 
 <h2>🧐 Features</h2>
 

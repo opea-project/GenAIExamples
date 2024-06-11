@@ -2,7 +2,7 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/d1SmaRb.png)
+![project-screenshot](../../../assets/img/codeGen_ui_init.jpg)
 
 <h2>🧐 Features</h2>
 
