@@ -215,5 +215,5 @@ app.include_router(router)
 if __name__ == "__main__":
     import uvicorn
 
-    fastapi_port = os.getenv("FASTAPI_PORT", "8000")
+    fastapi_port = int(os.getenv("FASTAPI_PORT", "8000"))
     uvicorn.run(app, host="0.0.0.0", port=int(fastapi_port))
