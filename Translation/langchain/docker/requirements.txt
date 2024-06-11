@@ -1,5 +1,5 @@
 fastapi
 huggingface_hub
 langchain
-uvicorn
 tiktoken # for test
+uvicorn
