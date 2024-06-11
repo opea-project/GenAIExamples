@@ -30,7 +30,7 @@ docker build -t opea/codetrans:latest --build-arg https_proxy=$https_proxy --bui
 ### 4. Build UI Docker Image
 
 ```bash
-cd GenAIExamples/CodeTrans/ui
+cd GenAIExamples/CodeTrans/docker/ui
 docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -60,7 +60,7 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7777/v1/codetrans"
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/CodeTrans/docker-composer/gaudi
+cd GenAIExamples/CodeTrans/docker/gaudi
 docker compose -f docker_compose.yaml up -d
 ```
 
@@ -110,3 +110,12 @@ pip install -U langsmith
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=ls_...
 ```
+
+## 🚀 Launch the UI
+
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/71214938-819c-4979-89cb-c03d937cd7b5)
+
+Here is an example for summarizing a article.
+
+![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/be543e96-ddcd-4ee0-9f2c-4e99fee77e37)

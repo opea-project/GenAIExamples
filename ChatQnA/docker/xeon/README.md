@@ -94,6 +94,7 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 
 ```bash
 docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
+cd ..
 ```
 
 ### 6. Build MegaService Docker Image
@@ -104,6 +105,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/docker
 docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd ../../..
 ```
 
 ### 7. Build UI Docker Image
@@ -111,8 +113,9 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/ui
+cd GenAIExamples/ChatQnA/docker/ui/
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd ../../../..
 ```
 
 Then run the command `docker images`, you will have the following 7 Docker Images:
@@ -175,7 +178,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/xeon
+cd GenAIExamples/ChatQnA/docker/xeon/
 docker compose -f docker_compose.yaml up -d
 ```
 
