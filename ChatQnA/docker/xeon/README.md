@@ -327,3 +327,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 ```
 
 ![project-screenshot](../../assets/img/chat_ui_init.png)
+
+Here is an example of running ChatQnA:
+
+![project-screenshot](../../assets/img/chat_ui_response.png)
