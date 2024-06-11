@@ -2,10 +2,10 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/oRuDrGX.png)
-![project-screenshot](https://imgur.com/j6vo4gl.png)
-![project-screenshot](https://imgur.com/LPBvBmM.png)
-![project-screenshot](https://imgur.com/yHryOQS.png)
+![project-screenshot](../../../assets/img/docSum_ui_upload.png)
+![project-screenshot](../../../assets/img/docSum_ui_exchange.png)
+![project-screenshot](../../../assets/img/docSum_ui_response.png)
+![project-screenshot](../../../assets/img/docSum_ui_text.png)
 
 <h2>🧐 Features</h2>
 

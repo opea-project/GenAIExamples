@@ -2,9 +2,9 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://i.imgur.com/26zMnEr.png)
-![project-screenshot](https://i.imgur.com/fZbOiTk.png)
-![project-screenshot](https://i.imgur.com/FnY3MuU.png)
+![project-screenshot](../../../assets/img/chat_ui_init.png)
+![project-screenshot](../../../assets/img/chat_ui_response.png)
+![project-screenshot](../../../assets/img/chat_ui_upload.png)
 
 <h2>🧐 Features</h2>
 
