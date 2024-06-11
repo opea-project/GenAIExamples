@@ -1,6 +1,6 @@
 # AudioQnA
 
-![audioqna](https://i.imgur.com/2hit8HL.jpeg)
+![audioqna](./assets/img/audioqna.jpg)
 
 In this example we will show you how to build an Audio Question and Answering application (AudioQnA). AudioQnA serves like a talking bot, enabling LLMs to talk with users. It basically accepts users' audio inputs, converts to texts and feed to LLMs, gets the text answers and converts back to audio outputs.
 
