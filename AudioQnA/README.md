@@ -2,7 +2,7 @@
 
 ![audioqna](https://i.imgur.com/2hit8HL.jpeg)
 
-In this example we will show you how to build an Audio Question and Answering application (AudioQnA). AudioQnA serves like a talking bot, let LLMs talk with users. It basically accepts users' audio inputs, converts to texts and feed to LLMs, gets the text answers and converts back to audio outputs.
+In this example we will show you how to build an Audio Question and Answering application (AudioQnA). AudioQnA serves like a talking bot, enabling LLMs to talk with users. It basically accepts users' audio inputs, converts to texts and feed to LLMs, gets the text answers and converts back to audio outputs.
 
 What AudioQnA is delivering and why it stands out:
 
@@ -156,7 +156,7 @@ cd ../../
 ```
 
 > [!NOTE]
-> If you modified any files and want that change introduced in this step, add `--build` to the end of the command to build the container image instead of pulling it from dockerhub.
+> If you have modified any files and want that change to be introduced in this step, add `--build` to the end of the command to build the container image instead of pulling it from dockerhub.
 
 ## Ingest data into Redis (Optional)
 

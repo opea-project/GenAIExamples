@@ -1,0 +1,68 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tei-reranking-service-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tei-reranking-service-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      labels:
+        app: tei-reranking-service-deploy
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+        name: tei-reranking-service-deploy
+        args:
+        - --model-id
+        - $(RERANK_MODEL_ID)
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+        # resources:
+        #   limits:
+        #     cpu: 56000m
+        #     memory: 26Gi
+        #   requests:
+        #     cpu: 56000m
+        #     memory: 26Gi
+      serviceAccountName: default
+      volumes:
+      - name: model-volume
+        hostPath:
+          # directory location on host
+          path: /mnt/models
+          # this field is optional
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tei-reranking-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: tei-reranking-service-deploy
+  ports:
+    - name: service
+      port: 8808
+      targetPort: 80

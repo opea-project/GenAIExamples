@@ -6,29 +6,28 @@ set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
-ip_name=$(echo $(hostname) | tr '[a-z]-' '[A-Z]_')_$(echo 'IP')
-ip_address=$(eval echo '$'$ip_name)
+ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/gen-ai-comps:llm-docsum-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
+    docker build --no-cache -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
-    cd $WORKPATH
-    docker build --no-cache -t opea/gen-ai-comps:docsum-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    cd $WORKPATH/docker
+    docker build --no-cache -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
-    cd $WORKPATH/ui
-    docker build --no-cache -t opea/gen-ai-comps:docsum-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+    cd $WORKPATH/docker/ui
+    docker build --no-cache -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
     docker images
 }
 
 function start_services() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
 
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
@@ -37,6 +36,8 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
     docker compose -f docker_compose.yaml up -d
@@ -44,62 +45,91 @@ function start_services() {
     sleep 2m # Waits 2 minutes
 }
 
+function validate_services() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local INPUT_DATA="$5"
+
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
+}
+
 function validate_microservices() {
     # Check if the microservices are running correctly.
-    # TODO: Any results check required??
-    curl http://${ip_address}:8008/generate \
-        -X POST \
-        -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tgi-gaudi-server >> ${LOG_PATH}/generate.log
-        exit 1
-    fi
-    sleep 5s
 
-    curl http://${ip_address}:9000/v1/chat/docsum \
-        -X POST \
-        -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs docsum-gaudi-backend-server >> ${LOG_PATH}/completions.log
-        exit 1
-    fi
-    sleep 5s
+    # tgi for llm service
+    validate_services \
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi-gaudi" \
+        "tgi-gaudi-server" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
+    # llm microservice
+    validate_services \
+        "${ip_address}:9000/v1/chat/docsum" \
+        "data: " \
+        "llm" \
+        "llm-docsum-gaudi-server" \
+        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
-    curl http://${ip_address}:8888/v1/docsum -H "Content-Type: application/json" -d '{
-        "model": "Intel/neural-chat-7b-v3-3",
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' > ${LOG_PATH}/curl_megaservice.log
+    validate_services \
+    "${ip_address}:8888/v1/docsum" \
+    "versatile toolkit" \
+    "mega-docsum" \
+    "docsum-gaudi-backend-server" \
+    '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+}
 
-    echo "Checking response results, make sure the output is reasonable. "
-    local status=false
-    if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c "versatile toolkit" $LOG_PATH/curl_megaservice.log) != 0 ]] && \
-    [[ $(grep -c "offering" $LOG_PATH/curl_megaservice.log) != 0 ]] && \
-    [[ $(grep -c "extraction" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
-        status=true
-    fi
+function validate_frontend() {
+    cd $WORKPATH/docker/ui/svelte
+    local conda_env_name="DocSum_e2e"
+    export PATH=${HOME}/miniforge3/bin/:$PATH
+    conda remove -n ${conda_env_name} --all -y
+    conda create -n ${conda_env_name} python=3.12 -y
+    source activate ${conda_env_name}
 
-    if [ $status == false ]; then
-        echo "Response check failed, please check the logs in artifacts!"
-        exit 1
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
+
+    exit_status=0
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------frontend test failed---------"
+        exit $exit_status
     else
-        echo "Response check succeed!"
+        echo "[TEST INFO]: ---------frontend test passed---------"
     fi
 
-    echo "Checking response format, make sure the output format is acceptable for UI."
-    # TODO
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker-composer/gaudi
+    cd $WORKPATH/docker/gaudi
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
@@ -116,6 +146,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
