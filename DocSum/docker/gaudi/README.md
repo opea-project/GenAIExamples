@@ -133,4 +133,3 @@ Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 Here is an example for summarizing a article.
 
 ![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/67ecb2ec-408d-4e81-b124-6ded6b833f55)
-
