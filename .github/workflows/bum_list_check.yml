@@ -41,11 +41,18 @@ jobs:
           cat main-requirements.txt
 
       - name: Compare requirements
+        env:
+          URL: ${{ github.event.issue.comments_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           comm -23 pr-requirements.txt main-requirements.txt > added-packages.txt
           if [ -s added-packages.txt ]; then
-            echo "New packages found in PR:" && cat added-packages.txt
-            exit 1
+            new_packages=$(cat added-packages.txt)
+            echo "New packages found in PR: $new_packages"
+            curl -X POST $URL \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            --data '{ "body": "New packages found in PR: $new_packages" }'
           else
             echo "No new packages found😊."
           fi
