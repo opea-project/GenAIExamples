@@ -59,6 +59,7 @@ Then run the command `docker images`, you will have the following 3 Docker Image
 Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 **Append the value of the public IP address to the no_proxy list**
+
 ```
 export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
