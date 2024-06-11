@@ -30,15 +30,7 @@ class CodeGenService:
         self.megaservice.add(llm)
         self.gateway = CodeGenGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
-    async def schedule(self):
-        await self.megaservice.schedule(
-            initial_inputs={"text": "Write a function that checks if a year is a leap year in Python."}
-        )
-        result_dict = self.megaservice.result_dict
-        print(result_dict)
-
 
 if __name__ == "__main__":
     chatqna = CodeGenService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     chatqna.add_remote_service()
-    asyncio.run(chatqna.schedule())

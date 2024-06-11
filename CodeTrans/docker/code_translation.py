@@ -29,28 +29,7 @@ class CodeTransService:
         self.megaservice.add(llm)
         self.gateway = CodeTransGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
-    async def schedule(self):
-        await self.megaservice.schedule(
-            initial_inputs={
-                "text": """
-    ### System: Please translate the following Golang codes into  Python codes.
-
-    ### Original codes:
-    '''Golang
-
-    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n
-
-    '''
-
-    ### Translated codes:
-"""
-            }
-        )
-        result_dict = self.megaservice.result_dict
-        print(result_dict)
-
 
 if __name__ == "__main__":
     service_ochestrator = CodeTransService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     service_ochestrator.add_remote_service()
-    asyncio.run(service_ochestrator.schedule())
