@@ -34,4 +34,3 @@ class CodeGenService:
 if __name__ == "__main__":
     chatqna = CodeGenService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     chatqna.add_remote_service()
-
