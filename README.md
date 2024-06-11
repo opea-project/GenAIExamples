@@ -53,17 +53,14 @@ The initially supported `Microservices` are described in the below table. More `
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="./comps/embeddings/README.md">Embedding</a></td>
-            <td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/BAAI/bge-large-en-v1.5">BAAI/bge-large-en-v1.5</a></td>
+			<td rowspan="2"><a href="./comps/embeddings/README.md">Embedding</a></td>
+            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a></td>
+			<td rowspan="2"><a href="https://huggingface.co/BAAI/bge-large-en-v1.5">BAAI/bge-large-en-v1.5</a></td>
 			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
 			<td>Gaudi2</td>
 			<td>Embedding on Gaudi2</td>
 		</tr>
 		<tr>
-			<td><a href="./comps/embeddings/README.md">Embedding</a></td>
-            <td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">BAAI/bge-base-en-v1.5</a></td>
 			<td><a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
 			<td>Xeon</td>
 			<td>Embedding on Xeon CPU</td>
@@ -77,58 +74,91 @@ The initially supported `Microservices` are described in the below table. More `
 			<td>Retriever on Xeon CPU</td>
 		</tr>
 		<tr>
-			<td><a href="./comps/reranks/README.md">Reranking</a></td>
-            <td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/BAAI/bge-reranker-large">BAAI/bge-reranker-large</a></td>
+			<td rowspan="2"><a href="./comps/reranks/README.md">Reranking</a></td>
+            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a></td>
+			<td ><a href="https://huggingface.co/BAAI/bge-reranker-large">BAAI/bge-reranker-large</a></td>
 			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
 			<td>Gaudi2</td>
 			<td>Reranking on Gaudi2</td>
 		</tr>
 		<tr>
-			<td><a href="./comps/reranks/README.md">Reranking</a></td>
-            <td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-reranker-base">BBAAI/bge-reranker-base</a></td>
 			<td><a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
 			<td>Xeon</td>
 			<td>Reranking on Xeon CPU</td>
 		</tr>
 		<tr>
-			<td><a href="./comps/llms/README.md">LLM</a></td>
-            <td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
+			<td rowspan="2"><a href="./comps/asr/README.md">ASR</a></td>
+            <td rowspan="2">NA</a></td>
+			<td rowspan="2"><a href="https://huggingface.co/openai/whisper-small">openai/whisper-small</a></td>
+			<td rowspan="2">NA</td>
+			<td>Gaudi2</td>
+			<td>Audio-Speech-Recognition on Gaudi2</td>
+		</tr>
+		<tr>
+			<td>Xeon</td>
+			<td>Audio-Speech-RecognitionS on Xeon CPU</td>
+		</tr>
+		<tr>
+			<td rowspan="2"><a href="./comps/tts/README.md">TTS</a></td>
+            <td rowspan="2">NA</a></td>
+			<td rowspan="2"><a href="https://huggingface.co/microsoft/speecht5_tts">microsoft/speecht5_tts</a></td>
+			<td rowspan="2">NA</td>
+			<td>Gaudi2</td>
+			<td>Text-To-Speech on Gaudi2</td>
+		</tr>
+		<tr>
+			<td>Xeon</td>
+			<td>Text-To-Speech on Xeon CPU</td>
+		</tr>
+		<tr>
+			<td rowspan="4"><a href="./comps/dataprep/README.md">Dataprep</a></td>
+            <td rowspan="2"><a href="https://qdrant.tech/">Qdrant</td>
+			<td rowspan="2"><a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">sentence-transformers/all-MiniLM-L6-v2</a></td>
+			<td rowspan="4">NA</td>
+			<td>Gaudi2</td>
+			<td>Dataprep on Gaudi2</td>
+		</tr>
+		<tr>
+			<td>Xeon</td>
+			<td>Dataprep on Xeon CPU</td>
+		</tr>
+		<tr>
+			<td rowspan="2"><a href="https://redis.io/">Redis</td>
+			<td rowspan="2"><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">BAAI/bge-base-en-v1.5</a></td>
+			<td>Gaudi2</td>
+			<td>Dataprep on Gaudi2</td>
+		</tr>
+		<tr>
+			<td>Xeon</td>
+			<td>Dataprep on Xeon CPU</td>
+		</tr>
+		<tr>
+			<td rowspan="5"><a href="./comps/llms/README.md">LLM</a></td>
+            <td rowspan="5"><a href="https://www.langchain.com">LangChain</a></td>
+			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
 			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI Gaudi</a></td>
 			<td>Gaudi2</td>
 			<td>LLM on Gaudi2</td>
 		</tr>
 		<tr>
-			<td><a href="./comps/llms/README.md">LLM</a></td>
-            <td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon</td>
 			<td>LLM on Xeon CPU</td>
 		</tr>
 		<tr>
-			<td><a href="./comps/llms/README.md">LLM</a></td>
-            <td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
-			<td><a href="https://github.com/vllm-project/vllm/">vLLM</a></td>
-			<td>Xeon</td>
-			<td>LLM on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td><a href="./comps/llms/README.md">LLM</a></td>
-            <td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
-			<td><a href="https://github.com/ray-project/ray">Ray Serve</a></td>
+			<td rowspan="2"><a href="https://huggingface.co/meta-llama/Llama-2-7b-chat-hf">meta-llama/Llama-2-7b-chat-hf</a></td>
+			<td rowspan="2"><a href="https://github.com/ray-project/ray">Ray Serve</a></td>
 			<td>Gaudi2</td>
 			<td>LLM on Gaudi2</td>
 		</tr>
 		<tr>
-			<td><a href="./comps/llms/README.md">LLM</a></td>
-            <td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
-			<td><a href="https://github.com/ray-project/ray">Ray Serve</a></td>
+			<td>Xeon</td>
+			<td>LLM on Xeon CPU</td>
+		</tr>
+		<tr>
+			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">mistralai/Mistral-7B-v0.1</a></td>
+			<td><a href="https://github.com/vllm-project/vllm/">vLLM</a></td>
 			<td>Xeon</td>
 			<td>LLM on Xeon CPU</td>
 		</tr>
@@ -190,7 +220,7 @@ class ExampleService:
             host=EMBEDDING_SERVICE_HOST_IP,
             port=EMBEDDING_SERVICE_PORT,
             endpoint="/v1/embeddings",
-            use_remote_service=True,S
+            use_remote_service=True,
             service_type=ServiceType.EMBEDDING,
         )
         llm = MicroService(
