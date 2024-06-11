@@ -40,7 +40,7 @@ docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/DocSum/ui/
+cd GenAIExamples/DocSum/docker/ui/
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -73,7 +73,7 @@ Note: Please replace with `host_ip` with your external IP address, do not use lo
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/DocSum/docker-composer/gaudi
+cd GenAIExamples/DocSum/docker/gaudi
 docker compose -f docker_compose.yaml up -d
 ```
 
@@ -128,4 +128,4 @@ export LANGCHAIN_API_KEY=ls_...
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
-![project-screenshot](https://i.imgur.com/26zMnEr.png)
+![project-screenshot](../../assets/img/docSum_ui_text.png)

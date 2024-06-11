@@ -11,12 +11,12 @@ Some noteworthy use case examples for VQA include:
 
 General architecture of VQA shows below:
 
-![VQA](https://i.imgur.com/BUntlSn.png)
+![VQA](./assets/img/vqa.png)
 
 This example guides you through how to deploy a [LLaVA](https://llava-vl.github.io/) (Large Language and Vision Assistant) model on Intel Gaudi2 to do visual question and answering task. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products/) for more details.
 
-![llava screenshot](https://i.imgur.com/Sqmoql8.png)
-![llava-screenshot](https://i.imgur.com/4wETEe7.png)
+![llava screenshot](./assets/img/llava_screenshot1.png)
+![llava-screenshot](./assets/img/llava_screenshot2.png)
 
 ## Start the LLaVA service
 
