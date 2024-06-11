@@ -2,8 +2,8 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/qrt8Lce.png)
-![project-screenshot](https://imgur.com/L12DP8Y.png)
+![project-screenshot](../../assets/img/audio_ui.png)
+![project-screenshot](../../assets/img/audio_ui_record.png)
 
 <h2>🧐 Features</h2>
 
