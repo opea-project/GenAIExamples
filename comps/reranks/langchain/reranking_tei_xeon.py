@@ -3,12 +3,21 @@
 
 import json
 import os
+import time
 
 import requests
 from langchain_core.prompts import ChatPromptTemplate
 from langsmith import traceable
 
-from comps import LLMParamsDoc, SearchedDoc, ServiceType, opea_microservices, register_microservice
+from comps import (
+    LLMParamsDoc,
+    SearchedDoc,
+    ServiceType,
+    opea_microservices,
+    register_microservice,
+    register_statistics,
+    statistics_dict,
+)
 
 
 @register_microservice(
@@ -21,7 +30,9 @@ from comps import LLMParamsDoc, SearchedDoc, ServiceType, opea_microservices, re
     output_datatype=LLMParamsDoc,
 )
 @traceable(run_type="llm")
+@register_statistics(names=["opea_service@reranking_tgi_gaudi"])
 def reranking(input: SearchedDoc) -> LLMParamsDoc:
+    start = time.time()
     docs = [doc.text for doc in input.retrieved_docs]
     url = tei_reranking_endpoint + "/rerank"
     data = {"query": input.initial_query, "texts": docs}
@@ -36,6 +47,7 @@ def reranking(input: SearchedDoc) -> LLMParamsDoc:
     prompt = ChatPromptTemplate.from_template(template)
     doc = input.retrieved_docs[best_response["index"]]
     final_prompt = prompt.format(context=doc.text, question=input.initial_query)
+    statistics_dict["opea_service@reranking_tgi_gaudi"].append_latency(time.time() - start, None)
     return LLMParamsDoc(query=final_prompt.strip())
 
 

@@ -29,3 +29,6 @@ from comps.cores.mega.gateway import Gateway, ChatQnAGateway, CodeGenGateway, Co
 
 # Telemetry
 from comps.cores.telemetry.opea_telemetry import opea_telemetry
+
+# Statistics
+from comps.cores.mega.base_statistics import statistics_dict, register_statistics
