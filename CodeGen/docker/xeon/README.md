@@ -139,6 +139,10 @@ To access the frontend, open the following URL in your browser: `http://{host_ip
 
 ![project-screenshot](../../assets/img/codeGen_ui_init.jpg)
 
+Here is an example of running CodeGen in the UI:
+
+![project-screenshot](../../assets/img/codeGen_ui_response.png)
+
 ## Install Copilot VSCode extension from Plugin Marketplace as the frontend
 
 In addition to the Svelte UI, users can also install the Copilot VSCode extension from the Plugin Marketplace as the frontend.
