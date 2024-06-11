@@ -251,6 +251,7 @@ self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port
 
 ## Additional Content
 
-- [Contribution](/CONTRIBUTING.md)
+- [Code of Conduct](https://github.com/opea-project/docs/tree/main/community/CODE_OF_CONDUCT.md)
+- [Contribution](https://github.com/opea-project/docs/tree/main/community/CONTRIBUTING.md)
+- [Security Policy](https://github.com/opea-project/docs/tree/main/community/SECURITY.md)
 - [Legal Information](/LEGAL_INFORMATION.md)
-- [Security Policy](/SECURITY.md)
