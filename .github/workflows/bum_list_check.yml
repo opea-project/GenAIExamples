@@ -52,7 +52,7 @@ jobs:
             curl -X POST $URL \
             -H "Content-Type: application/json" \
             -H "Authorization: token $GITHUB_TOKEN" \
-            --data "{ \"body\": \"New packages found in PR: $new_packages\" }"
+            --data "{ \"body\": \"New 3rd party dependency found in PR: $new_packages\" }"
           else
             echo "No new packages found😊."
           fi
