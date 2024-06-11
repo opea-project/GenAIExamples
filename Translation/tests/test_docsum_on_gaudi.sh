@@ -42,56 +42,89 @@ function start_services() {
     sleep 2m # Waits 2 minutes
 }
 
+function validate_services() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local INPUT_DATA="$5"
+
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
+}
+
+
+
 function validate_microservices() {
     # Check if the microservices are running correctly.
     # TODO: Any results check required??
-    curl http://${ip_address}:8008/generate \
-        -X POST \
-        -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/generate.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs tgi-gaudi-server >> ${LOG_PATH}/generate.log
-        exit 1
-    fi
-    sleep 5s
+    # tgi for llm service
+    validate_services \
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi-gaudi" \
+        "tgi-gaudi-server" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
-    curl http://${ip_address}:9000/v1/chat/completions \
-        -X POST \
-        -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
-        -H 'Content-Type: application/json' > ${LOG_PATH}/completions.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "Microservice failed, please check the logs in artifacts!"
-        docker logs llm-tgi-gaudi-server >> ${LOG_PATH}/completions.log
-        exit 1
-    fi
-    sleep 5s
+    # llm microservice
+    validate_services \
+        "${ip_address}:9000/v1/chat/completions" \
+        "data: " \
+        "llm" \
+        "llm-tgi-gaudi-server" \
+        '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
-    curl http://${ip_address}:8888/v1/translation -H "Content-Type: application/json" -d '{
-        "model": "haoranxu/ALMA-13B",
-        "messages": "Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' > ${LOG_PATH}/curl_megaservice.log
+    validate_services \
+    "${ip_address}:8888/v1/translation" \
+    "I love machine translation" \
+    "mega-translation" \
+    "translation-gaudi-backend-server" \
+    '{"messages": "Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
+}
 
-    echo "Checking response results, make sure the output is reasonable. "
-    local status=false
-    if [[ -f $LOG_PATH/curl_megaservice.log ]] && \
-    [[ $(grep -c "I love machine translation" $LOG_PATH/curl_megaservice.log) != 0 ]]; then
-        status=true
-    fi
+function validate_frontend() {
+    cd $WORKPATH/docker/ui/svelte
+    local conda_env_name="Translation_e2e"
+    export PATH=${HOME}/miniforge3/bin/:$PATH
+    conda remove -n ${conda_env_name} --all -y
+    conda create -n ${conda_env_name} python=3.12 -y
+    source activate ${conda_env_name}
 
-    if [ $status == false ]; then
-        echo "Response check failed, please check the logs in artifacts!"
-        exit 1
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
+
+    exit_status=0
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------frontend test failed---------"
+        exit $exit_status
     else
-        echo "Response check succeed!"
+        echo "[TEST INFO]: ---------frontend test passed---------"
     fi
 
-    echo "Checking response format, make sure the output format is acceptable for UI."
-    # TODO
 }
 
 function stop_docker() {
