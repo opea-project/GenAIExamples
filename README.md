@@ -242,7 +242,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 > **_NOTE:_** The `Language Translation`, `SearchQnA`, `VisualQnA` and other use cases not listing here are in active development. The code structure of these use cases are subject to change.
 
 ## Additional Content
-
-- [Contribution](/CONTRIBUTING.md)
+- [Code of Conduct](https://github.com/opea-project/docs/tree/main/community/CODE_OF_CONDUCT.md)
+- [Contribution](https://github.com/opea-project/docs/tree/main/community/CONTRIBUTING.md)
+- [Security Policy](https://github.com/opea-project/docs/tree/main/community/SECURITY.md)
 - [Legal Information](/LEGAL_INFORMATION.md)
-- [Security Policy](/SECURITY.md)
