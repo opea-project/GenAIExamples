@@ -8,7 +8,7 @@ Video RAG is a framework that retrieves video based on provided user prompt. It 
 
 ## Tools
 
-- **UI**: streamlit
+- **UI**: gradio **or** streamlit
 - **Vector Storage**: Chroma DB **or** Intel's VDMS
 - **Image Embeddings**: CLIP
 - **Text Embeddings**: all-MiniLM-L12-v2
@@ -91,8 +91,14 @@ Generating Image embeddings and store them into selected db, specify config file
 python3 embedding/generate_store_embeddings.py docs/config.yaml video_ingest/videos/
 ```
 
-**Web UI Video RAG**
+**Web UI Video RAG - Streamlit**
 
 ```bash
 streamlit run video-rag-ui.py --server.address 0.0.0.0 --server.port 50055
+```
+
+**Web UI Video RAG - Gradio**
+
+```bash
+python3 video-rag-ui.py docs/config.yaml True '0.0.0.0' 50055
 ```
