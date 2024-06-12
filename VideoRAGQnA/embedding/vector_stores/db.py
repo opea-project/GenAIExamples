@@ -20,7 +20,6 @@ import torch
 import uuid
 
 # 'similarity', 'similarity_score_threshold' (needs threshold), 'mmr'
-chosen_video_search_type = "similarity"
 
 #'mobilenet_v3_large', 'mobilenet'
 backbone = 'mobilenet_v3_large'
@@ -85,7 +84,7 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
         return self.embed_documents([text])[0]
 
 
-    def embed_video(self, paths: List[str]) -> List[List[float]]:
+    def embed_video(self, paths: List[str], **kwargs: Any) -> List[List[float]]:
         # Open images directly as PIL images
 
         video_features = []
@@ -96,7 +95,10 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
             videos_tensor, policy_images_tensor = self.load_video_for_adaclip(vid_path, num_frm=64,
                                                                               no_policy=False,
                                                                               policy_backbone=backbone,
-                                                                              max_img_size=224)
+                                                                              max_img_size=224,
+                                                                              start_time=kwargs.get("start_time", None),
+                                                                              clip_duration=kwargs.get("clip_duration", None)
+                                                                              )
             embeddings_tensor = self.model.get_video_embeddings(videos_tensor.unsqueeze(0).to(model_device), policy_images_tensor.unsqueeze(0).to(model_device))
 
             # Convert tensor to list and add to the video_features list
@@ -107,12 +109,15 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
         return video_features
 
 
-    def load_video_for_adaclip(self, vis_path, num_frm=64, no_policy=False, policy_backbone='mobilenet_v3_large', max_img_size=224):
+    def load_video_for_adaclip(self, vis_path, num_frm=64, no_policy=False, policy_backbone='mobilenet_v3_large', max_img_size=224, **kwargs):
         # Load video with VideoReader
         vr = VideoReader(vis_path, ctx=cpu(0))
+        fps = vr.get_avg_fps()
         num_frames = len(vr)
+        start_idx = int(fps*kwargs.get("start_time", [0])[0])
+        end_idx = start_idx+int(fps*kwargs.get("clip_duration", [num_frames])[0])
 
-        frame_idx = np.linspace(0, num_frames, num=num_frm, endpoint=False, dtype=int) # Uniform sampling
+        frame_idx = np.linspace(start_idx, end_idx, num=num_frm, endpoint=False, dtype=int) # Uniform sampling
 
         clip_images = []
         policy_images = []
@@ -142,10 +147,12 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
 
 class VS:
 
-    def __init__(self, host, port, selected_db):
+    def __init__(self, host, port, selected_db, chosen_video_search_type = "mmr"):
         self.host = host
         self.port = port
         self.selected_db = selected_db
+        self.chosen_video_search_type = chosen_video_search_type
+        self.constraints = None
 
         # initializing important variables
         self.client = None
@@ -186,7 +193,7 @@ class VS:
                 engine = "FaissFlat",
             )
 
-        self.image_retriever = self.image_db.as_retriever(search_type="mmr").configurable_fields(
+        self.image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type).configurable_fields(
             search_kwargs=ConfigurableField(
                 id="k_image_docs",
                 name="Search Kwargs",
@@ -223,27 +230,27 @@ class VS:
 
             if self.selected_db == 'vdms':
                 if date_string == 'today':
-                    constraints = {"date": [ "==", date_out]}
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, "filter":constraints})
+                    self.constraints = {"date": [ "==", date_out]}
+                    self.update_image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type, search_kwargs={'k':n_images, "filter":constraints})
                 elif date_out != str(today_date) and time_out =='00:00:00': ## exact day (example last firday)
-                    constraints = {"date": [ "==", date_out]}
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, "filter":constraints})
+                    self.constraints = {"date": [ "==", date_out]}
+                    self.update_image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type, search_kwargs={'k':n_images, "filter":constraints})
 
                 elif date_out == str(today_date) and time_out =='00:00:00': ## when search_date interprates words as dates output is todays date + time 00:00:00
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images})
+                    self.update_image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type, search_kwargs={'k':n_images})
                 else: ## Interval  of time:last 48 hours, last 2 days,..
-                    constraints = {"date_time": [ ">=", {"_date":iso_date_time}]}
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, "filter":constraints})
+                    self.constraints = {"date_time": [ ">=", {"_date":iso_date_time}]}
+                    self.update_image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type, search_kwargs={'k':n_images, "filter":constraints})
             if self.selected_db == 'chroma':
                 if date_string == 'today':
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, 'filter': {'date': {'$eq': date_out}}})
+                    self.update_image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type, search_kwargs={'k':n_images, 'filter': {'date': {'$eq': date_out}}})
                 elif date_out != str(today_date) and time_out =='00:00:00': ## exact day (example last firday)
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images, 'filter': {'date': {'$eq': date_out}}})
+                    self.update_image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type, search_kwargs={'k':n_images, 'filter': {'date': {'$eq': date_out}}})
                 elif date_out == str(today_date) and time_out =='00:00:00': ## when search_date interprates words as dates output is todays date + time 00:00:00
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'k':n_images})
+                    self.update_image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type, search_kwargs={'k':n_images})
                 else: ## Interval  of time:last 48 hours, last 2 days,..
-                    constraints = {"date_time": [ ">=", {"_date":iso_date_time}]}
-                    self.update_image_retriever = self.image_db.as_retriever(search_type="mmr", search_kwargs={'filter': {
+                    self.constraints = {"date_time": [ ">=", {"_date":iso_date_time}]}
+                    self.update_image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type, search_kwargs={'filter': {
                             "$or": [
                                 {
                                     "$and": [
@@ -305,7 +312,7 @@ class VS:
                         },
                         'k':n_images})
         else:
-            self.update_image_retriever = self.image_db.as_retriever(search_type=chosen_video_search_type, search_kwargs={'k':n_images})
+            self.update_image_retriever = self.image_db.as_retriever(search_type=self.chosen_video_search_type, search_kwargs={'k':n_images})
 
     def length(self):
         if self.selected_db == 'chroma':
@@ -345,10 +352,11 @@ class VS:
 
 
 class VideoVS(VS):
-    def __init__(self, host, port, selected_db, video_retriever_model):
+    def __init__(self, host, port, selected_db, video_retriever_model, chosen_video_search_type="similarity"):
         super().__init__(host, port, selected_db)
         self.video_collection = 'video-test'
         self.video_embedder = AdaCLIPEmbeddings(model=video_retriever_model)
+        self.chosen_video_search_type = chosen_video_search_type
 
         if self.selected_db == 'chroma':
             self.video_db = Chroma(
@@ -362,22 +370,23 @@ class VideoVS(VS):
                 embedding=self.video_embedder,
                 collection_name=self.video_collection,
                 engine="FaissFlat",
+                distance_strategy="IP"
             )
 
-        self.video_retriever = self.video_db.as_retriever(search_type=chosen_video_search_type).configurable_fields(
-            search_kwargs=ConfigurableField(
-                id="k_video_docs",
-                name="Search Kwargs",
-                description="The search kwargs to use",
-            )
-        )
+       #self.video_retriever = self.video_db.as_retriever(search_type=self.chosen_video_search_type).configurable_fields(
+       #     search_kwargs=ConfigurableField(
+       #         id="k_video_docs",
+       #         name="Search Kwargs",
+       #         description="The search kwargs to use",
+       #     )
+       # )
 
     
     def MultiModalRetrieval(self, query: str, n_videos: Optional[int] = 3):
         self.update_db(query, n_videos)
-        video_results = self.video_retriever.invoke(query)
-
-        for r in video_results:
-            print("videos:", r.metadata['video_path'], '\t', r.metadata['date'], '\t', r.metadata['time'], '\n')
+        #video_results = self.video_retriever.invoke(query)
+        video_results = self.video_db.similarity_search_with_score(query=query, k=n_videos, filter=self.constraints)
+        for r, score in video_results:
+            print("videos:", r.metadata['video_path'], '\t', r.metadata['date'], '\t', r.metadata['time'], r.metadata['timestamp'], f"score: {score}", '\n')
 
         return video_results

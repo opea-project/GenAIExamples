@@ -56,7 +56,18 @@ cd VideoRAGQnA
 pip3 install -r docs/requirements.txt
 ```
 
-The current framework supports both Chroma DB and Intel's VDMS, use either of them,
+This code is using a pre-released update of vdms vectordb in LangChain.
+First clone LangChain and install langchain-community:
+```bash
+cd <dir_to_clone_repos>
+git clone -b vdms_visual_rag https://github.com/intel-sandbox/cwlacewe.langchain.git
+cd cwlacewe.langchain/libs/community
+pip install -e .
+cd $WORKDIR
+```
+
+The current framework supports both Chroma DB and Intel's VDMS.
+We tested using VDMS only after video embedding based modification.
 
 Running Chroma DB as docker container
 ```bash

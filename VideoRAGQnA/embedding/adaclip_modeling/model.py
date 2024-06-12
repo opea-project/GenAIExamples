@@ -97,7 +97,7 @@ class AdaCLIP(nn.Module):
         frame_embd = self.get_visual_output(clip_inputs)
         return_hidden = self.word_agg
 
-        if policy_inputs is not None:
+        if self.use_policy and policy_inputs is not None:
             policy_inputs = self.get_visual_output(clip_inputs) if self.policy_backbone == "clip" else policy_inputs
             actions, logits = self.sampler(policy_inputs, tau)
             frame_embd = actions @ frame_embd
@@ -118,6 +118,10 @@ class AdaCLIP(nn.Module):
             weights = F.softmax(logits / frame_agg_temp, dim=1)
             video_embd = (frame_embd * weights).sum(dim=1)
             video_embd = video_embd / video_embd.norm(dim=-1, keepdim=True)
+        else:
+            video_embd = frame_embd.mean(dim=1)
+            video_embd = video_embd / video_embd.norm(dim=-1, keepdim=True)
+
         return video_embd
 
 

@@ -37,12 +37,13 @@ def setup_adaclip_model(cfg, device):
     pretrained_state_dict = CLIP.get_config(pretrained_clip_name=cfg.clip_backbone)
     state_dict = {}
     epoch = 0
-    if cfg.resume:
+    if cfg.resume is not None and os.path.exists(cfg.resume):
         print("Loading AdaCLIP from", cfg.resume)
         checkpoint = torch.load(cfg.resume, map_location="cpu")
         state_dict = checkpoint['state_dict']
         epoch = checkpoint["epoch"]
     else:
+        print("Loading CLIP pretrained weights ...")
         for key, val in pretrained_state_dict.items():    
             new_key = "clip." + key
             if new_key not in state_dict:
@@ -67,6 +68,11 @@ def setup_adaclip_model(cfg, device):
                         state_dict[key.replace(str(num_layer), "0")] = val.clone()
 
     model = AdaCLIP(cfg, pretrained_state_dict)
+    # use mean aggregation and no_policy if pretrained model weights don't exist
+    if cfg.resume is None or not os.path.exists(cfg.resume):
+        print("Using Mean Aggregation and no_policy")
+        model.frame_agg = "mean"
+        model.no_policy = True
     missing_keys = []
     unexpected_keys = []
     error_msgs = []
@@ -111,38 +117,6 @@ def setup_adaclip_model(cfg, device):
     print("Setup model done!")
     return model, epoch
 
-def load_video_for_adaclip(vis_path, num_frm=64, no_policy=False, policy_backbone='mobilenet_v3_large', max_img_size=224):
-    # Load video with VideoReader
-    vr = VideoReader(vis_path, ctx=cpu(0))
-    num_frames = len(vr)
-
-    frame_idx = np.linspace(0, num_frames, num=num_frm, endpoint=False, dtype=int) # Uniform sampling
-
-    clip_images = []
-    policy_images = []
-    
-    # Extract frames as numpy array
-    img_array = vr.get_batch(frame_idx).asnumpy() # img_array = [T,H,W,C]
-    clip_imgs = [Image.fromarray(img_array[j]) for j in range(img_array.shape[0])]
-
-    # preprocess images
-    for i in range(len(clip_imgs)):
-        im = clip_imgs[i]
-        clip_images.append(get_transforms("clip", max_img_size)(im)) # 3, 224, 224
-        if not no_policy:
-            policy_images.append(get_transforms(policy_backbone, 256)(im))
-    
-    clip_images_tensor = torch.zeros((num_frm,) + clip_images[0].shape)
-    clip_images_tensor[:num_frm] = torch.stack(clip_images)
-    if policy_images is not None:
-        policy_images_tensor = torch.zeros((num_frm,) + policy_images[0].shape)
-        policy_images_tensor[:num_frm] = torch.stack(policy_images)
-
-    if policy_images:
-        return clip_images_tensor, policy_images_tensor
-    else:
-        return clip_images_tensor, None
-
 def read_json(path):
     with open(path) as f:
         x = json.load(f)
@@ -177,7 +151,7 @@ def store_into_vectordb(vs, metadata_file_path, embedding_model, config):
                         'timestamp': frame_details['timestamp'],
                         'frame_path': frame_details['frame_path'],
                         'video': video,
-                        'embedding_path': data['embedding_path'],
+                        #'embedding_path': data['embedding_path'],
                         'date_time': frame_details['date_time'], #{"_date":frame_details['date_time']},
                         'date': frame_details['date'],
                         'year': frame_details['year'],
@@ -193,7 +167,7 @@ def store_into_vectordb(vs, metadata_file_path, embedding_model, config):
                         'timestamp': frame_details['timestamp'],
                         'frame_path': frame_details['frame_path'],
                         'video': video,
-                        'embedding_path': data['embedding_path'],
+                        #'embedding_path': data['embedding_path'],
                         'date': frame_details['date'],
                         'year': frame_details['year'],
                         'month': frame_details['month'],
@@ -222,7 +196,9 @@ def store_into_vectordb(vs, metadata_file_path, embedding_model, config):
             metadata_list = [data]
             vs.video_db.add_videos(
                 paths=image_name_list,
-                metadatas=metadata_list
+                metadatas=metadata_list,
+                start_time=[data['timestamp']],
+                clip_duration=[data['clip_duration']]
             )
         print (f'✅ {_+1}/{total_videos} video {video}, len {len(image_name_list)}, {len(metadata_list)}, {len(embedding_list)}')
 

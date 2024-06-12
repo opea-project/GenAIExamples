@@ -193,6 +193,7 @@ def get_top_doc(results, qcnt):
     for r in results:
         try:
             video_name = r.metadata['video']
+            playback_offset = r.metadata["start of interval in sec"]
             if video_name not in hit_score.keys(): hit_score[video_name] = 0
             hit_score[video_name] += 1
         except:
@@ -203,17 +204,17 @@ def get_top_doc(results, qcnt):
     if qcnt >= len(x):
         return None
     print (f'top docs = {x}')
-    return {'video': list(x)[qcnt]}
+    return {'video': list(x)[qcnt]}, playback_offset
 
-def play_video(x):
+def play_video(x, offset):
     if x is not None:
-        video_file = x.replace('.pt', '')
-        path = video_dir + video_file
-        
-        video_file = open(path, 'rb')
+        #video_file = x.replace('.pt', '')
+        #path = video_dir + video_file
+        #video_file = open(path, 'rb')
+        video_file = open(x, 'rb')
         video_bytes = video_file.read()
 
-        st.video(video_bytes, start_time=0)
+        st.video(video_bytes, start_time=offset)
 
 if 'llm' not in st.session_state.keys():
     with st.spinner('Loading Models . . .'):
@@ -251,13 +252,15 @@ def RAG(prompt):
     print (f'RAG prompt={prompt}\n')
     print("---___---")
       
-    top_doc = get_top_doc(results, st.session_state['qcnt'])
+    top_doc, playback_offset = get_top_doc(results, st.session_state["qcnt"])
     print ('TOP DOC = ', top_doc)
+    print("PLAYBACK OFFSET = ", playback_offset)
     if top_doc == None:
         return None, None
     video_name = top_doc['video']
+    print('Video from top doc: ', video_name)
     
-    return video_name, top_doc
+    return video_name, playback_offset, top_doc
 
 def get_description(vn):
     content = None
@@ -291,14 +294,15 @@ def handle_message():
             else:
                 st.session_state['qcnt'] = 0
                 st.session_state['prevprompt'] = prompt
-            video_name, top_doc = RAG(prompt)
+            video_name, playback_offset, top_doc = RAG(prompt)
+            print("VIDEO NAME USED IN PLAYBACK: ", video_name)
             if video_name == None:
                 full_response = f"No more relevant videos found. Select a different query. \n\n"
                 placeholder.markdown(full_response)
                 end = time.time()
             else:
                 with col2:
-                    play_video(video_name)
+                    play_video(video_name, playback_offset)
                 """
                 scene_des = get_description(video_name)
                 formatted_prompt = ph.get_formatted_prompt(scene=scene_des, prompt=prompt)
