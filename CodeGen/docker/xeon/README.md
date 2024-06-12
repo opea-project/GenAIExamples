@@ -58,7 +58,14 @@ Then run the command `docker images`, you will have the following 3 Docker Image
 
 Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
+**Append the value of the public IP address to the no_proxy list**
+
+```
+export your_no_proxy=${your_no_proxy},"External_Public_IP"
+```
+
 ```bash
+export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="meta-llama/CodeLlama-7b-hf"
@@ -138,6 +145,10 @@ To access the frontend, open the following URL in your browser: `http://{host_ip
 ```
 
 ![project-screenshot](../../assets/img/codeGen_ui_init.jpg)
+
+Here is an example of running CodeGen in the UI:
+
+![project-screenshot](../../assets/img/codeGen_ui_response.png)
 
 ## Install Copilot VSCode extension from Plugin Marketplace as the frontend
 
