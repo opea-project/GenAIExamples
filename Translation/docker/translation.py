@@ -17,8 +17,10 @@ import os
 
 from comps import TranslationGateway, MicroService, ServiceOrchestrator, ServiceType
 
-SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
-
+MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
+MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8888)
+LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
+LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
 
 class TranslationService:
     def __init__(self, port=8000):
@@ -28,8 +30,8 @@ class TranslationService:
     def add_remote_service(self):
         llm = MicroService(
             name="llm",
-            host=SERVICE_HOST_IP,
-            port=9000,
+            host=LLM_SERVICE_HOST_IP,
+            port=LLM_SERVICE_PORT,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
@@ -46,6 +48,6 @@ class TranslationService:
 
 
 if __name__ == "__main__":
-    translation = TranslationService(port=8888)
+    translation = TranslationService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     translation.add_remote_service()
     asyncio.run(translation.schedule())

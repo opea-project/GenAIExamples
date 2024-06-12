@@ -76,12 +76,12 @@ function validate_services() {
 function validate_microservices() {
     # Check if the microservices are running correctly.
     # TODO: Any results check required??
-    # tgi for llm service
+    # tgi gaudi service
     validate_services \
         "${ip_address}:8008/generate" \
         "generated_text" \
         "tgi-gaudi" \
-        "tgi-gaudi-server" \
+        "tgi_gaudi_service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice

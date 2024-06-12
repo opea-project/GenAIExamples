@@ -19,7 +19,7 @@ function build_docker_images() {
     docker build --no-cache -t opea/translation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
     cd $WORKPATH/docker/ui
-    docker build --no-cache -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+    docker build --no-cache -t opea/translation-ui:latest -f docker/Dockerfile .
 
     docker images
 }
@@ -78,7 +78,7 @@ function validate_microservices() {
         "${ip_address}:8008/generate" \
         "generated_text" \
         "tgi-gaudi" \
-        "tgi-gaudi-server" \
+        "tgi_service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
@@ -86,7 +86,7 @@ function validate_microservices() {
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "llm-tgi-gaudi-server" \
+        "llm-tgi-server" \
         '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
 }
 
@@ -96,7 +96,7 @@ function validate_megaservice() {
     "${ip_address}:8888/v1/translation" \
     "I love machine translation" \
     "mega-translation" \
-    "translation-gaudi-backend-server" \
+    "translation-xeon-backend-server" \
     '{"messages": "Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
 }
 
