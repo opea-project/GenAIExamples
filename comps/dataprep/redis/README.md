@@ -1,10 +1,18 @@
 # Dataprep Microservice with Redis
 
+For dataprep microservice, we provide two frameworks: `Langchain` and `LlamaIndex`.
+
+We organized these two folders in the same way, so you can use either framework for dataprep microservice with the following constructions.
+
 # 🚀1. Start Microservice with Python（Option 1）
 
 ## 1.1 Install Requirements
 
 ```bash
+# for langchain
+cd langchain
+# for llama_index
+cd llama_index
 pip install -r requirements.txt
 ```
 
@@ -48,9 +56,18 @@ export LANGCHAIN_PROJECT="opea/dataprep"
 
 ## 2.3 Build Docker Image
 
+- Build docker image with langchain
+
 ```bash
 cd ../../../../
-docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
+docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/docker/Dockerfile .
+```
+
+- Build docker image with llama_index
+
+```bash
+cd ../../../../
+docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/llama_index/docker/Dockerfile .
 ```
 
 ## 2.4 Run Docker with CLI (Option A)
@@ -62,7 +79,10 @@ docker run -d --name="dataprep-redis-server" -p 6007:6007 --ipc=host -e http_pro
 ## 2.5 Run with Docker Compose (Option B)
 
 ```bash
-cd comps/dataprep/redis/docker
+# for langchain
+cd comps/dataprep/redis/langchain/docker
+# for llama_index
+cd comps/dataprep/redis/llama_index/docker
 docker compose -f docker-compose-dataprep-redis.yaml up -d
 ```
 
