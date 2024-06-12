@@ -134,8 +134,8 @@ The initially supported `Microservices` are described in the below table. More `
 			<td>Dataprep on Xeon CPU</td>
 		</tr>
 		<tr>
-			<td rowspan="5"><a href="./comps/llms/README.md">LLM</a></td>
-            <td rowspan="5"><a href="https://www.langchain.com">LangChain</a></td>
+			<td rowspan="6"><a href="./comps/llms/README.md">LLM</a></td>
+            <td rowspan="6"><a href="https://www.langchain.com">LangChain</a></td>
 			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
 			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI Gaudi</a></td>
 			<td>Gaudi2</td>
@@ -147,7 +147,7 @@ The initially supported `Microservices` are described in the below table. More `
 			<td>LLM on Xeon CPU</td>
 		</tr>
 		<tr>
-			<td rowspan="2"><a href="https://huggingface.co/meta-llama/Llama-2-7b-chat-hf">meta-llama/Llama-2-7b-chat-hf</a></td>
+			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
 			<td rowspan="2"><a href="https://github.com/ray-project/ray">Ray Serve</a></td>
 			<td>Gaudi2</td>
 			<td>LLM on Gaudi2</td>
@@ -157,8 +157,12 @@ The initially supported `Microservices` are described in the below table. More `
 			<td>LLM on Xeon CPU</td>
 		</tr>
 		<tr>
-			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">mistralai/Mistral-7B-v0.1</a></td>
-			<td><a href="https://github.com/vllm-project/vllm/">vLLM</a></td>
+			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
+			<td rowspan="2"><a href="https://github.com/vllm-project/vllm/">vLLM</a></td>
+			<td>Gaudi2</td>
+			<td>LLM on Gaudi2</td>
+		</tr>
+		<tr>
 			<td>Xeon</td>
 			<td>LLM on Xeon CPU</td>
 		</tr>
