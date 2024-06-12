@@ -19,6 +19,7 @@ services:
     ports:
       - "6007:6007"
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
@@ -32,6 +33,7 @@ services:
       - "./data:/data"
     shm_size: 1g
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID}
@@ -44,6 +46,7 @@ services:
       - "6000:6000"
     ipc: host
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
@@ -60,6 +63,7 @@ services:
       - "7000:7000"
     ipc: host
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
@@ -78,6 +82,7 @@ services:
       - "./data:/data"
     shm_size: 1g
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
     command: --model-id ${RERANK_MODEL_ID}
@@ -90,6 +95,7 @@ services:
       - "8000:8000"
     ipc: host
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
@@ -107,6 +113,7 @@ services:
       - "./data:/data"
     shm_size: 1g
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
@@ -120,6 +127,7 @@ services:
       - "9000:9000"
     ipc: host
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
@@ -143,6 +151,7 @@ services:
     ports:
       - "8888:8888"
     environment:
+      - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
@@ -160,6 +169,7 @@ services:
     ports:
       - "5173:5173"
     environment:
+      - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
