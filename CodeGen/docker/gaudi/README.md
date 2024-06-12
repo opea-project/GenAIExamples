@@ -51,6 +51,7 @@ Then run the command `docker images`, you will have the following 3 Docker image
 Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
+export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="meta-llama/CodeLlama-7b-hf"
