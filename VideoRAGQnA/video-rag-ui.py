@@ -22,7 +22,6 @@ HUGGINGFACEHUB_API_TOKEN = "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"
 set_seed(22)
 import argparse
 
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 VECTORDB_SERVICE_HOST_IP = os.getenv("VECTORDB_SERVICE_HOST_IP", "0.0.0.0")
