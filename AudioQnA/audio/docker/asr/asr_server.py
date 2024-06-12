@@ -58,7 +58,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8008)
     parser.add_argument("--model_name_or_path", type=str, default="openai/whisper-tiny")
     parser.add_argument("--bf16", default=False, action="store_true")
-    parser.add_argument("--language", type=str, default="auto")
+    parser.add_argument("--language", type=str, default="english")
     parser.add_argument("--device", type=str, default="cpu")
 
     args = parser.parse_args()
