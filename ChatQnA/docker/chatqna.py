@@ -63,13 +63,7 @@ class ChatQnAService:
         self.megaservice.flow_to(rerank, llm)
         self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
-    async def schedule(self):
-        await self.megaservice.schedule(initial_inputs={"text": "What is the revenue of Nike in 2023?"})
-        result_dict = self.megaservice.result_dict
-        print(result_dict)
-
 
 if __name__ == "__main__":
     chatqna = ChatQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     chatqna.add_remote_service()
-    asyncio.run(chatqna.schedule())
