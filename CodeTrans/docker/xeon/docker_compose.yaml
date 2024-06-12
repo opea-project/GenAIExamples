@@ -14,6 +14,7 @@ services:
       - "./data:/data"
     shm_size: 1g
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
@@ -25,6 +26,7 @@ services:
       - "9000:9000"
     ipc: host
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
@@ -42,6 +44,7 @@ services:
     ports:
       - "7777:7777"
     environment:
+      - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
@@ -56,6 +59,7 @@ services:
     ports:
       - "5173:5173"
     environment:
+      - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - BASE_URL=${BACKEND_SERVICE_ENDPOINT}
