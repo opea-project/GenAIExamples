@@ -8,13 +8,13 @@
 import contextlib
 import os
 import time
+import urllib.request
 
 import numpy as np
 import torch
 from datasets import Audio, Dataset
 from pydub import AudioSegment
 from transformers import WhisperForConditionalGeneration, WhisperProcessor
-import urllib.request
 
 
 class AudioSpeechRecognition:
@@ -24,6 +24,7 @@ class AudioSpeechRecognition:
         if device == "hpu":
             # Explicitly link HPU with Torch
             from optimum.habana.transformers.modeling_utils import adapt_transformers_to_gaudi
+
             adapt_transformers_to_gaudi()
 
         self.device = device
@@ -44,7 +45,6 @@ class AudioSpeechRecognition:
             # whisper has a receptive field of 30 seconds
             # here we select a relatively long audio (~15 sec) to quickly warmup
             self._warmup_whisper_hpu_graph("https://paddlespeech.bj.bcebos.com/Parakeet/docs/demos/labixiaoxin.wav")
-
 
     def _audiosegment_to_librosawav(self, audiosegment):
         # https://github.com/jiaaro/pydub/blob/master/API.markdown#audiosegmentget_array_of_samples
