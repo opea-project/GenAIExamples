@@ -258,7 +258,12 @@ def spawnUI(share_gradio, server_port, server_name):
                         show_label=False,
                         container=False,
                         height=600,
-                        value=[[None, "Hello, welcome to Visual Rag! To get started, select a question from the drop-down menu above. \n Then, click on your selection and type your question below to chat with the video"]],
+                        value=[
+                            [
+                                None,
+                                "Hello, welcome to Visual Rag! To get started, select a question from the drop-down menu above. \n Then, click on your selection and type your question below to chat with the video",
+                            ]
+                        ],
                     )
                     # with gr.Group():
                     with gr.Row():
