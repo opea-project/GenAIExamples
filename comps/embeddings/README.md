@@ -27,7 +27,10 @@ For both of the implementations, you need to install requirements first.
 ## 1.1 Install Requirements
 
 ```bash
+# run with langchain
 pip install -r langchain/requirements.txt
+# run with llama_index
+pip install -r llama_index/requirements.txt
 ```
 
 ## 1.2 Start Embedding Service
@@ -57,8 +60,12 @@ curl localhost:$your_port/embed \
 Start the embedding service with the TEI_EMBEDDING_ENDPOINT.
 
 ```bash
+# run with langchain
 cd langchain
+# run with llama_index
+cd llama_index
 export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
+export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-large-en-v1.5"
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/gen-ai-comps:embeddings"
@@ -68,7 +75,10 @@ python embedding_tei_gaudi.py
 ### Start Embedding Service with Local Model
 
 ```bash
+# run with langchain
 cd langchain
+# run with llama_index
+cd llama_index
 python local_embedding.py
 ```
 
@@ -98,19 +108,29 @@ Export the `TEI_EMBEDDING_ENDPOINT` for later usage:
 
 ```bash
 export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
+export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-large-en-v1.5"
 ```
 
 ## 2.2 Build Docker Image
+
+### Build Langchain Docker (Option a)
 
 ```bash
 cd ../../
 docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
 ```
 
+### Build LlamaIndex Docker (Option b)
+
+```bash
+cd ../../
+docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/llama_index/docker/Dockerfile .
+```
+
 ## 2.3 Run Docker with CLI
 
 ```bash
-docker run -d --name="embedding-tei-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT opea/embedding-tei:latest
+docker run -d --name="embedding-tei-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e TEI_EMBEDDING_MODEL_NAME=$TEI_EMBEDDING_MODEL_NAME opea/embedding-tei:latest
 ```
 
 ## 2.4 Run Docker with Docker Compose

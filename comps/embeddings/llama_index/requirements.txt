@@ -1,0 +1,9 @@
+docarray[full]
+fastapi
+huggingface_hub
+langsmith
+llama-index-embeddings-text-embeddings-inference
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+shortuuid
