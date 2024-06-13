@@ -1,0 +1,13 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+import os
+
+# Embedding model
+EMBED_MODEL = os.getenv("EMBED_MODEL", "maidalun1020/bce-embedding-base_v1")
+# Embedding endpoints
+EMBEDDING_ENDPOINT = os.getenv("TEI_EMBEDDING_ENDPOINT", "")
+# MILVUS configuration
+MILVUS_HOST = os.getenv("MILVUS", "localhost")
+MILVUS_PORT = int(os.getenv("MILVUS_PORT", 19530))
+COLLECTION_NAME = os.getenv("COLLECTION_NAME", "rag_milvus")
