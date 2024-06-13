@@ -16,14 +16,14 @@ function build_docker_images() {
 
 function start_service() {
     docker run -d --name="test-comps-dataprep-redis" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 6379:6379 -p 8001:8001 --ipc=host redis/redis-stack:7.2.0-v9
-    dataprep_service_port=5011
+    dataprep_service_port=5012
     REDIS_URL="redis://${ip_address}:6379"
     docker run -d --name="test-comps-dataprep-redis-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -p ${dataprep_service_port}:6007 --ipc=host opea/dataprep-redis:comps
     sleep 1m
 }
 
 function validate_microservice() {
-    dataprep_service_port=5011
+    dataprep_service_port=5012
     URL="http://${ip_address}:$dataprep_service_port/v1/dataprep"
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > ./dataprep_file.txt
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
