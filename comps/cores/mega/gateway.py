@@ -230,6 +230,51 @@ class CodeTransGateway(Gateway):
         return ChatCompletionResponse(model="codetrans", choices=choices, usage=usage)
 
 
+class TranslationGateway(Gateway):
+    def __init__(self, megaservice, host="0.0.0.0", port=8888):
+        super().__init__(
+            megaservice, host, port, str(MegaServiceEndpoint.TRANSLATION), ChatCompletionRequest, ChatCompletionResponse
+        )
+
+    async def handle_request(self, request: Request):
+        data = await request.json()
+        language_from = data["language_from"]
+        language_to = data["language_to"]
+        source_language = data["source_language"]
+        prompt_template = """
+            Translate this from {language_from} to {language_to}:
+
+            {language_from}:
+            {source_language}
+
+            {language_to}:
+        """
+        prompt = prompt_template.format(
+            language_from=language_from, language_to=language_to, source_language=source_language
+        )
+        result_dict = await self.megaservice.schedule(initial_inputs={"query": prompt})
+        for node, response in result_dict.items():
+            # Here it suppose the last microservice in the megaservice is LLM.
+            if (
+                isinstance(response, StreamingResponse)
+                and node == list(self.megaservice.services.keys())[-1]
+                and self.megaservice.services[node].service_type == ServiceType.LLM
+            ):
+                return response
+        last_node = self.megaservice.all_leaves()[-1]
+        response = result_dict[last_node]["text"]
+        choices = []
+        usage = UsageInfo()
+        choices.append(
+            ChatCompletionResponseChoice(
+                index=0,
+                message=ChatMessage(role="assistant", content=response),
+                finish_reason="stop",
+            )
+        )
+        return ChatCompletionResponse(model="translation", choices=choices, usage=usage)
+
+
 class DocSumGateway(Gateway):
     def __init__(self, megaservice, host="0.0.0.0", port=8888):
         super().__init__(

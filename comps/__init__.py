@@ -25,7 +25,14 @@ from comps.cores.mega.constants import MegaServiceEndpoint, ServiceRoleType, Ser
 from comps.cores.mega.orchestrator import ServiceOrchestrator
 from comps.cores.mega.orchestrator_with_yaml import ServiceOrchestratorWithYaml
 from comps.cores.mega.micro_service import MicroService, register_microservice, opea_microservices
-from comps.cores.mega.gateway import Gateway, ChatQnAGateway, CodeGenGateway, CodeTransGateway, DocSumGateway
+from comps.cores.mega.gateway import (
+    Gateway,
+    ChatQnAGateway,
+    CodeGenGateway,
+    CodeTransGateway,
+    DocSumGateway,
+    TranslationGateway,
+)
 
 # Telemetry
 from comps.cores.telemetry.opea_telemetry import opea_telemetry
