@@ -6,15 +6,17 @@ set -xe
 USER_ID=$(whoami)
 LOG_PATH=/home/$(whoami)/logs
 MOUNT_DIR=/home/$USER_ID/charts-mnt
-# IMAGE_REPO is $OPEA_IMAGE_REPO, or else ""
-IMAGE_REPO=${OPEA_IMAGE_REPO:-amr-registry.caas.intel.com/aiops}
+IMAGE_REPO=${IMAGE_REPO:-}
+IMAGE_TAG=${IMAGE_TAG:-latest}
 
 function init_chatqna() {
     # executed under path manifest/chatqna/xeon
     # replace the mount dir "path: /mnt" with "path: $CHART_MOUNT"
     find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/models#path: $MOUNT_DIR#g" {} \;
+    # replace megaservice image tag
+    find . -name '*.yaml' -type f -exec sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" {} \;
     # replace the repository "image: opea/*" with "image: $IMAGE_REPO/opea/"
-    find . -name '*.yaml' -type f -exec sed -i "s#image: opea/*#image: $IMAGE_REPO/opea/#g" {} \;
+    find . -name '*.yaml' -type f -exec sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" {} \;
     # set huggingface token
     find . -name '*.yaml' -type f -exec sed -i "s#\${HUGGINGFACEHUB_API_TOKEN}#$(cat /home/$USER_ID/.cache/huggingface/token)#g" {} \;
 }
@@ -32,15 +34,29 @@ function install_chatqna {
 }
 
 function validate_chatqna() {
+    max_retry=20
     # make sure microservice retriever is ready
-    until curl http://retriever-svc.$NAMESPACE:7000/v1/retrieval -X POST \
-    -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
-    -H 'Content-Type: application/json'; do sleep 10; done
-
+    # try to curl retriever-svc for max_retry times
+    for ((i=1; i<=max_retry; i++))
+    do
+        curl http://retriever-svc.$NAMESPACE:7000/v1/retrieval -X POST \
+            -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
+            -H 'Content-Type: application/json' && break
+        sleep 10
+    done
     # make sure microservice tgi-svc is ready
-    until curl http://tgi-svc.$NAMESPACE:9009/generate -X POST \
-    -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-    -H 'Content-Type: application/json'; do sleep 10; done
+    for ((i=1; i<=max_retry; i++))
+    do
+        curl http://tgi-svc.$NAMESPACE:9009/generate -X POST \
+            -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+            -H 'Content-Type: application/json' && break
+        sleep 10
+    done
+    # if i is bigger than max_retry, then exit with error
+    if [ $i -gt $max_retry ]; then
+        echo "Microservice failed, exit with error."
+        exit 1
+    fi
 
     # check megaservice works
     # generate a random logfile name to avoid conflict among multiple runners
