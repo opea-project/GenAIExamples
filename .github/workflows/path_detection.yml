@@ -37,7 +37,7 @@ jobs:
           done < <(grep -Ern 'docker build .* -f comps/.+/Dockerfile' --include='*.md' .)
 
           echo $miss
-          if [[ "$miss" == "TRUE" ]]; then 
+          if [[ "$miss" == "TRUE" ]]; then
             exit 1
           fi
 
