@@ -300,14 +300,14 @@ class Chat:
             print(f"chat.upload_video - len(img_list): {len(self.img_list)}, AL-branch_out: audio_emb.size():{audio_emb.size()}, VL-branch_out: image_emb.size():{image_emb.size()}")
             return "Received."
 
-    def upload_video_without_audio(self, video_path):
+    def upload_video_without_audio(self, video_path, start_time, duration):
         msg = ""
         if isinstance(video_path, str):  # is a video path
             ext = os.path.splitext(video_path)[-1].lower()
             print(f"\nuploading {video_path}")
             # image = self.vis_processor(image).unsqueeze(0).to(self.device)
             video, msg = load_video(
-                video_path=video_path,
+                video_path=video_path, start_time=start_time, duration=duration,
                 n_frms=32,
                 height=224,
                 width=224,

@@ -22,12 +22,12 @@ import random as rnd
 MAX_INT = registry.get("MAX_INT")
 decord.bridge.set_bridge("torch")
 
-def load_video(video_path, n_frms=MAX_INT, height=-1, width=-1, sampling="uniform", return_msg = False, augment = False):
+def load_video(video_path, start_time=0, duration=-1, n_frms=MAX_INT, height=-1, width=-1, sampling="uniform", return_msg = False, augment = False):
     decord.bridge.set_bridge("torch")
     vr = VideoReader(uri=video_path, height=height, width=width)
-
+    fps = vr.get_avg_fps()
     vlen = len(vr)
-    start, end = 0, vlen
+    start, end = int(fps*start_time), min(vlen, int(fps*duration)) if duration != -1 else vlen
 
     n_frms = min(n_frms, vlen)
 

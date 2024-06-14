@@ -8,6 +8,7 @@ import torch
 import streamlit as st
 from transformers import AutoTokenizer, LlamaTokenizer, AutoModelForCausalLM, TextIteratorStreamer
 from transformers import set_seed
+import argparse
 
 from typing import Any, List, Mapping, Optional
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
@@ -15,9 +16,9 @@ from langchain.llms.base import LLM
 import threading
 from utils import config_reader as reader
 from utils import prompt_handler as ph
-# from vector_stores import db
 HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN", "")
 from embedding.extract_vl_embedding import VLEmbeddingExtractor as VL
+from embedding.generate_store_embeddings import setup_adaclip_model 
 from embedding.video_llama.common.config import Config
 from embedding.video_llama.common.dist_utils import get_rank
 from embedding.video_llama.common.registry import registry
@@ -42,9 +43,14 @@ config = st.session_state.config
 
 model_path = config['model_path']
 video_dir = config['videos']
-print(video_dir)
-video_dir = video_dir.replace('../', '')
-print(video_dir)
+# Read AdaCLIP
+if not os.path.exists(os.path.join(config['meta_output_dir'], "metadata.json")):
+    from embedding.generate_store_embeddings import main
+    vs = main()
+#import json
+#adaclip_cfg_json = json.load(open(config['adaclip_cfg_path'], 'r'))
+#adaclip_cfg_json["resume"] = config['adaclip_model_path']
+#adaclip_cfg = argparse.Namespace(**adaclip_cfg_json)
 st.set_page_config(initial_sidebar_state='collapsed', layout='wide')
 
 st.title("Video RAG")
@@ -109,8 +115,8 @@ class VideoLLM(LLM):
             video_path,
             text_input,
             chat,
-            #chat_state,
-            #img_list,
+            start_time,
+            duration,
             streamer = None,  # Add streamer as an argument
         ):
         
@@ -118,14 +124,14 @@ class VideoLLM(LLM):
         print("  text_input:", text_input)
         print(" - - ")
         
-        chat.upload_video_without_audio(video_path)#, chat_state, img_list)
+        chat.upload_video_without_audio(video_path, start_time, duration)
         chat.ask(text_input)#, chat_state)
         #answer = chat.answer(chat_state, img_list, max_new_tokens=300, num_beams=1, min_length=1, top_p=0.9, repetition_penalty=1.0, length_penalty=1, temperature=0.1, max_length=2000, keep_conv_hist=True, streamer=streamer)
         answer = chat.answer(max_new_tokens=300, num_beams=1, min_length=1, top_p=0.9, repetition_penalty=1.0, length_penalty=1, temperature=0.1, max_length=2000, keep_conv_hist=True, streamer=streamer)
 
-    def stream_res(self, video_path, text_input, chat):
+    def stream_res(self, video_path, text_input, chat, start_time, duration):
         #thread = threading.Thread(target=self._call, args=(video_path, text_input, chat, chat_state, img_list, streamer))  # Pass streamer to _call
-        thread = threading.Thread(target=self._call, args=(video_path, "<rag_prompt>"+text_input, chat, streamer))  # Pass streamer to _call
+        thread = threading.Thread(target=self._call, args=(video_path, "<rag_prompt>"+text_input, chat, start_time, duration, streamer))  # Pass streamer to _call
         thread.start()
         
         for text in streamer:
@@ -193,16 +199,21 @@ def get_top_doc(results, qcnt):
     for r in results:
         try:
             video_name = r.metadata['video']
-            playback_offset = r.metadata["start of interval in sec"]
+            #playback_offset = r.metadata["start of interval in sec"]
+            playback_offset = r.metadata["timestamp"]
             if video_name not in hit_score.keys(): hit_score[video_name] = 0
             hit_score[video_name] += 1
         except:
-            pass
+            r,score = r
+            video_name = r.metadata['video_path']
+            #playback_offset = r.metadata["start of interval in sec"]
+            playback_offset = r.metadata["timestamp"]
+            hit_score[video_name] = score
 
     x = dict(sorted(hit_score.items(), key=lambda item: -item[1]))
     
     if qcnt >= len(x):
-        return None
+        return None, None
     print (f'top docs = {x}')
     return {'video': list(x)[qcnt]}, playback_offset
 
@@ -219,8 +230,14 @@ def play_video(x, offset):
 if 'llm' not in st.session_state.keys():
     with st.spinner('Loading Models . . .'):
         time.sleep(1)
-        #st.session_state['llm'] = CustomLLM()
-        st.session_state['llm'] = VideoLLM()
+        if config['embeddings']['type'] == "frame":
+            print("Loading CustomLLM . . .")
+            st.session_state['llm'] = CustomLLM()
+        elif config['embeddings']['type'] == "video":
+            st.session_state['llm'] = VideoLLM()
+            print("Loading VideoLLM . . .")
+        else:
+            print("ERROR: line 240")
         
 if 'vs' not in st.session_state.keys():
     with st.spinner('Preparing RAG pipeline'):
@@ -228,8 +245,13 @@ if 'vs' not in st.session_state.keys():
         host = st.session_state.config['vector_db']['host']
         port = int(st.session_state.config['vector_db']['port'])
         selected_db = st.session_state.config['vector_db']['choice_of_db']
-        st.session_state['vs'] = db.VS(host, port, selected_db)
-        
+        st.session_state['vs'] = vs
+        #if config['embeddings']['type'] == "frame":
+        #    #st.session_state['vs'] = db.VS(host, port, selected_db)
+        #elif config['embeddings']['type'] == "video":
+        #    #model, _ = setup_adaclip_model(adaclip_cfg, device="cuda")
+        #    #st.session_state['vs'] = db.VideoVS(host, port, selected_db, model) # FIX THIS LINE
+
         if st.session_state.vs.client == None:
             print ('Error while connecting to vector DBs')
         
@@ -246,17 +268,17 @@ def RAG(prompt):
     
     with st.status("Querying database . . . ", expanded=True) as status:
         st.write('Retrieving 3 image docs') #1 text doc and 
-        results = st.session_state.vs.MultiModalRetrieval(prompt, n_images = 3) #n_texts = 1, n_images = 3)
+        results = st.session_state.vs.MultiModalRetrieval(prompt, top_k = 3) #n_texts = 1, n_images = 3)
         status.update(label="Retrived Top matching video!", state="complete", expanded=False)
     print("---___---")
-    print (f'RAG prompt={prompt}\n')
+    print (f'\tRAG prompt={prompt}')
     print("---___---")
       
     top_doc, playback_offset = get_top_doc(results, st.session_state["qcnt"])
     print ('TOP DOC = ', top_doc)
     print("PLAYBACK OFFSET = ", playback_offset)
     if top_doc == None:
-        return None, None
+        return None, None, None
     video_name = top_doc['video']
     print('Video from top doc: ', video_name)
     
@@ -312,7 +334,7 @@ def handle_message():
                 full_response = f"Most relevant retrived video is **{video_name}** \n\n"
                 
                 #for new_text in st.session_state.llm.stream_res(formatted_prompt):
-                for new_text in st.session_state.llm.stream_res(os.path.join(video_dir,video_name), prompt, chat):
+                for new_text in st.session_state.llm.stream_res(video_name, prompt, chat, playback_offset, config['clip_duration']):
                     full_response += new_text
                     placeholder.markdown(full_response)
 

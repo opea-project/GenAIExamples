@@ -66,6 +66,8 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
                 if len(tokens[i]) > 64:
                     tokens[i] = tokens[i][:64-1] + tokens[i][-1:]
                 tokenized_text[i, :len(tokens[i])] = torch.tensor(tokens[i])
+            print("text:", text[i])
+            print("tokenized_text:", tokenized_text[i,:10])
             text_embd, word_embd = self.model.get_text_output(tokenized_text.unsqueeze(0).to(model_device), return_hidden=False)
 
             # Normalize the embeddings
@@ -75,6 +77,7 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
 
             # Convert normalized tensor to list and add to the text_features list
             embeddings_list = text_embd.squeeze(0).tolist()
+            print("text embedding:", text_embd.flatten()[:10])
             text_features.append(embeddings_list)
 
         return text_features
@@ -88,12 +91,12 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
         # Open images directly as PIL images
 
         video_features = []
-        for vid_path in paths:
+        for vid_path in sorted(paths):
             # Encode the video to get the embeddings
             model_device = next(self.model.parameters()).device
             # Preprocess the video for the model
-            videos_tensor, policy_images_tensor = self.load_video_for_adaclip(vid_path, num_frm=64,
-                                                                              no_policy=False,
+            videos_tensor, policy_images_tensor = self.load_video_for_adaclip(vid_path, num_frm=self.model.num_frm,
+                                                                              no_policy=not self.model.use_policy,
                                                                               policy_backbone=backbone,
                                                                               max_img_size=224,
                                                                               start_time=kwargs.get("start_time", None),
@@ -103,6 +106,7 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
 
             # Convert tensor to list and add to the video_features list
             embeddings_list = embeddings_tensor.squeeze(0).tolist()
+            print("video embeddings:", embeddings_tensor.flatten()[:10])
 
             video_features.append(embeddings_list)
 
@@ -118,18 +122,24 @@ class AdaCLIPEmbeddings(BaseModel, Embeddings):
         end_idx = start_idx+int(fps*kwargs.get("clip_duration", [num_frames])[0])
 
         frame_idx = np.linspace(start_idx, end_idx, num=num_frm, endpoint=False, dtype=int) # Uniform sampling
-
         clip_images = []
         policy_images = []
 
         # Extract frames as numpy array
         img_array = vr.get_batch(frame_idx).asnumpy() # img_array = [T,H,W,C]
         clip_imgs = [Image.fromarray(img_array[j]) for j in range(img_array.shape[0])]
-
+        print("vis_path:", vis_path)
+        print("frame_idx:", frame_idx)
+        print("img_array[:,0,0,:]:", img_array[:,0,0,:])
+        print("clip_imgs:",)
+        for im in clip_imgs:
+            print("  -> list(im.get_data())[:3]:", list(im.get_data())[:3])
+        a=b
         # preprocess images
+        clip_preprocess = get_transforms("clip", max_img_size)
         for i in range(len(clip_imgs)):
             im = clip_imgs[i]
-            clip_images.append(get_transforms("clip", max_img_size)(im)) # 3, 224, 224
+            clip_images.append(clip_preprocess(im)) # 3, 224, 224
             if not no_policy:
                 policy_images.append(get_transforms(policy_backbone, 256)(im))
 
@@ -339,10 +349,10 @@ class VS:
     def MultiModalRetrieval(
             self,
             query: str,
-            n_images: Optional[int] = 3,
+            top_k: Optional[int] = 3,
         ):
 
-        self.update_db(query, n_images)
+        self.update_db(query, top_k)
         image_results = self.update_image_retriever.invoke(query)
 
         for r in image_results:
@@ -382,11 +392,11 @@ class VideoVS(VS):
        # )
 
     
-    def MultiModalRetrieval(self, query: str, n_videos: Optional[int] = 3):
-        self.update_db(query, n_videos)
+    def MultiModalRetrieval(self, query: str, top_k: Optional[int] = 3):
+        self.update_db(query, top_k)
         #video_results = self.video_retriever.invoke(query)
-        video_results = self.video_db.similarity_search_with_score(query=query, k=n_videos, filter=self.constraints)
+        video_results = self.video_db.similarity_search_with_score(query=query, k=top_k, filter=self.constraints)
         for r, score in video_results:
-            print("videos:", r.metadata['video_path'], '\t', r.metadata['date'], '\t', r.metadata['time'], r.metadata['timestamp'], f"score: {score}", '\n')
+            print("videos:", r.metadata['video_path'], '\t', r.metadata['date'], '\t', r.metadata['time'], r.metadata['timestamp'], f"score: {score}", r, '\n')
 
         return video_results

@@ -24,8 +24,8 @@ from langchain_experimental.open_clip import OpenCLIPEmbeddings
 from embedding.adaclip_modeling.model import AdaCLIP
 from embedding.adaclip_modeling.clip_model import CLIP
 from utils import config_reader as reader
-from extract_store_frames import process_all_videos
-from vector_stores import db
+from embedding.extract_store_frames import process_all_videos
+from embedding.vector_stores import db
 from decord import VideoReader, cpu
 import numpy as np
 from PIL import Image
@@ -228,7 +228,6 @@ def main():
     # Create argument parser
     parser = argparse.ArgumentParser(description='Process configuration file for generating and storing embeddings.')
     parser.add_argument('config_file', type=str, help='Path to configuration file (e.g., config.yaml)')
-    parser.add_argument('videos_folder', type=str, help='Path to folder containing videos')
 
     # Parse command-line arguments
     args = parser.parse_args()
@@ -272,6 +271,7 @@ def main():
         return
     generate_embeddings(config, model, vs)
     retrieval_testing(vs)
+    return vs
 
 if __name__ == '__main__':
     main()
