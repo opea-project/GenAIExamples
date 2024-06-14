@@ -4,9 +4,9 @@
 name: Check for missing Dockerfile paths in repo comps
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '00 12 * * 5'
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
 
 jobs:
   check-dockerfile-paths:
