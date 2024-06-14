@@ -1,0 +1,14 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+text:
+  - name: content
+  - name: source
+numeric:
+  - name: start_index
+vector:
+  - name: content_vector
+    algorithm: HNSW
+    datatype: FLOAT32
+    dims: 768
+    distance_metric: COSINE
