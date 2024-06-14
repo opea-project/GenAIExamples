@@ -15,12 +15,13 @@
 import asyncio
 import os
 
-from comps import TranslationGateway, MicroService, ServiceOrchestrator, ServiceType
+from comps import MicroService, ServiceOrchestrator, ServiceType, TranslationGateway
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8888)
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
+
 
 class TranslationService:
     def __init__(self, host="0.0.0.0", port=8000):
@@ -40,15 +41,7 @@ class TranslationService:
         self.megaservice.add(llm)
         self.gateway = TranslationGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
-    async def schedule(self):
-        await self.megaservice.schedule(
-            initial_inputs={"query": "Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}
-        )
-        result_dict = self.megaservice.result_dict
-        print(result_dict)
-
 
 if __name__ == "__main__":
     translation = TranslationService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     translation.add_remote_service()
-    asyncio.run(translation.schedule())

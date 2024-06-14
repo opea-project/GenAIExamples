@@ -79,7 +79,7 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:8008/generate" \
         "generated_text" \
-        "tgi-gaudi" \
+        "tgi" \
         "tgi_service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
@@ -99,7 +99,7 @@ function validate_megaservice() {
     "I love machine translation" \
     "mega-translation" \
     "translation-xeon-backend-server" \
-    '{"messages": "Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
+    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
 }
 
 function validate_frontend() {

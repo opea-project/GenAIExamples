@@ -18,8 +18,7 @@ function build_docker_images() {
     cd $WORKPATH/docker
     docker build --no-cache -t opea/translation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
-    cd $WORKPATH/docker/gaudi
-    docker build . --no-cache -t tgi-gaudi-translation:1.2.1 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile
+    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
@@ -102,7 +101,7 @@ function validate_megaservice() {
     "I love machine translation" \
     "mega-translation" \
     "translation-gaudi-backend-server" \
-    '{"messages": "Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
+    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
 }
 
 function validate_frontend() {
