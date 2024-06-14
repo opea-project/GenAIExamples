@@ -19,8 +19,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
 
 RUN git clone --single-branch --branch=${BRANCH} ${REPO_COMPS} /home/user/GenAIComps/ && \
     cd /home/user/GenAIComps/ && python3 setup.py install && \
-    pip install --no-cache-dir -r /home/user/GenAIComps/comps/llms/lm-eval/requirements.txt
+    pip install --no-cache-dir -r /home/user/GenAIComps/comps/llms/utils/lm-eval/requirements.txt
 
-WORKDIR /home/user/GenAIComps/comps/llms/lm-eval/
+WORKDIR /home/user/GenAIComps/comps/llms/utils/lm-eval/
 
 ENTRYPOINT ["python3", "self_hosted_hf.py"]
