@@ -9,7 +9,7 @@ on:
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/kubernetes/manifests/**"
-      - .github/workflows/manifest-validate.yaml
+      - .github/workflows/manifest-validate.yml
   workflow_dispatch:
 
 # If there is a new commit, the previous jobs will be canceled
