@@ -1,0 +1,28 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Check for missing Dockerfile paths in repo comps
+
+on:
+  schedule:
+    - cron: '0 17 * * *' # Runs at 5 PM UTC every day
+
+jobs:
+  check-dockerfile-paths:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Clone repo GenAIComps
+      run: |
+        git clone https://github.com/opea-project/GenAIComps.git ..
+
+    - name: Check for missing Dockerfile paths in GenAIComps
+      run: |
+        for file in $(find ../GenAIComps -type f -name '*.md'); do
+          echo "Checking $file"
+          grep -q 'comps/**/Dockerfile' "$file" || {
+            echo "Missing Dockerfile path in $file"
+          }
+        done
