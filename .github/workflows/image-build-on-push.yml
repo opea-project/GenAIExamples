@@ -1,0 +1,30 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+# Test
+name: Build latest images on push event
+
+on:
+  push:
+    branches: [ 'main' ]
+    paths:
+      - "**/docker/*.py"
+      - "**/docker/Dockerfile"
+      - "**/docker/ui/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-on-push
+  cancel-in-progress: true
+
+jobs:
+  job1:
+    uses: ./.github/workflows/reuse-get-test-matrix.yml
+
+  mega-image-build:
+    needs: job1
+    strategy:
+      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+    uses: ./.github/workflows/reuse-image-build.yml
+    with:
+      image-tag: latest
+      mega-service: "${{ matrix.example }}"
