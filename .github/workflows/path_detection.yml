@@ -18,7 +18,7 @@ jobs:
 
     - name: Clone repo GenAIComps
       run: |
-        git clone https://github.com/opea-project/GenAIComps.git ..
+        git clone https://github.com/opea-project/GenAIComps.git
 
     - name: Check for missing Dockerfile paths in GenAIComps
       run: |
