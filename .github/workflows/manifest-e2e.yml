@@ -5,7 +5,7 @@ name: E2E test with manifests
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, daisyonpush]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/kubernetes/manifests/**"
@@ -23,7 +23,7 @@ jobs:
   job1:
     uses: ./.github/workflows/reuse-get-test-matrix.yml
     with:
-      diff-excluded-files: '.github|deprecated|docker|assets'
+      diff-excluded-files: '.github|deprecated|docker|assets|*.md|*.txt'
       xeon-server-lable: 'k8s'
       gaudi-server-lable: ""
 
