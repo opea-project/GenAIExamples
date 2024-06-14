@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+# Support push and pull_request events
 name: Get Test Matrix
 permissions: read-all
 on:
@@ -33,15 +34,30 @@ jobs:
       - name: Checkout out Repo
         uses: actions/checkout@v4
         with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
           fetch-depth: 0
+
+      - name: print
+        run: |
+          echo "The event name is ${{ github.event_name }}"
+          echo "Before SHA is ${{ github.event.before }}"
+          echo "After SHA is ${{ github.event.after }}"
+          echo "Commit SHA is ${{ github.sha }}"
+          merged_commit=$(git log -1 --format='%H')
+          echo "Merged commit is $merged_commit"
+          echo "pull_request.base.sha is ${{ github.event.pull_request.base.sha }}"
+          echo "head_ref is ${{ github.head_ref }}"
 
       - name: Get test matrix
         id: get-test-matrix
         run: |
           set -xe
           merged_commit=$(git log -1 --format='%H')
-          changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} | \
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            base_commit=${{ github.event.pull_request.base.sha }}
+          else
+            base_commit=$(git rev-parse HEAD~1) # push event
+          fi
+          changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
           grep -vE '${{ inputs.diff-excluded-files }}')" || true
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
