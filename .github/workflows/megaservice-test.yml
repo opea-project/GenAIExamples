@@ -15,6 +15,9 @@ on:
       - tests/cores/**
   workflow_dispatch:
 
+permissions:
+  pull-requests: write
+
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -61,11 +64,9 @@ jobs:
           docker exec ${{ env.CONTAINER_NAME }} \
           bash -c "bash /GenAIComps/.github/workflows/scripts/test_ut.sh ${{ env.TEST_NAME }}"
 
-      #      - name: Run Workflow
-      #        env:
-      #          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      #        run: |
-      #          xxx
+      - uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}

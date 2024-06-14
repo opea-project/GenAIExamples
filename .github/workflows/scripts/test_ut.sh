@@ -14,7 +14,7 @@ if [ $test_name = 'mega' ]; then
     cd cores
     find . -name "*.yaml" -exec sh -c 'x="{}"; cp $x ./' \;
     comps_path=$(python -c 'import comps; print(comps.__path__[0])')
-    find . -name "test*.py" | sed "s,\.\/,python -m pytest --cov=\"${comps_path}\" --cov-append -vs --disable-warnings ,g" > run.sh
+    find . -name "test*.py" | sed "s,\.\/,python -m pytest --cov=\"${comps_path}\" --cov-report term --cov-report xml:coverage.xml --cov-append -vs --disable-warnings ,g" > run.sh
     bash run.sh 2>&1 | tee ${ut_log_name}
 else
     echo "run other test"
