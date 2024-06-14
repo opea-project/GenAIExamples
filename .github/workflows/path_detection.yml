@@ -4,6 +4,7 @@
 name: Check for missing Dockerfile paths in repo comps
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 17 * * *' # Runs at 5 PM UTC every day
 
