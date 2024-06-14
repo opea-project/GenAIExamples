@@ -36,6 +36,16 @@ jobs:
           ref: "refs/pull/${{ github.event.number }}/merge"
           fetch-depth: 0
 
+      - name: print
+        run: |
+          echo "The event name is ${{ github.event_name }}"
+          echo "Before SHA is ${{ github.event.before }}"
+          echo "After SHA is ${{ github.event.after }}"
+          echo "Commit SHA is ${{ github.sha }}"
+          merged_commit=$(git log -1 --format='%H')
+          echo "Merged commit is $merged_commit"
+          echo "pull_request.base.sha is ${{ github.event.pull_request.base.sha }}"
+
       - name: Get test matrix
         id: get-test-matrix
         run: |
