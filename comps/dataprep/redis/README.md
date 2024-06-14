@@ -129,10 +129,33 @@ docker container logs -f dataprep-redis-server
 
 Once document preparation microservice for Redis is started, user can use below command to invoke the microservice to convert the document to embedding and save to the database.
 
+Make sure the file path after `files=@` is correct.
+
+- Single file upload
+
 ```bash
 curl -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"path":"/path/to/document"}' \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./file1.txt" \
+    http://localhost:6007/v1/dataprep
+```
+
+- Multiple file upload
+
+```bash
+curl -X POST \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./file1.txt" \
+    -F "files=@./file2.txt" \
+    -F "files=@./file3.txt" \
+    http://localhost:6007/v1/dataprep
+```
+
+- Links upload (not supported for llama_index now)
+
+```bash
+curl -X POST \
+    -F 'link_list=["https://www.ces.tech/"]' \
     http://localhost:6007/v1/dataprep
 ```
 
