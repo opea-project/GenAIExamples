@@ -23,37 +23,9 @@ concurrency:
 
 jobs:
   job1:
-    name: Get-test-matrix
-    runs-on: ubuntu-latest
-    outputs:
-      run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
-    steps:
-      - name: Checkout out Repo
-        uses: actions/checkout@v4
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-          fetch-depth: 0
-
-      - name: Get test matrix
-        id: get-test-matrix
-        run: |
-          set -xe
-          merged_commit=$(git log -1 --format='%H')
-          changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} | \
-          grep -vE '.github|README.md|*.txt|deprecate|kubernetes|manifest')" || true
-          examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
-          run_matrix="{\"include\":["
-          for example in ${examples}; do
-              run_hardware=""
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
-              if [ "$run_hardware" = "" ]; then run_hardware="xeon"; fi
-              for hw in ${run_hardware}; do
-                  run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hw}\"},"
-              done
-          done
-          run_matrix=$run_matrix"]}"
-          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+    uses: ./.github/workflows/reuse-get-test-matrix.yml
+    with:
+      diff-excluded-files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|assets'
 
   Example-test:
     needs: job1

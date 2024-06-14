@@ -1,0 +1,62 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Get Test Matrix
+permissions: read-all
+on:
+  workflow_call:
+    inputs:
+      diff-excluded-files:
+        required: false
+        type: string
+        default: '.github|README.md|*.txt'
+      xeon-server-lable:
+        required: false
+        type: string
+        default: 'xeon'
+      gaudi-server-lable:
+        required: false
+        type: string
+        default: 'gaudi'
+    outputs:
+      run_matrix:
+        description: "The matrix string"
+        value: ${{ jobs.job1.outputs.run_matrix }}
+
+jobs:
+  job1:
+    name: Get-test-matrix
+    runs-on: ubuntu-latest
+    outputs:
+      run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+          fetch-depth: 0
+
+      - name: Get test matrix
+        id: get-test-matrix
+        run: |
+          set -xe
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} | \
+          grep -vE '${{ inputs.diff-excluded-files }}')" || true
+          examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
+          run_matrix="{\"include\":["
+          for example in ${examples}; do
+              run_hardware=""
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
+              if [ "$run_hardware" = "" ]; then run_hardware="xeon"; fi
+              for hw in ${run_hardware}; do
+                  if [ $hw = "gaudi" && ${{ inputs.gaudi-server-lable }} != ""]; then
+                    run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.gaudi-server-lable }}\"},"
+                  elif [ ${{ inputs.xeon-server-lable }} != "" ]; then
+                    run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.xeon-server-lable }}\"},"
+                  fi
+              done
+          done
+          run_matrix=$run_matrix"]}"
+          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
