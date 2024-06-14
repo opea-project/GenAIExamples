@@ -3,6 +3,7 @@
 
 import json
 import os
+import re
 import time
 
 import requests
@@ -40,12 +41,16 @@ def reranking(input: SearchedDoc) -> LLMParamsDoc:
     response = requests.post(url, data=json.dumps(data), headers=headers)
     response_data = response.json()
     best_response = max(response_data, key=lambda response: response["score"])
-    template = """Answer the question based only on the following context:
-    {context}
-    Question: {question}
-    """
-    prompt = ChatPromptTemplate.from_template(template)
     doc = input.retrieved_docs[best_response["index"]]
+    if doc.text and len(re.findall("[\u4E00-\u9FFF]", doc.text)) / len(doc.text) >= 0.3:
+        # chinese context
+        template = "仅基于以下背景回答问题:\n{context}\n问题: {question}"
+    else:
+        template = """Answer the question based only on the following context:
+{context}
+Question: {question}
+        """
+    prompt = ChatPromptTemplate.from_template(template)
     final_prompt = prompt.format(context=doc.text, question=input.initial_query)
     statistics_dict["opea_service@reranking_tgi_gaudi"].append_latency(time.time() - start, None)
     return LLMParamsDoc(query=final_prompt.strip())

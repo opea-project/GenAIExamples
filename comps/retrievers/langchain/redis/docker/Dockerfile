@@ -15,15 +15,15 @@ RUN useradd -m -s /bin/bash user && \
 
 COPY comps /home/user/comps
 
-RUN chmod +x /home/user/comps/retrievers/langchain/run.sh
+RUN chmod +x /home/user/comps/retrievers/langchain/redis/run.sh
 
 USER user
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/user/comps/retrievers/requirements.txt
+    pip install --no-cache-dir -r /home/user/comps/retrievers/langchain/redis/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/retrievers/langchain
+WORKDIR /home/user/comps/retrievers/langchain/redis
 
-ENTRYPOINT ["/home/user/comps/retrievers/langchain/run.sh"]
+ENTRYPOINT ["/home/user/comps/retrievers/langchain/redis/run.sh"]

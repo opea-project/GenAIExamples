@@ -12,7 +12,7 @@ services:
     volumes:
       - "./data:/data"
     shm_size: 1g
-    command: --model-id ${RERANK_MODEL_ID}
+    command: --model-id ${RERANK_MODEL_ID} --hf-api-token ${HF_TOKEN}
   reranking:
     image: opea/reranking-tei:latest
     container_name: reranking-tei-xeon-server
