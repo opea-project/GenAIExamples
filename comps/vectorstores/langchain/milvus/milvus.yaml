@@ -244,7 +244,7 @@ proxy:
     port: # high-level restful api
     acceptTypeAllowInt64: true # high-level restful api, whether http client can deal with int64
     enablePprof: true # Whether to enable pprof middleware on the metrics port
-  ip: # if not specified, use the first unicastable address
+  ip: 0.0.0.0 # if not specified, use the first unicastable address
   port: 19530
   internalPort: 19529
   grpc:

@@ -12,11 +12,12 @@ from langchain_milvus.vectorstores import Milvus
 from comps.cores.mega.micro_service import opea_microservices, register_microservice
 from comps.cores.proto.docarray import DocPath
 from comps.cores.telemetry.opea_telemetry import opea_telemetry
+from comps.dataprep.utils import document_loader
 
-current_script_path = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_script_path)
-sys.path.append(parent_dir)
-from utils import document_loader
+# current_script_path = os.path.dirname(os.path.abspath(__file__))
+# parent_dir = os.path.dirname(current_script_path)
+# sys.path.append(parent_dir)
+# from utils import document_loader
 
 
 @register_microservice(
