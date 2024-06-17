@@ -23,7 +23,7 @@ jobs:
   job1:
     uses: ./.github/workflows/reuse-get-test-matrix.yml
     with:
-      diff-excluded-files: '.github|deprecated|docker|assets'
+      diff-excluded-files: '.github|deprecated|docker|assets|*.md|*.txt'
       xeon-server-lable: 'k8s'
       gaudi-server-lable: ""
 
