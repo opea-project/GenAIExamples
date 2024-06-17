@@ -1,0 +1,42 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Image Build
+permissions: read-all
+on:
+  workflow_call:
+    inputs:
+      image-repo:
+        required: false
+        type: string
+      image-tag:
+        required: true
+        type: string
+      mega-service:
+        required: true
+        type: string
+      runner_lable:
+        required: false
+        type: string
+        default: 'docker-build'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-image-build
+
+jobs:
+  mega-image-build:
+    runs-on: ${{ inputs.runner_lable }}
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Building MegaService Docker Image
+        id: build-megaservice-image
+        env:
+          IMAGE_REPO: ${{ inputs.image-repo }}
+          IMAGE_TAG: ${{ inputs.image-tag }}
+          mega-service: ${{ inputs.mega-service }}
+        run: |
+          .github/workflows/scripts/build_push.sh ${{ env.mega-service}}

@@ -40,7 +40,7 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 ### 6. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
+docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/docker/Dockerfile .
 ```
 
 ### 7. Build TEI Gaudi Image
@@ -93,6 +93,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
+export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
@@ -261,4 +262,4 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
-![project-screenshot](https://i.imgur.com/26zMnEr.png)
+![project-screenshot](../../assets/img/chat_ui_init.png)

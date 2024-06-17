@@ -22,7 +22,7 @@ cd GenAIComps
 ### 1. Build LLM Image
 
 ```bash
-docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/docsum/langchain/docker/Dockerfile .
+docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:
@@ -59,6 +59,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
+export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
@@ -131,4 +132,4 @@ export LANGCHAIN_API_KEY=ls_...
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
-![project-screenshot](https://i.imgur.com/26zMnEr.png)
+![project-screenshot](../../assets/img/docSum_ui_text.png)

@@ -4,7 +4,7 @@ Language Translation is the communication of the meaning of a source-language te
 
 The workflow falls into the following architecture:
 
-![architecture](https://i.imgur.com/5f9hoAW.png)
+![architecture](./assets/img/translation_architecture.png)
 
 # Start Backend Service
 

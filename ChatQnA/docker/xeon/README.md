@@ -93,7 +93,7 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 ### 5. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/docker/Dockerfile .
+docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/docker/Dockerfile .
 cd ..
 ```
 
@@ -150,7 +150,14 @@ export host_ip="External_Public_IP"
 export your_hf_api_token="Your_Huggingface_API_Token"
 ```
 
+**Append the value of the public IP address to the no_proxy list**
+
+```
+export your_no_proxy=${your_no_proxy},"External_Public_IP"
+```
+
 ```bash
+export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
@@ -319,4 +326,8 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
-![project-screenshot](https://i.imgur.com/26zMnEr.png)
+![project-screenshot](../../assets/img/chat_ui_init.png)
+
+Here is an example of running ChatQnA:
+
+![project-screenshot](../../assets/img/chat_ui_response.png)
