@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+# Support push and pull_request events
 name: Get Test Matrix
 permissions: read-all
 on:
@@ -30,18 +31,32 @@ jobs:
     outputs:
       run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
     steps:
+      - name: Get checkout ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+          echo "checkout ref ${{ env.CHECKOUT_REF }}"
+
       - name: Checkout out Repo
         uses: actions/checkout@v4
         with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
+          ref: ${{ env.CHECKOUT_REF }}
           fetch-depth: 0
 
       - name: Get test matrix
         id: get-test-matrix
         run: |
           set -xe
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            base_commit=${{ github.event.pull_request.base.sha }}
+          else
+            base_commit=$(git rev-parse HEAD~1) # push event
+          fi
           merged_commit=$(git log -1 --format='%H')
-          changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} | \
+          changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
           grep -vE '${{ inputs.diff-excluded-files }}')" || true
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
@@ -51,7 +66,7 @@ jobs:
               if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
               if [ "$run_hardware" = "" ]; then run_hardware="xeon"; fi
               for hw in ${run_hardware}; do
-                  if [ $hw = "gaudi" && ${{ inputs.gaudi-server-lable }} != ""]; then
+                  if [ $hw = "gaudi" ] && [ ${{ inputs.gaudi-server-lable }} != ""]; then
                     run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.gaudi-server-lable }}\"},"
                   elif [ ${{ inputs.xeon-server-lable }} != "" ]; then
                     run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.xeon-server-lable }}\"},"
