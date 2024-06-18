@@ -214,7 +214,6 @@ def load_svg(svg_path):
     return text
 
 
-@timeout(600)
 def document_loader(doc_path):
     if doc_path.endswith(".pdf"):
         return load_pdf(doc_path)
