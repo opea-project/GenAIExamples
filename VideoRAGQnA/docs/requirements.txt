@@ -1,7 +1,7 @@
 chromadb
 opencv-python-headless
 langchain-experimental
-open-clip-torch
+open-clip-torch==2.24.0
 streamlit
 metafunctions
 sentence-transformers
@@ -9,3 +9,12 @@ accelerate
 vdms
 tzlocal
 dateparser
+pytorchvideo==0.1.5
+torch==2.2.0 --index-url https://download.pytorch.org/whl/cu121
+torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121
+torchvideo==0.0.0
+torchvision==0.17.0 --index-url https://download.pytorch.org/whl/cu121
+einops
+ptflops
+decord
+easydict

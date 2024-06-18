@@ -72,7 +72,7 @@ def setup_adaclip_model(cfg, device):
     if cfg.resume is None or not os.path.exists(cfg.resume):
         print("Using Mean Aggregation and no_policy")
         model.frame_agg = "mean"
-        model.no_policy = True
+        model.use_policy = False
     missing_keys = []
     unexpected_keys = []
     error_msgs = []
@@ -192,15 +192,15 @@ def store_into_vectordb(vs, metadata_file_path, embedding_model, config):
             )
         elif config['embeddings']['type'] == 'video':
             data['video'] = video
-            image_name_list = [data["video_path"]]
+            video_name_list = [data["video_path"]]
             metadata_list = [data]
             vs.video_db.add_videos(
-                paths=image_name_list,
+                paths=video_name_list,
                 metadatas=metadata_list,
                 start_time=[data['timestamp']],
                 clip_duration=[data['clip_duration']]
             )
-        print (f'✅ {_+1}/{total_videos} video {video}, len {len(image_name_list)}, {len(metadata_list)}, {len(embedding_list)}')
+        print (f'✅ {_+1}/{total_videos} video {video}, len {len(video_name_list)}, {len(metadata_list)}, {len(embedding_list)}')
 
 def generate_embeddings(config, embedding_model, vs):
     if not os.path.exists(config['image_output_dir']):

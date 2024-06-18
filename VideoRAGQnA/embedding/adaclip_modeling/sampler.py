@@ -82,7 +82,12 @@ class Sampler(nn.Module):
     def get_policy_actions(self, visual_inputs, tau):
 
         if self.cnn_model is not None:
+            #print("policy_backbone:", self.policy_backbone)
+            #print("use_rnn:", self.use_rnn)
+            #print("rnn_type:", self.rnn_type)
+            #print("visual_inputs input to cnn_model:", visual_inputs[0,0,:2,:2])
             feat_lite = self.cnn_model(visual_inputs) # (b * n_frms, feat_dim)
+            #print("feat_lite in cnn_model:", feat_lite[0,:3])
         elif self.policy_backbone == "clip":
             feat_lite = visual_inputs
         elif self.policy_backbone == "frozen_clip":
@@ -90,7 +95,7 @@ class Sampler(nn.Module):
         elif self.policy_backbone == "raw":
             feat_lite = visual_inputs
         feat_lite = rearrange(feat_lite, "(b n) d -> b n d", n=self.num_frm)
-
+        #print("feat_lite after rearrange:", feat_lite[:,0,:3])
         if self.use_rnn:
             if self.rnn_type == "transformer":
                 feat_lite = self.projection(feat_lite)
@@ -107,7 +112,10 @@ class Sampler(nn.Module):
                 feat_lite, _ = self.rnn(feat_lite)
                 feat_lite = rearrange(feat_lite, "b n (l d) -> b n l d", l=2)
                 feat_lite = torch.mean(feat_lite, dim=2)
+        #print(f"feat_lite after rnn {self.use_rnn} type:{self.rnn_type} :", feat_lite[:,0,:3])
         logits = self.linear(feat_lite).squeeze(-1)
+        #print("logits.shape:", logits.shape)
+        #print("logits:", logits[:,:3])
         if self.training:
             prob = torch.log(F.softmax(logits, dim=-1).clamp(min=1e-8))
             actions = gumbel_softmax_top_k(prob, int(self.top_k), tau, True, reduce_sum=False) # B, K, N

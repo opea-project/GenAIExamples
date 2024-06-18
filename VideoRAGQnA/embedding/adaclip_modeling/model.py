@@ -94,12 +94,18 @@ class AdaCLIP(nn.Module):
         clip_inputs: (B, num_frm, C, H, W)
         policy_inputs: (B, num_frm, C, H, W)
         """
+        print(f" clip_inputs input to get_visual_output:", clip_inputs[:,0,:,:3,:3])
         frame_embd = self.get_visual_output(clip_inputs)
+        print(f" frame_embd after get_visual_output:", frame_embd[:,:3,:3])
         return_hidden = self.word_agg
-
+        print("self.use_policy:", self.use_policy)
         if self.use_policy and policy_inputs is not None:
             policy_inputs = self.get_visual_output(clip_inputs) if self.policy_backbone == "clip" else policy_inputs
+            print("policy_inputs:", policy_inputs[:,0,:,:3,:3])
             actions, logits = self.sampler(policy_inputs, tau)
+            print("actions:", actions[:,:3,:3] ) # B K N
+            print("logits.shape:", logits.shape ) 
+            print("logits.flatten()[:3]:", logits.flatten()[:3])
             frame_embd = actions @ frame_embd
             if self.reuse_scores:
                 logits = actions @ logits.unsqueeze(-1)
@@ -108,20 +114,25 @@ class AdaCLIP(nn.Module):
             actions = actions.sum(dim=1)
         else:
             actions = torch.ones(clip_inputs.shape[:2]).to(clip_inputs.device)
-
+        print("actions before frame_transformation:", actions[:,:3])
+        print("frame_embd before frame_transformation:", frame_embd[:,:3,:3])
         frame_embd = self.frame_transformation(frame_embd)
-
+        print(f" frame_embd.shape after self.frame_transformation: {frame_embd.shape}") # (3, 64, 512) 3-> top_k=3
+        print(f" frame_embd:", frame_embd[:,:3,:3])
         # get video embeddings
         frame_agg_temp = 1 # default temperature value
+        print("self.frame_agg:", self.frame_agg)
         if self.frame_agg == "mlp":
             logits = self.frame_agg_mlp(frame_embd)
             weights = F.softmax(logits / frame_agg_temp, dim=1)
             video_embd = (frame_embd * weights).sum(dim=1)
             video_embd = video_embd / video_embd.norm(dim=-1, keepdim=True)
+            print("video embeddings after mlp aggregation:", video_embd.flatten()[:10])
         else:
+            frame_embd = frame_embd / frame_embd.norm(dim=-1, keepdim=True) 
             video_embd = frame_embd.mean(dim=1)
             video_embd = video_embd / video_embd.norm(dim=-1, keepdim=True)
-
+            print("video embeddings after mean aggregation:", video_embd.flatten()[:10])
         return video_embd
 
 
