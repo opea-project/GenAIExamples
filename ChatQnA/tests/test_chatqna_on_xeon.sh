@@ -14,7 +14,7 @@ function build_docker_images() {
     cd GenAIComps
 
     docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/docker/Dockerfile .
+    docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
     docker build -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
