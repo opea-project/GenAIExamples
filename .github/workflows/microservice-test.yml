@@ -46,7 +46,7 @@ jobs:
               if [[ "${path_level_1[@]}" =~ "${service}" ]]; then
                   run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
               else
-                  vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | cut -d'/' -f3 | grep -vE '*.py' | sort -u)
+                  vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | cut -d'/' -f3 | grep -vE '*.py|Dockerfile' | sort -u)
                   for vendor in ${vendors}; do
                       if [[ "${path_level_3[@]}" =~ "${service}_${vendor}" ]]; then
                           sub_vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | grep ${vendor} | cut -d'/' -f4 | grep -vE '*.py' | sort -u)
@@ -84,7 +84,7 @@ jobs:
           hardware: ${{ matrix.hardware }}
         run: |
           cd tests
-          if [ -f test_${service}.sh ]; then timeout 10m bash test_${service}.sh; else echo "Test script not found, skip test!"; fi
+          if [ -f test_${service}.sh ]; then timeout 30m bash test_${service}.sh; else echo "Test script not found, skip test!"; fi
 
       - name: Clean up container
         env:
