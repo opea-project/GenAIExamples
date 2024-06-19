@@ -48,7 +48,7 @@ cd ../../..
 ```
 
 
-Then run the command `docker images`, you will have
+Then run the command `docker images`, you will have follwing images ready:
 
 1. `opea/embedding-tei:latest`
 2. `opea/web-retriever-chroma:latest`
@@ -62,7 +62,7 @@ Then run the command `docker images`, you will have
 Before starting the services with `docker compose`, you have to recheck the following environment variables.
 
 ```bash
-export host_ip=<your External Public IP>
+export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
 export GOOGLE_CSE_ID=<your cse id>
 export GOOGLE_API_KEY=<your google api key>
 export HUGGINGFACEHUB_API_TOKEN=<your HF token>
