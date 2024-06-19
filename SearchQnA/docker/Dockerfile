@@ -16,9 +16,9 @@ RUN useradd -m -s /bin/bash user && \
     chown -R user /home/user/
 
 RUN cd /home/user/ && \
-    git clone https://github.com/Spycsh/GenAIComps.git
+    git clone https://github.com/opea-project/GenAIExamples.git
 
-RUN cd /home/user/GenAIComps && git checkout search && pip install --no-cache-dir --upgrade pip && \
+RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
 COPY ./searchqna.py /home/user/searchqna.py
