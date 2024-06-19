@@ -100,3 +100,12 @@ curl http://localhost:8000/v1/reranking \
   -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
   -H 'Content-Type: application/json'
 ```
+
+You can add the parameter `top_n` to specify the return number of the reranker model, default value is 1.
+
+```bash
+curl http://localhost:8000/v1/reranking \
+  -X POST \
+  -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}], "top_n":2}' \
+  -H 'Content-Type: application/json'
+```
