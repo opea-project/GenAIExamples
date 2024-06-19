@@ -45,7 +45,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://redis.io/">Redis</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
-			<td>Xeon/Gaudi2</td>
+			<td>Xeon/Gaudi2/GPU</td>
 			<td>Chatbot</td>
 		</tr>
 		<tr>
