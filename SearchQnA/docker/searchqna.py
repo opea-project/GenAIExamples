@@ -3,7 +3,7 @@
 
 import os
 
-from comps import SearchQnAGateway, MicroService, ServiceOrchestrator, ServiceType
+from comps import MicroService, SearchQnAGateway, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8888)

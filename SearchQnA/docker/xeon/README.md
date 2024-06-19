@@ -1,4 +1,3 @@
-
 # Build Mega Service of SearchQnA on Xeon
 
 This document outlines the deployment process for a SearchQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server.
@@ -47,15 +46,13 @@ docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_
 cd ../../..
 ```
 
-
-Then run the command `docker images`, you will have follwing images ready:
+Then run the command `docker images`, you will have following images ready:
 
 1. `opea/embedding-tei:latest`
 2. `opea/web-retriever-chroma:latest`
 3. `opea/reranking-tei:latest`
 4. `opea/llm-tgi:latest`
 5. `opea/searchqna:latest`
-
 
 ## 🚀 Set the environment variables
 
@@ -142,8 +139,8 @@ curl http://${host_ip}:3007/v1/chat/completions\
   -H 'Content-Type: application/json'
 
 ```
-## 🚀 Test MegaService
 
+## 🚀 Test MegaService
 
 ```bash
 curl http://${host_ip}:3008/v1/searchqna -H "Content-Type: application/json" -d '{

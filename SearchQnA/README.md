@@ -31,4 +31,3 @@ Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying
 ## Deploy SearchQnA on Gaudi
 
 Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying SearchQnA on Gaudi.
-

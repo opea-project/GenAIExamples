@@ -1,4 +1,3 @@
-
 # Build Mega Service of SearchQnA on Gaudi
 
 This document outlines the deployment process for a SearchQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server.
@@ -6,7 +5,6 @@ This document outlines the deployment process for a SearchQnA application utiliz
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
-
 
 ### 1. Source Code install GenAIComps
 
@@ -61,7 +59,6 @@ docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_
 cd ../../..
 ```
 
-
 Then you need to build the last Docker image `opea/searchqna:latest`, which represents the Mega service through following commands:
 
 ```bash
@@ -77,8 +74,6 @@ Then run the command `docker images`, you will have
 4. `opea/reranking-tei:latest`
 5. `opea/llm-tgi:latest`
 6. `opea/searchqna:latest`
-
-
 
 ## 🚀 Set the environment variables
 
@@ -165,8 +160,8 @@ curl http://${host_ip}:3007/v1/chat/completions\
   -H 'Content-Type: application/json'
 
 ```
-## 🚀 Test MegaService
 
+## 🚀 Test MegaService
 
 ```bash
 curl http://${host_ip}:3008/v1/searchqna -H "Content-Type: application/json" -d '{
