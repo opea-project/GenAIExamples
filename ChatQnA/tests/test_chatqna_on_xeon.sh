@@ -8,26 +8,6 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
-function build_docker_images() {
-    cd $WORKPATH
-    git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
-
-    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
-    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
-
-    cd $WORKPATH/docker
-    docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
-
-    cd $WORKPATH/docker/ui
-    docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
-
-    docker images
-}
-
 function start_services() {
     cd $WORKPATH/docker/xeon
 
@@ -50,9 +30,12 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
+    # Replace the container name with a test-specific name
+    echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+    sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
+    sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
+    sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
     # Start Docker Containers
-    # TODO: Replace the container name with a test-specific name
-
     docker compose -f docker_compose.yaml up -d
     n=0
     until [[ "$n" -ge 200 ]]; do
@@ -207,13 +190,10 @@ function main() {
     stop_docker
 
     begin_time=$(date +%s)
-    build_docker_images
-    start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
-    minimal_duration=$((end_time-start_time))
     maximal_duration=$((end_time-begin_time))
-    echo "Mega service start minimal duration is "$minimal_duration"s, maximal duration(including docker image build) is "$maximal_duration"s" && sleep 1s
+    echo "Mega service start duration is "$maximal_duration"s" && sleep 1s
 
     validate_microservices
     validate_megaservice
