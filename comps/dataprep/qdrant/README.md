@@ -69,3 +69,9 @@ Once document preparation microservice for Qdrant is started, user can use below
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"path":"/path/to/document"}' http://localhost:6000/v1/dataprep
 ```
+
+You can specify chunk_size and chunk_size by the following commands.
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"path":"/path/to/document","chunk_size":1500,"chunk_overlap":100}' http://localhost:6000/v1/dataprep
+```

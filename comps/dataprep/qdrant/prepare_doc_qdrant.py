@@ -25,11 +25,13 @@ tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 @opea_telemetry
 def ingest_documents(doc_path: DocPath):
     """Ingest document to Qdrant."""
-    doc_path = doc_path.path
-    print(f"Parsing document {doc_path}.")
+    path = doc_path.path
+    print(f"Parsing document {path}.")
 
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
-    content = document_loader(doc_path)
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=doc_path.chunk_size, chunk_overlap=doc_path.chunk_size, add_start_index=True
+    )
+    content = document_loader(path)
     chunks = text_splitter.split_text(content)
 
     print("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")

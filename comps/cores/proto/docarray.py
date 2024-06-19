@@ -20,11 +20,19 @@ class Base64ByteStrDoc(BaseDoc):
 
 class DocPath(BaseDoc):
     path: str
+    chunk_size: int = 1500
+    chunk_overlap: int = 100
 
 
 class EmbedDoc768(BaseDoc):
     text: str
     embedding: conlist(float, min_length=768, max_length=768)
+    search_type: str = "similarity"
+    k: int = 4
+    distance_threshold: Optional[float] = None
+    fetch_k: int = 20
+    lambda_mult: float = 0.5
+    score_threshold: float = 0.2
 
 
 class Audio2TextDoc(AudioDoc):
