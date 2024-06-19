@@ -24,7 +24,7 @@ function start_service() {
     tei_service_port=5007
     unset http_proxy
     docker run -d --name="test-comps-reranking-tei-server" -p ${tei_service_port}:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HF_TOKEN=$HF_TOKEN opea/reranking-tei:comps
-    sleep 1m
+    sleep 3m
 }
 
 function validate_microservice() {

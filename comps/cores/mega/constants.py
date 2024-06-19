@@ -26,6 +26,7 @@ class ServiceType(Enum):
     DATAPREP = 9
     UNDEFINED = 10
     RAGAS = 11
+    LVM = 12
 
 
 class MegaServiceEndpoint(Enum):

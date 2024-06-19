@@ -7,7 +7,7 @@ import numpy as np
 from docarray import BaseDoc, DocList
 from docarray.documents import AudioDoc
 from docarray.typing import AudioUrl
-from pydantic import Field, conlist
+from pydantic import Field, conint, conlist
 
 
 class TextDoc(BaseDoc):
@@ -102,3 +102,9 @@ class RAGASScores(BaseDoc):
     faithfulness: float
     context_recallL: float
     context_precision: float
+
+
+class LVMDoc(BaseDoc):
+    image: str
+    prompt: str
+    max_new_tokens: conint(ge=0, le=1024) = 512

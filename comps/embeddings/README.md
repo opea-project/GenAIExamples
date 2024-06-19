@@ -155,6 +155,6 @@ curl http://localhost:6000/v1/health_check\
 ```bash
 curl http://localhost:6000/v1/embeddings\
   -X POST \
-  -d '{"text":"Hello, world!"}' \
+  -d '{"input":"Hello, world!"}' \
   -H 'Content-Type: application/json'
 ```
