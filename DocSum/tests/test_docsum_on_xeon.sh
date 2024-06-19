@@ -8,22 +8,6 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
-function build_docker_images() {
-    cd $WORKPATH
-    git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
-
-    docker build --no-cache -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/Dockerfile .
-
-    cd $WORKPATH/docker
-    docker build --no-cache -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-
-    cd $WORKPATH/docker/ui
-    docker build --no-cache -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-
-    docker images
-}
-
 function start_services() {
     cd $WORKPATH/docker/xeon
 
@@ -36,8 +20,12 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
+    # Replace the container name with a test-specific name
+    echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+    sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" docker_compose.yaml
+    sed -i "s#image: opea/docsum-ui:latest#image: opea/docsum-ui:${IMAGE_TAG}#g" docker_compose.yaml
+    sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
     # Start Docker Containers
-    # TODO: Replace the container name with a test-specific name
     docker compose -f docker_compose.yaml up -d
 
     sleep 2m # Waits 2 minutes
@@ -139,7 +127,6 @@ function main() {
 
     stop_docker
 
-    build_docker_images
     start_services
 
     validate_microservices

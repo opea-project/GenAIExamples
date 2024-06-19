@@ -13,7 +13,7 @@ on:
       - "**/ui/**"
       - "!**.md"
       - "!**.txt"
-      - .github/workflows/E2E_test_with_compose.yml
+      - .github/workflows/docker-compose-e2e.yml
   workflow_dispatch:
 
 # If there is a new commit, the previous jobs will be canceled
@@ -25,10 +25,20 @@ jobs:
   job1:
     uses: ./.github/workflows/reuse-get-test-matrix.yml
     with:
-      diff-excluded-files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|assets'
+      diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|assets'
+
+  mega-image-build:
+    needs: job1
+    strategy:
+      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+    uses: ./.github/workflows/reuse-image-build.yml
+    with:
+      image_tag: ${{ github.event.pull_request.head.sha }}
+      mega_service: "${{ matrix.example }}"
+      runner_label: "docker-build-${{ matrix.hardware }}"
 
   Example-test:
-    needs: job1
+    needs: [job1, mega-image-build]
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     runs-on: ${{ matrix.hardware }}
@@ -51,6 +61,8 @@ jobs:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
           example: ${{ matrix.example }}
           hardware: ${{ matrix.hardware }}
+          IMAGE_REPO: ${{needs.mega-image-build.outputs.image_repo}}
+          IMAGE_TAG: ${{needs.mega-image-build.outputs.image_tag}}
         run: |
           cd ${{ github.workspace }}/$example/tests
           example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
