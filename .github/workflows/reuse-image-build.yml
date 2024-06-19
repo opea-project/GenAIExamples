@@ -1,0 +1,31 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Image Build
+permissions: read-all
+on:
+  workflow_call:
+    inputs:
+      micro_service:
+        required: true
+        type: string
+
+jobs:
+  micro-image-build:
+    continue-on-error: true
+    strategy:
+      matrix:
+        node: [docker-build-xeon, docker-build-gaudi]
+    runs-on: ${{ matrix.node }}
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Building MicroService Docker Image
+        id: build-microservice-image
+        env:
+          micro_service: ${{ inputs.micro_service }}
+        run: |
+          bash .github/workflows/scripts/docker_images_build_push.sh ${micro_service}

@@ -20,47 +20,7 @@ concurrency:
 
 jobs:
   job1:
-    name: Get-test-matrix
-    runs-on: ubuntu-latest
-    outputs:
-      run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
-    steps:
-      - name: Checkout out Repo
-        uses: actions/checkout@v4
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-          fetch-depth: 0
-      - name: Get test matrix
-        id: get-test-matrix
-        run: |
-          set -xe
-          merged_commit=$(git log -1 --format='%H')
-          changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${merged_commit} \
-          | grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')" || true
-          services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u)
-          path_level_1=("asr" "tts")
-          path_level_3=("llms_summarization" "llms_text-generation" "dataprep_redis")
-          run_matrix="{\"include\":["
-          for service in ${services}; do
-              hardware="gaudi" # default hardware, set based on the changed files
-              if [[ "${path_level_1[@]}" =~ "${service}" ]]; then
-                  run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
-              else
-                  vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | cut -d'/' -f3 | grep -vE '*.py|Dockerfile' | sort -u)
-                  for vendor in ${vendors}; do
-                      if [[ "${path_level_3[@]}" =~ "${service}_${vendor}" ]]; then
-                          sub_vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | grep ${vendor} | cut -d'/' -f4 | grep -vE '*.py' | sort -u)
-                          for sub_vendor in ${sub_vendors}; do
-                              run_matrix="${run_matrix}{\"service\":\"${service}_${vendor}_${sub_vendor}\",\"hardware\":\"${hardware}\"},"
-                          done
-                      else
-                          run_matrix="${run_matrix}{\"service\":\"${service}_${vendor}\",\"hardware\":\"${hardware}\"},"
-                      fi
-                  done
-              fi
-          done
-          run_matrix=$run_matrix"]}"
-          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+    uses: ./.github/workflows/reuse-get-test-matrix.yml
 
   Microservice-test:
     needs: job1
@@ -80,16 +40,15 @@ jobs:
       - name: Run microservice test
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          service: ${{ matrix.service }}
+          service_path: ${{ matrix.service }}
           hardware: ${{ matrix.hardware }}
         run: |
           cd tests
-          if [ -f test_${service}.sh ]; then timeout 30m bash test_${service}.sh; else echo "Test script not found, skip test!"; fi
+          service=$(echo $service_path | tr '/' '_')
+          echo "service=${service}" >> $GITHUB_ENV
+          if [ -f test_${service}.sh ]; then timeout 10m bash test_${service}.sh; else echo "Test script not found, skip test!"; fi
 
       - name: Clean up container
-        env:
-          service: ${{ matrix.service }}
-          hardware: ${{ matrix.hardware }}
         if: cancelled() || failure()
         run: |
           cid=$(docker ps -aq --filter "name=test-comps-*")
@@ -100,5 +59,5 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.service }}-${{ matrix.hardware }}
+          name: ${{ env.service }}
           path: ${{ github.workspace }}/tests/*.log

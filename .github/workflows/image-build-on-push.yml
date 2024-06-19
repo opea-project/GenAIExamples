@@ -1,0 +1,29 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+# Test
+name: Build latest images on push event
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - comps/**
+      - "!**.md"
+      - "!**.txt"
+      - .github/workflows/image-build-on-push.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-on-push
+  cancel-in-progress: true
+
+jobs:
+  job1:
+    uses: ./.github/workflows/reuse-get-test-matrix.yml
+
+  image-build:
+    needs: job1
+    strategy:
+      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+    uses: ./.github/workflows/reuse-image-build.yml
+    with:
+      micro_service: "${{ matrix.service }}"
