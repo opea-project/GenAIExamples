@@ -1,0 +1,55 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: File Change Warning
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  file-change-detection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clone repo GenAIExamples
+        run: |
+          cd ..
+          git clone https://github.com/opea-project/GenAIExamples
+
+      - name: Check for changed Dockerfile paths
+        run: |
+          shopt -s globstar
+          cd ${{github.workspace}}
+          is_use="FALSE"
+          used_files=""
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-status --diff-filter=DR ${{ github.event.pull_request.base.sha }} ${merged_commit} -- '**/Dockerfile' | cut -f2)"
+          if [ -n "$changed_files" ]; then
+            for file in $changed_files; do
+              if grep -q "$file" ../GenAIExamples/**/*.md; then
+                is_use="TRUE"
+                used_files+="$file "
+              fi
+            done
+          fi
+
+          if [[ "$is_use" == "TRUE" ]]; then
+            echo "Warning: Changed Dockerfile paths:"
+            echo "$used_files"
+            echo "Please modify the corresponding README in GenAIExamples repo and ask suyue.chen@intel.com for final confirmation."
+            exit 1
+          fi
