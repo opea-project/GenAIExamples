@@ -45,7 +45,7 @@ docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$h
 
 ### 7. Build TEI Gaudi Image
 
-Since a TEI Gaudi Docker image hasn't been published, we'll need to build it from the [tei-guadi](https://github.com/huggingface/tei-gaudi) repository.
+Since a TEI Gaudi Docker image hasn't been published, we'll need to build it from the [tei-gaudi](https://github.com/huggingface/tei-gaudi) repository.
 
 ```bash
 git clone https://github.com/huggingface/tei-gaudi
