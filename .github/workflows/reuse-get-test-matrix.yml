@@ -7,15 +7,15 @@ permissions: read-all
 on:
   workflow_call:
     inputs:
-      diff-excluded-files:
+      diff_excluded_files:
         required: false
         type: string
         default: '.github|README.md|*.txt'
-      xeon-server-lable:
+      xeon_server_label:
         required: false
         type: string
         default: 'xeon'
-      gaudi-server-lable:
+      gaudi_server_label:
         required: false
         type: string
         default: 'gaudi'
@@ -57,7 +57,7 @@ jobs:
           fi
           merged_commit=$(git log -1 --format='%H')
           changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
-          grep -vE '${{ inputs.diff-excluded-files }}')" || true
+          grep -vE '${{ inputs.diff_excluded_files }}')" || true
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           run_matrix="{\"include\":["
           for example in ${examples}; do
@@ -66,10 +66,10 @@ jobs:
               if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
               if [ "$run_hardware" == "" ]; then run_hardware="xeon"; fi
               for hw in ${run_hardware}; do
-                  if [ "$hw" == "gaudi" ] && [ "${{ inputs.gaudi-server-lable }}" != "" ]; then
-                    run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.gaudi-server-lable }}\"},"
-                  elif [ "${{ inputs.xeon-server-lable }}" != "" ]; then
-                    run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.xeon-server-lable }}\"},"
+                  if [ "$hw" == "gaudi" ] && [ "${{ inputs.gaudi_server_label }}" != "" ]; then
+                    run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.gaudi_server_label }}\"},"
+                  elif [ "${{ inputs.xeon_server_label }}" != "" ]; then
+                    run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.xeon_server_label }}\"},"
                   fi
               done
           done
