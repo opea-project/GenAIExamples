@@ -264,7 +264,7 @@ def main():
 
     elif config['embeddings']['type'] == 'video':
         # init adaclip model
-        model, _ = setup_adaclip_model(adaclip_cfg, device="cuda")
+        model, _ = setup_adaclip_model(adaclip_cfg, device="cpu")
         vs = db.VideoVS(host, port, selected_db, model)
     else:
         print(f"ERROR: Selected embedding type in config.yaml {config['embeddings']['type']} is not in [\'video\', \'frame\']")
