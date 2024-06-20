@@ -5,8 +5,6 @@ name: Container Build
 permissions: read-all
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "35 1 * * 6"
 jobs:
   # https://github.com/intel/ai-containers/blob/main/.github/action.yml
   build-containers:
