@@ -22,7 +22,7 @@ function checkExist() {
 
 function docker_build() {
     # check if if IMAGE_TAG is not "latest" and the image exists in the registry
-    if [ $IMAGE_TAG != "latest" && $(checkExist $1) == "true" ]; then
+    if [ "$IMAGE_TAG" != "latest" ] && [ "$(checkExist $1)" == "true" ]; then
         echo "Image ${IMAGE_REPO}opea/$1:$IMAGE_TAG already exists in the registry"
         return
     fi
@@ -35,7 +35,8 @@ function docker_build() {
     echo "Building ${IMAGE_REPO}opea/$1:$IMAGE_TAG using Dockerfile $DOCKERFILE_PATH"
     # if https_proxy and http_proxy are set, pass them to docker build
     if [ -z "$https_proxy" ]; then
-        docker build --no-cache -t ${IMAGE_REPO}opea/$1:$IMAGE_TAG -f $DOCKERFILE_PATH .
+        #docker build --no-cache -t ${IMAGE_REPO}opea/$1:$IMAGE_TAG -f $DOCKERFILE_PATH .
+        docker build -t ${IMAGE_REPO}opea/$1:$IMAGE_TAG -f $DOCKERFILE_PATH .
     else
         docker build --no-cache -t ${IMAGE_REPO}opea/$1:$IMAGE_TAG --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f $DOCKERFILE_PATH .
     fi

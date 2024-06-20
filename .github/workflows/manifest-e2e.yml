@@ -9,10 +9,9 @@ on:
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/kubernetes/manifests/**"
-      - "**/tests/**"
+      - "**/tests/test_manifest**"
       - "!**.md"
       - "!**.txt"
-      - .github/workflows/manifest-e2e.yml
   workflow_dispatch:
 
 concurrency:
@@ -21,50 +20,20 @@ concurrency:
 
 jobs:
   job1:
-    name: Get-test-matrix
-    runs-on: ubuntu-latest
-    outputs:
-      run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
-    steps:
-      - name: Checkout out Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get test matrix
-        id: get-test-matrix
-        run: |
-          set -xe
-          changed_files="$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | \
-          grep -E "/kubernetes/manifests/|test_manifest" | \
-          grep -vE '.github|deprecated|docker')" || true
-          examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
-          run_matrix="{\"include\":["
-          for example in ${examples}; do
-              run_hardware=""
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
-              if [[ -z "$run_hardware" ]]; then run_hardware="xeon"; fi
-              for hw in ${run_hardware}; do
-                  if [ $hw = "gaudi" ]; then
-                      continue # skip gaudi for K8s test temporarily
-                  else
-                      #lower_example=$(echo "${example}" | tr '[:upper:]' '[:lower:]')
-                      run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"k8s\"},"
-                  fi
-              done
-          done
-          run_matrix=$run_matrix"]}"
-          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+    uses: ./.github/workflows/reuse-get-test-matrix.yml
+    with:
+      diff_excluded_files: '.github|deprecated|docker|assets|*.md|*.txt'
+      xeon_server_label: 'k8s'
+      gaudi_server_label: ""
 
   mega-image-build:
     needs: job1
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    uses: ./.github/workflows/image-build.yaml
+    uses: ./.github/workflows/reuse-image-build.yml
     with:
-      image-tag: ${{ github.event.pull_request.head.sha }}
-      mega-service: "${{ matrix.example }}"
+      image_tag: ${{ github.event.pull_request.head.sha }}
+      mega_service: "${{ matrix.example }}"
 
   manifest-test:
     needs: [job1, mega-image-build]
@@ -87,8 +56,8 @@ jobs:
 
       - name: Set variables
         run: |
-          echo "IMAGE_REPO=${OPEA_IMAGE_REPO}/" >> $GITHUB_ENV
-          echo "IMAGE_TAG=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+          echo "IMAGE_REPO=${{needs.mega-image-build.outputs.image_repo}}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${{needs.mega-image-build.outputs.image_tag}}" >> $GITHUB_ENV
           lower_example=$(echo "${{ matrix.example }}" | tr '[:upper:]' '[:lower:]')
           echo "NAMESPACE=$lower_example-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
           echo "ROLLOUT_TIMEOUT_SECONDS=1800s" >> $GITHUB_ENV
