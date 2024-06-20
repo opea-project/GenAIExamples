@@ -58,13 +58,10 @@ pip install -r docs/requirements.txt
 ```
 
 This code is using a pre-released update of vdms vectordb in LangChain.
-First clone LangChain and install langchain-community:
 ```bash
-cd <dir_to_clone_repos>
-git clone -b vdms_visual_rag https://github.com/intel-sandbox/cwlacewe.langchain.git
-cd cwlacewe.langchain/libs/community
+cd cw-langchain-vdms-patch/libs/community
 pip install -e .
-cd $WORKDIR
+cd ../../../
 ```
 
 Download Llama-2-7b-chat-hf and video-llama models
