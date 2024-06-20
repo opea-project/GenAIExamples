@@ -34,9 +34,19 @@ jobs:
       image_repo: ${{ steps.build-megaservice-image.outputs.image_repo }}
       image_tag: ${{ steps.build-megaservice-image.outputs.image_tag }}
     steps:
+      - name: Get checkout ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+          echo "checkout ref ${{ env.CHECKOUT_REF }}"
+
       - name: Checkout out Repo
         uses: actions/checkout@v4
         with:
+          ref: ${{ env.CHECKOUT_REF }}
           fetch-depth: 0
 
       - name: Building MegaService Docker Image
