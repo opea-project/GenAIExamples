@@ -31,7 +31,7 @@ vector_db:
   port: 55555 #8000 #
 
 adaclip_cfg_path: embedding/adaclip_config/activitynet_filtered.json
-adaclip_model_path: embedding/adaclip_weights/activitynet/2024-04-19_13-57-38/trained_model.pth
+adaclip_model_path: #embedding/adaclip_weights/activitynet/2024-04-19_13-57-38/trained_model.pth
 
 # LLM path
 model_path: meta-llama/Llama-2-7b-chat-hf

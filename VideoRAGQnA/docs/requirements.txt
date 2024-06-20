@@ -9,12 +9,13 @@ accelerate
 vdms
 tzlocal
 dateparser
-pytorchvideo==0.1.5
-torch==2.2.0 --index-url https://download.pytorch.org/whl/cu121
-torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121
-torchvideo==0.0.0
-torchvision==0.17.0 --index-url https://download.pytorch.org/whl/cu121
+pytorchvideo
+torch==1.13.1 --index-url https://download.pytorch.org/whl/cpu
+torchaudio==0.13.1 --index-url https://download.pytorch.org/whl/cpu
+torchvision==0.14.1 --index-url https://download.pytorch.org/whl/cpu
 einops
 ptflops
 decord
 easydict
+omegaconf
+webdataset

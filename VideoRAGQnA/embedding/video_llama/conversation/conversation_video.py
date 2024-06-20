@@ -321,7 +321,7 @@ class Chat:
         
         
         # conv.system = "You can understand the video that the user provides.  Follow the instructions carefully and explain your answers in detail."
-        image_emb, _ = self.model.encode_videoQformer_visual(video)
+        image_emb, _ = self.model.encode_videoQformer_visual(video) 
         self.img_list.append(image_emb)
         self.conv.append_message(self.conv.roles[0], "<Video><ImageHere></Video> "+ msg)
         self.video_msg = msg

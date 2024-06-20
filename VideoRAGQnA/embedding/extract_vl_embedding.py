@@ -16,6 +16,10 @@ class VLEmbeddingExtractor(object):
 		self.cfg = Config(args)
 		self.setup_seeds()
 		model_config = self.cfg.model_cfg
+		print("vis_processor vit_precision:", model_config.get("vit_precision", "fp16"))
+		if model_config.get("vit_precision", "fp16") == "fp16":
+		    print("WARNING! FP16 not currently supported. Switching to FP32")
+		    model_config['vit_precision'] = "fp32"
 		model_cls = registry.get_model_class(model_config.arch)
 		self.model = model_cls.from_config(model_config).to('cpu')
 		self.model.eval()

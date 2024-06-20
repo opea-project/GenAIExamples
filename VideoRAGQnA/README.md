@@ -53,7 +53,8 @@ Install pip requirements
 
 ```bash
 cd VideoRAGQnA
-pip3 install -r docs/requirements.txt
+conda create --name vrag python=3.9 && conda activate vrag
+pip install -r docs/requirements.txt
 ```
 
 This code is using a pre-released update of vdms vectordb in LangChain.
@@ -65,6 +66,29 @@ cd cwlacewe.langchain/libs/community
 pip install -e .
 cd $WORKDIR
 ```
+
+Download Llama-2-7b-chat-hf and video-llama models
+
+```bash
+mkdir -p embedding/video_llama_weights
+cd embedding/video_llama_weights
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/VL_LLaMA_2_7B_Finetuned.pth
+
+cd ../../
+mkdir -p meta-llama/Llama-2-7b-chat-hf
+cd meta-llama/Llama-2-7b-chat-hf
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/llama-2-7b-chat-hf/config.json
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/llama-2-7b-chat-hf/generation_config.json
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/llama-2-7b-chat-hf/pytorch_model-00001-of-00002.bin
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/llama-2-7b-chat-hf/pytorch_model-00002-of-00002.bin
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/llama-2-7b-chat-hf/pytorch_model.bin.index.json
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/llama-2-7b-chat-hf/special_tokens_map.json
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/llama-2-7b-chat-hf/tokenizer.json
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/llama-2-7b-chat-hf/tokenizer.model
+wget https://huggingface.co/DAMO-NLP-SG/Video-LLaMA-2-7B-Finetuned/resolve/main/llama-2-7b-chat-hf/tokenizer_config.json
+cd ../..
+```
+
 
 The current framework supports both Chroma DB and Intel's VDMS.
 We tested using VDMS only after video embedding based modification.
@@ -84,17 +108,13 @@ docker run -d -p 55555:55555 intellabs/vdms:latest
 
 **Note-2:** Update your choice of db and port in ```docs/config.yaml```.
 
-Generating Image embeddings and store them into selected db, specify config file location and video input location
+
+**Web UI Video RAG**
 ```bash
-python3 embedding/generate_store_embeddings.py docs/config.yaml video_ingest/videos/
+streamlit run video-rag-ui.py docs/config.yaml --server.address 0.0.0.0 --server.port 50055
 ```
 
 **Troubleshooting:** If using chromadb, and getting this error ```ValueError: Could not connect to tenant default_tenant```, then: 
 ```bash
 export no_proxy="enter.your.ip.here"
-```
-
-**Web UI Video RAG**
-```bash
-streamlit run video-rag-ui.py --server.address 0.0.0.0 --server.port 50055
 ```

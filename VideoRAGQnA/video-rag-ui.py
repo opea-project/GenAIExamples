@@ -6,7 +6,8 @@ import torch
 
 import torch
 import streamlit as st
-from transformers import AutoTokenizer, LlamaTokenizer, AutoModelForCausalLM, TextIteratorStreamer
+#from transformers import AutoTokenizer
+from transformers import LlamaTokenizer, AutoModelForCausalLM, TextIteratorStreamer
 from transformers import set_seed
 import argparse
 
@@ -47,10 +48,6 @@ video_dir = config['videos']
 if not os.path.exists(os.path.join(config['meta_output_dir'], "metadata.json")):
     from embedding.generate_store_embeddings import main
     vs = main()
-#import json
-#adaclip_cfg_json = json.load(open(config['adaclip_cfg_path'], 'r'))
-#adaclip_cfg_json["resume"] = config['adaclip_model_path']
-#adaclip_cfg = argparse.Namespace(**adaclip_cfg_json)
 st.set_page_config(initial_sidebar_state='collapsed', layout='wide')
 
 st.title("Video RAG")
@@ -91,7 +88,7 @@ video_llama, tokenizer, streamer = load_models()
 vis_processor_cfg = video_llama.cfg.datasets_cfg.webvid.vis_processor.train
 vis_processor = registry.get_processor_class(vis_processor_cfg.name).from_config(vis_processor_cfg)
 
-chat = Chat(video_llama.model, vis_processor, device='cuda:{}'.format(config['vl_branch']['gpu_id']))
+chat = Chat(video_llama.model, vis_processor, device='cpu')
 
 def chat_reset(chat_state, img_list):
     if chat_state is not None:
@@ -245,12 +242,18 @@ if 'vs' not in st.session_state.keys():
         host = st.session_state.config['vector_db']['host']
         port = int(st.session_state.config['vector_db']['port'])
         selected_db = st.session_state.config['vector_db']['choice_of_db']
-        st.session_state['vs'] = vs
-        #if config['embeddings']['type'] == "frame":
-        #    #st.session_state['vs'] = db.VS(host, port, selected_db)
-        #elif config['embeddings']['type'] == "video":
-        #    #model, _ = setup_adaclip_model(adaclip_cfg, device="cuda")
-        #    #st.session_state['vs'] = db.VideoVS(host, port, selected_db, model) # FIX THIS LINE
+        try:
+            st.session_state['vs'] = vs
+        except:
+            if config['embeddings']['type'] == "frame":
+                st.session_state['vs'] = db.VS(host, port, selected_db)
+            elif config['embeddings']['type'] == "video":
+                import json
+                adaclip_cfg_json = json.load(open(config['adaclip_cfg_path'], 'r'))
+                adaclip_cfg_json["resume"] = config['adaclip_model_path']
+                adaclip_cfg = argparse.Namespace(**adaclip_cfg_json)
+                model, _ = setup_adaclip_model(adaclip_cfg, device="cpu")
+                st.session_state['vs'] = db.VideoVS(host, port, selected_db, model) # FIX THIS LINE
 
         if st.session_state.vs.client == None:
             print ('Error while connecting to vector DBs')
