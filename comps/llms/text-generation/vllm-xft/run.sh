@@ -3,6 +3,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+# Preload libiomp5.so by following cmd or LD_PRELOAD=libiomp5.so manually
+export $(python -c 'import xfastertransformer as xft; print(xft.get_env())')
+
 # convert the model to fastertransformer format
 python -c 'import os; import xfastertransformer as xft; xft.Qwen2Convert().convert(os.environ["HF_DATASET_DIR"], os.environ["OUTPUT_DIR"])'
 
