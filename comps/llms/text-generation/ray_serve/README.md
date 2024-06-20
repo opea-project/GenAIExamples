@@ -21,7 +21,7 @@ export HF_TOKEN=<token>
 And then you can make requests with the OpenAI-compatible APIs like below to check the service status:
 
 ```bash
-curl http://127.0.0.1:8080/v1/chat/completions \
+curl http://127.0.0.1:8008/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
   "model": <model_name>,
@@ -45,6 +45,6 @@ The ./serving/ray/launch_ray_service.sh script accepts five parameters:
 You have the flexibility to customize five parameters according to your specific needs. Additionally, you can set the Ray Gaudi endpoint by exporting the environment variable `RAY_Serve_ENDPOINT`:
 
 ```bash
-export RAY_Serve_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
+export RAY_Serve_ENDPOINT="http://xxx.xxx.xxx.xxx:8008"
 export LLM_MODEL=<model_name> # example: export LLM_MODEL="meta-llama/Llama-2-7b-chat-hf"
 ```

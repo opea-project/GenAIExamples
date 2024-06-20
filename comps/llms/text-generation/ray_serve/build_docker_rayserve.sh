@@ -7,7 +7,7 @@
 cd docker
 
 docker build \
-    -f Dockerfile ../../ \
+    -f Dockerfile.rayserve ../../ \
     -t ray_serve:habana \
     --network=host \
     --build-arg http_proxy=${http_proxy} \

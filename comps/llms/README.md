@@ -130,7 +130,6 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export vLLM_LLM_ENDPOINT="http://${your_ip}:8008"
 export LLM_MODEL_ID=${your_hf_llm_model}
 export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/llms"
 ```
 
@@ -141,8 +140,8 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export RAY_Serve_ENDPOINT="http://${your_ip}:8008"
 export LLM_MODEL=${your_hf_llm_model}
 export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/llms"
+export CHAT_PROCESSOR="ChatModelLlama"
 ```
 
 ## 2.2 Build Docker Image
@@ -156,16 +155,32 @@ docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build
 
 ### 2.2.2 vLLM
 
+Build vllm docker.
+
 ```bash
-cd ../../
-docker build -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/Dockerfile .
+bash build_docker_vllm.sh
+```
+
+Build microservice docker.
+
+```bash
+cd ../../../../
+docker build -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
 ```
 
 ### 2.2.3 Ray Serve
 
+Build Ray Serve docker.
+
 ```bash
-cd ../../
-docker built -t opeas/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/Dockerfile .
+bash build_docker_rayserve.sh
+```
+
+Build microservice docker.
+
+```bash
+cd ../../../../
+docker build -t opea/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice .
 ```
 
 To start a docker container, you have two options:
@@ -185,11 +200,27 @@ docker run -d --name="llm-tgi-server" -p 9000:9000 --ipc=host -e http_proxy=$htt
 
 ### 2.3.2 vLLM
 
+Start vllm endpoint.
+
 ```bash
-docker run -d --name="llm-vllm-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e vLLM_LLM_ENDPOINT=$vLLM_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e LLM_MODEL_ID=$LLM_MODEL_ID opea/llm-vllm:latest
+bash launch_vllm_service.sh
+```
+
+Start vllm microservice.
+
+```bash
+docker run --name="llm-vllm-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=${no_proxy} -e vLLM_LLM_ENDPOINT=$vLLM_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e LLM_MODEL_ID=$LLM_MODEL_ID opea/llm-vllm:latest
 ```
 
 ### 2.3.3 Ray Serve
+
+Start Ray Serve endpoint.
+
+```bash
+bash launch_ray_service.sh
+```
+
+Start Ray Serve microservice.
 
 ```bash
 docker run -d --name="llm-ray-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e RAY_Serve_ENDPOINT=$RAY_Serve_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e LLM_MODEL=$LLM_MODEL opea/llm-ray:latest
@@ -250,11 +281,11 @@ curl http://${your_ip}:9000/v1/chat/completions \
 
 ## 4. Validated Model
 
-| Model                     | TGI-Gaudi | vLLM-CPU | Ray |
-| ------------------------- | --------- | -------- | --- |
-| Intel/neural-chat-7b-v3-3 | ✓         | ✓        | ✓   |
-| Llama-2-7b-chat-hf        | ✓         | ✓        | ✓   |
-| Llama-2-70b-chat-hf       | ✓         | -        | x   |
-| Meta-Llama-3-8B-Instruct  | ✓         | ✓        | ✓   |
-| Meta-Llama-3-70B-Instruct | ✓         | -        | x   |
-| Phi-3                     | x         | Limit 4K | ✓   |
+| Model                     | TGI-Gaudi | vLLM-CPU | vLLM-Gaudi | Ray |
+| ------------------------- | --------- | -------- | ---------- | --- |
+| Intel/neural-chat-7b-v3-3 | ✓         | ✓        | ✓          | ✓   |
+| Llama-2-7b-chat-hf        | ✓         | ✓        | ✓          | ✓   |
+| Llama-2-70b-chat-hf       | ✓         | -        | ✓          | x   |
+| Meta-Llama-3-8B-Instruct  | ✓         | ✓        | ✓          | ✓   |
+| Meta-Llama-3-70B-Instruct | ✓         | -        | ✓          | x   |
+| Phi-3                     | x         | Limit 4K | Limit 4K   | ✓   |

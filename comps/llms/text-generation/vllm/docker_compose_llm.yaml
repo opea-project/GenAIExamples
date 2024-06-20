@@ -19,7 +19,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: /bin/sh -c "cd / && export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --host 0.0.0.0 --model $LLM_MODEL_ID --port 80"
   llm:
-    image: opea/gen-ai-comps:llm-vllm-server
+    image: opea/llm-vllm:latest
     container_name: llm-vllm-server
     ports:
       - "9000:9000"

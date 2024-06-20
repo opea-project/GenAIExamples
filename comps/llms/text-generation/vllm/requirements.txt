@@ -6,6 +6,7 @@ langserve
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+setuptools==69.5.1
 shortuuid
 transformers
 vllm

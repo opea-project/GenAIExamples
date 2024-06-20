@@ -25,7 +25,7 @@ export HF_TOKEN=<token>
 And then you can make requests like below to check the service status:
 
 ```bash
-curl http://127.0.0.1:8080/v1/completions \
+curl http://127.0.0.1:8008/v1/completions \
   -H "Content-Type: application/json" \
   -d '{
   "model": <model_name>,
@@ -46,6 +46,6 @@ The `./serving/vllm/launch_vllm_service.sh` script accepts three parameters:
 You have the flexibility to customize two parameters according to your specific needs. Additionally, you can set the vLLM endpoint by exporting the environment variable `vLLM_LLM_ENDPOINT`:
 
 ```bash
-export vLLM_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8080"
+export vLLM_LLM_ENDPOINT="http://xxx.xxx.xxx.xxx:8008"
 export LLM_MODEL=<model_name> # example: export LLM_MODEL="Intel/neural-chat-7b-v3-3"
 ```

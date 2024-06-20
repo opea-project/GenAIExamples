@@ -31,12 +31,13 @@ def post_process_text(text: str):
 )
 @traceable(run_type="llm")
 def llm_generate(input: LLMParamsDoc):
-    llm_endpoint = os.getenv("vLLM_LLM_ENDPOINT", "http://localhost:8080")
+    llm_endpoint = os.getenv("vLLM_LLM_ENDPOINT", "http://localhost:8008")
+    model_name = os.getenv("LLM_MODEL_ID", "meta-llama/Meta-Llama-3-8B-Instruct")
     llm = VLLMOpenAI(
         openai_api_key="EMPTY",
         openai_api_base=llm_endpoint + "/v1",
         max_tokens=input.max_new_tokens,
-        model_name=os.getenv("LLM_MODEL_ID", "meta-llama/Meta-Llama-3-8B-Instruct"),
+        model_name=model_name,
         top_p=input.top_p,
         temperature=input.temperature,
         presence_penalty=input.repetition_penalty,

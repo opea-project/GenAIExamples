@@ -16,28 +16,26 @@ version: "3.8"
 
 services:
   ray_service:
-    image: rayllm:habana
+    image: ray_serve:habana
     container_name: ray-service
     ports:
       - "8008:80"
     runtime: habana
+    ipc: host
+    volumes:
+      - "./data:/data"
     environment:
-      - OMPI_MCA_btl_vader_single_copy_mechanism=none
-      - HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-      - TRUST_REMOTE_CODE=${TRUST_REMOTE_CODE}
-      - LLM_MODEL=${LLM_MODEL}
-      - CHAT_PROCESSOR=${CHAT_PROCESSOR}
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      TRUST_REMOTE_CODE: True
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL: ${LLM_MODEL}
+      CHAT_PROCESSOR: ${CHAT_PROCESSOR}
+      HABANA_VISIBLE_DEVICES: all
     cap_add:
-      - SYS_NICE
-    command: >
-      /bin/bash -c "ray start --head &&
-      python api_server_openai.py --port_number 80
-      --model_id_or_path ${LLM_MODEL}
-      --chat_processor ${CHAT_PROCESSOR}
-      --num_cpus_per_worker 8
-      --num_hpus_per_worker 1"
+      - sys_nice
+    command: /bin/bash -c "ray start --head && python api_server_openai.py --port_number 80 --model_id_or_path ${LLM_MODEL} --chat_processor ${CHAT_PROCESSOR} --num_cpus_per_worker 8 --num_hpus_per_worker 1"
   llm:
-    image: opea/gen-ai-comps:llm-ray-server
+    image: opeas/llm-ray:latest
     container_name: llm-ray-server
     ports:
       - "9000:9000"
@@ -48,7 +46,6 @@ services:
       RAY_Serve_ENDPOINT: ${RAY_Serve_ENDPOINT}
       LLM_MODEL: ${LLM_MODEL}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
     restart: unless-stopped
 
 networks:
