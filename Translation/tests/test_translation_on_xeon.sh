@@ -8,21 +8,6 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
-function build_docker_images() {
-    cd $WORKPATH
-    git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
-    docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
-
-    cd $WORKPATH/docker
-    docker build --no-cache -t opea/translation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-
-    cd $WORKPATH/docker/ui
-    docker build --no-cache -t opea/translation-ui:latest -f docker/Dockerfile .
-
-    docker images
-}
-
 function start_services() {
     cd $WORKPATH/docker/gaudi
 
@@ -32,6 +17,12 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
+
+    # Replace the container name with a test-specific name
+    echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+    sed -i "s#image: opea/translation:latest#image: opea/translation:${IMAGE_TAG}#g" docker_compose.yaml
+    sed -i "s#image: opea/translation-ui:latest#image: opea/translation-ui:${IMAGE_TAG}#g" docker_compose.yaml
+    sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
 
     # Start Docker Containers
     # TODO: Replace the container name with a test-specific name
@@ -67,8 +58,6 @@ function validate_services() {
     fi
     sleep 1s
 }
-
-
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
@@ -139,7 +128,6 @@ function main() {
 
     stop_docker
 
-    build_docker_images
     start_services
 
     validate_microservices
