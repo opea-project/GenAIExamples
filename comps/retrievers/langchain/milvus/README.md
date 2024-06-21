@@ -15,6 +15,7 @@ Please refer to this [readme](../../../vectorstores/langchain/milvus/README.md).
 ## Setup Environment Variables
 
 ```bash
+export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export MILVUS=${your_milvus_host_ip}

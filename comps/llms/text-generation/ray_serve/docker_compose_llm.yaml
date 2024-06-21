@@ -41,6 +41,7 @@ services:
       - "9000:9000"
     ipc: host
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       RAY_Serve_ENDPOINT: ${RAY_Serve_ENDPOINT}

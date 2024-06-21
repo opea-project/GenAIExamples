@@ -22,6 +22,7 @@ services:
       - "9000:9000"
     ipc: host
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}

@@ -20,6 +20,7 @@ services:
       - "7000:7000"
     ipc: host
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}

@@ -11,6 +11,7 @@ services:
       - "6000:6000"
     ipc: host
     environment:
+      no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
