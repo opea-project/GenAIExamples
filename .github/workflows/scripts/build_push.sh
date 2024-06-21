@@ -35,8 +35,7 @@ function docker_build() {
     echo "Building ${IMAGE_REPO}opea/$1:$IMAGE_TAG using Dockerfile $DOCKERFILE_PATH"
     # if https_proxy and http_proxy are set, pass them to docker build
     if [ -z "$https_proxy" ]; then
-        #docker build --no-cache -t ${IMAGE_REPO}opea/$1:$IMAGE_TAG -f $DOCKERFILE_PATH .
-        docker build -t ${IMAGE_REPO}opea/$1:$IMAGE_TAG -f $DOCKERFILE_PATH .
+        docker build --no-cache -t ${IMAGE_REPO}opea/$1:$IMAGE_TAG -f $DOCKERFILE_PATH .
     else
         docker build --no-cache -t ${IMAGE_REPO}opea/$1:$IMAGE_TAG --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f $DOCKERFILE_PATH .
     fi
