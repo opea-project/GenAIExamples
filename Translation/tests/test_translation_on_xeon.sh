@@ -9,7 +9,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function start_services() {
-    cd $WORKPATH/docker/gaudi
+    cd $WORKPATH/docker/xeon
 
     export LLM_MODEL_ID="haoranxu/ALMA-13B"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
@@ -116,7 +116,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/gaudi
+    cd $WORKPATH/docker/xeon
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
