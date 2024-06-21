@@ -4,6 +4,7 @@
 from typing import Optional
 
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 from uvicorn import Config, Server
 
 from .base_service import BaseService
@@ -32,6 +33,7 @@ class HTTPService(BaseService):
         self.uvicorn_kwargs = uvicorn_kwargs or {}
         self.cors = cors
         self._app = self._create_app()
+        Instrumentator().instrument(self._app).expose(self._app)
 
     @property
     def app(self):
