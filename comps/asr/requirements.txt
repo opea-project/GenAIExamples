@@ -1,10 +1,11 @@
 datasets
 docarray[full]
 fastapi
-intel_extension_for_pytorch
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+optimum[habana]
+pydantic==2.7.2
 pydub
 shortuuid
 torch

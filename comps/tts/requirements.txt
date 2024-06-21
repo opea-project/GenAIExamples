@@ -1,8 +1,10 @@
+aiohttp
 docarray[full]
 fastapi
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+optimum[habana]
 sentencepiece
 shortuuid
 torch

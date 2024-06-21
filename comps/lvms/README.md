@@ -47,11 +47,11 @@ python lvm.py
 python check_lvm.py
 ```
 
-# 🚀1. Start Microservice with Docker (Option 2)
+# 🚀2. Start Microservice with Docker (Option 2)
 
-## 1.2 Build Images
+## 2.1 Build Images
 
-### 1.2.1 LLaVA Server Image
+### 2.1.1 LLaVA Server Image
 
 - Xeon CPU
 
@@ -67,16 +67,16 @@ cd ../..
 docker build -t opea/llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/Dockerfile_hpu .
 ```
 
-### 1.2.2 LVM Service Image
+### 2.1.2 LVM Service Image
 
 ```bash
 cd ../..
 docker build -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/Dockerfile .
 ```
 
-## 1.3 Start LLaVA and LVM Service
+## 2.2 Start LLaVA and LVM Service
 
-### 1.3.1 Start LLaVA server
+### 2.2.1 Start LLaVA server
 
 - Xeon
 
@@ -90,7 +90,7 @@ docker run -p 8399:8399 -e http_proxy=$http_proxy --ipc=host -e https_proxy=$htt
 docker run -p 8399:8399 --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/llava:latest
 ```
 
-### 1.3.2 Start LVM service
+### 2.2.2 Start LVM service
 
 ```bash
 ip_address=$(hostname -I | awk '{print $1}')
@@ -98,7 +98,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 docker run -p 9399:9399 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e LVM_ENDPOINT=http://$ip_address:8399 opea/lvm:latest
 ```
 
-### 1.3.3 Test
+### 2.2.3 Test
 
 ```bash
 # Use curl/python

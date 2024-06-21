@@ -3,7 +3,13 @@
 
 FROM python:3.11-slim
 
-ENV LANG C.UTF-8
+# Set environment variables
+ENV LANG=en_US.UTF-8
+ENV PYTHONPATH=/home/user
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y ffmpeg
 
 COPY comps /home/comps
 
@@ -12,6 +18,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 ENV PYTHONPATH=$PYTHONPATH:/home
 
-WORKDIR /home/comps/asr
+WORKDIR /home/comps/asr/whisper
 
-ENTRYPOINT ["python", "asr.py"]
+ENTRYPOINT ["python", "whisper_server.py", "--device", "cpu"]
