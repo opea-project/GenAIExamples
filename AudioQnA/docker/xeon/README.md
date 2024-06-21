@@ -42,7 +42,6 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/AudioQnA/docker
 docker build --no-cache -t opea/audioqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
 ```
 
 Then run the command `docker images`, you will have following images ready:
@@ -88,6 +87,11 @@ docker compose -f docker_compose.yaml up -d
 ## 🚀 Test MicroServices
 
 ```bash
+# whisper service
+curl http://${host_ip}:7066/v1/asr \
+  -X POST \
+  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
+  -H 'Content-Type: application/json'
 
 # asr microservice
 curl http://${host_ip}:3001/v1/audio/transcriptions \
@@ -107,6 +111,12 @@ curl http://${host_ip}:3007/v1/chat/completions\
   -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":false}' \
   -H 'Content-Type: application/json'
 
+# speecht5 service
+curl http://${host_ip}:7055/v1/tts \
+  -X POST \
+  -d '{"text": "Who are you?"}' \
+  -H 'Content-Type: application/json'
+
 # tts microservice
 curl http://${host_ip}:3002/v1/audio/speech \
   -X POST \
@@ -120,6 +130,6 @@ curl http://${host_ip}:3002/v1/audio/speech \
 ```bash
 curl http://${host_ip}:3008/v1/audioqna \
   -X POST \
-  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
+  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' \
   -H 'Content-Type: application/json'
 ```
