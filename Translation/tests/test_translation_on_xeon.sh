@@ -9,7 +9,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function start_services() {
-    cd $WORKPATH/docker/gaudi
+    cd $WORKPATH/docker/xeon
 
     export LLM_MODEL_ID="haoranxu/ALMA-13B"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
