@@ -26,5 +26,5 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/embeddings/llama_index
 
-ENTRYPOINT ["python3", "embedding_tei_gaudi.py"]
+ENTRYPOINT ["python3", "embedding_tei.py"]
 

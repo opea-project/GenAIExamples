@@ -24,5 +24,5 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/embeddings/langchain
 
-ENTRYPOINT ["python", "embedding_tei_gaudi.py"]
+ENTRYPOINT ["python", "embedding_tei.py"]
 

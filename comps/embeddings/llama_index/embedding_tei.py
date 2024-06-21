@@ -10,7 +10,7 @@ from comps import EmbedDoc768, ServiceType, TextDoc, opea_microservices, registe
 
 
 @register_microservice(
-    name="opea_service@embedding_tgi_gaudi",
+    name="opea_service@embedding_tei_llamaindex",
     service_type=ServiceType.EMBEDDING,
     endpoint="/v1/embeddings",
     host="0.0.0.0",
@@ -31,4 +31,4 @@ if __name__ == "__main__":
     tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT", "http://localhost:8090")
     embeddings = TextEmbeddingsInference(model_name=tei_embedding_model_name, base_url=tei_embedding_endpoint)
     print("TEI Gaudi Embedding initialized.")
-    opea_microservices["opea_service@embedding_tgi_gaudi"].start()
+    opea_microservices["opea_service@embedding_tei_llamaindex"].start()
