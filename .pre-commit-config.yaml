@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 ci:
   autofix_prs: true
   autoupdate_schedule: quarterly
@@ -11,10 +14,12 @@ repos:
       - id: check-json
         exclude: |
           (?x)^(
-              ChatQnA/ui/svelte/tsconfig.json|
-              SearchQnA/ui/svelte/tsconfig.json
+              ChatQnA/docker/ui/svelte/tsconfig.json|
+              SearchQnA/ui/svelte/tsconfig.json|
+              DocSum/docker/ui/svelte/tsconfig.json
           )$
       - id: check-yaml
+        args: [--allow-multiple-documents]
       - id: debug-statements
       - id: requirements-txt-fixer
       - id: trailing-whitespace
@@ -24,12 +29,21 @@ repos:
     rev: v1.5.5
     hooks:
       - id: insert-license
+        files: (Dockerfile)$
+        args:
+          [
+            --license-filepath=.github/license_template.txt,
+            --use-current-year,
+            --detect-license-in-X-top-lines=5,
+            --skip-license-insertion-comment=Copyright,
+          ]
+      - id: insert-license
         files: (.*\.(py|yaml|yml|sh))$
         args:
           [
             --license-filepath=.github/license_template.txt,
             --use-current-year,
-            --detect-license-in-X-top-lines=40,
+            --detect-license-in-X-top-lines=5,
             --skip-license-insertion-comment=Copyright,
           ]
       - id: insert-license
@@ -38,7 +52,7 @@ repos:
           [
             --license-filepath=.github/license_template.txt,
             --use-current-year,
-            --detect-license-in-X-top-lines=40,
+            --detect-license-in-X-top-lines=5,
             --skip-license-insertion-comment=Copyright,
             --comment-style=//,
           ]
@@ -48,7 +62,7 @@ repos:
           [
             --license-filepath=.github/license_template.txt,
             --use-current-year,
-            --detect-license-in-X-top-lines=40,
+            --detect-license-in-X-top-lines=5,
             --skip-license-insertion-comment=Copyright,
             --comment-style=<!--| |-->,
           ]
@@ -81,7 +95,7 @@ repos:
     hooks:
       - id: prettier
         args: [--print-width=120]
-        types_or: [yaml, markdown, html, css, scss, javascript, json, ts, shell, sh]
+        types_or: [markdown, html, css, scss, javascript, json, ts, shell, sh]
         additional_dependencies:
           - prettier@3.2.5
 

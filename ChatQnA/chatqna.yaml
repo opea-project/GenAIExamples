@@ -1,0 +1,84 @@
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+opea_micro_services:
+  redis-vector-db:
+    host: ${REDIS_SERVICE_HOST_IP}
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    image: redis/redis-stack:7.2.0-v9
+  dataprep-redis-service:
+    host: ${DATAPREP_SERVICE_HOST_IP}
+    ports: ${DATAPREP_SERVICE_PORT}
+    image: opea/dataprep-redis:latest
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+  tei-embedding-service:
+    host: ${TEI_EMBEDDING_SERVICE_IP}
+    ports: ${TEI_EMBEDDING_SERVICE_PORT}
+    image: opea/tei-gaudi:latest
+    volumes:
+      - "./data:/data"
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    environment:
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+    model-id: ${EMBEDDING_MODEL_ID}
+  embedding:
+    host: ${EMBEDDING_SERVICE_HOST_IP}
+    ports: ${EMBEDDING_SERVICE_PORT}
+    image: opea/embedding-tei:latest
+    endpoint: /v1/embeddings
+  retrieval:
+    host: ${RETRIEVER_SERVICE_HOST_IP}
+    ports: ${RETRIEVER_SERVICE_PORT}
+    image: opea/retriever-redis:latest
+    endpoint: /v1/retrieval
+  reranking:
+    host: ${RERANK_SERVICE_HOST_IP}
+    ports: ${RERANK_SERVICE_PORT}
+    image: opea/reranking-tei:latest
+    endpoint: /v1/reranking
+  tgi_service:
+    host: ${TGI_SERVICE_IP}
+    ports: ${TGI_SERVICE_PORT}
+    image: ghcr.io/huggingface/tgi-gaudi:1.2.1
+    volumes:
+      - "./data:/data"
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    environment:
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    model-id: ${LLM_MODEL_ID}
+  llm:
+    host: ${LLM_SERVICE_HOST_IP}
+    ports: ${LLM_SERVICE_PORT}
+    image: opea/llm-tgi:latest
+    endpoint: /v1/chat/completions
+  ui:
+    host: ${UI_SERVICE_HOST_IP}
+    ports:
+      - "5173:5173"
+    image: opea/chatqna-ui:latest
+    environment:
+      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
+
+opea_mega_service:
+  host: ${MEGA_SERVICE_HOST_IP}
+  ports: ${MEGA_SERVICE_PORT}
+  image: opea/chatqna:latest
+  endpoint: /v1/chatqna
+  mega_flow:
+    - embedding >> retrieval >> reranking >> llm

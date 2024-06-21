@@ -4,7 +4,7 @@
 
 This project provides a collective list of Generative AI (GenAI) and Retrieval-Augmented Generation (RAG) examples such as chatbot with question and answering (ChatQnA), code generation (CodeGen), document summary (DocSum), etc.
 
-[![version](https://img.shields.io/badge/release-0.1-green)](https://github.com/opea-project/GenAIExamples/releases)
+[![version](https://img.shields.io/badge/release-0.6-green)](https://github.com/opea-project/GenAIExamples/releases)
 [![license](https://img.shields.io/badge/license-Apache%202-blue)](https://github.com/intel/neural-compressor/blob/master/LICENSE)
 
 ---
@@ -44,8 +44,8 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://redis.io/">Redis</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
+			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 		<tr>
@@ -53,8 +53,8 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://www.trychroma.com/">Chroma</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
+			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 		<tr>
@@ -62,8 +62,8 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://redis.io/">Redis</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
+			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 		<tr>
@@ -71,8 +71,17 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://qdrant.tech/">Qdrant</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
+			<td>Xeon/Gaudi2</td>
+			<td>Chatbot</td>
+		</tr>
+		<tr>
+			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://huggingface.co/Qwen/Qwen2-7B">Qwen2-7B</a></td>
+			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
+			<td><a href="https://redis.io/">Redis</a></td>
+			<td><a href=<a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
+			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 	</tbody>
@@ -93,9 +102,9 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 		</tr>
 		<tr>
 			<td><a href="https://www.langchain.com">LangChain</a></td>
-			<td><a href="https://huggingface.co/deepseek-ai/deepseek-coder-33b-instruct">Deepseek-Coder-33B</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://huggingface.co/meta-llama/CodeLlama-7b-hf">meta-llama/CodeLlama-7b-hf</a></td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td>Xeon/Gaudi2</td>
 			<td>Copilot</td>
 		</tr>
 	</tbody>
@@ -117,8 +126,8 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 		<tr>
 			<td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/HuggingFaceH4/mistral-7b-grok">HuggingFaceH4/mistral-7b-grok</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td>Xeon/Gaudi2</td>
 			<td>Code Translation</td>
 		</tr>
 	</tbody>
@@ -140,15 +149,15 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 		<tr>
 			<td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 		<tr>
 			<td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 	</tbody>
@@ -170,8 +179,8 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 		<tr>
 			<td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/haoranxu/ALMA-13B">haoranxu/ALMA-13B</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td>Xeon/Gaudi2</td>
 			<td>Language Translation</td>
 		</tr>
 	</tbody>
@@ -193,15 +202,15 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 		<tr>
 			<td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 		<tr>
 			<td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
-			<td>Gaudi2</td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 	</tbody>
@@ -223,15 +232,18 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 		<tr>
 			<td><a href="https://www.langchain.com">LangChain</a></td>
 			<td><a href="https://huggingface.co/llava-hf/llava-1.5-7b-hf">LLaVA-1.5-7B</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI-Habana</a></td>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 	</tbody>
 </table>
 
+> **_NOTE:_** The `Language Translation`, `SearchQnA`, `VisualQnA` and other use cases not listing here are in active development. The code structure of these use cases are subject to change.
+
 ## Additional Content
 
-- [Contribution](/CONTRIBUTING.md)
+- [Code of Conduct](https://github.com/opea-project/docs/tree/main/community/CODE_OF_CONDUCT.md)
+- [Contribution](https://github.com/opea-project/docs/tree/main/community/CONTRIBUTING.md)
+- [Security Policy](https://github.com/opea-project/docs/tree/main/community/SECURITY.md)
 - [Legal Information](/LEGAL_INFORMATION.md)
-- [Security Policy](/SECURITY.md)
