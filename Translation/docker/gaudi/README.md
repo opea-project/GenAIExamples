@@ -11,21 +11,14 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 1. Build TGI Gaudi Image
+### 1. Build LLM Image
 
 ```bash
 cd GenAIExamples/Translation
-docker build . -t tgi-gaudi-translation:1.2.1 --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f microservice/gaudi/Dockerfile
+docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 2. Build LLM Image
-
-```bash
-cd GenAIExamples/Translation
-docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/langchain/docker/Dockerfile .
-```
-
-### 3. Build MegaService Docker Image
+### 2. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `translation.py` Python script. Build the MegaService Docker image using the command below:
 
@@ -35,7 +28,7 @@ cd GenAIExamples/Translation/microservice/gaudi/
 docker build -t opea/gen-ai-comps:translation-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
-### 4. Build UI Docker Image
+### 3. Build UI Docker Image
 
 Construct the frontend Docker image using the command below:
 
@@ -46,7 +39,7 @@ docker build -t opea/gen-ai-comps:translation-ui-server --build-arg https_proxy=
 
 Then run the command `docker images`, you will have the following four Docker Images:
 
-1. `tgi-gaudi-translation:1.2.1`
+1. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
 2. `opea/gen-ai-comps:llm-tgi-gaudi-server`
 3. `opea/gen-ai-comps:translation-megaservice-server`
 4. `opea/gen-ai-comps:translation-ui-server`
