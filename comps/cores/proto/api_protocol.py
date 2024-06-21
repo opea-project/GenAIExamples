@@ -49,6 +49,28 @@ class ChatCompletionRequest(BaseModel):
     user: Optional[str] = None
 
 
+class AudioChatCompletionRequest(BaseModel):
+    audio: str
+    messages: Optional[
+        Union[
+            str,
+            List[Dict[str, str]],
+            List[Dict[str, Union[str, List[Dict[str, Union[str, Dict[str, str]]]]]]],
+        ]
+    ] = None
+    model: Optional[str] = "Intel/neural-chat-7b-v3-3"
+    temperature: Optional[float] = 0.01
+    top_p: Optional[float] = 0.95
+    top_k: Optional[int] = 10
+    n: Optional[int] = 1
+    max_tokens: Optional[int] = 1024
+    stop: Optional[Union[str, List[str]]] = None
+    stream: Optional[bool] = False
+    presence_penalty: Optional[float] = 1.03
+    frequency_penalty: Optional[float] = 0.0
+    user: Optional[str] = None
+
+
 class ChatMessage(BaseModel):
     role: str
     content: str
