@@ -13,7 +13,7 @@ docker build -t opea/llm-vllm-xft:latest --build-arg https_proxy=$https_proxy --
 ## 2 Run Docker with CLI
 
 ```bash
-docker run -it -p 9000:9000  -v /home/sdp/Qwen2-7B-Instruct/:/Qwen2-7B-Instruct/   -e vLLM_LLM_ENDPOINT="http://localhost:18688" -e HF_DATASET_DIR="/Qwen2-7B-Instruct/" -e OUTPUT_DIR="./output" -e TOKEN_PATH="/Qwen2-7B-Instruct/" -e https_proxy=$https_proxy -e http_proxy=$http_proxy --ipc=host opea/llm-vllm-xft:latest
+docker run -it -p 9000:9000  -v /home/sdp/Qwen2-7B-Instruct/:/Qwen2-7B-Instruct/   -e vLLM_LLM_ENDPOINT="http://localhost:18688" -e HF_DATASET_DIR="/Qwen2-7B-Instruct/" -e OUTPUT_DIR="./output" -e TOKEN_PATH="/Qwen2-7B-Instruct/" -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e no_proxy=$no_proxy --ipc=host opea/llm-vllm-xft:latest
 ```
 
 # 🚀3. Consume LLM Service

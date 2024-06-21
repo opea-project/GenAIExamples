@@ -20,7 +20,7 @@ python -m vllm.entrypoints.openai.api_server \
         --dtype bf16 \
         --kv-cache-dtype fp16 \
         --served-model-name xft \
-        --host localhost \
+        --host 0.0.0.0 \
         --port 18688 \
         --trust-remote-code &
 
