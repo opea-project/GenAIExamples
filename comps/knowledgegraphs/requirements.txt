@@ -21,6 +21,7 @@ opentelemetry-sdk
 pandas
 pandas
 Pillow
+prometheus-fastapi-instrumentator
 pymupdf
 python-docx
 redis

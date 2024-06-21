@@ -10,6 +10,7 @@ numpy
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+prometheus-fastapi-instrumentator
 redis
 sentence_transformers
 shortuuid

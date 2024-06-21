@@ -12,6 +12,7 @@ opentelemetry-exporter-otlp
 opentelemetry-sdk
 pandas
 Pillow
+prometheus-fastapi-instrumentator
 pyarrow
 pymupdf
 python-docx

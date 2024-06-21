@@ -11,6 +11,7 @@ opentelemetry-exporter-otlp
 opentelemetry-sdk
 pandas
 Pillow
+prometheus-fastapi-instrumentator
 pymupdf
 python-docx
 qdrant-client

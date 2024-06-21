@@ -13,6 +13,7 @@ opentelemetry-exporter-otlp
 opentelemetry-sdk
 pandas
 Pillow
+prometheus-fastapi-instrumentator
 pydantic==2.7.3
 pymilvus==2.4.3
 pymupdf==1.24.5

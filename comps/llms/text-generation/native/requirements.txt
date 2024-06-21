@@ -4,5 +4,6 @@ langsmith
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+prometheus-fastapi-instrumentator
 shortuuid
 transformers
