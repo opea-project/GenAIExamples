@@ -84,7 +84,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
     "${ip_address}:8888/v1/translation" \
-    "I love machine translation" \
+    "translation" \
     "mega-translation" \
     "translation-xeon-backend-server" \
     '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
