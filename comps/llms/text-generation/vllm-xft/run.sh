@@ -3,7 +3,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-# Preload libiomp5.so by following cmd or LD_PRELOAD=libiomp5.so manually
+# Preloading libiomp5.so is essential for optimal performance.
+# libiomp5.so is the Intel OpenMP runtime library, providing parallel computation support,
+# thread management, task scheduling, and performance optimization on Intel X86 platforms.
 export $(python -c 'import xfastertransformer as xft; print(xft.get_env())')
 
 # convert the model to fastertransformer format
