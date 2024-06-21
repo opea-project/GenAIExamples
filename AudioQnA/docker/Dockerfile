@@ -16,9 +16,9 @@ RUN useradd -m -s /bin/bash user && \
     chown -R user /home/user/
 
 RUN cd /home/user/ && \
-    git clone https://github.com/spycsh/GenAIComps.git
+    git clone https://github.com/opea-project/GenAIComps.git
 
-RUN cd /home/user/GenAIComps && git checkout asr && pip install --no-cache-dir --upgrade pip && \
+RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
 COPY ./audioqna.py /home/user/audioqna.py
