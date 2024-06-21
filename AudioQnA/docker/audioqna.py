@@ -15,6 +15,7 @@ LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
 TTS_SERVICE_HOST_IP = os.getenv("TTS_SERVICE_HOST_IP", "0.0.0.0")
 TTS_SERVICE_PORT = os.getenv("TTS_SERVICE_PORT", 9088)
 
+
 class AudioQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
@@ -44,7 +45,7 @@ class AudioQnAService:
             port=TTS_SERVICE_PORT,
             endpoint="/v1/audio/speech",
             use_remote_service=True,
-            service_type=ServiceType.TTS
+            service_type=ServiceType.TTS,
         )
         self.megaservice.add(asr).add(llm).add(tts)
         self.megaservice.flow_to(asr, llm)

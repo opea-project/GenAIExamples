@@ -22,7 +22,6 @@ docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg
 
 ### 3. Build LLM Image
 
-
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
