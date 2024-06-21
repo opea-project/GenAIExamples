@@ -23,8 +23,8 @@ jobs:
     uses: ./.github/workflows/reuse-get-test-matrix.yml
     with:
       diff_excluded_files: '.github|deprecated|docker|assets|*.md|*.txt'
-      xeon_server_label: 'k8s'
-      gaudi_server_label: ""
+      xeon_server_label: 'xeon'
+      gaudi_server_label: 'gaudi'
 
   mega-image-build:
     needs: job1
@@ -34,12 +34,13 @@ jobs:
     with:
       image_tag: ${{ github.event.pull_request.head.sha }}
       mega_service: "${{ matrix.example }}"
+      runner_label: "docker-build-${{ matrix.hardware }}"
 
   manifest-test:
     needs: [job1, mega-image-build]
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    runs-on: ${{ matrix.hardware }}
+    runs-on: "k8s-${{ matrix.hardware }}"
     continue-on-error: true
     steps:
       - name: E2e test manifest
@@ -62,29 +63,32 @@ jobs:
           echo "NAMESPACE=$lower_example-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
           echo "ROLLOUT_TIMEOUT_SECONDS=1800s" >> $GITHUB_ENV
           echo "KUBECTL_TIMEOUT_SECONDS=60s" >> $GITHUB_ENV
+          echo "continue_test=true" >> $GITHUB_ENV
           echo "should_cleanup=false" >> $GITHUB_ENV
           echo "skip_validate=true" >> $GITHUB_ENV
           echo "NAMESPACE=$NAMESPACE"
 
-      - name: Initialize manifest testing
-        run: |
-          ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_xeon.sh init_${{ matrix.example }}
-
       - name: Kubectl install
         id: install
         run: |
-          echo "should_cleanup=true" >> $GITHUB_ENV
-          kubectl create ns $NAMESPACE
-          ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_xeon.sh install_${{ matrix.example }} $NAMESPACE
-          echo "Testing ${{ matrix.example }}, waiting for pod ready..."
-          if kubectl rollout status deployment --namespace "$NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
-            echo "Testing manifests ${{ matrix.example }}, waiting for pod ready done!"
-            echo "skip_validate=false" >> $GITHUB_ENV
+          if [[ ! -f ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_${{ matrix.hardware }}.sh ]]; then
+            echo "No test script found, exist test!"
+            exit 0
           else
-            echo "Timeout waiting for pods in namespace $NAMESPACE to be ready!"
-            exit 1
+            ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_${{ matrix.hardware }}.sh init_${{ matrix.example }}
+            echo "should_cleanup=true" >> $GITHUB_ENV
+            kubectl create ns $NAMESPACE
+            ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_${{ matrix.hardware }}.sh install_${{ matrix.example }} $NAMESPACE
+            echo "Testing ${{ matrix.example }}, waiting for pod ready..."
+            if kubectl rollout status deployment --namespace "$NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
+              echo "Testing manifests ${{ matrix.example }}, waiting for pod ready done!"
+              echo "skip_validate=false" >> $GITHUB_ENV
+            else
+              echo "Timeout waiting for pods in namespace $NAMESPACE to be ready!"
+              exit 1
+            fi
+            sleep 60
           fi
-          sleep 60
 
       - name: Validate e2e test
         if: always()
@@ -92,7 +96,7 @@ jobs:
           if $skip_validate; then
             echo "Skip validate"
           else
-            ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_xeon.sh validate_${{ matrix.example }} $NAMESPACE
+            ${{ github.workspace }}/${{ matrix.example }}/tests/test_manifest_on_${{ matrix.hardware }}.sh validate_${{ matrix.example }} $NAMESPACE
           fi
 
       - name: Kubectl uninstall
