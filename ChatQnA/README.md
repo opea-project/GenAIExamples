@@ -22,6 +22,10 @@ Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deployi
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying ChatQnA on Xeon.
 
+## Deploy ChatQnA on NVIDIA GPU
+
+Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for instructions on deploying ChatQnA on NVIDIA GPU.
+
 ## Deploy ChatQnA into Kubernetes on Xeon & Gaudi
 
 Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
