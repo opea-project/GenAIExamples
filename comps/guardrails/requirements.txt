@@ -1,6 +1,7 @@
 docarray[full]
 fastapi
 huggingface_hub
+langchain-community
 langchain-huggingface
 langsmith
 opentelemetry-api

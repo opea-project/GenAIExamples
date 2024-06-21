@@ -3,14 +3,17 @@
 
 import os
 
+from langchain_community.utilities.requests import JsonRequestsWrapper
 from langchain_huggingface import ChatHuggingFace
 from langchain_huggingface.llms import HuggingFaceEndpoint
 from langsmith import traceable
 
 from comps import ServiceType, TextDoc, opea_microservices, register_microservice
 
+DEFAULT_MODEL = "meta-llama/LlamaGuard-7b"
 
-def get_unsafe_dict(model_id="meta-llama/LlamaGuard-7b"):
+
+def get_unsafe_dict(model_id=DEFAULT_MODEL):
     if model_id == "meta-llama/LlamaGuard-7b":
         return {
             "O1": "Violence and Hate",
@@ -36,6 +39,18 @@ def get_unsafe_dict(model_id="meta-llama/LlamaGuard-7b"):
             "S10": "Self-Harm",
             "S11": "Sexual Content",
         }
+
+
+def get_tgi_service_model_id(endpoint_url, default=DEFAULT_MODEL):
+    """Returns Hugging Face repo id for deployed service's info endpoint
+    otherwise return default model."""
+    try:
+        requests = JsonRequestsWrapper()
+        info_endpoint = os.path.join(endpoint_url, "info")
+        model_info = requests.get(info_endpoint)
+        return model_info["model_id"]
+    except Exception as e:
+        return default
 
 
 @register_microservice(
@@ -64,6 +79,7 @@ def safety_guard(input: TextDoc) -> TextDoc:
 
 if __name__ == "__main__":
     safety_guard_endpoint = os.getenv("SAFETY_GUARD_ENDPOINT", "http://localhost:8080")
+    safety_guard_model = os.getenv("SAFETY_GUARD_MODEL_ID", get_tgi_service_model_id(safety_guard_endpoint))
     llm_guard = HuggingFaceEndpoint(
         endpoint_url=safety_guard_endpoint,
         max_new_tokens=100,
