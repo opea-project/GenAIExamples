@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { IconAi, IconUser } from "@tabler/icons-react"
 import style from "./conversationMessage.module.scss"
 import { Group, Text } from "@mantine/core"

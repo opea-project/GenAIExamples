@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { Button, Container, Drawer, FileInput, Text, TextInput } from '@mantine/core'
 import { SyntheticEvent, useState } from 'react'
 import { useAppDispatch } from '../../redux/store'
