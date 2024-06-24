@@ -1,0 +1,75 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tgi-service-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tgi-service-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      labels:
+        app: tgi-service-deploy
+    spec:
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: ghcr.io/huggingface/text-generation-inference:1.4
+        name: tgi-service-deploy-demo
+        args:
+        - --model-id
+        - $(LLM_MODEL_ID)
+        #- "/data/Llama-2-7b-hf"
+        # - "/data/Mistral-7B-Instruct-v0.2"
+        # - --quantize
+        # - "bitsandbytes-fp4"
+#        - --disable-custom-kernels
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+        resources:
+          # limits:
+          #   cpu: 56000m
+          #   memory: 26Gi
+          # requests:
+          #   cpu: 56000m
+          #   memory: 26Gi
+      serviceAccountName: default
+      nodeSelector:
+      volumes:
+      - name: model-volume
+        hostPath:
+          # directory location on host
+          path: /mnt/models
+          # this field is optional
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tgi-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: tgi-service-deploy
+  ports:
+    - name: service
+      port: 9009
+      targetPort: 80
