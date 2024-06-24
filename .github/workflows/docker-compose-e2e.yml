@@ -61,10 +61,13 @@ jobs:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
           example: ${{ matrix.example }}
           hardware: ${{ matrix.hardware }}
-          IMAGE_REPO: ${{needs.mega-image-build.outputs.image_repo}}
-          IMAGE_TAG: ${{needs.mega-image-build.outputs.image_tag}}
+          IMAGE_TAG: ${{ needs.mega-image-build.outputs.image_tag }}
+          IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
+          IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
         run: |
           cd ${{ github.workspace }}/$example/tests
+          if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
+          export IMAGE_REPO=${IMAGE_REPO}
           example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 30m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
 
