@@ -19,7 +19,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom'
+    environment: "jsdom",
   },
   define: {
     "import.meta.env": process.env,
