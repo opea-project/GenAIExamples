@@ -360,4 +360,4 @@ Here is an example of running ChatQnA:
 
 Here is an example of running ChatQnA with Conversational UI (React):
 
-![project-screenshot](../../assets/img/chat_ui_conversation.png)
+![project-screenshot](../../assets/img/conversation_ui_response.png)
