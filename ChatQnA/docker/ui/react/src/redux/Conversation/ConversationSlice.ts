@@ -9,7 +9,7 @@ import { notifications } from "@mantine/notifications";
 import { CHAT_QNA_URL, DATA_PREP_URL } from "../../config";
 
 const initialState: ConversationReducer = {
-  conversations:[],
+  conversations: [],
   selectedConversationId: "",
   onGoingResult: "",
 };
@@ -20,10 +20,10 @@ export const ConversationSlice = createSlice({
   name: "Conversation",
   initialState,
   reducers: {
-    logout:(state) => {
-      state.conversations=[]
-      state.selectedConversationId=""
-      state.onGoingResult=""
+    logout: (state) => {
+      state.conversations = []
+      state.selectedConversationId = ""
+      state.onGoingResult = ""
     },
     setOnGoingResult: (state, action: PayloadAction<string>) => {
       state.onGoingResult = action.payload;
@@ -32,59 +32,59 @@ export const ConversationSlice = createSlice({
       state,
       action: PayloadAction<Message>
     ) => {
-      const selectedConversation = state.conversations.find(x=>x.conversationId===state.selectedConversationId)
-        selectedConversation?.Messages?.push(action.payload);
+      const selectedConversation = state.conversations.find(x => x.conversationId === state.selectedConversationId)
+      selectedConversation?.Messages?.push(action.payload);
     },
     newConversation: (state) => {
       state.selectedConversationId = "",
-      state.onGoingResult="";
+        state.onGoingResult = "";
     },
-    createNewConversation: (state, action:PayloadAction<{title:string,id:string, message:Message }>) => {
+    createNewConversation: (state, action: PayloadAction<{ title: string, id: string, message: Message }>) => {
       state.conversations.push({
-        title:action.payload.title,
-        conversationId:action.payload.id,
-        Messages:[action.payload.message]
+        title: action.payload.title,
+        conversationId: action.payload.id,
+        Messages: [action.payload.message]
       })
     },
-    setSelectedConversationId: (state, action:PayloadAction<string>) => {
+    setSelectedConversationId: (state, action: PayloadAction<string>) => {
       state.selectedConversationId = action.payload
     }
   },
   extraReducers(builder) {
-    builder.addCase(uploadFile.fulfilled, ()=> {
+    builder.addCase(uploadFile.fulfilled, () => {
       notifications.update({
         id: "upload-file",
-        message: "File Uploaded SuccessFully",
-        loading:false,
-        autoClose:3000
+        message: "File Uploaded Successfully",
+        loading: false,
+        autoClose: 3000
       });
     }),
 
-    builder.addCase(uploadFile.rejected, ()=> {
-      notifications.update({
-        color:'red',
-        id: "upload-file",
-        message: "Failed to Upload file",
-        loading:false
+      builder.addCase(uploadFile.rejected, () => {
+        notifications.update({
+          color: 'red',
+          id: "upload-file",
+          message: "Failed to Upload file",
+          loading: false
+        });
       });
-    });
-    builder.addCase(submitDataSourceURL.fulfilled,()=>{
+    builder.addCase(submitDataSourceURL.fulfilled, () => {
       notifications.show({
-        message:"Subitted SuccessFully"
+        message: "Submitted Successfully"
       })
     });
-    builder.addCase(submitDataSourceURL.rejected,()=>{
+    builder.addCase(submitDataSourceURL.rejected, () => {
       notifications.show({
-        color:'red',
-        message:"Submit Failed"
+        color: 'red',
+        message: "Submit Failed"
       })
     });
   }
-  });
+});
 
 export const submitDataSourceURL = createAsyncThunkWrapper(
   "conversation/submitDataSourceURL",
-  async ({ link_list }: { link_list: string[] }, {}) => {
+  async ({ link_list }: { link_list: string[] }, { }) => {
     const body = new FormData();
     body.append("link_list", JSON.stringify(link_list));
     const response = await client.post(DATA_PREP_URL, body);
@@ -93,7 +93,7 @@ export const submitDataSourceURL = createAsyncThunkWrapper(
 );
 export const uploadFile = createAsyncThunkWrapper(
   "conversation/uploadFile",
-  async ({ file }: { file: File }, {}) => {
+  async ({ file }: { file: File }, { }) => {
     const body = new FormData();
     body.append("files", file);
 
