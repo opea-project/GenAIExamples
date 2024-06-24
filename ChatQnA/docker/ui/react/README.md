@@ -1,30 +1,33 @@
-# React + TypeScript + Vite
+<h1 align="center" id="title"> ChatQnA Conversational UI</h1>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### 📸 Project Screenshots
 
-Currently, two official plugins are available:
+![project-screenshot](../../../assets/img/chat_ui_conversation.png)
+![project-screenshot](../../../assets/img/chat_ui_conversation.png)
+![project-screenshot](../../../assets/img/chat_ui_conversation.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<h2>🧐 Features</h2>
 
-## Expanding the ESLint configuration
+Here're some of the project's features:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Start a Text Chat：Initiate a text chat with the ability to input written conversations, where the dialogue content can also be customized based on uploaded files.
+- Context Awareness: The AI assistant maintains the context of the conversation, understanding references to previous statements or questions. This allows for more natural and coherent exchanges.
+- Upload File: The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
+- Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
+- Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
+- Conversational Chat : The application maintains a history of the conversation, allowing users to review previous messages and the AI to refer back to earlier points in the dialogue when necessary.
 
-- Configure the top-level `parserOptions` property like this:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+<h2>🛠️ Get it Running:</h2>
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+1. Clone the repo.
+
+2. cd command to the current folder.
+
+3. Modify the required .env variables.
+   ```
+   DOC_BASE_URL = ''
+   ```
+4. Execute `npm install` to install the corresponding dependencies.
+
+5. Execute `npm run dev` in both environments
