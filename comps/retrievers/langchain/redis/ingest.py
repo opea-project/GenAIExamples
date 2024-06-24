@@ -7,6 +7,7 @@
 
 import io
 import os
+import time
 
 import numpy as np
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -16,6 +17,19 @@ from PIL import Image
 from redis_config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 
 tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
+
+timeout = 180  # Timeout in seconds
+check_interval = 5  # Check every 5 seconds
+
+
+def check_embedding_endpoint(embedder):
+    try:
+        test_sentence = "embedder available test."
+        embedder.embed_documents([test_sentence])
+        return True
+    except Exception as e:
+        print(f"Error embedder is unavailable: {e}")
+        return False
 
 
 def pdf_loader(file_path):
@@ -74,6 +88,15 @@ def ingest_documents():
     if tei_embedding_endpoint:
         # create embeddings using TEI endpoint service
         embedder = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            is_available = check_embedding_endpoint(embedder)
+            if is_available:
+                print("Embedder endpoint is available.")
+                break
+            else:
+                print("Embedder endpoint is not available. Checking again in 5 seconds...")
+                time.sleep(check_interval)
     else:
         # create embeddings using local embedding model
         embedder = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
