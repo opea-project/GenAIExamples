@@ -2,9 +2,9 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](../../../assets/img/chat_ui_conversation.png)
-![project-screenshot](../../../assets/img/chat_ui_conversation.png)
-![project-screenshot](../../../assets/img/chat_ui_conversation.png)
+![project-screenshot](../../../assets/img/conversation_ui_init.png)
+![project-screenshot](../../../assets/img/conversation_ui_response.png)
+![project-screenshot](../../../assets/img/conversation_ui_upload.png)
 
 <h2>🧐 Features</h2>
 
