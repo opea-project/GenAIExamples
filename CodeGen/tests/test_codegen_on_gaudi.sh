@@ -8,6 +8,24 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
+function build_docker_images() {
+    cd $WORKPATH
+    git clone https://github.com/opea-project/GenAIComps.git
+    cd GenAIComps
+
+    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
+
+    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+
+    cd $WORKPATH/docker
+    docker build --no-cache -t opea/codegen:latest -f Dockerfile .
+
+    cd $WORKPATH/docker/ui
+    docker build --no-cache -t opea/codegen-ui:latest -f docker/Dockerfile .
+
+    docker images
+}
+
 function start_services() {
     cd $WORKPATH/docker/gaudi
 
@@ -20,11 +38,14 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    # Replace the container name with a test-specific name
-    echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" docker_compose.yaml
-    sed -i "s#image: opea/codegen-ui:latest#image: opea/codegen-ui:${IMAGE_TAG}#g" docker_compose.yaml
-    sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/codegen-ui:latest#image: opea/codegen-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    fi
+
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
 
@@ -127,6 +148,7 @@ function main() {
 
     stop_docker
 
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices

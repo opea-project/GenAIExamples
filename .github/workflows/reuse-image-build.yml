@@ -60,7 +60,5 @@ jobs:
           if [ -z "${{ env.IMAGE_REPO }}" ]; then
             IMAGE_REPO=$OPEA_IMAGE_REPO
           fi
-          echo "IMAGE_REPO=${IMAGE_REPO}"
           echo "IMAGE_TAG=${IMAGE_TAG}"
-          echo "image_repo=$IMAGE_REPO" >> $GITHUB_OUTPUT
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT

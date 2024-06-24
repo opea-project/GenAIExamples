@@ -8,6 +8,22 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
+function build_docker_images() {
+    cd $WORKPATH
+    git clone https://github.com/opea-project/GenAIComps.git
+    cd GenAIComps
+
+    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
+
+    cd $WORKPATH/docker
+    docker build --no-cache -t opea/codetrans:latest -f Dockerfile .
+
+    cd $WORKPATH/docker/ui
+    docker build --no-cache -t opea/codetrans-ui:latest -f docker/Dockerfile .
+
+    docker images
+}
+
 function start_services() {
     cd $WORKPATH/docker/xeon
     export http_proxy=${http_proxy}
@@ -21,11 +37,14 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    # Replace the container name with a test-specific name
-    echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    sed -i "s#image: opea/codetrans:latest#image: opea/codetrans:${IMAGE_TAG}#g" docker_compose.yaml
-    sed -i "s#image: opea/codetrans-ui:latest#image: opea/codetrans-ui:${IMAGE_TAG}#g" docker_compose.yaml
-    sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/codetrans:latest#image: opea/codetrans:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/codetrans-ui:latest#image: opea/codetrans-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    fi
+
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
 
@@ -128,6 +147,7 @@ function main() {
 
     stop_docker
 
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices

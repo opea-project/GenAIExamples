@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
+echo "IMAGE_REPO=${IMAGE_REPO}"
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -58,11 +59,14 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    # Replace the container name with a test-specific name
-    echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-    sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-    sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    fi
+
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
@@ -215,14 +219,12 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    begin_time=$(date +%s)
-    # build_docker_images
-    # start_time=$(date +%s)
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
-    # minimal_duration=$((end_time-start_time))
-    maximal_duration=$((end_time-begin_time))
-    echo "Mega service start duration is "$maximal_duration"s"
+    duration=$((end_time-start_time))
+    echo "Mega service start duration is $duration s"
 
     validate_microservices
     validate_megaservice

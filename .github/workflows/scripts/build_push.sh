@@ -46,7 +46,7 @@ function docker_build() {
 # $1 is like "apple orange pear"
 for MEGA_SVC in $1; do
     case $MEGA_SVC in
-        "ChatQnA"|"CodeGen"|"CodeTrans"|"DocSum"|"SearchQnA")
+        "ChatQnA"|"CodeGen"|"CodeTrans"|"DocSum")
             cd $MEGA_SVC/docker
             IMAGE_NAME="$(getImagenameFromMega $MEGA_SVC)"
             docker_build ${IMAGE_NAME}
@@ -55,7 +55,6 @@ for MEGA_SVC in $1; do
             ;;
         "AudioQnA"|"SearchQnA"|"Translation"|"VisualQnA")
             echo "Not supported yet"
-            exit 1
             ;;
         *)
             echo "Unknown function: $MEGA_SVC"
