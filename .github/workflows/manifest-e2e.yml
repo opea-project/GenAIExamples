@@ -57,7 +57,7 @@ jobs:
 
       - name: Set variables
         run: |
-          IMAGE_REPO="" if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=${{ vars.IMAGE_REPO_GAUDI }}; else IMAGE_REPO=${{ vars.IMAGE_REPO_XEON }}; fi
+          IMAGE_REPO=""; if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=${{ vars.IMAGE_REPO_GAUDI }}; else IMAGE_REPO=${{ vars.IMAGE_REPO_XEON }}; fi
           echo "IMAGE_REPO=${IMAGE_REPO}" >> $GITHUB_OUTPUT
           echo "IMAGE_TAG=${{needs.mega-image-build.outputs.image_tag}}" >> $GITHUB_ENV
           lower_example=$(echo "${{ matrix.example }}" | tr '[:upper:]' '[:lower:]')
