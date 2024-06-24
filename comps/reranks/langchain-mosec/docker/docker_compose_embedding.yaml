@@ -1,0 +1,22 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  reranking:
+    image: opea/reranking-langchain-mosec:latest
+    container_name: reranking-langchain-mosec-server
+    ports:
+      - "6000:8000"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MOSEC_RERANKING_ENDPOINT: ${MOSEC_RERANKING_ENDPOINT}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
