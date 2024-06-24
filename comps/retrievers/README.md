@@ -13,3 +13,7 @@ For details, please refer to this [readme](langchain/redis/README.md)
 # Retriever Microservice with Milvus
 
 For details, please refer to this [readme](langchain/milvus/README.md)
+
+# Retriever Microservice with PGVector
+
+For details, please refer to this [readme](langchain/pgvector/README.md)

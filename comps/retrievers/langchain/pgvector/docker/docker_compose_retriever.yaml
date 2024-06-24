@@ -1,0 +1,31 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  tei_xeon_service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    container_name: tei-xeon-server
+    ports:
+      - "6060:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    command: --model-id ${RETRIEVE_MODEL_ID}
+  retriever:
+    image: opea/retriever-pgvector:latest
+    container_name: retriever-pgvector
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PG_CONNECTION_STRING: ${PG_CONNECTION_STRING}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
