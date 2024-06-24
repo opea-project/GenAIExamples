@@ -47,7 +47,7 @@ function validate_microservice() {
 }
 
 function stop_docker() {
-    cid_retrievers=$(docker ps -aq --filter "name=test-comps-retrievers*")
+    cid_retrievers=$(docker ps -aq --filter "name=test-comps-retriever*")
     if [[ ! -z "$cid_retrievers" ]]; then
         docker stop $cid_retrievers && docker rm $cid_retrievers && sleep 1s
     fi

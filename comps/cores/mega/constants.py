@@ -28,6 +28,7 @@ class ServiceType(Enum):
     RAGAS = 11
     LVM = 12
     KNOWLEDGE_GRAPH = 13
+    WEB_RETRIEVER = 14
 
 
 class MegaServiceEndpoint(Enum):

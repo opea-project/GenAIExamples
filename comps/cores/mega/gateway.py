@@ -350,3 +350,45 @@ class AudioQnAGateway(Gateway):
         response = result_dict[last_node]["byte_str"]
 
         return response
+
+
+class SearchQnAGateway(Gateway):
+    def __init__(self, megaservice, host="0.0.0.0", port=8888):
+        super().__init__(
+            megaservice, host, port, str(MegaServiceEndpoint.SEARCH_QNA), ChatCompletionRequest, ChatCompletionResponse
+        )
+
+    async def handle_request(self, request: Request):
+        data = await request.json()
+        stream_opt = data.get("stream", True)
+        chat_request = ChatCompletionRequest.parse_obj(data)
+        prompt = self._handle_message(chat_request.messages)
+        parameters = LLMParams(
+            max_new_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
+            top_k=chat_request.top_k if chat_request.top_k else 10,
+            top_p=chat_request.top_p if chat_request.top_p else 0.95,
+            temperature=chat_request.temperature if chat_request.temperature else 0.01,
+            repetition_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 1.03,
+            streaming=stream_opt,
+        )
+        result_dict = await self.megaservice.schedule(initial_inputs={"text": prompt}, llm_parameters=parameters)
+        for node, response in result_dict.items():
+            # Here it suppose the last microservice in the megaservice is LLM.
+            if (
+                isinstance(response, StreamingResponse)
+                and node == list(self.megaservice.services.keys())[-1]
+                and self.megaservice.services[node].service_type == ServiceType.LLM
+            ):
+                return response
+        last_node = self.megaservice.all_leaves()[-1]
+        response = result_dict[last_node]["text"]
+        choices = []
+        usage = UsageInfo()
+        choices.append(
+            ChatCompletionResponseChoice(
+                index=0,
+                message=ChatMessage(role="assistant", content=response),
+                finish_reason="stop",
+            )
+        )
+        return ChatCompletionResponse(model="searchqna", choices=choices, usage=usage)

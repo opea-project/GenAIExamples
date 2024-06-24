@@ -1,0 +1,14 @@
+bs4
+chromadb
+docarray[full]
+fastapi
+google-api-python-client>=2.100.0
+html2text
+langchain-huggingface
+langchain_community
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+prometheus-fastapi-instrumentator
+sentence_transformers
+shortuuid
