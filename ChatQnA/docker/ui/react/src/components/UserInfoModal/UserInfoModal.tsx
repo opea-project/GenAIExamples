@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks';
 import { TextInput, Button, Modal } from '@mantine/core';

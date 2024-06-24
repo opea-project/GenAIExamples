@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import "./App.scss"
 import { MantineProvider } from "@mantine/core"
 import '@mantine/notifications/styles.css';

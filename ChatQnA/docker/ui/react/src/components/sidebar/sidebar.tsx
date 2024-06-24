@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { useState } from "react"
 import { Tooltip, UnstyledButton, Stack, rem } from "@mantine/core"
 import { IconHome2, IconLogout } from "@tabler/icons-react"
