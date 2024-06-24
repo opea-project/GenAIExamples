@@ -69,6 +69,11 @@ class GeneratedDoc(BaseDoc):
     prompt: str
 
 
+class RerankedDoc(BaseDoc):
+    reranked_docs: DocList[TextDoc]
+    initial_query: str
+
+
 class LLMParamsDoc(BaseDoc):
     query: str
     max_new_tokens: int = 1024
