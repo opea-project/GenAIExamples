@@ -122,9 +122,13 @@ cd ../../../..
 
 Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
 
+**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
+
 ```bash
 cd GenAIExamples/ChatQnA/docker/ui/
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
 
