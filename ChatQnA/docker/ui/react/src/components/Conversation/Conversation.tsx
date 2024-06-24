@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { KeyboardEventHandler, SyntheticEvent, useEffect, useRef, useState } from 'react'
 import styleClasses from "./conversation.module.scss"
 import { ActionIcon, Group, Textarea, Title, rem } from '@mantine/core'

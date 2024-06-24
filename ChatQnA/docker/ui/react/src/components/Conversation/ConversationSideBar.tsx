@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { ScrollAreaAutosize, Title } from "@mantine/core"
 
 import contextStyles from "../../styles/components/context.module.scss"
