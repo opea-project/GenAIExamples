@@ -55,7 +55,7 @@ jobs:
               if [[ "${path_level_1[@]}" =~ "${service}" ]]; then
                   run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
               else
-                  vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | cut -d'/' -f3 | grep -vE '*.py|Dockerfile|*.md' | sort -u)
+                  vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | cut -d'/' -f3 | grep -vE '*.py|Dockerfile|*.md|*.sh' | sort -u)
                   for vendor in ${vendors}; do
                       if [[ "${path_level_3[@]}" =~ "${service}/${vendor}" ]]; then
                           sub_vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | grep ${vendor} | cut -d'/' -f4 | grep -vE '*.py' | sort -u)
