@@ -13,7 +13,7 @@
 // limitations under the License.
 import { env } from "$env/dynamic/public";
 
-const BASIC_URL = env.BASIC_URL;
+const BASIC_URL = env.BASE_URL;
 
 async function fetchPostRes(url, init) {
   try {

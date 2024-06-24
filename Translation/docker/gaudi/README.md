@@ -14,8 +14,7 @@ cd GenAIComps
 ### 1. Build LLM Image
 
 ```bash
-cd GenAIExamples/Translation
-docker build -t opea/gen-ai-comps:llm-tgi-gaudi-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -24,8 +23,8 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/Translation/microservice/gaudi/
-docker build -t opea/gen-ai-comps:translation-megaservice-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+cd GenAIExamples/Translation/docker
+docker build -t opea/translation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 ### 3. Build UI Docker Image
@@ -33,8 +32,8 @@ docker build -t opea/gen-ai-comps:translation-megaservice-server --build-arg htt
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/Translation/ui/
-docker build -t opea/gen-ai-comps:translation-ui-server --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/Translation/docker/ui/
+docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:
@@ -101,5 +100,5 @@ Following the validation of all aforementioned microservices, we are now prepare
 ## 🚀 Launch the UI
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
-![project-screenshot](https://imgur.com/yT2VDBX.png)
-![project-screenshot](https://imgur.com/8ajC7lE.png)
+![project-screenshot](../../assets/img/trans_ui_init.png)
+![project-screenshot](../../assets/img/trans_ui_select.png)
