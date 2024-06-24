@@ -121,8 +121,8 @@ def process_all_videos(config):
         metadata[each_video] = {}
         keyname = each_video
         video_path = os.path.join(path, each_video)
-        #date_time = datetime.datetime.now()  # FIXME CHECK: is this correct? 
-        date_time = t.ctime(os.stat(video_path).st_ctime)
+        date_time = datetime.datetime.now()  # FIXME CHECK: is this correct? 
+        #date_time = t.ctime(os.stat(video_path).st_ctime)
         print(f"date_time of {video_path} being created : ",date_time)
         # Get the local timezone of the machine
         local_timezone = get_localzone()
@@ -133,7 +133,8 @@ def process_all_videos(config):
             })
         elif emb_type == 'video':
             time_format = "%a %b %d %H:%M:%S %Y"
-            date_time = datetime.datetime.strptime(date_time, time_format)
+            if not isinstance(date_time, datetime.datetime):
+                date_time = datetime.datetime.strptime(date_time, time_format)
             time = date_time.strftime("%H:%M:%S")
             hours, minutes, seconds = map(float, time.split(":"))
             date = date_time.strftime("%Y-%m-%d")
