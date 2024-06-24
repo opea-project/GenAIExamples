@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -ex
+set -e
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
