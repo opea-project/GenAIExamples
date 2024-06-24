@@ -31,7 +31,7 @@ const Conversation = ({ title }: ConversationProps) => {
 
   const systemPrompt: Partial<Message> = {
     role: MessageRole.System,
-    content: "You are helpfull assistant",
+    content: "You are helpful assistant",
   };
 
 

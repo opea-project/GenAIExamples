@@ -189,7 +189,7 @@ services:
         - chaqna-xeon-backend-server
     ipc: host
     restart: always
-    
+
 networks:
   default:
     driver: bridge

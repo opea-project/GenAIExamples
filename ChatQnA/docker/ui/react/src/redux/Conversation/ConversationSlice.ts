@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState, store } from "../store";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
@@ -14,41 +17,35 @@ const initialState: ConversationReducer = {
   onGoingResult: "",
 };
 
-
-
 export const ConversationSlice = createSlice({
   name: "Conversation",
   initialState,
   reducers: {
     logout: (state) => {
-      state.conversations = []
-      state.selectedConversationId = ""
-      state.onGoingResult = ""
+      state.conversations = [];
+      state.selectedConversationId = "";
+      state.onGoingResult = "";
     },
     setOnGoingResult: (state, action: PayloadAction<string>) => {
       state.onGoingResult = action.payload;
     },
-    addMessageToMessages: (
-      state,
-      action: PayloadAction<Message>
-    ) => {
-      const selectedConversation = state.conversations.find(x => x.conversationId === state.selectedConversationId)
+    addMessageToMessages: (state, action: PayloadAction<Message>) => {
+      const selectedConversation = state.conversations.find((x) => x.conversationId === state.selectedConversationId);
       selectedConversation?.Messages?.push(action.payload);
     },
     newConversation: (state) => {
-      state.selectedConversationId = "",
-        state.onGoingResult = "";
+      (state.selectedConversationId = ""), (state.onGoingResult = "");
     },
-    createNewConversation: (state, action: PayloadAction<{ title: string, id: string, message: Message }>) => {
+    createNewConversation: (state, action: PayloadAction<{ title: string; id: string; message: Message }>) => {
       state.conversations.push({
         title: action.payload.title,
         conversationId: action.payload.id,
-        Messages: [action.payload.message]
-      })
+        Messages: [action.payload.message],
+      });
     },
     setSelectedConversationId: (state, action: PayloadAction<string>) => {
-      state.selectedConversationId = action.payload
-    }
+      state.selectedConversationId = action.payload;
+    },
   },
   extraReducers(builder) {
     builder.addCase(uploadFile.fulfilled, () => {
@@ -56,63 +53,59 @@ export const ConversationSlice = createSlice({
         id: "upload-file",
         message: "File Uploaded Successfully",
         loading: false,
-        autoClose: 3000
+        autoClose: 3000,
       });
     }),
-
       builder.addCase(uploadFile.rejected, () => {
         notifications.update({
-          color: 'red',
+          color: "red",
           id: "upload-file",
           message: "Failed to Upload file",
-          loading: false
+          loading: false,
         });
       });
     builder.addCase(submitDataSourceURL.fulfilled, () => {
       notifications.show({
-        message: "Submitted Successfully"
-      })
+        message: "Submitted Successfully",
+      });
     });
     builder.addCase(submitDataSourceURL.rejected, () => {
       notifications.show({
-        color: 'red',
-        message: "Submit Failed"
-      })
+        color: "red",
+        message: "Submit Failed",
+      });
     });
-  }
+  },
 });
 
 export const submitDataSourceURL = createAsyncThunkWrapper(
   "conversation/submitDataSourceURL",
-  async ({ link_list }: { link_list: string[] }, { }) => {
+  async ({ link_list }: { link_list: string[] }, {}) => {
     const body = new FormData();
     body.append("link_list", JSON.stringify(link_list));
     const response = await client.post(DATA_PREP_URL, body);
     return response.data;
-  }
+  },
 );
-export const uploadFile = createAsyncThunkWrapper(
-  "conversation/uploadFile",
-  async ({ file }: { file: File }, { }) => {
-    const body = new FormData();
-    body.append("files", file);
+export const uploadFile = createAsyncThunkWrapper("conversation/uploadFile", async ({ file }: { file: File }, {}) => {
+  const body = new FormData();
+  body.append("files", file);
 
-    notifications.show({
-      id: "upload-file",
-      message: "uploading File",
-      loading: true,
-    });
-    const response = await client.post(DATA_PREP_URL, body);
-    return response.data;
-  }
-);
+  notifications.show({
+    id: "upload-file",
+    message: "uploading File",
+    loading: true,
+  });
+  const response = await client.post(DATA_PREP_URL, body);
+  return response.data;
+});
 export const {
   logout,
   setOnGoingResult,
   newConversation,
   addMessageToMessages,
   setSelectedConversationId,
-  createNewConversation
+  createNewConversation,
 } = ConversationSlice.actions;
 export const conversationSelector = (state: RootState) => state.conversationReducer;
 export default ConversationSlice.reducer;
@@ -127,7 +120,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
         title: userPrompt.content,
         id,
         message: userPrompt,
-      })
+      }),
     );
     store.dispatch(setSelectedConversationId(id));
   } else {
@@ -155,11 +148,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
       async onopen(response) {
         if (response.ok) {
           return;
-        } else if (
-          response.status >= 400 &&
-          response.status < 500 &&
-          response.status !== 429
-        ) {
+        } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
           const e = await response.json();
           console.log(e);
           throw Error(e.error.message);
@@ -198,7 +187,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
             role: MessageRole.Assistant,
             content: result,
             time: getCurrentTimeStamp(),
-          })
+          }),
         );
       },
     });
