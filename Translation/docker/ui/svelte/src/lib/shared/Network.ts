@@ -13,7 +13,7 @@
 // limitations under the License.
 import { env } from "$env/dynamic/public";
 
-const BASIC_URL = env.BASE_URL;
+const BASE_URL = env.BASE_URL;
 
 async function fetchPostRes(url, init) {
   try {
@@ -27,7 +27,7 @@ async function fetchPostRes(url, init) {
 }
 
 export async function fetchLanguageResponse(input: string, transform: string, transTo: string) {
-  const url = `${BASIC_URL}/v1/translation`;
+  const url = `${BASE_URL}/v1/translation`;
   const transData = {
     language_from: transform,
     language_to: transTo,
