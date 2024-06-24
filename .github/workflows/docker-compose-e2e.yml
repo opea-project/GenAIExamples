@@ -66,7 +66,7 @@ jobs:
           IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
         run: |
           cd ${{ github.workspace }}/$example/tests
-          if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
+          IMAGE_REPO="" if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
           echo "IMAGE_REPO=${IMAGE_REPO}" >> $GITHUB_OUTPUT
           example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 30m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
