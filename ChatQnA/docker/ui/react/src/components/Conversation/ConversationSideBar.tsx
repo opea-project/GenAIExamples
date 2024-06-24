@@ -17,7 +17,7 @@ export function ConversationSideBar({ title }: ConversationContextProps) {
     // const user = useAppSelector(userSelector)
     const dispatch = useAppDispatch()
 
-    const converstaionList = conversations?.map((curr) => (
+    const conversationList = conversations?.map((curr) => (
         <div
             className={contextStyles.contextListItem}
             data-active={selectedConversationId === curr.conversationId || undefined}
@@ -38,7 +38,7 @@ export function ConversationSideBar({ title }: ConversationContextProps) {
                 {title}
             </Title>
             <ScrollAreaAutosize type="hover" scrollHideDelay={0}>
-                <div className={contextStyles.contextList}>{converstaionList}</div>
+                <div className={contextStyles.contextList}>{conversationList}</div>
             </ScrollAreaAutosize>
         </div>
     )
