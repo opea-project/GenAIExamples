@@ -19,15 +19,22 @@ import { env } from "$env/dynamic/public";
 const TTS_URL = env.TTS_URL;
 const CHAT_URL = env.CHAT_URL;
 const ASR_URL = env.ASR_URL;
-const UPLOAD_URL = env.UPLOAD_URL;
 
 export async function fetchAudioText(file) {
-	const url = `${ASR_URL}`;
-	const formData = new FormData();
-	formData.append("file", file);
+	console.log("file", file);
+
+	const url = `${CHAT_URL}`;
+	const requestBody = {
+		audio: file,
+		max_tokens: 64,
+	};
+
 	const init: RequestInit = {
 		method: "POST",
-		body: formData,
+		body: JSON.stringify(requestBody),
+		headers: {
+			"Content-Type": "application/json",
+		},
 	};
 
 	try {
@@ -51,27 +58,6 @@ export async function fetchAudioStream(text) {
 		headers: { "Content-Type": "application/json" },
 		payload: JSON.stringify(bodyData),
 	});
-}
-
-export async function fetchAudioEmbedding(file, text: string) {
-	const url = `${UPLOAD_URL}`;
-	const formData = new FormData();
-	formData.append("default_refer_file", file);
-	formData.append("default_refer_text", text);
-	formData.append("default_refer_language", "en");
-	const init: RequestInit = {
-		method: "POST",
-		body: formData,
-	};
-
-	try {
-		const response = await fetch(url, init);
-		if (!response.ok) throw response.status;
-		return await response.json();
-	} catch (error) {
-		console.error("network error: ", error);
-		return undefined;
-	}
 }
 
 export async function fetchTextResponse(query) {
