@@ -2,8 +2,8 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](../../assets/img/trans_ui_init.png)
-![project-screenshot](../../assets/img/trans_ui_select.png)
+![project-screenshot](../../../assets/img/trans_ui_init.png)
+![project-screenshot](../../../assets/img/trans_ui_select.png)
 
 <h2>🧐 Features</h2>
 

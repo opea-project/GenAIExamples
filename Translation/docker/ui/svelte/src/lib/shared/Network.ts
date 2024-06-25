@@ -12,32 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import { env } from "$env/dynamic/public";
+import { SSE } from "sse.js";
 
-const BASIC_URL = env.BASIC_URL;
-
-async function fetchPostRes(url, init) {
-  try {
-    const response = await fetch(url, init);
-    if (!response.ok) throw response.status;
-    return await response.json();
-  } catch (error) {
-    console.error("network error: ", error);
-    return undefined;
-  }
-}
+const BASE_URL = env.BASE_URL;
 
 export async function fetchLanguageResponse(input: string, transform: string, transTo: string) {
-  const url = `${BASIC_URL}/v1/translation`;
-  const transData = {
+  let payload = {};
+  let url = "";
+
+  payload = {
     language_from: transform,
     language_to: transTo,
     source_language: input,
   };
+  url = `${BASE_URL}`;
 
-  const init: RequestInit = {
-    method: "POST",
-    body: JSON.stringify(transData),
-  };
-
-  return fetchPostRes(url, init);
+  return new SSE(url, {
+    headers: { "Content-Type": "application/json" },
+    payload: JSON.stringify(payload),
+  });
 }
