@@ -40,8 +40,15 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/codetrans:latest#image: opea/codetrans:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/codetrans-ui:latest#image: opea/codetrans-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    fi
+
     # Start Docker Containers
-    # TODO: Replace the container name with a test-specific name
     docker compose -f docker_compose.yaml up -d
 
     sleep 2m # Waits 2 minutes
@@ -141,7 +148,7 @@ function main() {
 
     stop_docker
 
-    build_docker_images
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices
