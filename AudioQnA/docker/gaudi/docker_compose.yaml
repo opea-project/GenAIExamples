@@ -23,6 +23,7 @@ services:
     restart: unless-stopped
   asr:
     image: opea/asr:latest
+    container_name: asr-service
     ports:
       - "3001:9099"
     ipc: host
@@ -46,6 +47,7 @@ services:
     restart: unless-stopped
   tts:
     image: opea/tts:latest
+    container_name: tts-service
     ports:
       - "3002:9088"
     ipc: host
