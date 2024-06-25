@@ -1,0 +1,100 @@
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  whisper-service:
+    image: opea/whisper:latest
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  asr:
+    image: opea/asr:latest
+    container_name: asr-service
+    ports:
+      - "3001:9099"
+    ipc: host
+    environment:
+      ASR_ENDPOINT: ${ASR_ENDPOINT}
+  speecht5-service:
+    image: opea/speecht5:latest
+    container_name: speecht5-service
+    ports:
+      - "7055:7055"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  tts:
+    image: opea/tts:latest
+    container_name: tts-service
+    ports:
+      - "3002:9088"
+    ipc: host
+    environment:
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:1.4
+    container_name: tgi-service
+    ports:
+      - "3006:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    command: --model-id ${LLM_MODEL_ID}
+  llm:
+    image: opea/llm-tgi:latest
+    container_name: llm-tgi-server
+    depends_on:
+      - tgi-service
+    ports:
+      - "3007:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  audioqna-xeon-backend-server:
+    image: opea/audioqna:latest
+    container_name: audioqna-xeon-backend-server
+    depends_on:
+      - asr
+      - llm
+      - tts
+    ports:
+      - "3008:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
+      - ASR_SERVICE_PORT=${ASR_SERVICE_PORT}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
+      - TTS_SERVICE_HOST_IP=${TTS_SERVICE_HOST_IP}
+      - TTS_SERVICE_PORT=${TTS_SERVICE_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
