@@ -89,6 +89,7 @@ class SpeechT5Model:
         all_speech = np.array([])
         text = self.split_long_text_into_batch(text, batch_length=100)
         inputs = self.processor(text=text, padding=True, max_length=128, return_tensors="pt")
+        print(f"[SpeechT5] batch size: {inputs['input_ids'].size(0)}")
         with torch.no_grad():
             waveforms, waveform_lengths = self.model.generate_speech(
                 inputs["input_ids"].to(self.device),
@@ -101,3 +102,17 @@ class SpeechT5Model:
             all_speech = np.concatenate([all_speech, waveforms[i][: waveform_lengths[i]].cpu().numpy()])
 
         return all_speech
+
+
+if __name__ == "__main__":
+    st5 = SpeechT5Model()
+    all_speech = st5.t2s("""Who are you?""")
+    import soundfile as sf
+
+    sf.write("tmp.wav", all_speech, samplerate=16000)
+    with open("tmp.wav", "rb") as f:
+        bytes = f.read()
+    import base64
+
+    b64_str = base64.b64encode(bytes).decode()
+    assert b64_str[:3] == "Ukl"

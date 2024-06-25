@@ -5,6 +5,7 @@ import argparse
 import base64
 from io import BytesIO
 
+import soundfile as sf
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import Response
@@ -32,10 +33,12 @@ async def text_to_speech(request: Request):
     text = request_dict.pop("text")
 
     speech = tts.t2s(text)
+    sf.write("tmp.wav", speech, samplerate=16000)
+    with open("tmp.wav", "rb") as f:
+        bytes = f.read()
+    b64_str = base64.b64encode(bytes).decode()
 
-    buffered = BytesIO()
-    buffered.write(speech.tobytes())
-    return {"tts_result": base64.b64encode(buffered.getvalue())}
+    return {"tts_result": b64_str}
 
 
 if __name__ == "__main__":

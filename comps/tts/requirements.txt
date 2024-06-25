@@ -8,5 +8,6 @@ optimum[habana]
 prometheus-fastapi-instrumentator
 sentencepiece
 shortuuid
+soundfile
 torch
 transformers

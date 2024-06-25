@@ -23,7 +23,7 @@ function start_service() {
 
 function validate_microservice() {
     result=$(http_proxy="" curl http://localhost:9088/v1/audio/speech -XPOST -d '{"text": "Who are you?"}' -H 'Content-Type: application/json')
-    if [[ $result == *"AAA"* ]]; then
+    if [[ $result == *"Ukl"* ]]; then
         echo "Result correct."
     else
         echo "Result wrong."
