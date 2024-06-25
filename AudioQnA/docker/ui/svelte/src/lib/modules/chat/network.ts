@@ -21,8 +21,8 @@ const CHAT_URL = env.CHAT_URL;
 const ASR_URL = env.ASR_URL;
 
 export async function fetchAudioText(file) {
-	console.log('file', file);
-	
+	console.log("file", file);
+
 	const url = `${CHAT_URL}`;
 	const requestBody = {
 		audio: file,
@@ -47,7 +47,6 @@ export async function fetchAudioText(file) {
 	}
 }
 
-
 export async function fetchAudioStream(text) {
 	const url = `${TTS_URL}`;
 	const bodyData = {
@@ -60,7 +59,6 @@ export async function fetchAudioStream(text) {
 		payload: JSON.stringify(bodyData),
 	});
 }
-
 
 export async function fetchTextResponse(query) {
 	const url = `${CHAT_URL}`;
