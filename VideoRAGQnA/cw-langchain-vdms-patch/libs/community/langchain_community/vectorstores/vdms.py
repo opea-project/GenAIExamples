@@ -611,7 +611,7 @@ class VDMS(VectorStore):
 
         Args:
             paths: List of paths to the videos to add to the vectorstore.
-            metadatas: Optional list of text associated with the videos.
+            texts: Optional list of text associated with the videos.
             metadatas: Optional list of metadatas associated with the videos.
             ids: Optional list of unique IDs.
             batch_size (int): Number of concurrent requests to send to the server.
@@ -1342,6 +1342,8 @@ class VDMS(VectorStore):
                 filter=filter,
                 **kwargs,
             )
+            print("filter:", filter)
+            print("results:", results)
 
         return _results_to_docs_and_scores(results)
 

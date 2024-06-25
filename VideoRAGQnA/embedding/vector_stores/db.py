@@ -195,7 +195,7 @@ class VS:
     def get_db_client(self):
 
         if self.selected_db == 'chroma':
-            print ('Connecting to Chroma db server . . .')
+            print (f'Connecting to Chroma db server . . . host:{self.host}, port:{self.port}')
             self.client = chromadb.HttpClient(host=self.host, port=self.port)
 
         if self.selected_db == 'vdms':

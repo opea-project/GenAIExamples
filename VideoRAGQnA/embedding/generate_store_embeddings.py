@@ -146,7 +146,7 @@ def store_into_vectordb(vs, metadata_file_path, embedding_model, config):
             frame_metadata = read_json(data['extracted_frame_metadata_file'])
             for frame_id, frame_details in frame_metadata.items():
                 global_counter += 1
-                if selected_db == 'vdms':
+                if vs.selected_db == 'vdms':
                     meta_data = {
                         'timestamp': frame_details['timestamp'],
                         'frame_path': frame_details['frame_path'],
@@ -162,7 +162,7 @@ def store_into_vectordb(vs, metadata_file_path, embedding_model, config):
                         'minutes': frame_details['minutes'],
                         'seconds': frame_details['seconds'],
                     }
-                if selected_db == 'chroma':
+                if vs.selected_db == 'chroma':
                     meta_data = {
                         'timestamp': frame_details['timestamp'],
                         'frame_path': frame_details['frame_path'],
@@ -184,8 +184,6 @@ def store_into_vectordb(vs, metadata_file_path, embedding_model, config):
                 ids.append(str(global_counter))
                 # print('datetime',meta_data['date_time'])
 
-            # generate clip embeddings
-            embedding_list.extend(embedding_model.embed_image(image_name_list)) # FIXME: Are these even used??
             vs.add_images(
                 uris=image_name_list,
                 metadatas=metadata_list
@@ -194,13 +192,25 @@ def store_into_vectordb(vs, metadata_file_path, embedding_model, config):
             data['video'] = video
             video_name_list = [data["video_path"]]
             metadata_list = [data]
-            vs.video_db.add_videos(
-                paths=video_name_list,
-                metadatas=metadata_list,
-                start_time=[data['timestamp']],
-                clip_duration=[data['clip_duration']]
-            )
-        print (f'✅ {_+1}/{total_videos} video {video}, len {len(video_name_list)}, {len(metadata_list)}, {len(embedding_list)}')
+            if vs.selected_db == 'vdms':
+                vs.video_db.add_videos(
+                    paths=video_name_list,
+                    metadatas=metadata_list,
+                    start_time=[data['timestamp']],
+                    clip_duration=[data['clip_duration']]
+                )
+            else:
+                # Call local embedding function to retrieve tensor
+                tensor = vs.video_embedder.embed_video(paths=video_name_list,
+                    metadatas=metadata_list,
+                    start_time=[data['timestamp']],
+                    clip_duration=[data['clip_duration']])
+                vs.video_db._collection.add(
+                    metadatas=metadata_list,
+                    embeddings=tensor,
+                    ids=[f"id{i}" for i in range(len(metadata_list))]
+                )
+        print (f'✅ {_+1}/{total_videos} video {video}')
 
 def generate_embeddings(config, embedding_model, vs):
     if not os.path.exists(config['image_output_dir']):
@@ -255,7 +265,7 @@ def main():
 
     # Creating DB
     print ('Creating DB with text and image embedding support, \nIt may take few minutes to download and load all required models if you are running for first time.')
-    print('Connect to {} at {}:{}'.format(selected_db, host, port))
+    print('Connecting to {} at {}:{}'.format(selected_db, host, port))
 
     if config['embeddings']['type'] == 'frame':
         vs = db.VS(host, port, selected_db)

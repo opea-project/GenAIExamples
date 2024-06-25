@@ -94,6 +94,10 @@ Running Chroma DB as docker container
 ```bash
 docker run -d -p 8000:8000 chromadb/chroma
 ```
+**Troubleshooting:** If using chromadb, and getting this error ```ValueError: Could not connect to tenant default_tenant```, then: 
+```bash
+export no_proxy="0.0.0.0"
+```
 **or**
 
 Running VDMS DB as docker container
@@ -111,7 +115,3 @@ docker run -d -p 55555:55555 intellabs/vdms:latest
 streamlit run video-rag-ui.py docs/config.yaml --server.address 0.0.0.0 --server.port 50055
 ```
 
-**Troubleshooting:** If using chromadb, and getting this error ```ValueError: Could not connect to tenant default_tenant```, then: 
-```bash
-export no_proxy="enter.your.ip.here"
-```
