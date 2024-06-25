@@ -32,14 +32,47 @@
   let output: string = "";
   let loading = false;
 
-  async function handelTranslate() {
-    loading = true;
-    const res = await fetchLanguageResponse(input, langFrom, langTo);
-    if (res) {
-      output = res.target_language;
-      loading = false;
-    }
+  function decodeEscapedBytes(str: string): string {
+    const byteArray = str
+      .split("\\x")
+      .slice(1)
+      .map((byte) => parseInt(byte, 16));
+    return new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
   }
+
+  function decodeUnicode(str: string): string {
+    return str.replace(/\\u[\dA-Fa-f]{4}/g, (match) => {
+      return String.fromCharCode(parseInt(match.replace(/\\u/g, ""), 16));
+    });
+  }
+
+  const handelTranslate = async () => {
+    loading = true;
+    output = "";
+    const eventSource = await fetchLanguageResponse(input, langFrom, langTo);
+
+    eventSource.addEventListener("message", (e: any) => {
+      let Msg = e.data;
+      console.log("Msg", Msg);
+
+      if (Msg.startsWith("b")) {
+        let trimmedData = Msg.slice(2, -1);
+
+        if (/\\x[\dA-Fa-f]{2}/.test(trimmedData)) {
+          trimmedData = decodeEscapedBytes(trimmedData);
+        } else if (/\\u[\dA-Fa-f]{4}/.test(trimmedData)) {
+          trimmedData = decodeUnicode(trimmedData);
+        }
+
+        if (trimmedData !== "</s>") {
+          output += trimmedData.replace(/\\n/g, "\n");
+        }
+      } else if (Msg === "[DONE]") {
+        loading = false;
+      }
+    });
+    eventSource.stream();
+  };
 
   let timer;
 
