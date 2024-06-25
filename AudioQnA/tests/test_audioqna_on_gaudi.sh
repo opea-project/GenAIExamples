@@ -70,7 +70,7 @@ function start_services() {
     #     sleep 1s
     #     n=$((n+1))
     # done
-    sleep 5m
+    sleep 8m
 }
 
 
