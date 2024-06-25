@@ -185,6 +185,19 @@ services:
       - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
     ipc: host
     restart: always
+  chaqna-xeon-conversation-ui-server:
+    image: opea/chatqna-conversation-ui:latest
+    container_name: chatqna-xeon-conversation-ui-server
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ports:
+        - 5174:80
+    depends_on:
+        - chaqna-xeon-backend-server
+    ipc: host
+    restart: always
 
 networks:
   default:

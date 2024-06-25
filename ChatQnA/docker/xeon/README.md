@@ -118,6 +118,20 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 cd ../../../..
 ```
 
+### 8. Build Conversational React UI Docker Image (Optional)
+
+Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
+
+**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
+
+```bash
+cd GenAIExamples/ChatQnA/docker/ui/
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+cd ../../../..
+```
+
 Then run the command `docker images`, you will have the following 7 Docker Images:
 
 1. `opea/dataprep-redis:latest`
@@ -326,8 +340,24 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
+## 🚀 Launch the Conversational UI (react)
+
+To access the Conversational UI frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  chaqna-xeon-conversation-ui-server:
+    image: opea/chatqna-conversation-ui:latest
+    ...
+    ports:
+      - "80:80"
+```
+
 ![project-screenshot](../../assets/img/chat_ui_init.png)
 
 Here is an example of running ChatQnA:
 
 ![project-screenshot](../../assets/img/chat_ui_response.png)
+
+Here is an example of running ChatQnA with Conversational UI (React):
+
+![project-screenshot](../../assets/img/conversation_ui_response.png)

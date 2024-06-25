@@ -1,0 +1,22 @@
+FROM node as vite-app
+ 
+COPY . /usr/app
+WORKDIR /usr/app/react
+
+ARG BACKEND_SERVICE_ENDPOINT
+ARG DATAPREP_SERVICE_ENDPOINT
+ENV VITE_BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT
+ENV VITE_DATA_PREP_SERVICE_URL=$DATAPREP_SERVICE_ENDPOINT
+
+RUN ["npm", "install"]
+RUN ["npm", "run", "build"]
+
+
+FROM nginx:alpine
+EXPOSE 80
+
+
+COPY --from=vite-app /usr/app/react/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=vite-app /usr/app/react/dist /usr/share/nginx/html
+
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
