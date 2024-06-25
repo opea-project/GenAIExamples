@@ -22,7 +22,6 @@ logger = logging.getLogger(settings.APP_NAME)
 
 
 class ConversationStore:
-
     def __init__(
         self,
         user: str,

@@ -18,7 +18,6 @@ don't know."""
 
 
 class Message:
-
     class Error:
         INVALID_IMPLEMENTATION = "Something is wrong with implementation logic."
         METHOD_NOT_ALLOWED = (

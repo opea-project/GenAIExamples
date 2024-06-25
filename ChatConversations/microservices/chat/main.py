@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-﻿import uvicorn
+import uvicorn
 from conf.config import Settings
 from core.util.exception import get_formatted_error
 from fastapi import FastAPI, HTTPException
@@ -32,6 +32,7 @@ PluginLoader.load_modules()
 @app.exception_handler(HTTPException)
 async def pipeline_api_http_exception_handler(request, exc):
     return get_formatted_error(request, exc)
+
 
 if __name__ == "__main__":
     uvicorn.run(

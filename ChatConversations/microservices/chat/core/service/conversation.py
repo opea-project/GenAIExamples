@@ -31,7 +31,6 @@ logger = logging.getLogger(settings.APP_NAME)
 
 
 class ConversationBuilder:
-
     def __init__(
         self,
         user: str,

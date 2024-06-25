@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-﻿from pydantic import BaseModel
+from pydantic import BaseModel
 from conf.config import Settings
 
 settings = Settings()

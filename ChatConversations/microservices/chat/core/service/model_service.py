@@ -19,7 +19,6 @@ logger = logging.getLogger(settings.APP_NAME)
 
 
 class SupportedModels:
-
     @staticmethod
     async def get_model_attribute(model_type: str, attribute_name: str, user_id: str) -> str:
         attribute_value: Any = ""
