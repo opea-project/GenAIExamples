@@ -7,7 +7,7 @@ ARG VITE_SERVICE_URL
 ENV VITE_SERVICE_URL=$VITE_SERVICE_URL
 
 
-RUN ["npm", "ci"]
+RUN ["npm", "install"]
 RUN ["npm", "run", "build"]
 
 
