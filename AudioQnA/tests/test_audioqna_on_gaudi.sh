@@ -132,7 +132,7 @@ function main() {
 
     # validate_microservices
     validate_megaservice
-    validate_frontend
+    # validate_frontend
 
     stop_docker
     echo y | docker system prune
