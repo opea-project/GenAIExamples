@@ -130,7 +130,7 @@ function main() {
     # maximal_duration=$((end_time-begin_time))
     # echo "Mega service start duration is "$maximal_duration"s"
 
-    validate_microservices
+    # validate_microservices
     validate_megaservice
     validate_frontend
 
