@@ -1,10 +1,14 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import time
-from pydantic import BaseModel, Field, ConfigDict, field_serializer, model_validator
-from decimal import Decimal
-from typing import Optional, List, Annotated
-from core.common.constant import Message
-from schema.type import AlphaNumericString
 import uuid
+from decimal import Decimal
+from typing import Annotated, List, Optional
+
+from core.common.constant import Message
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, model_validator
+from schema.type import AlphaNumericString
 
 
 # Adding schema for legacy inference entries in database
@@ -49,8 +53,8 @@ class MessageModel(BaseModel):
 class MessageUpdateModel(BaseModel):
     assistant: Optional[str] = None
     feedback: Optional[FeedbackModel] = None
-    
-    # use_case param needed for storing it in feedback table after updating the feedback for 
+
+    # use_case param needed for storing it in feedback table after updating the feedback for
     # the message. Its value is not verified for now, and can be any invalid value.
     use_case: Optional[AlphaNumericString] = None
 

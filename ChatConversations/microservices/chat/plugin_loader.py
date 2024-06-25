@@ -1,15 +1,19 @@
-import logging
-import json
-import os
-from typing import Any
-from core.util.exception import ConversationManagerError
-from conf.config import Settings
-from logging.config import dictConfig
-from core.common.logger import Logger
-from core.common.constant import Message
-from core.plugin import Plugin, PluginFactory
-import core.factory_names as factory
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import importlib
+import json
+import logging
+import os
+from logging.config import dictConfig
+from typing import Any
+
+import core.factory_names as factory
+from conf.config import Settings
+from core.common.constant import Message
+from core.common.logger import Logger
+from core.plugin import Plugin, PluginFactory
+from core.util.exception import ConversationManagerError
 
 settings = Settings()
 dictConfig(Logger().model_dump())
@@ -21,31 +25,26 @@ class PluginLoader:
     super_factory: dict[str, PluginFactory] = {}
 
     @staticmethod
-    def register_plugin_factory(
-        plugin_type: str, plugin_factory: PluginFactory
-    ) -> None:
+    def register_plugin_factory(plugin_type: str, plugin_factory: PluginFactory) -> None:
         PluginLoader.super_factory[plugin_type] = plugin_factory
 
     @staticmethod
     def load_modules():
-        """Read llm manifest file. load and register all declared modules."""
+        """Read llm manifest file.
+
+        load and register all declared modules.
+        """
 
         # Load Plugin modules
         with open(PluginLoader.plugin_file, "r") as plugin_manifest:
             try:
                 plugin_specs = json.load(plugin_manifest)
-                active_plugin_specs = [
-                    plugin for plugin in plugin_specs if not plugin.get("disabled")
-                ]
+                active_plugin_specs = [plugin for plugin in plugin_specs if not plugin.get("disabled")]
 
                 logger.info("Loading and registering all defined plugin modules.")
                 for plugin_data in active_plugin_specs:
-                    plugin: Plugin = PluginLoader.import_initialize_module(
-                        plugin_data
-                    )
-                    plugin_factory: PluginFactory = PluginLoader.super_factory.get(
-                        plugin_data["plugin_type"]
-                    )
+                    plugin: Plugin = PluginLoader.import_initialize_module(plugin_data)
+                    plugin_factory: PluginFactory = PluginLoader.super_factory.get(plugin_data["plugin_type"])
                     plugin.register_plugin(plugin_factory)
 
             except ValueError as e:
@@ -54,8 +53,11 @@ class PluginLoader:
 
     @staticmethod
     def get_module_envs(envs: dict) -> dict:
-        """Get the envs dict from manifest. Values in this dict are
-        environment variables on host. Load their values in a new dict"""
+        """Get the envs dict from manifest.
+
+        Values in this dict are
+        environment variables on host. Load their values in a new dict
+        """
 
         try:
             env_args = dict((key, os.environ[val]) for key, val in envs.items())

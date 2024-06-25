@@ -1,15 +1,13 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 ﻿import uvicorn
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from conf.config import Settings
 from core.util.exception import get_formatted_error
-from routers import (
-    health,
-    conversation,
-)
-
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from plugin_loader import PluginLoader
-
+from routers import conversation, health
 
 settings = Settings()
 app = FastAPI(

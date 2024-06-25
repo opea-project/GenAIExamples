@@ -1,7 +1,11 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+from dataclasses import dataclass
 from typing import Any
+
 from core.chat_model.llm_interface import LlmInterface
 from langchain_community.chat_models import ChatOpenAI
-from dataclasses import dataclass
 
 
 @dataclass

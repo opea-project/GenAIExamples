@@ -1,24 +1,24 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 from __future__ import annotations
+
 import logging
-import openai
 from logging.config import dictConfig
-from core.common.logger import Logger
-from core.chain.openai_chain import OpenaiChain
-from core.chain.generic_chain import GenericChain
-from core.util.exception import (
-    ConversationManagerError,
-    ConversationApiError,
-    ModelServerError,
-    ThrottlingError,
-)
-from schema.payload import ConversationRequest
-from conf.config import Settings
-from core.common.constant import Message, Prompt
-from core.service.model_service import SupportedModels
 from typing import Any, Dict, List
+
+import openai
+from conf.config import Settings
+from core.chain.generic_chain import GenericChain
+from core.chain.openai_chain import OpenaiChain
+from core.common.constant import Message, Prompt
+from core.common.logger import Logger
+from core.service.model_service import SupportedModels
+from core.util.exception import ConversationApiError, ConversationManagerError, ModelServerError, ThrottlingError
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.schema import LLMResult
+from schema.payload import ConversationRequest
 
 settings = Settings()
 dictConfig(Logger().model_dump())
@@ -27,12 +27,11 @@ logger = logging.getLogger(settings.APP_NAME)
 
 class AsyncFinalIteratorCallbackHandler(AsyncIteratorCallbackHandler):
     """Inherits a callback handler that returns an async iterator.
+
     Only the final output of the chain will be iterated and streamed.
     """
 
-    async def on_llm_start(
-        self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any
-    ) -> None:
+    async def on_llm_start(self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any) -> None:
         # Reset streaming flags
         self.done.clear()
 
@@ -60,9 +59,7 @@ class AsyncFinalIteratorCallbackHandler(AsyncIteratorCallbackHandler):
 class GetPromptCallbackHandler(BaseCallbackHandler):
     """Inherits a callback handler that returns formatted prompt that being parse into LLM."""
 
-    def on_llm_start(
-        self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any
-    ) -> Any:
+    def on_llm_start(self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any) -> Any:
         # Concatenates the list of prompts into a string.
         # Inserting newline separator between each elements in the list.
         self.formatted_prompts = "\n".join(prompts)
@@ -71,8 +68,10 @@ class GetPromptCallbackHandler(BaseCallbackHandler):
 class ChainFactory:
     # TODO
     """Change the following instantitation pattern to new Factory-registration pattern.
+
     instantiate_chain static method should be able to instantiate different types
-    of chain classes based on model or type of chain required."""
+    of chain classes based on model or type of chain required.
+    """
 
     @staticmethod
     async def get_conversation_chain(
@@ -101,7 +100,6 @@ class ChainFactory:
             # This pattern to be fixed in new design pattern updates
             if model_platform in ["azure", "edge", "ray"]:
                 chain = OpenaiChain(**chain_params)
-
 
             else:
                 logger.error(Message.Plugin.Llm.UNREGISTERED_LLM)
@@ -133,10 +131,7 @@ class ChainHelper:
             )
             chain = await chain_obj.build_chain()
 
-            input = {
-                "system_prompt": system_prompt or Prompt.system,
-                "messages": user_prompt
-            }
+            input = {"system_prompt": system_prompt or Prompt.system, "messages": user_prompt}
 
             ai_message, llm_input_prompts = await ChainHelper.invoke_chain(chain, input)
             logger.info(llm_input_prompts)
@@ -147,7 +142,7 @@ class ChainHelper:
             # Get token count for output response
             answer = ai_message.content
             output_token = chain_obj.get_num_tokens(answer)
-        
+
             # Include input_token and output_token into result dict()
             result["answer"] = answer
             result["input_token"] = input_token
@@ -170,7 +165,7 @@ class ChainHelper:
 
         try:
             config = {"callbacks": [prompt_handler]}
-            
+
             result = await chain.ainvoke(chain_input, **chain_params, config=config)
             llm_prompts = prompt_handler.formatted_prompts
 

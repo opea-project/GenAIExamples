@@ -102,7 +102,7 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
-    
+
     echo "Validating megaservice [ ${service_name_chat} ]:"
     validate_services \
         "${CONVERSATION_URL}/conversations?user=test" \

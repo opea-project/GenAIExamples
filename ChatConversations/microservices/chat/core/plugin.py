@@ -1,4 +1,7 @@
-from typing import Protocol, Any
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+from typing import Any, Protocol
 
 
 class PluginFactory(Protocol):

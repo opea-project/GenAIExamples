@@ -1,10 +1,14 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import logging
-from core.chat_model.llm_interface import LlmInterface
-from core.util.exception import ConversationManagerError
-from conf.config import Settings
 from logging.config import dictConfig
-from core.common.logger import Logger
+
+from conf.config import Settings
+from core.chat_model.llm_interface import LlmInterface
 from core.common.constant import Message
+from core.common.logger import Logger
+from core.util.exception import ConversationManagerError
 
 settings = Settings()
 dictConfig(Logger().model_dump())
@@ -27,7 +31,7 @@ class LlmFactory:
 
     @staticmethod
     def create(model_type: str) -> LlmInterface:
-        """Fetch and return the llm class for the given model_type"""
+        """Fetch and return the llm class for the given model_type."""
 
         try:
             if not model_type:

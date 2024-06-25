@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 ﻿# Use Alpine-based Python image
 FROM python:3.10-alpine3.18 as build
 

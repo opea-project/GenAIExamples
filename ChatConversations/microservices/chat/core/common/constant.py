@@ -1,8 +1,13 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+
 class Literals:
     conversations = "conversations"
     tags = "tags"
     projects = "projects"
     feedbacks = "feedbacks"
+
 
 class Prompt:
     system = """You are a helpful AI Assistant. You answer all questions in brief \
@@ -11,15 +16,20 @@ you answer in a very detailed fashion but still not more than 12 sentences. You 
 to answer offensive and inappropriate answer. You don't try to answer the questions you \
 don't know."""
 
+
 class Message:
 
     class Error:
         INVALID_IMPLEMENTATION = "Something is wrong with implementation logic."
-        METHOD_NOT_ALLOWED = "The requested API endpoint does not support the authorization flow being used by the client application."
+        METHOD_NOT_ALLOWED = (
+            "The requested API endpoint does not support the authorization flow being used by the client application."
+        )
         GATEWAY_ERROR = "Some error occurred at Model Service Provider."
         MODEL_LIMIT_REACHED = "Selected Model is temporarily overloaded as there are too many active users. Please use a different model or retry after some time."
         RETRIEVER_SERVICE_THROTTLING = "Retriever service is temporarily overloaded. Please retry after some time."
-        RETRIEVER_PROVIDER_ERROR = "Retriever service is currently unavailable or failing to respond. Please retry after some time."
+        RETRIEVER_PROVIDER_ERROR = (
+            "Retriever service is currently unavailable or failing to respond. Please retry after some time."
+        )
         OPENAI_KEY_MISSING = "OPENAI_API_KEY and OPENAI_API_BASE not set."
         KEY_NOT_FOUND_ERROR = "Key Not Found Error"
         VALUE_NOT_FOUND_ERROR = "Value Not Found Error"
@@ -32,11 +42,13 @@ class Message:
         INVALID_CONVERSATION_ID = "Conversation ID is invalid."
         INVALID_MESSAGE_ID = "Message ID is invalid"
         INVALID_TAG_ID = "Invalid tag ID. Perhaps the fetched tag record doesnot exist anymore."
-        FACTORY_PATTERN_ERROR = (
-            "Error ocurred while instantiating classes using factory."
+        FACTORY_PATTERN_ERROR = "Error occurred while instantiating classes using factory."
+        MAX_MESSAGES_LIMIT_EXCEEDED = (
+            "Limit for Maximum Messages for this Conversation Exceeded. Please start a New Conversation."
         )
-        MAX_MESSAGES_LIMIT_EXCEEDED = "Limit for Maximum Messages for this Conversation Exceeded. Please start a New Conversation."
-        MAX_CONVERSATION_LIMIT_EXCEEDED = "Limit for Maximum Conversations Exceeded. Please delete an existing Conversation."
+        MAX_CONVERSATION_LIMIT_EXCEEDED = (
+            "Limit for Maximum Conversations Exceeded. Please delete an existing Conversation."
+        )
         INVALID_TOKEN_LIMIT = "Invalid token_limit value for selected model."
 
         SYNC_FAILED = "Sync process failed due to some error."
@@ -72,24 +84,22 @@ class Message:
             INVALID_TOKEN_LIMIT = "Invalid value for token limit for the given model."
 
         class Retriever:
-            UNREGISTERED_RETRIEVER = (
-                "No registered retriever/sync-controller found for provided index type."
-            )
+            UNREGISTERED_RETRIEVER = "No registered retriever/sync-controller found for provided index type."
             INDEX_NOT_PROVIDED = "No index type was provided."
             INVALID_RETRIEVER = "Provided retriever is not valid."
 
     class DB:
-        NEW_TABLE_ERROR = "Error ocurred while creating new table."
+        NEW_TABLE_ERROR = "Error occurred while creating new table."
         EXISTING_TABLE_ERROR = "Table for an existing user doesn't seem to exist."
         TABLE_DOESNOT_EXIST = "Table does not exist."
         COLLECTION_NAME_ERROR = "Could not get the required Collection name. Did you forget to update collections dict?"
-        MESSAGE_UPDATE_ERROR = "An error ocurred while updating message!"
+        MESSAGE_UPDATE_ERROR = "An error occurred while updating message!"
         MESSAGE_FETCH_ERROR = "Could not fetch message using the Message ID!"
 
     class Conversation:
         STORAGE_NOT_SET = "Conversation storage must be set before creating conversation."
         CONVERSATION_NOT_FOUND = "Required conversation was not found."
-        CONVERSATION_ID_NOT_SET = "Conversation ID is not set. Can not proceeed."
+        CONVERSATION_ID_NOT_SET = "Conversation ID is not set. Can not proceed."
         MESSAGE_ID_NOT_SET = "Message ID is not set. Can not proceed."
         MSG_UPDATE_DATA_NOT_SET = "At least one value required to update the message is not set."
         USE_CASE_NOT_SET = "use_case is not set"

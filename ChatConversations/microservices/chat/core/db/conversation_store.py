@@ -1,21 +1,25 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import logging
 import time
-from conf.config import Settings
 from logging.config import dictConfig
-from core.common.constant import Literals
-from core.common.logger import Logger
-from core.common.constant import Message
-from schema.type import MongoObjectId
-from core.db.mongo_conn import MongoClient
-from bson.objectid import ObjectId
+
 import bson.errors as BsonError
-from schema.payload import ConversationModel
-from schema.message import MessageModel
+from bson.objectid import ObjectId
+from conf.config import Settings
+from core.common.constant import Literals, Message
+from core.common.logger import Logger
+from core.db.mongo_conn import MongoClient
 from core.util.exception import ConversationApiError, ConversationManagerError, ValidationError
+from schema.message import MessageModel
+from schema.payload import ConversationModel
+from schema.type import MongoObjectId
 
 settings = Settings()
 dictConfig(Logger().model_dump())
 logger = logging.getLogger(settings.APP_NAME)
+
 
 class ConversationStore:
 
@@ -41,9 +45,7 @@ class ConversationStore:
         try:
             logger.info(conversation.messages)
             inserted_conv = await self.collection.insert_one(
-                conversation.model_dump(
-                    by_alias=True, mode="json", exclude={"conversation_id"}
-                )
+                conversation.model_dump(by_alias=True, mode="json", exclude={"conversation_id"})
             )
             self.conversation_id = str(inserted_conv.inserted_id)
             return self.conversation_id
@@ -52,9 +54,7 @@ class ConversationStore:
             logger.error(e)
             raise ConversationManagerError()
 
-    async def update_conversation(
-        self, message: MessageModel, update_time: int
-    ) -> bool:
+    async def update_conversation(self, message: MessageModel, update_time: int) -> bool:
         """Add a new message/chat to an existing conversation and updates its metadata."""
 
         try:
@@ -62,9 +62,7 @@ class ConversationStore:
             update_result = await self.collection.update_one(
                 {"_id": _id},
                 {
-                    "$push": {
-                        "messages": message.model_dump(by_alias=True, mode="json")
-                    },
+                    "$push": {"messages": message.model_dump(by_alias=True, mode="json")},
                     "$inc": {"message_count": 1},
                     "$set": {"updated_at": update_time},
                 },
@@ -82,13 +80,11 @@ class ConversationStore:
         except Exception as e:
             logger.error(e)
             raise ConversationManagerError()
-        
+
     async def get_all_conversations_by_user(self) -> list[dict]:
         conversation_list: list = []
         try:
-            cursor = self.collection.find(
-                {"user_id": self.user}, {"messages": 0}
-            )
+            cursor = self.collection.find({"user_id": self.user}, {"messages": 0})
             async for document in cursor:
                 conversation_list.append(document)
 
@@ -105,9 +101,7 @@ class ConversationStore:
 
         try:
             _id = ObjectId(self.conversation_id)
-            response: dict | None = await self.collection.find_one(
-                {"_id": _id, "user_id": self.user}
-            )
+            response: dict | None = await self.collection.find_one({"_id": _id, "user_id": self.user})
 
             return response
 
@@ -126,9 +120,7 @@ class ConversationStore:
 
         try:
             _id = ObjectId(self.conversation_id)
-            delete_result = await self.collection.delete_one(
-                {"_id": _id, "user_id": self.user}
-            )
+            delete_result = await self.collection.delete_one({"_id": _id, "user_id": self.user})
 
             delete_count = delete_result.deleted_count
             logger.info(f"Deleted {delete_count} documents!")

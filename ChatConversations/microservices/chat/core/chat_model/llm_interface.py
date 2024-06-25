@@ -1,7 +1,11 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from core.plugin import PluginFactory
 from typing import Any
+
+from core.plugin import PluginFactory
 
 
 @dataclass
@@ -13,7 +17,7 @@ class LlmInterface(ABC):
 
     @abstractmethod
     def instantiate_llm(self, params: dict) -> Any:
-        """Instantiate and return the relevant llm"""
+        """Instantiate and return the relevant llm."""
         pass
 
     def register_plugin(self, llm_factory: PluginFactory) -> None:

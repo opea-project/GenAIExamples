@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { User } from "../User/user";
 
 export interface Conversation {
@@ -8,7 +11,7 @@ export interface Conversation {
   created_at?: number;
   updated_at?: number;
   messages?: Message[];
-  last_message?: Message
+  last_message?: Message;
 }
 
 export interface Message {
@@ -41,7 +44,7 @@ export interface ConversationReducer {
 }
 
 export type ConversationRequest = {
-  conversationId:string
+  conversationId: string;
   user: User;
   prompt: string;
   temperature: number;

@@ -1,6 +1,9 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+from core.common.constant import Message
 from fastapi import status
 from fastapi.responses import JSONResponse
-from core.common.constant import Message
 
 
 def get_formatted_error(req, exc):
@@ -26,7 +29,7 @@ class ConversationManagerError(ConversationApiError):
 
     def __init__(
         self,
-        message="Some error ocurred at  Conversation Manager.",
+        message="Some error occurred at  Conversation Manager.",
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
     ):
         self.status_code = status_code
@@ -102,16 +105,14 @@ class ValidationError(ConversationApiError):
 class AuthorizationError(ConversationApiError):
     """Custom Exception to authorization error in Conversation Manager."""
 
-    def __init__(
-        self, message="Authorization failed.", status_code=status.HTTP_401_UNAUTHORIZED
-    ):
+    def __init__(self, message="Authorization failed.", status_code=status.HTTP_401_UNAUTHORIZED):
         self.status_code = status_code
         self.message = message
         super().__init__(self.message, self.status_code)
 
 
 class InvalidRequestFile(ConversationApiError):
-    """Custom Exception for invalid request file"""
+    """Custom Exception for invalid request file."""
 
     def __init__(
         self,

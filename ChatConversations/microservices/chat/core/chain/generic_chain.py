@@ -1,10 +1,13 @@
-import logging
-from typing import Any
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
+import logging
 from logging.config import dictConfig
+from typing import Any
+
 from conf.config import Settings
 from core.common.logger import Logger
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 settings = Settings()
 dictConfig(Logger().model_dump())
@@ -26,9 +29,7 @@ class GenericChain:
         callbacks=[],
     ):
         # Check if prepare_prompt method is called by base classes or not.
-        if not hasattr(self, "prompt_without_context") and not hasattr(
-            self, "prompt_with_context"
-        ):
+        if not hasattr(self, "prompt_without_context") and not hasattr(self, "prompt_with_context"):
             raise Exception("Prompt is not set. Can not build chain.")
 
         self.temperature = temp
@@ -69,7 +70,7 @@ class GenericChain:
 
         \n\nAssistant:
         """
-        
+
         self.prompt_with_user_context = """You are a helpful AI Assistant which is great a answering questions based on provided context.
         Answer questions by considering following context:
 
@@ -77,7 +78,7 @@ class GenericChain:
 
         Question: {question}
         """
-        
+
         self.prompt_without_context = """\n\nHuman: You are a helpful AI Assistant.
         Answer questions by considering following context:
         {chat_history}
@@ -87,7 +88,7 @@ class GenericChain:
         """
 
     def build_chain_without_retriever(self):
-        
+
         prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", "{system_prompt}"),
@@ -97,7 +98,6 @@ class GenericChain:
 
         chain = prompt | self.get_llm()
         return chain
-
 
     async def build_chain(self):
         return self.build_chain_without_retriever()

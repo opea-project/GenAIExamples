@@ -1,23 +1,26 @@
-import requests
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import logging
-import pydantic
 from logging.config import dictConfig
-from fastapi import APIRouter, HTTPException, Response, Query, Request, status
 from typing import Annotated
+
+import pydantic
+import requests
+import schema.type as type
 from conf.config import Settings
 from core.common.logger import Logger
+from core.service.conversation import ConversationBuilder
 from core.util.exception import ConversationApiError
-import schema.type as type
-from sse_starlette import EventSourceResponse
+from fastapi import APIRouter, HTTPException, Query, Request, Response, status
 from schema.payload import (
-    ConversationRequest,
+    ConversationList,
     ConversationModel,
     ConversationModelResponse,
-    ConversationList,
+    ConversationRequest,
     UpsertedConversation,
 )
-from core.service.conversation import ConversationBuilder
-
+from sse_starlette import EventSourceResponse
 
 router = APIRouter()
 settings = Settings()
@@ -35,13 +38,13 @@ async def get_all_conversations(
     req: Request,
     user: Annotated[str, Query(description="User")],
 ) -> type.ConversationServiceResponseWrapper[ConversationList]:
-    """Get all conversations for user
+    """Get all conversations for user.
 
     **Args:**
 
      - Query Parameters:
 
-            user_id (string): User_ID for which to retrive conversation.
+            user_id (string): User_ID for which to retrieve conversation.
 
     **Raises:**
 
@@ -55,10 +58,8 @@ async def get_all_conversations(
     try:
         logger.info("Get conversation for user: {}.".format(user))
 
-        conv_builder  = ConversationBuilder(user=user)
-        conversations: ConversationList = (
-            await conv_builder.get_conversations_for_user()
-        )
+        conv_builder = ConversationBuilder(user=user)
+        conversations: ConversationList = await conv_builder.get_conversations_for_user()
         response = type.ConversationServiceResponseWrapper(data=conversations)
         return response
 
@@ -69,7 +70,6 @@ async def get_all_conversations(
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @router.get(
@@ -84,7 +84,7 @@ async def get_conversation_by_id(
     user: Annotated[str, Query(description="User")],
     response: Response,
 ) -> ConversationModelResponse | None:
-    """Get conversation for a given conversation ID
+    """Get conversation for a given conversation ID.
 
     **Args:**
 
@@ -145,7 +145,7 @@ async def delete_conversation(
     user: Annotated[str, Query(description="User")],
     response: Response,
 ) -> None:
-    """Delete conversation with given conversation_id for current user
+    """Delete conversation with given conversation_id for current user.
 
     **Args:**
 
@@ -187,12 +187,12 @@ async def create_conversation(
     user: Annotated[str, Query(description="User")],
     payload: ConversationRequest,
 ) -> UpsertedConversation:
-    """API endpoint to start a new conversation
+    """API endpoint to start a new conversation.
 
     **Args:**
 
      - Body Parameters
-            
+
             messages (str | JSON): A query string or a list of messages containing "system", "user" and "assistant" key and values.
             temperature (float): (Optional) Temperature param for LLM
             model (string): (Required) LLM to be used for Inference
@@ -203,7 +203,7 @@ async def create_conversation(
     **Raises:**
 
      - 500 Internal Server Error:
-            
+
             When some error occurs in reading or loading the settings variable as JSON
 
     **Returns:**
@@ -223,9 +223,7 @@ async def create_conversation(
             result = conversation_builder.stream_and_build_conversation()
             return EventSourceResponse(result, media_type="text/event-stream")
         else:
-            conversation: UpsertedConversation = (
-                await conversation_builder.build_conversation()
-            )
+            conversation: UpsertedConversation = await conversation_builder.build_conversation()
             logger.info(conversation)
             return conversation
 
@@ -250,7 +248,7 @@ async def continue_conversation(
     payload: ConversationRequest,
     conversation_id: type.MongoObjectId,
 ) -> UpsertedConversation:
-    """API endpoint to resume an exiting conversation
+    """API endpoint to resume an exiting conversation.
 
     **Args:**
 
@@ -269,7 +267,7 @@ async def continue_conversation(
 
      **Raises:**
      - 500 Internal Server Error:
-     
+
             When some error occurs in reading or loading the settings variable as JSON
 
 
@@ -281,9 +279,7 @@ async def continue_conversation(
     try:
         logger.info("Continue conversation for id: {}".format(conversation_id))
         conversation_builder = ConversationBuilder(
-            user=user,
-            conversation_request=payload,
-            conversation_id=conversation_id
+            user=user, conversation_request=payload, conversation_id=conversation_id
         )
         await conversation_builder.continue_existing_conversation()
 

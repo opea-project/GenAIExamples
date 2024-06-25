@@ -12,7 +12,7 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 ## 🚀 Setup for serving the LLMs
 
-We will use vLLM running on CPU to serve the LLMs. For that, we will  clone and build the docker image for vLLM. Please make sure you have git and docker installed with correct proxy configuration.
+We will use vLLM running on CPU to serve the LLMs. For that, we will clone and build the docker image for vLLM. Please make sure you have git and docker installed with correct proxy configuration.
 
 ### 1. Clone the OPEA GenAI Components project
 
@@ -23,7 +23,7 @@ cd GenAIComps
 
 ### 2. Build LLM Image
 
-vLLM instance will be pre-configured to run on CPUs. Below are the steps to build the docker image for vLLM for serving LLMs on CPU. 
+vLLM instance will be pre-configured to run on CPUs. Below are the steps to build the docker image for vLLM for serving LLMs on CPU.
 
 ```bash
 cd comps/llms/text-generation/vllm && chmod +x build_docker_vllm.sh  && bash ./build_docker_vllm.sh
@@ -33,10 +33,9 @@ This build will take a while to complete. Once the build succeeds, run:
 
 ```bash
 docker images | grep "vllm"
-``` 
+```
 
 It will give you list of all vLLM images on your machine. If build is successful, the list should have a vLLM image with tag as `cpu`.
-
 
 ## 🚀 Setup and Run the ChatConversation Megaservice
 
@@ -73,9 +72,9 @@ export CONVERSATION_URL="http://${host_ip}:${CHAT_API_PORT}"
 export no_proxy=${no_proxy},"Your_External_Public_IP"
 ```
 
->_**Note**_: Please replace **Your_External_Public_IP** with your actual external public IP.
+> _**Note**_: Please replace **Your_External_Public_IP** with your actual external public IP.
 
->_**Note**_: If `host_ip` does not contain your external IP, replace `host_ip` with you external IP address manually. Please do not use `localhost`.
+> _**Note**_: If `host_ip` does not contain your external IP, replace `host_ip` with you external IP address manually. Please do not use `localhost`.
 
 Value provided as ports are just for example purpose and you can change them to any available port on your machine. You can run above export commands directly on your shell or add them to a file and run following command to set them all in a handy way:
 
@@ -93,18 +92,16 @@ export HUGGING_FACE_HUB_TOKEN="Your_Huggingface_Hub_API_Token"
 
 Replace `Your_Huggingface_Hub_API_Token` in above command with your actual token.
 
-
 ### 3. 🚀 Build and bring up the Megaservice
 
 ```bash
 docker compose up -d --build
 ```
 
-This will start the build process. Once the build succeeds, docker will spin up all the containers that are part of Megaservice (including the containers for vLLM images). There will be 2 containers for vLLM service as we are going to server 2 LLMs. 
+This will start the build process. Once the build succeeds, docker will spin up all the containers that are part of Megaservice (including the containers for vLLM images). There will be 2 containers for vLLM service as we are going to server 2 LLMs.
 
-| :memo: Please make sure all the environment variables in previous step is setup properly, otherwise most of these containers will fail to start.  |
-  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-
+| :memo: Please make sure all the environment variables in previous step is setup properly, otherwise most of these containers will fail to start. |
+| ------------------------------------------------------------------------------------------------------------------------------------------------ |
 
 Verify that all the services are up and running using the following command:
 
@@ -123,7 +120,7 @@ CONTAINER ID   IMAGE                                      COMMAND               
 cba7a1001b97   opea/chat-conversation-service:latest      "python3 main.py"        7 seconds ago   Up 3 seconds   0.0.0.0:50005->8002/tcp, :::50005->8002/tcp     xeon-chat-1
 ```
 
-### Test the API Endpoints 
+### Test the API Endpoints
 
 The chatConversation service can dynamically communicate with different LLMs. Below are the commands to test the APIs targeting different LLMs.
 
@@ -164,14 +161,15 @@ curl -X 'POST' \
 To access the frontend, open the following URL in your browser: http://{host_ip}:80. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker-compose.yaml` file as shown below:
 
 ```yaml
-    ui:
-        image: opea/ui-service
-        container_name: ui-service
-        build:
-            context: ../../microservices/ui
-        ports:
-            - <new port>:80
+ui:
+  image: opea/ui-service
+  container_name: ui-service
+  build:
+    context: ../../microservices/ui
+  ports:
+    - <new port>:80
 ```
 
 ![UI Screenshot](../../media/demo.png)
+
 > ChatConversations Demo Screenshot

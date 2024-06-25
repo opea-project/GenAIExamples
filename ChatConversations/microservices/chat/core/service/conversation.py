@@ -1,35 +1,34 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+import asyncio
 import logging
 import time
 import uuid
+from logging.config import dictConfig
+
 import pydantic
 from conf.config import Settings
-from logging.config import dictConfig
+from core.common.constant import Message
 from core.common.logger import Logger
+from core.db.conversation_store import ConversationStore
+from core.service.model_service import SupportedModels
+from core.util.chain_utils import AsyncFinalIteratorCallbackHandler, ChainHelper
+from core.util.exception import ConversationManagerError, ValidationError
 from fastapi import status
+from schema.message import InferenceSettings, MessageModel
 from schema.payload import (
-    ConversationRequest,
+    ConversationList,
     ConversationModel,
     ConversationModelResponse,
-    ConversationList,
+    ConversationRequest,
     UpsertedConversation,
 )
-from core.service.model_service import SupportedModels
-from core.util.chain_utils import ChainHelper, AsyncFinalIteratorCallbackHandler
-from core.common.constant import Message
-from schema.message import (
-    InferenceSettings,
-    MessageModel,
-)
-from core.db.conversation_store import ConversationStore
-from core.util.exception import (
-    ConversationManagerError,
-    ValidationError,
-)
-import asyncio
 
 settings = Settings()
 dictConfig(Logger().model_dump())
 logger = logging.getLogger(settings.APP_NAME)
+
 
 class ConversationBuilder:
 
@@ -43,28 +42,26 @@ class ConversationBuilder:
         self.user_params: ConversationRequest = conversation_request
         self.conversation_id: str = conversation_id
         self.system_prompt: str = ""
-        self.prompt: list[tuple]  = []
+        self.prompt: list[tuple] = []
 
         if self.user:
             self.initialize_storage()
 
     def initialize_storage(self):
         try:
-            self.conversation_storage = ConversationStore(
-                self.user, conversation_id=self.conversation_id
-            )
+            self.conversation_storage = ConversationStore(self.user, conversation_id=self.conversation_id)
             self.conversation_storage.initialize_storage()
         except Exception as e:
             logger.error(e)
             raise e
-        
+
     def _adapt_messages(self, messages, db_chat_history: list = []) -> str:
-        """ 
+        """
         Args:
             messages (str | list):
-                Given a messages in ChatML specification, it creates and refines messages 
+                Given a messages in ChatML specification, it creates and refines messages
                 array to contain list of tuples, each containing either human or ai message.
-                If system prompt is present in messages, extracts the system prompts. 
+                If system prompt is present in messages, extracts the system prompts.
 
             db_chat_history (list):
                 If chat history is available from db, it adds the db chat history to the messages
@@ -106,10 +103,11 @@ class ConversationBuilder:
 
         return query
 
-
     def _initialize_conversation_model(self, current_query: str) -> None:
         """Initialize the known values for conversation object
-        to be saved in storage. This object can contain all messages
+        to be saved in storage.
+
+        This object can contain all messages
         (list of messages).
         """
 
@@ -118,16 +116,10 @@ class ConversationBuilder:
             first_query=current_query,
         )
 
-    def _prepare_new_message_model(
-        self, first_query: str, current_query: str, conversation_id: str = None
-    ) -> None:
+    def _prepare_new_message_model(self, first_query: str, current_query: str, conversation_id: str = None) -> None:
         """Initialize the known values for message object."""
 
-        self.message = MessageModel(
-            message_id=uuid.uuid4().hex,
-            human=current_query
-        )
-    
+        self.message = MessageModel(message_id=uuid.uuid4().hex, human=current_query)
         """This conversation object contains the message object which will contain
         the new message. It represents the created or updated conversation.
         """
@@ -138,18 +130,14 @@ class ConversationBuilder:
             last_message=self.message,
         )
 
-
     async def initialize_new_conversation(self) -> None:
         try:
 
             query: str = self._adapt_messages(self.user_params.messages)
 
             self._initialize_conversation_model(query)
-            
-            self._prepare_new_message_model(
-                first_query=query,
-                current_query=query
-            )
+
+            self._prepare_new_message_model(first_query=query, current_query=query)
 
         except Exception as e:
             logger.error(e)
@@ -207,9 +195,7 @@ class ConversationBuilder:
 
         return self.message
 
-    def _append_new_message(
-        self, message: MessageModel = None, update_time: int = 0
-    ) -> ConversationModel:
+    def _append_new_message(self, message: MessageModel = None, update_time: int = 0) -> ConversationModel:
         """Add a newly created message to current conversation."""
 
         message: MessageModel = message or self.message
@@ -220,7 +206,6 @@ class ConversationBuilder:
         self.conversation.messages.append(message)
         self.conversation.message_count += 1
         self.conversation.updated_at = current_time
-
         """ Update_time implies we are updating an existing conversation.
         If provided, we may not want to set the created_at time for conversation.
         """
@@ -229,16 +214,14 @@ class ConversationBuilder:
 
         return self.conversation
 
-    def _get_upserted_conversation(
-        self, conversation: ConversationModel
-    ) -> UpsertedConversation:
+    def _get_upserted_conversation(self, conversation: ConversationModel) -> UpsertedConversation:
         """Get the updated or created conversation with current message.
+
         Sent as API response.
         """
 
         # Update the conversation object to be returned as API response
         self.upserted_conversation.conversation_id = conversation.conversation_id
-
         """use_case is already loaded from request params in case of new conversation.
         However, in case of continuing an existing conversation this might not be present
         in request params. Hence, re-loading it from conversation object.
@@ -307,18 +290,14 @@ class ConversationBuilder:
             self.user_params.model, "display_name", self.user
         )
         # Create and set the message based on query result
-        message = self._build_new_message(
-            query_result, model_display_name=model_display_name
-        )
+        message = self._build_new_message(query_result, model_display_name=model_display_name)
 
         # If conversation_id is present, update existing stored conversation with new message.
         if self.conversation_id:
             is_update_done = True
             time_of_update = int(time.time())
             if self.user:
-                is_update_done = await self.conversation_storage.update_conversation(
-                    message, time_of_update
-                )
+                is_update_done = await self.conversation_storage.update_conversation(message, time_of_update)
 
             # If update is successful, then update conversation object with updated data,
             # as update_one method on monogodb does not return the updated document.
@@ -331,18 +310,12 @@ class ConversationBuilder:
         else:
             conversation = self._append_new_message(message)
             if self.user:
-                conversation.conversation_id = (
-                    await self.conversation_storage.save_conversation(conversation)
-                )
+                conversation.conversation_id = await self.conversation_storage.save_conversation(conversation)
         return self._get_upserted_conversation(conversation)
-        
+
     async def get_conversations_for_user(self) -> ConversationList:
-        conversations: list[dict] = (
-            await self.conversation_storage.get_all_conversations_by_user()
-        )
-        conversation_list: ConversationList = pydantic.parse_obj_as(
-            ConversationList, conversations
-        )
+        conversations: list[dict] = await self.conversation_storage.get_all_conversations_by_user()
+        conversation_list: ConversationList = pydantic.parse_obj_as(ConversationList, conversations)
         return conversation_list
 
     async def get_existing_conversation(self) -> ConversationModel | None:
