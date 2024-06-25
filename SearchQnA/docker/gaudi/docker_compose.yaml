@@ -128,7 +128,7 @@ services:
     restart: unless-stopped
   searchqna-gaudi-backend-server:
     image: opea/searchqna:latest
-    container_name: chatqna-gaudi-backend-server
+    container_name: searchqna-gaudi-backend-server
     depends_on:
       - tei-embedding-service
       - embedding

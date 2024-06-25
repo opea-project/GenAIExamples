@@ -62,16 +62,15 @@ function start_services() {
     # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
-    sleep 8m
-    # n=0
-    # until [[ "$n" -ge 200 ]]; do
-    #     docker logs tgi-service > tgi_service_start.log
-    #     if grep -q Connected tgi_service_start.log; then
-    #         break
-    #     fi
-    #     sleep 1s
-    #     n=$((n+1))
-    # done
+    n=0
+    until [[ "$n" -ge 200 ]]; do
+        docker logs tgi-service > tgi_service_start.log
+        if grep -q Connected tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 
@@ -82,6 +81,8 @@ function validate_megaservice() {
     if [[ $result == *"www"* ]]; then
         echo "Result correct."
     else
+        docker logs web-retriever-chroma-server
+        docker logs searchqna-xeon-backend-server
         echo "Result wrong."
         exit 1
     fi
