@@ -48,7 +48,7 @@ jobs:
           grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')" || true
           services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u)
           path_level_1=("asr" "tts")
-          path_level_3=("llms/summarization" "llms/text-generation" "dataprep/redis" "retrievers/langchain/redis")
+          path_level_3=("llms/summarization" "llms/text-generation" "dataprep/redis" "retrievers/langchain")
           run_matrix="{\"include\":["
           for service in ${services}; do
               hardware="gaudi" # default hardware, set based on the changed files
