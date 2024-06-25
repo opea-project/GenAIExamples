@@ -68,5 +68,30 @@ jobs:
                   done
               fi
           done
+
+          # add test for comps/dataprep/utils.py
+          if [[ "${changed_files[@]}" =~ "comps/dataprep/utils.py" ]]; then
+              service_list=("dataprep/qdrant" "dataprep/redis/langchain")
+              hardware="gaudi" # default hardware, set based on the changed files
+              for service in ${service_list[@]}; do
+                  if [ $(echo ${run_matrix} | grep -c ${service}) == 0 ]; then
+                      run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
+                  fi
+              done
+          fi
+
+          # add test for test scripts update
+          changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
+          grep 'tests/' | grep -vE '*.md|*.txt|tests/cores')" || true
+          test_files=$(printf '%s\n' "${changed_files[@]}" | grep -E "tests/test_*" | grep -E "*.sh")
+          for test_file in ${test_files}; do
+              service_script=$(echo $test_file | cut -d'/' -f2 | cut -d'.' -f1 | cut -c6-)
+              service=$(echo $service_script | tr '_' '/')
+              hardware="gaudi" # default hardware, set based on the changed files
+              if [ $(echo ${run_matrix} | grep -c ${service}) == 0 ]; then
+                  run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
+              fi
+          done
+
           run_matrix=$run_matrix"]}"
           echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT

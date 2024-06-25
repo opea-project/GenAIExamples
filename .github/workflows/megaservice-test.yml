@@ -43,10 +43,19 @@ jobs:
               docker stop ${{ env.CONTAINER_NAME }} && docker rm -vf ${{ env.CONTAINER_NAME }} || true
           fi
 
+      - name: Get checkout ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+          echo "checkout ref ${{ env.CHECKOUT_REF }}"
+
       - name: Checkout out Repo
         uses: actions/checkout@v4
         with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
+          ref: ${{ env.CHECKOUT_REF }}
 
       - name: Docker Build
         run: |
