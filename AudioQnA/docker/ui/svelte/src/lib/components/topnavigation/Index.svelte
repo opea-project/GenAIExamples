@@ -15,7 +15,6 @@
 -->
 
 <script>
-	import UploadVoice from "../talkbot/upload-voice.svelte";
 </script>
 
 <header
@@ -29,7 +28,6 @@
 				class="ml-4 self-center whitespace-nowrap py-2 text-3xl font-semibold text-white"
 				>AudioQnA</span
 			>
-			<UploadVoice />
 		</div>
 	</nav>
 </header>
