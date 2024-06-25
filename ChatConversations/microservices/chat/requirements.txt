@@ -1,3 +1,4 @@
+fastapi==0.109.2
 langchain==0.1.12
 langchain-community==0.0.28
 langchain-openai
@@ -7,4 +8,3 @@ openai==1.10.0
 pydantic_settings==2.0.3
 sse-starlette==2.0.
 uvicorn>=0.21.0,<0.23.0
-fastapi==0.109.2

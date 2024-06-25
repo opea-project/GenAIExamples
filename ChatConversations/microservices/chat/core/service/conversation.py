@@ -120,7 +120,9 @@ class ConversationBuilder:
 
         self.message = MessageModel(message_id=uuid.uuid4().hex, human=current_query)
         """This conversation object contains the message object which will contain
-        the new message. It represents the created or updated conversation.
+        the new message.
+
+        It represents the created or updated conversation.
         """
         self.upserted_conversation = UpsertedConversation(
             conversation_id=conversation_id,
@@ -205,7 +207,8 @@ class ConversationBuilder:
         self.conversation.messages.append(message)
         self.conversation.message_count += 1
         self.conversation.updated_at = current_time
-        """ Update_time implies we are updating an existing conversation.
+        """Update_time implies we are updating an existing conversation.
+
         If provided, we may not want to set the created_at time for conversation.
         """
         if not update_time:
@@ -222,6 +225,7 @@ class ConversationBuilder:
         # Update the conversation object to be returned as API response
         self.upserted_conversation.conversation_id = conversation.conversation_id
         """use_case is already loaded from request params in case of new conversation.
+
         However, in case of continuing an existing conversation this might not be present
         in request params. Hence, re-loading it from conversation object.
         """

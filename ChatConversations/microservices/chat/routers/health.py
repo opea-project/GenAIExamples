@@ -1,8 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from fastapi import APIRouter
 from conf.config import Settings
+from fastapi import APIRouter
 
 router = APIRouter()
 settings = Settings()
