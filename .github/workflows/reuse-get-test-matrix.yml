@@ -46,7 +46,7 @@ jobs:
 
           changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
           grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')" || true
-          services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u)
+          services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u) || true
           path_level_1=("asr" "tts")
           path_level_3=("llms/summarization" "llms/text-generation" "dataprep/redis" "retrievers/langchain")
           run_matrix="{\"include\":["
@@ -83,7 +83,7 @@ jobs:
           # add test for test scripts update
           changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
           grep 'tests/' | grep -vE '*.md|*.txt|tests/cores')" || true
-          test_files=$(printf '%s\n' "${changed_files[@]}" | grep -E "tests/test_*" | grep -E "*.sh")
+          test_files=$(printf '%s\n' "${changed_files[@]}" | grep -E "tests/test_*" | grep -E "*.sh") || true
           for test_file in ${test_files}; do
               service_script=$(echo $test_file | cut -d'/' -f2 | cut -d'.' -f1 | cut -c6-)
               service=$(echo $service_script | tr '_' '/')
