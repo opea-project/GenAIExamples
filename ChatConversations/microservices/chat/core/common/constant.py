@@ -40,7 +40,7 @@ class Message:
 
         INVALID_CONVERSATION_ID = "Conversation ID is invalid."
         INVALID_MESSAGE_ID = "Message ID is invalid"
-        INVALID_TAG_ID = "Invalid tag ID. Perhaps the fetched tag record doesnot exist anymore."
+        INVALID_TAG_ID = "Invalid tag ID. Perhaps the fetched tag record does not exist anymore."
         FACTORY_PATTERN_ERROR = "Error occurred while instantiating classes using factory."
         MAX_MESSAGES_LIMIT_EXCEEDED = (
             "Limit for Maximum Messages for this Conversation Exceeded. Please start a New Conversation."
