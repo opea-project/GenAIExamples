@@ -57,7 +57,7 @@ function start_services() {
     # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
-    sleep 5m
+    sleep 3m
     # n=0
     # until [[ "$n" -ge 200 ]]; do
     #     docker logs tgi-service > tgi_service_start.log

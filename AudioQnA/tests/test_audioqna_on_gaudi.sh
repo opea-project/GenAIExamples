@@ -70,7 +70,7 @@ function start_services() {
     #     sleep 1s
     #     n=$((n+1))
     # done
-    sleep 8m
+    sleep 5m
 }
 
 
@@ -121,14 +121,14 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    begin_time=$(date +%s)
-    # build_docker_images
+    # begin_time=$(date +%s)
+    build_docker_images
     # start_time=$(date +%s)
     start_services
-    end_time=$(date +%s)
+    # end_time=$(date +%s)
     # minimal_duration=$((end_time-start_time))
-    maximal_duration=$((end_time-begin_time))
-    echo "Mega service start duration is "$maximal_duration"s"
+    # maximal_duration=$((end_time-begin_time))
+    # echo "Mega service start duration is "$maximal_duration"s"
 
     validate_microservices
     validate_megaservice
