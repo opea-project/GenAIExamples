@@ -16,21 +16,19 @@ import { SSE } from "sse.js";
 
 const BASE_URL = env.BASE_URL;
 
-
 export async function fetchLanguageResponse(input: string, transform: string, transTo: string) {
-	let payload = {};
-	let url = "";
+  let payload = {};
+  let url = "";
 
-	payload = {
+  payload = {
     language_from: transform,
     language_to: transTo,
     source_language: input,
-	};
-	url = `${BASE_URL}`;
+  };
+  url = `${BASE_URL}`;
 
-	return new SSE(url, {
-		headers: { "Content-Type": "application/json" },
-		payload: JSON.stringify(payload),
-	});
+  return new SSE(url, {
+    headers: { "Content-Type": "application/json" },
+    payload: JSON.stringify(payload),
+  });
 }
-
