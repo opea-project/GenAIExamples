@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import base64
 import errno
 import functools
 import io
@@ -198,6 +199,16 @@ def load_csv(input_path):
 
 def load_image(image_path):
     """Load the image file."""
+    if os.getenv("SUMMARIZE_IMAGE_VIA_LVM", None) == "1":
+        query = "Please summarize this image."
+        image_b64_str = base64.b64encode(open(image_path, "rb").read()).decode()
+        response = requests.post(
+            "http://localhost:9399/v1/lvm",
+            data=json.dumps({"image": image_b64_str, "prompt": query}),
+            headers={"Content-Type": "application/json"},
+            proxies={"http": None},
+        )
+        return response.json()["text"].strip()
     loader = UnstructuredImageLoader(image_path)
     text = loader.load()[0].page_content
     return text
@@ -239,7 +250,12 @@ def document_loader(doc_path):
         return load_xlsx(doc_path)
     elif doc_path.endswith(".csv"):
         return load_csv(doc_path)
-    elif doc_path.endswith(".tiff"):
+    elif (
+        doc_path.endswith(".tiff")
+        or doc_path.endswith(".jpg")
+        or doc_path.endswith(".jpeg")
+        or doc_path.endswith(".png")
+    ):
         return load_image(doc_path)
     elif doc_path.endswith(".svg"):
         return load_image(doc_path)
