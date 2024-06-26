@@ -23,17 +23,6 @@ If you want these visual RAG to work on your own videos, make sure it matches be
 ```bash
 video_ingest/
 .
-├── scene_description
-│   ├── op_10_0320241830.mp4.txt
-│   ├── op_1_0320241830.mp4.txt
-│   ├── op_19_0320241830.mp4.txt
-│   ├── op_21_0320241830.mp4.txt
-│   ├── op_24_0320241830.mp4.txt
-│   ├── op_31_0320241830.mp4.txt
-│   ├── op_47_0320241830.mp4.txt
-│   ├── op_5_0320241915.mp4.txt
-│   ├── op_DSCF2862_Rendered_001.mp4.txt
-│   └── op_DSCF2864_Rendered_006.mp4.txt
 └── videos
     ├── op_10_0320241830.mp4
     ├── op_1_0320241830.mp4
