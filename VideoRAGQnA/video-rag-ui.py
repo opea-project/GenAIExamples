@@ -192,6 +192,8 @@ class CustomLLM(LLM):
         return "custom"
     
 def get_top_doc(results, qcnt):
+    if results == []:
+        return None, None
     hit_score = {}
     for r in results:
         try:
@@ -272,7 +274,7 @@ def RAG(prompt):
     with st.status("Querying database . . . ", expanded=True) as status:
         st.write('Retrieving 3 image docs') #1 text doc and 
         results = st.session_state.vs.MultiModalRetrieval(prompt, top_k = 3) #n_texts = 1, n_images = 3)
-        status.update(label="Retrived Top matching video!", state="complete", expanded=False)
+        status.update(label="Retrieved Top matching video!", state="complete", expanded=False)
     print("---___---")
     print (f'\tRAG prompt={prompt}')
     print("---___---")
@@ -287,13 +289,6 @@ def RAG(prompt):
     
     return video_name, playback_offset, top_doc
 
-def get_description(vn):
-    content = None
-    des_path = os.path.join(config['description'], vn + '.txt')
-    with open(des_path, 'r') as file:
-        content = file.read()
-    return content
-    
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
 if 'prevprompt' not in st.session_state.keys():
@@ -328,13 +323,9 @@ def handle_message():
             else:
                 with col2:
                     play_video(video_name, playback_offset)
-                """
-                scene_des = get_description(video_name)
-                formatted_prompt = ph.get_formatted_prompt(scene=scene_des, prompt=prompt)
-                """
                 
                 full_response = ''
-                full_response = f"Most relevant retrived video is **{video_name}** \n\n"
+                full_response = f"Most relevant retrieved video is **{video_name}** \n\n"
                 
                 #for new_text in st.session_state.llm.stream_res(formatted_prompt):
                 for new_text in st.session_state.llm.stream_res(video_name, prompt, chat, playback_offset, config['clip_duration']):

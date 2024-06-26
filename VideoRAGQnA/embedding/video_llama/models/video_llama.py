@@ -116,9 +116,9 @@ class VideoLLAMA(Blip2Base):
             self.Qformer.train = disabled_train
             self.query_tokens.requires_grad = False
             logging.info("freeze Qformer")
-        logging.info('Loading Q-Former Done')
+        print('Loading Q-Former Done')
         
-        logging.info('Loading LLAMA Tokenizer')
+        print('Loading LLAMA Tokenizer')
         self.llama_tokenizer = LlamaTokenizer.from_pretrained(llama_model, use_fast=False)
         if self.llama_tokenizer.pad_token is None:
             self.llama_tokenizer.pad_token = self.llama_tokenizer.unk_token 
@@ -130,7 +130,7 @@ class VideoLLAMA(Blip2Base):
         self.IMAGE_PATCH_TOKEN_ID = self.llama_tokenizer.get_vocab()[DEFAULT_IMAGE_PATCH_TOKEN]
         self.AUDIO_PATCH_TOKEN_ID = self.llama_tokenizer.get_vocab()[DEFAULT_AUDIO_PATCH_TOKEN]
 
-        logging.info('Loading LLAMA Model')
+        print('Loading LLAMA Model')
         if self.low_resource:
             self.llama_model = LlamaForCausalLM.from_pretrained(
                 llama_model,
@@ -146,13 +146,13 @@ class VideoLLAMA(Blip2Base):
 
         for name, param in self.llama_model.named_parameters():
             param.requires_grad = False
-        logging.info('Loading LLAMA Done')
+        print('Loading LLAMA Done')
         
 
 
-        logging.info('Loading LLAMA proj')
+        print('Loading LLAMA proj')
         self.llama_proj = nn.Linear(
-            self.Qformer.config.hidden_size, 4096 #self.llama_model.config.hidden_size
+            self.Qformer.config.hidden_size, self.llama_model.config.hidden_size
         )
         if llama_proj_model:
             print("load llama proj weight: {}".format(llama_proj_model))

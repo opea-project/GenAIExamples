@@ -82,28 +82,31 @@ def _results_to_docs(results: Any) -> List[Document]:
 
 def _results_to_docs_and_scores(results: Any) -> List[Tuple[Document, float]]:
     final_res: List[Any] = []
-    responses, blobs = results[0]
-    if (
-        "FindDescriptor" in responses[0]
-        and "entities" in responses[0]["FindDescriptor"]
-    ):
-        result_entities = responses[0]["FindDescriptor"]["entities"]
-        # result_blobs = blobs
-        for ent in result_entities:
-            distance = round(ent["_distance"], 10)
-            txt_contents = ent["content"]
-            for p in INVALID_DOC_METADATA_KEYS:
-                if p in ent:
-                    del ent[p]
-            props = {
-                mkey: mval
-                for mkey, mval in ent.items()
-                if mval not in INVALID_METADATA_VALUE
-            }
+    try:
+        responses, blobs = results[0]
+        if (
+            "FindDescriptor" in responses[0]
+            and "entities" in responses[0]["FindDescriptor"]
+        ):
+            result_entities = responses[0]["FindDescriptor"]["entities"]
+            # result_blobs = blobs
+            for ent in result_entities:
+                distance = round(ent["_distance"], 10)
+                txt_contents = ent["content"]
+                for p in INVALID_DOC_METADATA_KEYS:
+                    if p in ent:
+                        del ent[p]
+                props = {
+                    mkey: mval
+                    for mkey, mval in ent.items()
+                    if mval not in INVALID_METADATA_VALUE
+                }
 
-            final_res.append(
-                (Document(page_content=txt_contents, metadata=props), distance)
-            )
+                final_res.append(
+                    (Document(page_content=txt_contents, metadata=props), distance)
+                )
+    except:
+        print("ERROR while parsing the results:", results)
     return final_res
 
 
