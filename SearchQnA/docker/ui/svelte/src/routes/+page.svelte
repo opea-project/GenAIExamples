@@ -106,7 +106,7 @@
 					trimmedData = decodeUnicode(trimmedData);
 				}
 				console.log('trimmedData before', trimmedData);
-				
+
 				trimmedData = trimmedData.replace(/\\n/g, "\n");
 
 				console.log('trimmedData after', trimmedData);

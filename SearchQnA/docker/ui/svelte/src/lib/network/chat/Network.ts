@@ -23,7 +23,7 @@ export async function fetchTextStream(query: string, knowledge_base_id: string, 
 
 	payload = {
 		messages: query,
-		"stream": "True",
+		stream: "True",
 	};
 	url = `${BACKEND_BASE_URL}`;
 
