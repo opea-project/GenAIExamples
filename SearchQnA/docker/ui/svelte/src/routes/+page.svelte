@@ -60,14 +60,10 @@
 	});
 
 	function handleTop() {
-		console.log("top");
-
 		scrollToTop(scrollToDiv);
 	}
 
 	function storeMessages() {
-		console.log("localStorage", chatMessages);
-
 		localStorage.setItem(
 			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
 			JSON.stringify(chatMessages)
@@ -105,14 +101,9 @@
 				} else if (/\\u[\dA-Fa-f]{4}/.test(trimmedData)) {
 					trimmedData = decodeUnicode(trimmedData);
 				}
-				console.log('trimmedData before', trimmedData);
-
 				trimmedData = trimmedData.replace(/\\n/g, "\n");
 
-				console.log('trimmedData after', trimmedData);
-
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-					console.log("?", getCurrentTimeStamp());
 
 					chatMessages = [
 						...chatMessages,
@@ -136,17 +127,9 @@
 				let totalTime = parseFloat(
 					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
 				);
-				console.log("done totalTime", totalTime);
-				console.log(
-					"chatMessages[chatMessages.length - 1]",
-					chatMessages[chatMessages.length - 1]
-				);
-
 				if (chatMessages.length - 1 !== -1) {
 					chatMessages[chatMessages.length - 1].time = totalTime;
 				}
-				console.log("done chatMessages", chatMessages);
-
 				storeMessages();
 			}
 		});
@@ -154,8 +137,6 @@
 	};
 
 	const handleTextSubmit = async () => {
-		console.log("handleTextSubmit");
-
 		loading = true;
 		const newMessage = {
 			role: MessageRole.User,
