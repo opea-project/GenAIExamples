@@ -12,6 +12,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
     build-essential \
     libgl1-mesa-glx \
     libjemalloc-dev \
+    default-jre \
     vim
 
 RUN useradd -m -s /bin/bash user && \

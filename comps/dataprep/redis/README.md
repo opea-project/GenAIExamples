@@ -11,6 +11,8 @@ We organized these two folders in the same way, so you can use either framework 
 - option 1: Install Single-process version (for 1-10 files processing)
 
 ```bash
+apt update
+apt install default-jre
 # for langchain
 cd langchain
 # for llama_index

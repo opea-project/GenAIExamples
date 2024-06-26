@@ -14,6 +14,7 @@ from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFace
 from langchain_community.vectorstores import Redis
 from langchain_text_splitters import HTMLHeaderTextSplitter
 from langsmith import traceable
+from pyspark import SparkConf, SparkContext
 
 from comps import DocPath, opea_microservices, register_microservice
 from comps.dataprep.utils import document_loader, parse_html
@@ -128,11 +129,34 @@ async def ingest_documents(
         upload_folder = "./uploaded_files/"
         if not os.path.exists(upload_folder):
             Path(upload_folder).mkdir(parents=True, exist_ok=True)
+        uploaded_files = []
         for file in files:
             save_path = upload_folder + file.filename
             await save_file_to_local_disk(save_path, file)
-            ingest_data_to_redis(DocPath(path=save_path, chunk_size=chunk_size, chunk_overlap=chunk_overlap))
+            uploaded_files.append(save_path)
             print(f"Successfully saved file {save_path}")
+
+        def process_files_wrapper(files):
+            if not isinstance(files, list):
+                files = [files]
+            for file in files:
+                ingest_data_to_redis(DocPath(path=file, chunk_size=chunk_size, chunk_overlap=chunk_overlap))
+
+        try:
+            # Create a SparkContext
+            conf = SparkConf().setAppName("Parallel-dataprep").setMaster("local[*]")
+            sc = SparkContext(conf=conf)
+            # Create an RDD with parallel processing
+            parallel_num = min(len(uploaded_files), os.cpu_count())
+            rdd = sc.parallelize(uploaded_files, parallel_num)
+            # Perform a parallel operation
+            rdd_trans = rdd.map(process_files_wrapper)
+            rdd_trans.collect()
+            # Stop the SparkContext
+            sc.stop()
+        except:
+            # Stop the SparkContext
+            sc.stop()
         return {"status": 200, "message": "Data preparation succeeded"}
 
     if link_list:

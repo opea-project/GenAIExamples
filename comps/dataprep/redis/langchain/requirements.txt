@@ -7,6 +7,7 @@ langchain
 langchain-community
 langchain-text-splitters
 langsmith
+markdown
 numpy
 opentelemetry-api
 opentelemetry-exporter-otlp
@@ -15,7 +16,9 @@ pandas
 Pillow
 prometheus-fastapi-instrumentator
 pymupdf
+pyspark
 python-docx
 redis
 sentence_transformers
 shortuuid
+unstructured
