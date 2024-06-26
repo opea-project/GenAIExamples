@@ -54,7 +54,7 @@ The initially supported `Microservices` are described in the below table. More `
 		</tr>
 		<tr>
 			<td rowspan="2"><a href="./comps/embeddings/README.md">Embedding</a></td>
-            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a></td>
+            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td rowspan="2"><a href="https://huggingface.co/BAAI/bge-large-en-v1.5">BAAI/bge-large-en-v1.5</a></td>
 			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
 			<td>Gaudi2</td>
@@ -67,7 +67,7 @@ The initially supported `Microservices` are described in the below table. More `
 		</tr>
 		<tr>
 			<td><a href="./comps/retrievers/README.md">Retriever</a></td>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">BAAI/bge-base-en-v1.5</a></td>
 			<td><a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
 			<td>Xeon</td>
@@ -75,7 +75,7 @@ The initially supported `Microservices` are described in the below table. More `
 		</tr>
 		<tr>
 			<td rowspan="2"><a href="./comps/reranks/README.md">Reranking</a></td>
-            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a></td>
+            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td ><a href="https://huggingface.co/BAAI/bge-reranker-large">BAAI/bge-reranker-large</a></td>
 			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
 			<td>Gaudi2</td>
@@ -135,7 +135,7 @@ The initially supported `Microservices` are described in the below table. More `
 		</tr>
 		<tr>
 			<td rowspan="6"><a href="./comps/llms/README.md">LLM</a></td>
-            <td rowspan="6"><a href="https://www.langchain.com">LangChain</a></td>
+            <td rowspan="6"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
 			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI Gaudi</a></td>
 			<td>Gaudi2</td>
