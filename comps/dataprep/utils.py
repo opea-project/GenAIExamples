@@ -22,6 +22,7 @@ import requests
 import yaml
 from bs4 import BeautifulSoup
 from docx import Document as DDocument
+from langchain import LLMChain, PromptTemplate
 from langchain_community.document_loaders import (
     UnstructuredHTMLLoader,
     UnstructuredImageLoader,
@@ -29,6 +30,7 @@ from langchain_community.document_loaders import (
     UnstructuredPowerPointLoader,
     UnstructuredXMLLoader,
 )
+from langchain_community.llms import HuggingFaceEndpoint
 from PIL import Image
 
 
@@ -457,3 +459,104 @@ def parse_html(input):
             print("The given link/str {} cannot be parsed.".format(link))
 
     return chucks
+
+
+def get_tables_result(pdf_path, table_strategy):
+    """Extract tables information from pdf file."""
+    if table_strategy == "fast":
+        return None
+
+    from unstructured.documents.elements import FigureCaption
+    from unstructured.partition.pdf import partition_pdf
+
+    tables_result = []
+    raw_pdf_elements = partition_pdf(
+        filename=pdf_path,
+        infer_table_structure=True,
+    )
+    tables = [el for el in raw_pdf_elements if el.category == "Table"]
+    for table in tables:
+        table_coords = table.metadata.coordinates.points
+        content = table.metadata.text_as_html
+        table_page_number = table.metadata.page_number
+        min_distance = float("inf")
+        table_summary = None
+        if table_strategy == "hq":
+            for element in raw_pdf_elements:
+                if isinstance(element, FigureCaption) or element.text.startswith("Tab"):
+                    caption_page_number = element.metadata.page_number
+                    caption_coords = element.metadata.coordinates.points
+                    related, y_distance = get_relation(
+                        table_coords, caption_coords, table_page_number, caption_page_number
+                    )
+                    if related:
+                        if y_distance < min_distance:
+                            min_distance = y_distance
+                            table_summary = element.text
+            if table_summary is None:
+                parent_id = table.metadata.parent_id
+                for element in raw_pdf_elements:
+                    if element.id == parent_id:
+                        table_summary = element.text
+                        break
+        elif table_strategy == "llm":
+            table_summary = llm_generate(content)
+            table_summary = table_summary.lstrip("\n ")
+        elif table_strategy is None:
+            table_summary = None
+        if table_summary is None:
+            text = f"[Table: {content}]"
+        else:
+            text = f"|Table: [Summary: {table_summary}], [Content: {content}]|"
+        tables_result.append(text)
+    return tables_result
+
+
+def llm_generate(content):
+    llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
+    llm = HuggingFaceEndpoint(
+        endpoint_url=llm_endpoint,
+        max_new_tokens=1000,
+        top_k=40,
+        top_p=0.9,
+        temperature=0.8,
+        streaming=False,
+        num_beams=2,
+        num_return_sequences=2,
+        use_cache=True,
+        timeout=600,
+    )
+
+    table_summary_template = """
+    Task: Your task is to give a concise summary of the table. \
+    The summary should cover the overall table structure and all detailed information of the table. \
+    The table will be given in html format. Summarize the table below.
+    ---
+    ### Table:
+    {table_content}
+    ---
+    ### Generated Summary:
+    """
+
+    prompt = PromptTemplate(template=table_summary_template, input_variables=["table_content"])
+
+    llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+    response = llm_chain.invoke(content)
+    response = response["text"]
+    print("response", response)
+    return response
+
+
+def get_relation(table_coords, caption_coords, table_page_number, caption_page_number, threshold=100):
+    """Get the relation of a pair of table and caption."""
+    same_page = table_page_number == caption_page_number
+    x_overlap = (min(table_coords[2][0], caption_coords[2][0]) - max(table_coords[0][0], caption_coords[0][0])) > 0
+    if table_coords[0][1] - caption_coords[1][1] >= 0:
+        y_distance = table_coords[0][1] - caption_coords[1][1]
+    elif caption_coords[0][1] - table_coords[1][1] >= 0:
+        y_distance = caption_coords[0][1] - table_coords[1][1]
+    else:
+        y_distance = 0
+    y_close = y_distance < threshold
+    return same_page and x_overlap and y_close, y_distance

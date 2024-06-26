@@ -22,6 +22,8 @@ class DocPath(BaseDoc):
     path: str
     chunk_size: int = 1500
     chunk_overlap: int = 100
+    process_table: bool = False
+    table_strategy: str = "fast"
 
 
 class EmbedDoc768(BaseDoc):

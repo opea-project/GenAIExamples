@@ -21,4 +21,4 @@ python-docx
 redis
 sentence_transformers
 shortuuid
-unstructured
+unstructured[all-docs]==0.11.5

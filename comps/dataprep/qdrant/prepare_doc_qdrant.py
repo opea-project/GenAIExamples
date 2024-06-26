@@ -10,7 +10,7 @@ from langchain_community.vectorstores import Qdrant
 from langchain_text_splitters import HTMLHeaderTextSplitter
 
 from comps import DocPath, opea_microservices, opea_telemetry, register_microservice
-from comps.dataprep.utils import document_loader
+from comps.dataprep.utils import document_loader, get_tables_result
 
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 
@@ -43,7 +43,9 @@ def ingest_documents(doc_path: DocPath):
 
     content = document_loader(path)
     chunks = text_splitter.split_text(content)
-
+    if doc_path.process_table and path.endswith(".pdf"):
+        table_chunks = get_tables_result(path, doc_path.table_strategy)
+        chunks = chunks + table_chunks
     print("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
     # Create vectorstore
     if tei_embedding_endpoint:
