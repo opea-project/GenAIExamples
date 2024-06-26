@@ -66,8 +66,6 @@ class PIIDetectorWithNER(PIIDetector):
         if PIIEntityType.NAME in entity_types or PIIEntityType.PASSWORD in entity_types:
             result = result + detect_name_password(text, self.pipeline, entity_types)
 
-        print(result)
-
         return True if len(result) > 0 else False  # Dummy function, replace with actual logic
 
 
