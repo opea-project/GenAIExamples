@@ -59,7 +59,7 @@
 			>
 		</div>
 		<div class="flex items-center space-x-1 text-base text-gray-800"  data-testid='msg-time'>
-			<strong>End to End Time: </strong>
+			<strong>结束时间: </strong>
 			<p>{time}s</p>
 		</div>
 	</div>

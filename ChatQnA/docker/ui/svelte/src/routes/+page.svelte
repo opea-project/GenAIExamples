@@ -190,7 +190,7 @@
 						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
 						type="text"
 						data-testid="chat-input"
-						placeholder="Enter prompt here"
+						placeholder="输入你想问的问题"
 						disabled={loading}
 						maxlength="1200"
 						bind:value={query}
@@ -234,7 +234,7 @@
 							><path
 								d="M12.6 12 10 9.4 7.4 12 6 10.6 8.6 8 6 5.4 7.4 4 10 6.6 12.6 4 14 5.4 11.4 8l2.6 2.6zm7.4 8V2q0-.824-.587-1.412A1.93 1.93 0 0 0 18 0H2Q1.176 0 .588.588A1.93 1.93 0 0 0 0 2v12q0 .825.588 1.412Q1.175 16 2 16h14zm-3.15-6H2V2h16v13.125z"
 							/></svg
-						><span class="font-medium text-[#0597ff]">CLEAR</span></button
+						><span class="font-medium text-[#0597ff]">清除聊天记录</span></button
 					>
 				</div>
 			</div>
