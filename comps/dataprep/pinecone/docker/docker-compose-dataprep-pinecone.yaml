@@ -1,0 +1,21 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3"
+services:
+  dataprep-pinecone:
+    image: opea/gen-ai-comps:dataprep-pinecone-xeon-server
+    container_name: dataprep-pinecone-server
+    ports:
+      - "6000:6000"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PINECONE_API_KEY: ${PINECONE_API_KEY}
+      PINECONE_INDEX_NAME: ${PINECONE_INDEX_NAME}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

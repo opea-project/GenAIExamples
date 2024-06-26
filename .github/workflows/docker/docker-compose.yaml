@@ -14,7 +14,7 @@ services:
     pull_policy: always
   retriever-redis-server:
     build:
-      dockerfile: comps/retrievers/langchain/docker/Dockerfile
+      dockerfile: comps/retrievers/langchain/redis/docker/Dockerfile
     extends: embedding-tei-server
     image: ${REGISTRY}/${REPO}:retriever-redis-server
   reranking-tei-server:

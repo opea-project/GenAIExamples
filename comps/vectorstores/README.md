@@ -13,3 +13,7 @@ For details, please refer to this [readme](langchain/qdrant/README.md)
 # Vectorstores Microservice with PGVector
 
 For details, please refer to this [readme](langchain/pgvector/README.md)
+
+# Vectorstores Microservice with Pinecone
+
+For details, please refer to this [readme](langchain/pinecone/README.md)

@@ -22,6 +22,10 @@ For details, please refer to this [readme](milvus/README.md)
 
 For details, please refer to this [readme](qdrant/README.md)
 
+# Dataprep Microservice with Pinecone
+
+For details, please refer to this [readme](pinecone/README.md)
+
 # Dataprep Microservice with PGVector
 
 For details, please refer to this [readme](pgvector/README.md)
