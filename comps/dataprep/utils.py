@@ -23,6 +23,7 @@ import yaml
 from bs4 import BeautifulSoup
 from docx import Document as DDocument
 from langchain_community.document_loaders import (
+    UnstructuredHTMLLoader,
     UnstructuredImageLoader,
     UnstructuredMarkdownLoader,
     UnstructuredPowerPointLoader,
@@ -112,11 +113,11 @@ def load_pdf(pdf_path):
 
 def load_html(html_path):
     """Load the html file."""
-    with open(html_path, "r", encoding="utf-8") as file:
-        html = file.read()
-    soup = BeautifulSoup(html, "html.parser")
-    text = soup.get_text(strip=True)
-    return text
+    data_html = UnstructuredHTMLLoader(html_path).load()
+    content = ""
+    for ins in data_html:
+        content += ins.page_content
+    return content
 
 
 def load_txt(txt_path):

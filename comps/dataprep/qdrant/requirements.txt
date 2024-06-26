@@ -5,6 +5,7 @@ fastapi
 huggingface_hub
 langchain
 langchain-community
+langchain-text-splitters
 numpy
 opentelemetry-api
 opentelemetry-exporter-otlp

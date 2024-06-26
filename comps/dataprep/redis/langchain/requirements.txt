@@ -5,6 +5,7 @@ fastapi
 huggingface_hub
 langchain
 langchain-community
+langchain-text-splitters
 langsmith
 numpy
 opentelemetry-api
