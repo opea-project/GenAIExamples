@@ -7,9 +7,9 @@ import os
 from comps import CodeGenGateway, MicroService, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
-MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 7778)
+MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 7778))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
-LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
+LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
 
 class CodeGenService:

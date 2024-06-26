@@ -7,13 +7,13 @@ import os
 from comps import AudioQnAGateway, MicroService, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
-MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8888)
+MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 ASR_SERVICE_HOST_IP = os.getenv("ASR_SERVICE_HOST_IP", "0.0.0.0")
-ASR_SERVICE_PORT = os.getenv("ASR_SERVICE_PORT", 9099)
+ASR_SERVICE_PORT = int(os.getenv("ASR_SERVICE_PORT", 9099))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
-LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
+LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 TTS_SERVICE_HOST_IP = os.getenv("TTS_SERVICE_HOST_IP", "0.0.0.0")
-TTS_SERVICE_PORT = os.getenv("TTS_SERVICE_PORT", 9088)
+TTS_SERVICE_PORT = int(os.getenv("TTS_SERVICE_PORT", 9088))
 
 
 class AudioQnAService:
