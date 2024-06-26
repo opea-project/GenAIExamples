@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 TGI_ENDPOINT = os.getenv("TGI_ENDPOINT", "http://localhost:8080")
-SERVICE_PORT = os.getenv("SERVER_PORT", 8000)
+SERVICE_PORT = int(os.getenv("SERVER_PORT", 8000))
 
 
 class CodeTranslationAPIRouter(APIRouter):
