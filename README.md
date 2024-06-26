@@ -101,7 +101,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/meta-llama/CodeLlama-7b-hf">meta-llama/CodeLlama-7b-hf</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
@@ -124,7 +124,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/HuggingFaceH4/mistral-7b-grok">HuggingFaceH4/mistral-7b-grok</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
