@@ -101,8 +101,10 @@
 				} else if (/\\u[\dA-Fa-f]{4}/.test(trimmedData)) {
 					trimmedData = decodeUnicode(trimmedData);
 				}
-				trimmedData = trimmedData.replace(/\\n/g, "\n");
-
+				
+				if (trimmedData !== "</s>") {
+				        trimmedData = trimmedData.replace(/\\n/g, "\n");
+				}
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
 
 					chatMessages = [
