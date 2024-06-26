@@ -13,7 +13,7 @@ apt-get install poppler-utils -y
 
 ## Start Qdrant Server
 
-Please refer to this [readme](../../../vectorstores/langchain/qdrant/README.md).
+Please refer to this [readme](../../vectorstores/langchain/qdrant/README.md).
 
 ## Setup Environment Variables
 
@@ -24,6 +24,7 @@ export https_proxy=${your_http_proxy}
 export QDRANT=${host_ip}
 export QDRANT_PORT=6333
 export COLLECTION_NAME=${your_collection_name}
+export PYTHONPATH=${path_to_comps}
 ```
 
 ## Start Document Preparation Microservice for Qdrant with Python Script

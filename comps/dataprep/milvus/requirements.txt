@@ -1,5 +1,7 @@
 beautifulsoup4
+cairosvg
 docarray[full]
+docx2txt
 easyocr
 fastapi
 frontend==0.0.3
@@ -8,6 +10,7 @@ langchain
 langchain-community
 langchain-text-splitters
 langchain_milvus
+markdown
 numpy
 opentelemetry-api
 opentelemetry-exporter-otlp
@@ -19,6 +22,7 @@ pydantic==2.7.3
 pymilvus==2.4.3
 pymupdf==1.24.5
 python-docx==0.8.11
+python-pptx
 sentence_transformers
 shortuuid
 unstructured[all-docs]==0.11.5

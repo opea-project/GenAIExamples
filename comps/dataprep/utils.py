@@ -9,15 +9,20 @@ import json
 import multiprocessing
 import os
 import re
+import shutil
 import signal
 import timeit
 import unicodedata
 from urllib.parse import urlparse, urlunparse
 
+import cairosvg
+import docx
+import docx2txt
 import easyocr
 import fitz
 import numpy as np
 import pandas as pd
+import pptx
 import requests
 import yaml
 from bs4 import BeautifulSoup
@@ -27,7 +32,6 @@ from langchain_community.document_loaders import (
     UnstructuredHTMLLoader,
     UnstructuredImageLoader,
     UnstructuredMarkdownLoader,
-    UnstructuredPowerPointLoader,
     UnstructuredXMLLoader,
 )
 from langchain_community.llms import HuggingFaceEndpoint
@@ -131,32 +135,81 @@ def load_txt(txt_path):
 
 def load_doc(doc_path):
     """Load doc file."""
-    txt_path = doc_path.replace(".doc", ".txt")
-    try:
-        os.system(f'antiword "{doc_path}" > "{txt_path}"')
-    except:
-        raise AssertionError(
-            "antiword failed or not installed, if not installed,"
-            + 'use "apt-get update && apt-get install -y antiword" to install it.'
-        )
-    text = load_txt(txt_path)
-    os.remove(txt_path)
+    print("Converting doc file to docx file...")
+    docx_path = doc_path + "x"
+    os.system(f"libreoffice --headless --invisible --convert-to docx --outdir {os.path.dirname(docx_path)} {doc_path}")
+    print("Converted doc file to docx file.")
+    text = load_docx(docx_path)
+    os.remove(docx_path)
     return text
 
 
 def load_docx(docx_path):
     """Load docx file."""
-    doc = DDocument(docx_path)
+    doc = docx.Document(docx_path)
     text = ""
+    # Save all 'rId:filenames' relationships in an dictionary and save the images if any.
+    rid2img = {}
+    for r in doc.part.rels.values():
+        if isinstance(r._target, docx.parts.image.ImagePart):
+            rid2img[r.rId] = os.path.basename(r._target.partname)
+    if rid2img:
+        save_path = "./imgs/"
+        os.makedirs(save_path, exist_ok=True)
+        docx2txt.process(docx_path, save_path)
     for paragraph in doc.paragraphs:
-        text += paragraph.text
+        if hasattr(paragraph, "text"):
+            text += paragraph.text + "\n"
+        if "graphicData" in paragraph._p.xml:
+            for rid in rid2img:
+                if rid in paragraph._p.xml:
+                    img_path = os.path.join(save_path, rid2img[rid])
+                    img_text = load_image(img_path)
+                    if img_text:
+                        text += img_text + "\n"
+    if rid2img:
+        shutil.rmtree(save_path)
+    return text
+
+
+def load_ppt(ppt_path):
+    """Load ppt file."""
+    print("Converting ppt file to pptx file...")
+    pptx_path = ppt_path + "x"
+    os.system(f"libreoffice --headless --invisible --convert-to pptx --outdir {os.path.dirname(pptx_path)} {ppt_path}")
+    print("Converted ppt file to pptx file.")
+    text = load_pptx(pptx_path)
+    os.remove(pptx_path)
     return text
 
 
 def load_pptx(pptx_path):
     """Load pptx file."""
-    loader = UnstructuredPowerPointLoader(pptx_path)
-    text = loader.load()[0].page_content
+    text = ""
+    prs = pptx.Presentation(pptx_path)
+    for slide in prs.slides:
+        for shape in sorted(slide.shapes, key=lambda shape: (shape.top, shape.left)):
+            if shape.has_text_frame:
+                if shape.text:
+                    text += shape.text + "\n"
+            if shape.has_table:
+                table_contents = "\n".join(
+                    [
+                        "\t".join([(cell.text if hasattr(cell, "text") else "") for cell in row.cells])
+                        for row in shape.table.rows
+                        if hasattr(row, "cells")
+                    ]
+                )
+                if table_contents:
+                    text += table_contents + "\n"
+            if hasattr(shape, "image") and hasattr(shape.image, "blob"):
+                img_path = f"./{shape.image.filename}"
+                with open(img_path, "wb") as f:
+                    f.write(shape.image.blob)
+                img_text = load_image(img_path)
+                if img_text:
+                    text += img_text + "\n"
+                os.remove(img_path)
     return text
 
 
@@ -214,13 +267,11 @@ def load_image(image_path):
         return response.json()["text"].strip()
     loader = UnstructuredImageLoader(image_path)
     text = loader.load()[0].page_content
-    return text
+    return text.strip()
 
 
 def load_svg(svg_path):
     """Load the svg file."""
-    import cairosvg
-
     png_path = svg_path.replace(".svg", ".png")
     cairosvg.svg2png(url=svg_path, write_to=png_path)
     text = load_image(png_path)
@@ -239,7 +290,9 @@ def document_loader(doc_path):
         return load_doc(doc_path)
     elif doc_path.endswith(".docx"):
         return load_docx(doc_path)
-    elif doc_path.endswith(".pptx") or doc_path.endswith(".ppt"):
+    elif doc_path.endswith(".ppt"):
+        return load_ppt(doc_path)
+    elif doc_path.endswith(".pptx"):
         return load_pptx(doc_path)
     elif doc_path.endswith(".md"):
         return load_md(doc_path)
@@ -261,7 +314,7 @@ def document_loader(doc_path):
     ):
         return load_image(doc_path)
     elif doc_path.endswith(".svg"):
-        return load_image(doc_path)
+        return load_svg(doc_path)
     else:
         raise NotImplementedError(
             "Current only support pdf, html, txt, doc, docx, pptx, ppt, md, xml"

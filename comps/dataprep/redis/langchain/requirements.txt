@@ -1,5 +1,7 @@
 beautifulsoup4
+cairosvg
 docarray[full]
+docx2txt
 easyocr
 fastapi
 huggingface_hub
@@ -18,6 +20,7 @@ prometheus-fastapi-instrumentator
 pymupdf
 pyspark
 python-docx
+python-pptx
 redis
 sentence_transformers
 shortuuid

@@ -31,7 +31,7 @@ cd langchain_ray; pip install -r requirements_ray.txt
 
 ## 1.2 Start Redis Stack Server
 
-Please refer to this [readme](../../../vectorstores/langchain/redis/README.md).
+Please refer to this [readme](../../vectorstores/langchain/redis/README.md).
 
 ## 1.3 Setup Environment Variables
 
@@ -41,6 +41,7 @@ export INDEX_NAME=${your_index_name}
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/gen-ai-comps:dataprep"
+export PYTHONPATH=${path_to_comps}
 ```
 
 ## 1.4 Start Document Preparation Microservice for Redis with Python Script
