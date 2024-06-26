@@ -65,11 +65,24 @@
 	}
 
 	function storeMessages() {
-
 		localStorage.setItem(
 			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
-			JSON.stringify(chatMessages)
+			JSON.stringify(chatMessages),
 		);
+	}
+
+	function decodeEscapedBytes(str: string): string {
+		const byteArray = str
+			.split("\\x")
+			.slice(1)
+			.map((byte) => parseInt(byte, 16));
+		return new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
+	}
+
+	function decodeUnicode(str: string): string {
+		return str.replace(/\\u[\dA-Fa-f]{4}/g, (match) => {
+			return String.fromCharCode(parseInt(match.replace(/\\u/g, ""), 16));
+		});
 	}
 
 	const callTextStream = async (query: string, startSendTime: number) => {
@@ -78,7 +91,17 @@
 		eventSource.addEventListener("message", (e: any) => {
 			let Msg = e.data;
 			if (Msg.startsWith("b")) {
-				const currentMsg = Msg.slice(2, -1);
+				let currentMsg = Msg.slice(2, -1);
+
+				if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
+					currentMsg = decodeEscapedBytes(currentMsg);
+				} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
+					currentMsg = decodeUnicode(currentMsg);
+				}
+				if (currentMsg !== "</s>") {
+					currentMsg = currentMsg.replace(/\\n/g, "\n");
+				}
+
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
 					chatMessages = [
 						...chatMessages,
@@ -99,7 +122,7 @@
 
 				loading = false;
 				let totalTime = parseFloat(
-					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
+					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2),
 				);
 
 				if (chatMessages.length - 1 !== -1) {
