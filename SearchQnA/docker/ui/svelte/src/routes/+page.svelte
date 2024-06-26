@@ -101,7 +101,7 @@
 				} else if (/\\u[\dA-Fa-f]{4}/.test(trimmedData)) {
 					trimmedData = decodeUnicode(trimmedData);
 				}
-				
+
 				if (trimmedData !== "</s>") {
 				        trimmedData = trimmedData.replace(/\\n/g, "\n");
 				}
