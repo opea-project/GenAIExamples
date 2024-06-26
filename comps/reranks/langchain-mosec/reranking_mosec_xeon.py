@@ -49,26 +49,29 @@ from comps import (
 def reranking(input: SearchedDoc) -> LLMParamsDoc:
     print("reranking input: ", input)
     start = time.time()
-    docs = [doc.text for doc in input.retrieved_docs]
-    url = mosec_reranking_endpoint + "/inference"
-    data = {"query": input.initial_query, "texts": docs}
-    headers = {"Content-Type": "application/json"}
-    response = requests.post(url, data=json.dumps(data), headers=headers)
-    response_data = response.json()
-    best_response = max(response_data, key=lambda response: response["score"])
-    doc = input.retrieved_docs[best_response["index"]]
-    if doc.text and len(re.findall("[\u4E00-\u9FFF]", doc.text)) / len(doc.text) >= 0.3:
-        # chinese context
-        template = "仅基于以下背景回答问题:\n{context}\n问题: {question}"
+    if input.retrieved_docs:
+        docs = [doc.text for doc in input.retrieved_docs]
+        url = mosec_reranking_endpoint + "/inference"
+        data = {"query": input.initial_query, "texts": docs}
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(url, data=json.dumps(data), headers=headers)
+        response_data = response.json()
+        best_response = max(response_data, key=lambda response: response["score"])
+        doc = input.retrieved_docs[best_response["index"]]
+        if doc.text and len(re.findall("[\u4E00-\u9FFF]", doc.text)) / len(doc.text) >= 0.3:
+            # chinese context
+            template = "仅基于以下背景回答问题:\n{context}\n问题: {question}"
+        else:
+            template = """Answer the question based only on the following context:
+    {context}
+    Question: {question}
+            """
+        prompt = ChatPromptTemplate.from_template(template)
+        final_prompt = prompt.format(context=doc.text, question=input.initial_query)
+        statistics_dict["opea_service@reranking_mosec_xeon"].append_latency(time.time() - start, None)
+        return LLMParamsDoc(query=final_prompt.strip())
     else:
-        template = """Answer the question based only on the following context:
-{context}
-Question: {question}
-        """
-    prompt = ChatPromptTemplate.from_template(template)
-    final_prompt = prompt.format(context=doc.text, question=input.initial_query)
-    statistics_dict["opea_service@reranking_mosec_xeon"].append_latency(time.time() - start, None)
-    return LLMParamsDoc(query=final_prompt.strip())
+        return LLMParamsDoc(query=input.initial_query)
 
 
 if __name__ == "__main__":
