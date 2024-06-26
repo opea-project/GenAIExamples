@@ -18,9 +18,9 @@ import os
 from comps import MicroService, ServiceOrchestrator, ServiceType, TranslationGateway
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
-MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8888)
+MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
-LLM_SERVICE_PORT = os.getenv("LLM_SERVICE_PORT", 9000)
+LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
 
 class TranslationService:
