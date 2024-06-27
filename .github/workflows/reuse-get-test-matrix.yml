@@ -83,12 +83,12 @@ jobs:
           # add test for test scripts update
           changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
           grep 'tests/' | grep -vE '*.md|*.txt|tests/cores')" || true
+          run_matrix_match=$(echo $run_matrix | tr '/' '_')
           test_files=$(printf '%s\n' "${changed_files[@]}" | grep -E "tests/test_*" | grep -E "*.sh") || true
           for test_file in ${test_files}; do
-              service_script=$(echo $test_file | cut -d'/' -f2 | cut -d'.' -f1 | cut -c6-)
-              service=$(echo $service_script | tr '_' '/')
+              service=$(echo $test_file | cut -d'/' -f2 | cut -d'.' -f1 | cut -c6-)
               hardware="gaudi" # default hardware, set based on the changed files
-              if [ $(echo ${run_matrix} | grep -c ${service}) == 0 ]; then
+              if [ $(echo ${run_matrix_match} | grep -c ${service}) == 0 ]; then
                   run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
               fi
           done
