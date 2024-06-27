@@ -90,7 +90,7 @@
 	}
 
 	const callTextStream = async (query: string, startSendTime: number) => {
-		const eventSource = await fetchTextStream(query, knowledge_1);
+		const eventSource = await fetchTextStream(query);
 
 		eventSource.addEventListener("message", (e: any) => {
 			let Msg = e.data;
