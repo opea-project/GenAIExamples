@@ -161,18 +161,20 @@ if [ $# -eq 0 ]; then
 fi
 
 case "$1" in
-    install_chatqna)
+    init_ChatQnA)
         pushd ChatQnA/kubernetes
         init_chatqna
         popd
         ;;
-    install_chatqna)
+    install_ChatQnA)
         pushd ChatQnA/kubernetes
+	NAMESPACE=$2
         install_chatqna
         popd
         ;;
-    validate_chatqna)
+    validate_ChatQnA)
         pushd ChatQnA/kubernetes
+	NAMESPACE=$2
         validate_chatqna
         popd
         ;;
