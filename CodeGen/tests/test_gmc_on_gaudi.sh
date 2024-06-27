@@ -51,7 +51,7 @@ function validate_codegen() {
     sed -i "s|namespace: codegen|namespace: $APP_NAMESPACE|g"  ./codegen_gaudi.yaml
     kubectl apply -f ./codegen_gaudi.yaml
 
-    sleep 60
+    sleep 30
  
     ip_address=$(kubectl get svc $SERVICE_NAME -n $APP_NAMESPACE -o jsonpath='{.spec.clusterIP}')
     port=$(kubectl get svc $SERVICE_NAME -n $APP_NAMESPACE -o jsonpath='{.spec.ports[0].port}')
