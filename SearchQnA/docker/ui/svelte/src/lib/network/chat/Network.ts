@@ -22,10 +22,10 @@ export async function fetchTextStream(query: string, knowledge_base_id: string, 
 	let url = "";
 
 	payload = {
-		query: query,
-		knowledge_base_id: knowledge_base_id,
+		messages: query,
+		stream: "True",
 	};
-	url = `${BACKEND_BASE_URL}/web_search_chat_stream`;
+	url = `${BACKEND_BASE_URL}`;
 
 	return new SSE(url, {
 		headers: { "Content-Type": "application/json" },

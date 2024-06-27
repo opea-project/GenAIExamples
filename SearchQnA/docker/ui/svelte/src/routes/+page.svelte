@@ -16,7 +16,11 @@
 
 <script lang="ts">
 	export let data;
-	import { ifStoreMsg, isCheckedStore, knowledge1 } from "$lib/shared/stores/common/Store";
+	import {
+		ifStoreMsg,
+		isCheckedStore,
+		knowledge1,
+	} from "$lib/shared/stores/common/Store";
 	import { onMount } from "svelte";
 	import Header from "$lib/shared/components/header/header.svelte";
 	import {
@@ -56,73 +60,85 @@
 	});
 
 	function handleTop() {
-		console.log("top");
-
 		scrollToTop(scrollToDiv);
 	}
 
 	function storeMessages() {
-		console.log('localStorage', chatMessages);
-
 		localStorage.setItem(
 			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
 			JSON.stringify(chatMessages)
 		);
 	}
 
+	function decodeEscapedBytes(str: string): string {
+		const byteArray = str
+			.split("\\x")
+			.slice(1)
+			.map((byte) => parseInt(byte, 16));
+		return new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
+	}
+
+	function decodeUnicode(str: string): string {
+		return str.replace(/\\u[\dA-Fa-f]{4}/g, (match) => {
+			return String.fromCharCode(parseInt(match.replace(/\\u/g, ""), 16));
+		});
+	}
+
 	const callTextStream = async (query: string) => {
-		const eventSource = await fetchTextStream(query, knowledge_1, $isCheckedStore);
+		const eventSource = await fetchTextStream(
+			query,
+			knowledge_1,
+			$isCheckedStore
+		);
 
 		eventSource.addEventListener("message", (e: any) => {
-			let currentMsg = e.data;
-			currentMsg = currentMsg.replaceAll("@#$", " ")
-			console.log("currentMsg", currentMsg);
-			if (currentMsg == "[DONE]") {
-				console.log("done getCurrentTimeStamp", getCurrentTimeStamp);
-				let startTime = chatMessages[chatMessages.length - 1].time;
+			let Msg = e.data;
+			if (Msg.startsWith("b")) {
+				let trimmedData = Msg.slice(2, -1);
 
-				loading = false;
-				let totalTime = parseFloat(((getCurrentTimeStamp() - startTime) / 1000).toFixed(2));
-				console.log("done totalTime", totalTime);
-				console.log(
-					"chatMessages[chatMessages.length - 1]",
-					chatMessages[chatMessages.length - 1]
-				);
-
-				if (chatMessages.length - 1 !== -1) {
-					chatMessages[chatMessages.length - 1].time = totalTime;
+				if (/\\x[\dA-Fa-f]{2}/.test(trimmedData)) {
+					trimmedData = decodeEscapedBytes(trimmedData);
+				} else if (/\\u[\dA-Fa-f]{4}/.test(trimmedData)) {
+					trimmedData = decodeUnicode(trimmedData);
 				}
-				console.log("done chatMessages", chatMessages);
 
-				storeMessages();
-			} else {
+				if (trimmedData !== "</s>") {
+				        trimmedData = trimmedData.replace(/\\n/g, "\n");
+				}
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-					console.log("?", getCurrentTimeStamp());
 
 					chatMessages = [
 						...chatMessages,
 						{
 							role: MessageRole.Assistant,
 							type: MessageType.Text,
-							content: currentMsg,
+							content: trimmedData,
 							time: getCurrentTimeStamp(),
 						},
 					];
 					console.log("? chatMessages", chatMessages);
 				} else {
 					let content = chatMessages[chatMessages.length - 1].content as string;
-					chatMessages[chatMessages.length - 1].content =
-						content + currentMsg;
+					chatMessages[chatMessages.length - 1].content = content + trimmedData;
 				}
 				scrollToBottom(scrollToDiv);
+			} else if (Msg === "[DONE]") {
+				let startTime = chatMessages[chatMessages.length - 1].time;
+
+				loading = false;
+				let totalTime = parseFloat(
+					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
+				);
+				if (chatMessages.length - 1 !== -1) {
+					chatMessages[chatMessages.length - 1].time = totalTime;
+				}
+				storeMessages();
 			}
 		});
 		eventSource.stream();
 	};
 
 	const handleTextSubmit = async () => {
-		console.log("handleTextSubmit");
-
 		loading = true;
 		const newMessage = {
 			role: MessageRole.User,
@@ -154,6 +170,8 @@
 		}
 		return true;
 	}
+
+
 </script>
 
 <Header />
@@ -165,7 +183,7 @@
 			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0"
 		>
 			<div class="relative my-4 flex w-full flex-row justify-center">
-				<div class="focus:border-none relative w-full">
+				<div class="relative w-full focus:border-none">
 					<input
 						class="text-md block w-full border-0 border-b-2 border-gray-300 px-1 py-4
 						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
