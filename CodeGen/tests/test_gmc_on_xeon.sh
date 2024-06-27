@@ -51,32 +51,46 @@ function validate_codegen() {
     sed -i "s|namespace: codegen|namespace: $APP_NAMESPACE|g"  ./codegen_xeon.yaml
     kubectl apply -f ./codegen_xeon.yaml
 
-    sleep 30
-
-    ip_address=$(kubectl get svc $SERVICE_NAME -n $APP_NAMESPACE -o jsonpath='{.spec.clusterIP}')
-    port=$(kubectl get svc $SERVICE_NAME -n $APP_NAMESPACE -o jsonpath='{.spec.ports[0].port}')
-    echo "try to curl http://${ip_address}:${port}/v1/codegen..."
-
-    # generate a random logfile name to avoid conflict among multiple runners
-    LOGFILE=$LOG_PATH/curlmega_$APP_NAMESPACE.log
-
-    curl http://${ip_address}:${port}/v1/codegen -H "Content-Type: application/json" \
-    -d '{"messages": "def print_hello_world():"}' > $LOGFILE
+    # Wait until the router service is ready
+    echo "Waiting for the codegen router service to be ready..."
+    wait_until_pod_ready "codegen router" $APP_NAMESPACE "router-service"
+    output=$(kubectl get pods -n $APP_NAMESPACE)
+    echo $output
+ 
+ 
+    # deploy client pod for testing
+    kubectl create deployment client-test -n $APP_NAMESPACE --image=python:3.8.13 -- sleep infinity
+ 
+    # wait for client pod ready
+    wait_until_pod_ready "client-test" $APP_NAMESPACE "client-test"
+    # giving time to populating data
+    sleep 60
+ 
+    kubectl get pods -n $APP_NAMESPACE
+    # send request to codegen
+    export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
+    echo "$CLIENT_POD"
+    accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='codegen')].status.accessUrl}")
+    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"messages": "def print_hello_world():"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codegen.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-        echo "Megaservice codegen failed, please check the logs in $LOGFILE!"
+        echo "chatqna failed, please check the logs in ${LOG_PATH}!"
         exit 1
     fi
-
+ 
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
-    if [[ -f $LOGFILE ]] && \
-    [[ $(grep -c "print" $LOGFILE) != 0 ]]; then
+    if [[ -f $LOG_PATH/gmc_codegen.log ]] && \
+    [[ $(grep -c "print" $LOG_PATH/gmc_codegen.log) != 0 ]]; then
         status=true
     fi
-
     if [ $status == false ]; then
+        if [[ -f $LOG_PATH/gmc_codegen.log ]]; then
+            cat $LOG_PATH/gmc_codegen.log
+        fi
         echo "Response check failed, please check the logs in artifacts!"
+        cat $LOG_PATH/gmc_codegen.log
+        exit 1
     else
         echo "Response check succeed!"
     fi
@@ -146,7 +160,6 @@ case "$1" in
         ;;
     validate_CodeGen)
         pushd CodeGen/kubernetes
-        SERVICE_NAME=codegen
         validate_codegen
         popd
         ;;
