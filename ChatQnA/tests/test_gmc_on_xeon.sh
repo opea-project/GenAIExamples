@@ -11,7 +11,7 @@ IMAGE_REPO=${IMAGE_REPO:-}
 function init_chatqna() {
     wget https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/rbac/gmc-manager-rbac.yaml
     wget https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/manager/gmc-manager.yaml
-    wget -O manifests/ https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/gmcrouter/gmc-router.yaml
+    wget -O manifests/gmc-router.yaml https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/gmcrouter/gmc-router.yaml
 
     # replace namespace for gmc-router and gmc-manager
     sed -i "s|namespace: system|namespace: $SYSTEM_NAMESPACE|g"  ./gmc-manager.yaml
