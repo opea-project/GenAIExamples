@@ -9,7 +9,7 @@ Please install GMC  in your Kubernetes cluster, if you have not already done so,
 The ChatQnA application is defined as a Custom Resource (CR) file that the above GMC operator acts  upon. It first checks if the microservices listed in the CR yaml file are running, if not starts them and then proceeds to connect them. When the ChatQnA RAG pipeline is ready, the service endpoint details are returned, letting you use the application. Should you use "kubectl get pods" commands you will see all the component microservices, in particular `embedding`, `retriever`, `rerank`, and `llm`.
 
 
-## Prebuilt images
+## Uses prebuilt images
 
 The ChatQnA uses the below prebuilt images if you choose a Xeon deployment
 
