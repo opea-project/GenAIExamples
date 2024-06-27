@@ -16,7 +16,7 @@
 
 <script lang="ts">
 	export let data;
-	import { ifStoreMsg, knowledge1 } from "$lib/shared/stores/common/Store";
+	import { knowledge1, storageFiles } from "$lib/shared/stores/common/Store";
 	import { onMount } from "svelte";
 	import {
 		LOCAL_STORAGE_KEY,
@@ -25,21 +25,19 @@
 		type Message,
 	} from "$lib/shared/constant/Interface";
 	import {
-		fromTimeStampToTime,
 		getCurrentTimeStamp,
 		scrollToBottom,
 		scrollToTop,
 	} from "$lib/shared/Utils";
 	import { fetchTextStream } from "$lib/network/chat/Network";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
-	import { browser } from "$app/environment";
 	import "driver.js/dist/driver.css";
 	import "$lib/assets/layout/css/driver.css";
 	import UploadFile from "$lib/shared/components/upload/uploadFile.svelte";
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
-	import Gallery from "$lib/shared/components/chat/gallery.svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
+	import { fetchAllFile } from "$lib/network/upload/Network.js";
 
 	let query: string = "";
 	let loading: boolean = false;
@@ -55,6 +53,11 @@
 		scrollToDiv = document
 			.querySelector(".chat-scrollbar")
 			?.querySelector(".svlr-viewport")!;
+
+		const res = await fetchAllFile();
+		if (res) {
+			storageFiles.set(res);
+		}
 	});
 
 	function handleTop() {
@@ -143,7 +146,6 @@
 	};
 
 	const handleTextSubmit = async () => {
-
 		loading = true;
 		const newMessage = {
 			role: MessageRole.User,
@@ -165,15 +167,6 @@
 	function handelClearHistory() {
 		localStorage.removeItem(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY);
 		chatMessages = [];
-	}
-
-	function isEmptyObject(obj: any): boolean {
-		for (let key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				return false;
-			}
-		}
-		return true;
 	}
 </script>
 
@@ -240,8 +233,7 @@
 							><path
 								d="M12.6 12 10 9.4 7.4 12 6 10.6 8.6 8 6 5.4 7.4 4 10 6.6 12.6 4 14 5.4 11.4 8l2.6 2.6zm7.4 8V2q0-.824-.587-1.412A1.93 1.93 0 0 0 18 0H2Q1.176 0 .588.588A1.93 1.93 0 0 0 0 2v12q0 .825.588 1.412Q1.175 16 2 16h14zm-3.15-6H2V2h16v13.125z"
 							/></svg
-						><span class="font-medium text-[#0597ff]">CLEAR</span
-						></button
+						><span class="font-medium text-[#0597ff]">CLEAR</span></button
 					>
 				</div>
 			</div>
