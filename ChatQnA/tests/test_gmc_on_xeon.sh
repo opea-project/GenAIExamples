@@ -9,7 +9,6 @@ MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 
 function init_chatqna() {
-    cp $(pwd)/config/gmcrouter/gmc-router.yaml -p $(pwd)/config/manifests/
     wget https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/rbac/gmc-manager-rbac.yaml
     wget https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/manager/gmc-manager.yaml
     wget -O manifests/ https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/gmcrouter/gmc-router.yaml
