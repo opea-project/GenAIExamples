@@ -20,71 +20,29 @@
 
 	const dispatch = createEventDispatcher();
 	let value;
-	let fileName = "未选择文件";
 
 	function handleInput(event: Event) {
-		const file = (event.target as HTMLInputElement).files![0];
+	  const file = (event.target as HTMLInputElement).files![0];
 
-		if (!file) return;
+	  if (!file) return;
 
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			if (!reader.result) return;
-			const src = reader.result.toString();
-			dispatch("upload", { src: src, fileName: file.name });
-		};
-		reader.readAsDataURL(file);
+	  const reader = new FileReader();
+	  reader.onloadend = () => {
+		if (!reader.result) return;
+		const src = reader.result.toString();
+		dispatch("upload", { src: src, fileName: file.name });
+	  };
+	  reader.readAsDataURL(file);
 	}
+  </script>
 
-	const handleFileChange = (event) => {
-		const fileInput = event.target;
-		if (fileInput.files.length > 0) {
-			fileName = fileInput.files[0].name;
-		} else {
-			fileName = "未选择文件";
-		}
-	};
-</script>
-
-<div>
-	<Label class="mb-2 space-y-2">
-		<div class="file-upload border-gray-300 h-full">
-			<label
-				for="file-upload"
-				class="file-upload-label bg-gray-50 p-2.5 text-gray-900"
-				data-testid="file-upload"
-			>
-				选择文件
-			</label>
-			<input
-				id="file-upload"
-				type="file"
-				class="hidden-input"
-				on:change={handleInput}
-				data-testid="file-upload"
-			/>
-			<span class="file-upload-name pl-4">
-				{fileName}
-			</span>
-		</div>
-
+  <div>
+	<Label class="space-y-2 mb-2">
+	  <Fileupload
+		bind:value
+		on:change={handleInput}
+		class="focus:border-blue-700 focus:ring-0"
+		data-testid="file-upload"
+	  />
 	</Label>
-</div>
-
-<style>
-	.file-upload {
-		border: 1px solid #d1d5db;
-		padding: 5% 0;
-		border-radius: 10px;
-	}
-
-	.file-upload-label {
-		background: #1f2937;
-		color: #fafafa;
-		border-radius: 10px 0 0 10px;
-		padding: 5% 9%;
-	}
-	.hidden-input {
-		display: none;
-	}
-</style>
+  </div>

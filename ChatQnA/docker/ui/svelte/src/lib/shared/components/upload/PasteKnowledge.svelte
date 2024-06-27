@@ -44,9 +44,9 @@
 			class="w-full rounded-none rounded-r-lg bg-blue-700"
 			data-testid="paste-click"
 
-			on:click={() => handelPasteURL()}>确认</Button
+			on:click={() => handelPasteURL()}>Confirm</Button
 		>
 	</div>
 
-	<Helper>如果要一次上传多个URL, 请用分号 (;) 进行分隔。</Helper>
+	<Helper>Use semicolons (;) to separate multiple URLs.</Helper>
 </Label>

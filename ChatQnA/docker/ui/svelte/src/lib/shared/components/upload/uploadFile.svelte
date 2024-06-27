@@ -128,7 +128,7 @@
 			id="drawer-label"
 			class="mb-4 inline-flex items-center text-base font-semibold text-gray-500 dark:text-gray-400"
 		>
-			<InfoCircleSolid class="me-2.5 h-4 w-4" />数据来源
+			<InfoCircleSolid class="me-2.5 h-4 w-4" />Data Source
 		</h5>
 		<CloseButton
 			on:click={() => (hidden6 = true)}
@@ -136,18 +136,19 @@
 		/>
 	</div>
 	<p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
-		请上传您本地文件或者将远程的文件链接粘贴到文本框，对话将基于您上传的文件内容进行回答。
+		Please upload your local file or paste a remote file link, and Chat will
+		respond based on the content of the uploaded file.
 	</p>
 	<Tabs
 		style="full"
 		defaultClass="flex rounded-lg divide-x rtl:divide-x-reverse divide-gray-200 shadow dark:divide-gray-700 focus:ring-0"
 	>
 		<TabItem class="w-full" open>
-			<span slot="title">上传文件</span>
+			<span slot="title">Upload File</span>
 			<UploadFile on:upload={handleKnowledgeUpload} />
 		</TabItem>
 		<TabItem class="w-full" data-testid="exchange-paste">
-			<span slot="title">粘贴文件链接</span>
+			<span slot="title">Paste Link</span>
 			<PasteURL on:paste={handleKnowledgePaste} />
 		</TabItem>
 	</Tabs>
