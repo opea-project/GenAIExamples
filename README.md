@@ -147,14 +147,14 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
@@ -177,7 +177,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/haoranxu/ALMA-13B">haoranxu/ALMA-13B</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
@@ -200,14 +200,14 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
@@ -230,7 +230,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/llava-hf/llava-1.5-7b-hf">LLaVA-1.5-7B</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Gaudi2</td>
