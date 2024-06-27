@@ -9,6 +9,7 @@ MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 
 function init_chatqna() {
+    wget https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/crd/bases/gmc.opea.io_gmconnectors.yaml
     wget https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/rbac/gmc-manager-rbac.yaml
     wget https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/manager/gmc-manager.yaml
     wget -O manifests/gmc-router.yaml https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/gmcrouter/gmc-router.yaml
@@ -34,7 +35,7 @@ function install_chatqna() {
     echo "install microservice-connector, using repo $DOCKER_REGISTRY and tag $VERSION"
     echo "using namespace $SYSTEM_NAMESPACE and $APP_NAMESPACE"
 
-    kubectl apply -f https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/crd/bases/gmc.opea.io_gmconnectors.yaml
+    kubectl apply -f ./gmc.opea.io_gmconnectors.yaml
     kubectl apply -f ./gmc-manager-rbac.yaml
     kubectl create configmap gmcyaml -n $SYSTEM_NAMESPACE --from-file $(pwd)/../kubernetes/manifests
     kubectl apply -f ./gmc-manager.yaml
@@ -97,7 +98,7 @@ function validate_chatqna() {
        echo "Response check succeed!"
    fi
 
-   rm -f ./gmc-manager-rbac.yaml ./gmc-manager.yaml manifests/gmc-router.yaml
+   rm -f ./gmc.opea.io_gmconnectors.yaml ./gmc-manager-rbac.yaml ./gmc-manager.yaml manifests/gmc-router.yaml
 }
 
 function wait_until_pod_ready() {
