@@ -9,9 +9,9 @@ MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 
 function init_chatqna() {
-    wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/crd/bases/gmc.opea.io_gmconnectors.yaml 
-    wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/rbac/gmc-manager-rbac.yaml 
-    wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/manager/gmc-manager.yaml 
+    wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/crd/bases/gmc.opea.io_gmconnectors.yaml
+    wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/rbac/gmc-manager-rbac.yaml
+    wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/manager/gmc-manager.yaml
     wget -O manifests/gmc-router.yaml https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/gmcrouter/gmc-router.yaml
 
     # replace namespace for gmc-router and gmc-manager
