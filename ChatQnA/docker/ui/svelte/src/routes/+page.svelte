@@ -107,7 +107,7 @@
 				}
 
 				if (containsNewLine && requiresDecoding) {
-					currentMsg += "\n"; 
+					currentMsg += "\n";
 				}
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
 					chatMessages = [
