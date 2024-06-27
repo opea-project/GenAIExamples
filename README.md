@@ -40,7 +40,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://redis.io/">Redis</a></td>
@@ -49,7 +49,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Chatbot</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://www.trychroma.com/">Chroma</a></td>
@@ -58,7 +58,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Chatbot</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://redis.io/">Redis</a></td>
@@ -67,7 +67,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Chatbot</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://qdrant.tech/">Qdrant</a></td>
@@ -76,7 +76,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Chatbot</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/Qwen/Qwen2-7B">Qwen2-7B</a></td>
 			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
 			<td><a href="https://redis.io/">Redis</a></td>
@@ -101,7 +101,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/meta-llama/CodeLlama-7b-hf">meta-llama/CodeLlama-7b-hf</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
@@ -124,7 +124,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a></td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/HuggingFaceH4/mistral-7b-grok">HuggingFaceH4/mistral-7b-grok</a></td>
 			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Xeon/Gaudi2</td>
