@@ -159,13 +159,11 @@ case "$1" in
         ;;
     install_ChatQnA)
         pushd ChatQnA/kubernetes
-	NAMESPACE=$2
         install_chatqna
         popd
         ;;
     validate_ChatQnA)
         pushd ChatQnA/kubernetes
-	NAMESPACE=$2
         validate_chatqna
         popd
         ;;

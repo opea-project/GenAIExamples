@@ -48,8 +48,7 @@ jobs:
       - name: Set variables
         run: |
           if [ ${{ matrix.hardware }} == "gaudi" ]; then IMAGE_REPO=${{ vars.IMAGE_REPO_GAUDI }}; else IMAGE_REPO=${{ vars.IMAGE_REPO_XEON }}; fi
-          echo "IMAGE_REPO=${IMAGE_REPO}" >> $GITHUB_ENV
-          echo "IMAGE_TAG=${{needs.mega-image-build.outputs.image_tag}}" >> $GITHUB_ENV
+          echo "IMAGE_REPO=$OPEA_IMAGE_REPO" >> $GITHUB_ENV
           lower_example=$(echo "${{ matrix.example }}" | tr '[:upper:]' '[:lower:]')
           echo "SYSTEM_NAMESPACE=opea-system-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
           echo "APP_NAMESPACE=$lower_example-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
@@ -69,14 +68,13 @@ jobs:
           else
             ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh init_${{ matrix.example }}
             echo "should_cleanup=true" >> $GITHUB_ENV
-            kubectl create ns $NAMESPACE
-            ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh install_${{ matrix.example }} $NAMESPACE
+            ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh install_${{ matrix.example }}
             echo "Testing ${{ matrix.example }}, waiting for pod ready..."
-            if kubectl rollout status deployment --namespace "$NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
+            if kubectl rollout status deployment --namespace "$APP_NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
               echo "Testing gmc ${{ matrix.example }}, waiting for pod ready done!"
               echo "skip_validate=false" >> $GITHUB_ENV
             else
-              echo "Timeout waiting for pods in namespace $NAMESPACE to be ready!"
+              echo "Timeout waiting for pods in namespace $APP_NAMESPACE to be ready!"
               exit 1
             fi
             sleep 60
@@ -88,15 +86,19 @@ jobs:
           if $skip_validate; then
             echo "Skip validate"
           else
-            ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh validate_${{ matrix.example }} $NAMESPACE
+            ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh validate_${{ matrix.example }}
           fi
 
       - name: Kubectl uninstall
         if: always()
         run: |
           if $should_cleanup; then
-            if ! kubectl delete ns $NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
-              kubectl delete pods --namespace $NAMESPACE --force --grace-period=0 --all
-              kubectl delete ns $NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
+            if ! kubectl delete ns $APP_NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
+              kubectl delete pods --namespace $APP_NAMESPACE --force --grace-period=0 --all
+              kubectl delete ns $APP_NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
+            fi
+            if ! kubectl delete ns $SYSTEM_NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
+              kubectl delete pods --namespace $SYSTEM_NAMESPACE --force --grace-period=0 --all
+              kubectl delete ns $SYSTEM_NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
             fi
           fi
