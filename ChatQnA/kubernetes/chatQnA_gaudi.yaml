@@ -1,0 +1,63 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: gmc.opea.io/v1alpha3
+kind: GMConnector
+metadata:
+  labels:
+    app.kubernetes.io/name: gmconnector
+    app.kubernetes.io/managed-by: kustomize
+    gmc/platform: gaudi
+  name: chatqa
+  namespace: chatqa
+spec:
+  routerConfig:
+    name: router
+    serviceName: router-service
+  nodes:
+    root:
+      routerType: Sequence
+      steps:
+      - name: Embedding
+        internalService:
+          serviceName: embedding-svc
+          config:
+            endpoint: /v1/embeddings
+      - name: TeiEmbeddingGaudi
+        internalService:
+          serviceName: tei-embedding-gaudi-svc
+          isDownstreamService: true
+      - name: Retriever
+        data: $response
+        internalService:
+          serviceName: retriever-svc
+          config:
+            endpoint: /v1/retrieval
+      - name: VectorDB
+        internalService:
+          serviceName: redis-vector-db
+          isDownstreamService: true
+      - name: Reranking
+        data: $response
+        internalService:
+          serviceName: reranking-svc
+          config:
+            endpoint: /v1/reranking
+      - name: TeiReranking
+        internalService:
+          serviceName: tei-reranking-svc
+          config:
+            endpoint: /rerank
+          isDownstreamService: true
+      - name: Llm
+        data: $response
+        internalService:
+          serviceName: llm-svc
+          config:
+            endpoint: /v1/chat/completions
+      - name: TgiGaudi
+        internalService:
+          serviceName: tgi-gaudi-svc
+          config:
+            endpoint: /generate
+          isDownstreamService: true
