@@ -26,7 +26,7 @@ spec:
             endpoint: /v1/chat/completions
       - name: TgiGaudi
         internalService:
-          serviceName: tgi-service
+          serviceName: tgi-gaudi-svc
           config:
             LLM_MODEL_ID: ise-uiuc/Magicoder-S-DS-6.7B
             endpoint: /generate
