@@ -34,8 +34,6 @@ function install_chatqna() {
     echo "install microservice-connector, using repo $DOCKER_REGISTRY and tag $VERSION"
     echo "using namespace $SYSTEM_NAMESPACE and $APP_NAMESPACE"
 
-    init_chatqna
-
     kubectl apply -f https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/config/crd/bases/gmc.opea.io_gmconnectors.yaml
     kubectl apply -f ./gmc-manager-rbac.yaml
     kubectl create configmap gmcyaml -n $SYSTEM_NAMESPACE --from-file $(pwd)/../kubernetes/manifests
