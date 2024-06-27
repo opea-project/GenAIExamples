@@ -46,7 +46,6 @@
 	let scrollToDiv: HTMLDivElement;
 	// ·········
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
-	console.log("chatMessages", chatMessages);
 
 	// ··············
 
@@ -59,15 +58,13 @@
 	});
 
 	function handleTop() {
-		console.log("top");
-
 		scrollToTop(scrollToDiv);
 	}
 
 	function storeMessages() {
 		localStorage.setItem(
 			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
-			JSON.stringify(chatMessages),
+			JSON.stringify(chatMessages)
 		);
 	}
 
@@ -76,13 +73,17 @@
 			.split("\\x")
 			.slice(1)
 			.map((byte) => parseInt(byte, 16));
-		return new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
+		const decoded = new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
+
+		return decoded;
 	}
 
 	function decodeUnicode(str: string): string {
-		return str.replace(/\\u[\dA-Fa-f]{4}/g, (match) => {
+		const decoded = str.replace(/\\u[\dA-Fa-f]{4}/g, (match) => {
 			return String.fromCharCode(parseInt(match.replace(/\\u/g, ""), 16));
 		});
+
+		return decoded;
 	}
 
 	const callTextStream = async (query: string, startSendTime: number) => {
@@ -92,16 +93,22 @@
 			let Msg = e.data;
 			if (Msg.startsWith("b")) {
 				let currentMsg = Msg.slice(2, -1);
+				const containsNewLine = /\\n/.test(currentMsg);
+				let requiresDecoding = false;
+
+				currentMsg = currentMsg.replace(/\\n/g, "\n");
 
 				if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
 					currentMsg = decodeEscapedBytes(currentMsg);
+					requiresDecoding = true;
 				} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
 					currentMsg = decodeUnicode(currentMsg);
-				}
-				if (currentMsg !== "</s>") {
-					currentMsg = currentMsg.replace(/\\n/g, "\n");
+					requiresDecoding = true;
 				}
 
+				if (containsNewLine && requiresDecoding) {
+					currentMsg += "\n";
+				}
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
 					chatMessages = [
 						...chatMessages,
@@ -122,7 +129,7 @@
 
 				loading = false;
 				let totalTime = parseFloat(
-					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2),
+					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
 				);
 
 				if (chatMessages.length - 1 !== -1) {
@@ -136,7 +143,6 @@
 	};
 
 	const handleTextSubmit = async () => {
-		console.log("handleTextSubmit");
 
 		loading = true;
 		const newMessage = {
@@ -234,7 +240,8 @@
 							><path
 								d="M12.6 12 10 9.4 7.4 12 6 10.6 8.6 8 6 5.4 7.4 4 10 6.6 12.6 4 14 5.4 11.4 8l2.6 2.6zm7.4 8V2q0-.824-.587-1.412A1.93 1.93 0 0 0 18 0H2Q1.176 0 .588.588A1.93 1.93 0 0 0 0 2v12q0 .825.588 1.412Q1.175 16 2 16h14zm-3.15-6H2V2h16v13.125z"
 							/></svg
-						><span class="font-medium text-[#0597ff]">CLEAR</span></button
+						><span class="font-medium text-[#0597ff]">CLEAR</span
+						></button
 					>
 				</div>
 			</div>

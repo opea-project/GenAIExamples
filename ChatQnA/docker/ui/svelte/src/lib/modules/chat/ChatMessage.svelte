@@ -44,7 +44,7 @@
 	<div class="group relative items-center">
 		<div>
 			<p
-				class=" max-w-[60vw] items-center whitespace-pre-line break-keep text-[0.8rem] leading-5 sm:max-w-[50rem]"
+				class=" max-w-[60vw] items-center whitespace-pre-line break-keep text-[0.8rem] leading-5 sm:max-w-[60rem]"
 			>
 				{@html msg.content}
 			</p>
