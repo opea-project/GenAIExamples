@@ -38,12 +38,14 @@
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 	import { fetchAllFile } from "$lib/network/upload/Network.js";
+	import { getNotificationsContext } from "svelte-notifications";
 
 	let query: string = "";
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
 	// ·········
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
+	const { addNotification } = getNotificationsContext();
 
 	// ··············
 
@@ -59,6 +61,15 @@
 			storageFiles.set(res);
 		}
 	});
+
+	function showNotification(text: string, type: string) {
+		addNotification({
+			text: text,
+			position: "top-left",
+			type: type,
+			removeAfter: 3000,
+		});
+	}
 
 	function handleTop() {
 		scrollToTop(scrollToDiv);
@@ -90,59 +101,74 @@
 	}
 
 	const callTextStream = async (query: string, startSendTime: number) => {
-		const eventSource = await fetchTextStream(query);
-
-		eventSource.addEventListener("message", (e: any) => {
-			let Msg = e.data;
-			if (Msg.startsWith("b")) {
-				let currentMsg = Msg.slice(2, -1);
-				const containsNewLine = /\\n/.test(currentMsg);
-				let requiresDecoding = false;
-
-				currentMsg = currentMsg.replace(/\\n/g, "\n");
-
-				if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
-					currentMsg = decodeEscapedBytes(currentMsg);
-					requiresDecoding = true;
-				} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
-					currentMsg = decodeUnicode(currentMsg);
-					requiresDecoding = true;
+		try {
+			const eventSource = await fetchTextStream(query);
+			eventSource.addEventListener("error", (e: any) => {
+				if (e.type === "error") {
+					showNotification("Failed to load chat content.", "error");
+					loading = false;
 				}
+			})
 
-				if (containsNewLine && requiresDecoding) {
-					currentMsg += "\n";
+
+			eventSource.addEventListener("message", (e: any) => {
+				let Msg = e.data;
+				if (Msg.startsWith("b")) {
+					let currentMsg = Msg.slice(2, -1);
+					const containsNewLine = /\\n/.test(currentMsg);
+					let requiresDecoding = false;
+
+					currentMsg = currentMsg.replace(/\\n/g, "\n");
+
+					if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
+						currentMsg = decodeEscapedBytes(currentMsg);
+						requiresDecoding = true;
+					} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
+						currentMsg = decodeUnicode(currentMsg);
+						requiresDecoding = true;
+					}
+
+					if (containsNewLine && requiresDecoding) {
+						currentMsg += "\n";
+					}
+					if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
+						chatMessages = [
+							...chatMessages,
+							{
+								role: MessageRole.Assistant,
+								type: MessageType.Text,
+								content: currentMsg,
+								time: startSendTime,
+							},
+						];
+					} else {
+						let content = chatMessages[chatMessages.length - 1]
+							.content as string;
+						chatMessages[chatMessages.length - 1].content =
+							content + currentMsg;
+					}
+					scrollToBottom(scrollToDiv);
+				} else if (Msg === "[DONE]") {
+					let startTime = chatMessages[chatMessages.length - 1].time;
+
+					loading = false;
+					let totalTime = parseFloat(
+						((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
+					);
+
+					if (chatMessages.length - 1 !== -1) {
+						chatMessages[chatMessages.length - 1].time = totalTime;
+					}
+
+					storeMessages();
 				}
-				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-					chatMessages = [
-						...chatMessages,
-						{
-							role: MessageRole.Assistant,
-							type: MessageType.Text,
-							content: currentMsg,
-							time: startSendTime,
-						},
-					];
-				} else {
-					let content = chatMessages[chatMessages.length - 1].content as string;
-					chatMessages[chatMessages.length - 1].content = content + currentMsg;
-				}
-				scrollToBottom(scrollToDiv);
-			} else if (Msg === "[DONE]") {
-				let startTime = chatMessages[chatMessages.length - 1].time;
+			});
 
-				loading = false;
-				let totalTime = parseFloat(
-					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
-				);
-
-				if (chatMessages.length - 1 !== -1) {
-					chatMessages[chatMessages.length - 1].time = totalTime;
-				}
-
-				storeMessages();
-			}
-		});
-		eventSource.stream();
+			eventSource.stream();
+		} catch (error: any) {
+			showNotification("Failed to load chat content.", "error");
+			loading = false;
+		}
 	};
 
 	const handleTextSubmit = async () => {

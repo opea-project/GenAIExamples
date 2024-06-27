@@ -37,7 +37,7 @@
 
 </Modal>
 
-<div class="grid grid-cols-2 gap-5">
+<div class="grid grid-cols-2 gap-5 max-h-[35rem]  overflow-auto">
 	{#each files as file, index}
 		<div
 			class="group relative flex w-full flex-col items-center justify-center p-2 px-12 text-center hover:bg-[#d9eeff] focus:bg-[#d9eeff]"
