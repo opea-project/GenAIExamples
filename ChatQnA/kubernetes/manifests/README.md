@@ -3,13 +3,13 @@ This document outlines the deployment process for a ChatQnA application utilizin
 
 The ChatQnA Service leverages a Kubernetes operator called genai-microservices-connector(GMC). GMC supports connecting microservices to create pipelines based on the specification in the pipeline yaml file in addition to allowing the user to dynamically control which model is used in a service such as an LLM or embedder. The underlying pipeline language also supports using external services that may be running in public or private cloud elsewhere.
 
-Please install GMC  in your Kubernetes cluster, if you have not already done so, by following the steps in Section "Getting Started" at [GMC Install](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector). Soon as we publish images to Docker Hub, at which point no builds will be required, simplifying install/
+Please install GMC  in your Kubernetes cluster, if you have not already done so, by following the steps in Section "Getting Started" at [GMC Install](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector). Soon as we publish images to Docker Hub, at which point no builds will be required, simplifying install.
 
 
 The ChatQnA application is defined as a Custom Resource (CR) file that the above GMC operator acts  upon. It first checks if the microservices listed in the CR yaml file are running, if not starts them and then proceeds to connect them. When the ChatQnA RAG pipeline is ready, the service endpoint details are returned, letting you use the application. Should you use "kubectl get pods" commands you will see all the component microservices, in particular `embedding`, `retriever`, `rerank`, and `llm`.
 
 
-## Uses prebuilt images
+## Using prebuilt images
 
 The ChatQnA uses the below prebuilt images if you choose a Xeon deployment
 
@@ -30,7 +30,7 @@ For Gaudi:
 - tgi-service: ghcr.io/huggingface/tgi-gaudi:1.2.1
 
 > [NOTE]  
-> Please refer README [for Xeon](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/xeon/README.md) and [for Gaudi](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/gaudi/README.md) to build the opea images. These too will be available on Docker Hub soon.
+> Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/xeon/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/gaudi/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.
 
 ## Deploy ChatQnA pipeline
 This involves deploying the ChatQnA custom resource. You can use chatQnA_xeon.yaml or if you have a Gaudi cluster, you could use chatQnA_gaudi.yaml. 
@@ -40,37 +40,40 @@ kubectl create ns chatqa
 kubectl apply -f $(pwd)/chatQnA_xeon.yaml
 ```
 
-**GMC will reconcile chatQnA custom resource and get all related components/services ready**
+**GMC will reconcile the ChatQnA custom resource and get all related components/services ready**
 
 ```sh
 kubectl get service -n chatqa
 ```
 
-**Check GMC chatQnA custom resource to get access URL for the pipeline**
+**Obtain the ChatQnA custom resource/pipeline access URL**
 
-```bash
-$kubectl get gmconnectors.gmc.opea.io -n chatqa
+```sh
+kubectl get gmconnectors.gmc.opea.io -n chatqa
 NAME     URL                                                      READY     AGE
 chatqa   http://router-service.chatqa.svc.cluster.local:8080      8/0/8     3m
 ```
 
-**Deploy one client pod for testing the chatQnA application**
+**Deploy a client pod to test the ChatQnA application**
 
-```bash
+```sh
 kubectl create deployment client-test -n chatqa --image=python:3.8.13 -- sleep infinity
 ```
 
 **Access the pipeline using the above URL from the client pod**
 
-```bash
-export CLIENT_POD=$(kubectl get pod  -l app=client-test -o jsonpath={.items..metadata.name})
+```sh
+export CLIENT_POD=$(kubectl get pod -l app=client-test -o jsonpath={.items..metadata.name})
 export accessUrl=$(kubectl get gmc -n chatqa -o jsonpath="{.items[?(@.metadata.name=='chatqa')].status.accessUrl}")
 kubectl exec "$CLIENT_POD" -n chatqa -- curl $accessUrl  -X POST  -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
 ```
 
-Should you want to change for instance the LLM model you are using in the ChatQnA pipeline, just edit the custom resource file. For instance, if you want to using Llama-2-7b-chat-hf make the following edit.
+**Modify ChatQnA custom resource to use another LLM model**
 
-**Modify chatQnA custom resource to change to another LLM model**
+Should you, for instance, want to change the LLM model you are using in the ChatQnA pipeline, just edit the custom resource file.
+For example, to use Llama-2-7b-chat-hf make the following edit:
+
+
 
 ```yaml
 - name: Tgi
@@ -85,16 +88,16 @@ Apply the change using
 kubectl apply -f $(pwd)/chatQnA_xeon.yaml
 ```
 
-**Check the tgi-svc-deployment has been changed to use the new LLM Model**
+**Check that the tgi-svc-deployment has been changed to use the new LLM Model**
 
 ```sh
 kubectl get deployment tgi-svc-deployment -n chatqa -o jsonpath="{.spec.template.spec.containers[*].env[?(@.name=='LLM_MODEL_ID')].value}"
 ```
 
-**Access the updated pipeline using the above URL from the client pod**
+**Access the updated pipeline using the same URL frm above from within the client pod**
 
-```bash
-kubectl exec "$CLIENT_POD" -n chatqa -- curl $accessUrl  -X POST  -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
+```sh
+kubectl exec "$CLIENT_POD" -n chatqa -- curl $accessUrl -X POST -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
 ```
 
 > [NOTE]
