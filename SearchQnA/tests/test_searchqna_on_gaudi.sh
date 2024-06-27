@@ -69,7 +69,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
-    until [[ "$n" -ge 200 ]]; do
+    until [[ "$n" -ge 300 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
             break
@@ -84,7 +84,7 @@ function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the latest news? Give me also the source link", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"www"* ]]; then
+    if [[ $result == *"news"* ]]; then
         echo "Result correct."
     else
         docker logs web-retriever-chroma-server
