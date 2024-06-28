@@ -1,5 +1,7 @@
 <h1 align="center" id="title">Deploy CodeGen in Kubernetes Cluster</h1>
 
+We assume that you have installed the GMC controller on your cluster. If you have not done so, please follow the instructions at
+Section "Getting Started" at [GMC Install](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector). Soon we will publish images to Docker Hub, builds can be avoided, simplifying install.
 > [NOTE]
 > The following values must be set before you can deploy:
 > HUGGINGFACEHUB_API_TOKEN
