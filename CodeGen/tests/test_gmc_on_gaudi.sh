@@ -55,15 +55,15 @@ function validate_codegen() {
     wait_until_pod_ready "codegen router" $APP_NAMESPACE "router-service"
     output=$(kubectl get pods -n $APP_NAMESPACE)
     echo $output
- 
+
     # deploy client pod for testing
     kubectl create deployment client-test -n $APP_NAMESPACE --image=python:3.8.13 -- sleep infinity
- 
+
     # wait for client pod ready
     wait_until_pod_ready "client-test" $APP_NAMESPACE "client-test"
     # giving time to populating data
     sleep 60
- 
+
     kubectl get pods -n $APP_NAMESPACE
     # send request to codegen
     export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
@@ -75,7 +75,7 @@ function validate_codegen() {
         echo "chatqna failed, please check the logs in ${LOG_PATH}!"
         exit 1
     fi
- 
+
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/gmc_codegen.log ]] && \
