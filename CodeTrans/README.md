@@ -14,9 +14,10 @@ The Code Translation service can be effortlessly deployed on either Intel Gaudi2
 
 ## Deploy with Docker
 
-* To deploy Code Translation on Gaudi please refer to the [Gaudi Guide](./docker/gaudi/README.md)
+- To deploy Code Translation on Gaudi please refer to the [Gaudi Guide](./docker/gaudi/README.md)
 
-* To deploy Code Translation on Xeon please refer to the [Xeon Guide](./docker/xeon/README.md).
+- To deploy Code Translation on Xeon please refer to the [Xeon Guide](./docker/xeon/README.md).
 
 ## Deploy with Kubernetes
+
 Please refer to the [CodeTranslation Kubernetes Guide](./kubernetes/README.md)

@@ -17,9 +17,9 @@ Based on whether you want to use Docker or Kubernetes, please follow the instruc
 
 ## Deploy using Docker
 
-* Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying Document Summarization on Gaudi.
+- Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying Document Summarization on Gaudi.
 
-* Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying Document Summarization on Xeon.
+- Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying Document Summarization on Xeon.
 
 ## Deploy using Kubernetes
 
