@@ -93,12 +93,12 @@ jobs:
         if: always()
         run: |
           if $should_cleanup; then
-            if ! kubectl delete ns $APP_NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
-              kubectl delete pods --namespace $APP_NAMESPACE --force --grace-period=0 --all
-              kubectl delete ns $APP_NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
-            fi
             if ! kubectl delete ns $SYSTEM_NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
               kubectl delete pods --namespace $SYSTEM_NAMESPACE --force --grace-period=0 --all
               kubectl delete ns $SYSTEM_NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
+            fi
+            if ! kubectl delete ns $APP_NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
+              kubectl delete pods --namespace $APP_NAMESPACE --force --grace-period=0 --all
+              kubectl delete ns $APP_NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
             fi
           fi
