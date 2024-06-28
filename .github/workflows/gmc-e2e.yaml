@@ -33,6 +33,7 @@ jobs:
     runs-on: "k8s-${{ matrix.hardware }}"
     concurrency:
       group: examples-gmc-test-${{ matrix.hardware }}
+      cancel-in-progress: false
     continue-on-error: true
     steps:
       - name: E2e test gmc
