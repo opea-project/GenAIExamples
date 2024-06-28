@@ -85,12 +85,15 @@ function validate_megaservice() {
 #    cd $WORKPATH/docker/ui/svelte
 #    local conda_env_name="OPEA_e2e"
 #    export PATH=${HOME}/miniforge3/bin/:$PATH
+##    conda remove -n ${conda_env_name} --all -y
+##    conda create -n ${conda_env_name} python=3.12 -y
 #    source activate ${conda_env_name}
 #
 #    sed -i "s/localhost/$ip_address/g" playwright.config.ts
 #
-##    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
-##    node -v && npm -v && pip list
+##    conda install -c conda-forge nodejs -y
+#    npm install && npm ci && npx playwright install --with-deps
+#    node -v && npm -v && pip list
 #
 #    exit_status=0
 #    npx playwright test || exit_status=$?
