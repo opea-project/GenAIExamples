@@ -56,7 +56,6 @@ function validate_codetrans() {
     output=$(kubectl get pods -n $APP_NAMESPACE)
     echo $output
  
- 
     # deploy client pod for testing
     kubectl create deployment client-test -n $APP_NAMESPACE --image=python:3.8.13 -- sleep infinity
  
