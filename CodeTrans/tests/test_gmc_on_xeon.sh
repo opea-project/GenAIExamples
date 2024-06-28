@@ -156,7 +156,7 @@ case "$1" in
         popd
         ;;
     validate_CodeTrans)
-        pushd codetrans/kubernetes
+        pushd CodeTrans/kubernetes
         validate_codetrans
         popd
         ;;
