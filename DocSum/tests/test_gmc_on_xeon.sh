@@ -70,7 +70,7 @@ function validate_docsum() {
     export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
     echo "$CLIENT_POD"
     accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='docsum')].status.accessUrl}")
-    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_docsum.log
+    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'  -H 'Content-Type: application/json' > $LOG_PATH/gmc_docsum.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "docsum failed, please check the logs in ${LOG_PATH}!"
@@ -80,7 +80,7 @@ function validate_docsum() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/gmc_docsum.log ]] && \
-    [[ $(grep -c "import" $LOG_PATH/gmc_docsum.log) != 0 ]]; then
+    [[ $(grep -c "connect" $LOG_PATH/gmc_docsum.log) != 0 ]]; then
         status=true
     fi
     if [ $status == false ]; then

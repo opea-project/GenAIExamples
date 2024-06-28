@@ -56,6 +56,10 @@ spec:
             - configMapRef:
                 name: qna-config
           env:
+            - name: HUGGING_FACE_HUB_TOKEN
+              value: $(HUGGINGFACEHUB_API_TOKEN)
+            - name: HF_TOKEN
+              value: $(HUGGINGFACEHUB_API_TOKEN)
             - name: LANGCHAIN_TRACING_V2
               value: "false"
             - name: LANGCHAIN_PROJECT
