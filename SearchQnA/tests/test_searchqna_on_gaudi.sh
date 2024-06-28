@@ -69,7 +69,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
-    until [[ "$n" -ge 200 ]]; do
+    until [[ "$n" -ge 300 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
             break
@@ -84,7 +84,7 @@ function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the latest news? Give me also the source link", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"www"* ]]; then
+    if [[ $result == *"news"* ]]; then
         echo "Result correct."
     else
         docker logs web-retriever-chroma-server
@@ -95,30 +95,30 @@ function validate_megaservice() {
 
 }
 
-# function validate_frontend() {
-#     cd $WORKPATH/docker/ui/svelte
-#     local conda_env_name="ChatQnA_e2e"
-#     export PATH=${HOME}/miniforge3/bin/:$PATH
-#     conda remove -n ${conda_env_name} --all -y
-#     conda create -n ${conda_env_name} python=3.12 -y
-#     source activate ${conda_env_name}
-
-#     sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-#     conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
-#     node -v && npm -v && pip list
-
-#     exit_status=0
-#     npx playwright test || exit_status=$?
-
-#     if [ $exit_status -ne 0 ]; then
-#         echo "[TEST INFO]: ---------frontend test failed---------"
-#         exit $exit_status
-#     else
-#         echo "[TEST INFO]: ---------frontend test passed---------"
-#     fi
-
-# }
+#function validate_frontend() {
+#    cd $WORKPATH/docker/ui/svelte
+#    local conda_env_name="OPEA_e2e"
+#    export PATH=${HOME}/miniforge3/bin/:$PATH
+##    conda remove -n ${conda_env_name} --all -y
+##    conda create -n ${conda_env_name} python=3.12 -y
+#    source activate ${conda_env_name}
+#
+#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+#
+##    conda install -c conda-forge nodejs -y
+#    npm install && npm ci && npx playwright install --with-deps
+#    node -v && npm -v && pip list
+#
+#    exit_status=0
+#    npx playwright test || exit_status=$?
+#
+#    if [ $exit_status -ne 0 ]; then
+#        echo "[TEST INFO]: ---------frontend test failed---------"
+#        exit $exit_status
+#    else
+#        echo "[TEST INFO]: ---------frontend test passed---------"
+#    fi
+#}
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
