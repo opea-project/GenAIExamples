@@ -1,7 +1,6 @@
 #!/bin/bash
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-# for test
 
 set -e
 echo "IMAGE_REPO=${IMAGE_REPO}"
