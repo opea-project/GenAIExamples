@@ -1,0 +1,33 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: gmc.opea.io/v1alpha3
+kind: GMConnector
+metadata:
+  labels:
+    app.kubernetes.io/name: gmconnector
+    app.kubernetes.io/managed-by: kustomize
+    gmc/platform: xeon
+  name: codetrans
+  namespace: codetrans
+spec:
+  routerConfig:
+    name: router
+    serviceName: router-service
+  nodes:
+    root:
+      routerType: Sequence
+      steps:
+      - name: Llm
+        data: $response
+        internalService:
+          serviceName: codetrans-service
+          config:
+            endpoint: /v1/chat/completions
+      - name: Tgi
+        internalService:
+          serviceName: tgi-service
+          config:
+            LLM_MODEL_ID: HuggingFaceH4/mistral-7b-grok
+            endpoint: /generate
+          isDownstreamService: true

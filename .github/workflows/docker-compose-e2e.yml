@@ -25,7 +25,7 @@ jobs:
   job1:
     uses: ./.github/workflows/reuse-get-test-matrix.yml
     with:
-      diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|assets'
+      diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|gmc|assets'
 
   mega-image-build:
     needs: job1
