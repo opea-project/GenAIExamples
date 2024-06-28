@@ -81,7 +81,7 @@ function validate_docsum() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/gmc_docsum.log ]] && \
-    [[ $(grep -c "connect" $LOG_PATH/gmc_docsum.log) != 0 ]]; then
+    [[ $(grep -c "[DONE]" $LOG_PATH/gmc_docsum.log) != 0 ]]; then
         status=true
     fi
     if [ $status == false ]; then
