@@ -16,7 +16,7 @@ The Document Summarization service can be effortlessly deployed on either Intel 
 Based on whether you want to use Docker or Kubernetes, please follow the instructions below.
 
 ## Docker
-###Deploy Document Summarization on Gaudi
+### Deploy Document Summarization on Gaudi
 
 Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying Document Summarization on Gaudi.
 
