@@ -64,7 +64,7 @@ jobs:
               run_hardware=""
               if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
               if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
-              if [ "$run_hardware" == "" ]; then run_hardware="xeon"; fi
+              if [ "$run_hardware" == "" ]; then run_hardware="gaudi"; fi
               for hw in ${run_hardware}; do
                   if [ "$hw" == "gaudi" ] && [ "${{ inputs.gaudi_server_label }}" != "" ]; then
                     run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.gaudi_server_label }}\"},"
