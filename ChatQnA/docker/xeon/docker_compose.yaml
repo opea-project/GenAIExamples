@@ -36,7 +36,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-    command: --model-id ${EMBEDDING_MODEL_ID}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
     image: opea/embedding-tei:latest
     container_name: embedding-tei-server
