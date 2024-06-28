@@ -70,7 +70,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
-    until [[ "$n" -ge 200 ]]; do
+    until [[ "$n" -ge 400 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
             break
