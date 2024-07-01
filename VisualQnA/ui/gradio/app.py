@@ -50,7 +50,6 @@ enable_btn = gr.Button(interactive=True)
 disable_btn = gr.Button(interactive=False)
 
 
-
 def process_image(image, return_pil=False, image_format="PNG", max_len=1344, min_len=672):
     if max(image.size) > max_len:
         max_hw, min_hw = max(image.size), min(image.size)
@@ -111,7 +110,7 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
         with gr.Row():
             with gr.Column(scale=3):
                 imagebox = gr.Image(type="pil", label="图片", interactive=True, elem_id="my_imagebox")
-                
+
                 if cur_dir is None:
                     cur_dir = os.path.dirname(os.path.abspath(__file__))
                 gr.Examples(
