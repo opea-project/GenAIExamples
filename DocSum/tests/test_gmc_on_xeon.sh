@@ -8,7 +8,7 @@ LOG_PATH=/home/$(whoami)/logs
 MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 
-function init_codegen() {
+function init_docsum() {
     wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/crd/bases/gmc.opea.io_gmconnectors.yaml
     wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/rbac/gmc-manager-rbac.yaml
     wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/manager/gmc-manager.yaml
@@ -29,7 +29,7 @@ function init_codegen() {
     find . -name '*.yaml' -type f -exec sed -i "s#default.svc#$APP_NAMESPACE.svc#g" {} \;
 }
 
-function install_codegen() {
+function install_docsum() {
     # Make sure you have to use image tag $VERSION for microservice-connector installation
     echo "install microservice-connector, using repo $DOCKER_REGISTRY and tag $VERSION"
     echo "using namespace $SYSTEM_NAMESPACE and $APP_NAMESPACE"
@@ -45,16 +45,17 @@ function install_codegen() {
     rm -f ./gmc.opea.io_gmconnectors.yaml ./gmc-manager-rbac.yaml ./gmc-manager.yaml manifests/gmc-router.yaml
 }
 
-function validate_codegen() {
+function validate_docsum() {
     kubectl create ns $APP_NAMESPACE
-    sed -i "s|namespace: codegen|namespace: $APP_NAMESPACE|g"  ./codegen_xeon.yaml
-    kubectl apply -f ./codegen_xeon.yaml
+    sed -i "s|namespace: docsum|namespace: $APP_NAMESPACE|g"  ./docsum_xeon.yaml
+    kubectl apply -f ./docsum_xeon.yaml
 
     # Wait until the router service is ready
-    echo "Waiting for the codegen router service to be ready..."
-    wait_until_pod_ready "codegen router" $APP_NAMESPACE "router-service"
+    echo "Waiting for the docsum router service to be ready..."
+    wait_until_pod_ready "docsum router" $APP_NAMESPACE "router-service"
     output=$(kubectl get pods -n $APP_NAMESPACE)
     echo $output
+
 
     # deploy client pod for testing
     kubectl create deployment client-test -n $APP_NAMESPACE --image=python:3.8.13 -- sleep infinity
@@ -65,29 +66,29 @@ function validate_codegen() {
     sleep 60
 
     kubectl get pods -n $APP_NAMESPACE
-    # send request to codegen
+    # send request to docsum
     export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
     echo "$CLIENT_POD"
-    accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='codegen')].status.accessUrl}")
-    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query": "def print_hello_world():"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codegen.log
+    accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='docsum')].status.accessUrl}")
+    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'  -H 'Content-Type: application/json' > $LOG_PATH/gmc_docsum.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-        echo "chatqna failed, please check the logs in ${LOG_PATH}!"
+        echo "docsum failed, please check the logs in ${LOG_PATH}!"
         exit 1
     fi
 
+    cat $LOG_PATH/gmc_docsum.log
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
-    if [[ -f $LOG_PATH/gmc_codegen.log ]] && \
-    [[ $(grep -c "print" $LOG_PATH/gmc_codegen.log) != 0 ]]; then
+    if [[ -f $LOG_PATH/gmc_docsum.log ]] && \
+    [[ $(grep -c "[DONE]" $LOG_PATH/gmc_docsum.log) != 0 ]]; then
         status=true
     fi
     if [ $status == false ]; then
-        if [[ -f $LOG_PATH/gmc_codegen.log ]]; then
-            cat $LOG_PATH/gmc_codegen.log
+        if [[ -f $LOG_PATH/gmc_docsum.log ]]; then
+            cat $LOG_PATH/gmc_docsum.log
         fi
         echo "Response check failed, please check the logs in artifacts!"
-        cat $LOG_PATH/gmc_codegen.log
         exit 1
     else
         echo "Response check succeed!"
@@ -146,19 +147,19 @@ if [ $# -eq 0 ]; then
 fi
 
 case "$1" in
-    init_CodeGen)
+    init_DocSum)
         pushd ChatQnA/kubernetes
-        init_codegen
+        init_docsum
         popd
         ;;
-    install_CodeGen)
+    install_DocSum)
         pushd ChatQnA/kubernetes
-        install_codegen
+        install_docsum
         popd
         ;;
-    validate_CodeGen)
-        pushd CodeGen/kubernetes
-        validate_codegen
+    validate_DocSum)
+        pushd DocSum/kubernetes
+        validate_docsum
         popd
         ;;
     *)
