@@ -89,7 +89,6 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 cd ../../../..
 ```
 
-
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/embedding-tei:latest`
