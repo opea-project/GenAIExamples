@@ -20,4 +20,4 @@ The Code Translation service can be effortlessly deployed on either Intel Gaudi2
 
 ## Deploy with Kubernetes
 
-Please refer to the [CodeTranslation Kubernetes Guide](./kubernetes/README.md)
+Please refer to the [Code Translation Kubernetes Guide](./kubernetes/README.md)

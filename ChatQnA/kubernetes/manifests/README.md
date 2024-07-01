@@ -41,7 +41,7 @@ kubectl create ns chatqa
 kubectl apply -f $(pwd)/chatQnA_xeon.yaml
 ```
 
-2. GMC will reconcile the ChatQnA custom resource and get all related components/services ready. Check if service up.
+2. GMC will reconcile the ChatQnA custom resource and get all related components/services ready. Check if the service up.
 
 ```sh
 kubectl get service -n chatqa

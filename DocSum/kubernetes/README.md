@@ -11,17 +11,15 @@ The DocSum pipeline uses  prebuilt images. The Xeon version uses the prebuilt im
 the image ghcr.io/huggingface/text-generation-inference:1.4. The service is called tgi-svc. Meanwhile, the Gaudi version launches the
 service tgi-gaudi-svc, which uses the image ghcr.io/huggingface/tgi-gaudi:1.2.1. Both TGI model services serve the model specified in the LLM_MODEL_ID variable that is exported by you. In the below example we use Intel/neural-chat-7b-v3-3.
 
-
 [NOTE]
 Please refer to [Docker Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/xeon/README.md) or
 [Docker Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/gaudi/README.md) to build the OPEA images. 
 These will be available on Docker Hub soon, simplifying installation.
 
-
 ## Deploy the RAG pipeline
 This involves deploying the application pipeline custom resource. You can use docsum_xeon.yaml if you have just a Xeon cluster or docsum_gaudi.yaml if you have a Gaudi cluster.
 
-1. Setup Environment variables
+1. Setup Environment variables. These are specific to the user. Skip the proxy settings if you are not operating behind one.
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -34,19 +32,19 @@ export ns=${docsum}
 
 2. Create namespace for the application and deploy it
 ```bash
-kubectl create ns $(ns)
+kubectl create ns ${ns}
 kubectl apply -f $(pwd)/docsum_xeon.yaml
 ```
 
 3. GMC will reconcile the custom resource and get all related components/services ready. Confirm the service status using below command
 ```bash
-kubectl get service -n $(ns)
+kubectl get service -n ${ns}
 ```
 
 4. Obtain the custom resource/pipeline access URL
 
 ```bash
-kubectl get gmconnectors.gmc.opea.io -n $(ns)
+kubectl get gmconnectors.gmc.opea.io -n ${ns}
 NAME     URL                                                      READY     AGE
 docsum   http://router-service.docsum.svc.cluster.local:8080      8/0/8     3m
 ```
@@ -54,7 +52,7 @@ docsum   http://router-service.docsum.svc.cluster.local:8080      8/0/8     3m
 5. Deploy a client pod to test the application
 
 ```bash
-kubectl create deployment client-test -n chatqa --image=python:3.8.13 -- sleep infinity
+kubectl create deployment client-test -n ${ns} --image=python:3.8.13 -- sleep infinity
 ```
 
 6. Access the pipeline using the above URL from the client pod and execute a request
@@ -62,7 +60,7 @@ kubectl create deployment client-test -n chatqa --image=python:3.8.13 -- sleep i
 ```bash
 export CLIENT_POD=$(kubectl get pod -l app=client-test -o jsonpath={.items..metadata.name})
 export accessUrl=$(kubectl get gmc -n $ns -o jsonpath="{.items[?(@.metadata.name=='docsum')].status.accessUrl}")
-kubectl exec "$CLIENT_POD" -n $ns -- curl $accessUrl  -X POST  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'  -H 'Content-Type: application/json'
+kubectl exec "$CLIENT_POD" -n $ns -- curl $accessUrl -X POST -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'  -H 'Content-Type: application/json'
 ```
 
 7. Clean up. Use standard Kubernetes custom resource remove commands. Confirm cleaned by retrieving pods in application namespace.
