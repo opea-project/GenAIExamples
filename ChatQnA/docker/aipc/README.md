@@ -2,7 +2,6 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AIPC. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
 
-
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
@@ -65,7 +64,6 @@ cd GenAIExamples/ChatQnA/docker/ui/
 docker build --no-cache -t opea/chatqna-ui:latest -f ./docker/Dockerfile .
 cd ../../../..
 ```
-
 
 Then run the command `docker images`, you will have the following 7 Docker Images:
 
@@ -236,7 +234,6 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep" \
 ```
 
 This command updates a knowledge base by submitting a list of HTTP links for processing.
-
 
 ## 🚀 Launch the UI
 
