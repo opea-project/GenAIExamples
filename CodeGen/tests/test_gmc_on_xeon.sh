@@ -8,7 +8,7 @@ LOG_PATH=/home/$(whoami)/logs
 MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 
-function init_chatqna() {
+function init_codegen() {
     wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/crd/bases/gmc.opea.io_gmconnectors.yaml
     wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/rbac/gmc-manager-rbac.yaml
     wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/manager/gmc-manager.yaml
@@ -29,7 +29,7 @@ function init_chatqna() {
     find . -name '*.yaml' -type f -exec sed -i "s#default.svc#$APP_NAMESPACE.svc#g" {} \;
 }
 
-function install_chatqna() {
+function install_codegen() {
     # Make sure you have to use image tag $VERSION for microservice-connector installation
     echo "install microservice-connector, using repo $DOCKER_REGISTRY and tag $VERSION"
     echo "using namespace $SYSTEM_NAMESPACE and $APP_NAMESPACE"
@@ -42,77 +42,56 @@ function install_chatqna() {
     # Wait until the gmc controller pod is ready
     wait_until_pod_ready "gmc-controller" $SYSTEM_NAMESPACE "gmc-controller"
     kubectl get pods -n $SYSTEM_NAMESPACE
+    rm -f ./gmc.opea.io_gmconnectors.yaml ./gmc-manager-rbac.yaml ./gmc-manager.yaml manifests/gmc-router.yaml
 }
 
-function validate_chatqna() {
-   kubectl create ns $APP_NAMESPACE
-   sed -i "s|namespace: chatqa|namespace: $APP_NAMESPACE|g"  ./chatQnA_xeon.yaml
-   kubectl apply -f ./chatQnA_xeon.yaml
+function validate_codegen() {
+    kubectl create ns $APP_NAMESPACE
+    sed -i "s|namespace: codegen|namespace: $APP_NAMESPACE|g"  ./codegen_xeon.yaml
+    kubectl apply -f ./codegen_xeon.yaml
 
-   # Wait until the router service is ready
-   echo "Waiting for the chatqa router service to be ready..."
-   wait_until_pod_ready "chatqna router" $APP_NAMESPACE "router-service"
-   output=$(kubectl get pods -n $APP_NAMESPACE)
-   echo $output
+    # Wait until the router service is ready
+    echo "Waiting for the codegen router service to be ready..."
+    wait_until_pod_ready "codegen router" $APP_NAMESPACE "router-service"
+    output=$(kubectl get pods -n $APP_NAMESPACE)
+    echo $output
 
-   # Wait until the tgi pod is ready
-   TGI_POD_NAME=$(kubectl get pods --namespace=$APP_NAMESPACE | grep ^tgi-service | awk '{print $1}')
-   kubectl describe pod $TGI_POD_NAME -n $APP_NAMESPACE
-   kubectl wait --for=condition=ready pod/$TGI_POD_NAME --namespace=$APP_NAMESPACE --timeout=300s
+    # deploy client pod for testing
+    kubectl create deployment client-test -n $APP_NAMESPACE --image=python:3.8.13 -- sleep infinity
 
+    # wait for client pod ready
+    wait_until_pod_ready "client-test" $APP_NAMESPACE "client-test"
+    # giving time to populating data
+    sleep 60
 
-   # deploy client pod for testing
-   kubectl create deployment client-test -n $APP_NAMESPACE --image=python:3.8.13 -- sleep infinity
+    kubectl get pods -n $APP_NAMESPACE
+    # send request to codegen
+    export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
+    echo "$CLIENT_POD"
+    accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='codegen')].status.accessUrl}")
+    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query": "def print_hello_world():"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codegen.log
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "chatqna failed, please check the logs in ${LOG_PATH}!"
+        exit 1
+    fi
 
-   # wait for client pod ready
-   wait_until_pod_ready "client-test" $APP_NAMESPACE "client-test"
-
-   max_retry=20
-   # make sure microservice retriever is ready
-   # try to curl retriever-svc for max_retry times
-   for ((i=1; i<=max_retry; i++))
-   do
-     curl http://retriever-svc.$APP_NAMESPACE:7000/v1/retrieval -X POST \
-       -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
-       -H 'Content-Type: application/json' && break
-     sleep 10
-   done
-
-   # if i is bigger than max_retry, then exit with error
-   if [ $i -gt $max_retry ]; then
-       echo "Microservice failed, exit with error."
-       exit 1
-   fi
-
-   kubectl get pods -n $APP_NAMESPACE
-   # send request to chatqnA
-   export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
-   echo "$CLIENT_POD"
-   accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='chatqa')].status.accessUrl}")
-   kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json' > $LOG_PATH/curl_chatqna.log
-   exit_code=$?
-   if [ $exit_code -ne 0 ]; then
-       echo "chatqna failed, please check the logs in ${LOG_PATH}!"
-       exit 1
-   fi
-
-   echo "Checking response results, make sure the output is reasonable. "
-   local status=false
-   if [[ -f $LOG_PATH/curl_chatqna.log ]] && \
-   [[ $(grep -c "billion" $LOG_PATH/curl_chatqna.log) != 0 ]]; then
-       status=true
-   fi
-   if [ $status == false ]; then
-       if [[ -f $LOG_PATH/curl_chatqna.log ]]; then
-           cat $LOG_PATH/curl_chatqna.log
-       fi
-       echo "Response check failed, please check the logs in artifacts!"
-       exit 1
-   else
-       echo "Response check succeed!"
-   fi
-
-   rm -f ./gmc.opea.io_gmconnectors.yaml ./gmc-manager-rbac.yaml ./gmc-manager.yaml manifests/gmc-router.yaml
+    echo "Checking response results, make sure the output is reasonable. "
+    local status=false
+    if [[ -f $LOG_PATH/gmc_codegen.log ]] && \
+    [[ $(grep -c "print" $LOG_PATH/gmc_codegen.log) != 0 ]]; then
+        status=true
+    fi
+    if [ $status == false ]; then
+        if [[ -f $LOG_PATH/gmc_codegen.log ]]; then
+            cat $LOG_PATH/gmc_codegen.log
+        fi
+        echo "Response check failed, please check the logs in artifacts!"
+        cat $LOG_PATH/gmc_codegen.log
+        exit 1
+    else
+        echo "Response check succeed!"
+    fi
 }
 
 function wait_until_pod_ready() {
@@ -167,19 +146,19 @@ if [ $# -eq 0 ]; then
 fi
 
 case "$1" in
-    init_ChatQnA)
+    init_CodeGen)
         pushd ChatQnA/kubernetes
-        init_chatqna
+        init_codegen
         popd
         ;;
-    install_ChatQnA)
+    install_CodeGen)
         pushd ChatQnA/kubernetes
-        install_chatqna
+        install_codegen
         popd
         ;;
-    validate_ChatQnA)
-        pushd ChatQnA/kubernetes
-        validate_chatqna
+    validate_CodeGen)
+        pushd CodeGen/kubernetes
+        validate_codegen
         popd
         ;;
     *)
