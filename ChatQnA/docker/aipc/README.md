@@ -89,6 +89,8 @@ Since the `docker_compose.yaml` will consume some environment variables, you nee
 export host_ip="External_Public_IP"
 ```
 
+For Linux users, please run `hostname -I | awk '{print $1}'`. For Windows users, please run `ipconfig | findstr /i "IPv4"` to get the external public ip.
+
 **Export the value of your Huggingface API token to the `your_hf_api_token` environment variable**
 
 > Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
@@ -123,6 +125,8 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 
 export OLLAMA_ENDPOINT=http://${host_ip}:11434
+# On Windows PC, please use host.docker.internal instead of ${host_ip}
+#export OLLAMA_ENDPOINT=http://host.docker.internal:11434
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
