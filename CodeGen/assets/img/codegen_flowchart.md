@@ -1,9 +1,9 @@
 flowchart TB
-    subgraph A[ ]
-        direction LR
-        CodeGen
-        Legend
-    end
+subgraph A[ ]
+direction LR
+CodeGen
+Legend
+end
 
     subgraph CodeGen
         A1[User] --> |Input query| B[CodeGen Gateway]
@@ -26,4 +26,7 @@ flowchart TB
         G([Microservice])
         H{{Server API}}
     end
+
+```
+
 ```
