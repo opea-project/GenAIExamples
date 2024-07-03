@@ -228,7 +228,6 @@ curl -X POST "http://${host_ip}:6008/v1/dataprep/get_file" \
      -H "Content-Type: application/json"
 ```
 
-
 To delete the file/link you uploaded:
 
 ```bash
@@ -241,7 +240,7 @@ curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
 curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
      -d '{"file_path": "nke-10k-2023.pdf"}' \
      -H "Content-Type: application/json"
-     
+
 # delete all uploaded files and links
 curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
      -d '{"file_path": "all"}' \
