@@ -18,6 +18,40 @@ The workflow falls into the following architecture:
 
 ![architecture](./assets/img/codegen_architecture.png)
 
+The mega flow of the CodeGen application, from user's input query to the application's output response, is as follows:
+
+```mermaid
+flowchart TB
+    subgraph A[ ]
+    direction LR
+    CodeGen
+    Legend
+    end
+
+    subgraph CodeGen
+        A1[User] --> |Input query| B[CodeGen Gateway]
+        B --> |Invoke| C([LLM])
+        C --> |Depend on| D([Text Generation Inference])
+        D --> |Post| E{{HuggingFace Endpoint}}
+        E --> |Get| D
+        C --> |Output| F[Response]
+
+        subgraph Megaservice["Megaservice"]
+            direction TB
+            C
+            D
+            E
+        end
+    end
+
+    subgraph Legend
+        direction TB
+        G([Microservice])
+        H{{Server API}}
+    end
+```
+
+
 # Deploy CodeGen Service
 
 The CodeGen service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.

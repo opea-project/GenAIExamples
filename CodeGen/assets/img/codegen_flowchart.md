@@ -1,4 +1,4 @@
-```Mermaid
+```mermaid
 flowchart TB
     subgraph A[ ]
     direction LR
