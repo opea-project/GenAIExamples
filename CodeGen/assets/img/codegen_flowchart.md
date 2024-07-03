@@ -1,8 +1,9 @@
+```Mermaid
 flowchart TB
     subgraph A[ ]
-        direction LR
-        CodeGen
-        Legend
+    direction LR
+    CodeGen
+    Legend
     end
 
     subgraph CodeGen
