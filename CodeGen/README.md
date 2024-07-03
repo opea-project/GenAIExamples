@@ -51,7 +51,6 @@ flowchart TB
     end
 ```
 
-
 # Deploy CodeGen Service
 
 The CodeGen service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
