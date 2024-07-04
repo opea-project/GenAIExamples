@@ -8,6 +8,7 @@ langchain
 langchain-community
 langchain_milvus
 numpy
+openai
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
@@ -20,3 +21,4 @@ pymupdf==1.24.5
 python-docx==0.8.11
 sentence_transformers
 shortuuid
+tiktoken
