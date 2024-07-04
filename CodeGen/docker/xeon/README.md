@@ -53,9 +53,11 @@ Then run the command `docker images`, you will have the following 3 Docker Image
 - `opea/codegen-ui:latest`
 
 ## 🚀 Start Microservices and MegaService
+
 The CodeGen megaservice manages a single microservice called LLM within a Directed Acyclic Graph (DAG). In the diagram above, the LLM microservice is a language model microservice that generates code snippets based on the user's input query. The TGI service serves as a text generation interface, providing a RESTful API for the LLM microservice. The CodeGen Gateway acts as the entry point for the CodeGen application, invoking the Megaservice to generate code snippets in response to the user's input query.
 
 The mega flow of the CodeGen application, from user's input query to the application's output response, is as follows:
+
 ```mermaid
 flowchart LR
     subgraph CodeGen
@@ -75,7 +77,6 @@ flowchart LR
         I([Microservice]) -.-> J{{Server API}}
     end
 ```
-
 
 ### Setup Environment Variables
 
