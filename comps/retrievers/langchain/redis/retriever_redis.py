@@ -7,7 +7,7 @@ import time
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
 from langsmith import traceable
-from redis_config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
+from redis_config import EMBED_MODEL, INDEX_NAME, REDIS_URL
 
 from comps import (
     EmbedDoc768,
@@ -34,6 +34,13 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
 @register_statistics(names=["opea_service@retriever_redis"])
 def retrieve(input: EmbedDoc768) -> SearchedDoc:
     start = time.time()
+    # check if the Redis index has data
+    if vector_db.client.keys() == []:
+        result = SearchedDoc(retrieved_docs=[], initial_query=input.text)
+        statistics_dict["opea_service@retriever_redis"].append_latency(time.time() - start, None)
+        return result
+
+    # if the Redis index has data, perform the search
     if input.search_type == "similarity":
         search_res = vector_db.similarity_search_by_vector(embedding=input.embedding, k=input.k)
     elif input.search_type == "similarity_distance_threshold":
@@ -68,10 +75,5 @@ if __name__ == "__main__":
         # create embeddings using local embedding model
         embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
 
-    vector_db = Redis.from_existing_index(
-        embedding=embeddings,
-        index_name=INDEX_NAME,
-        redis_url=REDIS_URL,
-        schema=INDEX_SCHEMA,
-    )
+    vector_db = Redis(embedding=embeddings, index_name=INDEX_NAME, redis_url=REDIS_URL)
     opea_microservices["opea_service@retriever_redis"].start()
