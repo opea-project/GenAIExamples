@@ -1,5 +1,7 @@
 beautifulsoup4
+cairosvg
 docarray[full]
+docx2txt
 easyocr
 fastapi
 huggingface_hub
@@ -16,6 +18,7 @@ prometheus-fastapi-instrumentator
 pyarrow
 pymupdf
 python-docx
+python-pptx
 ray
 redis
 sentence_transformers

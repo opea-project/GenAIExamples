@@ -106,13 +106,13 @@ docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https
 - option 1: Start single-process version (for 1-10 files processing)
 
 ```bash
-docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT opea/dataprep-redis:latest
+docker run -d --name="dataprep-redis-server" -p 6007:6007 -p 6008:6008 -p 6009:6009 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT opea/dataprep-redis:latest
 ```
 
 - option 2: Start multi-process version (for >10 files processing)
 
 ```bash
-docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT -e TIMEOUT_SECONDS=600 opea/dataprep-on-ray-redis:latest
+docker run -d --name="dataprep-redis-server" -p 6007:6007 -p 6008:6008 -p 6009:6009 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT -e TIMEOUT_SECONDS=600 opea/dataprep-on-ray-redis:latest
 ```
 
 ## 2.5 Run with Docker Compose (Option B - deprecated, will move to genAIExample in future)
@@ -132,6 +132,8 @@ docker container logs -f dataprep-redis-server
 ```
 
 # 🚀4. Consume Microservice
+
+## 4.1 Consume Upload API
 
 Once document preparation microservice for Redis is started, user can use below command to invoke the microservice to convert the document to embedding and save to the database.
 
@@ -209,4 +211,59 @@ try:
     print("Request successful!")
 except requests.exceptions.RequestException as e:
     print("An error occurred:", e)
+```
+
+## 4.2 Consume get_file API
+
+To get uploaded file structures, use the following command:
+
+```bash
+curl -X POST \
+    -H "Content-Type: application/json" \
+    http://localhost:6008/v1/dataprep/get_file
+```
+
+Then you will get the response JSON like this:
+
+```json
+[
+  {
+    "name": "uploaded_file_1.txt",
+    "id": "uploaded_file_1.txt",
+    "type": "File",
+    "parent": ""
+  },
+  {
+    "name": "uploaded_file_2.txt",
+    "id": "uploaded_file_2.txt",
+    "type": "File",
+    "parent": ""
+  }
+]
+```
+
+## 4.3 Consume delete_file API
+
+To delete uploaded file/link, use the following command.
+
+The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
+
+```bash
+# delete link
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"file_path": "https://www.ces.tech/.txt"}' \
+    http://10.165.57.68:6009/v1/dataprep/delete_file
+
+# delete file
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"file_path": "uploaded_file_1.txt"}' \
+    http://10.165.57.68:6009/v1/dataprep/delete_file
+
+# delete all files and links
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"file_path": "all"}' \
+    http://10.165.57.68:6009/v1/dataprep/delete_file
 ```
