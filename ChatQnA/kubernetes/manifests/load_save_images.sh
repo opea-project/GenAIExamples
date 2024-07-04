@@ -19,10 +19,6 @@ images=(
 for image in "${images[@]}"; do
   tar_file="${image//\//}.tar"
   docker save -o "$tar_file" "$image"
-done
-
-# Load images from the tar files
-for tar_file in *.tar; do
   sudo nerdctl -n k8s.io load -i "$tar_file"
 done
 

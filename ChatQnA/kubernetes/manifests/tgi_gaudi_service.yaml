@@ -37,7 +37,7 @@ spec:
           value: "all"
             #- name: QUANT_CONFIG
             #value: "/data/maxabs_quant.json"
-        image: tgi_gaudi:1.15.1
+        image: $(TGI_GAUDI_IMAGE)
         name: tgi-gaudi-service-deploy-demo
         securityContext:
           capabilities:
