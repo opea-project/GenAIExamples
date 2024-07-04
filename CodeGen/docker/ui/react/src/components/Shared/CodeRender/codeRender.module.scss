@@ -3,15 +3,14 @@
 .code {
   margin: 7px 0px;
   .codeHead {
-    background:  #379af1;
+    background: #379af1;
 
     padding: 0px 10px !important;
     @include flex(row, nowrap, center, space-between);
     .codeTitle {
-
     }
-    .codeActionGroup{
-        @include flex(row, nowrap, center, flex-start);
+    .codeActionGroup {
+      @include flex(row, nowrap, center, flex-start);
     }
   }
   .codeHighlighterDiv {
@@ -20,5 +19,5 @@
 }
 
 .inlineCode {
-  background: #d7d7d7
+  background: #d7d7d7;
 }
