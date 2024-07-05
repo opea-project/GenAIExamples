@@ -25,4 +25,4 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/llms/text-generation/ollama
 
-ENTRYPOINT ["python", "llm.py"]
+ENTRYPOINT ["bash", "entrypoint.sh"]

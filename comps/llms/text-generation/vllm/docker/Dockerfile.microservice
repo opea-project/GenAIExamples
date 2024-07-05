@@ -29,4 +29,4 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/llms/text-generation/vllm
 
-ENTRYPOINT ["python", "llm.py"]
+ENTRYPOINT ["bash", "entrypoint.sh"]

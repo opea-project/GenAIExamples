@@ -34,4 +34,4 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/llms/text-generation/ray_serve
 
-ENTRYPOINT ["python", "llm.py"]
+ENTRYPOINT ["bash", "entrypoint.sh"]

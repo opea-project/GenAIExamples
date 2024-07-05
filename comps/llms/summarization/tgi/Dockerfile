@@ -24,4 +24,4 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/llms/summarization/tgi
 
-ENTRYPOINT ["python", "llm.py"]
+ENTRYPOINT ["bash", "entrypoint.sh"]
