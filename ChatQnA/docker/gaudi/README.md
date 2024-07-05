@@ -28,7 +28,7 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 ### 4. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
 ```
 
 ### 5. Build LLM Image
