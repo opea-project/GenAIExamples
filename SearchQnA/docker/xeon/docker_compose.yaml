@@ -17,7 +17,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-    command: --model-id ${EMBEDDING_MODEL_ID}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
     image: opea/embedding-tei:latest
     container_name: embedding-tei-server
@@ -62,7 +62,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-    command: --model-id ${RERANK_MODEL_ID}
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
     image: opea/reranking-tei:latest
     container_name: reranking-tei-xeon-server
