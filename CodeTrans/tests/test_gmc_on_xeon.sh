@@ -69,7 +69,7 @@ function validate_codetrans() {
     export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
     echo "$CLIENT_POD"
     accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='codetrans')].status.accessUrl}")
-    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codetrans.log
+    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codetrans.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "codetrans failed, please check the logs in ${LOG_PATH}!"
@@ -79,7 +79,7 @@ function validate_codetrans() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/gmc_codetrans.log ]] && \
-    [[ $(grep -c "import" $LOG_PATH/gmc_codetrans.log) != 0 ]]; then
+    [[ $(grep -c "[DONE]" $LOG_PATH/gmc_codetrans.log) != 0 ]]; then
         status=true
     fi
     if [ $status == false ]; then
