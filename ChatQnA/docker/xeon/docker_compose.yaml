@@ -110,7 +110,7 @@ services:
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   tgi_service:
-    image: ghcr.io/huggingface/text-generation-inference:1.4
+    image: ghcr.io/huggingface/text-generation-inference:2.1.0
     container_name: tgi-service
     ports:
       - "9009:80"
