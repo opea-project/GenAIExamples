@@ -8,12 +8,12 @@ Overall, this microservice provides robust backend support for applications requ
 
 # Retriever Microservice with Redis
 
-For details, please refer to this [readme](langchain/redis/README.md)
+For details, please refer to this [readme](redis/README.md)
 
 # Retriever Microservice with Milvus
 
-For details, please refer to this [readme](langchain/milvus/README.md)
+For details, please refer to this [readme](milvus/README.md)
 
 # Retriever Microservice with PGVector
 
-For details, please refer to this [readme](langchain/pgvector/README.md)
+For details, please refer to this [readme](pgvector/README.md)

@@ -27,7 +27,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/reranks/langchain
+WORKDIR /home/user/comps/reranks/tei
 
-ENTRYPOINT ["python", "reranking_tei_xeon.py"]
+ENTRYPOINT ["python", "reranking_tei.py"]
 

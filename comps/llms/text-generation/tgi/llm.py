@@ -5,7 +5,7 @@ import os
 import time
 
 from fastapi.responses import StreamingResponse
-from langchain_community.llms import HuggingFaceEndpoint
+from huggingface_hub import AsyncInferenceClient
 from langsmith import traceable
 
 from comps import (
@@ -28,26 +28,23 @@ from comps import (
 )
 @traceable(run_type="llm")
 @register_statistics(names=["opea_service@llm_tgi"])
-def llm_generate(input: LLMParamsDoc):
+async def llm_generate(input: LLMParamsDoc):
+    stream_gen_time = []
     start = time.time()
-    llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
-    llm = HuggingFaceEndpoint(
-        endpoint_url=llm_endpoint,
-        max_new_tokens=input.max_new_tokens,
-        top_k=input.top_k,
-        top_p=input.top_p,
-        typical_p=input.typical_p,
-        temperature=input.temperature,
-        repetition_penalty=input.repetition_penalty,
-        streaming=input.streaming,
-        timeout=600,
-    )
     if input.streaming:
-        stream_gen_time = []
 
         async def stream_generator():
             chat_response = ""
-            async for text in llm.astream(input.query):
+            text_generation = await llm.text_generation(
+                prompt=input.query,
+                stream=input.streaming,
+                max_new_tokens=input.max_new_tokens,
+                repetition_penalty=input.repetition_penalty,
+                temperature=input.temperature,
+                top_k=input.top_k,
+                top_p=input.top_p,
+            )
+            async for text in text_generation:
                 stream_gen_time.append(time.time() - start)
                 chat_response += text
                 chunk_repr = repr(text.encode("utf-8"))
@@ -59,10 +56,23 @@ def llm_generate(input: LLMParamsDoc):
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     else:
-        response = llm.invoke(input.query)
+        response = await llm.text_generation(
+            prompt=input.query,
+            stream=input.streaming,
+            max_new_tokens=input.max_new_tokens,
+            repetition_penalty=input.repetition_penalty,
+            temperature=input.temperature,
+            top_k=input.top_k,
+            top_p=input.top_p,
+        )
         statistics_dict["opea_service@llm_tgi"].append_latency(time.time() - start, None)
         return GeneratedDoc(text=response, prompt=input.query)
 
 
 if __name__ == "__main__":
+    llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
+    llm = AsyncInferenceClient(
+        model=llm_endpoint,
+        timeout=600,
+    )
     opea_microservices["opea_service@llm_tgi"].start()

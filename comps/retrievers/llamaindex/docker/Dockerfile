@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-FROM langchain/langchain:latest
+FROM ubuntu:22.04
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
@@ -15,15 +15,13 @@ RUN useradd -m -s /bin/bash user && \
 
 COPY comps /home/user/comps
 
-RUN chmod +x /home/user/comps/retrievers/langchain/pinecone/run.sh
-
 USER user
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/user/comps/retrievers/langchain/pinecone/requirements.txt
+    pip install --no-cache-dir -r /home/user/comps/retrievers/llamaindex/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/retrievers/langchain/pinecone
+WORKDIR /home/user/comps/retrievers/llamaindex
 
-ENTRYPOINT ["/home/user/comps/retrievers/langchain/pinecone/run.sh"]
+ENTRYPOINT ["python", "retriever_redis.py"]
