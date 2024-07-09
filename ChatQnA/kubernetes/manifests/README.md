@@ -64,7 +64,7 @@ kubectl create deployment client-test -n chatqa --image=python:3.8.13 -- sleep i
 5. Access the application using the above URL from the client pod
 
 ```sh
-export CLIENT_POD=$(kubectl get pod -l app=client-test -o jsonpath={.items..metadata.name})
+export CLIENT_POD=$(kubectl get pod -n chatqa -l app=client-test -o jsonpath={.items..metadata.name})
 export accessUrl=$(kubectl get gmc -n chatqa -o jsonpath="{.items[?(@.metadata.name=='chatqa')].status.accessUrl}")
 kubectl exec "$CLIENT_POD" -n chatqa -- curl $accessUrl  -X POST  -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
 ```
@@ -79,7 +79,7 @@ For example, to use Llama-2-7b-chat-hf make the following edit:
 ```yaml
 - name: Tgi
   internalService:
-    serviceName: tgi-svc
+    serviceName: tgi-service-m
     config:
       LLM_MODEL_ID: Llama-2-7b-chat-hf
 ```
@@ -92,7 +92,7 @@ kubectl apply -f $(pwd)/chatQnA_xeon.yaml
 8. Check that the tgi-svc-deployment has been changed to use the new LLM Model
 
 ```sh
-kubectl get deployment tgi-svc-deployment -n chatqa -o jsonpath="{.spec.template.spec.containers[*].env[?(@.name=='LLM_MODEL_ID')].value}"
+kubectl get deployment tgi-service-m-deployment -n chatqa -o jsonpath="{.spec.template.spec.containers[*].env[?(@.name=='LLM_MODEL_ID')].value}"
 ```
 
 9. Access the updated pipeline using the same URL from above using the client pod
