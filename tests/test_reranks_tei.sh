@@ -8,7 +8,7 @@ WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
-    docker build --no-cache -t opea/reranking-tei:comps -f comps/reranks/langchain/docker/Dockerfile .
+    docker build --no-cache -t opea/reranking-tei:comps -f comps/reranks/tei/docker/Dockerfile .
 }
 
 function start_service() {
@@ -29,12 +29,19 @@ function start_service() {
 
 function validate_microservice() {
     tei_service_port=5007
-    http_proxy="" curl http://${ip_address}:${tei_service_port}/v1/reranking\
+    local CONTENT=$(curl http://${ip_address}:${tei_service_port}/v1/reranking \
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-        -H 'Content-Type: application/json'
-    docker logs test-comps-reranking-tei-server
-    docker logs test-comps-reranking-tei-endpoint
+        -H 'Content-Type: application/json')
+
+    if echo "$CONTENT" | grep -q "### Search results:"; then
+        echo "Content is as expected."
+    else
+        echo "Content does not match the expected result: $CONTENT"
+        docker logs test-comps-reranking-tei-server
+        docker logs test-comps-reranking-tei-endpoint
+        exit 1
+    fi
 }
 
 function stop_docker() {

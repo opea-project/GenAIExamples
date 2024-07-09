@@ -39,7 +39,7 @@ case ${micro_service} in
     "retrievers/langchain")
         IMAGE_NAME="opea/retriever-redis"
         ;;
-    "reranks/langchain")
+    "reranks/tei")
         IMAGE_NAME="opea/reranking-tei"
         ;;
     "llms/text-generation/tgi")

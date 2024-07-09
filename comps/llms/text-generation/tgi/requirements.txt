@@ -1,5 +1,7 @@
+aiohttp
 docarray[full]
 fastapi
+httpx
 huggingface_hub
 langsmith
 opentelemetry-api

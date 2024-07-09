@@ -1,5 +1,7 @@
+aiohttp
 docarray[full]
 fastapi
+httpx
 langsmith
 opentelemetry-api
 opentelemetry-exporter-otlp

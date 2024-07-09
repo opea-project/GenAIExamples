@@ -1,6 +1,8 @@
+aiohttp
 docarray[full]
 easyocr
 fastapi
+httpx
 langsmith
 llama-index-vector-stores-redis
 llama_index
@@ -11,3 +13,4 @@ pymupdf
 redis
 sentence_transformers
 shortuuid
+
