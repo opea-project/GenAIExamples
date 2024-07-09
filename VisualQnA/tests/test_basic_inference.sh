@@ -7,17 +7,15 @@ set -xe
 function test_env_setup() {
     WORKPATH=$(dirname "$PWD")
     LOG_PATH="$WORKPATH/tests/inference.log"
-    CONTAINER_NAME="test-llava-gaudi-service"
     cd $WORKPATH
 }
 
 function launch_llava_service() {
     cd ${WORKPATH}
-    cd serving/
     local port=8855
-    docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -t intel/gen-ai-examples:${CONTAINER_NAME}
-    docker run -d --name=${CONTAINER_NAME} -p ${port}:8000 -v ~/.cache/huggingface/hub/:/root/.cache/huggingface/hub/ -e http_proxy=$http_proxy -e https_proxy=$http_proxy \
-    --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:${CONTAINER_NAME}
+    docker compose build
+    docker run -d --name=visualqna -p ${port}:8000 -v ~/.cache/huggingface/hub/:/root/.cache/huggingface/hub/ -e http_proxy=$http_proxy -e https_proxy=$http_proxy \
+    --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host opea/visualqna:latest
 
     sleep 3m
 }
@@ -45,21 +43,20 @@ function check_response() {
 }
 
 function docker_stop() {
-    local container_name=$1
-    cid=$(docker ps -aq --filter "name=$container_name")
+    cid=$(docker ps -aq --filter "name=visualqna")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid; fi
 }
 
 function main() {
     test_env_setup
-    docker_stop $CONTAINER_NAME && sleep 5s
+    docker_stop visualqna && sleep 5s
 
     launch_llava_service
 
     run_tests
     check_response
 
-    docker_stop $CONTAINER_NAME && sleep 5s
+    docker_stop visualqna && sleep 5s
     echo y | docker system prune
 }
 

@@ -1,0 +1,89 @@
+# Copyright (c) 2024 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Container Integration Tests
+on:
+  pull_request: null
+permissions: read-all
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  group-diff:
+    runs-on: ubuntu-latest
+    outputs:
+      groups: ${{ steps.group-list.outputs.FOLDERS }}
+    steps:
+    - name: Harden Runner
+      uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+      with:
+        egress-policy: audit
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      with:
+        fetch-depth: 0
+    - name: Output Modified Group Directories
+      id: group-list
+      run: |
+        # Get diff array filtered by specific filetypes
+        DIFF=$(git diff --diff-filter=d \
+            --name-only ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} \
+            -- '*/*Dockerfile' '*.py' '*.yaml' '*.yml' '*.sh' '*/*requirements.txt' '*.json' '*.ts' '*.js' | \
+            jq -R '.' | jq -sc '.' \
+        )
+        # Search for compose files in each file to determine the container groups
+        DOCKER_COMPOSE_PATHS=()
+        for path in $(echo $DIFF | jq -r '.[]'); do
+          while [[ "$path" != "." ]]; do
+            DIR_PATH=$(dirname "$path")
+            if [ -n "$(find "$DIR_PATH" -maxdepth 1 -name 'docker-compose.yaml' -print -quit)" ] && [ "$DIR_PATH" != "." ]; then
+              DOCKER_COMPOSE_PATHS+=("$DIR_PATH")
+              path="."
+            else
+              path="$DIR_PATH"
+            fi
+          done
+        done
+        # Convert the array to a JSON array
+        DOCKER_COMPOSE_PATHS_JSON=$(printf '%s\n' "${DOCKER_COMPOSE_PATHS[@]}" | jq -R '.' | jq -sc 'unique_by(.)')
+        echo "FOLDERS=$DOCKER_COMPOSE_PATHS_JSON" >> $GITHUB_OUTPUT
+  pipeline-ci:
+    needs: group-diff
+    if: needs.group-diff.outputs.groups != '[""]'
+    strategy:
+      matrix:
+        group: ${{ fromJson(needs.group-diff.outputs.groups) }}
+        experimental: [true]
+      fail-fast: false
+    uses: opea/genaiexamples/.github/workflows/reuse-container-ci.yaml@main
+    with:
+      group_dir: ${{ matrix.group }}
+      no_start: true
+    secrets: inherit
+  status-check:
+    needs: [group-diff, pipeline-ci]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: Harden Runner
+      uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+      with:
+        egress-policy: audit
+    - run: exit 1
+      if: >-
+        ${{
+             contains(needs.*.result, 'failure')
+          || contains(needs.*.result, 'cancelled')
+          || contains(needs.*.result, 'skipped')
+          && needs.group-diff.outputs.groups != '[""]'
+        }}

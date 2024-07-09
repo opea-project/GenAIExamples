@@ -34,14 +34,14 @@ docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --buil
 docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/Dockerfile .
 ```
 
-### 6. Build MegaService Docker Image
+### 6. Build MegaService Docker Images
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `audioqna.py` Python script. Build the MegaService Docker image using the command below:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `audioqna.py` Python script. Build the MegaService Docker images using the command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/AudioQnA/docker
-docker build --no-cache -t opea/audioqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd GenAIExamples/AudioQnA
+docker compose build audioqna audioqna-ui
 ```
 
 Then run the command `docker images`, you will have following images ready:
@@ -52,6 +52,7 @@ Then run the command `docker images`, you will have following images ready:
 4. `opea/speecht5:latest`
 5. `opea/tts:latest`
 6. `opea/audioqna:latest`
+7. `opea/qudioqna-ui:latest`
 
 ## 🚀 Set the environment variables
 

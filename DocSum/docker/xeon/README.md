@@ -27,23 +27,14 @@ docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy 
 
 Then run the command `docker images`, you will have the following four Docker Images:
 
-### 2. Build MegaService Docker Image
+### 2. Build MegaService Docker Images
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `docsum.py` Python script. Build the MegaService Docker image via below command:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `docsum.py` Python script. Build the MegaService Docker images via below command:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/DocSum/docker
-docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-### 3. Build UI Docker Image
-
-Build the frontend Docker image via below command:
-
-```bash
-cd GenAIExamples/DocSum/docker/ui/
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/DocSum
+docker compose build docsum docsum-ui
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:

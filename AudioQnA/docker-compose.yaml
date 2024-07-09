@@ -1,0 +1,20 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Container CI for AudioQnA
+services:
+  audioqna:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ""
+      context: ./docker
+      dockerfile: Dockerfile
+    image: ${REGISTRY:-opea}/audioqna:${GITHUB_RUN_NUMBER:-latest}
+  audioqna-ui: # This image isn't being utilized, but does exist.
+    build:
+      context: ./docker/ui
+      dockerfile: ./docker/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/audioqna-ui:${GITHUB_RUN_NUMBER:-latest}

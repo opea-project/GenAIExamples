@@ -23,14 +23,13 @@ This example guides you through how to deploy a [LLaVA](https://llava-vl.github.
 1. Build the Docker image needed for starting the service
 
 ```
-cd serving/
-docker build . --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${http_proxy} -t intel/gen-ai-examples:llava-gaudi
+docker compose build
 ```
 
 2. Start the LLaVA service on Intel Gaudi2
 
 ```
-docker run -d -p 8085:8000 -v ./data:/root/.cache/huggingface/hub/ -e http_proxy=$http_proxy -e https_proxy=$http_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host intel/gen-ai-examples:llava-gaudi
+docker run -d -p 8085:8000 -v ./data:/root/.cache/huggingface/hub/ -e http_proxy=$http_proxy -e https_proxy=$http_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host opea/llava-gaudi:latest
 ```
 
 Here are some explanation about the above parameters:

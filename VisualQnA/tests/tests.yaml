@@ -1,0 +1,8 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# https://github.com/intel/ai-containers/tree/main/test-runner
+import-comps:
+  img: ${REGISTRY}/visualqna:${GITHUB_RUN_NUMBER:-0}
+  cmd: llava_server.py -h
+  entrypoint: "python"

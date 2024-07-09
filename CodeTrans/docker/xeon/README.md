@@ -27,19 +27,12 @@ cd GenAIComps
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 3. Build MegaService Docker Image
+### 3. Build MegaService Docker Images
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/CodeTrans/docker
-docker build -t opea/codetrans:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-### 4. Build UI Docker Image
-
-```bash
-cd GenAIExamples/CodeTrans/docker/ui
-docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/CodeTrans
+docker compose build codetrans codetrans-ui
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
