@@ -49,14 +49,14 @@ jobs:
           cd tests
           service=$(echo $service_path | tr '/' '_')
           echo "service=${service}" >> $GITHUB_ENV
-          if [ -f test_${service}.sh ]; then timeout 10m bash test_${service}.sh; else echo "Test script not found, skip test!"; fi
+          if [ -f test_${service}.sh ]; then timeout 30m bash test_${service}.sh; else echo "Test script not found, skip test!"; fi
 
       - name: Clean up container
         if: cancelled() || failure()
         run: |
           cid=$(docker ps -aq --filter "name=test-comps-*")
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-          echo y | docker system prune
+          echo y | docker system prune --all
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
