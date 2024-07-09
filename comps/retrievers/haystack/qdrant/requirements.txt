@@ -1,0 +1,13 @@
+docarray[full]
+easyocr
+fastapi
+haystack-ai
+langchain_community
+langsmith
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+pymupdf
+qdrant-haystack
+sentence_transformers
+shortuuid
