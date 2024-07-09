@@ -50,7 +50,6 @@ jobs:
           if [ ${{ matrix.hardware }} == "gaudi" ]; then IMAGE_REPO=${{ vars.IMAGE_REPO_GAUDI }}; else IMAGE_REPO=${{ vars.IMAGE_REPO_XEON }}; fi
           echo "IMAGE_REPO=$OPEA_IMAGE_REPO" >> $GITHUB_ENV
           lower_example=$(echo "${{ matrix.example }}" | tr '[:upper:]' '[:lower:]')
-          echo "SYSTEM_NAMESPACE=opea-system-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
           echo "APP_NAMESPACE=$lower_example-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
           echo "ROLLOUT_TIMEOUT_SECONDS=1800s" >> $GITHUB_ENV
           echo "KUBECTL_TIMEOUT_SECONDS=60s" >> $GITHUB_ENV
@@ -66,7 +65,6 @@ jobs:
             echo "No test script found, exist test!"
             exit 0
           else
-            ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh init_${{ matrix.example }}
             echo "should_cleanup=true" >> $GITHUB_ENV
             ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh install_${{ matrix.example }}
             echo "Testing ${{ matrix.example }}, waiting for pod ready..."
@@ -93,10 +91,6 @@ jobs:
         if: always()
         run: |
           if $should_cleanup; then
-            if ! kubectl delete ns $SYSTEM_NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
-              kubectl delete pods --namespace $SYSTEM_NAMESPACE --force --grace-period=0 --all
-              kubectl delete ns $SYSTEM_NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
-            fi
             if ! kubectl delete ns $APP_NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
               kubectl delete pods --namespace $APP_NAMESPACE --force --grace-period=0 --all
               kubectl delete ns $APP_NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
