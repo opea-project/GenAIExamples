@@ -222,7 +222,7 @@ curl http://${host_ip}:8808/rerank \
 Output is:
 `[{"index":1,"score":0.9988041},{"index":0,"score":0.022948774}]`
 
-It socres the input
+It scores the input
 
 ### 5 Reranking Microservice
 
