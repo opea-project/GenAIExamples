@@ -6,10 +6,13 @@ FROM python:3.11-slim
 
 ENV LANG C.UTF-8
 
+ARG ARCH="cpu"
+
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     build-essential \
     libgl1-mesa-glx \
     libjemalloc-dev \
+    default-jre \
     vim
 
 RUN useradd -m -s /bin/bash user && \
@@ -21,6 +24,7 @@ USER user
 COPY comps /home/user/comps
 
 RUN pip install --no-cache-dir --upgrade pip setuptools && \
+    if [ ${ARCH} = "cpu" ]; then pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
     pip install --no-cache-dir -r /home/user/comps/dataprep/pgvector/langchain/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user

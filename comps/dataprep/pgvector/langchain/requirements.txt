@@ -1,11 +1,14 @@
 beautifulsoup4
+cairosvg
 docarray[full]
+docx2txt
 easyocr
 fastapi
 huggingface_hub
 langchain
 langchain-community
 langsmith
+markdown
 numpy
 opentelemetry-api
 opentelemetry-exporter-otlp
@@ -17,5 +20,6 @@ prometheus-fastapi-instrumentator==7.0.0
 psycopg2-binary
 pymupdf
 python-docx
+python-pptx
 sentence_transformers
 shortuuid
