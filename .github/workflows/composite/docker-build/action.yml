@@ -61,7 +61,6 @@ runs:
         overwrite: true
     - name: Push Containers
       shell: bash
-      if: ${{ !fromJson(inputs.no-push) }}
       run: |
         REGISTRY=${{ inputs.registry }} \
         COMPOSE_PROJECT_NAME=${{ env.project-number }} \
