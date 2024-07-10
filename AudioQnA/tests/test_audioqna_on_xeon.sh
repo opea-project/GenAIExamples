@@ -10,18 +10,6 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH
-    git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
-
-    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/whisper:latest -f comps/asr/whisper/Dockerfile .
-    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/asr:latest -f comps/asr/Dockerfile .
-    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/speecht5:latest -f comps/tts/speecht5/Dockerfile .
-    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/tts:latest -f comps/tts/Dockerfile .
-
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
-
-    cd $WORKPATH
     docker compose build
 
     # cd $WORKPATH/docker/ui
