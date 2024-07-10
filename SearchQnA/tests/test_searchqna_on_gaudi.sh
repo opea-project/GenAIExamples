@@ -87,6 +87,7 @@ function validate_megaservice() {
     if [[ $result == *"news"* ]]; then
         echo "Result correct."
     else
+        docker logs embedding-tei-server
         docker logs web-retriever-chroma-server
         docker logs searchqna-gaudi-backend-server
         echo "Result wrong."
