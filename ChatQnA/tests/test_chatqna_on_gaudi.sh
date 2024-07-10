@@ -185,7 +185,7 @@ function validate_megaservice() {
 }
 
 function validate_frontend() {
-    set -e  # 
+    set -e  #
     trap 'echo "[ERROR] Error occurred at line $LINENO"; exit 1' ERR  # catch error line
 
     echo "[INFO] Changing to Svelte directory"
