@@ -223,16 +223,12 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 <table>
 	<tbody>
 		<tr>
-			<td>Framework</td>
 			<td>LLM</td>
-			<td>Serving</td>
 			<td>HW</td>
 			<td>Description</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
 			<td><a href="https://huggingface.co/llava-hf/llava-1.5-7b-hf">LLaVA-1.5-7B</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
 			<td>Gaudi2</td>
 			<td>Chatbot</td>
 		</tr>
