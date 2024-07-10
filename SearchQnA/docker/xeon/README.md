@@ -35,14 +35,15 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 6. Build MegaService Docker Images
+### 6. Build MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `searchqna.py` Python script. Build the MegaService Docker images using the command below:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `searchqna.py` Python script. Build the MegaService Docker image using the command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/SearchQnA
-docker compose build searchqna searchqna-ui
+cd GenAIExamples/SearchQnA/docker
+docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd ../../..
 ```
 
 Then run the command `docker images`, you will have following images ready:

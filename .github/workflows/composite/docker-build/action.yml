@@ -1,0 +1,81 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Source: https://github.com/intel/ai-containers/blob/main/.github/action.yml
+
+---
+name: Build Container Group
+description: Given the inputs found below, build all containers found in a docker-compose.yaml file for a given configuration
+author: tyler.titsworth@intel.com
+inputs:
+  group_dir:
+    description: Directory with docker-compose.yaml to build
+    required: true
+    type: string
+  env_overrides:
+    description: Bash Env Variable Overrides in `KEY=VAL && KEY2=VAL2` format
+    required: false
+    type: string
+  registry:
+    description: Container Registry URL
+    required: false
+    default: 'opea-project'
+    type: string
+outputs:
+  container-group:
+    description: "Container Group"
+    value: ${{ steps.container-output.outputs.group }}
+runs:
+  using: composite
+  steps:
+      # This step generates a random number to use as the project number
+      # which can help avoid collisions with parallel builds on the same system
+    - name: Generate Project Number
+      shell: bash
+      run: echo "project-number=$(shuf -i 0-10000 -n1)" >> $GITHUB_ENV
+    - name: Build Containers
+      shell: bash
+      run: |
+        REGISTRY=${{ inputs.registry }} \
+        COMPOSE_PROJECT_NAME=${{ env.project-number }} \
+        ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} up --build --force-recreate --always-recreate-deps --no-start
+      working-directory: ${{ inputs.group_dir }}
+    - name: Print Containers
+      id: container-output
+      shell: bash
+      run: |
+        mkdir matrix
+        images=$(REGISTRY=${{ inputs.registry }} \
+        COMPOSE_PROJECT_NAME=${{ env.project-number }} \
+        ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} images --format json)
+        for image in $(echo $images | jq -r --arg registry "$REGISTRY" '.[] | select(.Repository | contains($registry)) | .Tag'); do
+          echo "$image" > matrix/$image.txt
+        done
+        echo "group=${{ inputs.group_dir }}" | tr '/' '_' >> $GITHUB_OUTPUT
+      working-directory: ${{ inputs.group_dir }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.project-number }}-${{ steps.container-output.outputs.group }}
+        path: ${{ inputs.group_dir }}/matrix/*
+        retention-days: 1
+        overwrite: true
+    - name: Push Containers
+      shell: bash
+      if: ${{ !fromJson(inputs.no-push) }}
+      run: |
+        REGISTRY=${{ inputs.registry }} \
+        COMPOSE_PROJECT_NAME=${{ env.project-number }} \
+        ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} push
+      working-directory: ${{ inputs.group_dir }}
+    - name: Un-Tag Containers
+      if: ${{ always() }}
+      shell: bash
+      run: |
+        REGISTRY=${{ inputs.registry }} \
+        COMPOSE_PROJECT_NAME=${{ env.project-number }} \
+        ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} down --rmi all
+      working-directory: ${{ inputs.group_dir }}
+    - name: Remove Containers
+      if: ${{ always() }}
+      shell: bash
+      run: docker system prune --force

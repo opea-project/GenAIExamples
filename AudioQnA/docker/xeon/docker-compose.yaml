@@ -2,8 +2,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3.8"
-
 services:
   whisper-service:
     image: opea/whisper:latest
@@ -73,7 +71,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   audioqna-xeon-backend-server:
-    image: opea/audioqna:latest
+    image: ${REGISTRY:-opea}/audioqna:${GITHUB_RUN_NUMBER:-latest}
     container_name: audioqna-xeon-backend-server
     depends_on:
       - asr

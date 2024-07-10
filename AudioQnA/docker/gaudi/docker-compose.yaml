@@ -90,7 +90,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   audioqna-gaudi-backend-server:
-    image: opea/audioqna:latest
+    image: ${REGISTRY:-opea}/audioqna:${GITHUB_RUN_NUMBER:-latest}
     container_name: audioqna-gaudi-backend-server
     depends_on:
       - asr

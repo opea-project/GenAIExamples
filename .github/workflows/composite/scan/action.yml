@@ -1,0 +1,26 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Source: https://github.com/intel/ai-containers/blob/main/.github/scan/action.yml
+
+name: 'Aqua Security Trivy'
+description: 'Scans container images for vulnerabilities with Trivy without building the image. For use behind firewalls.'
+author: 'tyler.titsworth@intel.com'
+inputs:
+  image-ref:
+    description: 'image reference(for backward compatibility)'
+    required: true
+  output:
+    description: 'writes results to a file with the specified file name'
+    required: true
+runs:
+  using: 'docker'
+  image: "docker://ghcr.io/aquasecurity/trivy"
+  entrypoint: trivy
+  args:
+    - '--timeout=30m'
+    - image
+    - '--format=sarif'
+    - '--no-progress'
+    - '--output=${{ inputs.output }}'
+    - ${{ inputs.image-ref }}

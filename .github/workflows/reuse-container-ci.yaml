@@ -1,16 +1,5 @@
-# Copyright (c) 2024 Intel Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
 name: Container CI
 permissions: read-all
@@ -30,56 +19,17 @@ on:
         default: test-runner
         required: true
         type: string
-      no_build:
-        description: No build
-        default: false
-        required: true
-        type: boolean
-      no_push:
-        description: Do not push to Registry
-        required: true
-        default: false
-        type: boolean
-      no_start:
-        description: No Start
-        default: false
-        required: true
-        type: boolean
   workflow_call:
     inputs:
       group_dir:
         required: true
         type: string
-      no_push:
-        required: false
-        type: boolean
-      no_start:
-        required: false
-        type: boolean
 jobs:
-  ####################################################################################################
-  # Compose Build
-  ####################################################################################################
-  setup-build:
-    outputs:
-      matrix: ${{ steps.build-matrix.outputs.matrix }}
-    runs-on: ubuntu-latest # ${{ github.repository_owner == 'intel' && 'intel-ubuntu-latest' || 'ubuntu-latest' }}
-    steps:
-    - name: Harden Runner
-      uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-    - name: Set Matrix
-      id: build-matrix
-      run: echo "matrix=$(jq -c . < ${{ inputs.group_dir }}/.actions.json)" >> $GITHUB_OUTPUT
-    - name: Print Inputs
-      if: ${{ inputs.env_overrides }}
-      run: echo "Overrides - ${{ inputs.env_overrides }}" >> $GITHUB_STEP_SUMMARY
+####################################################################################################
+# Compose Build
+####################################################################################################
   build-containers:
-    needs: [setup-build]
-    env: ${{ matrix }}
-    runs-on: ubuntu-latest # ${{ github.repository_owner == 'intel' && 'intel-ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJson(needs.setup-build.outputs.matrix) }}
       fail-fast: false
@@ -87,7 +37,6 @@ jobs:
       group: ${{ steps.build-group.outputs.container-group }}
     steps:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      if: ${{ !inputs.no_build }}
     - uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
       with:
         registry: ${{ secrets.REGISTRY }}
@@ -97,21 +46,18 @@ jobs:
     - name: Build Container Group
       if: ${{ !inputs.no_build }}
       id: build-group
-      uses: intel/ai-containers/.github@main
+      uses: ./.github/workflows/composite/docker-build
       with:
         group_dir: ${{ inputs.group_dir }}
         env_overrides: ${{ inputs.env_overrides || env.env_overrides || '' }}
         registry: ${{ secrets.REGISTRY }}
-        repo: ${{ secrets.REPO }}
-        no-push: ${{ inputs.no_push }}
-        no-start: ${{ inputs.no_start }}
-        ####################################################################################################
-        # Trivy Scan
-        ####################################################################################################
+####################################################################################################
+# Trivy Scan
+####################################################################################################
   setup-scan:
     needs: [build-containers]
     if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest # ${{ github.repository_owner == 'intel' && 'intel-ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.scan-matrix.outputs.matrix }}
     steps:
@@ -128,7 +74,7 @@ jobs:
   scan-containers:
     needs: [setup-scan]
     if: ${{ !inputs.no_build && github.event_name == 'pull_request' }}
-    runs-on: ${{ github.repository_owner == 'intel' && 'intel-ubuntu-latest' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     env:
       GROUP_DIR: ${{ inputs.group_dir }}
     strategy:
@@ -153,7 +99,7 @@ jobs:
       env:
         GROUP_DIR: ${{ inputs.group_dir }}
     - name: Scan Container
-      uses: intel/ai-containers/.github/scan@main
+      uses: ./.github/workflows/composite/scan
       with:
         image-ref: ${{ secrets.REGISTRY }}/${{ env.group_dir }}:${{ matrix.container }}
         output: ${{ matrix.container }}-${{ env.group_dir }}-scan.sarif
@@ -165,48 +111,45 @@ jobs:
         sarif_file: '${{ matrix.container }}-${{ env.group_dir }}-scan.sarif'
         category: '${{ matrix.container }}'
       continue-on-error: true
-      ####################################################################################################
-      # Generic Test Runner
-      ####################################################################################################
-  setup-test:
-    needs: [build-containers]
-    runs-on: ubuntu-latest # ${{ github.repository_owner == 'intel' && 'intel-ubuntu-latest' || 'ubuntu-latest' }}
-    outputs:
-      matrix: ${{ steps.test-matrix.outputs.matrix }}
-    steps:
-    - name: Harden Runner
-      uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-    - name: Get Recipes
-      id: test-matrix
-      run: echo "matrix=$(find ${{ inputs.group_dir }} -type f -name 'tests.yaml' -exec dirname {} \; | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-  test-containers:
-    needs: [setup-build, setup-test]
-    if: ${{ needs.setup-test.outputs.matrix != '[]' }}
-    runs-on: ${{ fromJson(needs.setup-build.outputs.matrix).runner_label }}
-    strategy:
-      matrix:
-        tests: ${{ fromJson(needs.setup-test.outputs.matrix) }}
-        experimental: [true]
-      fail-fast: false
-    steps:
-    - uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
-      with:
-        egress-policy: audit
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-    - uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
-      with:
-        registry: ${{ secrets.REGISTRY }}
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_TOKEN }}
-    - name: Test Container Group
-      uses: intel/ai-containers/test-runner@main
-      with:
-        cache_registry: ${{ secrets.CACHE_REGISTRY }}
-        recipe_dir: ${{ inputs.group_dir }}
-        registry: ${{ secrets.REGISTRY }}
-        repo: ${{ secrets.REPO }}
-        test_dir: ${{ matrix.tests }}
-        token: ${{ secrets.GITHUB_TOKEN }}
+####################################################################################################
+# Generic Test Runner
+####################################################################################################
+  # setup-test:
+  #   needs: [build-containers]
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     matrix: ${{ steps.test-matrix.outputs.matrix }}
+  #   steps:
+  #   - name: Harden Runner
+  #     uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+  #     with:
+  #       egress-policy: audit
+  #   - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+  #   - name: Get Recipes
+  #     id: test-matrix
+  #     run: echo "matrix=$(find ${{ inputs.group_dir }} -type f -name 'tests.yaml' -exec dirname {} \; | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+  # test-containers:
+  #   needs: [setup-build, setup-test]
+  #   if: ${{ needs.setup-test.outputs.matrix != '[]' }}
+  #   runs-on: ${{ fromJson(needs.setup-build.outputs.matrix).runner_label }}
+  #   strategy:
+  #     matrix:
+  #       tests: ${{ fromJson(needs.setup-test.outputs.matrix) }}
+  #       experimental: [true]
+  #     fail-fast: false
+  #   steps:
+  #   - uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+  #     with:
+  #       egress-policy: audit
+  #   - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+  #   - uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
+  #     with:
+  #       registry: ${{ secrets.REGISTRY }}
+  #       username: ${{ secrets.REGISTRY_USER }}
+  #       password: ${{ secrets.REGISTRY_TOKEN }}
+  #   - name: Test Container Group
+  #     uses: ./.github/workflows/composite/test
+  #     with:
+  #       registry: ${{ secrets.REGISTRY }}
+  #       test_dir: ${{ matrix.tests }}
+  #       token: ${{ secrets.GITHUB_TOKEN }}
