@@ -32,12 +32,10 @@
 	} from "$lib/shared/Utils";
 	import { fetchTextStream } from "$lib/network/chat/Network";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
-	import { browser } from "$app/environment";
 	import "driver.js/dist/driver.css";
 	import "$lib/assets/layout/css/driver.css";
 	import UploadFile from "$lib/shared/components/upload/uploadFile.svelte";
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
-	import Gallery from "$lib/shared/components/chat/gallery.svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 
@@ -90,43 +88,42 @@
 		const eventSource = await fetchTextStream(query, knowledge_1);
 
 		eventSource.addEventListener("message", (e: any) => {
-			let Msg = e.data;
-			if (Msg.startsWith("b")) {
-				let currentMsg = Msg.slice(2, -1);
-				const containsNewLine = /\\n/.test(currentMsg);
-				let requiresDecoding = false;
+			let msg = e.data;
+			console.log("msg", msg);
 
-				currentMsg = currentMsg.replace(/\\n/g, "\n");
+			const handleDecodedMessage = (decodedMsg: string) => {
+				if (decodedMsg !== "</s>") {
+					decodedMsg = decodedMsg.replace(/\\n/g, "\n");
+				}
+
+				if (chatMessages[chatMessages.length - 1].role === MessageRole.User) {
+					chatMessages.push({
+						role: MessageRole.Assistant,
+						type: MessageType.Text,
+						content: decodedMsg,
+						time: startSendTime,
+					});
+				} else {
+					chatMessages[chatMessages.length - 1].content += decodedMsg;
+				}
+
+				scrollToBottom(scrollToDiv);
+			};
+
+			if (msg.startsWith("b")) {
+				let currentMsg = msg.slice(2, -1);
 
 				if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
 					currentMsg = decodeEscapedBytes(currentMsg);
-					requiresDecoding = true;
 				} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
 					currentMsg = decodeUnicode(currentMsg);
-					requiresDecoding = true;
 				}
 
-				if (containsNewLine && requiresDecoding) {
-					currentMsg += "\n";
-				}
-				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-					chatMessages = [
-						...chatMessages,
-						{
-							role: MessageRole.Assistant,
-							type: MessageType.Text,
-							content: currentMsg,
-							time: startSendTime,
-						},
-					];
-				} else {
-					let content = chatMessages[chatMessages.length - 1].content as string;
-					chatMessages[chatMessages.length - 1].content = content + currentMsg;
-				}
-				scrollToBottom(scrollToDiv);
-			} else if (Msg === "[DONE]") {
+				handleDecodedMessage(currentMsg);
+			} else if (msg === "[DONE]") {
+				console.log("Done");
+
 				let startTime = chatMessages[chatMessages.length - 1].time;
-
 				loading = false;
 				let totalTime = parseFloat(
 					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
@@ -137,8 +134,19 @@
 				}
 
 				storeMessages();
+			} else {
+				if (/\\x[\dA-Fa-f]{2}/.test(msg)) {
+					msg = decodeEscapedBytes(msg);
+				} else if (/\\u[\dA-Fa-f]{4}/.test(msg)) {
+					msg = decodeUnicode(msg);
+				}
+
+				let currentMsg = msg.replace(/"/g, "").replace(/\\n/g, "\n");
+
+				handleDecodedMessage(currentMsg);
 			}
 		});
+
 		eventSource.stream();
 	};
 
