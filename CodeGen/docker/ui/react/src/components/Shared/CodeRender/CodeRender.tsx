@@ -31,7 +31,7 @@ const CodeRender = ({ cleanCode, language, inline }:CodeRenderProps) => {
                 </div>
                 <SyntaxHighlighter
                     className={styles.codeHighlighterDiv}
-                    children={cleanCode}
+                    children={cleanCode.toString()}
                     wrapLongLines={true}
                     style={tomorrow}
                     language={language}
