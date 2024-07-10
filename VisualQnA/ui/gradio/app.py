@@ -13,10 +13,22 @@ import gradio as gr
 import requests
 
 title_markdown = """
-# 🌋 在 Gaudi2 上展示 LLaVA
+# 🌋 LLaVA demo on Gaudi2
 """
 
 tos_markdown = """
+### Terms of use
+By using this service, users are required to agree to the following terms:
+The service is a research preview intended for non-commercial use only. It only provides limited safety measures and may generate offensive content. It must not be used for any illegal, harmful, violent, racist, or sexual purposes. The service may collect user dialogue data for future research.
+Please click the "Flag" button if you get any inappropriate answer! We will collect those to keep improving our moderator.
+For an optimal experience, please use desktop computers for this demo, as mobile devices may compromise its quality.
+"""
+
+title_markdown_cn = """
+# 🌋 在 Gaudi2 上展示 LLaVA
+"""
+
+tos_markdown_cn = """
 ### 使用条款
 使用本服务即表示用户同意以下条款：
 本服务为研究预览版，仅供非商业用途。它仅提供有限的安全措施，可能会生成冒犯性内容。严禁将本服务用于任何非法、有害、暴力、种族歧视或色情的目的。本服务可能会收集用户对话数据以用于未来研究。
@@ -97,7 +109,7 @@ def clear_history(chat_history, image, text):
     return [chat_history, image, text] + [disable_btn]
 
 
-def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
+def build_demo_cn(embed_mode, cur_dir=None, concurrency_count=10):
     textbox = gr.Textbox(show_label=False, placeholder="输入文字并按回车键", container=False)
     with gr.Blocks(title="LLaVA", theme=gr.themes.Default(), css=block_css) as demo:
         # demo.add(custom_html)
@@ -105,7 +117,7 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
         state = gr.State()
 
         if not embed_mode:
-            gr.Markdown(title_markdown)
+            gr.Markdown(title_markdown_cn)
 
         with gr.Row():
             with gr.Column(scale=3):
@@ -151,6 +163,81 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                     clear_btn = gr.Button(value="🗑️  清除", interactive=False)
 
         if not embed_mode:
+            gr.Markdown(tos_markdown_cn)
+
+        btn_list = [clear_btn]
+
+        clear_btn.click(
+            clear_history,
+            [chatbot, imagebox, textbox],
+            [chatbot, imagebox, textbox] + btn_list,
+        )
+
+        textbox.submit(
+            handle_llava_request,
+            [textbox, imagebox, max_output_tokens, chatbot],
+            [chatbot] + btn_list,
+        )
+
+        submit_btn.click(
+            handle_llava_request,
+            [textbox, imagebox, max_output_tokens, chatbot],
+            [chatbot] + btn_list,
+        )
+
+    return demo
+
+def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
+    textbox = gr.Textbox(show_label=False, placeholder="Enter text and press ENTER", container=False)
+    with gr.Blocks(title="LLaVA", theme=gr.themes.Default(), css=block_css) as demo:
+        state = gr.State()
+
+        if not embed_mode:
+            gr.Markdown(title_markdown)
+
+        with gr.Row():
+            with gr.Column(scale=3):
+                imagebox = gr.Image(type="pil")
+
+                if cur_dir is None:
+                    cur_dir = os.path.dirname(os.path.abspath(__file__))
+                gr.Examples(
+                    examples=[
+                        [f"{cur_dir}/resources/extreme_ironing.jpg", "What is unusual about this image?"],
+                        [
+                            f"{cur_dir}/resources/waterview.jpg",
+                            "What are the things I should be cautious about when I visit here?",
+                        ],
+                    ],
+                    inputs=[imagebox, textbox],
+                )
+
+                with gr.Accordion("Parameters", open=False) as parameter_row:
+                    max_output_tokens = gr.Slider(
+                        minimum=0,
+                        maximum=1024,
+                        value=512,
+                        step=64,
+                        interactive=True,
+                        label="Max output tokens",
+                    )
+
+            with gr.Column(scale=8):
+                chatbot = gr.Chatbot(
+                    elem_id="chatbot",
+                    label="LLaVA Chatbot",
+                    height=650,
+                    layout="panel",
+                )
+                with gr.Row():
+                    with gr.Column(scale=8):
+                        textbox.render()
+                    with gr.Column(scale=1, min_width=50):
+                        submit_btn = gr.Button(value="Send", variant="primary")
+                with gr.Row(elem_id="buttons") as button_row:
+                    clear_btn = gr.Button(value="🗑️  Clear", interactive=False)
+
+        if not embed_mode:
             gr.Markdown(tos_markdown)
 
         btn_list = [clear_btn]
@@ -181,6 +268,8 @@ if __name__ == "__main__":
     # frontend host and port
     parser.add_argument("--host", type=str, default="0.0.0.0")
     parser.add_argument("--port", type=int)
+    parser.add_argument("--lang", type=str,  default='En')
+
     # backend worker address
     parser.add_argument(
         "--worker-addr", type=str, default="http://localhost:8085", help="The worker address of the LLaVA server."
@@ -191,6 +280,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     print(args)
-    demo = build_demo(args.embed, concurrency_count=args.concurrency_count)
+    selectedLang = args.lang
+    if selectedLang == 'CN':
+        demo = build_demo_cn(args.embed, concurrency_count=args.concurrency_count)
+    else:
+        demo = build_demo(args.embed, concurrency_count=args.concurrency_count)
 
     demo.queue(api_open=False).launch(server_name=args.host, server_port=args.port, share=args.share)
