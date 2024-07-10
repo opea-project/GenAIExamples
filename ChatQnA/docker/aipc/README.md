@@ -26,7 +26,7 @@ docker build --no-cache -t opea/retriever-redis:latest -f comps/retrievers/langc
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
 ```
 
 ### 4. Build LLM Image
