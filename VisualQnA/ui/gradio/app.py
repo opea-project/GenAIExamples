@@ -187,6 +187,7 @@ def build_demo_cn(embed_mode, cur_dir=None, concurrency_count=10):
 
     return demo
 
+
 def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
     textbox = gr.Textbox(show_label=False, placeholder="Enter text and press ENTER", container=False)
     with gr.Blocks(title="LLaVA", theme=gr.themes.Default(), css=block_css) as demo:
@@ -268,7 +269,7 @@ if __name__ == "__main__":
     # frontend host and port
     parser.add_argument("--host", type=str, default="0.0.0.0")
     parser.add_argument("--port", type=int)
-    parser.add_argument("--lang", type=str,  default='En')
+    parser.add_argument("--lang", type=str, default="En")
 
     # backend worker address
     parser.add_argument(
@@ -281,7 +282,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
     selectedLang = args.lang
-    if selectedLang == 'CN':
+    if selectedLang == "CN":
         demo = build_demo_cn(args.embed, concurrency_count=args.concurrency_count)
     else:
         demo = build_demo(args.embed, concurrency_count=args.concurrency_count)
