@@ -29,7 +29,7 @@ jobs:
 # Compose Build
 ####################################################################################################
   build-containers:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # local registry label
     strategy:
       matrix: ${{ fromJson(needs.setup-build.outputs.matrix) }}
       fail-fast: false
@@ -74,7 +74,7 @@ jobs:
   scan-containers:
     needs: [setup-scan]
     if: ${{ !inputs.no_build && github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # local registry label
     env:
       GROUP_DIR: ${{ inputs.group_dir }}
     strategy:
@@ -111,45 +111,35 @@ jobs:
         sarif_file: '${{ matrix.container }}-${{ env.group_dir }}-scan.sarif'
         category: '${{ matrix.container }}'
       continue-on-error: true
-####################################################################################################
-# Generic Test Runner
-####################################################################################################
-  # setup-test:
-  #   needs: [build-containers]
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     matrix: ${{ steps.test-matrix.outputs.matrix }}
-  #   steps:
-  #   - name: Harden Runner
-  #     uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
-  #     with:
-  #       egress-policy: audit
-  #   - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-  #   - name: Get Recipes
-  #     id: test-matrix
-  #     run: echo "matrix=$(find ${{ inputs.group_dir }} -type f -name 'tests.yaml' -exec dirname {} \; | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-  # test-containers:
-  #   needs: [setup-build, setup-test]
-  #   if: ${{ needs.setup-test.outputs.matrix != '[]' }}
-  #   runs-on: ${{ fromJson(needs.setup-build.outputs.matrix).runner_label }}
-  #   strategy:
-  #     matrix:
-  #       tests: ${{ fromJson(needs.setup-test.outputs.matrix) }}
-  #       experimental: [true]
-  #     fail-fast: false
-  #   steps:
-  #   - uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
-  #     with:
-  #       egress-policy: audit
-  #   - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-  #   - uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
-  #     with:
-  #       registry: ${{ secrets.REGISTRY }}
-  #       username: ${{ secrets.REGISTRY_USER }}
-  #       password: ${{ secrets.REGISTRY_TOKEN }}
-  #   - name: Test Container Group
-  #     uses: ./.github/workflows/composite/test
-  #     with:
-  #       registry: ${{ secrets.REGISTRY }}
-  #       test_dir: ${{ matrix.tests }}
-  #       token: ${{ secrets.GITHUB_TOKEN }}
+  setup-test:
+    needs: [build-containers]
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.test-matrix.outputs.matrix }}
+    steps:
+    - name: Harden Runner
+      uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+      with:
+        egress-policy: audit
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - name: Get Tests
+      id: test-matrix
+      run: echo "matrix=$(find ${{ inputs.group_dir }}/tests -type f -name 'test_*.sh' -print | jq -R . | jq -sc .)" >> $GITHUB_OUTPUT
+  test-containers:
+    needs: [setup-test]
+    if: ${{ needs.setup-test.outputs.matrix != '[]' }}
+    runs-on: ubuntu-latest # validation label
+    strategy:
+      matrix:
+        tests: ${{ fromJson(needs.setup-test.outputs.matrix) }}
+        experimental: [true]
+      fail-fast: false
+    steps:
+    - uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+      with:
+        egress-policy: audit
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - name: Run Test
+      run: bash ${{ matrix.tests }}
+      env:
+        REGISTRY: ${{ secrets.REGISTRY }}

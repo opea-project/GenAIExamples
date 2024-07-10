@@ -13,16 +13,16 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/whisper:latest -f comps/asr/whisper/Dockerfile .
-    docker build -t opea/asr:latest -f comps/asr/Dockerfile .
-    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/speecht5:latest -f comps/tts/speecht5/Dockerfile .
-    docker build -t opea/tts:latest -f comps/tts/Dockerfile .
+    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/whisper:latest -f comps/asr/whisper/Dockerfile .
+    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/asr:latest -f comps/asr/Dockerfile .
+    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/speecht5:latest -f comps/tts/speecht5/Dockerfile .
+    docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t opea/tts:latest -f comps/tts/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
 
-    cd $WORKPATH/docker
-    docker build --no-cache -t opea/audioqna:latest -f Dockerfile .
+    cd $WORKPATH
+    docker compose build
 
     # cd $WORKPATH/docker/ui
     # docker build --no-cache -t opea/audioqna-ui:latest -f docker/Dockerfile .
@@ -52,11 +52,12 @@ function start_services() {
 
     # Replace the container name with a test-specific name
     # echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    # sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    # sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker-compose.yaml
+    # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker-compose.yaml
+    # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker-compose.yaml
     # Start Docker Containers
-    docker compose -f docker_compose.yaml up -d
+    docker compose down --remove-orphans
+    docker compose up -d
     sleep 3m
     # n=0
     # until [[ "$n" -ge 200 ]]; do
@@ -106,18 +107,8 @@ function validate_megaservice() {
 #    fi
 #}
 
-function stop_docker() {
-    cd $WORKPATH/docker/xeon
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
-}
-
 function main() {
 
-    stop_docker
     build_docker_images
     # begin_time=$(date +%s)
     start_services
@@ -128,7 +119,7 @@ function main() {
     validate_megaservice
     # validate_frontend
 
-    stop_docker
+    docker compose down
     echo y | docker system prune
 
 }
