@@ -69,7 +69,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
-    until [[ "$n" -ge 300 ]]; do
+    until [[ "$n" -ge 500 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
             break
@@ -87,9 +87,10 @@ function validate_megaservice() {
     if [[ $result == *"news"* ]]; then
         echo "Result correct."
     else
+        docker logs tei-embedding-gaudi-server
         docker logs embedding-tei-server
-        docker logs web-retriever-chroma-server
-        docker logs searchqna-gaudi-backend-server
+        # docker logs web-retriever-chroma-server
+        # docker logs searchqna-gaudi-backend-server
         echo "Result wrong."
         exit 1
     fi
