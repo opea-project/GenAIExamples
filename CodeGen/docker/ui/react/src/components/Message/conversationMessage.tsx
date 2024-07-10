@@ -6,7 +6,6 @@ import style from "./conversationMessage.module.scss"
 import { Group, Text } from "@mantine/core"
 import { DateTime } from "luxon"
 import Markdown from "../Shared/Markdown/Markdown"
-import CodeRender from "../Shared/CodeRender/CodeRender"
 
 export interface ConversationMessageProps {
   message: string

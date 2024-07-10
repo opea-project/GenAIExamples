@@ -47,6 +47,7 @@ const Markdown = ({ content }: MarkdownProps) => {
                             </div>
                         );
                     },
+                    //@ts-expect-error inline can undefined sometimes
                     code({ inline, className, children, }) {
                         const lang = /language-(\w+)/.exec(className || '')
                             // if (lang && lang[1] === "mermaid") {
