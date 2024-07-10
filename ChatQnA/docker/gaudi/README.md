@@ -89,20 +89,6 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 cd ../../../..
 ```
 
-### 10. Build Conversational React UI Docker Image (Optional)
-
-Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
-
-**Export the value of the public IP address of your Gaudi node to the `host_ip` environment variable**
-
-```bash
-cd GenAIExamples/ChatQnA/docker/ui/
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
-cd ../../../..
-```
-
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/embedding-tei:latest`
