@@ -185,8 +185,8 @@ function validate_megaservice() {
 }
 
 function validate_frontend() {
-    set -e  #
-    trap 'echo "[ERROR] Error occurred at line $LINENO"; exit 1' ERR  # catch error line
+    set -e  # Enable error handling
+    trap 'echo "[ERROR] Error occurred at line $LINENO"; exit 1' ERR  # Catch error line
 
     echo "[INFO] Changing to Svelte directory"
     cd $WORKPATH/docker/ui/svelte
@@ -195,20 +195,24 @@ function validate_frontend() {
     echo "[INFO] Setting PATH for conda"
     export PATH=${HOME}/miniforge3/bin/:$PATH
 
-    # echo "[INFO] Removing existing conda environment"
-    # conda remove -n ${conda_env_name} --all -y
-
-    # echo "[INFO] Creating new conda environment with Python 3.12"
-    # conda create -n ${conda_env_name} python=3.12 -y
-
     echo "[INFO] Activating conda environment"
     source activate ${conda_env_name}
 
     echo "[INFO] Updating playwright config with IP address"
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    # echo "[INFO] Installing Node.js via conda"
-    # conda install -c conda-forge nodejs -y
+    echo "[INFO] Installing Node.js via conda"
+    conda install -c conda-forge nodejs -y
+
+    echo "[INFO] Verifying Node.js and npm installation"
+    node -v
+    npm -v
+    npx --version
+
+    echo "[INFO] Creating and running a simple Node.js script"
+    echo 'console.log("Node.js is working!");' > test.js
+    node test.js
+    rm test.js
 
     echo "[INFO] Installing npm dependencies"
     npm install
@@ -231,6 +235,7 @@ function validate_frontend() {
         echo "[TEST INFO]: ---------frontend test passed---------"
     fi
 }
+
 
 
 
