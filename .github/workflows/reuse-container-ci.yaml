@@ -30,9 +30,6 @@ jobs:
 ####################################################################################################
   build-containers:
     runs-on: ubuntu-latest # local registry label
-    strategy:
-      matrix: ${{ fromJson(needs.setup-build.outputs.matrix) }}
-      fail-fast: false
     outputs:
       group: ${{ steps.build-group.outputs.container-group }}
     steps:
