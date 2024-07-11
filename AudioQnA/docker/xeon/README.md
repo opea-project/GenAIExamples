@@ -41,7 +41,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/AudioQnA
-docker compose build audioqna audioqna-ui
+docker compose build
 ```
 
 Then run the command `docker images`, you will have following images ready:
