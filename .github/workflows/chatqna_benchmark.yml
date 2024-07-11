@@ -56,15 +56,12 @@ jobs:
         run: |
           # cd ${{ github.workspace }}/$example/tests
           cd ${{ github.workspace }}/.github/workflows
-          pwd
-          ls
           cp ../../../GenAIEval/evals/benchmark/chatqna_benchmark.py .
           # if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
           # export IMAGE_REPO=${IMAGE_REPO}
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           # if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 30m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
-          if [ -f test_chatqna.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh; else echo "Test script not found, skip test!"; fi
-          pwd
+          if [ -f test_chatqna_on_xeon.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh; else echo "Test script not found, skip test!"; fi
 
       # - name: Clean up container
       #   env:
