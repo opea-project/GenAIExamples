@@ -1,29 +1,26 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Container CI
+name: Example Container CI
 permissions: read-all
 on:
-  workflow_dispatch:
-    inputs:
-      group_dir:
-        required: true
-        description: 'Enter Container Group Directory:'
-        type: string
-      env_overrides:
-        description: 'Enter Bash Env Variable Overrides in `KEY=VAL KEY2=VAL2` format:'
-        required: false
-        type: string
-      runner_label:
-        description: 'Enter Validation Runner Label:'
-        default: test-runner
-        required: true
-        type: string
   workflow_call:
     inputs:
-      group_dir:
+      example_dir:
         required: true
         type: string
+      scan:
+        default: true
+        required: false
+        type: boolean
+      test:
+        default: true
+        required: false
+        type: boolean
+      publish:
+        default: false
+        required: false
+        type: boolean
 jobs:
 ####################################################################################################
 # Compose Build
@@ -45,7 +42,7 @@ jobs:
       id: build-group
       uses: ./.github/workflows/composite/docker-build
       with:
-        group_dir: ${{ inputs.group_dir }}
+        example_dir: ${{ inputs.example_dir }}
         env_overrides: ${{ inputs.env_overrides || env.env_overrides || '' }}
         registry: ${{ secrets.REGISTRY }}
 ####################################################################################################
@@ -53,7 +50,7 @@ jobs:
 ####################################################################################################
   setup-scan:
     needs: [build-containers]
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ fromJSON(inputs.scan) }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.scan-matrix.outputs.matrix }}
@@ -70,10 +67,10 @@ jobs:
       run: echo "matrix=$(cat matrix/*-${{ needs.build-containers.outputs.group }}/*.txt | jq -R '.' | jq -sc '. | unique')" >> $GITHUB_OUTPUT
   scan-containers:
     needs: [setup-scan]
-    if: ${{ !inputs.no_build && github.event_name == 'pull_request' }}
+    if: ${{ fromJSON(inputs.scan) }}
     runs-on: ubuntu-latest # local registry label
     env:
-      GROUP_DIR: ${{ inputs.group_dir }}
+      example_dir: ${{ inputs.example_dir }}
     strategy:
       matrix:
         container: ${{ fromJSON(needs.setup-scan.outputs.matrix) }}
@@ -90,26 +87,36 @@ jobs:
         username: ${{ secrets.REGISTRY_USER }}
         password: ${{ secrets.REGISTRY_TOKEN }}
     - name: Downcase Group Dir
-      run: echo "group_dir=${GROUP_DIR,,}" >> ${GITHUB_ENV}
+      run: echo "example_dir=${example_dir,,}" >> ${GITHUB_ENV}
     - name: Pull Image
-      run: docker pull ${{ secrets.REGISTRY }}/${{ env.group_dir }}:${{ matrix.container }}
+      run: docker pull ${{ secrets.REGISTRY }}/${{ env.example_dir }}:${{ matrix.container }}
       env:
-        GROUP_DIR: ${{ inputs.group_dir }}
+        example_dir: ${{ inputs.example_dir }}
     - name: Scan Container
       uses: ./.github/workflows/composite/scan
       with:
-        image-ref: ${{ secrets.REGISTRY }}/${{ env.group_dir }}:${{ matrix.container }}
-        output: ${{ matrix.container }}-${{ env.group_dir }}-scan.sarif
+        image-ref: ${{ secrets.REGISTRY }}/${{ env.example_dir }}:${{ matrix.container }}
+        output: ${{ matrix.container }}-${{ env.example_dir }}-scan.txt
     - name: Cleanup
       if: always()
-      run: docker rmi -f ${{ secrets.REGISTRY }}/${{ env.group_dir }}:${{ matrix.container }}
-    - uses: github/codeql-action/upload-sarif@b611370bb5703a7efb587f9d136a52ea24c5c38c # v3.25.11
+      run: docker rmi -f ${{ secrets.REGISTRY }}/${{ env.example_dir }}:${{ matrix.container }}
+    # Requires GitHub Advanced Security
+    # - uses: github/codeql-action/upload-sarif@b611370bb5703a7efb587f9d136a52ea24c5c38c # v3.25.11
+    #   with:
+    #     sarif_file: '${{ matrix.container }}-${{ env.example_dir }}-scan.sarif'
+    #     category: '${{ matrix.container }}'
+    #   continue-on-error: true
+    - uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
       with:
-        sarif_file: '${{ matrix.container }}-${{ env.group_dir }}-scan.sarif'
-        category: '${{ matrix.container }}'
-      continue-on-error: true
+        name: ${{ matrix.container }}-${{ env.example_dir }}-scan
+        path: ${{ matrix.container }}-${{ env.example_dir }}-scan.txt
+        overwrite: true
+####################################################################################################
+# Validation
+####################################################################################################
   setup-test:
     needs: [build-containers]
+    if: ${{ fromJSON(inputs.test) }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.test-matrix.outputs.matrix }}
@@ -121,10 +128,10 @@ jobs:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - name: Get Tests
       id: test-matrix
-      run: echo "matrix=$(find ${{ inputs.group_dir }}/tests -type f -name 'test_*.sh' -print | jq -R . | jq -sc .)" >> $GITHUB_OUTPUT
+      run: echo "matrix=$(find ${{ inputs.example_dir }}/tests -type f -name 'test_*.sh' -print | jq -R . | jq -sc .)" >> $GITHUB_OUTPUT
   test-containers:
     needs: [setup-test]
-    if: ${{ needs.setup-test.outputs.matrix != '[]' }}
+    if: ${{ needs.setup-test.outputs.matrix != '[]' && fromJSON(inputs.test) }}
     runs-on: ubuntu-latest # validation label
     strategy:
       matrix:
@@ -140,3 +147,33 @@ jobs:
       run: bash ${{ matrix.tests }}
       env:
         REGISTRY: ${{ secrets.REGISTRY }}
+####################################################################################################
+# Publish
+####################################################################################################
+  publish:
+    needs: [build-containers, scan-containers, test-containers]
+    if: ${{ fromJSON(inputs.publish) }}
+    runs-on: ubuntu-latest # local registry label
+    steps:
+    - name: Harden Runner
+      uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+      with:
+        egress-policy: audit
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Pull Images
+      run: docker compose pull
+      working-directory: ${{ inputs.example_dir }}
+    - name: Push Images
+      run: docker compose push
+      working-directory: ${{ inputs.example_dir }}
+    - name: Cleanup
+      if: always()
+      run: |
+        docker logout
+        docker compose down
+        echo 'y' | docker system prune
+      working-directory: ${{ inputs.example_dir }}

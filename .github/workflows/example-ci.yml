@@ -1,18 +1,18 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Container Integration Tests
+name: Example Integration Tests
 on:
-  pull_request
+  pull_request: null
 permissions: read-all
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
-  group-diff:
+  example-diff:
     runs-on: ubuntu-latest
     outputs:
-      groups: ${{ steps.group-list.outputs.FOLDERS }}
+      examples: ${{ steps.example-list.outputs.FOLDERS }}
     steps:
     - name: Harden Runner
       uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
@@ -21,8 +21,8 @@ jobs:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       with:
         fetch-depth: 0
-    - name: Output Modified Group Directories
-      id: group-list
+    - name: Output Modified example Directories
+      id: example-list
       run: |
         # Get diff array filtered by specific filetypes
         DIFF=$(git diff --diff-filter=d \
@@ -30,7 +30,7 @@ jobs:
             -- '*/*Dockerfile' '*.py' '*.yaml' '*.yml' '*.sh' '*/*requirements.txt' '*.json' '*.ts' '*.js' | \
             jq -R '.' | jq -sc '.' \
         )
-        # Search for compose files in each file to determine the container groups
+        # Search for compose files in each file to determine the container examples
         DOCKER_COMPOSE_PATHS=()
         for path in $(echo $DIFF | jq -r '.[]'); do
           while [[ "$path" != "." ]]; do
@@ -47,19 +47,22 @@ jobs:
         DOCKER_COMPOSE_PATHS_JSON=$(printf '%s\n' "${DOCKER_COMPOSE_PATHS[@]}" | jq -R '.' | jq -sc 'unique_by(.)')
         echo "FOLDERS=$DOCKER_COMPOSE_PATHS_JSON" >> $GITHUB_OUTPUT
   pipeline-ci:
-    needs: group-diff
-    if: needs.group-diff.outputs.groups != '[""]'
+    needs: example-diff
+    if: needs.example-diff.outputs.examples != '[""]'
     strategy:
       matrix:
-        group: ${{ fromJson(needs.group-diff.outputs.groups) }}
+        example: ${{ fromJson(needs.example-diff.outputs.examples) }}
         experimental: [true]
       fail-fast: false
-    uses: opea/genaiexamples/.github/workflows/reuse-container-ci.yaml@main
+    uses: opea/genaiexamples/.github/workflows/container-ci.yaml@main
     with:
-      group_dir: ${{ matrix.group }}
+      example_dir: ${{ matrix.example }}
+      scan: false
+      test: true
+      publish: false
     secrets: inherit
   status-check:
-    needs: [group-diff, pipeline-ci]
+    needs: [example-diff, pipeline-ci]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -73,5 +76,5 @@ jobs:
              contains(needs.*.result, 'failure')
           || contains(needs.*.result, 'cancelled')
           || contains(needs.*.result, 'skipped')
-          && needs.group-diff.outputs.groups != '[""]'
+          && needs.example-diff.outputs.examples != '[""]'
         }}

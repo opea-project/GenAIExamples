@@ -1,0 +1,54 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build Specific Examples
+on:
+  workflow_dispatch:
+    inputs:
+      examples:
+        default: 'example1, example2'
+        description: 'List of comma-separated examples to test'
+        required: true
+        type: string
+      scan:
+        default: true
+        description: 'Scan all examples with Trivy'
+        required: false
+        type: boolean
+      test:
+        default: true
+        description: 'Test Examples'
+        required: false
+        type: boolean
+      publish:
+        default: false
+        description: 'Publish Images to Dockerhub'
+        required: false
+        type: boolean
+permissions: read-all
+jobs:
+  setup-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.get-matrix.outputs.matrix }}
+    steps:
+    - name: Create Matrix
+      id: get-matrix
+      run: |
+        EXAMPLES=($(echo ${{ github.event.inputs.examples }} | tr ',' ' '))
+        EXAMPLES_JSON=$(printf '%s\n' "${EXAMPLES[@]}" | jq -R '.' | jq -sc '.')
+        echo "matrix=$EXAMPLES_JSON" >> $GITHUB_OUTPUT
+  container-ci:
+    needs: [setup-matrix]
+    strategy:
+      matrix:
+        example: ${{ fromJson(needs.setup-matrix.outputs.matrix) }}
+        experimental: [true]
+      fail-fast: false
+    uses: opea/genaiexamples/.github/workflows/container-ci.yaml@main
+    with:
+      example_dir: ${{ matrix.example }}
+      scan: ${{ fromJSON(inputs.scan) }}
+      test: ${{ fromJSON(inputs.test) }}
+      publish: ${{ fromJSON(inputs.publish) }}
+    secrets: inherit

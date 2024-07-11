@@ -20,7 +20,7 @@ runs:
   args:
     - '--timeout=30m'
     - image
-    - '--format=sarif'
+    - '--format=table'
     - '--no-progress'
     - '--output=${{ inputs.output }}'
     - ${{ inputs.image-ref }}
