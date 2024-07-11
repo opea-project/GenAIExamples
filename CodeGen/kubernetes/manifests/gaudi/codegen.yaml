@@ -97,7 +97,7 @@ spec:
             - name: PORT
               value: "80"
           securityContext: {}
-          image: "ghcr.io/huggingface/tgi-gaudi:2.0.1"
+          image: "ghcr.io/huggingface/tgi-gaudi:1.2.1"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
