@@ -20,7 +20,7 @@ function build_docker_images() {
     docker build -t opea/speecht5:latest  -f comps/tts/speecht5/Dockerfile_hpu .
     docker build -t opea/tts:latest  -f comps/tts/Dockerfile .
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 
     cd ..
 

@@ -86,7 +86,7 @@ services:
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:1.2.1
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
     container_name: tgi-gaudi-server
     ports:
       - "3006:80"
