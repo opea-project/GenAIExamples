@@ -28,7 +28,7 @@ jobs:
   build-containers:
     runs-on: ubuntu-latest # local registry label
     outputs:
-      group: ${{ steps.build-group.outputs.container-group }}
+      example: ${{ steps.build-example.outputs.container-example }}
     steps:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
@@ -36,10 +36,8 @@ jobs:
         registry: ${{ secrets.REGISTRY }}
         username: ${{ secrets.REGISTRY_USER }}
         password: ${{ secrets.REGISTRY_TOKEN }}
-      if: ${{ !inputs.no_build }}
-    - name: Build Container Group
-      if: ${{ !inputs.no_build }}
-      id: build-group
+    - name: Build Container example
+      id: build-example
       uses: ./.github/workflows/composite/docker-build
       with:
         example_dir: ${{ inputs.example_dir }}
@@ -64,7 +62,7 @@ jobs:
         path: matrix
     - name: Set Matrix
       id: scan-matrix
-      run: echo "matrix=$(cat matrix/*-${{ needs.build-containers.outputs.group }}/*.txt | jq -R '.' | jq -sc '. | unique')" >> $GITHUB_OUTPUT
+      run: echo "matrix=$(cat matrix/*-${{ needs.build-containers.outputs.example }}/*.txt | jq -R '.' | jq -sc '. | unique')" >> $GITHUB_OUTPUT
   scan-containers:
     needs: [setup-scan]
     if: ${{ fromJSON(inputs.scan) }}
@@ -86,7 +84,7 @@ jobs:
         registry: ${{ secrets.REGISTRY }}
         username: ${{ secrets.REGISTRY_USER }}
         password: ${{ secrets.REGISTRY_TOKEN }}
-    - name: Downcase Group Dir
+    - name: Downcase example Dir
       run: echo "example_dir=${example_dir,,}" >> ${GITHUB_ENV}
     - name: Pull Image
       run: docker pull ${{ secrets.REGISTRY }}/${{ env.example_dir }}:${{ matrix.container }}
