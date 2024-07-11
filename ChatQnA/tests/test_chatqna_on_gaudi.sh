@@ -20,10 +20,10 @@ function build_docker_images() {
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
 
-    cd ..
-    git clone https://github.com/huggingface/tei-gaudi
-    cd tei-gaudi/
-    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+#    cd ..
+#    git clone https://github.com/huggingface/tei-gaudi
+#    cd tei-gaudi/
+#    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
@@ -39,6 +39,11 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker/gaudi
+
+    # build tei-gaudi for each test instead of pull from local registry
+    git clone https://github.com/huggingface/tei-gaudi
+    cd tei-gaudi/
+    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"

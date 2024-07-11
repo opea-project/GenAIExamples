@@ -15,10 +15,10 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/embedding-tei:latest  -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/web-retriever-chroma:latest  -f comps/web_retrievers/langchain/chroma/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest  -f comps/reranks/tei/docker/Dockerfile .
-    docker build -t opea/llm-tgi:latest  -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build --no-cache -t opea/embedding-tei:latest  -f comps/embeddings/langchain/docker/Dockerfile .
+    docker build --no-cache -t opea/web-retriever-chroma:latest  -f comps/web_retrievers/langchain/chroma/docker/Dockerfile .
+    docker build --no-cache -t opea/reranking-tei:latest  -f comps/reranks/tei/docker/Dockerfile .
+    docker build --no-cache -t opea/llm-tgi:latest  -f comps/llms/text-generation/tgi/Dockerfile .
 
     cd ..
     git clone https://github.com/huggingface/tei-gaudi
@@ -28,7 +28,7 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     cd $WORKPATH/docker
-    docker build -t opea/searchqna:latest -f Dockerfile .
+    docker build --no-cache -t opea/searchqna:latest -f Dockerfile .
 
     # cd $WORKPATH/docker/ui
     # docker build --no-cache -t opea/searchqna-ui:latest -f docker/Dockerfile .
