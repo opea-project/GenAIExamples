@@ -4,7 +4,7 @@
 name: E2E test with chatqna_benchmark
 
 on:
-  push:
+  pull_request:
     branches: [chatqna_benchmark]
     
   # schedule:
@@ -22,6 +22,7 @@ jobs:
     # strategy:
     #   matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     # runs-on: ${{ matrix.hardware }}
+    runs-on: ubuntu-latest
     # continue-on-error: true
     steps:
       # - name: Test example
