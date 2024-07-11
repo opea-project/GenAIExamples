@@ -4,11 +4,11 @@
 # Source: https://github.com/intel/ai-containers/blob/main/.github/action.yml
 
 ---
-name: Build Container Group
+name: Build Container Example
 description: Given the inputs found below, build all containers found in a docker-compose.yaml file for a given configuration
 author: tyler.titsworth@intel.com
 inputs:
-  group_dir:
+  example_dir:
     description: Directory with docker-compose.yaml to build
     required: true
     type: string
@@ -22,9 +22,9 @@ inputs:
     default: 'opea-project'
     type: string
 outputs:
-  container-group:
-    description: "Container Group"
-    value: ${{ steps.container-output.outputs.group }}
+  container-example:
+    description: "Container Example"
+    value: ${{ steps.container-output.outputs.example }}
 runs:
   using: composite
   steps:
@@ -39,7 +39,7 @@ runs:
         REGISTRY=${{ inputs.registry }} \
         COMPOSE_PROJECT_NAME=${{ env.project-number }} \
         ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} up --build --force-recreate --always-recreate-deps --no-start
-      working-directory: ${{ inputs.group_dir }}
+      working-directory: ${{ inputs.example_dir }}
     - name: Print Containers
       id: container-output
       shell: bash
@@ -51,12 +51,12 @@ runs:
         for image in $(echo $images | jq -r --arg registry "$REGISTRY" '.[] | select(.Repository | contains($registry)) | .Tag'); do
           echo "$image" > matrix/$image.txt
         done
-        echo "group=${{ inputs.group_dir }}" | tr '/' '_' >> $GITHUB_OUTPUT
-      working-directory: ${{ inputs.group_dir }}
+        echo "example=${{ inputs.example_dir }}" | tr '/' '_' >> $GITHUB_OUTPUT
+      working-directory: ${{ inputs.example_dir }}
     - uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.project-number }}-${{ steps.container-output.outputs.group }}
-        path: ${{ inputs.group_dir }}/matrix/*
+        name: ${{ env.project-number }}-${{ steps.container-output.outputs.example }}
+        path: ${{ inputs.example_dir }}/matrix/*
         retention-days: 1
         overwrite: true
     - name: Push Containers
@@ -65,7 +65,7 @@ runs:
         REGISTRY=${{ inputs.registry }} \
         COMPOSE_PROJECT_NAME=${{ env.project-number }} \
         ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} push
-      working-directory: ${{ inputs.group_dir }}
+      working-directory: ${{ inputs.example_dir }}
     - name: Un-Tag Containers
       if: ${{ always() }}
       shell: bash
@@ -73,7 +73,7 @@ runs:
         REGISTRY=${{ inputs.registry }} \
         COMPOSE_PROJECT_NAME=${{ env.project-number }} \
         ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} down --rmi all
-      working-directory: ${{ inputs.group_dir }}
+      working-directory: ${{ inputs.example_dir }}
     - name: Remove Containers
       if: ${{ always() }}
       shell: bash
