@@ -67,8 +67,6 @@ jobs:
     needs: [setup-scan]
     if: ${{ fromJSON(inputs.scan) }}
     runs-on: ubuntu-latest # local registry label
-    env:
-      example_dir: ${{ inputs.example_dir }}
     strategy:
       matrix:
         container: ${{ fromJSON(needs.setup-scan.outputs.matrix) }}
@@ -85,11 +83,11 @@ jobs:
         username: ${{ secrets.REGISTRY_USER }}
         password: ${{ secrets.REGISTRY_TOKEN }}
     - name: Downcase example Dir
-      run: echo "example_dir=${example_dir,,}" >> ${GITHUB_ENV}
+      run: echo "example_dir=${EXAMPLE_DIR,,}" >> ${GITHUB_ENV}
+      env:
+        EXAMPLE_DIR: ${{ inputs.example_dir }}
     - name: Pull Image
       run: docker pull ${{ secrets.REGISTRY }}/${{ env.example_dir }}:${{ matrix.container }}
-      env:
-        example_dir: ${{ inputs.example_dir }}
     - name: Scan Container
       uses: ./.github/workflows/composite/scan
       with:
