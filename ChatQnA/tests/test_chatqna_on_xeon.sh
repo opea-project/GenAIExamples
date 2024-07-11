@@ -197,7 +197,7 @@ function validate_frontend() {
         echo "[TEST INFO]: ---------frontend test failed---------"
         mkdir -p ${LOG_PATH}/frontend
         cp -r test-results ${LOG_PATH}/frontend/
-        echo "[TEST INFO]: Trace files copied to ${LOG_PATH}/frontend/test-results"
+        echo "[TEST INFO]: Trace files copied to ${LOG_PATH}/frontend/Xeon/test-results"
         exit $exit_status
     else
         echo "[TEST INFO]: ---------frontend test passed---------"
