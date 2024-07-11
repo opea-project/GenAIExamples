@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: E2E test with chatqna_benchmark
+name: benchmark test with chatqna_benchmark
 
 on:
   pull_request:
