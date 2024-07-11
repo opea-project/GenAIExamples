@@ -38,13 +38,13 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/gaudi
-
     # build tei-gaudi for each test instead of pull from local registry
+    cd $WORKPATH
     git clone https://github.com/huggingface/tei-gaudi
     cd tei-gaudi/
     docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
+    cd $WORKPATH/docker/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
