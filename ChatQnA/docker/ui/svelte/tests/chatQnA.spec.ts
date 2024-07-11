@@ -70,7 +70,10 @@ test.describe("Upload file", () => {
 		await page.waitForTimeout(10000);
 		await uploadFile(page, FILE_PATH);
 	});
+});
 
+// Test description: Upload file
+test.describe("Paste link", () => {
 	// Test: Paste link
 	test("should paste link", async ({ page }) => {
 		await page.waitForTimeout(10000);
