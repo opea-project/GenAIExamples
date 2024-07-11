@@ -76,9 +76,17 @@ function start_services() {
 
 function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
+    echo "result is === $result"
     if [[ $result == *"AAA"* ]]; then
         echo "Result correct."
     else
+        docker logs whisper-service > $LOG_PATH/whisper-service.log
+        docker logs asr-service > $LOG_PATH/asr-service.log
+        docker logs speecht5-service > $LOG_PATH/tts-service.log
+        docker logs tts-service > $LOG_PATH/tts-service.log
+        docker logs tgi-gaudi-server > $LOG_PATH/tgi-gaudi-server.log
+        docker logs llm-tgi-gaudi-server > $LOG_PATH/llm-tgi-gaudi-server.log
+
         echo "Result wrong."
         exit 1
     fi
