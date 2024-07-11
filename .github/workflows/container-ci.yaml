@@ -126,13 +126,19 @@ jobs:
       with:
         egress-policy: audit
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      with:
+        fetch-depth: 0
     - name: Get Tests
       id: test-matrix
-      run: echo "matrix=$(find ${{ inputs.example_dir }}/tests -type f -name 'test_*.sh' -print | jq -R . | jq -sc .)" >> $GITHUB_OUTPUT
+      run: |
+        echo "matrix=$(find ${{ inputs.example_dir }}/tests -type f -name 'test_*.sh' -print | \
+        sed -n 's|.*/\(test_[^_]*_on_\([^\.]*\)\).sh|\{"test": "\1", "hardware_label": "\2"}|p' | \
+        jq -sc .)" >> $GITHUB_OUTPUT
+      # ex: [{"test":"test_audioqna_on_xeon","hardware_label":"xeon"},{"test":"test_audioqna_on_gaudi","hardware_label":"gaudi"}]
   test-containers:
     needs: [setup-test]
     if: ${{ needs.setup-test.outputs.matrix != '[]' && fromJSON(inputs.test) }}
-    runs-on: ubuntu-latest # validation label
+    runs-on: ${{ matrix.hardware_label }}
     strategy:
       matrix:
         tests: ${{ fromJson(needs.setup-test.outputs.matrix) }}
@@ -144,7 +150,7 @@ jobs:
         egress-policy: audit
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - name: Run Test
-      run: bash ${{ matrix.tests }}
+      run: bash ${{ matrix.test }}.sh
       env:
         REGISTRY: ${{ secrets.REGISTRY }}
 ####################################################################################################
