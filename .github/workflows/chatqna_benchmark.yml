@@ -4,8 +4,11 @@
 name: E2E test with chatqna_benchmark
 
 on:
-  schedule:
-    - cron: "35 1 * * 5"
+  push:
+    branches: [chatqna_benchmark]
+    
+  # schedule:
+  #   - cron: "35 1 * * 5"
   workflow_dispatch:
 
 jobs:
