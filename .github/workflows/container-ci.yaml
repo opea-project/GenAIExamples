@@ -136,7 +136,7 @@ jobs:
   test-containers:
     needs: [setup-test]
     if: ${{ needs.setup-test.outputs.matrix != '[]' && fromJSON(inputs.test) }}
-    runs-on: ${{ matrix.hardware_label }}
+    runs-on: ${{ matrix.tests.hardware_label }}
     strategy:
       matrix:
         tests: ${{ fromJson(needs.setup-test.outputs.matrix) }}
@@ -148,7 +148,7 @@ jobs:
         egress-policy: audit
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - name: Run Test
-      run: bash ${{ matrix.test }}.sh
+      run: bash ${{ matrix.tests.test }}.sh
       env:
         REGISTRY: ${{ secrets.REGISTRY }}
 ####################################################################################################

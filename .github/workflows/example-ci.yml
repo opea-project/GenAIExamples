@@ -57,7 +57,7 @@ jobs:
     uses: opea/genaiexamples/.github/workflows/container-ci.yaml@main
     with:
       example_dir: ${{ matrix.example }}
-      scan: false
+      scan: true
       test: true
       publish: false
     secrets: inherit
