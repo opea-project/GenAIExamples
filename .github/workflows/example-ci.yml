@@ -27,7 +27,7 @@ jobs:
         # Get diff array filtered by specific filetypes
         DIFF=$(git diff --diff-filter=d \
             --name-only ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} \
-            -- '*/*Dockerfile' '*.py' '*.yaml' '*.yml' '*.sh' '*/*requirements.txt' '*.json' '*.ts' '*.js' | \
+            -- '*/*Dockerfile*' '*.py' '*.yaml' '*.yml' '*.sh' '*/*requirements.txt' '*.json' '*.ts' '*.js' | \
             jq -R '.' | jq -sc '.' \
         )
         # Search for compose files in each file to determine the container examples

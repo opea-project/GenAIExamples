@@ -1,3 +1,4 @@
+
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -17,6 +18,8 @@ services:
       - redis-vector-db
     ports:
       - "6007:6007"
+      - "6008:6008"
+      - "6009:6009"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -90,7 +93,7 @@ services:
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
     image: opea/reranking-tei:latest
-    container_name: reranking-tei-aipc-server
+    container_name: reranking-tei-xeon-server
     depends_on:
       - tei-reranking-service
     ports:
@@ -108,9 +111,27 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
+  tgi_service:
+    image: ghcr.io/huggingface/text-generation-inference:2.1.0
+    container_name: tgi-service
+    ports:
+      - "9009:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-ollama
-    container_name: llm-ollama
+    image: opea/llm-tgi:latest
+    container_name: llm-tgi-server
+    depends_on:
+      - tgi_service
     ports:
       - "9000:9000"
     ipc: host
@@ -125,10 +146,10 @@ services:
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"
-      OLLAMA_ENDPOINT: ${OLLAMA_ENDPOINT}
-  chaqna-aipc-backend-server:
-    image: opea/chatqna:latest
-    container_name: chatqna-aipc-backend-server
+    restart: unless-stopped
+  chaqna-xeon-backend-server:
+    image: ${REGISTRY:-opea}/chatqna:${GITHUB_RUN_NUMBER:-latest}
+    container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
       - tei-embedding-service
@@ -136,6 +157,7 @@ services:
       - retriever
       - tei-reranking-service
       - reranking
+      - tgi_service
       - llm
     ports:
       - "8888:8888"
@@ -150,11 +172,11 @@ services:
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  chaqna-aipc-ui-server:
-    image: opea/chatqna-ui:latest
-    container_name: chatqna-aipc-ui-server
+  chaqna-xeon-ui-server:
+    image: ${REGISTRY:-opea}/chatqna-ui:${GITHUB_RUN_NUMBER:-latest}
+    container_name: chatqna-xeon-ui-server
     depends_on:
-      - chaqna-aipc-backend-server
+      - chaqna-xeon-backend-server
     ports:
       - "5173:5173"
     environment:
@@ -163,6 +185,21 @@ services:
       - http_proxy=${http_proxy}
       - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
       - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
+      - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
+      - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
+    ipc: host
+    restart: always
+  chaqna-xeon-conversation-ui-server:
+    image: opea/chatqna-conversation-ui:latest
+    container_name: chatqna-xeon-conversation-ui-server
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ports:
+        - 5174:80
+    depends_on:
+        - chaqna-xeon-backend-server
     ipc: host
     restart: always
 

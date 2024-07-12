@@ -27,26 +27,23 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:1.2
-    container_name: tei-embedding-server
+    image: opea/tei-gaudi:latest
+    container_name: tei-embedding-gaudi-server
     ports:
       - "8090:80"
     volumes:
       - "./data:/data"
-    shm_size: 1g
+    runtime: habana
+    cap_add:
+      - SYS_NICE
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
     command: --model-id ${EMBEDDING_MODEL_ID}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
   embedding:
     image: opea/embedding-tei:latest
     container_name: embedding-tei-server
@@ -83,8 +80,8 @@ services:
       LANGCHAIN_PROJECT: "opea-retriever-service"
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:1.2
-    container_name: tei-reranking-server
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    container_name: tei-reranking-gaudi-server
     ports:
       - "8808:80"
     volumes:
@@ -97,17 +94,10 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-    command: --model-id ${RERANK_MODEL_ID}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
     image: opea/reranking-tei:latest
-    container_name: reranking-tei-server
+    container_name: reranking-tei-gaudi-server
     depends_on:
       - tei-reranking-service
     ports:
@@ -126,8 +116,8 @@ services:
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.0
-    container_name: tgi-server
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.0
+    container_name: tgi-gaudi-server
     ports:
       - "8008:80"
     volumes:
@@ -139,18 +129,16 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+    runtime: habana
+    cap_add:
+      - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
   llm:
     image: opea/llm-tgi:latest
-    container_name: llm-tgi-server
+    container_name: llm-tgi-gaudi-server
     depends_on:
       - tgi-service
     ports:
@@ -168,9 +156,9 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
-  chaqna-backend-server:
-    image: opea/chatqna:latest
-    container_name: chatqna-backend-server
+  chaqna-gaudi-backend-server:
+    image: ${REGISTRY:-opea}/chatqna:${GITHUB_RUN_NUMBER:-latest}
+    container_name: chatqna-gaudi-backend-server
     depends_on:
       - redis-vector-db
       - tei-embedding-service
@@ -193,11 +181,11 @@ services:
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  chaqna-ui-server:
-    image: opea/chatqna-ui:latest
-    container_name: chatqna-ui-server
+  chaqna-gaudi-ui-server:
+    image: ${REGISTRY:-opea}/chatqna-ui:${GITHUB_RUN_NUMBER:-latest}
+    container_name: chatqna-gaudi-ui-server
     depends_on:
-      - chaqna-backend-server
+      - chaqna-gaudi-backend-server
     ports:
       - "5173:5173"
     environment:

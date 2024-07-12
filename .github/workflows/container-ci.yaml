@@ -115,7 +115,8 @@ jobs:
     if: ${{ fromJSON(inputs.test) }}
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.test-matrix.outputs.matrix }}
+      container-matrix: ${{ steps.test-container-matrix.outputs.matrix }}
+      k8s-matrix: ${{ steps.test-k8s-matrix.outputs.matrix }}
     steps:
     - name: Harden Runner
       uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
@@ -124,20 +125,24 @@ jobs:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       with:
         fetch-depth: 0
-    - name: Get Tests
-      id: test-matrix
+    - name: Get Container Tests
+      id: test-container-matrix
       run: |
         echo "matrix=$(find ${{ inputs.example_dir }}/tests -type f -name 'test_*.sh' -print | \
         sed -n 's|.*/\(test_[^_]*_on_\([^\.]*\)\).sh|\{"test": "\1", "hardware_label": "\2"}|p' | \
         jq -sc .)" >> $GITHUB_OUTPUT
       # ex: [{"test":"test_audioqna_on_xeon","hardware_label":"xeon"},{"test":"test_audioqna_on_gaudi","hardware_label":"gaudi"}]
+    - name: Get k8s Tests
+      id: test-k8s-matrix
+      run: |
+        echo "matrix=$()" >> $GITHUB_OUTPUT
   test-containers:
     needs: [setup-test]
-    if: ${{ needs.setup-test.outputs.matrix != '[]' && fromJSON(inputs.test) }}
+    if: ${{ needs.setup-test.outputs.container-matrix != '[]' && fromJSON(inputs.test) }}
     runs-on: ${{ matrix.tests.hardware_label }}
     strategy:
       matrix:
-        tests: ${{ fromJson(needs.setup-test.outputs.matrix) }}
+        tests: ${{ fromJson(needs.setup-test.outputs.container-matrix) }}
         experimental: [true]
       fail-fast: false
     steps:
@@ -149,6 +154,27 @@ jobs:
       run: bash ${{ matrix.tests.test }}.sh
       env:
         REGISTRY: ${{ secrets.REGISTRY }}
+  test-k8s:
+    needs: [setup-test]
+    if: ${{ needs.setup-test.outputs.k8s-matrix != '[]' && fromJSON(inputs.test) }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tests: ${{ fromJson(needs.setup-test.outputs.k8s-matrix) }}
+        experimental: [true]
+      fail-fast: false
+    steps:
+    - uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+      with:
+        egress-policy: audit
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - name: Run Test
+      run: |
+        echo "Running Kubernetes tests"
+    - name: Cleanup
+      if: always()
+      run: |
+        echo "Cleaning up Kubernetes tests"
 ####################################################################################################
 # Publish
 ####################################################################################################
