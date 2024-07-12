@@ -219,7 +219,7 @@ function main() {
     end_time=$(date +%s)
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
-    python3 $WORKPATH/.github/workflows/chatqna_benchmark.py
+    python3 $WORKPATH/workflows/chatqna_benchmark.py
     # validate_microservices
     # validate_megaservice
     # validate_frontend
