@@ -41,6 +41,8 @@ jobs:
       - name: Clone repo GenAIEval
         run: |
           cd ..
+          pwd
+          whoami
           git clone https://github.com/opea-project/GenAIEval.git
           pwd
 
