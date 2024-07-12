@@ -42,8 +42,6 @@ jobs:
         run: |
           cd ..
           git clone https://github.com/opea-project/GenAIEval.git
-          pwd
-          ls
 
       - name: Run test
         env:
@@ -59,12 +57,19 @@ jobs:
           # cd ${{ github.workspace }}/$example/tests
           cd ${{ github.workspace }}/.github/workflows
           cp ../../../GenAIEval/evals/benchmark/chatqna_benchmark.py .
-          ls
           # if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
           # export IMAGE_REPO=${IMAGE_REPO}
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           # if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 30m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
-          if [ -f test_chatqna_on_xeon.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh; else echo "Test script not found, skip test!"; fi
+          if [ -f test_chatqna_on_xeon.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh > output.log; else echo "Test script not found, skip test!"; fi
+
+      - name: Process log and save to JSON
+        run: |
+          echo '{}' > output.json
+          echo $(grep -a 'Total Requests:' output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > output.json
+          echo $(grep -a 'P50 latency is' output.log | awk '{print "{\"p50_latency\": \""$4 "\"}"}') >> output.json
+          echo $(grep -a 'P99 latency is' output.log | awk '{print "{\"p99_latency\": \""$4 "\"}"}') >> output.json
+          jq -s 'add' output.json > final_output.json && mv final_output.json output.json
 
       # - name: Clean up container
       #   env:
