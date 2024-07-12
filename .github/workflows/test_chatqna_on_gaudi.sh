@@ -43,7 +43,7 @@ function start_services() {
     git clone https://github.com/huggingface/tei-gaudi
     cd tei-gaudi/
     docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
-    
+
     cd $WORKPATH/../ChatQnA/docker/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
