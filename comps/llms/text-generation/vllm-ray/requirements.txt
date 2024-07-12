@@ -1,0 +1,17 @@
+docarray[full]
+fastapi
+huggingface_hub
+langchain==0.1.16
+langchain_openai
+langserve
+langsmith
+openai
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+prometheus-fastapi-instrumentator
+ray[serve]>=2.10
+setuptools==69.5.1
+shortuuid
+transformers
+vllm

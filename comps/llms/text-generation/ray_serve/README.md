@@ -21,13 +21,9 @@ export HF_TOKEN=<token>
 And then you can make requests with the OpenAI-compatible APIs like below to check the service status:
 
 ```bash
-curl http://127.0.0.1:8008/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-  "model": <model_name>,
-  "messages": [{"role": "user", "content": "What is deep learning?"}],
-  "max_tokens": 32,
-  }'
+curl http://172.17.0.1:8008/v1/chat/completions   \
+  -H "Content-Type: application/json"   \
+  -d '{"model": <model_name>, "messages": [{"role": "user", "content": "How are you?"}], "max_tokens": 32 }'
 ```
 
 For more information about the OpenAI APIs, you can checkeck the [OpenAI official document](https://platform.openai.com/docs/api-reference/).
