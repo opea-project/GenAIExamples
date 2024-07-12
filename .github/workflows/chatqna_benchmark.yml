@@ -42,6 +42,7 @@ jobs:
         run: |
           cd ..
           git clone https://github.com/opea-project/GenAIEval.git
+          pwd
 
       - name: Run test
         env:
