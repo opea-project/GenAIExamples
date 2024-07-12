@@ -54,7 +54,7 @@ jobs:
         example: ${{ fromJson(needs.example-diff.outputs.examples) }}
         experimental: [true]
       fail-fast: false
-    uses: opea/genaiexamples/.github/workflows/container-ci.yaml@main
+    uses: opea-project/genaiexamples/.github/workflows/container-ci.yaml@main
     with:
       example_dir: ${{ matrix.example }}
       scan: true
