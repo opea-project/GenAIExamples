@@ -43,6 +43,7 @@ services:
       https_proxy: ${https_proxy}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
+      MAX_WARMUP_SEQUENCE_LENGTH: 512
     command: --model-id ${EMBEDDING_MODEL_ID}
   embedding:
     image: opea/embedding-tei:latest
@@ -116,7 +117,7 @@ services:
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.0
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
     container_name: tgi-gaudi-server
     ports:
       - "8008:80"

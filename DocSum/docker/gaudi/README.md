@@ -16,7 +16,7 @@ cd GenAIComps
 As TGI Gaudi has been officially published as a Docker image, we simply need to pull it:
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 ```
 
 ### 2. Build LLM Image
@@ -46,7 +46,7 @@ docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --bui
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
+1. `ghcr.io/huggingface/tgi-gaudi:2.0.1`
 2. `opea/llm-docsum-tgi:latest`
 3. `opea/docsum:latest`
 4. `opea/docsum-ui:latest`

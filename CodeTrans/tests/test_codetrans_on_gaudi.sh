@@ -15,7 +15,7 @@ function build_docker_images() {
 
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 
     cd $WORKPATH/docker
     docker build --no-cache -t opea/codetrans:latest -f Dockerfile .
