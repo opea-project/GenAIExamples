@@ -42,7 +42,7 @@ jobs:
         run: |
           cd ..
           pwd
-          whoami
+          ls
           git clone https://github.com/opea-project/GenAIEval.git
           pwd
 
