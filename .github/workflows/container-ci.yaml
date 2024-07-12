@@ -144,11 +144,27 @@ jobs:
     - uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
       with:
         egress-policy: audit
+    - name: Set Variables
+      run: |
+        echo "lower_example=${EXAMPLE_DIR,,}" >> ${GITHUB_ENV}
+        echo "date=$(date +%Y%m%d%H%M%S)" >> ${GITHUB_ENV}
+      env:
+        EXAMPLE_DIR: ${{ inputs.example_dir }}
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - uses: azure/setup-kubectl@v4
+      if: ${{ contains(matrix.tests.test, "gmc") || contains(matrix.tests.test, "manifest") }}
     - name: Run Test
       run: bash ${{ matrix.tests.test }}.sh
       env:
         REGISTRY: ${{ secrets.REGISTRY }}
+        IMAGE_REPO: $OPEA_IMAGE_REPO
+        IMAGE_TAG: $GITHUB_RUN_NUMBER
+        APP_NAMESPACE: $lower_example-$date
+        ROLLOUT_TIMEOUT_SECONDS: 1800s
+        KUBECTL_TIMEOUT_SECONDS: 60s
+        continue_test: true
+        should_cleanup: false
+        skip_validate: true
 ####################################################################################################
 # Publish
 ####################################################################################################
