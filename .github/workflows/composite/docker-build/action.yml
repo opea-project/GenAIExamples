@@ -4,6 +4,7 @@
 # Source: https://github.com/intel/ai-containers/blob/main/.github/action.yml
 
 ---
+# Assumes $REGISTRY is provided in runner .env and already authenticated
 name: Build Container Example
 description: Given the inputs found below, build all containers found in a docker-compose.yaml file for a given configuration
 author: tyler.titsworth@intel.com
@@ -15,11 +16,6 @@ inputs:
   env_overrides:
     description: Bash Env Variable Overrides in `KEY=VAL && KEY2=VAL2` format
     required: false
-    type: string
-  registry:
-    description: Container Registry URL
-    required: false
-    default: 'opea-project'
     type: string
 outputs:
   container-example:
@@ -36,7 +32,6 @@ runs:
     - name: Build Containers
       shell: bash
       run: |
-        REGISTRY=${{ inputs.registry }} \
         COMPOSE_PROJECT_NAME=${{ env.project-number }} \
         ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} up --build --force-recreate --always-recreate-deps --no-start
       working-directory: ${{ inputs.example_dir }}
@@ -45,8 +40,7 @@ runs:
       shell: bash
       run: |
         mkdir matrix
-        images=$(REGISTRY=${{ inputs.registry }} \
-        COMPOSE_PROJECT_NAME=${{ env.project-number }} \
+        images=$(COMPOSE_PROJECT_NAME=${{ env.project-number }} \
         ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} images --format json)
         for image in $(echo $images | jq -r --arg registry "$REGISTRY" '.[] | select(.Repository | contains($registry)) | .Tag'); do
           echo "$image" > matrix/$image.txt
@@ -62,7 +56,6 @@ runs:
     - name: Push Containers
       shell: bash
       run: |
-        REGISTRY=${{ inputs.registry }} \
         COMPOSE_PROJECT_NAME=${{ env.project-number }} \
         ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} push
       working-directory: ${{ inputs.example_dir }}
@@ -70,7 +63,6 @@ runs:
       if: ${{ always() }}
       shell: bash
       run: |
-        REGISTRY=${{ inputs.registry }} \
         COMPOSE_PROJECT_NAME=${{ env.project-number }} \
         ${{ inputs.env_overrides }} docker compose -p ${{ env.project-number }} down --rmi all
       working-directory: ${{ inputs.example_dir }}

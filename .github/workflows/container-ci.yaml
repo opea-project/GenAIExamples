@@ -31,18 +31,12 @@ jobs:
       example: ${{ steps.build-example.outputs.container-example }}
     steps:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-    - uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
-      with:
-        registry: ${{ secrets.REGISTRY }}
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_TOKEN }}
     - name: Build Container example
       id: build-example
       uses: ./.github/workflows/composite/docker-build
       with:
         example_dir: ${{ inputs.example_dir }}
         env_overrides: ${{ inputs.env_overrides || env.env_overrides || '' }}
-        registry: ${{ secrets.REGISTRY }}
 ####################################################################################################
 # Trivy Scan
 ####################################################################################################
@@ -77,11 +71,6 @@ jobs:
       with:
         egress-policy: audit
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-    - uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
-      with:
-        registry: ${{ secrets.REGISTRY }}
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_TOKEN }}
     - name: Downcase example Dir
       run: echo "example_dir=${EXAMPLE_DIR,,}" >> ${GITHUB_ENV}
       env:
