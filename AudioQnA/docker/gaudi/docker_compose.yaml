@@ -54,7 +54,7 @@ services:
     environment:
       TTS_ENDPOINT: ${TTS_ENDPOINT}
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:1.2.1
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
     container_name: tgi-gaudi-server
     ports:
       - "3006:80"
@@ -73,7 +73,7 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID}
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
   llm:
     image: opea/llm-tgi:latest
     container_name: llm-tgi-gaudi-server
