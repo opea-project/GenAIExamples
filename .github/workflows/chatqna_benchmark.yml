@@ -23,7 +23,7 @@ jobs:
     # strategy:
     #   matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     # runs-on: ${{ matrix.hardware }}
-    runs-on: ubuntu-latest
+    runs-on: xeon
     # continue-on-error: true
     steps:
       # - name: Test example
