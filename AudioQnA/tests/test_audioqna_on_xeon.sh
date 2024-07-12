@@ -10,7 +10,19 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH
-    docker compose build
+    git clone https://github.com/opea-project/GenAIComps.git
+    cd GenAIComps
+
+    docker build -t opea/whisper:latest -f comps/asr/whisper/Dockerfile .
+    docker build -t opea/asr:latest -f comps/asr/Dockerfile .
+    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build -t opea/speecht5:latest -f comps/tts/speecht5/Dockerfile .
+    docker build -t opea/tts:latest -f comps/tts/Dockerfile .
+
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+
+    cd $WORKPATH/docker
+    docker build --no-cache -t opea/audioqna:latest -f Dockerfile .
 
     # cd $WORKPATH/docker/ui
     # docker build --no-cache -t opea/audioqna-ui:latest -f docker/Dockerfile .
