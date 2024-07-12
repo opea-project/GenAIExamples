@@ -17,7 +17,7 @@ function build_docker_images() {
     cd $WORKPATH/docker
     docker build --no-cache -t opea/translation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .

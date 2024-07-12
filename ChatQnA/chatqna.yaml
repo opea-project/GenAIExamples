@@ -48,7 +48,7 @@ opea_micro_services:
   tgi_service:
     host: ${TGI_SERVICE_IP}
     ports: ${TGI_SERVICE_PORT}
-    image: ghcr.io/huggingface/tgi-gaudi:1.2.1
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
     volumes:
       - "./data:/data"
     runtime: habana

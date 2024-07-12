@@ -38,7 +38,7 @@ docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy 
 
 Then run the command `docker images`, you will have the following four Docker Images:
 
-1. `ghcr.io/huggingface/tgi-gaudi:1.2.1`
+1. `ghcr.io/huggingface/tgi-gaudi:2.0.1`
 2. `opea/gen-ai-comps:llm-tgi-gaudi-server`
 3. `opea/gen-ai-comps:translation-megaservice-server`
 4. `opea/gen-ai-comps:translation-ui-server`

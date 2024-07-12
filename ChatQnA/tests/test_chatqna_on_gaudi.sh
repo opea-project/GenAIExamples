@@ -20,12 +20,12 @@ function build_docker_images() {
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
 
-    cd ..
-    git clone https://github.com/huggingface/tei-gaudi
-    cd tei-gaudi/
-    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+#    cd ..
+#    git clone https://github.com/huggingface/tei-gaudi
+#    cd tei-gaudi/
+#    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.0
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 
     cd $WORKPATH/docker
@@ -38,8 +38,13 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/gaudi
+    # build tei-gaudi for each test instead of pull from local registry
+    cd $WORKPATH
+    git clone https://github.com/huggingface/tei-gaudi
+    cd tei-gaudi/
+    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
+    cd $WORKPATH/docker/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
@@ -66,6 +71,9 @@ function start_services() {
         sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" docker_compose.yaml
+        echo "cat docker_compose.yaml"
+        cat docker_compose.yaml
     fi
 
     # Start Docker Containers
