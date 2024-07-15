@@ -236,7 +236,7 @@ function main() {
 
     if [ "${mode}" == "perf" ]; then
         python3 $WORKPATH/workflows/chatqna_benchmark.py
-    else:
+    elif [ "${mode}" == "func" ]; then
         validate_microservices
         validate_megaservice
         validate_frontend
