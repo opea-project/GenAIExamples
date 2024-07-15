@@ -258,7 +258,7 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s"
 
-    if [ "${mode}" == "perf" ]; then 
+    if [ "${mode}" == "perf" ]; then
         python3 $WORKPATH/workflows/chatqna_benchmark.py
     else:
         validate_microservices
