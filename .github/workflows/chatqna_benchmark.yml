@@ -70,7 +70,6 @@ jobs:
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           if [ -f test_chatqna_on_${hardware}.sh ]; then timeout 30m bash test_chatqna_on_${hardware}.sh > ${hardware}_output.log; else echo "Test script not found, skip test!"; fi
           # if [ -f test_chatqna_on_xeon.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh > output.log; else echo "Test script not found, skip test!"; fi
-          ls
 
       - name: Install jq
         run: |
@@ -80,7 +79,7 @@ jobs:
 
       - name: Process log and save to JSON
         run: |
-          ls
+          cd ${{ github.workspace }}/.github/workflows
           echo '{}' > ${hardware}_output.json
           echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
           echo $(grep -a 'P50 latency is' ${hardware}_output.log | awk '{print "{\"p50_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
@@ -106,4 +105,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.example }}-${{ matrix.hardware }}
-          path: ${{ github.workspace }}/${{ matrix.example }}/tests/*.log
+          path: ${{ github.workspace }}/.github/workflows/*.log
