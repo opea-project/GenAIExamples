@@ -37,6 +37,27 @@ function build_docker_images() {
     docker images
 }
 
+function pull_docker_images() {
+
+    docker pull opea/embedding-tei:latest
+    docker pull opea/retriever-redis:latest
+    docker pull opea/reranking-tei:latest
+    docker pull opea/llm-tgi:latest
+    docker pull opea/dataprep-redis:latest
+
+#    cd ..
+#    git clone https://github.com/huggingface/tei-gaudi
+#    cd tei-gaudi/
+#    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    docker pull opea/chatqna:latest
+    docker pull opea/chatqna-ui:latest
+
+    docker images
+}
+
 function start_services() {
     # build tei-gaudi for each test instead of pull from local registry
     cd $WORKPATH
@@ -229,7 +250,8 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    pull_docker_images
+    # if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)

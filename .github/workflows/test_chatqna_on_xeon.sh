@@ -29,6 +29,19 @@ function build_docker_images() {
     docker images
 }
 
+function pull_docker_images() {
+
+    docker pull opea/embedding-tei:latest
+    docker pull opea/retriever-redis:latest
+    docker pull opea/reranking-tei:latest
+    docker pull opea/llm-tgi:latest
+    docker pull opea/dataprep-redis:latest
+    docker pull opea/chatqna:latest
+    docker pull opea/chatqna-ui:latest
+
+    docker images
+}
+
 function start_services() {
     cd $WORKPATH/../ChatQnA/docker/xeon
 
@@ -213,7 +226,8 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    pull_docker_images
+    # if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)

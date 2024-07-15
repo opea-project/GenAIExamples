@@ -7,7 +7,11 @@ on:
   pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize]
-
+    inputs:
+      hardware:
+        description: 'Enter your param' #gaudi or xeon
+        required: true
+        default: 'default-value'
   # schedule:
   #   - cron: "35 1 * * 5"
   workflow_dispatch:
@@ -23,13 +27,9 @@ jobs:
     # strategy:
     #   matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     # runs-on: ${{ matrix.hardware }}
-    runs-on: xeon
+    runs-on: ${{ github.event.inputs.hardware }}
     # continue-on-error: true
     steps:
-      # - name: Test example
-      #   run: |
-      #     echo "Matrix - example ${{ matrix.example }}, hardware ${{ matrix.hardware }}"
-
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
 
@@ -57,21 +57,20 @@ jobs:
           # cd ${{ github.workspace }}/$example/tests
           cd ${{ github.workspace }}/.github/workflows
           cp ../../GenAIEval/evals/benchmark/chatqna_benchmark.py .
-          cp ../../GenAIEval/evals/benchmark/data.json ../../ChatQnA/docker/xeon/
+          cp ../../GenAIEval/evals/benchmark/data.json ../../ChatQnA/docker/${hardware}/
           # cp ../../GenAIEval/evals/benchmark/data.json ../../ChatQnA/docker/gaudi/
-          # if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
-          # export IMAGE_REPO=${IMAGE_REPO}
+
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
-          # if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 30m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
-          if [ -f test_chatqna_on_xeon.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh > output.log; else echo "Test script not found, skip test!"; fi
+          if [ -f test_chatqna_on_${hardware}.sh ]; then timeout 30m bash test_chatqna_on_${hardware}.sh > ${hardware}_output.log; else echo "Test script not found, skip test!"; fi
+          # if [ -f test_chatqna_on_xeon.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh > output.log; else echo "Test script not found, skip test!"; fi
 
       - name: Process log and save to JSON
         run: |
-          echo '{}' > output.json
-          echo $(grep -a 'Total Requests:' output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > output.json
-          echo $(grep -a 'P50 latency is' output.log | awk '{print "{\"p50_latency\": \""$4 "\"}"}') >> output.json
-          echo $(grep -a 'P99 latency is' output.log | awk '{print "{\"p99_latency\": \""$4 "\"}"}') >> output.json
-          jq -s 'add' output.json > final_output.json && mv final_output.json output.json
+          echo '{}' > ${hardware}_output.json
+          echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
+          echo $(grep -a 'P50 latency is' ${hardware}_output.log | awk '{print "{\"p50_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
+          echo $(grep -a 'P99 latency is' ${hardware}_output.log | awk '{print "{\"p99_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
+          jq -s 'add' ${hardware}_output.json > ${hardware}_final_output.json && mv ${hardware}_final_output.json ${hardware}_output.json
 
       # - name: Clean up container
       #   env:
