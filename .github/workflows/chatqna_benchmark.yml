@@ -11,7 +11,7 @@ on:
       hardware:
         description: 'Enter your param' #gaudi or xeon
         required: true
-        default: 'default-value'
+        default: 'xeon'
   # schedule:
   #   - cron: "35 1 * * 5"
   workflow_dispatch:
