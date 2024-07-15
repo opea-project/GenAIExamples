@@ -65,8 +65,8 @@ jobs:
           cp ../../GenAIEval/evals/benchmark/chatqna_benchmark.py .
           cp ../../GenAIEval/evals/benchmark/data.json ../../ChatQnA/docker/${hardware}/
 
-          # if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
-          # export IMAGE_REPO=${IMAGE_REPO}
+          if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
+          export IMAGE_REPO=${IMAGE_REPO}
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           if [ -f test_chatqna_on_${hardware}.sh ]; then timeout 30m bash test_chatqna_on_${hardware}.sh > ${hardware}_output.log; else echo "Test script not found, skip test!"; fi
           # if [ -f test_chatqna_on_xeon.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh > output.log; else echo "Test script not found, skip test!"; fi
