@@ -149,7 +149,7 @@ set BACKEND_SERVICE_ENDPOINT=http://%host_ip%:8888/v1/chatqna
 set DATAPREP_SERVICE_ENDPOINT=http://%host_ip%:6007/v1/dataprep
 
 set OLLAMA_ENDPOINT=http://host.docker.internal:11434
-set OLLAMA_MODEL=llama3
+set OLLAMA_MODEL="llama3"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -237,7 +237,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-     "messages": "What is the revenue of Nike in 2023?"
+     "messages": "What is the revenue of Nike in 2023?", "model": "'"${OLLAMA_MODEL}"'"
      }'
 ```
 
