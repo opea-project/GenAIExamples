@@ -33,7 +33,7 @@ jobs:
     #   matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     # runs-on: ${{ matrix.hardware }}
     # runs-on: ${{ github.event.inputs.hardware }}
-    runs-on: xeon
+    runs-on: gaudi #xeon
     # continue-on-error: true
     steps:
       - name: Clean Up Working Directory
@@ -81,7 +81,7 @@ jobs:
       - name: Process log and save to JSON
         run: |
           cd ${{ github.workspace }}/.github/workflows
-          pwd
+          echo ${hardware}
           ls
           echo '{}' > ${hardware}_output.json
           echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
