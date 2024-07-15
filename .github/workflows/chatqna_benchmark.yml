@@ -64,8 +64,7 @@ jobs:
           cd ${{ github.workspace }}/.github/workflows
           cp ../../GenAIEval/evals/benchmark/chatqna_benchmark.py .
           cp ../../GenAIEval/evals/benchmark/data.json ../../ChatQnA/docker/${hardware}/
-          # cp ../../GenAIEval/evals/benchmark/data.json ../../ChatQnA/docker/gaudi/
-          echo $IMAGE_REPO, $IMAGE_REPO_GAUDI, $IMAGE_REPO_XEON
+
           if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
           export IMAGE_REPO=${IMAGE_REPO}
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
