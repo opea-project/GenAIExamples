@@ -56,6 +56,7 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           # example: ${{ matrix.example }}
           hardware: xeon #${{ matrix.hardware }}
+          mode: perf
           IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
           IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
           IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
@@ -80,6 +81,8 @@ jobs:
       - name: Process log and save to JSON
         run: |
           cd ${{ github.workspace }}/.github/workflows
+          pwd
+          ls
           echo '{}' > ${hardware}_output.json
           echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
           echo $(grep -a 'P50 latency is' ${hardware}_output.log | awk '{print "{\"p50_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
