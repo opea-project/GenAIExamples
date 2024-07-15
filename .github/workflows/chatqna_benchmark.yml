@@ -71,8 +71,12 @@ jobs:
           if [ -f test_chatqna_on_${hardware}.sh ]; then timeout 30m bash test_chatqna_on_${hardware}.sh > ${hardware}_output.log; else echo "Test script not found, skip test!"; fi
           # if [ -f test_chatqna_on_xeon.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh > output.log; else echo "Test script not found, skip test!"; fi
 
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          echo y | sudo apt-get install jq
+
       - name: Process log and save to JSON
-        uses: actions/setup-jq@v1
         run: |
           echo '{}' > ${hardware}_output.json
           echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
