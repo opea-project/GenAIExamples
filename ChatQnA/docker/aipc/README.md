@@ -105,6 +105,8 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
+- Linux PC
+
 ```bash
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
@@ -125,8 +127,29 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 
 export OLLAMA_ENDPOINT=http://${host_ip}:11434
-# On Windows PC, please use host.docker.internal instead of ${host_ip}
-#export OLLAMA_ENDPOINT=http://host.docker.internal:11434
+export OLLAMA_MODEL="llama3"
+```
+
+- Windows PC
+
+```bash
+set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
+set RERANK_MODEL_ID=BAAI/bge-reranker-base
+set TEI_EMBEDDING_ENDPOINT=http://%host_ip%:6006
+set TEI_RERANKING_ENDPOINT=http://%host_ip%:8808
+set REDIS_URL=redis://%host_ip%:6379
+set INDEX_NAME=rag-redis
+set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
+set MEGA_SERVICE_HOST_IP=%host_ip%
+set EMBEDDING_SERVICE_HOST_IP=%host_ip%
+set RETRIEVER_SERVICE_HOST_IP=%host_ip%
+set RERANK_SERVICE_HOST_IP=%host_ip%
+set LLM_SERVICE_HOST_IP=%host_ip%
+set BACKEND_SERVICE_ENDPOINT=http://%host_ip%:8888/v1/chatqna
+set DATAPREP_SERVICE_ENDPOINT=http://%host_ip%:6007/v1/dataprep
+
+set OLLAMA_ENDPOINT=http://host.docker.internal:11434
+set OLLAMA_MODEL="llama3"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -140,7 +163,10 @@ cd GenAIExamples/ChatQnA/docker/aipc/
 docker compose -f docker_compose.yaml up -d
 
 # let ollama service runs
-ollama run llama3
+# e.g. ollama run llama3
+ollama run $OLLAMA_MODEL
+# for windows
+# ollama run %OLLAMA_MODEL%
 ```
 
 ### Validate Microservices
@@ -211,7 +237,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-     "messages": "What is the revenue of Nike in 2023?"
+     "messages": "What is the revenue of Nike in 2023?", "model": "'"${OLLAMA_MODEL}"'"
      }'
 ```
 
