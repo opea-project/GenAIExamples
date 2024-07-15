@@ -44,6 +44,8 @@ def post_process_text(text: str):
 def llm_generate(input: LLMParamsDoc):
     llm_endpoint = os.getenv("RAY_Serve_ENDPOINT", "http://localhost:8080")
     llm_model = os.getenv("LLM_MODEL", "Llama-2-7b-chat-hf")
+    if "/" in llm_model:
+        llm_model = llm_model.split("/")[-1]
     llm = ChatOpenAI(
         openai_api_base=llm_endpoint + "/v1",
         model_name=llm_model,

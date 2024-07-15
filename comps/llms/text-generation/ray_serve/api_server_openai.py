@@ -121,7 +121,9 @@ def main(argv=None):
     ).bind(infer_conf, infer_conf["max_num_seqs"], infer_conf["max_batch_size"])
     deployment = edict(deployment)
     openai_serve_run(deployment, host, route_prefix, port, infer_conf["max_concurrent_queries"])
-    input("Service is deployed successfully.")
+    # input("Service is deployed successfully.")
+    while 1:
+        pass
 
 
 if __name__ == "__main__":
