@@ -56,7 +56,7 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           # example: ${{ matrix.example }}
           hardware: xeon #${{ matrix.hardware }}
-          IMAGE_TAG: ${{ needs.mega-image-build.outputs.image_tag }}
+          IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
           IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
           IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
         run: |
