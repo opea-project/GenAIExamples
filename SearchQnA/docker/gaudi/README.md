@@ -59,6 +59,16 @@ docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_
 cd ../../..
 ```
 
+### 9. Build UI Docker Image
+
+Construct the frontend Docker image using the command below:
+
+```bash
+cd GenAIExamples/SearchQnA/docker/ui/
+docker build --no-cache -t opea/searchqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd ../../../..
+```
+
 Then you need to build the last Docker image `opea/searchqna:latest`, which represents the Mega service through following commands:
 
 ```bash
@@ -74,6 +84,7 @@ Then run the command `docker images`, you will have
 4. `opea/reranking-tei:latest`
 5. `opea/llm-tgi:latest`
 6. `opea/searchqna:latest`
+8. `opea/searchqna-ui:latest`
 
 ## 🚀 Set the environment variables
 
@@ -98,6 +109,8 @@ export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export WEB_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
+
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:3008/v1/searchqna"
 
 export EMBEDDING_SERVICE_PORT=3002
 export WEB_RETRIEVER_SERVICE_PORT=3003
