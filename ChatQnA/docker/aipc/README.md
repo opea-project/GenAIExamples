@@ -163,7 +163,10 @@ cd GenAIExamples/ChatQnA/docker/aipc/
 docker compose -f docker_compose.yaml up -d
 
 # let ollama service runs
-ollama run llama3
+# e.g. ollama run llama3
+ollama run $OLLAMA_MODEL
+# for windows
+# ollama run %OLLAMA_MODEL%
 ```
 
 ### Validate Microservices
