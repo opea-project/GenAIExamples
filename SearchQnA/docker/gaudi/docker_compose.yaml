@@ -169,7 +169,7 @@ services:
       - http_proxy=${http_proxy}
       - BACKEND_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
-    restart: always    
+    restart: always
 
 networks:
   default:

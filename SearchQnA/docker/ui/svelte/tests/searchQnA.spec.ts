@@ -20,7 +20,6 @@ async function enterMessageToChat(page: Page, message: string) {
 	await expect(page.getByTestId("display-answer")).toBeVisible();
 }
 
-
 // Test description: New Chat
 test.describe("New Chat", () => {
 	// Test: Enter message to chat
@@ -28,4 +27,3 @@ test.describe("New Chat", () => {
 		await enterMessageToChat(page, CHAT_ITEMS[0]);
 	});
 });
-

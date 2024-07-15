@@ -84,7 +84,7 @@ Then run the command `docker images`, you will have
 4. `opea/reranking-tei:latest`
 5. `opea/llm-tgi:latest`
 6. `opea/searchqna:latest`
-8. `opea/searchqna-ui:latest`
+7. `opea/searchqna-ui:latest`
 
 ## 🚀 Set the environment variables
 
