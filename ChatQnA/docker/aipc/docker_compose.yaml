@@ -126,6 +126,7 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"
       OLLAMA_ENDPOINT: ${OLLAMA_ENDPOINT}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
   chaqna-aipc-backend-server:
     image: opea/chatqna:latest
     container_name: chatqna-aipc-backend-server
