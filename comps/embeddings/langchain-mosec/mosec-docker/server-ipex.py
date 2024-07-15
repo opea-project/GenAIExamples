@@ -34,9 +34,14 @@ class Embedding(Worker):
         d = torch.randint(vocab_size, size=[batch_size, seq_length])
         t = torch.randint(0, 1, size=[batch_size, seq_length])
         m = torch.randint(1, 2, size=[batch_size, seq_length])
-        self.model = torch.jit.trace(self.model, [d, t, m], check_trace=False, strict=False)
+        model_inputs = [d]
+        if "token_type_ids" in self.tokenizer.model_input_names:
+            model_inputs.append(t)
+        if "attention_mask" in self.tokenizer.model_input_names:
+            model_inputs.append(m)
+        self.model = torch.jit.trace(self.model, model_inputs, check_trace=False, strict=False)
         self.model = torch.jit.freeze(self.model)
-        self.model(d, t, m)
+        self.model(*model_inputs)
 
     def get_embedding_with_token_count(self, sentences: Union[str, List[Union[str, List[int]]]]):
         # Mean Pooling - Take attention mask into account for correct averaging
