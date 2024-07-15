@@ -72,7 +72,7 @@ jobs:
           # if [ -f test_chatqna_on_xeon.sh ]; then timeout 30m bash test_chatqna_on_xeon.sh > output.log; else echo "Test script not found, skip test!"; fi
 
       - name: Process log and save to JSON
-        use: actions/setup-jq@v1
+        uses: actions/setup-jq@v1
         run: |
           echo '{}' > ${hardware}_output.json
           echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
