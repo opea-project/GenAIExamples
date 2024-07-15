@@ -8,7 +8,7 @@ ChatQnA architecture shows below:
 
 ![architecture](./assets/img/chatqna_architecture.png)
 
-ChatQnA is implmented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the ChatQnA Flow Chart shows below:
+ChatQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the ChatQnA Flow Chart shows below:
 
 ![Flow Chart](./assets/img/chatqna_flow_chart.png)
 
