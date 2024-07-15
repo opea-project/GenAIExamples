@@ -23,6 +23,8 @@ class MicroService:
         protocol: str = "http",
         host: str = "localhost",
         port: int = 8080,
+        ssl_keyfile: Optional[str] = None,
+        ssl_certfile: Optional[str] = None,
         endpoint: Optional[str] = "/",
         input_datatype: Type[Any] = TextDoc,
         output_datatype: Type[Any] = TextDoc,
@@ -42,6 +44,13 @@ class MicroService:
         self.input_datatype = input_datatype
         self.output_datatype = output_datatype
         self.use_remote_service = use_remote_service
+        self.uvicorn_kwargs = {}
+
+        if ssl_keyfile:
+            self.uvicorn_kwargs["ssl_keyfile"] = ssl_keyfile
+
+        if ssl_certfile:
+            self.uvicorn_kwargs["ssl_certfile"] = ssl_certfile
 
         if not use_remote_service:
             self.replicas = replicas
@@ -81,7 +90,7 @@ class MicroService:
             "description": "OPEA Microservice Infrastructure",
         }
 
-        return HTTPService(runtime_args=runtime_args)
+        return HTTPService(uvicorn_kwargs=self.uvicorn_kwargs, runtime_args=runtime_args)
 
     async def _async_setup(self):
         """The async method setup the runtime.
@@ -140,6 +149,8 @@ def register_microservice(
     protocol: str = "http",
     host: str = "localhost",
     port: int = 8080,
+    ssl_keyfile: Optional[str] = None,
+    ssl_certfile: Optional[str] = None,
     endpoint: Optional[str] = "/",
     input_datatype: Type[Any] = TextDoc,
     output_datatype: Type[Any] = TextDoc,
@@ -155,6 +166,8 @@ def register_microservice(
             protocol=protocol,
             host=host,
             port=port,
+            ssl_keyfile=ssl_keyfile,
+            ssl_certfile=ssl_certfile,
             endpoint=endpoint,
             input_datatype=input_datatype,
             output_datatype=output_datatype,
