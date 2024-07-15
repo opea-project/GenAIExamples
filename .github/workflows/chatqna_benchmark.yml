@@ -7,19 +7,19 @@ on:
   pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize]
-    inputs:
-      hardware:
-        description: 'Enter your param' #gaudi or xeon
-        required: true
-        default: xeon
+    # inputs:
+    #   hardware:
+    #     description: 'Enter your param' #gaudi or xeon
+    #     required: true
+    #     default: xeon
   # schedule:
   #   - cron: "35 1 * * 5"
   workflow_dispatch:
-    inputs:
-      hardware:
-        description: 'Enter your param' #gaudi or xeon
-        required: true
-        default: xeon
+    # inputs:
+    #   hardware:
+    #     description: 'Enter your param' #gaudi or xeon
+    #     required: true
+    #     default: xeon
 
 jobs:
   # job1:
@@ -32,7 +32,8 @@ jobs:
     # strategy:
     #   matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     # runs-on: ${{ matrix.hardware }}
-    runs-on: ${{ github.event.inputs.hardware }}
+    # runs-on: ${{ github.event.inputs.hardware }}
+    runs-on: xeon
     # continue-on-error: true
     steps:
       - name: Clean Up Working Directory
@@ -54,7 +55,7 @@ jobs:
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           # example: ${{ matrix.example }}
-          # hardware: ${{ matrix.hardware }}
+          hardware: xeon #${{ matrix.hardware }}
           IMAGE_TAG: ${{ needs.mega-image-build.outputs.image_tag }}
           IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
           IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
