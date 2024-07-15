@@ -29,19 +29,6 @@ function build_docker_images() {
     docker images
 }
 
-function pull_docker_images() {
-
-    docker pull opea/embedding-tei:latest
-    docker pull opea/retriever-redis:latest
-    docker pull opea/reranking-tei:latest
-    docker pull opea/llm-tgi:latest
-    docker pull opea/dataprep-redis:latest
-    docker pull opea/chatqna:latest
-    docker pull opea/chatqna-ui:latest
-
-    docker images
-}
-
 function start_services() {
     cd $WORKPATH/../ChatQnA/docker/xeon
 
@@ -67,9 +54,9 @@ function start_services() {
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        # sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
+        # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        # sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
     fi
 
@@ -226,8 +213,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    pull_docker_images
-    # if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)

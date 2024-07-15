@@ -41,8 +41,6 @@ jobs:
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
 
       - name: Clone repo GenAIEval
         run: |
@@ -57,7 +55,7 @@ jobs:
           # example: ${{ matrix.example }}
           hardware: xeon #${{ matrix.hardware }}
           mode: perf
-          IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
+          IMAGE_TAG: latest
           IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
           IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
         run: |
@@ -66,18 +64,20 @@ jobs:
           cp ../../GenAIEval/evals/benchmark/chatqna_benchmark.py .
           cp ../../GenAIEval/evals/benchmark/data.json ../../ChatQnA/docker/${hardware}/
 
-          # if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
-          # export IMAGE_REPO=${IMAGE_REPO}
+          if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
+          export IMAGE_REPO=${IMAGE_REPO}
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           if [ -f test_chatqna_on_${hardware}.sh ]; then timeout 30m bash test_chatqna_on_${hardware}.sh > ${hardware}_output.log; else echo "Test script not found, skip test!"; fi
 
-      - name: Install jq
-        run: |
-          sudo apt-get update
-          echo y | sudo apt-get install jq
-          jq --version
+      # - name: Install jq
+      #   run: |
+      #     sudo apt-get update
+      #     echo y | sudo apt-get install jq
+      #     jq --version
 
       - name: Process log and save to JSON
+        env:
+          hardware: xeon
         run: |
           cd ${{ github.workspace }}/.github/workflows
           echo ${hardware}
