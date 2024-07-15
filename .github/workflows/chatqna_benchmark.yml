@@ -33,7 +33,7 @@ jobs:
     #   matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     # runs-on: ${{ matrix.hardware }}
     # runs-on: ${{ github.event.inputs.hardware }}
-    runs-on: ${{ github.event.inputs.hardware ? github.event.inputs.hardware : 'xeon' }}
+    runs-on: xeon
     # continue-on-error: true
     steps:
       - name: Clean Up Working Directory
