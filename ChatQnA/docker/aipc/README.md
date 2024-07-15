@@ -105,7 +105,7 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
-* Linux PC
+- Linux PC
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -130,7 +130,7 @@ export OLLAMA_ENDPOINT=http://${host_ip}:11434
 export OLLAMA_MODEL="llama3"
 ```
 
-* Windows PC
+- Windows PC
 
 ```bash
 set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
