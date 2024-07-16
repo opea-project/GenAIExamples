@@ -72,11 +72,11 @@ jobs:
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           if [ -f test_chatqna_on_${hardware}.sh ]; then timeout 30m bash test_chatqna_on_${hardware}.sh > ${hardware}_output.log; else echo "Test script not found, skip test!"; fi
 
-      # - name: Install jq
-      #   run: |
-      #     sudo apt-get update
-      #     echo y | sudo apt-get install jq
-      #     jq --version
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          echo y | sudo apt-get install jq
+          jq --version
 
       - name: Process log and save to JSON
         env:
