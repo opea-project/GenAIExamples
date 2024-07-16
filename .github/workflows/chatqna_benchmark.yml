@@ -48,6 +48,7 @@ jobs:
         run: |
           git clone https://github.com/opea-project/GenAIEval.git
           cd GenAIEval && git checkout v0.6
+          pip install numpy
 
       - name: Run test
         env:
