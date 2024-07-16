@@ -8,18 +8,20 @@ on:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize]
     # inputs:
-    #   hardware:
-    #     description: 'Enter your param' #gaudi or xeon
-    #     required: true
-    #     default: xeon
+    #   variables:
+    #     hardware:
+    #       description: 'Enter your param' #gaudi or xeon
+    #       required: true
+    #       default: xeon
   # schedule:
   #   - cron: "35 1 * * 5"
   workflow_dispatch:
-    inputs:
-      hardware:
-        description: 'Enter your hardware' #gaudi or xeon
-        required: true
-        default: xeon
+    variables:
+      inputs:
+        hardware:
+          description: 'Enter your hardware' #gaudi or xeon
+          required: true
+          default: xeon
 
 jobs:
   # job1:
@@ -69,19 +71,11 @@ jobs:
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           if [ -f test_chatqna_on_${hardware}.sh ]; then timeout 30m bash test_chatqna_on_${hardware}.sh > ${hardware}_output.log; else echo "Test script not found, skip test!"; fi
 
-      # - name: Install jq
-      #   run: |
-      #     sudo apt-get update
-      #     echo y | sudo apt-get install jq
-      #     jq --version
-
       - name: Process log and save to JSON
         env:
           hardware: xeon
         run: |
           cd ${{ github.workspace }}/.github/workflows
-          echo ${hardware}
-          ls
           echo '{}' > ${hardware}_output.json
           echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
           echo $(grep -a 'P50 latency is' ${hardware}_output.log | awk '{print "{\"p50_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
