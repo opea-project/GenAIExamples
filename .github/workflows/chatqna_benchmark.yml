@@ -4,15 +4,15 @@
 name: benchmark test with chatqna_benchmark
 
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, reopened, ready_for_review, synchronize]
-    # inputs:
-    #   variables:
-    #     hardware:
-    #       description: 'Enter your param' #gaudi or xeon
-    #       required: true
-    #       default: xeon
+  # pull_request:
+  #   branches: [main]
+  #   types: [opened, reopened, ready_for_review, synchronize]
+  #   # inputs:
+  #   #   variables:
+  #   #     hardware:
+  #   #       description: 'Enter your param' #gaudi or xeon
+  #   #       required: true
+  #   #       default: xeon
   # schedule:
   #   - cron: "35 1 * * 5"
   workflow_dispatch:
@@ -24,7 +24,7 @@ on:
 
 jobs:
   Example-test:
-    runs-on: xeon  #gaudi
+    runs-on: ${{ github.event.inputs.hardware }}  #xeon  #gaudi
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
@@ -42,7 +42,7 @@ jobs:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          hardware: xeon
+          hardware: ${{ github.event.inputs.hardware }}  #xeon
           mode: perf
           IMAGE_TAG: latest
           IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
@@ -60,7 +60,7 @@ jobs:
 
       - name: Process log and save to JSON
         env:
-          hardware: xeon
+          hardware: ${{ github.event.inputs.hardware }}   #xeon
         run: |
           cd ${{ github.workspace }}/.github/workflows
           echo '{}' > ${hardware}_output.json
