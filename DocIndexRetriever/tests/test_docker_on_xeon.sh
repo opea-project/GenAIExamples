@@ -81,7 +81,7 @@ function validate_megaservice() {
     validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon" "dataprep-redis-server"
 
     # Curl the Mega Service
-    echo "Testing retriver service"
+    echo "Testing retriever service"
     local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "text": "Explain the OPEA project?"
     }' | tee ${LOG_PATH}/doc-index-retriever-service-xeon.log)

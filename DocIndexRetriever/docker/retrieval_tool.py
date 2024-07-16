@@ -4,7 +4,7 @@
 import asyncio
 import os
 
-from comps import RetrievalToolGateway, MicroService, ServiceOrchestrator, ServiceType
+from comps import MicroService, RetrievalToolGateway, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8889)
@@ -47,7 +47,7 @@ class RetrievalToolService:
             use_remote_service=True,
             service_type=ServiceType.RERANK,
         )
-        
+
         self.megaservice.add(embedding).add(retriever).add(rerank)
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, rerank)

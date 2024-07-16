@@ -4,24 +4,28 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 
 ### 1. Build Images for necessary microservices. (This step will not needed after docker image released)
 
-* Embedding TEI Image
+- Embedding TEI Image
+
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
 ```
 
-* Retriever Vector store Image
+- Retriever Vector store Image
+
 ```bash
 docker build -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/redis/docker/Dockerfile .
 ```
 
-* Rerank TEI Image
+- Rerank TEI Image
+
 ```bash
 docker build -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
 ```
 
-* Dataprep Image
+- Dataprep Image
+
 ```bash
 docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
 ```
@@ -85,6 +89,7 @@ curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: applicati
 ### 4. Trouble shooting
 
 1. check all containers are alive
+
 ```bash
 # redis vector store
 docker container logs redis-vector-db
@@ -116,6 +121,6 @@ curl http://${host_ip}:8000/v1/reranking \
   -H 'Content-Type: application/json' > output
 docker container logs reranking-tei-server
 
-# megaservice gateway 
+# megaservice gateway
 docker container logs doc-index-retriever-server
 ```

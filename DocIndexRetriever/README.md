@@ -4,5 +4,5 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 
 ## We provided DocWriterAgent with different deployment infra
 
-  * [docker xeon version](docker/xeon/) => minimum endpoints, easy to setup
-  * [docker gaudi version](docker/gaudi/) => with extra tei_gaudi endpoint, faster
+- [docker xeon version](docker/xeon/) => minimum endpoints, easy to setup
+- [docker gaudi version](docker/gaudi/) => with extra tei_gaudi endpoint, faster
