@@ -16,12 +16,11 @@ on:
   # schedule:
   #   - cron: "35 1 * * 5"
   workflow_dispatch:
-    variables:
-      inputs:
-        hardware:
-          description: 'Enter your hardware' #gaudi or xeon
-          required: true
-          default: xeon
+    inputs:
+      hardware:
+        description: 'Enter your hardware' #gaudi or xeon
+        required: true
+        default: xeon
 
 jobs:
   # job1:
@@ -30,13 +29,7 @@ jobs:
   #     diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|gmc|assets'
 
   Example-test:
-    # needs: [job1]
-    # strategy:
-    #   matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    # runs-on: ${{ matrix.hardware }}
-    # runs-on: ${{ github.event.inputs.hardware }}
     runs-on: xeon  #gaudi
-    # continue-on-error: true
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
