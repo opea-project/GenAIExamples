@@ -46,13 +46,6 @@ function start_services() {
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
 
-    if [[ "$IMAGE_REPO" != "" ]]; then
-        # Replace the container name with a test-specific name
-        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/doc-index-retriever:latest#image: opea/doc-index-retriever:${IMAGE_TAG}#g" docker_compose.yaml
-        cat docker_compose.yaml
-    fi
-
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     sleep 20
@@ -63,13 +56,11 @@ function validate() {
     local CONTENT="$1"
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
-    local DOCKER_NAME="$4"
 
     if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-        echo "[ $SERVICE_NAME ] Content is as expected."
+        echo "[ $SERVICE_NAME ] Content is as expected: $CONTENT"
     else
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
     fi
 }
@@ -79,14 +70,25 @@ function validate_megaservice() {
     local CONTENT=$(curl -X POST "http://${ip_address}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]' | tee ${LOG_PATH}/dataprep-redis-service-gaudi.log)
-    validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-gaudi" "dataprep-redis-server"
+    validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-gaudi" || EXIT_CODE=$?
+    if [ "$EXIT_CODE" -eq 1 ]; then
+        docker logs dataprep-redis-server | tee -a ${LOG_PATH}/dataprep-redis-service-gaudi.log
+        return 1
+    fi
 
     # Curl the Mega Service
     echo "Testing retriever service"
     local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "text": "Explain the OPEA project?"
     }' | tee ${LOG_PATH}/doc-index-retriever-service-gaudi.log)
-    validate "$CONTENT" "Enterprise AI (OPEA)" "doc-index-retriever-service-gaudi" "doc-index-retriever-server"
+    validate "$CONTENT" "reranked_docs" "doc-index-retriever-service-gaudi" || EXIT_CODE=$?
+    if [ "$EXIT_CODE" -eq 1 ]; then
+        docker logs tei-embedding-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        exit 1
+    fi
 }
 
 function stop_docker() {
@@ -102,7 +104,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    build_docker_images
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
