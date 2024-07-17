@@ -65,6 +65,15 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 cd ../../..
 ```
 
+If you want to enable guardrails microservice in the pipeline, please use the below command instead:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA/docker
+docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_guardrails .
+cd ../../..
+```
+
 ### 9. Build UI Docker Image
 
 Construct the frontend Docker image using the command below:
@@ -89,6 +98,16 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 cd ../../../..
 ```
 
+### 11. Build Guardrails Docker Image (Optional)
+
+To fortify AI initiatives in production, Guardrails microservice can secure model inputs and outputs, building Trustworthy, Safe, and Secure LLM-based Applications.
+
+```bash
+cd GenAIExamples/ChatQnA/docker
+docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/langchain/docker/Dockerfile .
+cd ../../..
+```
+
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/embedding-tei:latest`
@@ -97,12 +116,16 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 4. `opea/llm-tgi:latest`
 5. `opea/tei-gaudi:latest`
 6. `opea/dataprep-redis:latest`
-7. `opea/chatqna:latest`
+7. `opea/chatqna:latest` or `opea/chatqna-guardrails:latest`
 8. `opea/chatqna-ui:latest`
 
 If Conversation React UI is built, you will find one more image:
 
 9. `opea/chatqna-conversation-ui:latest`
+
+If Guardrails docker image is built, you will find one more image:
+
+10. `opea/guardrails-tgi:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -134,6 +157,14 @@ export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
 ```
 
+If guardrails microservice is enabled in the pipeline, the below environment variables are necessary to be set.
+
+```bash
+export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+export SAFETY_GUARD_ENDPOINT="http://${host_ip}:8088"
+export GUARDRAIL_SERVICE_HOST_IP=${host_ip}
+```
+
 Note: Please replace with `host_ip` with you external IP address, do **NOT** use localhost.
 
 ### Start all the services Docker Containers
@@ -141,6 +172,13 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
 docker compose -f docker_compose.yaml up -d
+```
+
+If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
+
+```bash
+cd GenAIExamples/ChatQnA/docker/gaudi/
+docker compose -f docker_compose_guardrails.yaml up -d
 ```
 
 ### Validate MicroServices and MegaService
@@ -274,6 +312,15 @@ curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
 curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
+```
+
+10. Guardrails (Optional)
+
+```bash
+curl http://${host_ip}:9090/v1/guardrails\
+  -X POST \
+  -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
+  -H 'Content-Type: application/json'
 ```
 
 ## Enable LangSmith for Monotoring Application (Optional)
