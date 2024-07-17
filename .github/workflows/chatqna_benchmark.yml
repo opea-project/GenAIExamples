@@ -57,17 +57,20 @@ jobs:
           export IMAGE_REPO=${IMAGE_REPO}
           # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           if [ -f test_chatqna_on_${hardware}.sh ]; then timeout 30m bash test_chatqna_on_${hardware}.sh > ${hardware}_output.log; else echo "Test script not found, skip test!"; fi
+          pwd&&ls
 
       - name: Process log and save to JSON
         env:
           hardware: xeon   #${{ github.event.inputs.hardware }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
+          pwd
           echo '{}' > ${hardware}_output.json
           echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
           echo $(grep -a 'P50 latency is' ${hardware}_output.log | awk '{print "{\"p50_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
           echo $(grep -a 'P99 latency is' ${hardware}_output.log | awk '{print "{\"p99_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
           jq -s 'add' ${hardware}_output.json > ${hardware}_final_output.json && mv ${hardware}_final_output.json ${hardware}_output.json
+          ls
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
