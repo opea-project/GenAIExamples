@@ -6,7 +6,7 @@ version: "3.8"
 
 services:
   whisper-service:
-    image: opea/whisper:latest
+    image: opea/whisper-gaudi:latest
     container_name: whisper-service
     ports:
       - "7066:7066"

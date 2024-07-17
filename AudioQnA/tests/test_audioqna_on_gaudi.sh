@@ -13,11 +13,11 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/whisper:latest  -f comps/asr/whisper/Dockerfile_hpu .
+    docker build -t opea/whisper-gaudi:latest  -f comps/asr/whisper/Dockerfile_hpu .
 
     docker build -t opea/asr:latest  -f comps/asr/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/speecht5:latest  -f comps/tts/speecht5/Dockerfile_hpu .
+    docker build -t opea/speecht5-gaudi:latest  -f comps/tts/speecht5/Dockerfile_hpu .
     docker build -t opea/tts:latest  -f comps/tts/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
