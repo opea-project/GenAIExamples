@@ -66,6 +66,7 @@ cd ../../..
 ```
 
 If you want to enable guardrails microservice in the pipeline, please use the below command instead:
+
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/docker
@@ -157,12 +158,12 @@ export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_
 ```
 
 If guardrails microservice is enabled in the pipeline, the below environment variables are necessary to be set.
+
 ```bash
 export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
 export SAFETY_GUARD_ENDPOINT="http://${host_ip}:8088"
 export GUARDRAIL_SERVICE_HOST_IP=${host_ip}
 ```
-
 
 Note: Please replace with `host_ip` with you external IP address, do **NOT** use localhost.
 
