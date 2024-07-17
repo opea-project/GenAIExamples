@@ -68,8 +68,9 @@ class ChatQnAService:
         self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
     async def schedule(self):
-        await self.megaservice.schedule(initial_inputs={"text": "What is the revenue of Nike in 2023?"})
-        result_dict = self.megaservice.result_dict
+        result_dict, runtime_graph = await self.megaservice.schedule(
+            initial_inputs={"text": "What is the revenue of Nike in 2023?"}
+        )
         print(result_dict)
 
 

@@ -46,7 +46,7 @@ class TestBaseStatistics(unittest.IsolatedAsyncioTestCase):
         for _ in range(2):
             task1 = asyncio.create_task(self.service_builder.schedule(initial_inputs={"text": "hello, "}))
             await asyncio.gather(task1)
-            result_dict1 = task1.result()
+            result_dict1, _ = task1.result()
 
         response = requests.get("http://localhost:8083/v1/statistics")
         res = response.json()

@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
+import copy
 import json
+import re
 from typing import Dict, List
 
 import aiohttp
@@ -39,10 +41,16 @@ class ServiceOrchestrator(DAG):
 
     async def schedule(self, initial_inputs: Dict, llm_parameters: LLMParams = LLMParams()):
         result_dict = {}
+        runtime_graph = DAG()
+        runtime_graph.graph = copy.deepcopy(self.graph)
 
         timeout = aiohttp.ClientTimeout(total=1000)
         async with aiohttp.ClientSession(trust_env=True, timeout=timeout) as session:
-            pending = {asyncio.create_task(self.execute(session, node, initial_inputs)) for node in self.ind_nodes()}
+            pending = {
+                asyncio.create_task(self.execute(session, node, initial_inputs, runtime_graph))
+                for node in self.ind_nodes()
+            }
+            ind_nodes = self.ind_nodes()
 
             while pending:
                 done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
@@ -51,13 +59,40 @@ class ServiceOrchestrator(DAG):
                     self.dump_outputs(node, response, result_dict)
 
                     # traverse the current node's downstream nodes and execute if all one's predecessors are finished
-                    downstreams = self.downstream(node)
-                    for d_node in downstreams:
-                        if all(i in result_dict for i in self.predecessors(d_node)):
-                            inputs = self.process_outputs(self.predecessors(d_node), result_dict)
-                            pending.add(asyncio.create_task(self.execute(session, d_node, inputs, llm_parameters)))
+                    downstreams = runtime_graph.downstream(node)
 
-        return result_dict
+                    # remove all the black nodes that are skipped to be forwarded to
+                    if not isinstance(response, StreamingResponse) and "downstream_black_list" in response:
+                        for black_node in response["downstream_black_list"]:
+                            for downstream in reversed(downstreams):
+                                try:
+                                    if re.findall(black_node, downstream):
+                                        print(f"skip forwardding to {downstream}...")
+                                        runtime_graph.delete_edge(node, downstream)
+                                        downstreams.remove(downstream)
+                                except re.error as e:
+                                    print("Pattern invalid! Operation cancelled.")
+
+                    for d_node in downstreams:
+                        if all(i in result_dict for i in runtime_graph.predecessors(d_node)):
+                            inputs = self.process_outputs(runtime_graph.predecessors(d_node), result_dict)
+                            pending.add(
+                                asyncio.create_task(
+                                    self.execute(session, d_node, inputs, runtime_graph, llm_parameters)
+                                )
+                            )
+        nodes_to_keep = []
+        for i in ind_nodes:
+            nodes_to_keep.append(i)
+            nodes_to_keep.extend(runtime_graph.all_downstreams(i))
+
+        all_nodes = list(runtime_graph.graph.keys())
+
+        for node in all_nodes:
+            if node not in nodes_to_keep:
+                runtime_graph.delete_node_if_exists(node)
+
+        return result_dict, runtime_graph
 
     def process_outputs(self, prev_nodes: List, result_dict: Dict) -> Dict:
         all_outputs = {}
@@ -72,6 +107,7 @@ class ServiceOrchestrator(DAG):
         session: aiohttp.client.ClientSession,
         cur_node: str,
         inputs: Dict,
+        runtime_graph: DAG,
         llm_parameters: LLMParams = LLMParams(),
     ):
         # send the cur_node request/reply
@@ -97,8 +133,8 @@ class ServiceOrchestrator(DAG):
         else:
             if (
                 self.services[cur_node].service_type == ServiceType.LLM
-                and self.predecessors(cur_node)
-                and "asr" in self.predecessors(cur_node)[0]
+                and runtime_graph.predecessors(cur_node)
+                and "asr" in runtime_graph.predecessors(cur_node)[0]
             ):
                 inputs["query"] = inputs["text"]
                 del inputs["text"]
@@ -109,8 +145,8 @@ class ServiceOrchestrator(DAG):
     def dump_outputs(self, node, response, result_dict):
         result_dict[node] = response
 
-    def get_all_final_outputs(self, result_dict):
+    def get_all_final_outputs(self, result_dict, runtime_graph):
         final_output_dict = {}
-        for leaf in self.all_leaves():
+        for leaf in runtime_graph.all_leaves():
             final_output_dict[leaf] = result_dict[leaf]
         return final_output_dict

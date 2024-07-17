@@ -44,7 +44,7 @@ class TestServiceOrchestrator(unittest.IsolatedAsyncioTestCase):
         self.gateway.stop()
 
     async def test_schedule(self):
-        result_dict = await self.service_builder.schedule(initial_inputs={"text": "hello, "})
+        result_dict, _ = await self.service_builder.schedule(initial_inputs={"text": "hello, "})
         self.assertEqual(result_dict[self.s2.name]["text"], "hello, opea project!")
 
 
