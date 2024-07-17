@@ -49,7 +49,7 @@ docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --buil
 
 ```bash
 cd ../..
-docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile_hpu .
+docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile_hpu .
 ```
 
 ### 2.1.2 TTS Service Image
@@ -71,7 +71,7 @@ docker run -p 7055:7055 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$htt
 - Gaudi2 HPU
 
 ```bash
-docker run -p 7055:7055 --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/speecht5:latest
+docker run -p 7055:7055 --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/speecht5-gaudi:latest
 ```
 
 ### 2.2.2 Start TTS service

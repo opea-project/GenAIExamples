@@ -27,5 +27,6 @@ jobs:
         id: build-microservice-image
         env:
           micro_service: ${{ inputs.micro_service }}
+          hardware: ${{ matrix.node }}
         run: |
-          bash .github/workflows/scripts/docker_images_build_push.sh ${micro_service}
+          bash .github/workflows/scripts/docker_images_build_push.sh ${micro_service} ${hardware}

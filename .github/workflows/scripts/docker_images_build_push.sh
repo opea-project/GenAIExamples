@@ -13,10 +13,15 @@ function docker_build() {
     IMAGE_NAME=$1
     micro_service=$2
     dockerfile_path=${WORKSPACE}/comps/${micro_service}
-    if [ -f "$dockerfile_path/Dockerfile" ]; then
-        DOCKERFILE_PATH="$dockerfile_path/Dockerfile"
-    elif [ -f "$dockerfile_path/docker/Dockerfile" ]; then
-        DOCKERFILE_PATH="$dockerfile_path/docker/Dockerfile"
+    if [[ "$IMAGE_NAME" == *"gaudi" ]]; then
+        dockerfile_name="Dockerfile_hpu"
+    else
+        dockerfile_name="Dockerfile"
+    fi
+    if [ -f "$dockerfile_path/$dockerfile_name" ]; then
+        DOCKERFILE_PATH="$dockerfile_path/$dockerfile_name"
+    elif [ -f "$dockerfile_path/docker/$dockerfile_name" ]; then
+        DOCKERFILE_PATH="$dockerfile_path/docker/$dockerfile_name"
     else
         echo "Dockerfile not found"
         exit 1
@@ -29,6 +34,7 @@ function docker_build() {
 }
 
 micro_service=$1
+hardware=$(echo $2 | cut -d- -f3)
 case ${micro_service} in
     "asr"|"tts")
         IMAGE_NAME="opea/${micro_service}"
@@ -55,10 +61,10 @@ case ${micro_service} in
         IMAGE_NAME="opea/web-retriever-chroma"
         ;;
     "tts/speecht5")
-        IMAGE_NAME="opea/speecht5"
+        if [ "${hardware}" == "gaudi" ]; then IMAGE_NAME="opea/speecht5-gaudi"; else IMAGE_NAME="opea/speecht5"; fi
         ;;
     "asr/whisper")
-        IMAGE_NAME="opea/whisper"
+        if [ "${hardware}" == "gaudi" ]; then IMAGE_NAME="opea/whisper-gaudi"; else IMAGE_NAME="opea/whisper"; fi
         ;;
     *)
         echo "Not supported yet"
