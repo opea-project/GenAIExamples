@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
+echo "IMAGE_REPO=${IMAGE_REPO}"
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -13,11 +14,11 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/whisper:latest  -f comps/asr/whisper/Dockerfile_hpu .
+    docker build -t opea/whisper-gaudi:latest  -f comps/asr/whisper/Dockerfile_hpu .
 
     docker build -t opea/asr:latest  -f comps/asr/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/speecht5:latest  -f comps/tts/speecht5/Dockerfile_hpu .
+    docker build -t opea/speecht5-gaudi:latest  -f comps/tts/speecht5/Dockerfile_hpu .
     docker build -t opea/tts:latest  -f comps/tts/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
@@ -54,23 +55,27 @@ function start_services() {
 
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    # Replace the container name with a test-specific name
-    # echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    # sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/audioqna:latest#image: opea/audioqna:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/audioqna-ui:latest#image: opea/audioqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        echo "cat docker_compose.yaml"
+        cat docker_compose.yaml
+    fi
+
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
-    # n=0
-    # until [[ "$n" -ge 200 ]]; do
-    #     docker logs tgi-gaudi-server > tgi_service_start.log
-    #     if grep -q Connected tgi_service_start.log; then
-    #         break
-    #     fi
-    #     sleep 1s
-    #     n=$((n+1))
-    # done
-    sleep 8m
+     n=0
+     until [[ "$n" -ge 500 ]]; do
+         docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
+         if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+             break
+         fi
+         sleep 1s
+         n=$((n+1))
+     done
 }
 
 
@@ -130,14 +135,8 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    # begin_time=$(date +%s)
-    build_docker_images
-    # start_time=$(date +%s)
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
-    # end_time=$(date +%s)
-    # minimal_duration=$((end_time-start_time))
-    # maximal_duration=$((end_time-begin_time))
-    # echo "Mega service start duration is "$maximal_duration"s"
 
     # validate_microservices
     validate_megaservice

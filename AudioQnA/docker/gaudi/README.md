@@ -14,7 +14,7 @@ cd GenAIComps
 ### 2. Build ASR Image
 
 ```bash
-docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile_hpu .
+docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile_hpu .
 
 
 docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/Dockerfile .
@@ -29,7 +29,7 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 ### 4. Build TTS Image
 
 ```bash
-docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile_hpu .
+docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile_hpu .
 
 docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/Dockerfile .
 ```
@@ -46,10 +46,10 @@ docker build --no-cache -t opea/audioqna:latest --build-arg https_proxy=$https_p
 
 Then run the command `docker images`, you will have following images ready:
 
-1. `opea/whisper:latest`
+1. `opea/whisper-gaudi:latest`
 2. `opea/asr:latest`
 3. `opea/llm-tgi:latest`
-4. `opea/speecht5:latest`
+4. `opea/speecht5-gaudi:latest`
 5. `opea/tts:latest`
 6. `opea/audioqna:latest`
 
