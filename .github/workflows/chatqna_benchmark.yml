@@ -49,9 +49,9 @@ jobs:
           IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
         run: |
           # cd ${{ github.workspace }}/$example/tests
-          cd ${{ github.workspace }}/.github/workflows
+          cd ${{ github.workspace }}/ChatQnA/tests
           cp ../../GenAIEval/evals/benchmark/chatqna_benchmark.py .
-          cp ../../GenAIEval/evals/benchmark/data.json ../../ChatQnA/docker/${hardware}/
+          cp ../../GenAIEval/evals/benchmark/data.json ${{ github.workspace }}/ChatQnA/docker/${hardware}/
 
           if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
           export IMAGE_REPO=${IMAGE_REPO}
@@ -62,7 +62,7 @@ jobs:
         env:
           hardware: ${{ github.event.inputs.hardware }}   #xeon
         run: |
-          cd ${{ github.workspace }}/.github/workflows
+          cd ${{ github.workspace }}/ChatQnA/tests
           echo '{}' > ${hardware}_output.json
           echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
           echo $(grep -a 'P50 latency is' ${hardware}_output.log | awk '{print "{\"p50_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
