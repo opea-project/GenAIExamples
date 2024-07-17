@@ -7,6 +7,8 @@ from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
+GUARDRAIL_SERVICE_HOST_IP = os.getenv("GUARDRAIL_SERVICE_HOST_IP", "0.0.0.0")
+GUARDRAIL_SERVICE_PORT = int(os.getenv("GUARDRAIL_SERVICE_PORT", 9090))
 EMBEDDING_SERVICE_HOST_IP = os.getenv("EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
 EMBEDDING_SERVICE_PORT = int(os.getenv("EMBEDDING_SERVICE_PORT", 6000))
 RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
@@ -24,6 +26,14 @@ class ChatQnAService:
         self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
+        guardrail = MicroService(
+            name="guardrail",
+            host=GUARDRAIL_SERVICE_HOST_IP,
+            port=GUARDRAIL_SERVICE_PORT,
+            endpoint="/v1/guardrails",
+            use_remote_service=True,
+            service_type=ServiceType.GUARDRAIL,
+        )
         embedding = MicroService(
             name="embedding",
             host=EMBEDDING_SERVICE_HOST_IP,
@@ -56,7 +66,8 @@ class ChatQnAService:
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )
-        self.megaservice.add(embedding).add(retriever).add(rerank).add(llm)
+        self.megaservice.add(guardrail).add(embedding).add(retriever).add(rerank).add(llm)
+        self.megaservice.flow_to(guardrail, embedding)
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, rerank)
         self.megaservice.flow_to(rerank, llm)
