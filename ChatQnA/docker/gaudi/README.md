@@ -122,10 +122,9 @@ If Conversation React UI is built, you will find one more image:
 
 9. `opea/chatqna-conversation-ui:latest`
 
-If Guardrails docker iamge is built, you will find one more image:
+If Guardrails docker image is built, you will find one more image:
 
 10. `opea/guardrails-tgi:latest`
-
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -321,7 +320,6 @@ curl http://${host_ip}:9090/v1/guardrails\
   -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
   -H 'Content-Type: application/json'
 ```
-
 
 ## Enable LangSmith for Monotoring Application (Optional)
 
