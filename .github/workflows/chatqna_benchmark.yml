@@ -4,9 +4,9 @@
 name: benchmark test with chatqna_benchmark
 
 on:
-  # pull_request:
-  #   branches: [main]
-  #   types: [opened, reopened, ready_for_review, synchronize]
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
   #   # inputs:
   #   #   variables:
   #   #     hardware:
@@ -24,7 +24,7 @@ on:
 
 jobs:
   Example-test:
-    runs-on: ${{ github.event.inputs.hardware }}  #xeon  #gaudi
+    runs-on: xeon #${{ github.event.inputs.hardware }}    #gaudi
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
@@ -42,7 +42,7 @@ jobs:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          hardware: ${{ github.event.inputs.hardware }}  #xeon
+          hardware: xeon  #${{ github.event.inputs.hardware }}  
           mode: perf
           IMAGE_TAG: latest
           IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
@@ -60,7 +60,7 @@ jobs:
 
       - name: Process log and save to JSON
         env:
-          hardware: ${{ github.event.inputs.hardware }}   #xeon
+          hardware: xeon   #${{ github.event.inputs.hardware }}
         run: |
           cd ${{ github.workspace }}/ChatQnA/tests
           echo '{}' > ${hardware}_output.json
