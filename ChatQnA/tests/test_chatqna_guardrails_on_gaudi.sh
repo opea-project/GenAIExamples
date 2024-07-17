@@ -60,9 +60,11 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export GUARDRAIL_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+    export SAFETY_GUARD_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
     export SAFETY_GUARD_ENDPOINT="http://${ip_address}:8088"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
@@ -193,7 +195,7 @@ function validate_microservices() {
     # guardrails microservice
     validate_services \
         "${ip_address}:9090/v1/guardrails" \
-        "data: " \
+        "Violated policies" \
         "guardrails" \
         "guardrails-tgi-gaudi-server" \
         '{"text":"How do you buy a tiger in the US?"}'
@@ -206,7 +208,7 @@ function validate_megaservice() {
         "${ip_address}:8888/v1/chatqna" \
         "billion" \
         "mega-chatqna" \
-        "chatqna-gaudi-backend-server" \
+        "chatqna-gaudi-guardrails-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
