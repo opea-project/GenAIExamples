@@ -221,7 +221,7 @@ function main() {
     echo "Mega service start duration is $duration s" && sleep 1s
 
     if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/workflows/chatqna_benchmark.py
+        python3 $WORKPATH/tests/chatqna_benchmark.py
     elif [ "${mode}" == "func" ]; then
         validate_microservices
         validate_megaservice
