@@ -40,7 +40,8 @@ class ServiceOrchestrator(DAG):
     async def schedule(self, initial_inputs: Dict, llm_parameters: LLMParams = LLMParams()):
         result_dict = {}
 
-        async with aiohttp.ClientSession(trust_env=True) as session:
+        timeout = aiohttp.ClientTimeout(total=1000)
+        async with aiohttp.ClientSession(trust_env=True, timeout=timeout) as session:
             pending = {asyncio.create_task(self.execute(session, node, initial_inputs)) for node in self.ind_nodes()}
 
             while pending:
