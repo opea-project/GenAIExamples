@@ -65,6 +65,14 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 cd ../../..
 ```
 
+If you want to enable guardrails microservice in the pipeline, please use the below command instead:
+```bash
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA/docker
+docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_guardrails .
+cd ../../..
+```
+
 ### 9. Build UI Docker Image
 
 Construct the frontend Docker image using the command below:
@@ -107,7 +115,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 4. `opea/llm-tgi:latest`
 5. `opea/tei-gaudi:latest`
 6. `opea/dataprep-redis:latest`
-7. `opea/chatqna:latest`
+7. `opea/chatqna:latest` or `opea/chatqna-guardrails:latest`
 8. `opea/chatqna-ui:latest`
 
 If Conversation React UI is built, you will find one more image:
@@ -148,6 +156,13 @@ export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
 ```
+
+If guardrails microservice is enabled in the pipeline, the below environment variables are necessary to be set.
+```bash
+export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+export SAFETY_GUARD_ENDPOINT="http://${host_ip}:8088"
+```
+
 
 Note: Please replace with `host_ip` with you external IP address, do **NOT** use localhost.
 
