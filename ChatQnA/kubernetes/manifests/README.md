@@ -64,7 +64,7 @@ kubectl create deployment client-test -n chatqa --image=python:3.8.13 -- sleep i
 5. Access the application using the above URL from the client pod
 
 ```sh
-export CLIENT_POD=$(kubectl get pod -l app=client-test -o jsonpath={.items..metadata.name})
+export CLIENT_POD=$(kubectl get pod -n chatqa -l app=client-test -o jsonpath={.items..metadata.name})
 export accessUrl=$(kubectl get gmc -n chatqa -o jsonpath="{.items[?(@.metadata.name=='chatqa')].status.accessUrl}")
 kubectl exec "$CLIENT_POD" -n chatqa -- curl $accessUrl  -X POST  -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
 ```
