@@ -18,25 +18,28 @@ Benefits brought by RAG agent includes:
 
 ## ROADMAP of RAGAgent
 
-We plan to complete RAGAgent exmaple with 3 phases along with OPEA release v0.8, v0.9, v1.0
+We plan to complete RAGAgent example with 3 phases along with OPEA release v0.8, v0.9, v1.0
 
-* RAG agent v0.1(current version): (base functionality ready)
-    * support Single VectorDB
-    * provide agent workflow with benefit #1, #4, and #5
- 
-* RAG agent v1.0: (benchmark or real use case)
-    * Multiple VectorDBs --> retrieve_kb1(query), retrieve_kb2(query), etc.
-    * provide agent workflow with benefit #2
- 
-* RAG agent v2.0: (Support not only vectorDB)
-    * support structured function_calls, APIs, SQL and KnowledgeGraph query.
-    * provide agent workflow with benefit #3
+- RAG agent v0.1(current version): (base functionality ready)
+
+  - support Single VectorDB
+  - provide agent workflow with benefit #1, #4, and #5
+
+- RAG agent v1.0: (benchmark or real use case)
+
+  - Multiple VectorDBs --> retrieve_kb1(query), retrieve_kb2(query), etc.
+  - provide agent workflow with benefit #2
+
+- RAG agent v2.0: (Support not only vectorDB)
+  - support structured function_calls, APIs, SQL and KnowledgeGraph query.
+  - provide agent workflow with benefit #3
 
 ## Quick Start
 
 ### 1. Build Images for necessary microservices. (This step will not needed after docker image released)
 
-* Agent Image
+- Agent Image
+
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
@@ -44,7 +47,8 @@ docker build -t opea/comps-agent-langchain:latest -f comps/agent/langchain/docke
 cd ..
 ```
 
-* Retrieval Megaservice
+- Retrieval Megaservice
+
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
@@ -62,7 +66,7 @@ docker build -t opea/doc-index-retriever:latest -f GenAIExamples/DocIndexRetriev
 
 ### 2. Start megaservices
 
-* IndexRetriever megaservice => Refer to [DocIndexerRetriver](DocIndexRetriever) for details
+- IndexRetriever megaservice => Refer to [DocIndexerRetriver](DocIndexRetriever) for details
 
 ```bash
 export ip_address=$(hostname -I | awk '{print $1}')
@@ -93,14 +97,16 @@ docker logs tgi-gaudi-server
 
 ### 3. Validation
 
-* Data Prep Knowledge Base
+- Data Prep Knowledge Base
+
 ```bash
 curl -X POST "http://${ip_address}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 ```
 
-* RagAgent
+- RagAgent
+
 ```bash
 # Below question is related to the document we provided.
 $ curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
