@@ -60,7 +60,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     if [[ "$IMAGE_REPO" != "" ]]; then
-        Replace the container name with a test-specific name
+        # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         sed -i "s#image: opea/searchqna:latest#image: opea/searchqna:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/searchqna-ui:latest#image: opea/searchqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
