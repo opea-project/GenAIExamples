@@ -74,4 +74,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.example }}-${{ matrix.hardware }}
-          path: ${{ github.workspace }}/.github/workflows/*.log,*.json
+          path: ${{ github.workspace }}/ChatQnA/tests/*.log,*.json
