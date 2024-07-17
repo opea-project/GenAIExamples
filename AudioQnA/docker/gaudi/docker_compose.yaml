@@ -30,7 +30,7 @@ services:
     environment:
       ASR_ENDPOINT: ${ASR_ENDPOINT}
   speecht5-service:
-    image: opea/speecht5:latest
+    image: opea/speecht5-gaudi:latest
     container_name: speecht5-service
     ports:
       - "7055:7055"
