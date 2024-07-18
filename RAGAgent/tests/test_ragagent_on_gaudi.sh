@@ -15,7 +15,9 @@ function build_docker_images_indexretriever() {
         git clone https://github.com/opea-project/GenAIComps.git
     fi
     cd GenAIComps
-    if [ `git branch --show-current` != "PR314" ] ; then
+    local CUR=$(git branch --show-current)
+    echo "Check to DocIndexerRetriever component, Current Branch is ${CUR}"
+    if [ "${CUR}" != "PR314" ] ; then
         git fetch origin pull/314/head:PR314; git checkout PR314
     fi
 
@@ -29,20 +31,25 @@ function build_docker_images_indexretriever() {
 
     cd $WORKPATH/../../
     cd GenAIExamples
-    if [ `git branch --show-current` != "PR405" ] ; then
+    git checkout -b ragagent
+    local CUR=$(git branch --show-current)
+    echo "Check to DocIndexerRetriever megaservice, Current Branch is ${CUR}"
+    if [ "${CUR}" != "PR405" ] ; then
         git fetch origin pull/405/head:PR405; git checkout PR405
     fi
     cd ..
     docker build -t opea/doc-index-retriever:latest -f GenAIExamples/DocIndexRetriever/docker/Dockerfile .
+    git checkout ragagent
 }
 
 function build_docker_images_agent() {
-    cd $WORKPATH/../../
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git
     fi
     cd GenAIComps
-    if [ `git branch --show-current` != "PR228" ] ; then
+    local CUR=$(git branch --show-current)
+    echo "Check to Agent component, Current Branch is ${CUR}"
+    if [ "${CUR}" != "PR228" ] ; then
         git fetch origin pull/228/head:PR228; git checkout PR228
     fi
     docker build -t opea/comps-agent-langchain:latest -f comps/agent/langchain/docker/Dockerfile .
