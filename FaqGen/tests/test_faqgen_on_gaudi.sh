@@ -101,7 +101,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${ip_address}:9000/v1/chat/faqgen" \
+        "${ip_address}:9000/v1/faqgen" \
         "data: " \
         "llm" \
         "llm-faqgen-server" \

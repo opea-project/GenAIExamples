@@ -26,7 +26,7 @@ function build_docker_images() {
     cd $WORKPATH/../../
     docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f GenAIExamples/FaqGen/docker/Dockerfile .
 
-    cd $WORKPATH/GenAIExamples/FaqGen/docker/ui
+    cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
     docker images
