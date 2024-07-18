@@ -112,7 +112,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
     "${ip_address}:8888/v1/faqgen" \
-    "versatile toolkit" \
+    "Text Embeddings Inference" \
     "mega-faqgen" \
     "faqgen-gaudi-backend-server" \
     '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
