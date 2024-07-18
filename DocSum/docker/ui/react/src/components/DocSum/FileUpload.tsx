@@ -1,7 +1,7 @@
 import { Group, Text, rem } from '@mantine/core';
 import { IconUpload, IconCloudUpload, IconX, IconFile } from '@tabler/icons-react';
 import { } from '@tabler/icons-react';
-import { Dropzone, DropzoneProps, FileWithPath, MIME_TYPES } from '@mantine/dropzone';
+import { Dropzone, DropzoneProps, FileWithPath } from '@mantine/dropzone';
 import '@mantine/dropzone/styles.css';
 import { useState } from 'react';
 
