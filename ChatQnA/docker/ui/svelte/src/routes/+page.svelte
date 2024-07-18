@@ -110,67 +110,71 @@
 				}
 			});
 
-		eventSource.addEventListener("message", (e: any) => {
-			let msg = e.data;
-			console.log("msg", msg);
+			eventSource.addEventListener("message", (e: any) => {
+				let msg = e.data;
+				console.log("msg", msg);
 
-			const handleDecodedMessage = (decodedMsg: string) => {
-				if (decodedMsg !== "</s>") {
-					decodedMsg = decodedMsg.replace(/\\n/g, "\n");
-				}
+				const handleDecodedMessage = (decodedMsg: string) => {
+					if (decodedMsg !== "</s>") {
+						decodedMsg = decodedMsg.replace(/\\n/g, "\n");
+					}
 
-				if (chatMessages[chatMessages.length - 1].role === MessageRole.User) {
-					chatMessages.push({
-						role: MessageRole.Assistant,
-						type: MessageType.Text,
-						content: decodedMsg,
-						time: startSendTime,
-					});
-				} else {
-					chatMessages[chatMessages.length - 1].content += decodedMsg;
-				}
+					if (chatMessages[chatMessages.length - 1].role === MessageRole.User) {
+						chatMessages.push({
+							role: MessageRole.Assistant,
+							type: MessageType.Text,
+							content: decodedMsg,
+							time: startSendTime,
+						});
+					} else {
+						chatMessages[chatMessages.length - 1].content += decodedMsg;
+					}
 
-				scrollToBottom(scrollToDiv);
-			};
+					scrollToBottom(scrollToDiv);
+				};
 
-			if (msg.startsWith("b")) {
-				let currentMsg = msg.slice(2, -1);
+				if (msg.startsWith("b")) {
+					let currentMsg = msg.slice(2, -1);
 
-				if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
-					currentMsg = decodeEscapedBytes(currentMsg);
-				} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
-					currentMsg = decodeUnicode(currentMsg);
-				}
+					if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
+						currentMsg = decodeEscapedBytes(currentMsg);
+					} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
+						currentMsg = decodeUnicode(currentMsg);
+					}
 
-				handleDecodedMessage(currentMsg);
-			} else if (msg === "[DONE]") {
-				console.log("Done");
+					handleDecodedMessage(currentMsg);
+				} else if (msg === "[DONE]") {
+					console.log("Done");
 
-				let startTime = chatMessages[chatMessages.length - 1].time;
-				loading = false;
-				let totalTime = parseFloat(
-					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
-				);
+					let startTime = chatMessages[chatMessages.length - 1].time;
+					loading = false;
+					let totalTime = parseFloat(
+						((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
+					);
 
 					if (chatMessages.length - 1 !== -1) {
 						chatMessages[chatMessages.length - 1].time = totalTime;
 					}
 
-				storeMessages();
-			} else {
-				if (/\\x[\dA-Fa-f]{2}/.test(msg)) {
-					msg = decodeEscapedBytes(msg);
-				} else if (/\\u[\dA-Fa-f]{4}/.test(msg)) {
-					msg = decodeUnicode(msg);
+					storeMessages();
+				} else {
+					if (/\\x[\dA-Fa-f]{2}/.test(msg)) {
+						msg = decodeEscapedBytes(msg);
+					} else if (/\\u[\dA-Fa-f]{4}/.test(msg)) {
+						msg = decodeUnicode(msg);
+					}
+
+					let currentMsg = msg.replace(/"/g, "").replace(/\\n/g, "\n");
+
+					handleDecodedMessage(currentMsg);
 				}
+			});
 
-				let currentMsg = msg.replace(/"/g, "").replace(/\\n/g, "\n");
-
-				handleDecodedMessage(currentMsg);
-			}
-		});
-
-		eventSource.stream();
+			eventSource.stream();
+		} catch (error: any) {
+			showNotification("Failed to load chat content.", "error");
+			loading = false;
+		}
 	};
 
 	const handleTextSubmit = async () => {
