@@ -40,7 +40,7 @@ export LANGCHAIN_PROJECT="opea/gaurdrails"
 volume=$PWD/data
 model_id="meta-llama/Meta-Llama-Guard-2-8B"
 docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
-docker run -p 8088:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy ghcr.io/huggingface/tgi-gaudi:2.0.1 --model-id $model_id
+docker run -p 8088:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy -e HF_TOKEN=$HF_TOKEN ghcr.io/huggingface/tgi-gaudi:2.0.1 --model-id $model_id --max-input-length 1024 --max-total-tokens 2048
 ```
 
 ## 1.3 Verify the TGI Gaudi Service
