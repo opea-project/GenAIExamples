@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script lang="ts">
 	import { storageFiles } from "$lib/shared/stores/common/Store";
 	import TreeNode from "./tree-node.svelte";
@@ -18,10 +23,10 @@
 
 	function changeData() {
 		console.log('change', $storageFiles);
-		
+
 		data = $storageFiles[currentIdx].children;
 	}
- 
+
 	$: $storageFiles ? changeData() : console.log('No change', $storageFiles);
 
 	console.log(data);

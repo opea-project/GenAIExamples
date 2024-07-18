@@ -26,8 +26,7 @@ export async function fetchTextStream(query: string) {
 		messages: query,
 	};
 	url = `${CHAT_BASE_URL}`;
-	console.log('fetchTextStream', url);
-		
+	console.log("fetchTextStream", url);
 
 	return new SSE(url, {
 		headers: { "Content-Type": "application/json" },

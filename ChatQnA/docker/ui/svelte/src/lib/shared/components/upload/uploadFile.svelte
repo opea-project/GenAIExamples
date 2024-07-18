@@ -81,7 +81,7 @@
 			const res = await fetchAllFile();
 			uploading = false;
 			console.log('handleUploadResult', res);
-			
+
 			if (res) {
 				storageFiles.set(res);
 				files = $storageFiles;

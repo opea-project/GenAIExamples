@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script>
 	import FolderIcon from "$lib/assets/DocManagement/folderIcon.svelte";
 	import LinkfolderIcon from "$lib/assets/DocManagement/LinkfolderIcon.svelte";
