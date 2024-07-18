@@ -104,7 +104,7 @@ function validate_microservices() {
         "${ip_address}:9000/v1/chat/faqgen" \
         "data: " \
         "llm" \
-        "llm-faqgen-gaudi-server" \
+        "llm-faqgen-server" \
         '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
