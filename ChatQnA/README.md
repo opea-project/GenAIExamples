@@ -26,7 +26,7 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 docker pull opea/chatqna:latest
 ```
 
-Two type of UI are supported now, choose one you like and pull the referred docker image. 
+Two type of UI are supported now, choose one you like and pull the referred docker image.
 
 If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/gaudi#-launch-the-conversational-ui-optional) and modify the [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
 
@@ -120,7 +120,7 @@ curl http://${host_ip}:8888/v1/chatqna \
 
 To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`
 
-By default, the UI runs on port 5173 internally. 
+By default, the UI runs on port 5173 internally.
 
 If you choose conversational UI, use this URL: `http://{host_ip}:5174`
 
