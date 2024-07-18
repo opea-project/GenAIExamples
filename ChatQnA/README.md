@@ -18,7 +18,7 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 
 The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
-Currently we support two ways of deploying ChatQnA services:
+Currently we support two ways of deploying ChatQnA services on docker:
 
 1. Start services using the docker image on `docker hub`.
 
