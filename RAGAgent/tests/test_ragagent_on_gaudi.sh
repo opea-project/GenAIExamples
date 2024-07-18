@@ -39,10 +39,11 @@ function build_docker_images_indexretriever() {
     fi
     cd ..
     docker build -t opea/doc-index-retriever:latest -f GenAIExamples/DocIndexRetriever/docker/Dockerfile .
-    git checkout ragagent
+    cd GenAIExamples; git checkout ragagent; cd ..
 }
 
 function build_docker_images_agent() {
+    cd $WORKPATH/../../
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git
     fi
