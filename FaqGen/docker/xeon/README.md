@@ -12,7 +12,7 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 ## 🚀 Build Docker Images
 
-First of all, you need to build Docker Images locally and install the python package of it.
+First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
@@ -24,8 +24,6 @@ cd GenAIComps
 ```bash
 docker build -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/Dockerfile .
 ```
-
-Then run the command `docker images`, you will have the following four Docker Images:
 
 ### 2. Build MegaService Docker Image
 
