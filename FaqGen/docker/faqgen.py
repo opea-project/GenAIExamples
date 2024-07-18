@@ -3,6 +3,7 @@
 
 import asyncio
 import os
+
 from comps import FaqGenGateway, MicroService, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")

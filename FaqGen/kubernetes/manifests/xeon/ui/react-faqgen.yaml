@@ -118,11 +118,11 @@ spec:
             - name: PORT
               value: "80"
             - name: http_proxy
-              value: 
+              value:
             - name: https_proxy
-              value: 
+              value:
             - name: no_proxy
-              value: 
+              value:
           securityContext: {}
           image: "ghcr.io/huggingface/text-generation-inference:1.4"
           imagePullPolicy: IfNotPresent
@@ -171,11 +171,11 @@ spec:
             - name: HUGGINGFACEHUB_API_TOKEN
               value: "insert-your-huggingface-token-here"
             - name: http_proxy
-              value: 
+              value:
             - name: https_proxy
-              value: 
+              value:
             - name: no_proxy
-              value: 
+              value:
           securityContext: {}
           image: "opea/llm-faqgen-tgi:latest"
           imagePullPolicy: IfNotPresent
@@ -222,11 +222,11 @@ spec:
             - name: LLM_SERVICE_HOST_IP
               value: faqgen-llm-uservice
             - name: http_proxy
-              value: 
+              value:
             - name: https_proxy
-              value: 
+              value:
             - name: no_proxy
-              value: 
+              value:
           securityContext: null
           image: "opea/faqgen:latest"
           imagePullPolicy: IfNotPresent
@@ -265,11 +265,11 @@ spec:
             - name: DOC_BASE_URL
               value: "http://faqgen:8888/v1/faqgen"
             - name: http_proxy
-              value: 
+              value:
             - name: https_proxy
-              value: 
+              value:
             - name: no_proxy
-              value: 
+              value:
           securityContext: null
           image: "opea/faqgen-react-ui:latest"
           imagePullPolicy: IfNotPresent

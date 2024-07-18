@@ -42,6 +42,7 @@ Build the frontend Docker image via below command:
 cd GenAIExamples/FaqGen/docker/ui/
 docker build -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
+
 ### 4. Build react UI Docker Image (Optional)
 
 Build the frontend Docker image based on react framework via below command:
@@ -142,6 +143,7 @@ Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 ![project-screenshot](../../assets/img/faqgen_ui_text.png)
 
 ## 🚀 Launch the React UI (Optional)
+
 To access the FAQGen (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `faqgen-xeon-ui-server` service with the `faqgen-xeon-react-ui-server` service as per the config below:
 
 ```bash
@@ -159,10 +161,11 @@ To access the FAQGen (react based) frontend, modify the UI service in the `docke
     ipc: host
     restart: always
 ```
+
 Open this URL `http://{host_ip}:5174` in your browser to access the react based frontend.
 
 - Create FAQs from Text input
-![project-screenshot](../../assets/img/faqgen_react_ui_text.png)
+  ![project-screenshot](../../assets/img/faqgen_react_ui_text.png)
 
 - Create FAQs from Text Files
-![project-screenshot](../../assets/img/faqgen_react_ui_text_files.png)
+  ![project-screenshot](../../assets/img/faqgen_react_ui_text_files.png)
