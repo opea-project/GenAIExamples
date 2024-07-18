@@ -30,8 +30,8 @@ function build_docker_images() {
     cd $WORKPATH/docker
     docker build --no-cache -t opea/searchqna:latest -f Dockerfile .
 
-    # cd $WORKPATH/docker/ui
-    # docker build --no-cache -t opea/searchqna-ui:latest -f docker/Dockerfile .
+    cd $WORKPATH/docker/ui
+    docker build --no-cache -t opea/searchqna-ui:latest -f docker/Dockerfile .
 
     docker images
 }
