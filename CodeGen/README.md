@@ -66,7 +66,6 @@ docker compose -f docker_compose.yaml up -d
 
 - If your version of `Habana Driver` >= 1.16.0, refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
-
 ### Deploy CodeGen on Xeon
 
 ```bash
@@ -79,7 +78,6 @@ Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on buil
 ## Deploy CodeGen using Kubernetes
 
 Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
-
 
 # Consume CodeGen Service
 
@@ -95,6 +93,6 @@ curl http://${host_ip}:7778/v1/codegen \
 
 2. Access via frontend
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. 
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173.
 
 By default, the UI runs on port 5173 internally.
