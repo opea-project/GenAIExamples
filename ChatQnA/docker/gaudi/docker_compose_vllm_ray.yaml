@@ -135,7 +135,7 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: /bin/bash -c "ray start --head && python vllm_ray_openai.py --port_number 8000 --model_id_or_path $LLM_MODEL --tensor_parallel_size 2 --enforce_eager False"
+    command: /bin/bash -c "ray start --head && python vllm_ray_openai.py --port_number 8000 --model_id_or_path $LLM_MODEL --tensor_parallel_size 2 --enforce_eager True"
   llm:
     image: opea/llm-vllm-ray:latest
     container_name: llm-vllm-ray-gaudi-server
