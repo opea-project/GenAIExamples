@@ -28,6 +28,7 @@ Currently we support two ways of deploying ChatQnA services:
 To set up environment variables for deploying ChatQnA services, follow these steps:
 
 1. Set the required environment variables:
+
 ```bash
 export host_ip="External_Public_IP"
 export no_proxy="Your_No_Proxy"
