@@ -28,7 +28,7 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 ### 4. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
 ```
 
 ### 5. Build LLM Image
@@ -65,6 +65,15 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 cd ../../..
 ```
 
+If you want to enable guardrails microservice in the pipeline, please use the below command instead:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA/docker
+docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_guardrails .
+cd ../../..
+```
+
 ### 9. Build UI Docker Image
 
 Construct the frontend Docker image using the command below:
@@ -75,6 +84,30 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 cd ../../../..
 ```
 
+### 10. Build Conversational React UI Docker Image (Optional)
+
+Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
+
+**Export the value of the public IP address of your Gaudi node to the `host_ip` environment variable**
+
+```bash
+cd GenAIExamples/ChatQnA/docker/ui/
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+cd ../../../..
+```
+
+### 11. Build Guardrails Docker Image (Optional)
+
+To fortify AI initiatives in production, Guardrails microservice can secure model inputs and outputs, building Trustworthy, Safe, and Secure LLM-based Applications.
+
+```bash
+cd GenAIExamples/ChatQnA/docker
+docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/langchain/docker/Dockerfile .
+cd ../../..
+```
+
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/embedding-tei:latest`
@@ -83,8 +116,16 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 4. `opea/llm-tgi:latest`
 5. `opea/tei-gaudi:latest`
 6. `opea/dataprep-redis:latest`
-7. `opea/chatqna:latest`
+7. `opea/chatqna:latest` or `opea/chatqna-guardrails:latest`
 8. `opea/chatqna-ui:latest`
+
+If Conversation React UI is built, you will find one more image:
+
+9. `opea/chatqna-conversation-ui:latest`
+
+If Guardrails docker image is built, you will find one more image:
+
+10. `opea/guardrails-tgi:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -116,6 +157,14 @@ export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
 ```
 
+If guardrails microservice is enabled in the pipeline, the below environment variables are necessary to be set.
+
+```bash
+export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+export SAFETY_GUARD_ENDPOINT="http://${host_ip}:8088"
+export GUARDRAIL_SERVICE_HOST_IP=${host_ip}
+```
+
 Note: Please replace with `host_ip` with you external IP address, do **NOT** use localhost.
 
 ### Start all the services Docker Containers
@@ -123,6 +172,13 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
 docker compose -f docker_compose.yaml up -d
+```
+
+If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
+
+```bash
+cd GenAIExamples/ChatQnA/docker/gaudi/
+docker compose -f docker_compose_guardrails.yaml up -d
 ```
 
 ### Validate MicroServices and MegaService
@@ -258,6 +314,15 @@ curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
      -H "Content-Type: application/json"
 ```
 
+10. Guardrails (Optional)
+
+```bash
+curl http://${host_ip}:9090/v1/guardrails\
+  -X POST \
+  -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
+  -H 'Content-Type: application/json'
+```
+
 ## Enable LangSmith for Monotoring Application (Optional)
 
 LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
@@ -290,3 +355,41 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 ```
 
 ![project-screenshot](../../assets/img/chat_ui_init.png)
+
+Here is an example of running ChatQnA:
+
+![project-screenshot](../../assets/img/chat_ui_response.png)
+
+## 🚀 Launch the Conversational UI (Optional)
+
+To access the Conversational UI (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
+
+```yaml
+chaqna-gaudi-conversation-ui-server:
+  image: opea/chatqna-conversation-ui:latest
+  container_name: chatqna-gaudi-conversation-ui-server
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+  ports:
+    - "5174:80"
+  depends_on:
+    - chaqna-gaudi-backend-server
+  ipc: host
+  restart: always
+```
+
+Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  chaqna-gaudi-conversation-ui-server:
+    image: opea/chatqna-conversation-ui:latest
+    ...
+    ports:
+      - "80:80"
+```
+
+Here is an example of running ChatQnA with Conversational UI (React):
+
+![project-screenshot](../../assets/img/conversation_ui_response.png)
