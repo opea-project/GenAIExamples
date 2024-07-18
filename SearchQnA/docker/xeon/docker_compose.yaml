@@ -155,7 +155,7 @@ services:
       - BACKEND_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
-      
+
 
 networks:
   default:
