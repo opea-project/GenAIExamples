@@ -18,17 +18,81 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 
 The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
+Currently we support two ways of deploying ChatQnA services with docker compose:
+
+1. Start services using the docker image on `docker hub`:
+
+```bash
+docker pull opea/chatqna:latest
+```
+
+Two type of UI are supported now, choose one you like and pull the referred docker image.
+
+If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/gaudi#-launch-the-conversational-ui-optional) and modify the [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
+
+```bash
+docker pull opea/chatqna-ui:latest
+# or
+docker pull opea/chatqna-conversation-ui:latest
+```
+
+2. Start services using the docker images `built from source`: [Guide](./docker)
+
+## Setup Environment Variable
+
+To set up environment variables for deploying ChatQnA services, follow these steps:
+
+1. Set the required environment variables:
+
+```bash
+export host_ip="External_Public_IP"
+export no_proxy="Your_No_Proxy"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+```
+
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+```bash
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+```
+
+3. Set up other environment variables:
+
+```bash
+bash ./docker/set_env.sh
+```
+
 ## Deploy ChatQnA on Gaudi
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying ChatQnA on Gaudi.
+If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start ChatQnA services. Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
+
+```bash
+cd GenAIExamples/ChatQnA/docker/gaudi/
+docker compose -f docker_compose.yaml up -d
+```
+
+If your version of `Habana Driver` >= 1.16.0, refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
 ## Deploy ChatQnA on Xeon
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying ChatQnA on Xeon.
+Please find corresponding [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
+
+```bash
+cd GenAIExamples/ChatQnA/docker/xeon/
+docker compose -f docker_compose.yaml up -d
+```
+
+Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
 
 ## Deploy ChatQnA on NVIDIA GPU
 
-Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for instructions on deploying ChatQnA on NVIDIA GPU.
+```bash
+cd GenAIExamples/ChatQnA/docker/gpu/
+docker compose -f docker_compose.yaml up -d
+```
+
+Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for more instructions on building docker images from source.
 
 ## Deploy ChatQnA into Kubernetes on Xeon & Gaudi
 
@@ -37,3 +101,37 @@ Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructio
 ## Deploy ChatQnA on AI PC
 
 Refer to the [AI PC Guide](./docker/aipc/README.md) for instructions on deploying ChatQnA on AI PC.
+
+# Consume ChatQnA Service
+
+Two ways of consuming ChatQnA Service:
+
+1. Use cURL command on terminal
+
+```bash
+curl http://${host_ip}:8888/v1/chatqna \
+    -H "Content-Type: application/json" \
+    -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+    }'
+```
+
+2. Access via frontend
+
+To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`
+
+By default, the UI runs on port 5173 internally.
+
+If you choose conversational UI, use this URL: `http://{host_ip}:5174`
+
+# Troubleshooting
+
+1. If you get errors like "Access Denied", please [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/xeon#validate-microservices) first. A simple example:
+
+```bash
+http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'
+```
+
+2. (Docker only) If all microservices work well, please check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `docker_compose.yaml`.
+
+3. (Docker only) If you get errors like "The container name is in use", please change container name in `docker_compose.yaml`.
