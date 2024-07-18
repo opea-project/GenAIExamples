@@ -13,6 +13,7 @@ List the type of change like below. Please delete options that are not relevant.
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds new functionality)
 - [ ] Breaking change (fix or feature that would break existing design and interface)
+- [ ] Others (enhancement, documentation, validation, etc.)
 
 ## Dependencies
 
