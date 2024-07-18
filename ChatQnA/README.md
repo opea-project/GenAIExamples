@@ -18,17 +18,48 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 
 The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
+Before deploying ChatQnA services, you need to set up environment variables.
+```bash
+export host_ip="External_Public_IP"
+export no_proxy="Your_No_Proxy"
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+```
+
+Then you need to set other environment variables running the `set_env.sh` script.
+```bash
+bash ./docker/set_env.sh
+```
+
 ## Deploy ChatQnA on Gaudi
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying ChatQnA on Gaudi.
+If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start ChatQnA services.
+
+If your version of `Habana Driver` >= 1.16.0, please refer to the [Gaudi Guide](./docker/gaudi/README.md) for more instructions on building the newest docker image manually.
+
+```bash
+cd GenAIExamples/ChatQnA/docker/gaudi/
+docker compose -f docker_compose.yaml up -d
+```
 
 ## Deploy ChatQnA on Xeon
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying ChatQnA on Xeon.
+```bash
+cd GenAIExamples/ChatQnA/docker/xeon/
+docker compose -f docker_compose.yaml up -d
+```
+
+Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on other features (validate microservice, enable langsmith, launch the conversational ui).
 
 ## Deploy ChatQnA on NVIDIA GPU
 
-Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for instructions on deploying ChatQnA on NVIDIA GPU.
+```bash
+cd GenAIExamples/ChatQnA/docker/gpu/
+docker compose -f docker_compose.yaml up -d
+```
+
+Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for more instructions on other features (validate microservice, enable langsmith, launch ui).
 
 ## Deploy ChatQnA into Kubernetes on Xeon & Gaudi
 
