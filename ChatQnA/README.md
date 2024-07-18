@@ -21,6 +21,7 @@ The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel
 Currently we support two ways of deploying ChatQnA services with docker compose:
 
 1. Start services using the docker image on `docker hub`:
+
 ```bash
 docker pull opea/chatqna:latest
 ```
@@ -64,6 +65,7 @@ docker compose -f docker_compose.yaml up -d
 If your version of `Habana Driver` >= 1.16.0, refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
 ## Deploy ChatQnA on Xeon
+
 Please find corresponding [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
 
 ```bash
@@ -112,12 +114,12 @@ By default, the UI runs on port 5173 internally.
 
 # Troubleshooting
 
-1. If you get errors like "Access Denied", please [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/xeon#validate-microservices) first. A simple example: 
+1. If you get errors like "Access Denied", please [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/xeon#validate-microservices) first. A simple example:
+
 ```bash
 http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'
 ```
 
-2. (Docker only) If all microservices work well, please check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `docker_compose.yaml`. 
+2. (Docker only) If all microservices work well, please check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `docker_compose.yaml`.
 
-3. (Docker only) If you get errors like "The container name is in use", please change container name in `docker_compose.yaml`.  
-
+3. (Docker only) If you get errors like "The container name is in use", please change container name in `docker_compose.yaml`.
