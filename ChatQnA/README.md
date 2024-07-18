@@ -19,6 +19,7 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
 Before deploying ChatQnA services, you need to set up environment variables.
+
 ```bash
 export host_ip="External_Public_IP"
 export no_proxy="Your_No_Proxy"
@@ -28,6 +29,7 @@ export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 Then you need to set other environment variables running the `set_env.sh` script.
+
 ```bash
 bash ./docker/set_env.sh
 ```
