@@ -24,7 +24,7 @@ function build_docker_images() {
     docker build --no-cache -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
-    
+
     cd $WORKPATH/../../
     docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f GenAIExamples/FaqGen/docker/Dockerfile .
 
@@ -156,7 +156,7 @@ function main() {
 
     stop_docker
 
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    build_docker_images
     start_services
 
     validate_microservices
