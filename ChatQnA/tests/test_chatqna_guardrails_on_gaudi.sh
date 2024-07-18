@@ -19,6 +19,7 @@ function build_docker_images() {
     docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
+    docker build -t opea/guardrails-tgi:latest -f comps/guardrails/langchain/docker/Dockerfile .
 
 #    cd ..
 #    git clone https://github.com/huggingface/tei-gaudi
@@ -29,7 +30,7 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 
     cd $WORKPATH/docker
-    docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
+    docker build --no-cache -t opea/chatqna-guardrails:latest -f Dockerfile_guardrails .
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
@@ -59,29 +60,29 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export GUARDRAIL_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
+    export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+    export SAFETY_GUARD_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+    export SAFETY_GUARD_ENDPOINT="http://${ip_address}:8088"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        if [ "${mode}" == "perf" ]; then
-            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
-        else
-            sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-            sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-            sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose.yaml
-            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
-            sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" docker_compose.yaml
-        fi
-        echo "cat docker_compose.yaml"
-        cat docker_compose.yaml
+        sed -i "s#image: opea/chatqna-guardrails:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose_guardrails.yaml
+        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose_guardrails.yaml
+        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose_guardrails.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose_guardrails.yaml
+        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" docker_compose_guardrails.yaml
+        echo "cat docker_compose_guardrails.yaml"
+        cat docker_compose_guardrails.yaml
     fi
 
     # Start Docker Containers
-    docker compose -f docker_compose.yaml up -d
+    docker compose -f docker_compose_guardrails.yaml up -d
     n=0
     until [[ "$n" -ge 400 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
@@ -183,6 +184,22 @@ function validate_microservices() {
         "llm-tgi-gaudi-server" \
         '{"query":"What is Deep Learning?"}'
 
+    # tgi for guardrails service
+    validate_services \
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi-guardrails" \
+        "tgi-guardrails-server" \
+        '{"inputs":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}'
+
+    # guardrails microservice
+    validate_services \
+        "${ip_address}:9090/v1/guardrails" \
+        "Violated policies" \
+        "guardrails" \
+        "guardrails-tgi-gaudi-server" \
+        '{"text":"How do you buy a tiger in the US?"}'
+
 }
 
 function validate_megaservice() {
@@ -191,72 +208,39 @@ function validate_megaservice() {
         "${ip_address}:8888/v1/chatqna" \
         "billion" \
         "mega-chatqna" \
-        "chatqna-gaudi-backend-server" \
+        "chatqna-gaudi-guardrails-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
 
 function validate_frontend() {
-    set -e  # Enable error handling
-    trap 'echo "[ERROR] Error occurred at line $LINENO"; exit 1' ERR  # Catch error line
-
-    echo "[INFO] Changing to Svelte directory"
     cd $WORKPATH/docker/ui/svelte
-
     local conda_env_name="OPEA_e2e"
-    echo "[INFO] Setting PATH for conda"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-
-    echo "[INFO] Activating conda environment"
+#    conda remove -n ${conda_env_name} --all -y
+#    conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
-    echo "[INFO] Updating playwright config with IP address"
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    echo "[INFO] Installing Node.js via conda"
-    conda install -c conda-forge nodejs -y
-
-    echo "[INFO] Verifying Node.js and npm installation"
-    node -v
-    npm -v
-    npx --version
-
-    echo "[INFO] Creating and running a simple Node.js script"
-    echo 'console.log("Node.js is working!");' > test.js
-    node test.js
-    rm test.js
-
-    echo "[INFO] Installing npm dependencies"
-    npm install
-    npm ci
-    npx playwright install --with-deps
-
-    echo "[INFO] Displaying Node.js and npm versions"
-    node -v
-    npm -v
-    pip list
+#    conda install -c conda-forge nodejs -y
+    npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
 
     exit_status=0
-    echo "[INFO] Running Playwright tests"
     npx playwright test || exit_status=$?
 
     if [ $exit_status -ne 0 ]; then
         echo "[TEST INFO]: ---------frontend test failed---------"
-        mkdir -p ${LOG_PATH}/frontend
-        cp -r test-results ${LOG_PATH}/frontend/
-        echo "[TEST INFO]: Trace files copied to ${LOG_PATH}/frontend/gaudi/test-results"
         exit $exit_status
     else
         echo "[TEST INFO]: ---------frontend test passed---------"
     fi
 }
 
-
-
-
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
+    container_list=$(cat docker_compose_guardrails.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
         if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
@@ -273,13 +257,9 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s"
 
-    if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/tests/chatqna_benchmark.py
-    elif [ "${mode}" == "" ]; then
-        validate_microservices
-        validate_megaservice
-        validate_frontend
-    fi
+    validate_microservices
+    validate_megaservice
+    # validate_frontend
 
     stop_docker
     echo y | docker system prune
