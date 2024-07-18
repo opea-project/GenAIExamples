@@ -41,6 +41,7 @@ function start_services() {
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/codegen-ui:latest#image: opea/codegen-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/codegen-conversation-ui:latest#image: opea/codegen-conversation-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
     fi
 
