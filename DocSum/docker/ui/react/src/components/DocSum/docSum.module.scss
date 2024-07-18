@@ -25,7 +25,7 @@
       }
       .docSumTitle {
         @include flex(row, nowrap, center, flex-start);
-        height: 60px;  
+        height: 60px;
         border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
       }
       .docSumContentButtonGroup {
@@ -38,7 +38,6 @@
         }
       }
       .docSumResult {
-
       }
     }
   }
