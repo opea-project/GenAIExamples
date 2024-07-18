@@ -1,0 +1,78 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: benchmark test with chatqna_benchmark
+
+on:
+  # pull_request:
+  #   branches: [main]
+  #   types: [opened, reopened, ready_for_review, synchronize]
+  #   # inputs:
+  #   #   variables:
+  #   #     hardware:
+  #   #       description: 'Enter your param' #gaudi or xeon
+  #   #       required: true
+  #   #       default: xeon
+  schedule:
+    - cron: "35 0 * * 6"
+  workflow_dispatch:
+    inputs:
+      hardware:
+        description: 'Enter your hardware' #gaudi or xeon
+        required: true
+        default: gaudi
+
+jobs:
+  Example-test:
+    runs-on: ${{ github.event.inputs.hardware || 'gaudi' }} #xeon    #gaudi
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Clone repo GenAIEval
+        run: |
+          git clone https://github.com/opea-project/GenAIEval.git
+          cd GenAIEval && git checkout v0.6
+
+      - name: Run test
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          hardware: ${{ github.event.inputs.hardware || 'gaudi' }}  #xeon
+          mode: perf
+          IMAGE_TAG: latest
+          IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
+          IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
+        run: |
+          # cd ${{ github.workspace }}/$example/tests
+          cd ${{ github.workspace }}/ChatQnA/tests
+          cp ../../GenAIEval/evals/benchmark/chatqna_benchmark.py .
+          cp ../../GenAIEval/evals/benchmark/data.json ${{ github.workspace }}/ChatQnA/docker/${hardware}/
+
+          if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
+          export IMAGE_REPO=${IMAGE_REPO}
+          # example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
+          if [ -f test_chatqna_on_${hardware}.sh ]; then timeout 30m bash test_chatqna_on_${hardware}.sh > ${hardware}_output.log; else echo "Test script not found, skip test!"; fi
+
+      - name: Process log and save to JSON
+        env:
+          hardware: ${{ github.event.inputs.hardware || 'gaudi' }}   #xeon
+        run: |
+          cd ${{ github.workspace }}/ChatQnA/tests
+          echo '{}' > ${hardware}_output.json
+          echo $(grep -a 'Total Requests:' ${hardware}_output.log | awk '{print "{\"total_requests\": \""$3 "\"}"}') > ${hardware}_output.json
+          echo $(grep -a 'P50 latency is' ${hardware}_output.log | awk '{print "{\"p50_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
+          echo $(grep -a 'P99 latency is' ${hardware}_output.log | awk '{print "{\"p99_latency\": \""$4 "\"}"}') >> ${hardware}_output.json
+          jq -s 'add' ${hardware}_output.json > ${hardware}_final_output.json && mv ${hardware}_final_output.json ${hardware}_output.json
+
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: |
+            ${{ github.workspace }}/ChatQnA/tests/*.log
+            ${{ github.workspace }}/ChatQnA/tests/*.json
