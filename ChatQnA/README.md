@@ -22,7 +22,7 @@ Currently we support two ways of deploying ChatQnA services:
 
 1. Start services using the docker image on `docker hub`.
 
-2. Start services using the docker images built `manually`.
+2. Start services using the docker images `built from source`.
 
 ## Setup Environment Variable
 
@@ -58,7 +58,7 @@ cd GenAIExamples/ChatQnA/docker/gaudi/
 docker compose -f docker_compose.yaml up -d
 ```
 
-If your version of `Habana Driver` >= 1.16.0, refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images manually.
+If your version of `Habana Driver` >= 1.16.0, refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
 ## Deploy ChatQnA on Xeon
 
@@ -67,7 +67,7 @@ cd GenAIExamples/ChatQnA/docker/xeon/
 docker compose -f docker_compose.yaml up -d
 ```
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images manually.
+Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
 
 ## Deploy ChatQnA on NVIDIA GPU
 
@@ -76,7 +76,7 @@ cd GenAIExamples/ChatQnA/docker/gpu/
 docker compose -f docker_compose.yaml up -d
 ```
 
-Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for more instructions on building docker images manually.
+Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for more instructions on building docker images from source.
 
 ## Deploy ChatQnA into Kubernetes on Xeon & Gaudi
 
