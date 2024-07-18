@@ -58,7 +58,7 @@ kubectl create deployment client-test -n ${ns} --image=python:3.8.13 -- sleep in
 6. Access the pipeline using the above URL from the client pod and execute a request
 
 ```bash
-export CLIENT_POD=$(kubectl get pod -l app=client-test -o jsonpath={.items..metadata.name})
+export CLIENT_POD=$(kubectl get pod -n ${ns} -l app=client-test -o jsonpath={.items..metadata.name})
 export accessUrl=$(kubectl get gmc -n $ns -o jsonpath="{.items[?(@.metadata.name=='docsum')].status.accessUrl}")
 kubectl exec "$CLIENT_POD" -n $ns -- curl $accessUrl -X POST -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'  -H 'Content-Type: application/json'
 ```
