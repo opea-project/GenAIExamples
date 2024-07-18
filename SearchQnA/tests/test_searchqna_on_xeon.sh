@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -52,14 +52,18 @@ function start_services() {
     export WEB_RETRIEVER_SERVICE_PORT=3003
     export RERANK_SERVICE_PORT=3005
     export LLM_SERVICE_PORT=3007
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
 
-    # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    # Replace the container name with a test-specific name
-    # echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    # sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/searchqna:latest#image: opea/searchqna:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/searchqna-ui:latest#image: opea/searchqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    fi
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
