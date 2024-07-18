@@ -26,6 +26,16 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 docker pull opea/chatqna:latest
 ```
 
+Two type of UI are supported now, choose one you like and pull the referred docker image. 
+
+If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/gaudi#-launch-the-conversational-ui-optional) and modify the [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
+
+```bash
+docker pull opea/chatqna-ui:latest
+# or
+docker pull opea/chatqna-conversation-ui:latest
+```
+
 2. Start services using the docker images `built from source`: [Guide](./docker)
 
 ## Setup Environment Variable
@@ -37,6 +47,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 ```bash
 export host_ip="External_Public_IP"
 export no_proxy="Your_No_Proxy"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -44,7 +55,6 @@ export no_proxy="Your_No_Proxy"
 ```bash
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 3. Set up other environment variables:
@@ -108,9 +118,11 @@ curl http://${host_ip}:8888/v1/chatqna \
 
 2. Access via frontend
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173.
+To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`
 
-By default, the UI runs on port 5173 internally.
+By default, the UI runs on port 5173 internally. 
+
+If you choose conversational UI, use this URL: `http://{host_ip}:5174`
 
 # Troubleshooting
 
