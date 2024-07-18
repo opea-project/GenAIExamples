@@ -15,7 +15,7 @@ from langchain_community.vectorstores import PGVector
 from langsmith import traceable
 
 from comps import DocPath, ServiceType, opea_microservices, register_microservice, register_statistics
-from comps.dataprep.utils import document_loader, parse_html
+from comps.dataprep.utils import document_loader, get_separators, parse_html
 
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 
@@ -36,7 +36,9 @@ def ingest_doc_to_pgvector(doc_path: DocPath):
     doc_path = doc_path.path
     print(f"Parsing document {doc_path}.")
 
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1500, chunk_overlap=100, add_start_index=True, separators=get_separators()
+    )
     content = document_loader(doc_path)
     chunks = text_splitter.split_text(content)
     print("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")

@@ -25,7 +25,7 @@ from langsmith import traceable
 from pyspark import SparkConf, SparkContext
 
 from comps import DocPath, opea_microservices, register_microservice
-from comps.dataprep.utils import document_loader, get_tables_result, parse_html
+from comps.dataprep.utils import document_loader, get_separators, get_tables_result, parse_html
 
 # workaround notes: cp comps/dataprep/utils.py ./milvus/utils.py
 # from utils import document_loader, get_tables_result, parse_html
@@ -82,7 +82,7 @@ def ingest_data_to_milvus(doc_path: DocPath):
         text_splitter = HTMLHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
     else:
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=doc_path.chunk_size, chunk_overlap=100, add_start_index=True
+            chunk_size=doc_path.chunk_size, chunk_overlap=100, add_start_index=True, separators=get_separators()
         )
 
     content = document_loader(path)

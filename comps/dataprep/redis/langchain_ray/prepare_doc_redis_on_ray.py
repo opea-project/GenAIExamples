@@ -48,6 +48,7 @@ from comps.dataprep.utils import (
     document_loader,
     encode_filename,
     get_file_structure,
+    get_separators,
     parse_html,
     remove_folder_with_ignore,
     save_content_to_local_disk,
@@ -170,7 +171,9 @@ def data_to_redis_ray(data):
 
 
 def data_to_redis(data):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100, add_start_index=True)
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1500, chunk_overlap=100, add_start_index=True, separators=get_separators(), is_separator_regex=False
+    )
     chunks = text_splitter.split_text(data)
 
     # Create vectorstore
