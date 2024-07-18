@@ -215,7 +215,6 @@ If use tgi for llm backend.
 docker compose -f docker_compose.yaml up -d
 ```
 
-<<<<<<< HEAD
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
 
 ```bash
@@ -223,10 +222,7 @@ cd GenAIExamples/ChatQnA/docker/gaudi/
 docker compose -f docker_compose_guardrails.yaml up -d
 ```
 
-If vllm tgi for llm backend.
-=======
 If use vllm for llm backend.
->>>>>>> e63e959 (add vllm-on-ray into ChatQnA)
 ```bash
 docker compose -f docker_compose_vllm.yaml up -d
 ```
