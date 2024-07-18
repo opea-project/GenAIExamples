@@ -83,3 +83,23 @@ Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructio
 ## Deploy ChatQnA on AI PC
 
 Refer to the [AI PC Guide](./docker/aipc/README.md) for instructions on deploying ChatQnA on AI PC.
+
+# Consume ChatQnA Service
+
+Two ways of consuming ChatQnA Service:
+
+1. Use cURL command on terminal
+
+```bash
+curl http://${host_ip}:8888/v1/chatqna \
+    -H "Content-Type: application/json" \
+    -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+    }'
+```
+
+2. Access via frontend
+
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173. 
+
+By default, the UI runs on port 5173 internally.
