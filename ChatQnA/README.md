@@ -25,6 +25,7 @@ Currently we support two ways of deploying ChatQnA services:
 2. Start services using the docker images built `manually`.
 
 ## Setup Environment Variable
+
 To set up environment variables for deploying ChatQnA services, follow these steps:
 
 1. Set the required environment variables:
@@ -35,6 +36,7 @@ export no_proxy="Your_No_Proxy"
 ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
+
 ```bash
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
@@ -42,6 +44,7 @@ export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 3. Set up other environment variables:
+
 ```bash
 bash ./docker/set_env.sh
 ```
@@ -56,7 +59,6 @@ docker compose -f docker_compose.yaml up -d
 ```
 
 If your version of `Habana Driver` >= 1.16.0, refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images manually.
-
 
 ## Deploy ChatQnA on Xeon
 
