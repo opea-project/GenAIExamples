@@ -28,7 +28,7 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 ### 4. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
 ```
 
 ### 5. Build LLM Image
@@ -75,6 +75,20 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 cd ../../../..
 ```
 
+### 10. Build Conversational React UI Docker Image (Optional)
+
+Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
+
+**Export the value of the public IP address of your Gaudi node to the `host_ip` environment variable**
+
+```bash
+cd GenAIExamples/ChatQnA/docker/ui/
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+cd ../../../..
+```
+
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/embedding-tei:latest`
@@ -85,6 +99,10 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 6. `opea/dataprep-redis:latest`
 7. `opea/chatqna:latest`
 8. `opea/chatqna-ui:latest`
+
+If Conversation React UI is built, you will find one more image:
+
+9. `opea/chatqna-conversation-ui:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -112,6 +130,8 @@ export RERANK_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do **NOT** use localhost.
@@ -124,6 +144,9 @@ docker compose -f docker_compose.yaml up -d
 ```
 
 ### Validate MicroServices and MegaService
+
+Follow the instructions to validate MicroServices.
+For validation details, please refer to [how-to-validate_service](./how_to_validate_service.md).
 
 1. TEI Embedding Service
 
@@ -145,21 +168,17 @@ curl http://${host_ip}:6000/v1/embeddings \
 
 3. Retriever Microservice
 
-To consume the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
+is determined by the embedding model.
+Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
 
-```python
-import random
-
-embedding = [random.uniform(-1, 1) for _ in range(768)]
-print(embedding)
-```
-
-Then substitute your mock embedding vector for the `${your_embedding}` in the following `curl` command:
+Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
 
 ```bash
+your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${host_ip}:7000/v1/retrieval \
   -X POST \
-  -d '{"text":"test", "embedding":${your_embedding}}' \
+  -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
   -H 'Content-Type: application/json'
 ```
 
@@ -231,6 +250,32 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep" \
 
 This command updates a knowledge base by submitting a list of HTTP links for processing.
 
+Also, you are able to get the file/link list that you uploaded:
+
+```bash
+curl -X POST "http://${host_ip}:6008/v1/dataprep/get_file" \
+     -H "Content-Type: application/json"
+```
+
+To delete the file/link you uploaded:
+
+```bash
+# delete link
+curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+     -d '{"file_path": "https://opea.dev"}' \
+     -H "Content-Type: application/json"
+
+# delete file
+curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+     -d '{"file_path": "nke-10k-2023.pdf"}' \
+     -H "Content-Type: application/json"
+
+# delete all uploaded files and links
+curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+     -d '{"file_path": "all"}' \
+     -H "Content-Type: application/json"
+```
+
 ## Enable LangSmith for Monotoring Application (Optional)
 
 LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
@@ -263,3 +308,41 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 ```
 
 ![project-screenshot](../../assets/img/chat_ui_init.png)
+
+Here is an example of running ChatQnA:
+
+![project-screenshot](../../assets/img/chat_ui_response.png)
+
+## 🚀 Launch the Conversational UI (Optional)
+
+To access the Conversational UI (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
+
+```yaml
+chaqna-gaudi-conversation-ui-server:
+  image: opea/chatqna-conversation-ui:latest
+  container_name: chatqna-gaudi-conversation-ui-server
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+  ports:
+    - "5174:80"
+  depends_on:
+    - chaqna-gaudi-backend-server
+  ipc: host
+  restart: always
+```
+
+Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  chaqna-gaudi-conversation-ui-server:
+    image: opea/chatqna-conversation-ui:latest
+    ...
+    ports:
+      - "80:80"
+```
+
+Here is an example of running ChatQnA with Conversational UI (React):
+
+![project-screenshot](../../assets/img/conversation_ui_response.png)

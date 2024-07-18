@@ -8,44 +8,7 @@ LOG_PATH=/home/$(whoami)/logs
 MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 
-function init_codetrans() {
-    wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/crd/bases/gmc.opea.io_gmconnectors.yaml
-    wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/rbac/gmc-manager-rbac.yaml
-    wget https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/manager/gmc-manager.yaml
-    wget -O manifests/gmc-router.yaml https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/config/gmcrouter/gmc-router.yaml
-
-    # replace namespace for gmc-router and gmc-manager
-    sed -i "s|namespace: system|namespace: $SYSTEM_NAMESPACE|g"  ./gmc-manager.yaml
-    sed -i "s|namespace: system|namespace: $SYSTEM_NAMESPACE|g"  ./gmc-manager-rbac.yaml
-    sed -i "s|name: system|name: $SYSTEM_NAMESPACE|g" ./gmc-manager-rbac.yaml
-    # replace the mount dir "path: /mnt/model" with "path: $CHART_MOUNT"
-    find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/models#path: $MOUNT_DIR#g" {} \;
-    # replace the repository "image: opea/*" with "image: ${IMAGE_REPO}opea/"
-    find . -name '*.yaml' -type f -exec sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" {} \;
-    find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}opea/#g" {} \;
-    # set huggingface token
-    find . -name '*.yaml' -type f -exec sed -i "s#\${HUGGINGFACEHUB_API_TOKEN}#$(cat /home/$USER_ID/.cache/huggingface/token)#g" {} \;
-    # replace namespace "default" with real namespace
-    find . -name '*.yaml' -type f -exec sed -i "s#default.svc#$APP_NAMESPACE.svc#g" {} \;
-}
-
 function install_codetrans() {
-    # Make sure you have to use image tag $VERSION for microservice-connector installation
-    echo "install microservice-connector, using repo $DOCKER_REGISTRY and tag $VERSION"
-    echo "using namespace $SYSTEM_NAMESPACE and $APP_NAMESPACE"
-
-    kubectl apply -f ./gmc.opea.io_gmconnectors.yaml
-    kubectl apply -f ./gmc-manager-rbac.yaml
-    kubectl create configmap gmcyaml -n $SYSTEM_NAMESPACE --from-file $(pwd)/../kubernetes/manifests
-    kubectl apply -f ./gmc-manager.yaml
-
-    # Wait until the gmc controller pod is ready
-    wait_until_pod_ready "gmc-controller" $SYSTEM_NAMESPACE "gmc-controller"
-    kubectl get pods -n $SYSTEM_NAMESPACE
-    rm -f ./gmc.opea.io_gmconnectors.yaml ./gmc-manager-rbac.yaml ./gmc-manager.yaml manifests/gmc-router.yaml
-}
-
-function validate_codetrans() {
     kubectl create ns $APP_NAMESPACE
     sed -i "s|namespace: codetrans|namespace: $APP_NAMESPACE|g"  ./codetrans_xeon.yaml
     kubectl apply -f ./codetrans_xeon.yaml
@@ -55,7 +18,9 @@ function validate_codetrans() {
     wait_until_pod_ready "codetrans router" $APP_NAMESPACE "router-service"
     output=$(kubectl get pods -n $APP_NAMESPACE)
     echo $output
+}
 
+function validate_codetrans() {
     # deploy client pod for testing
     kubectl create deployment client-test -n $APP_NAMESPACE --image=python:3.8.13 -- sleep infinity
 
@@ -69,7 +34,7 @@ function validate_codetrans() {
     export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
     echo "$CLIENT_POD"
     accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='codetrans')].status.accessUrl}")
-    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codetrans.log
+    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codetrans.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "codetrans failed, please check the logs in ${LOG_PATH}!"
@@ -79,7 +44,7 @@ function validate_codetrans() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/gmc_codetrans.log ]] && \
-    [[ $(grep -c "import" $LOG_PATH/gmc_codetrans.log) != 0 ]]; then
+    [[ $(grep -c "[DONE]" $LOG_PATH/gmc_codetrans.log) != 0 ]]; then
         status=true
     fi
     if [ $status == false ]; then
@@ -145,13 +110,8 @@ if [ $# -eq 0 ]; then
 fi
 
 case "$1" in
-    init_CodeTrans)
-        pushd ChatQnA/kubernetes
-        init_codetrans
-        popd
-        ;;
     install_CodeTrans)
-        pushd ChatQnA/kubernetes
+        pushd CodeTrans/kubernetes
         install_codetrans
         popd
         ;;

@@ -8,6 +8,10 @@ ChatQnA architecture shows below:
 
 ![architecture](./assets/img/chatqna_architecture.png)
 
+ChatQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the ChatQnA Flow Chart shows below:
+
+![Flow Chart](./assets/img/chatqna_flow_chart.png)
+
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
 # Deploy ChatQnA Service
@@ -29,3 +33,7 @@ Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for instructions on depl
 ## Deploy ChatQnA into Kubernetes on Xeon & Gaudi
 
 Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
+
+## Deploy ChatQnA on AI PC
+
+Refer to the [AI PC Guide](./docker/aipc/README.md) for instructions on deploying ChatQnA on AI PC.
