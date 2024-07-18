@@ -55,7 +55,6 @@ export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any) {
 	}
 }
 
-
 export async function fetchAllFile() {
 	const data = {
 		knowledge_base_id: "default",

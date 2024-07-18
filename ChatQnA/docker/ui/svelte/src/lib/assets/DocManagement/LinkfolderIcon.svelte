@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script>
 	export let className = "w-16 h-16";
 </script>

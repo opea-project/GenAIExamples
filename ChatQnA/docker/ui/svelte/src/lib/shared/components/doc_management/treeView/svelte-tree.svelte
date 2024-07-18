@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script lang="ts">
 	import TreeBranch from "./tree-branch.svelte";
 	import { createEventDispatcher } from "svelte";

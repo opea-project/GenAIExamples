@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <svg
   class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500"
   xmlns="http://www.w3.org/2000/svg"
