@@ -1,0 +1,35 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: gmc.opea.io/v1alpha3
+kind: GMConnector
+metadata:
+  labels:
+    app.kubernetes.io/name: gmconnector
+    app.kubernetes.io/managed-by: kustomize
+    gmc/platform: xeon
+  name: docsum
+  namespace: docsum
+spec:
+  routerConfig:
+    name: router
+    serviceName: router-service
+  nodes:
+    root:
+      routerType: Sequence
+      steps:
+      - name: DocSum
+        data: $response
+        internalService:
+          serviceName: docsum-llm-uservice
+          config:
+            endpoint: /v1/chat/docsum
+            PORT: "9009"
+      - name: Tgi
+        internalService:
+          serviceName: tgi-svc
+          config:
+            LANGCHAIN_TRACING_V2: "false"
+            LANGCHAIN_PROJECT: "opea-llm-service"
+            endpoint: /generate
+          isDownstreamService: true

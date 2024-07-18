@@ -1,7 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import asyncio
 import os
 
 from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType

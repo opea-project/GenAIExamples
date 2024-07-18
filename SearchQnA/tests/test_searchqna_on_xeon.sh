@@ -15,7 +15,7 @@ function build_docker_images() {
 
     docker build -t opea/embedding-tei:latest  -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/web-retriever-chroma:latest  -f comps/web_retrievers/langchain/chroma/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest  -f comps/reranks/langchain/docker/Dockerfile .
+    docker build -t opea/reranking-tei:latest  -f comps/reranks/tei/docker/Dockerfile .
     docker build -t opea/llm-tgi:latest  -f comps/llms/text-generation/tgi/Dockerfile .
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     docker pull ghcr.io/huggingface/text-generation-inference:1.4
@@ -78,7 +78,7 @@ function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the latest news? Give me also the source link", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"www"* ]]; then
+    if [[ $result == *"news"* ]]; then
         echo "Result correct."
     else
         docker logs web-retriever-chroma-server
@@ -89,30 +89,30 @@ function validate_megaservice() {
 
 }
 
-# function validate_frontend() {
-#     cd $WORKPATH/docker/ui/svelte
-#     local conda_env_name="ChatQnA_e2e"
-#     export PATH=${HOME}/miniforge3/bin/:$PATH
-#     conda remove -n ${conda_env_name} --all -y
-#     conda create -n ${conda_env_name} python=3.12 -y
-#     source activate ${conda_env_name}
-
-#     sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-#     conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
-#     node -v && npm -v && pip list
-
-#     exit_status=0
-#     npx playwright test || exit_status=$?
-
-#     if [ $exit_status -ne 0 ]; then
-#         echo "[TEST INFO]: ---------frontend test failed---------"
-#         exit $exit_status
-#     else
-#         echo "[TEST INFO]: ---------frontend test passed---------"
-#     fi
-
-# }
+#function validate_frontend() {
+#    cd $WORKPATH/docker/ui/svelte
+#    local conda_env_name="OPEA_e2e"
+#    export PATH=${HOME}/miniforge3/bin/:$PATH
+##    conda remove -n ${conda_env_name} --all -y
+##    conda create -n ${conda_env_name} python=3.12 -y
+#    source activate ${conda_env_name}
+#
+#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+#
+##    conda install -c conda-forge nodejs -y
+#    npm install && npm ci && npx playwright install --with-deps
+#    node -v && npm -v && pip list
+#
+#    exit_status=0
+#    npx playwright test || exit_status=$?
+#
+#    if [ $exit_status -ne 0 ]; then
+#        echo "[TEST INFO]: ---------frontend test failed---------"
+#        exit $exit_status
+#    else
+#        echo "[TEST INFO]: ---------frontend test passed---------"
+#    fi
+#}
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon

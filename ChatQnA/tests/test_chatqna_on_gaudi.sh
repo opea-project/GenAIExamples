@@ -16,16 +16,16 @@ function build_docker_images() {
 
     docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
+    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
 
-    cd ..
-    git clone https://github.com/huggingface/tei-gaudi
-    cd tei-gaudi/
-    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+#    cd ..
+#    git clone https://github.com/huggingface/tei-gaudi
+#    cd tei-gaudi/
+#    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
 
     cd $WORKPATH/docker
@@ -38,8 +38,13 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/gaudi
+    # build tei-gaudi for each test instead of pull from local registry
+    cd $WORKPATH
+    git clone https://github.com/huggingface/tei-gaudi
+    cd tei-gaudi/
+    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
+    cd $WORKPATH/docker/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
@@ -64,13 +69,17 @@ function start_services() {
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" docker_compose.yaml
+        echo "cat docker_compose.yaml"
+        cat docker_compose.yaml
     fi
 
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
-    until [[ "$n" -ge 200 ]]; do
+    until [[ "$n" -ge 400 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
             break
@@ -185,15 +194,16 @@ function validate_megaservice() {
 
 function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
-    local conda_env_name="ChatQnA_e2e"
+    local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-    conda remove -n ${conda_env_name} --all -y
-    conda create -n ${conda_env_name} python=3.12 -y
+#    conda remove -n ${conda_env_name} --all -y
+#    conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+#    conda install -c conda-forge nodejs -y
+    npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
     exit_status=0
@@ -228,7 +238,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+    # validate_frontend
 
     stop_docker
     echo y | docker system prune

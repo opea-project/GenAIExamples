@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
+echo "IMAGE_REPO=${IMAGE_REPO}"
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -19,7 +20,7 @@ function build_docker_images() {
     docker build -t opea/speecht5:latest -f comps/tts/speecht5/Dockerfile .
     docker build -t opea/tts:latest -f comps/tts/Dockerfile .
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 
     cd $WORKPATH/docker
     docker build --no-cache -t opea/audioqna:latest -f Dockerfile .
@@ -50,23 +51,27 @@ function start_services() {
 
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    # Replace the container name with a test-specific name
-    # echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    # sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/audioqna:latest#image: opea/audioqna:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/audioqna-ui:latest#image: opea/audioqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        echo "cat docker_compose.yaml"
+        cat docker_compose.yaml
+    fi
+
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
-    sleep 3m
-    # n=0
-    # until [[ "$n" -ge 200 ]]; do
-    #     docker logs tgi-service > tgi_service_start.log
-    #     if grep -q Connected tgi_service_start.log; then
-    #         break
-    #     fi
-    #     sleep 1s
-    #     n=$((n+1))
-    # done
+     n=0
+     until [[ "$n" -ge 200 ]]; do
+         docker logs tgi-service > $LOG_PATH/tgi_service_start.log
+         if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+             break
+         fi
+         sleep 1s
+         n=$((n+1))
+     done
 }
 
 
@@ -81,30 +86,30 @@ function validate_megaservice() {
 
 }
 
-# function validate_frontend() {
-#     cd $WORKPATH/docker/ui/svelte
-#     local conda_env_name="ChatQnA_e2e"
-#     export PATH=${HOME}/miniforge3/bin/:$PATH
-#     conda remove -n ${conda_env_name} --all -y
-#     conda create -n ${conda_env_name} python=3.12 -y
-#     source activate ${conda_env_name}
-
-#     sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-#     conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
-#     node -v && npm -v && pip list
-
-#     exit_status=0
-#     npx playwright test || exit_status=$?
-
-#     if [ $exit_status -ne 0 ]; then
-#         echo "[TEST INFO]: ---------frontend test failed---------"
-#         exit $exit_status
-#     else
-#         echo "[TEST INFO]: ---------frontend test passed---------"
-#     fi
-
-# }
+#function validate_frontend() {
+#    cd $WORKPATH/docker/ui/svelte
+#    local conda_env_name="OPEA_e2e"
+#    export PATH=${HOME}/miniforge3/bin/:$PATH
+##    conda remove -n ${conda_env_name} --all -y
+##    conda create -n ${conda_env_name} python=3.12 -y
+#    source activate ${conda_env_name}
+#
+#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+#
+##    conda install -c conda-forge nodejs -y
+#    npm install && npm ci && npx playwright install --with-deps
+#    node -v && npm -v && pip list
+#
+#    exit_status=0
+#    npx playwright test || exit_status=$?
+#
+#    if [ $exit_status -ne 0 ]; then
+#        echo "[TEST INFO]: ---------frontend test failed---------"
+#        exit $exit_status
+#    else
+#        echo "[TEST INFO]: ---------frontend test passed---------"
+#    fi
+#}
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
@@ -118,12 +123,8 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    build_docker_images
-    # begin_time=$(date +%s)
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
-    # end_time=$(date +%s)
-    # maximal_duration=$((end_time-begin_time))
-    # echo "Mega service start duration is "$maximal_duration"s" && sleep 1s
 
     validate_megaservice
     # validate_frontend

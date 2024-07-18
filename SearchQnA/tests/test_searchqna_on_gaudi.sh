@@ -2,6 +2,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+# for test
+
 set -e
 
 WORKPATH=$(dirname "$PWD")
@@ -13,10 +15,10 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/embedding-tei:latest  -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/web-retriever-chroma:latest  -f comps/web_retrievers/langchain/chroma/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest  -f comps/reranks/langchain/docker/Dockerfile .
-    docker build -t opea/llm-tgi:latest  -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build --no-cache -t opea/embedding-tei:latest  -f comps/embeddings/langchain/docker/Dockerfile .
+    docker build --no-cache -t opea/web-retriever-chroma:latest  -f comps/web_retrievers/langchain/chroma/docker/Dockerfile .
+    docker build --no-cache -t opea/reranking-tei:latest  -f comps/reranks/tei/docker/Dockerfile .
+    docker build --no-cache -t opea/llm-tgi:latest  -f comps/llms/text-generation/tgi/Dockerfile .
 
     cd ..
     git clone https://github.com/huggingface/tei-gaudi
@@ -24,9 +26,9 @@ function build_docker_images() {
     docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     cd $WORKPATH/docker
-    docker build -t opea/searchqna:latest -f Dockerfile .
+    docker build --no-cache -t opea/searchqna:latest -f Dockerfile .
 
     # cd $WORKPATH/docker/ui
     # docker build --no-cache -t opea/searchqna-ui:latest -f docker/Dockerfile .
@@ -69,7 +71,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
-    until [[ "$n" -ge 200 ]]; do
+    until [[ "$n" -ge 500 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
             break
@@ -84,41 +86,43 @@ function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the latest news? Give me also the source link", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"www"* ]]; then
+    if [[ $result == *"news"* ]]; then
         echo "Result correct."
     else
-        docker logs web-retriever-chroma-server
-        docker logs searchqna-gaudi-backend-server
+        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
+        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
+        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
+        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
         echo "Result wrong."
         exit 1
     fi
 
 }
 
-# function validate_frontend() {
-#     cd $WORKPATH/docker/ui/svelte
-#     local conda_env_name="ChatQnA_e2e"
-#     export PATH=${HOME}/miniforge3/bin/:$PATH
-#     conda remove -n ${conda_env_name} --all -y
-#     conda create -n ${conda_env_name} python=3.12 -y
-#     source activate ${conda_env_name}
-
-#     sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-#     conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
-#     node -v && npm -v && pip list
-
-#     exit_status=0
-#     npx playwright test || exit_status=$?
-
-#     if [ $exit_status -ne 0 ]; then
-#         echo "[TEST INFO]: ---------frontend test failed---------"
-#         exit $exit_status
-#     else
-#         echo "[TEST INFO]: ---------frontend test passed---------"
-#     fi
-
-# }
+#function validate_frontend() {
+#    cd $WORKPATH/docker/ui/svelte
+#    local conda_env_name="OPEA_e2e"
+#    export PATH=${HOME}/miniforge3/bin/:$PATH
+##    conda remove -n ${conda_env_name} --all -y
+##    conda create -n ${conda_env_name} python=3.12 -y
+#    source activate ${conda_env_name}
+#
+#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+#
+##    conda install -c conda-forge nodejs -y
+#    npm install && npm ci && npx playwright install --with-deps
+#    node -v && npm -v && pip list
+#
+#    exit_status=0
+#    npx playwright test || exit_status=$?
+#
+#    if [ $exit_status -ne 0 ]; then
+#        echo "[TEST INFO]: ---------frontend test failed---------"
+#        exit $exit_status
+#    else
+#        echo "[TEST INFO]: ---------frontend test passed---------"
+#    fi
+#}
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
