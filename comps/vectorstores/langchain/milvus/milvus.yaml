@@ -285,7 +285,7 @@ queryCoord:
   heartbeatAvailableInterval: 10000 # 10s, Only QueryNodes which fetched heartbeats within the duration are available
   loadTimeoutSeconds: 600
   distRequestTimeout: 5000 # the request timeout for querycoord fetching data distribution from querynodes, in milliseconds
-  heatbeatWarningLag: 5000 # the lag value for querycoord report warning when last heatbeat is too old, in milliseconds
+  heatbeatWarningLag: 5000 # the lag value for querycoord report warning when last heartbeat is too old, in milliseconds
   checkHandoffInterval: 5000
   enableActiveStandby: false
   checkInterval: 1000

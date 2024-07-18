@@ -3,7 +3,6 @@ docarray
 docarray[full]
 easyocr
 fastapi
-fastapi
 huggingface_hub
 langchain
 langchain_community==0.2.5
@@ -13,12 +12,8 @@ langsmith
 neo4j
 numpy
 opentelemetry-api
-opentelemetry-api
-opentelemetry-exporter-otlp
 opentelemetry-exporter-otlp
 opentelemetry-sdk
-opentelemetry-sdk
-pandas
 pandas
 Pillow
 prometheus-fastapi-instrumentator

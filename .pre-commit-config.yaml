@@ -7,7 +7,7 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: end-of-file-fixer
         files: (.*\.(py|md|rst|yaml|yml|json|ts|js|html|svelte|sh))$
@@ -93,13 +93,13 @@ repos:
           - prettier@3.2.5
 
   - repo: https://github.com/psf/black.git
-    rev: 24.3.0
+    rev: 24.4.2
     hooks:
       - id: black
         files: (.*\.py)$
 
   - repo: https://github.com/asottile/blacken-docs
-    rev: 1.16.0
+    rev: 1.18.0
     hooks:
       - id: blacken-docs
         args: [--line-length=120, --skip-errors]
@@ -107,7 +107,7 @@ repos:
           - black==24.3.0
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.3.0
     hooks:
       - id: codespell
         args: [-w]
@@ -115,7 +115,7 @@ repos:
           - tomli
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.5
+    rev: v0.5.0
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --no-cache]
