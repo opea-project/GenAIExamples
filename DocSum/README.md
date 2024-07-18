@@ -78,7 +78,6 @@ Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on buil
 
 Please refer to [Kubernetes deployment](./kubernetes/README.md)
 
-
 # Consume Document Summarization Service
 
 Two ways of consuming Document Summarization Service:
@@ -112,4 +111,3 @@ curl http://${your_ip}:8008/generate \
 2. (Docker only) If all microservices work well, please check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `docker_compose.yaml`.
 
 3. (Docker only) If you get errors like "The container name is in use", please change container name in `docker_compose.yaml`.
-
