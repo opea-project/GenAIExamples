@@ -215,13 +215,6 @@ If use tgi for llm backend.
 docker compose -f docker_compose.yaml up -d
 ```
 
-If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
-
-```bash
-cd GenAIExamples/ChatQnA/docker/gaudi/
-docker compose -f docker_compose_guardrails.yaml up -d
-```
-
 If use vllm for llm backend.
 ```bash
 docker compose -f docker_compose_vllm.yaml up -d
@@ -235,6 +228,13 @@ docker compose -f docker_compose_vllm_ray.yaml up -d
 If use ray serve for llm backend.
 ```bash
 docker compose -f docker_compose_ray_serve.yaml up -d
+```
+
+If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
+
+```bash
+cd GenAIExamples/ChatQnA/docker/gaudi/
+docker compose -f docker_compose_guardrails.yaml up -d
 ```
 
 ### Validate MicroServices and MegaService
