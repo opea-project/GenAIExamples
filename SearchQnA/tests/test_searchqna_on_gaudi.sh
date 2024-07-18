@@ -107,7 +107,7 @@ function validate_megaservice() {
 function validate_frontend() {
    cd $WORKPATH/docker/ui/svelte
    local conda_env_name="OPEA_e2e"
-   
+
    export PATH=${HOME}/miniforge3/bin/:$PATH
 #    conda remove -n ${conda_env_name} --all -y
 #    conda create -n ${conda_env_name} python=3.12 -y
