@@ -150,6 +150,7 @@ services:
       - ${TOOLSET_PATH}:/home/user/tools/
     environment:
       - port=9090
+      - ip_address=${ip_address}
       - strategy=${AGENT_STRATEGY}
       - llm_endpoint_url=${LLM_ENDPOINT_URL}
       - llm_engine=tgi

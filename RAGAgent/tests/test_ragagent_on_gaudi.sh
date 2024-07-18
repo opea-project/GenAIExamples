@@ -4,6 +4,7 @@
 
 set -e
 echo "IMAGE_REPO=${IMAGE_REPO}"
+echo "HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}"
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -63,14 +64,13 @@ function start_services() {
     export AGENT_STRATEGY=react
     export LLM_ENDPOINT_URL="http://${ip_address}:8008"
     export TOOLSET_PATH=$WORKPATH/tools
-    export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+    export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export EMBEDDING_SERVICE_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
@@ -82,15 +82,14 @@ function start_services() {
     echo "Waiting tgi gaudi ready"
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
-        docker logs tgi-gaudi-server > ${WORKPATH}/tests/test-ragagent.log
+        docker logs tgi-gaudi-server > ${WORKPATH}/tests/tgi-gaudi-service.log
         n=$((n+1))
-        if grep -q Connected ${WORKPATH}/tests/test-ragagent.log; then
+        if grep -q Connected ${WORKPATH}/tests/tgi-gaudi-service.log; then
             break
         fi
         sleep 5s
     done
     sleep 5s
-    docker logs tgi-gaudi-server
     echo "Service started successfully"
     docker ps
 }
@@ -105,7 +104,7 @@ function validate() {
         echo 0
     else
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-        exit 1
+        echo 1
     fi
 }
 
@@ -113,26 +112,27 @@ function validate_megaservice() {
     echo "Testing DataPrep Service"
     local CONTENT=$(curl -X POST "http://${ip_address}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
-     -F 'link_list=["https://opea.dev"]' | tee ${LOG_PATH}/test-ragagent.log)
-    local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "test-ragagent" )
+     -F 'link_list=["https://opea.dev"]' | tee -a ${LOG_PATH}/test-dataprep.log)
+    local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "test-dataprep" )
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     if [ "$EXIT_CODE" == "1" ]; then
-        docker logs dataprep-redis-server | tee -a ${LOG_PATH}/test-ragagent.log
+        docker logs dataprep-redis-server >> ${LOG_PATH}/test-dataprep.log
         exit 1
     fi
 
     echo "Testing agent service"
     local CONTENT=$(curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "What is Intel OPEA project?"
-    }' | tee ${LOG_PATH}/test-ragagent.log)
+    }' | tee -a ${LOG_PATH}/test-ragagent.log)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-ragagent")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
+    docker container logs rag-agent-server &> ${LOG_PATH}/test-ragagent-service.log
+    docker container logs doc-index-retriever-server &> ${LOG_PATH}/test-doc-index-retriever.log
     if [ "$EXIT_CODE" == "1" ]; then
-        docker logs tgi-gaudi-server | tee -a ${LOG_PATH}/test-ragagent.log
-        docker logs rag-agent-server | tee -a ${LOG_PATH}/test-ragagent.log
+        docker container logs tgi-gaudi-server &> ${LOG_PATH}/tgi-gaudi-service.log
         exit 1
     fi
 }
