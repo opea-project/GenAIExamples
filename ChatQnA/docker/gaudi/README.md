@@ -48,6 +48,17 @@ Build microservice docker.
 ```bash
 docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .   
 ```
+
+#### 5.3 Use VLLM-on-Ray
+Build vllm-on-ray docker.
+```bash
+docker build --no-cache -t vllm_ray:habana --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray .
+```
+Build microservice docker.
+```bash
+docker build --no-cache -t opea/llm-vllm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice . 
+```
+
 ### 6. Build Dataprep Image
 
 ```bash
@@ -124,7 +135,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 1. `opea/embedding-tei:latest`
 2. `opea/retriever-redis:latest`
 3. `opea/reranking-tei:latest`
-4. `opea/llm-tgi:latest` or `opea/llm-vllm:latest`
+4. `opea/llm-tgi:latest` or `opea/llm-vllm:latest` or `opea/llm-vllm-ray:latest`
 5. `opea/tei-gaudi:latest`
 6. `opea/dataprep-redis:latest`
 7. `opea/chatqna:latest` or `opea/chatqna-guardrails:latest`
@@ -155,6 +166,8 @@ export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export vLLM_LLM_ENDPOINT="http://${host_ip}:8008"
+export vLLM_RAY_LLM_ENDPOINT="http://${host_ip}:8008"
+export LLM_SERVICE_PORT=9000
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
@@ -190,6 +203,7 @@ If use tgi for llm backend.
 docker compose -f docker_compose.yaml up -d
 ```
 
+<<<<<<< HEAD
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
 
 ```bash
@@ -198,10 +212,17 @@ docker compose -f docker_compose_guardrails.yaml up -d
 ```
 
 If vllm tgi for llm backend.
+=======
+If use vllm for llm backend.
+>>>>>>> e63e959 (add vllm-on-ray into ChatQnA)
 ```bash
 docker compose -f docker_compose_vllm.yaml up -d
 ```
 
+If use vllm-on-ray for llm backend.
+```bash
+docker compose -f docker_compose_vllm_ray.yaml up -d
+```
 
 ### Validate MicroServices and MegaService
 
@@ -280,6 +301,13 @@ curl http://${your_ip}:8008/v1/completions \
   "max_tokens": 32,
   "temperature": 0
   }'
+```
+
+```bash
+#vLLM-on-Ray Service
+curl http://${your_ip}:8008/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "${LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 ```
 
 7. LLM Microservice
