@@ -33,7 +33,7 @@
 		: "flex w-full items-center gap-3"}
 	data-testid={msg.role === 0
 		? "display-answer"
-		: "display-question"}		
+		: "display-question"}
 >
 	<div
 		class={msg.role === 0
