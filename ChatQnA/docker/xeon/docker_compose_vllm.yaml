@@ -125,7 +125,7 @@ services:
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-    command: /bin/bash -c "cd / && export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --model $LLM_MODEL_ID --host 0.0.0.0 --port 80"
+    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
   llm:
     image: opea/llm-vllm:latest
     container_name: llm-vllm-server
@@ -138,7 +138,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      vLLM_ENDPOINT: ${vllm_LLM_ENDPOINT}
+      vLLM_ENDPOINT: ${vLLM_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LLM_MODEL: ${LLM_MODEL_ID}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
