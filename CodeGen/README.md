@@ -68,9 +68,9 @@ cd GenAIExamples/CodeGen/docker/gaudi
 docker compose -f docker_compose.yaml up -d
 ```
 
-Notice that the released gaudi docker image is compatible with `Habana Driver 1.16.x`.
+> Notice: Currently only the <b>Habana Driver 1.16.x</b> is supported for Gaudi.
 
-If your version of `Habana Driver < 1.16.0`, Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
 ### Deploy CodeGen on Xeon
 
