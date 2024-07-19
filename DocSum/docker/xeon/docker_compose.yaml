@@ -69,7 +69,7 @@ services:
     ipc: host
     restart: always
   docsum-xeon-react-ui-server:
-    image: opea/docsum--react-ui:latest
+    image: opea/docsum-react-ui:latest
     container_name: docsum-xeon-react-ui-server
     depends_on:
       - docsum-xeon-backend-server

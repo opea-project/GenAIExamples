@@ -2,10 +2,9 @@
 
 ### 📸 Project Screenshots
 
-![project-screenshot](../../../assets/img/docSum_ui_upload.png)
-![project-screenshot](../../../assets/img/docSum_ui_exchange.png)
-![project-screenshot](../../../assets/img/docSum_ui_response.png)
-![project-screenshot](../../../assets/img/docSum_ui_text.png)
+![project-screenshot](../../../assets/img/docsum-ui-react.png)
+![project-screenshot](../../../assets/img/docsum-ui-react-file.png)
+![project-screenshot](../../../assets/img/docsum-ui-react-error.png)
 
 <h2>🧐 Features</h2>
 
