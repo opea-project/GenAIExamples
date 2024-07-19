@@ -32,41 +32,55 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 ```
 
 ### 5. Build LLM Image
+
 You can use different LLM serving solutions, choose one of following four options.
 
 #### 5.1 Use TGI
+
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
 #### 5.2 Use VLLM
+
 Build vllm docker.
+
 ```bash
 docker build --no-cache -t vllm:hpu --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.hpu .
 ```
+
 Build microservice docker.
+
 ```bash
-docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .   
+docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
 ```
 
 #### 5.3 Use VLLM-on-Ray
+
 Build vllm-on-ray docker.
+
 ```bash
 docker build --no-cache -t vllm_ray:habana --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray .
 ```
+
 Build microservice docker.
+
 ```bash
-docker build --no-cache -t opea/llm-vllm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice . 
+docker build --no-cache -t opea/llm-vllm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice .
 ```
 
 #### 5.4 Use Ray Serve
+
 Build Ray Serve docker.
+
 ```bash
 docker build --no-cache -t ray_serve:habana --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.rayserve .
 ```
+
 Build microservice docker.
+
 ```bash
-docker build --no-cache -t opea/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice .   
+docker build --no-cache -t opea/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice .
 ```
 
 ### 6. Build Dataprep Image
@@ -208,24 +222,28 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
-````
+```
 
 If use tgi for llm backend.
+
 ```bash
 docker compose -f docker_compose.yaml up -d
 ```
 
 If use vllm for llm backend.
+
 ```bash
 docker compose -f docker_compose_vllm.yaml up -d
 ```
 
 If use vllm-on-ray for llm backend.
+
 ```bash
 docker compose -f docker_compose_vllm_ray.yaml up -d
 ```
 
 If use ray serve for llm backend.
+
 ```bash
 docker compose -f docker_compose_ray_serve.yaml up -d
 ```

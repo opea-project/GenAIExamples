@@ -18,7 +18,7 @@ function build_docker_images() {
     docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
     docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
     docker build -t ray_serve:habana -f comps/llms/text-generation/ray_serve/docker/Dockerfile.rayserve .
-    docker build -t opea/llm-ray:latest -f comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice . 
+    docker build -t opea/llm-ray:latest -f comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
 
 #    cd ..
