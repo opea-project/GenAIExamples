@@ -93,7 +93,9 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 ```
 
 ### Use vLLM as backend
+
 Build vLLM docker.
+
 ```bash
 git clone https://github.com/vllm-project/vllm.git
 cd ./vllm/
@@ -101,6 +103,7 @@ docker build --no-cache -t vllm:cpu --build-arg https_proxy=$https_proxy --build
 ```
 
 Build microservice.
+
 ```bash
 docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
 ```
@@ -217,16 +220,19 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 ### Start all the services Docker Containers
 
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
+
 ```bash
 cd GenAIExamples/ChatQnA/docker/xeon/
 ```
 
 If use TGI backend.
+
 ```bash
 docker compose -f docker_compose.yaml up -d
 ```
 
 If use vLLM backend.
+
 ```bash
 docker compose -f docker_compose_vllm.yaml up -d
 ```
