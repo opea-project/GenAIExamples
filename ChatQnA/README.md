@@ -60,19 +60,21 @@ export https_proxy="Your_HTTPs_Proxy"
 3. Set up other environment variables:
 
 ```bash
-bash ./docker/set_env.sh
+source ./docker/set_env.sh
 ```
 
 ## Deploy ChatQnA on Gaudi
 
-If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start ChatQnA services. Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
+Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
 docker compose -f docker_compose.yaml up -d
 ```
 
-If your version of `Habana Driver` >= 1.16.0, refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Notice that the released gaudi docker image is compatible with `Habana Driver 1.16.x`.
+
+If your version of `Habana Driver < 1.16.0`, Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
 ## Deploy ChatQnA on Xeon
 

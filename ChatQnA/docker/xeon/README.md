@@ -369,12 +369,30 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
-## 🚀 Launch the Conversational UI (react)
+## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
 
 ```yaml
-  chaqna-xeon-conversation-ui-server:
+chaqna-gaudi-conversation-ui-server:
+  image: opea/chatqna-conversation-ui:latest
+  container_name: chatqna-gaudi-conversation-ui-server
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+  ports:
+    - "5174:80"
+  depends_on:
+    - chaqna-gaudi-backend-server
+  ipc: host
+  restart: always
+```
+
+Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  chaqna-gaudi-conversation-ui-server:
     image: opea/chatqna-conversation-ui:latest
     ...
     ports:
