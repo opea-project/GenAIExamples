@@ -67,7 +67,7 @@
 
         # Start Docker Containers
         docker compose -f docker_compose.yaml up -d
-        
+
         sleep 2m # Waits 2 minutes
 
     }
