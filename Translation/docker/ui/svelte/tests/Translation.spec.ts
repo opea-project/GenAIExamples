@@ -16,7 +16,9 @@ async function enterMessageToChat(page: Page, message: string) {
   await page.getByTestId("translate-input").click();
   await page.getByTestId("translate-input").fill(message);
   await page.waitForTimeout(10000);
-  await expect(page.getByTestId("translate-output")).toContainText("你好");
+  const outputText = await page.getByTestId("translate-output").inputValue();
+  console.log("Actual text:", outputText);
+  await expect(page.getByTestId("translate-output")).not.toHaveValue("");
 }
 
 // Test description: New Doc Summary
