@@ -57,13 +57,6 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    if [[ "$IMAGE_REPO" != "" ]]; then
-        # Replace the container name with a test-specific name
-        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/searchqna:latest#image: opea/searchqna:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/searchqna-ui:latest#image: opea/searchqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
-    fi
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
@@ -93,30 +86,30 @@ function validate_megaservice() {
 
 }
 
-#function validate_frontend() {
-#    cd $WORKPATH/docker/ui/svelte
-#    local conda_env_name="OPEA_e2e"
-#    export PATH=${HOME}/miniforge3/bin/:$PATH
-##    conda remove -n ${conda_env_name} --all -y
-##    conda create -n ${conda_env_name} python=3.12 -y
-#    source activate ${conda_env_name}
-#
-#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-#
-##    conda install -c conda-forge nodejs -y
-#    npm install && npm ci && npx playwright install --with-deps
-#    node -v && npm -v && pip list
-#
-#    exit_status=0
-#    npx playwright test || exit_status=$?
-#
-#    if [ $exit_status -ne 0 ]; then
-#        echo "[TEST INFO]: ---------frontend test failed---------"
-#        exit $exit_status
-#    else
-#        echo "[TEST INFO]: ---------frontend test passed---------"
-#    fi
-#}
+function validate_frontend() {
+   cd $WORKPATH/docker/ui/svelte
+   local conda_env_name="OPEA_e2e"
+   export PATH=${HOME}/miniforge3/bin/:$PATH
+#    conda remove -n ${conda_env_name} --all -y
+#    conda create -n ${conda_env_name} python=3.12 -y
+   source activate ${conda_env_name}
+
+   sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+#    conda install -c conda-forge nodejs -y
+   npm install && npm ci && npx playwright install --with-deps
+   node -v && npm -v && pip list
+
+   exit_status=0
+   npx playwright test || exit_status=$?
+
+   if [ $exit_status -ne 0 ]; then
+       echo "[TEST INFO]: ---------frontend test failed---------"
+       exit $exit_status
+   else
+       echo "[TEST INFO]: ---------frontend test passed---------"
+   fi
+}
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
@@ -138,7 +131,7 @@ function main() {
     # echo "Mega service start duration is "$maximal_duration"s" && sleep 1s
 
     validate_megaservice
-    # validate_frontend
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
