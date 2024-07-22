@@ -35,9 +35,18 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
 
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/translation:latest#image: opea/translation:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/translation-ui:latest#image: opea/translation-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        echo "cat compose.yaml"
+        cat compose.yaml
+    fi
+
     # Start Docker Containers
-    # TODO: Replace the container name with a test-specific name
-    docker compose -f docker_compose.yaml up -d
+    docker compose up -d
 
     sleep 2m # Waits 2 minutes
 }
@@ -130,18 +139,14 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose down
 }
 
 function main() {
 
     stop_docker
 
-    build_docker_images
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices
