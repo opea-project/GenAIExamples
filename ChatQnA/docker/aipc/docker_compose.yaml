@@ -4,7 +4,7 @@
 version: "3.8"
 
 include:
- - ../data-service/${DATA_SERVICE}/docker-compose.yaml
+ - ../data-service/${DATA_SERVICE:-redis}/docker-compose.yaml
 
 services:
   tei-embedding-service:
