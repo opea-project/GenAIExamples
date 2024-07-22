@@ -1,36 +1,120 @@
-# Megaservice images
+# Example images
 
-| Megaservice images            | Dockerfile                                                                                                                            |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| opea/chatqna-conversation-ui  | https://github.com/opea-project/GenAIExamples/blob/2e312f44edbcbf89bf00bc21d9e9c847405ecae8/ChatQnA/docker/ui/docker/Dockerfile.react |
-| opea/searchqna                | https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/Dockerfile                                                   |
-| opea/docsum-ui                | https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/ui/docker/Dockerfile                                            |
-| opea/docsum                   | https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/Dockerfile                                                      |
-| opea/codetrans-ui             | https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/ui/docker/Dockerfile                                         |
-| opea/codetrans                | https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/Dockerfile                                                   |
-| opea/codegen-ui               | https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/ui/docker/Dockerfile                                           |
-| opea/codegen                  | https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/Dockerfile                                                     |
-| opea/chatqna-ui               | https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/ui/docker/Dockerfile                                           |
-| opea/chatqna                  | https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/Dockerfile                                                     |
-| opea/web-retriever-chroma     | https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/langchain/chroma/docker                                     |
-| opea/retriever-redis          | https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/docker/Dockerfile                               |
-| opea/reranking-tei            | https://github.com/opea-project/GenAIComps/blob/main/comps/reranks/tei/docker/Dockerfile                                              |
-| opea/llm-vllm                 | https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/vllm/docker/Dockerfile.microservice                   |
-| opea/llm-tgi                  | https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/tgi/Dockerfile                                        |
-| opea/llm-ray                  | https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice              |
-| opea/llm-docsum-tgi           | https://github.com/opea-project/GenAIComps/blob/main/comps/llms/summarization/tgi/Dockerfile                                          |
-| opea/guardrails-pii-detection | https://github.com/opea-project/GenAIComps/blob/main/comps/guardrails/pii_detection/docker/Dockerfile                                 |
-| opea/embedding-tei            | https://github.com/opea-project/GenAIComps/blob/main/comps/embeddings/langchain/docker/Dockerfile                                     |
-| opea/dataprep-on-ray-redis    | https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain_ray/docker/Dockerfile                             |
-| opea/dataprep-redis           | https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain/docker/Dockerfile                                 |
-| opea/knowledge_graphs         | https://github.com/opea-project/GenAIComps/blob/main/comps/knowledgegraphs/langchain/docker/Dockerfile                                |
+<table class="tg"><thead>
+  <tr>
+    <th class="tg-cly1">Example Images</th>
+    <th class="tg-cly1">Dockerfile</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna-ui">opea/chatqna-ui</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/ui/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna">opea/chatqna</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna-conversation-ui">opea/chatqna-conversation-ui</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIExamples/blob/add_up_list/ChatQnA/docker/ui/docker/Dockerfile.react</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/docsum-ui">opea/docsum-ui</a></td>
+    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/ui/docker/Dockerfile">https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/ui/docker/Dockerfile</a></td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/docsum">opea/docsum</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/codetrans-ui">opea/codetrans-ui</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/ui/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/codetrans">opea/codetrans</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/codegen-ui">opea/codegen-ui</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/ui/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/codegen">opea/codegen</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/searchqna/tags">opea/searchqna</a></td>
+    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/Dockerfile">https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/Dockerfile</a></td>
+  </tr>
+</tbody></table>
 
 # Microservice images
 
-| Microservice images               | Dockerfile                                                                                      |
-| --------------------------------- | ----------------------------------------------------------------------------------------------- |
-| opea/tei-gaudi Tags               | https://github.com/huggingface/tei-gaudi/blob/habana-main/Dockerfile-hpu                        |
-| opea/gmcrouter                    | https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.router  |
-| opea/gmcmanager                   | https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.manager |
-| opea/chat-conversation-ui-service |                                                                                                 |
-| opea/chat-conversation-service    |                                                                                                 |
+<table class="tg"><thead>
+  <tr>
+    <th class="tg-cly1">Microservice Images</th>
+    <th class="tg-cly1">Dockerfile</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/tei-gaudi/tags">opea/tei-gaudi</a></td>
+    <td class="tg-na8o">https://github.com/huggingface/tei-gaudi/blob/habana-main/Dockerfile-hpu</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/web-retriever-chroma">opea/web-retriever-chroma</a></td>
+    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/langchain/chroma/docker">https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/langchain/chroma/docker</a></td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/retriever-redis">opea/retriever-redis</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/reranking-tei">opea/reranking-tei</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/reranks/tei/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-tgi">opea/llm-tgi</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/tgi/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-docsum-tgi">opea/llm-docsum-tgi</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/llms/summarization/tgi/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-vllm">opea/llm-vllm</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/vllm/docker/Dockerfile.microservice</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-ray">opea/llm-ray</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/guardrails-pii-detection">opea/guardrails-pii-detection</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/guardrails/pii_detection/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/embedding-tei">opea/embedding-tei</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/embeddings/langchain/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/dataprep-on-ray-redis">opea/dataprep-on-ray-redis</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain_ray/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/dataprep-redis">opea/dataprep-redis</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/knowledge_graphs">opea/knowledge_graphs</a></td>
+    <td class="tg-na8o">https://github.com/opea-project/GenAIComps/blob/main/comps/knowledgegraphs/langchain/docker/Dockerfile</td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/gmcrouter">opea/gmcrouter</a></td>
+    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.manager">https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.manager</a></td>
+  </tr>
+  <tr>
+    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/gmcmanager">opea/gmcmanager</a></td>
+    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.router">https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.router</a></td>
+  </tr>
+</tbody></table>
+
