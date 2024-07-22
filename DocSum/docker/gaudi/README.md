@@ -54,9 +54,6 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
 ```
 
-Note:
-If docker build fails, update the Base image in `Dockerfile.react` to `node:20.10.0-alpine`
-
 Then run the command `docker images`, you will have the following Docker Images:
 
 1. `ghcr.io/huggingface/tgi-gaudi:2.0.1`
