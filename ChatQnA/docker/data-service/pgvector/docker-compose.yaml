@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 services:
   pgvector-vector-db:
     container_name: pgvector-vector-db
@@ -13,7 +16,7 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    
+
   dataprep-service:
     image: opea/dataprep-pgvector:latest
     container_name: dataprep-pgvector
@@ -26,7 +29,7 @@ services:
       PG_CONNECTION_STRING: ${PG_CONNECTION_STRING}
       INDEX_NAME: ${INDEX_NAME}
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-  
+
   retriever:
     image: opea/retriever-pgvector:latest
     container_name: retriever-pgvector

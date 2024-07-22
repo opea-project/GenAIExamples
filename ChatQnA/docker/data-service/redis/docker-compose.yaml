@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 services:
   redis-vector-db:
     image: redis/redis-stack:7.2.0-v9
