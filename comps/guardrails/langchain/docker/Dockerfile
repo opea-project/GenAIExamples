@@ -3,7 +3,7 @@
 
 FROM langchain/langchain:latest
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 
 ARG ARCH="cpu"
 

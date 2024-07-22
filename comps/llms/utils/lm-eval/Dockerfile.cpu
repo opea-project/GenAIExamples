@@ -3,7 +3,7 @@ FROM ubuntu:${UBUNTU_VER} as devel
 
 ARG REPO_COMPS=https://github.com/opea-project/GenAIComps.git
 ARG BRANCH=main
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 
 RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
     aspell \

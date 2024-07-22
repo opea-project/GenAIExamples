@@ -4,7 +4,7 @@
 
 FROM python:3.11-slim
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 
 ARG ARCH="cpu"
 
