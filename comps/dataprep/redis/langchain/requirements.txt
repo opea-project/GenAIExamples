@@ -19,6 +19,7 @@ Pillow
 prometheus-fastapi-instrumentator
 pymupdf
 pyspark
+python-bidi==0.4.2
 python-docx
 python-pptx
 redis

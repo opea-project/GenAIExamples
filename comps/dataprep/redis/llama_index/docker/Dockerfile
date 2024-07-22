@@ -12,7 +12,8 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
     build-essential \
     libgl1-mesa-glx \
     libjemalloc-dev \
-    vim
+    vim \
+    libcairo2
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
@@ -23,7 +24,7 @@ USER user
 COPY comps /home/user/comps
 
 RUN pip install --no-cache-dir --upgrade pip setuptools && \
-    if [ ${ARCH} = "cpu" ]; then pip install torch --index-url https://download.pytorch.org/whl/cpu; fi && \
+    if [ ${ARCH} = "cpu" ]; then pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
     pip install --no-cache-dir -r /home/user/comps/dataprep/redis/llama_index/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user

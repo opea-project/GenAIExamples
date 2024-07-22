@@ -11,6 +11,7 @@ opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
 prometheus-fastapi-instrumentator
+python-bidi==0.4.2
 redis
 sentence_transformers
 shortuuid

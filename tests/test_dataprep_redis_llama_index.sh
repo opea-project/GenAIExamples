@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -11,7 +11,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build --no-cache -t opea/dataprep-redis:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/llama_index/docker/Dockerfile .
+    docker build --no-cache -t opea/dataprep-redis-llama-index:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/llama_index/docker/Dockerfile .
 }
 
 function start_service() {
@@ -19,7 +19,7 @@ function start_service() {
     dataprep_service_port=5012
     dataprep_file_service_port=5017
     REDIS_URL="redis://${ip_address}:6381"
-    docker run -d --name="test-comps-dataprep-redis-llama-index-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -p ${dataprep_service_port}:6007 -p ${dataprep_file_service_port}:6008 --ipc=host opea/dataprep-redis:comps
+    docker run -d --name="test-comps-dataprep-redis-llama-index-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -p ${dataprep_service_port}:6007 -p ${dataprep_file_service_port}:6008 --ipc=host opea/dataprep-redis-llama-index:comps
     sleep 2m
 }
 
@@ -80,7 +80,7 @@ function main() {
 
     stop_docker
 
-    # build_docker_images
+    build_docker_images
     start_service
 
     validate_microservice

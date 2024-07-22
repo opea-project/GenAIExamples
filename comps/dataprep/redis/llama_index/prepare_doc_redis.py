@@ -15,15 +15,9 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.redis import RedisVectorStore
 from redis import Redis
 from redisvl.schema import IndexSchema
+from utils import *
 
 from comps import DocPath, opea_microservices, register_microservice
-from comps.dataprep.utils import (
-    create_upload_folder,
-    encode_filename,
-    get_file_structure,
-    remove_folder_with_ignore,
-    save_content_to_local_disk,
-)
 
 upload_folder = "./uploaded_files/"
 
