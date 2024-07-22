@@ -1,6 +1,6 @@
 # Description
 
-A list of released OPEA docker images in https://hub.docker.com/, contains all relevant images from the GenAIExamples, GenAIComps and GenAIInfra projects. Please expect more public available images in the future release. 
+A list of released OPEA docker images in https://hub.docker.com/, contains all relevant images from the GenAIExamples, GenAIComps and GenAIInfra projects. Please expect more public available images in the future release.
 
 # Example images
 
