@@ -37,6 +37,7 @@ Construct the frontend Docker image via the command below:
 cd GenAIExamples/CodeGen/docker/ui/
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
+
 ### 5. Build the React UI Docker Image
 
 Construct the React frontend Docker image via the command below:
@@ -45,6 +46,7 @@ Construct the React frontend Docker image via the command below:
 cd GenAIExamples/CodeGen/docker/ui/
 docker build -t opea/codegen-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
 ```
+
 Then run the command `docker images`, you will have the following 3 Docker images:
 
 - `opea/llm-tgi:latest`
