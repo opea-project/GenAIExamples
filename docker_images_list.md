@@ -1,3 +1,6 @@
+# Description
+OPEA's list of currently released images in https://hub.docker.com/, contains all relevant images from the GenAIExamples, GenAIComps and GenAIInfra projects.
+
 # Example images
 
 <table class="tg"><thead>
