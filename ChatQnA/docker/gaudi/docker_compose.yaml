@@ -4,28 +4,10 @@
 
 version: "3.8"
 
+include:
+ - ../data-service/${DATA_SERVICE}/docker-compose.yaml
+
 services:
-  redis-vector-db:
-    image: redis/redis-stack:7.2.0-v9
-    container_name: redis-vector-db
-    ports:
-      - "6379:6379"
-      - "8001:8001"
-  dataprep-redis-service:
-    image: opea/dataprep-redis:latest
-    container_name: dataprep-redis-server
-    depends_on:
-      - redis-vector-db
-    ports:
-      - "6007:6007"
-      - "6008:6008"
-      - "6009:6009"
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      REDIS_URL: ${REDIS_URL}
-      INDEX_NAME: ${INDEX_NAME}
   tei-embedding-service:
     image: opea/tei-gaudi:latest
     container_name: tei-embedding-gaudi-server
@@ -61,24 +43,6 @@ services:
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-embedding-service"
-    restart: unless-stopped
-  retriever:
-    image: opea/retriever-redis:latest
-    container_name: retriever-redis-server
-    depends_on:
-      - redis-vector-db
-    ports:
-      - "7000:7000"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      REDIS_URL: ${REDIS_URL}
-      INDEX_NAME: ${INDEX_NAME}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-retriever-service"
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
