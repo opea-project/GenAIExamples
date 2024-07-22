@@ -1,7 +1,7 @@
 # Megaservice images
 
-| Megaservice images             | Dockerfile                                                                                                                            |
-|-------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| Megaservice images            | Dockerfile                                                                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | opea/chatqna-conversation-ui  | https://github.com/opea-project/GenAIExamples/blob/2e312f44edbcbf89bf00bc21d9e9c847405ecae8/ChatQnA/docker/ui/docker/Dockerfile.react |
 | opea/searchqna                | https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/Dockerfile                                                   |
 | opea/docsum-ui                | https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/ui/docker/Dockerfile                                            |
@@ -25,11 +25,10 @@
 | opea/dataprep-redis           | https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain/docker/Dockerfile                                 |
 | opea/knowledge_graphs         | https://github.com/opea-project/GenAIComps/blob/main/comps/knowledgegraphs/langchain/docker/Dockerfile                                |
 
-
 # Microservice images
 
-| Microservice images                | Dockerfile                                                                                      |
-|-----------------------------------|-------------------------------------------------------------------------------------------------|
+| Microservice images               | Dockerfile                                                                                      |
+| --------------------------------- | ----------------------------------------------------------------------------------------------- |
 | opea/tei-gaudi Tags               | https://github.com/huggingface/tei-gaudi/blob/habana-main/Dockerfile-hpu                        |
 | opea/gmcrouter                    | https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.router  |
 | opea/gmcmanager                   | https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.manager |
