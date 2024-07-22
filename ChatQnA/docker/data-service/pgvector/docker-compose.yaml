@@ -1,0 +1,46 @@
+services:
+  pgvector-vector-db:
+    container_name: pgvector-vector-db
+    image: pgvector/pgvector:0.7.0-pg16
+    ports:
+      - "5432:5432"
+    restart: always
+    ipc: host
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    
+  dataprep-service:
+    image: opea/dataprep-pgvector:latest
+    container_name: dataprep-pgvector
+    ports:
+      - "6007:6007"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PG_CONNECTION_STRING: ${PG_CONNECTION_STRING}
+      INDEX_NAME: ${INDEX_NAME}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+  
+  retriever:
+    image: opea/retriever-pgvector:latest
+    container_name: retriever-pgvector
+    depends_on:
+      - pgvector-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PG_CONNECTION_STRING: ${PG_CONNECTION_STRING}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-retriever-service"
+    restart: unless-stopped

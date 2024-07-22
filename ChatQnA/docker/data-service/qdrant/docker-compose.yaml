@@ -1,0 +1,38 @@
+services:
+  qdrant-vector-db:
+    image: qdrant/qdrant
+    container_name: qdrant-vector-db
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+  dataprep-qdrant-service:
+    image: opea/dataprep-qdrant:latest
+    container_name: dataprep-qdrant-server
+    depends_on:
+      - qdrant-vector-db
+    ports:
+      - "6000:6000"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      QDRANT: ${host_ip}
+      QDRANT_PORT: 6333
+      COLLECTION_NAME: ${INDEX_NAME}
+  retriever:
+    image: opea/retriever-qdrant:latest
+    container_name: retriever-qdrant-server
+    depends_on:
+      - qdrant-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      QDRANT_HOST: ${host_ip}
+      QDRANT_PORT: 6333
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+    restart: unless-stopped
