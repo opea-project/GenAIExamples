@@ -22,6 +22,7 @@ function build_docker_images() {
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/codegen-ui:latest -f docker/Dockerfile .
+    docker build --no-cache --build-arg BACKEND_SERVICE_ENDPOINT=http://${ip_address}:7778/v1/codegen -t opea/codegen--react-ui:latest -f docker/Dockerfile.react .
 
     docker images
 }
@@ -49,7 +50,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
 
-    sleep 2m # Waits 2 minutes
+    sleep 5m # Waits 5 minutes
 }
 
 function validate_services() {
