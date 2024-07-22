@@ -12,6 +12,7 @@ on:
       - "**/tests/test_gmc**"
       - "!**.md"
       - "!**.txt"
+      - "!**/kubernetes/manifests/**"
   workflow_dispatch:
 
 concurrency:
