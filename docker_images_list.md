@@ -117,4 +117,3 @@
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.router">https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.router</a></td>
   </tr>
 </tbody></table>
-
