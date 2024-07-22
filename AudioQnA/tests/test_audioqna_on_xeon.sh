@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
+echo "IMAGE_REPO=${IMAGE_REPO}"
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -36,26 +37,9 @@ function start_services() {
     export TTS_SERVICE_PORT=3002
     export LLM_SERVICE_PORT=3007
 
-    # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
-
-    # Replace the container name with a test-specific name
-    # echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    # sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker-compose.yaml
-    # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker-compose.yaml
-    # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker-compose.yaml
-    # Start Docker Containers
     docker compose down --remove-orphans
     docker compose up -d
     sleep 3m
-    # n=0
-    # until [[ "$n" -ge 200 ]]; do
-    #     docker logs tgi-service > tgi_service_start.log
-    #     if grep -q Connected tgi_service_start.log; then
-    #         break
-    #     fi
-    #     sleep 1s
-    #     n=$((n+1))
-    # done
 }
 
 
@@ -100,9 +84,6 @@ function main() {
     build_docker_images
     # begin_time=$(date +%s)
     start_services
-    # end_time=$(date +%s)
-    # maximal_duration=$((end_time-begin_time))
-    # echo "Mega service start duration is "$maximal_duration"s" && sleep 1s
 
     validate_megaservice
     # validate_frontend

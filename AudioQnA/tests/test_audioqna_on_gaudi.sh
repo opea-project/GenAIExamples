@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
+echo "IMAGE_REPO=${IMAGE_REPO}"
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -106,14 +107,15 @@ function validate_megaservice() {
 
 function main() {
 
+<<<<<<< HEAD
     # begin_time=$(date +%s)
     build_docker_images
     # start_time=$(date +%s)
+=======
+    stop_docker
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+>>>>>>> source/main
     start_services
-    # end_time=$(date +%s)
-    # minimal_duration=$((end_time-start_time))
-    # maximal_duration=$((end_time-begin_time))
-    # echo "Mega service start duration is "$maximal_duration"s"
 
     # validate_microservices
     validate_megaservice
