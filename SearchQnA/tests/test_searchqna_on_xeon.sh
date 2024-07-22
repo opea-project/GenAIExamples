@@ -121,11 +121,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose down
 }
 
 function main() {

@@ -75,7 +75,7 @@ function start_services() {
         sed -i "s#image: opea/searchqna:latest#image: opea/searchqna:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/searchqna-ui:latest#image: opea/searchqna-ui:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
-        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" docker_compose.yaml
+        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose.yaml
         echo "cat compose.yaml"
         cat compose.yaml
     fi
