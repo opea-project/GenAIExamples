@@ -20,10 +20,10 @@ function build_docker_images() {
     docker build --no-cache -t opea/reranking-tei:latest  -f comps/reranks/tei/docker/Dockerfile .
     docker build --no-cache -t opea/llm-tgi:latest  -f comps/llms/text-generation/tgi/Dockerfile .
 
-    cd ..
-    git clone https://github.com/huggingface/tei-gaudi
-    cd tei-gaudi/
-    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+#    cd ..
+#    git clone https://github.com/huggingface/tei-gaudi
+#    cd tei-gaudi/
+#    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
@@ -37,6 +37,12 @@ function build_docker_images() {
 }
 
 function start_services() {
+    # build tei-gaudi for each test instead of pull from local registry
+    cd $WORKPATH
+    git clone https://github.com/huggingface/tei-gaudi
+    cd tei-gaudi/
+    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+
     cd $WORKPATH/docker/gaudi
     export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
     export GOOGLE_API_KEY=$GOOGLE_API_KEY
@@ -63,17 +69,23 @@ function start_services() {
 
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    # Replace the container name with a test-specific name
-    # echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    # sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/searchqna:latest#image: opea/searchqna:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/searchqna-ui:latest#image: opea/searchqna-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose.yaml
+        echo "cat compose.yaml"
+        cat compose.yaml
+    fi
+
     # Start Docker Containers
-    docker compose -f docker_compose.yaml up -d
+    docker compose up -d
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs tgi-gaudi-server > tgi_service_start.log
-        if grep -q Connected tgi_service_start.log; then
+        docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
+        if grep -q Connected $LOG_PATH/tgi_service_start.log; then
             break
         fi
         sleep 1s
@@ -126,22 +138,14 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose down
 }
 
 function main() {
 
     stop_docker
-    build_docker_images
-    # begin_time=$(date +%s)
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
-    # end_time=$(date +%s)
-    # maximal_duration=$((end_time-begin_time))
-    # echo "Mega service start duration is "$maximal_duration"s" && sleep 1s
 
     validate_megaservice
     # validate_frontend

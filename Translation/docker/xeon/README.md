@@ -54,7 +54,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to set up them in advance as below.
 
 ```bash
 export http_proxy=${your_http_proxy}
@@ -72,7 +72,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 ### Start Microservice Docker Containers
 
 ```bash
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 ### Validate Microservices
