@@ -44,7 +44,7 @@ function validate_codegen() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOG_PATH/gmc_codegen.log ]] && \
-    [[ $(grep -c "print" $LOG_PATH/gmc_codegen.log) != 0 ]]; then
+    [[ $(grep -c "[DONE]" $LOG_PATH/gmc_codegen.log) != 0 ]]; then
         status=true
     fi
     if [ $status == false ]; then
