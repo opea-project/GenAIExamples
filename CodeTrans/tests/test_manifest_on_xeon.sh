@@ -9,36 +9,37 @@ MOUNT_DIR=/home/$USER_ID/charts-mnt
 IMAGE_REPO=${IMAGE_REPO:-}
 IMAGE_TAG=${IMAGE_TAG:-latest}
 
-function init_codegen() {
-    # executed under path manifest/codegen/xeon
+function init_codetrans() {
+    # executed under path manifest/codetrans/xeon
     # replace the mount dir "path: /mnt/model" with "path: $CHART_MOUNT"
     find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/opea-models#path: $MOUNT_DIR#g" {} \;
     # replace megaservice image tag
-    find . -name '*.yaml' -type f -exec sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" {} \;
+    find . -name '*.yaml' -type f -exec sed -i "s#image: opea/codetrans:latest#image: opea/codetrans:${IMAGE_TAG}#g" {} \;
     # replace the repository "image: opea/*" with "image: $IMAGE_REPO/opea/"
     find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}opea/#g" {} \;
     # set huggingface token
     find . -name '*.yaml' -type f -exec sed -i "s#insert-your-huggingface-token-here#$(cat /home/$USER_ID/.cache/huggingface/token)#g" {} \;
 }
 
-function install_codegen {
+function install_codetrans {
     echo "namespace is $NAMESPACE"
     kubectl apply -f . -n $NAMESPACE
 }
 
-function validate_codegen() {
+function validate_codetrans() {
     ip_address=$(kubectl get svc $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.spec.clusterIP}')
     port=$(kubectl get svc $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.spec.ports[0].port}')
-    echo "try to curl http://${ip_address}:${port}/v1/codegen..."
+    echo "try to curl http://${ip_address}:${port}/v1/codetrans..."
 
     # generate a random logfile name to avoid conflict among multiple runners
     LOGFILE=$LOG_PATH/curlmega_$NAMESPACE.log
     # Curl the Mega Service
-    curl http://${ip_address}:${port}/v1/codegen -H "Content-Type: application/json" \
-    -d '{"messages": "def print_hello_world():"}' > $LOGFILE
+    curl http://${ip_address}:${port}/v1/codetrans \
+    -H 'Content-Type: application/json' \
+    -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}' > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-        echo "Megaservice codegen failed, please check the logs in $LOGFILE!"
+        echo "Megaservice codetrans failed, please check the logs in $LOGFILE!"
         exit 1
     fi
 
@@ -62,21 +63,21 @@ if [ $# -eq 0 ]; then
 fi
 
 case "$1" in
-    init_CodeGen)
-        pushd CodeGen/kubernetes/manifests/xeon
-        init_codegen
+    init_CodeTrans)
+        pushd CodeTrans/kubernetes/manifests/xeon
+        init_codetrans
         popd
         ;;
-    install_CodeGen)
-        pushd CodeGen/kubernetes/manifests/xeon
+    install_CodeTrans)
+        pushd CodeTrans/kubernetes/manifests/xeon
         NAMESPACE=$2
-        install_codegen
+        install_codetrans
         popd
         ;;
-    validate_CodeGen)
+    validate_CodeTrans)
         NAMESPACE=$2
-        SERVICE_NAME=codegen
-        validate_codegen
+        SERVICE_NAME=codetrans
+        validate_codetrans
         ;;
     *)
         echo "Unknown function: $1"
