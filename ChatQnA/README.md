@@ -45,7 +45,9 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 1. Set the required environment variables:
 
 ```bash
+# Example: host_ip="192.168.1.1"
 export host_ip="External_Public_IP"
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 export no_proxy="Your_No_Proxy"
 export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
@@ -59,20 +61,29 @@ export https_proxy="Your_HTTPs_Proxy"
 
 3. Set up other environment variables:
 
+> Notice that you can only choose <b>one</b> command below to set up envs according to your hardware. Other that the port numbers may be set incorrectly.
+
 ```bash
-bash ./docker/set_env.sh
+# on Gaudi
+source ./docker/gaudi/set_env.sh
+# on Xeon
+source ./docker/xeon/set_env.sh
+# on Nvidia GPU
+source ./docker/gpu/set_env.sh
 ```
 
 ## Deploy ChatQnA on Gaudi
 
-If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start ChatQnA services. Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
+Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
 docker compose -f docker_compose.yaml up -d
 ```
 
-If your version of `Habana Driver` >= 1.16.0, refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+> Notice: Currently only the <b>Habana Driver 1.16.x</b> is supported for Gaudi.
+
+Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
 ## Deploy ChatQnA on Xeon
 

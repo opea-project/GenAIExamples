@@ -44,6 +44,8 @@ services:
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       MAX_WARMUP_SEQUENCE_LENGTH: 512
+      INIT_HCCL_ON_ACQUIRE: 0
+      ENABLE_EXPERIMENTAL_FLAGS: true
     command: --model-id ${EMBEDDING_MODEL_ID}
   embedding:
     image: opea/embedding-tei:latest
