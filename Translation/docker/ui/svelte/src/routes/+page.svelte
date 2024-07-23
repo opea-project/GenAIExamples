@@ -128,6 +128,8 @@
           rows="25"
           placeholder="Input"
           bind:value={input}
+          data-testid="translate-input"
+
         />
         <textarea
           readonly
@@ -137,6 +139,7 @@
           rows="25"
           placeholder="Translation"
           bind:value={output}
+          data-testid="translate-output"
         />
       </div>
     </div>

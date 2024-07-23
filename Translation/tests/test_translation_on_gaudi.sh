@@ -35,6 +35,8 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
 
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
@@ -151,6 +153,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
