@@ -12,7 +12,7 @@ function build_docker_images() {
     cd $WORKPATH
 
     git clone https://github.com/opea-project/GenAIComps.git
-
+    cd GenAIComps
     docker build --no-cache -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
