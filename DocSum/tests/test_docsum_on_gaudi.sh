@@ -44,6 +44,8 @@ function start_services() {
         sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/docsum-ui:latest#image: opea/docsum-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        echo "cat docker_compose.yaml"
+        cat docker_compose.yaml
     fi
 
     # Start Docker Containers

@@ -43,6 +43,8 @@ function start_services() {
         sed -i "s#image: opea/codetrans:latest#image: opea/codetrans:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/codetrans-ui:latest#image: opea/codetrans-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        echo "cat docker_compose.yaml"
+        cat docker_compose.yaml
     fi
 
     # Start Docker Containers
