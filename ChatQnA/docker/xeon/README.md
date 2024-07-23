@@ -226,21 +226,19 @@ curl http://${host_ip}:6000/v1/embeddings\
   -H 'Content-Type: application/json'
 ```
 
-3. Retriever Microservice  
-   To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+3. Retriever Microservice
 
-```Python
-import random
-embedding = [random.uniform(-1, 1) for _ in range(768)]
-print(embedding)
-```
+To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
+is determined by the embedding model.
+Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
 
-Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
+Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
 
 ```bash
+your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${host_ip}:7000/v1/retrieval \
   -X POST \
-  -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
+  -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
   -H 'Content-Type: application/json'
 ```
 
@@ -369,12 +367,30 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
-## 🚀 Launch the Conversational UI (react)
+## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
 
 ```yaml
-  chaqna-xeon-conversation-ui-server:
+chaqna-gaudi-conversation-ui-server:
+  image: opea/chatqna-conversation-ui:latest
+  container_name: chatqna-gaudi-conversation-ui-server
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+  ports:
+    - "5174:80"
+  depends_on:
+    - chaqna-gaudi-backend-server
+  ipc: host
+  restart: always
+```
+
+Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  chaqna-gaudi-conversation-ui-server:
     image: opea/chatqna-conversation-ui:latest
     ...
     ports:
