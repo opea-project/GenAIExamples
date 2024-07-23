@@ -59,6 +59,7 @@ REDIS_URL = format_redis_conn_from_env()
 
 # Vector Index Configuration
 INDEX_NAME = os.getenv("INDEX_NAME", "rag-redis")
+KEY_INDEX_NAME = os.getenv("KEY_INDEX_NAME", "file-keys")
 
 current_file_path = os.path.abspath(__file__)
 parent_dir = os.path.dirname(current_file_path)
