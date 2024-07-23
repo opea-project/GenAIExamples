@@ -24,8 +24,6 @@ spec:
           serviceName: docsum-llm-uservice
           config:
             endpoint: /v1/chat/docsum
-            HUGGING_FACE_HUB_TOKEN: <HUGGING_FACE_HUB_TOKEN>
-            HF_TOKEN: <HF_TOKEN>
             PORT: "9009"
             TGI_LLM_ENDPOINT: tgi-gaudi-svc
       - name: TgiGaudi
