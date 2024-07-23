@@ -67,7 +67,7 @@ class ChatQnAService:
             service_type=ServiceType.LLM,
         )
         guardrail_out = MicroService(
-            name="guardrail_in",
+            name="guardrail_out",
             host=GUARDRAIL_SERVICE_HOST_IP,
             port=GUARDRAIL_SERVICE_PORT,
             endpoint="/v1/guardrails",
