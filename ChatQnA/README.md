@@ -46,21 +46,27 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 ```bash
 export host_ip="External_Public_IP"
-export no_proxy="Your_No_Proxy"
 export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
 
 ```bash
+export no_proxy="Your_No_Proxy"
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
 ```
 
 3. Set up other environment variables:
 
+> Choose the command that corresponds to your hardware.
 ```bash
-source ./docker/set_env.sh
+# on Gaudi
+source ./docker/gaudi/set_env.sh
+# on Xeon
+source ./docker/xeon/set_env.sh
+# on Nvidia GPU
+source ./docker/gpu/set_env.sh
 ```
 
 ## Deploy ChatQnA on Gaudi

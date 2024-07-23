@@ -226,21 +226,19 @@ curl http://${host_ip}:6000/v1/embeddings\
   -H 'Content-Type: application/json'
 ```
 
-3. Retriever Microservice  
-   To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+3. Retriever Microservice
 
-```Python
-import random
-embedding = [random.uniform(-1, 1) for _ in range(768)]
-print(embedding)
-```
+To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
+is determined by the embedding model.
+Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
 
-Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
+Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
 
 ```bash
+your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${host_ip}:7000/v1/retrieval \
   -X POST \
-  -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
+  -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
   -H 'Content-Type: application/json'
 ```
 
