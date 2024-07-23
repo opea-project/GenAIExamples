@@ -4,7 +4,7 @@
 name: E2E test with GMC
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -56,11 +56,14 @@ jobs:
           echo "KUBECTL_TIMEOUT_SECONDS=60s" >> $GITHUB_ENV
           echo "continue_test=true" >> $GITHUB_ENV
           echo "should_cleanup=false" >> $GITHUB_ENV
-          echo "skip_validate=true" >> $GITHUB_ENV
           echo "APP_NAMESPACE=$APP_NAMESPACE"
 
-      - name: Kubectl install
-        id: install
+      - name: Run tests
+        id: run-test
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
           if [[ ! -f ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh ]]; then
             echo "No test script found, exist test!"
@@ -70,22 +73,13 @@ jobs:
             ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh install_${{ matrix.example }}
             echo "Testing ${{ matrix.example }}, waiting for pod ready..."
             if kubectl rollout status deployment --namespace "$APP_NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
-              echo "Testing gmc ${{ matrix.example }}, waiting for pod ready done!"
-              echo "skip_validate=false" >> $GITHUB_ENV
+              echo "Testing gmc ${{ matrix.example }}, running validation test..."
+              ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh validate_${{ matrix.example }}
             else
               echo "Timeout waiting for pods in namespace $APP_NAMESPACE to be ready!"
               exit 1
             fi
             sleep 60
-          fi
-
-      - name: Validate e2e test
-        if: always()
-        run: |
-          if $skip_validate; then
-            echo "Skip validate"
-          else
-            ${{ github.workspace }}/${{ matrix.example }}/tests/test_gmc_on_${{ matrix.hardware }}.sh validate_${{ matrix.example }}
           fi
 
       - name: Kubectl uninstall
