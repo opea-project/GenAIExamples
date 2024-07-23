@@ -1,70 +1,70 @@
 ---
-# Source: codegen/charts/llm-uservice/templates/configmap.yaml
+# Source: codetrans/charts/llm-uservice/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: codegen-llm-uservice-config
+  name: codetrans-llm-uservice-config
   labels:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
-    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/instance: codetrans
     app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
 data:
-  TGI_LLM_ENDPOINT: "http://codegen-tgi"
+  TGI_LLM_ENDPOINT: "http://codetrans-tgi"
   HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   HF_HOME: "/tmp/.cache/huggingface"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   LANGCHAIN_TRACING_V2: "false"
   LANGCHAIN_API_KEY: insert-your-langchain-key-here
   LANGCHAIN_PROJECT: "opea-llm-uservice"
 ---
-# Source: codegen/charts/tgi/templates/configmap.yaml
+# Source: codetrans/charts/tgi/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: codegen-tgi-config
+  name: codetrans-tgi-config
   labels:
     helm.sh/chart: tgi-0.8.0
     app.kubernetes.io/name: tgi
-    app.kubernetes.io/instance: codegen
-    app.kubernetes.io/version: "1.4"
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
 data:
-  MODEL_ID: "meta-llama/CodeLlama-7b-hf"
+  MODEL_ID: "HuggingFaceH4/mistral-7b-grok"
   PORT: "2080"
   HUGGING_FACE_HUB_TOKEN: "insert-your-huggingface-token-here"
   HF_TOKEN: "insert-your-huggingface-token-here"
   MAX_INPUT_TOKENS: "1024"
   MAX_TOTAL_TOKENS: "4096"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   HABANA_LOGS: "/tmp/habana_logs"
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
 ---
-# Source: codegen/charts/llm-uservice/templates/service.yaml
+# Source: codetrans/charts/llm-uservice/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: codegen-llm-uservice
+  name: codetrans-llm-uservice
   labels:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
-    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/instance: codetrans
     app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -76,21 +76,21 @@ spec:
       name: llm-uservice
   selector:
     app.kubernetes.io/name: llm-uservice
-    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/instance: codetrans
 ---
-# Source: codegen/charts/tgi/templates/service.yaml
+# Source: codetrans/charts/tgi/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: codegen-tgi
+  name: codetrans-tgi
   labels:
     helm.sh/chart: tgi-0.8.0
     app.kubernetes.io/name: tgi
-    app.kubernetes.io/instance: codegen
-    app.kubernetes.io/version: "1.4"
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -101,45 +101,45 @@ spec:
       name: tgi
   selector:
     app.kubernetes.io/name: tgi
-    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/instance: codetrans
 ---
-# Source: codegen/templates/service.yaml
+# Source: codetrans/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: codegen
+  name: codetrans
   labels:
-    helm.sh/chart: codegen-0.8.0
-    app.kubernetes.io/name: codegen
-    app.kubernetes.io/instance: codegen
+    helm.sh/chart: codetrans-0.8.0
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
     app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
   ports:
-    - port: 7778
-      targetPort: 7778
+    - port: 7777
+      targetPort: 7777
       protocol: TCP
-      name: codegen
+      name: codetrans
   selector:
-    app.kubernetes.io/name: codegen
-    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
 ---
-# Source: codegen/charts/llm-uservice/templates/deployment.yaml
+# Source: codetrans/charts/llm-uservice/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: codegen-llm-uservice
+  name: codetrans-llm-uservice
   labels:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
-    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/instance: codetrans
     app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -147,20 +147,20 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: llm-uservice
-      app.kubernetes.io/instance: codegen
+      app.kubernetes.io/instance: codetrans
   template:
     metadata:
       labels:
         app.kubernetes.io/name: llm-uservice
-        app.kubernetes.io/instance: codegen
+        app.kubernetes.io/instance: codetrans
     spec:
       securityContext:
         {}
       containers:
-        - name: codegen
+        - name: codetrans
           envFrom:
             - configMapRef:
-                name: codegen-llm-uservice-config
+                name: codetrans-llm-uservice-config
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -184,7 +184,7 @@ spec:
             exec:
               command:
               - curl
-              - http://codegen-tgi
+              - http://codetrans-tgi
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 120
@@ -194,31 +194,31 @@ spec:
         - name: tmp
           emptyDir: {}
 ---
-# Source: codegen/charts/tgi/templates/deployment.yaml
+# Source: codetrans/charts/tgi/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: codegen-tgi
+  name: codetrans-tgi
   labels:
     helm.sh/chart: tgi-0.8.0
     app.kubernetes.io/name: tgi
-    app.kubernetes.io/instance: codegen
-    app.kubernetes.io/version: "1.4"
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: tgi
-      app.kubernetes.io/instance: codegen
+      app.kubernetes.io/instance: codetrans
   template:
     metadata:
       labels:
         app.kubernetes.io/name: tgi
-        app.kubernetes.io/instance: codegen
+        app.kubernetes.io/instance: codetrans
     spec:
       securityContext:
         {}
@@ -226,10 +226,10 @@ spec:
         - name: tgi
           envFrom:
             - configMapRef:
-                name: codegen-tgi-config
+                name: codetrans-tgi-config
           securityContext:
             {}
-          image: "ghcr.io/huggingface/text-generation-inference:1.4"
+          image: "ghcr.io/huggingface/text-generation-inference:2.1.0"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
@@ -250,41 +250,41 @@ spec:
         - name: tmp
           emptyDir: {}
 ---
-# Source: codegen/templates/deployment.yaml
+# Source: codetrans/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: codegen
+  name: codetrans
   labels:
-    helm.sh/chart: codegen-0.8.0
-    app.kubernetes.io/name: codegen
-    app.kubernetes.io/instance: codegen
+    helm.sh/chart: codetrans-0.8.0
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
     app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: codegen
-      app.kubernetes.io/instance: codegen
+      app.kubernetes.io/name: codetrans
+      app.kubernetes.io/instance: codetrans
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: codegen
-        app.kubernetes.io/instance: codegen
+        app.kubernetes.io/name: codetrans
+        app.kubernetes.io/instance: codetrans
     spec:
       securityContext:
         null
       containers:
-        - name: codegen
+        - name: codetrans
           env:
             - name: LLM_SERVICE_HOST_IP
-              value: codegen-llm-uservice
+              value: codetrans-llm-uservice
             #- name: MEGA_SERVICE_PORT
-            #  value: 7778
+            #  value: 7777
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -295,31 +295,15 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/codegen:latest"
+          image: "opea/codetrans:latest"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /tmp
               name: tmp
           ports:
-            - name: codegen
-              containerPort: 7778
+            - name: codetrans
+              containerPort: 7777
               protocol: TCP
-                #          startupProbe:
-                #            httpGet:
-                #              host: codegen-llm-uservice
-                #              port: 9000
-                #              path: /
-                #            initialDelaySeconds: 5
-                #            periodSeconds: 5
-                #            failureThreshold: 120
-                #          livenessProbe:
-                #            httpGet:
-                #              path: /
-                #              port: 7778
-                #          readinessProbe:
-                #            httpGet:
-                #              path: /
-                #              port: 7778
           resources:
             null
       volumes:
