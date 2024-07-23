@@ -71,9 +71,13 @@ docker compose -f docker_compose.yaml up -d
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
 
-## Deploy with Kubernetes
+## Deploy using Kubernetes with GMC
 
 Please refer to the [Code Translation Kubernetes Guide](./kubernetes/README.md)
+
+## Deploy using Kubernetes without GMC
+
+Please refer to the [Code Translation Kubernetes Guide](./kubernetes/manifests/README.md)
 
 # Consume Code Translation Service
 
