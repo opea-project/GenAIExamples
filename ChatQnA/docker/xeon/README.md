@@ -86,26 +86,8 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 
 ### 4. Build LLM Image
 
-#### Use TGI as backend
-
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
-```
-
-### Use vLLM as backend
-
-Build vLLM docker.
-
-```bash
-git clone https://github.com/vllm-project/vllm.git
-cd ./vllm/
-docker build --no-cache -t vllm:cpu --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu .
-```
-
-Build microservice.
-
-```bash
-docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
 ```
 
 ### 5. Build Dataprep Image
@@ -228,13 +210,13 @@ cd GenAIExamples/ChatQnA/docker/xeon/
 If use TGI backend.
 
 ```bash
-docker compose -f docker_compose.yaml up -d
+docker compose -f compose.yaml up -d
 ```
 
 If use vLLM backend.
 
 ```bash
-docker compose -f docker_compose_vllm.yaml up -d
+docker compose -f compose_vllm.yaml up -d
 ```
 
 ### Validate Microservices
@@ -294,18 +276,10 @@ curl http://${host_ip}:8000/v1/reranking\
 6. LLM backend Service
 
 ```bash
-# TGI service
 curl http://${host_ip}:9009/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
-```
-
-```bash
-#vLLM Service
-curl http://${your_ip}:9009/v1/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
 ```
 
 7. LLM Microservice
@@ -377,7 +351,7 @@ curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
 
 ## Enable LangSmith for Monotoring Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 
@@ -396,7 +370,7 @@ export LANGCHAIN_API_KEY=ls_...
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   chaqna-gaudi-ui-server:
@@ -408,7 +382,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 ## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
 
 ```yaml
 chaqna-gaudi-conversation-ui-server:
@@ -426,7 +400,7 @@ chaqna-gaudi-conversation-ui-server:
   restart: always
 ```
 
-Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   chaqna-gaudi-conversation-ui-server:

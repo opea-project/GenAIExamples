@@ -17,15 +17,15 @@ start the docker containers
 
 ```
 cd ./GenAIExamples/ChatQnA/docker/gaudi
-docker compose -f ./docker_compose.yaml up -d
+docker compose up -d
 ```
 
-Check the start up log by `docker compose -f ./docker/gaudi/docker_compose.yaml logs`.
-Where the docker_compose.yaml file is the mega service docker-compose configuration.
+Check the start up log by `docker compose -f ./docker/gaudi/compose.yaml logs`.
+Where the compose.yaml file is the mega service docker-compose configuration.
 The warning messages point out the veriabls are **NOT** set.
 
 ```
-ubuntu@gaudi-vm:~/GenAIExamples/ChatQnA/docker/gaudi$ docker compose -f ./docker_compose.yaml up -d
+ubuntu@gaudi-vm:~/GenAIExamples/ChatQnA/docker/gaudi$ docker compose -f ./compose.yaml up -d
 WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
 WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
 WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
@@ -34,7 +34,7 @@ WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank st
 WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
 WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
 WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
-WARN[0000] /home/ubuntu/GenAIExamples/ChatQnA/docker/gaudi/docker_compose.yaml: `version` is obsolete
+WARN[0000] /home/ubuntu/GenAIExamples/ChatQnA/docker/gaudi/compose.yaml: `version` is obsolete
 ```
 
 ## 2. Check the docker container status
@@ -118,7 +118,7 @@ Check the log by `docker logs f7a08f9867f9 -t`.
 
 The log indicates the MODLE_ID is not set.
 
-View the docker input parameters in `./ChatQnA/docker/gaudi/docker_compose.yaml`
+View the docker input parameters in `./ChatQnA/docker/gaudi/compose.yaml`
 
 ```
   tgi-service:
@@ -146,10 +146,10 @@ The input MODEL_ID is `${LLM_MODEL_ID}`
 Check environment variable `LLM_MODEL_ID` is set correctly, spelled correctly.
 Set the LLM_MODEL_ID then restart the containers.
 
-Also you can check overall logs with the following command, where the docker_compose.yaml is the mega service docker-compose configuration file.
+Also you can check overall logs with the following command, where the compose.yaml is the mega service docker-compose configuration file.
 
 ```
-docker compose -f ./docker-composer/gaudi/docker_compose.yaml logs
+docker compose -f ./docker-composer/gaudi/compose.yaml logs
 ```
 
 ## 4. Check each micro service used by the Mega Service
