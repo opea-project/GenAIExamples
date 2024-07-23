@@ -11,15 +11,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/../../
 
-    if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git
-    fi
-    cd GenAIComps
-    local CUR=$(git branch --show-current)
-    echo "Check to FAQGen component, Current Branch is ${CUR}"
-    if [ "${CUR}" != "PR318" ] ; then
-        git fetch origin pull/318/head:PR318; git checkout PR318
-    fi
+    git clone https://github.com/opea-project/GenAIComps.git
 
     docker build --no-cache -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/Dockerfile .
 
@@ -93,7 +85,7 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:8008/generate" \
         "generated_text" \
-        "tgi-llm" \
+        "tgi_service" \
         "tgi_xeon_server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
