@@ -36,13 +36,13 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    if [[ "$IMAGE_REPO" != "" ]]; then
-        # Replace the container name with a test-specific name
-        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/faqgen:latest#image: opea/faqgen:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/faqgen-ui:latest#image: opea/faqgen-ui:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
-    fi
+    # if [[ "$IMAGE_REPO" != "" ]]; then
+    #     # Replace the container name with a test-specific name
+    #     echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+    #     sed -i "s#image: opea/faqgen:latest#image: opea/faqgen:${IMAGE_TAG}#g" docker_compose.yaml
+    #     sed -i "s#image: opea/faqgen-ui:latest#image: opea/faqgen-ui:${IMAGE_TAG}#g" docker_compose.yaml
+    #     sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+    # fi
 
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
