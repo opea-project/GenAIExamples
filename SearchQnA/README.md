@@ -41,8 +41,9 @@ To set up environment variables for deploying SearchQnA services, follow these s
 1. Set the required environment variables:
 
 ```bash
+# Example: host_ip="192.168.1.1"
 export host_ip="External_Public_IP"
-# Example: no_proxy="localhost, 127.0.0.1, External_Public_IP"
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 export no_proxy="Your_No_Proxy"
 export GOOGLE_CSE_ID="Your_CSE_ID"
 export GOOGLE_API_KEY="Your_Google_API_Key"

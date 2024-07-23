@@ -29,8 +29,9 @@ To set up environment variables for deploying Code Translation services, follow 
 1. Set the required environment variables:
 
 ```bash
+# Example: host_ip="192.168.1.1"
 export host_ip="External_Public_IP"
-# Example: no_proxy="localhost, 127.0.0.1, External_Public_IP"
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 export no_proxy="Your_No_Proxy"
 export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
