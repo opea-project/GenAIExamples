@@ -33,13 +33,14 @@ To set up environment variables for deploying Document Summarization services, f
 
 ```bash
 export host_ip="External_Public_IP"
+# Example: no_proxy="localhost, 127.0.0.1, External_Public_IP"
+export no_proxy="Your_No_Proxy"
 export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
 
 ```bash
-export no_proxy="Your_No_Proxy"
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
 ```
