@@ -15,8 +15,8 @@ function build_docker_images() {
 
     docker build --no-cache -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/Dockerfile .
 
-    cd $WORKPATH/../../
-    docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f GenAIExamples/FaqGen/docker/Dockerfile .
+    cd $WORKPATH/docker
+    docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
@@ -47,7 +47,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
 
-    sleep 2m # Waits 2 minutes
+    sleep 4m # Waits 4 minutes
 }
 
 function validate_services() {

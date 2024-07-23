@@ -21,7 +21,7 @@ RUN cd /home/user/ && \
 RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
-COPY GenAIExamples/FaqGen/docker/faqgen.py /home/user/faqgen.py
+COPY ./faqgen.py /home/user/faqgen.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
