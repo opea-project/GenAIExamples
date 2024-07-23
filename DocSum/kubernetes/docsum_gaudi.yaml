@@ -18,13 +18,14 @@ spec:
     root:
       routerType: Sequence
       steps:
-      - name: DocSumGaudi
+      - name: DocSum
         data: $response
         internalService:
           serviceName: docsum-llm-uservice
           config:
             endpoint: /v1/chat/docsum
             PORT: "9009"
+            TGI_LLM_ENDPOINT: tgi-gaudi-svc
       - name: TgiGaudi
         internalService:
           serviceName: tgi-gaudi-svc
