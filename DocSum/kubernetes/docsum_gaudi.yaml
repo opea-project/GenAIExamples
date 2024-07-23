@@ -18,7 +18,7 @@ spec:
     root:
       routerType: Sequence
       steps:
-      - name: DocSumGaudi
+      - name: DocSum
         data: $response
         internalService:
           serviceName: docsum-llm-uservice
