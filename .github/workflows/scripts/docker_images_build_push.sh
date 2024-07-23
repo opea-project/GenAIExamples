@@ -57,6 +57,9 @@ case ${micro_service} in
     "llms/summarization/tgi")
         IMAGE_NAME="opea/llm-docsum-tgi"
         ;;
+    "llms/faq-generation/tgi")
+        IMAGE_NAME="opea/llm-faqgen-tgi"
+        ;;
     "web_retrievers/langchain/chroma")
         IMAGE_NAME="opea/web-retriever-chroma"
         ;;
