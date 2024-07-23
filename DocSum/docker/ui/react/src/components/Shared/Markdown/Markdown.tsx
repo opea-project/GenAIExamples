@@ -49,9 +49,6 @@ const Markdown = ({ content }: MarkdownProps) => {
                     // @ts-expect-error inline can be undefined
                     code({ inline, className, children, }) {
                         const lang = /language-(\w+)/.exec(className || '')
-                            // if (lang && lang[1] === "mermaid") {
-                            //     return <Mermaid content={String(children).replace(/\n$/, '')} key={"id"} />
-                            // }
                         return <CodeRender cleanCode={children} inline={inline} language={(lang && lang[1]) || ""} />
                     }
                 }}

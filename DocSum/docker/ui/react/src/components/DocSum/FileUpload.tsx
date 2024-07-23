@@ -14,18 +14,7 @@ export function FileUpload(props: Partial<DropzoneProps>) {
             maxSize={5 * 1024 ** 2}
             multiple={false}
             accept={[
-                // MIME_TYPES.png,
-                // MIME_TYPES.jpeg,
-                // MIME_TYPES.svg,
-                // MIME_TYPES.gif,
-                // MIME_TYPES.webp,
-                // MIME_TYPES.doc,
-                // MIME_TYPES.docx,
-                // MIME_TYPES.pdf,
-                // MIME_TYPES.xls,
-                // MIME_TYPES.xlsx,
                 "text/plain",
-                // "application/json"
             ]}
             style={{ height: '220px', width: '100%', borderColor: 'var(--mantine-color-blue-6)' }}
             {...props}
@@ -68,7 +57,6 @@ export function FileUpload(props: Partial<DropzoneProps>) {
                         </Text>
                         <Text size="md" c="dimmed" inline mt={7}>
                             .txt
-                            {/* pdf, txt, doc, docx, png, jpg ..so on  */}
                         </Text>
                     </div>
 

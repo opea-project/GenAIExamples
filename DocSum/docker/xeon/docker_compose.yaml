@@ -78,11 +78,6 @@ services:
         - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
     ports:
       - "5174:80"
-    environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 
