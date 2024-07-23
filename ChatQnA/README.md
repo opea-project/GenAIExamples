@@ -60,6 +60,7 @@ export https_proxy="Your_HTTPs_Proxy"
 3. Set up other environment variables:
 
 > Choose the command that corresponds to your hardware.
+
 ```bash
 # on Gaudi
 source ./docker/gaudi/set_env.sh
