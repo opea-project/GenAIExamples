@@ -76,12 +76,6 @@ services:
     build:
       args:
         - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
-
-    environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-      - BASIC_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 

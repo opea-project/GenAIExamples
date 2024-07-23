@@ -15,20 +15,12 @@ export interface ConversationMessageProps {
 
 export function ConversationMessage({ human, message, date }: ConversationMessageProps) {
   const dateFormat = () => {
-    // console.log(date)
-    // console.log(new Date(date))
     return DateTime.fromJSDate(new Date(date)).toLocaleString(DateTime.DATETIME_MED)
   }
 
   return (
     <div className={style.conversationMessage}>
       <Group>
-        {/* <Avatar
-          src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png"
-          alt="Jacob Warnhalter"
-          radius="xl"
-        /> */}
-
         {human && <IconUser />}
         {!human && <IconAi />}
 
@@ -44,13 +36,6 @@ export function ConversationMessage({ human, message, date }: ConversationMessag
       <Text pl={54} pt="sm" size="sm">
         {human? message : (<Markdown content={message}/>)}
       </Text>
-
-      {/* <div className={style.header}>
-        {human && <IconUser />}
-        {!human && <IconAi />}
-      </div>
-
-      <div className={style.message}>{message}</div> */}
     </div>
   )
 }
