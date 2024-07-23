@@ -63,11 +63,11 @@ source ./docker/set_env.sh
 
 ## Deploy SearchQnA on Gaudi
 
-Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
+If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start SearchQnA services. Please find corresponding [compose.yaml](./docker/gaudi/compose.yaml).
 
 ```bash
 cd GenAIExamples/SearchQnA/docker/gaudi/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 > Notice: Currently only the <b>Habana Driver 1.16.x</b> is supported for Gaudi.
@@ -76,11 +76,11 @@ Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker imag
 
 ## Deploy SearchQnA on Xeon
 
-Please find corresponding [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
+Please find corresponding [compose.yaml](./docker/xeon/compose.yaml).
 
 ```bash
 cd GenAIExamples/SearchQnA/docker/xeon/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
@@ -118,6 +118,6 @@ curl http://${host_ip}:3001/embed \
     -H 'Content-Type: application/json'
 ```
 
-2. (Docker only) If all microservices work well, please check the port ${host_ip}:3008, the port may be allocated by other users, you can modify the `docker_compose.yaml`.
+2. (Docker only) If all microservices work well, please check the port ${host_ip}:3008, the port may be allocated by other users, you can modify the `compose.yaml`.
 
-3. (Docker only) If you get errors like "The container name is in use", please change container name in `docker_compose.yaml`.
+3. (Docker only) If you get errors like "The container name is in use", please change container name in `compose.yaml`.
