@@ -9,7 +9,7 @@ ENV LANG=en_US.UTF-8
 WORKDIR /root/vllm-ray
 
 # copy the source code to the package directory
-COPY ../../vllm-ray/ /root/vllm-ray
+COPY comps/llms/text-generation/vllm-ray /root/vllm-ray
 
 RUN pip install --upgrade-strategy eager optimum[habana] && \
     pip install git+https://github.com/HabanaAI/DeepSpeed.git@1.15.1

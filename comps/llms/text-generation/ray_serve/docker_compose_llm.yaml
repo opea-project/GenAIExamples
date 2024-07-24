@@ -15,28 +15,32 @@
 version: "3.8"
 
 services:
-  ray_service:
+  ray-service:
     image: ray_serve:habana
-    container_name: ray-service
+    container_name: ray-gaudi-server
     ports:
       - "8008:80"
-    runtime: habana
-    ipc: host
     volumes:
       - "./data:/data"
     environment:
-      OMPI_MCA_btl_vader_single_copy_mechanism: none
-      TRUST_REMOTE_CODE: True
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      LLM_MODEL: ${LLM_MODEL}
-      CHAT_PROCESSOR: ${CHAT_PROCESSOR}
       HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      LLM_MODEL: ${LLM_MODEL}
+      TRUST_REMOTE_CODE: True
+    runtime: habana
     cap_add:
-      - sys_nice
-    command: /bin/bash -c "ray start --head && python api_server_openai.py --port_number 80 --model_id_or_path ${LLM_MODEL} --chat_processor ${CHAT_PROCESSOR} --num_cpus_per_worker 8 --num_hpus_per_worker 1"
+      - SYS_NICE
+    ipc: host
+    command: /bin/bash -c "ray start --head && python api_server_openai.py --port_number 80 --model_id_or_path $LLM_MODEL --chat_processor ChatModelLlama --num_cpus_per_worker 8 --num_hpus_per_worker 1"
   llm:
-    image: opeas/llm-ray:latest
-    container_name: llm-ray-server
+    image: opea/llm-ray:latest
+    container_name: llm-ray-gaudi-server
+    depends_on:
+      - ray-service
     ports:
       - "9000:9000"
     ipc: host
@@ -45,8 +49,8 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       RAY_Serve_ENDPOINT: ${RAY_Serve_ENDPOINT}
-      LLM_MODEL: ${LLM_MODEL}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL: ${LLM_MODEL}
     restart: unless-stopped
 
 networks:

@@ -6,7 +6,6 @@ opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
 prometheus-fastapi-instrumentator
-setuptools==69.5.1
 shortuuid
 transformers
 vllm

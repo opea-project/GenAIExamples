@@ -4,18 +4,18 @@
 version: "3.8"
 
 services:
-  vllm-service:
-    image: vllm:hpu
-    container_name: vllm-gaudi-server
+  vllm-ray-service:
+    image: vllm_ray:habana
+    container_name: vllm-ray-gaudi-server
     ports:
-      - "8008:80"
+      - "8006:8000"
     volumes:
       - "./data:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       LLM_MODEL: ${LLM_MODEL}
@@ -23,12 +23,12 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: /bin/bash -c "export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --enforce-eager --model $LLM_MODEL --tensor-parallel-size 1 --host 0.0.0.0 --port 80"
+    command: /bin/bash -c "ray start --head && python vllm_ray_openai.py --port_number 8000 --model_id_or_path $LLM_MODEL --tensor_parallel_size 2 --enforce_eager False"
   llm:
-    image: opea/llm-vllm:latest
-    container_name: llm-vllm-gaudi-server
+    image: opea/llm-vllm-ray:latest
+    container_name: llm-vllm-ray-gaudi-server
     depends_on:
-      - vllm-service
+      - vllm-ray-service
     ports:
       - "9000:9000"
     ipc: host
@@ -36,7 +36,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      vLLM_ENDPOINT: ${vLLM_ENDPOINT}
+      vLLM_RAY_ENDPOINT: ${vLLM_RAY_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LLM_MODEL: ${LLM_MODEL}
     restart: unless-stopped

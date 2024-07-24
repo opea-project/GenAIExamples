@@ -36,11 +36,11 @@ function start_service() {
         --ipc=host \
         -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
         vllm:hpu \
-        /bin/bash -c "export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --enforce-eager --model $LLM_MODEL  --tensor-parallel-size 1 --host 0.0.0.0 --port 80"
+        /bin/bash -c "export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --enforce-eager --model $LLM_MODEL  --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048"
 
     export vLLM_ENDPOINT="http://${ip_address}:${port_number}"
     docker run -d --rm \
-        --name="test-comps-llm-vllm-server" \
+        --name="test-comps-vllm-microservice" \
         -p 9000:9000 \
         --ipc=host \
         -e vLLM_ENDPOINT=$vLLM_ENDPOINT \
@@ -50,7 +50,7 @@ function start_service() {
 
     # check whether vllm ray is fully ready
     n=0
-    until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+    until [[ "$n" -ge 120 ]] || [[ $ready == true ]]; do
         docker logs test-comps-vllm-service > ${WORKPATH}/tests/test-comps-vllm-service.log
         n=$((n+1))
         if grep -q Connected ${WORKPATH}/tests/test-comps-vllm-service.log; then
@@ -75,7 +75,7 @@ function validate_microservice() {
         -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_p":0.95,"temperature":0.01,"streaming":false}' \
         -H 'Content-Type: application/json'
             docker logs test-comps-vllm-service
-            docker logs test-comps-llm-vllm-server
+            docker logs test-comps-vllm-microservice
         }
 
 function stop_docker() {

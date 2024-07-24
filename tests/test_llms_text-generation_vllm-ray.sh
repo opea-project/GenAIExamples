@@ -9,10 +9,10 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     ## Build VLLM Ray docker
-    cd $WORKPATH/comps/llms/text-generation/vllm-ray/docker
+    cd $WORKPATH
     docker build \
-        -f Dockerfile.vllmray  \
-        -t vllm_ray:habana --network=host ../../
+        -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray  \
+        -t vllm_ray:habana --network=host .
 
     ## Build OPEA microservice docker
     cd $WORKPATH
