@@ -105,9 +105,13 @@ docker compose -f docker_compose.yaml up -d
 
 Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for more instructions on building docker images from source.
 
-## Deploy ChatQnA into Kubernetes on Xeon & Gaudi
+## Deploy ChatQnA into Kubernetes on Xeon & Gaudi with GMC
 
-Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
+Refer to the [Kubernetes Guide](./kubernetes/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi with GMC.
+
+## Deploy ChatQnA into Kubernetes on Xeon & Gaudi without GMC
+
+Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi without GMC.
 
 ## Deploy ChatQnA into Kubernetes using Helm Chart
 
