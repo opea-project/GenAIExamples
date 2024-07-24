@@ -24,9 +24,13 @@ Here're some of the project's features:
 2. cd command to the current folder.
 
 3. Modify the required .env variables.
+
    ```
    DOC_BASE_URL = ''
+
+   UPLOAD_FILE_BASE_URL = ''
    ```
+
 4. Execute `npm install` to install the corresponding dependencies.
 
 5. Execute `npm run dev` in both environments
