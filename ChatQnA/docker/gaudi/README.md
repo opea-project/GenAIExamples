@@ -33,8 +33,54 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 
 ### 5. Build LLM Image
 
+You can use different LLM serving solutions, choose one of following four options.
+
+#### 5.1 Use TGI
+
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+```
+
+#### 5.2 Use VLLM
+
+Build vllm docker.
+
+```bash
+docker build --no-cache -t vllm:hpu --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.hpu .
+```
+
+Build microservice docker.
+
+```bash
+docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
+```
+
+#### 5.3 Use VLLM-on-Ray
+
+Build vllm-on-ray docker.
+
+```bash
+docker build --no-cache -t vllm_ray:habana --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray .
+```
+
+Build microservice docker.
+
+```bash
+docker build --no-cache -t opea/llm-vllm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice .
+```
+
+#### 5.4 Use Ray Serve
+
+Build Ray Serve docker.
+
+```bash
+docker build --no-cache -t ray_serve:habana --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.rayserve .
+```
+
+Build microservice docker.
+
+```bash
+docker build --no-cache -t opea/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice .
 ```
 
 ### 6. Build Dataprep Image
@@ -113,7 +159,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 1. `opea/embedding-tei:latest`
 2. `opea/retriever-redis:latest`
 3. `opea/reranking-tei:latest`
-4. `opea/llm-tgi:latest`
+4. `opea/llm-tgi:latest` or `opea/llm-vllm:latest` or `opea/llm-vllm-ray:latest` or `opea/llm-ray:latest`
 5. `opea/tei-gaudi:latest`
 6. `opea/dataprep-redis:latest`
 7. `opea/chatqna:latest` or `opea/chatqna-guardrails:latest`
@@ -140,9 +186,14 @@ export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID_NAME="neural-chat-7b-v3-3"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
+export vLLM_LLM_ENDPOINT="http://${host_ip}:8008"
+export vLLM_RAY_LLM_ENDPOINT="http://${host_ip}:8008"
+export RAY_Serve_LLM_ENDPOINT="http://${host_ip}:8008"
+export LLM_SERVICE_PORT=9000
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
@@ -171,7 +222,30 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
+```
+
+If use tgi for llm backend.
+
+```bash
 docker compose -f docker_compose.yaml up -d
+```
+
+If use vllm for llm backend.
+
+```bash
+docker compose -f docker_compose_vllm.yaml up -d
+```
+
+If use vllm-on-ray for llm backend.
+
+```bash
+docker compose -f docker_compose_vllm_ray.yaml up -d
+```
+
+If use ray serve for llm backend.
+
+```bash
+docker compose -f docker_compose_ray_serve.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
@@ -238,13 +312,40 @@ curl http://${host_ip}:8000/v1/reranking \
   -H 'Content-Type: application/json'
 ```
 
-6. TGI Service
+6. LLM backend Service
 
 ```bash
+#TGI Service
 curl http://${host_ip}:8008/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
   -H 'Content-Type: application/json'
+```
+
+```bash
+#vLLM Service
+curl http://${your_ip}:8008/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "${LLM_MODEL_ID}",
+  "prompt": "What is Deep Learning?",
+  "max_tokens": 32,
+  "temperature": 0
+  }'
+```
+
+```bash
+#vLLM-on-Ray Service
+curl http://${your_ip}:8008/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "${LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
+```
+
+```bash
+#Ray Serve Service
+curl http://${your_ip}:8008/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "${LLM_MODEL_ID_NAME}", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 32 }'
 ```
 
 7. LLM Microservice
