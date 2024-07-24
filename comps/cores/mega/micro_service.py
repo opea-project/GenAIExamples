@@ -28,7 +28,6 @@ class MicroService:
         endpoint: Optional[str] = "/",
         input_datatype: Type[Any] = TextDoc,
         output_datatype: Type[Any] = TextDoc,
-        replicas: int = 1,
         provider: Optional[str] = None,
         provider_endpoint: Optional[str] = None,
         use_remote_service: Optional[bool] = False,
@@ -53,7 +52,6 @@ class MicroService:
             self.uvicorn_kwargs["ssl_certfile"] = ssl_certfile
 
         if not use_remote_service:
-            self.replicas = replicas
             self.provider = provider
             self.provider_endpoint = provider_endpoint
             self.endpoints = []
@@ -154,7 +152,6 @@ def register_microservice(
     endpoint: Optional[str] = "/",
     input_datatype: Type[Any] = TextDoc,
     output_datatype: Type[Any] = TextDoc,
-    replicas: int = 1,
     provider: Optional[str] = None,
     provider_endpoint: Optional[str] = None,
 ):
@@ -171,7 +168,6 @@ def register_microservice(
             endpoint=endpoint,
             input_datatype=input_datatype,
             output_datatype=output_datatype,
-            replicas=replicas,
             provider=provider,
             provider_endpoint=provider_endpoint,
         )
