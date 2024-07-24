@@ -46,15 +46,15 @@ docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy 
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `opea/gen-ai-comps:llm-tgi-server`
-2. `opea/gen-ai-comps:translation-megaservice-server`
-3. `opea/gen-ai-comps:translation-ui-server`
+1. `opea/llm-tgi:latest`
+2. `opea/translation:latest`
+3. `opea/translation-ui:latest`
 
 ## 🚀 Start Microservices
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to set up them in advance as below.
 
 ```bash
 export http_proxy=${your_http_proxy}
@@ -72,7 +72,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 ### Start Microservice Docker Containers
 
 ```bash
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 ### Validate Microservices

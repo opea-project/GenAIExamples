@@ -24,10 +24,11 @@ spec:
           serviceName: codetrans-service
           config:
             endpoint: /v1/chat/completions
+            TGI_LLM_ENDPOINT: tgi-service
       - name: Tgi
         internalService:
           serviceName: tgi-service
           config:
-            LLM_MODEL_ID: HuggingFaceH4/mistral-7b-grok
+            MODEL_ID: HuggingFaceH4/mistral-7b-grok
             endpoint: /generate
           isDownstreamService: true
