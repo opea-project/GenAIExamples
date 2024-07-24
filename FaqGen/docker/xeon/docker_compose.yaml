@@ -1,0 +1,72 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  tgi_service:
+    image: ghcr.io/huggingface/text-generation-inference:1.4
+    container_name: tgi_xeon_server
+    ports:
+      - "8008:80"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    command: --model-id ${LLM_MODEL_ID}
+  llm_faqgen:
+    image: opea/llm-faqgen-tgi:latest
+    container_name: llm-faqgen-server
+    depends_on:
+      - tgi_service
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
+    restart: unless-stopped
+  faqgen-xeon-backend-server:
+    image: opea/faqgen:latest
+    container_name: faqgen-xeon-backend-server
+    depends_on:
+      - tgi_service
+      - llm_faqgen
+    ports:
+      - "8888:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  faqgen-xeon-ui-server:
+    image: opea/faqgen-ui:latest
+    container_name: faqgen-xeon-ui-server
+    depends_on:
+      - faqgen-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+networks:
+  default:
+    driver: bridge
