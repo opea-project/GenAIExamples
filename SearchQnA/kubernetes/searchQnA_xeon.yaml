@@ -1,0 +1,65 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: gmc.opea.io/v1alpha3
+kind: GMConnector
+metadata:
+  labels:
+    app.kubernetes.io/name: gmconnector
+    app.kubernetes.io/managed-by: kustomize
+    gmc/platform: xeon
+  name: searchqa
+  namespace: searchqa
+spec:
+  routerConfig:
+    name: router
+    serviceName: router-service
+  nodes:
+    root:
+      routerType: Sequence
+      steps:
+      - name: Embedding
+        internalService:
+          serviceName: embedding-svc
+          config:
+            endpoint: /v1/embeddings
+            TEI_EMBEDDING_ENDPOINT: tei-embedding-svc
+      - name: TeiEmbedding
+        internalService:
+          serviceName: tei-embedding-svc
+          isDownstreamService: true
+      - name: WebRetriever
+        data: $response
+        internalService:
+          serviceName: web-retriever-svc
+          config:
+            endpoint: /v1/web_retrieval
+            TEI_EMBEDDING_ENDPOINT: tei-embedding-svc
+            GOOGLE_API_KEY: "insert-your-google-api-key-here"
+            GOOGLE_CSE_ID: "insert-your-google-cse-id-here"
+      - name: Reranking
+        data: $response
+        internalService:
+          serviceName: reranking-svc
+          config:
+            endpoint: /v1/reranking
+            TEI_RERANKING_ENDPOINT: tei-reranking-svc
+      - name: TeiReranking
+        internalService:
+          serviceName: tei-reranking-svc
+          config:
+            endpoint: /rerank
+          isDownstreamService: true
+      - name: Llm
+        data: $response
+        internalService:
+          serviceName: llm-svc
+          config:
+            endpoint: /v1/chat/completions
+            TGI_LLM_ENDPOINT: tgi-service-m
+      - name: Tgi
+        internalService:
+          serviceName: tgi-service-m
+          config:
+            endpoint: /generate
+          isDownstreamService: true
