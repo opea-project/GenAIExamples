@@ -38,15 +38,15 @@ function build_docker_images() {
 
 function start_services() {
 # build tei-gaudi for each test instead of pull from local registry
-cd $WORKPATH
-git clone https://github.com/huggingface/tei-gaudi
-cd tei-gaudi/
-docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+    cd $WORKPATH
+    git clone https://github.com/huggingface/tei-gaudi
+    cd tei-gaudi/
+    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
-cd $WORKPATH/docker/gaudi
-export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
-export GOOGLE_API_KEY=$GOOGLE_API_KEY
-export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
+    cd $WORKPATH/docker/gaudi
+    export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
+    export GOOGLE_API_KEY=$GOOGLE_API_KEY
+    export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
 
     export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
     export TEI_EMBEDDING_ENDPOINT=http://$ip_address:3001
@@ -71,28 +71,28 @@ export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-if [[ "$IMAGE_REPO" != "" ]]; then
-    # Replace the container name with a test-specific name
-    echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    sed -i "s#image: opea/searchqna:latest#image: opea/searchqna:${IMAGE_TAG}#g" compose.yaml
-    sed -i "s#image: opea/searchqna-ui:latest#image: opea/searchqna-ui:${IMAGE_TAG}#g" compose.yaml
-    sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
-    sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose.yaml
-    echo "cat compose.yaml"
-    cat compose.yaml
-fi
-
-# Start Docker Containers
-docker compose up -d
-n=0
-until [[ "$n" -ge 500 ]]; do
-    docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
-    if grep -q Connected $LOG_PATH/tgi_service_start.log; then
-        break
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/searchqna:latest#image: opea/searchqna:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/searchqna-ui:latest#image: opea/searchqna-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose.yaml
+        echo "cat compose.yaml"
+        cat compose.yaml
     fi
-    sleep 1s
-    n=$((n+1))
-done
+
+    # Start Docker Containers
+    docker compose up -d
+    n=0
+    until [[ "$n" -ge 500 ]]; do
+        docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
+        if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 
@@ -114,41 +114,41 @@ function validate_megaservice() {
 }
 
 function validate_frontend() {
-cd $WORKPATH/docker/ui/svelte
-local conda_env_name="OPEA_e2e"
+    cd $WORKPATH/docker/ui/svelte
+    local conda_env_name="OPEA_e2e"
 
-export PATH=${HOME}/miniforge3/bin/:$PATH
-#    conda remove -n ${conda_env_name} --all -y
-#    conda create -n ${conda_env_name} python=3.12 -y
-source activate ${conda_env_name}
+    export PATH=${HOME}/miniforge3/bin/:$PATH
+    #    conda remove -n ${conda_env_name} --all -y
+    #    conda create -n ${conda_env_name} python=3.12 -y
+    source activate ${conda_env_name}
 
-sed -i "s/localhost/$ip_address/g" playwright.config.ts
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-#    conda install -c conda-forge nodejs -y
-npm install && npm ci && npx playwright install --with-deps
-node -v && npm -v && pip list
+    #    conda install -c conda-forge nodejs -y
+    npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
 
-exit_status=0
-npx playwright test || exit_status=$?
+    exit_status=0
+    npx playwright test || exit_status=$?
 
-if [ $exit_status -ne 0 ]; then
-    echo "[TEST INFO]: ---------frontend test failed---------"
-    exit $exit_status
-else
-    echo "[TEST INFO]: ---------frontend test passed---------"
-fi
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------frontend test failed---------"
+        exit $exit_status
+    else
+        echo "[TEST INFO]: ---------frontend test passed---------"
+    fi
 }
 
 function stop_docker() {
-cd $WORKPATH/docker/gaudi
-docker compose down
+    cd $WORKPATH/docker/gaudi
+    docker compose down
 }
 
 function main() {
 
-stop_docker
-if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
-start_services
+    stop_docker
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    start_services
 
     validate_megaservice
     validate_frontend
