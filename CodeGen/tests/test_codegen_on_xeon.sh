@@ -15,6 +15,8 @@ function build_docker_images() {
 
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
 
+    docker pull ghcr.io/huggingface/text-generation-inference:1.4
+
     cd $WORKPATH/docker
     docker build --no-cache -t opea/codegen:latest -f Dockerfile .
 
