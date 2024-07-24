@@ -1,161 +1,161 @@
-    #!/bin/bash
-    # Copyright (C) 2024 Intel Corporation
-    # SPDX-License-Identifier: Apache-2.0
+#!/bin/bash
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
-    # for test
+# for test
 
-    set -xe
+set -xe
 
-    WORKPATH=$(dirname "$PWD")
-    LOG_PATH="$WORKPATH/tests"
-    ip_address=$(hostname -I | awk '{print $1}')
+WORKPATH=$(dirname "$PWD")
+LOG_PATH="$WORKPATH/tests"
+ip_address=$(hostname -I | awk '{print $1}')
 
-    function build_docker_images() {
-        cd $WORKPATH
-        git clone https://github.com/opea-project/GenAIComps.git
-        cd GenAIComps
+function build_docker_images() {
+    cd $WORKPATH
+    git clone https://github.com/opea-project/GenAIComps.git
+    cd GenAIComps
 
-        docker build --no-cache -t opea/embedding-tei:latest  -f comps/embeddings/langchain/docker/Dockerfile .
-        docker build --no-cache -t opea/web-retriever-chroma:latest  -f comps/web_retrievers/langchain/chroma/docker/Dockerfile .
-        docker build --no-cache -t opea/reranking-tei:latest  -f comps/reranks/tei/docker/Dockerfile .
-        docker build --no-cache -t opea/llm-tgi:latest  -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build --no-cache -t opea/embedding-tei:latest  -f comps/embeddings/langchain/docker/Dockerfile .
+    docker build --no-cache -t opea/web-retriever-chroma:latest  -f comps/web_retrievers/langchain/chroma/docker/Dockerfile .
+    docker build --no-cache -t opea/reranking-tei:latest  -f comps/reranks/tei/docker/Dockerfile .
+    docker build --no-cache -t opea/llm-tgi:latest  -f comps/llms/text-generation/tgi/Dockerfile .
 
 #    cd ..
 #    git clone https://github.com/huggingface/tei-gaudi
 #    cd tei-gaudi/
 #    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
-        docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-        docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
-        cd $WORKPATH/docker
-        docker build --no-cache -t opea/searchqna:latest -f Dockerfile .
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+    cd $WORKPATH/docker
+    docker build --no-cache -t opea/searchqna:latest -f Dockerfile .
 
-        cd $WORKPATH/docker/ui
-        docker build --no-cache -t opea/searchqna-ui:latest -f docker/Dockerfile .
+    cd $WORKPATH/docker/ui
+    docker build --no-cache -t opea/searchqna-ui:latest -f docker/Dockerfile .
 
-        docker images
-    }
+    docker images
+}
 
 function start_services() {
-    # build tei-gaudi for each test instead of pull from local registry
-    cd $WORKPATH
-    git clone https://github.com/huggingface/tei-gaudi
-    cd tei-gaudi/
-    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+# build tei-gaudi for each test instead of pull from local registry
+cd $WORKPATH
+git clone https://github.com/huggingface/tei-gaudi
+cd tei-gaudi/
+docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
-    cd $WORKPATH/docker/gaudi
-    export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
-    export GOOGLE_API_KEY=$GOOGLE_API_KEY
-    export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
+cd $WORKPATH/docker/gaudi
+export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
+export GOOGLE_API_KEY=$GOOGLE_API_KEY
+export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
 
-        export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
-        export TEI_EMBEDDING_ENDPOINT=http://$ip_address:3001
-        export RERANK_MODEL_ID=BAAI/bge-reranker-base
-        export TEI_RERANKING_ENDPOINT=http://$ip_address:3004
+    export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
+    export TEI_EMBEDDING_ENDPOINT=http://$ip_address:3001
+    export RERANK_MODEL_ID=BAAI/bge-reranker-base
+    export TEI_RERANKING_ENDPOINT=http://$ip_address:3004
 
-        export TGI_LLM_ENDPOINT=http://$ip_address:3006
-        export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
+    export TGI_LLM_ENDPOINT=http://$ip_address:3006
+    export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
 
-        export MEGA_SERVICE_HOST_IP=${ip_address}
-        export EMBEDDING_SERVICE_HOST_IP=${ip_address}
-        export WEB_RETRIEVER_SERVICE_HOST_IP=${ip_address}
-        export RERANK_SERVICE_HOST_IP=${ip_address}
-        export LLM_SERVICE_HOST_IP=${ip_address}
+    export MEGA_SERVICE_HOST_IP=${ip_address}
+    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
+    export WEB_RETRIEVER_SERVICE_HOST_IP=${ip_address}
+    export RERANK_SERVICE_HOST_IP=${ip_address}
+    export LLM_SERVICE_HOST_IP=${ip_address}
 
-        export EMBEDDING_SERVICE_PORT=3002
-        export WEB_RETRIEVER_SERVICE_PORT=3003
-        export RERANK_SERVICE_PORT=3005
-        export LLM_SERVICE_PORT=3007
-        export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
+    export EMBEDDING_SERVICE_PORT=3002
+    export WEB_RETRIEVER_SERVICE_PORT=3003
+    export RERANK_SERVICE_PORT=3005
+    export LLM_SERVICE_PORT=3007
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
 
 
-        sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    if [[ "$IMAGE_REPO" != "" ]]; then
-        # Replace the container name with a test-specific name
-        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/searchqna:latest#image: opea/searchqna:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/searchqna-ui:latest#image: opea/searchqna-ui:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
-        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose.yaml
-        echo "cat compose.yaml"
-        cat compose.yaml
+if [[ "$IMAGE_REPO" != "" ]]; then
+    # Replace the container name with a test-specific name
+    echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+    sed -i "s#image: opea/searchqna:latest#image: opea/searchqna:${IMAGE_TAG}#g" compose.yaml
+    sed -i "s#image: opea/searchqna-ui:latest#image: opea/searchqna-ui:${IMAGE_TAG}#g" compose.yaml
+    sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+    sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose.yaml
+    echo "cat compose.yaml"
+    cat compose.yaml
+fi
+
+# Start Docker Containers
+docker compose up -d
+n=0
+until [[ "$n" -ge 500 ]]; do
+    docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
+    if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+        break
     fi
-
-    # Start Docker Containers
-    docker compose up -d
-    n=0
-    until [[ "$n" -ge 500 ]]; do
-        docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
-        if grep -q Connected $LOG_PATH/tgi_service_start.log; then
-            break
-        fi
-        sleep 1s
-        n=$((n+1))
-    done
+    sleep 1s
+    n=$((n+1))
+done
 }
 
 
-    function validate_megaservice() {
-        result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the latest news? Give me also the source link", "stream": "False"}' -H 'Content-Type: application/json')
-        echo $result
+function validate_megaservice() {
+    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the latest news? Give me also the source link", "stream": "False"}' -H 'Content-Type: application/json')
+    echo $result
 
-        if [[ $result == *"news"* ]]; then
-            echo "Result correct."
-        else
-            docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
-            docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
-            docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
-            docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
-            echo "Result wrong."
-            exit 1
-        fi
+    if [[ $result == *"news"* ]]; then
+        echo "Result correct."
+    else
+        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
+        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
+        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
+        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
+        echo "Result wrong."
+        exit 1
+    fi
 
-    }
+}
 
 function validate_frontend() {
-   cd $WORKPATH/docker/ui/svelte
-   local conda_env_name="OPEA_e2e"
+cd $WORKPATH/docker/ui/svelte
+local conda_env_name="OPEA_e2e"
 
-   export PATH=${HOME}/miniforge3/bin/:$PATH
+export PATH=${HOME}/miniforge3/bin/:$PATH
 #    conda remove -n ${conda_env_name} --all -y
 #    conda create -n ${conda_env_name} python=3.12 -y
-   source activate ${conda_env_name}
+source activate ${conda_env_name}
 
-    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    #    conda install -c conda-forge nodejs -y
-    npm install && npm ci && npx playwright install --with-deps
-    node -v && npm -v && pip list
+#    conda install -c conda-forge nodejs -y
+npm install && npm ci && npx playwright install --with-deps
+node -v && npm -v && pip list
 
-    exit_status=0
-    npx playwright test || exit_status=$?
+exit_status=0
+npx playwright test || exit_status=$?
 
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
-    }
-
-function stop_docker() {
-    cd $WORKPATH/docker/gaudi
-    docker compose down
+if [ $exit_status -ne 0 ]; then
+    echo "[TEST INFO]: ---------frontend test failed---------"
+    exit $exit_status
+else
+    echo "[TEST INFO]: ---------frontend test passed---------"
+fi
 }
 
-    function main() {
+function stop_docker() {
+cd $WORKPATH/docker/gaudi
+docker compose down
+}
+
+function main() {
+
+stop_docker
+if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+start_services
+
+    validate_megaservice
+    validate_frontend
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
-    start_services
+    echo y | docker system prune
 
-        validate_megaservice
-        validate_frontend
+}
 
-        stop_docker
-        echo y | docker system prune
-
-    }
-
-    main
+main
