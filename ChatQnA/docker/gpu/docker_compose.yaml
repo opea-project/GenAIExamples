@@ -39,7 +39,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-    command: --model-id ${EMBEDDING_MODEL_ID}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
     deploy:
       resources:
         reservations:
@@ -97,7 +97,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-    command: --model-id ${RERANK_MODEL_ID}
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
     deploy:
       resources:
         reservations:
