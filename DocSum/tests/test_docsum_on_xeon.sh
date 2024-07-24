@@ -49,7 +49,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
 
-    sleep 2m # Waits 2 minutes
+    sleep 5m # Waits 5 minutes
 }
 
 function validate_services() {
