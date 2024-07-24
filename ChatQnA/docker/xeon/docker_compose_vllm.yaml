@@ -30,23 +30,15 @@ services:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-embedding-server
     ports:
-      - "8090:80"
+      - "6006:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
-    ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-    command: --model-id ${EMBEDDING_MODEL_ID}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
     image: opea/embedding-tei:latest
     container_name: embedding-tei-server
@@ -78,6 +70,7 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-retriever-service"
@@ -97,17 +90,10 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-    command: --model-id ${RERANK_MODEL_ID}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
     image: opea/reranking-tei:latest
-    container_name: reranking-tei-server
+    container_name: reranking-tei-xeon-server
     depends_on:
       - tei-reranking-service
     ports:
@@ -125,34 +111,26 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
-  tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.0
-    container_name: tgi-server
+  vllm_service:
+    image: vllm:cpu
+    container_name: vllm-service
     ports:
-      - "8008:80"
+      - "9009:80"
     volumes:
       - "./data:/data"
+    shm_size: 128g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-    ipc: host
-    command: --model-id ${LLM_MODEL_ID}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
   llm:
-    image: opea/llm-tgi:latest
-    container_name: llm-tgi-server
+    image: opea/llm-vllm:latest
+    container_name: llm-vllm-server
     depends_on:
-      - tgi-service
+      - vllm_service
     ports:
       - "9000:9000"
     ipc: host
@@ -160,17 +138,18 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      vLLM_ENDPOINT: ${vLLM_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL: ${LLM_MODEL_ID}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
-  chaqna-backend-server:
+  chaqna-xeon-backend-server:
     image: opea/chatqna:latest
-    container_name: chatqna-backend-server
+    container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
       - tei-embedding-service
@@ -178,7 +157,7 @@ services:
       - retriever
       - tei-reranking-service
       - reranking
-      - tgi-service
+      - vllm_service
       - llm
     ports:
       - "8888:8888"
@@ -193,11 +172,11 @@ services:
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  chaqna-ui-server:
+  chaqna-xeon-ui-server:
     image: opea/chatqna-ui:latest
-    container_name: chatqna-ui-server
+    container_name: chatqna-xeon-ui-server
     depends_on:
-      - chaqna-backend-server
+      - chaqna-xeon-backend-server
     ports:
       - "5173:5173"
     environment:
@@ -208,6 +187,19 @@ services:
       - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
       - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
       - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
+    ipc: host
+    restart: always
+  chaqna-xeon-conversation-ui-server:
+    image: opea/chatqna-conversation-ui:latest
+    container_name: chatqna-xeon-conversation-ui-server
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ports:
+        - 5174:80
+    depends_on:
+        - chaqna-xeon-backend-server
     ipc: host
     restart: always
 
