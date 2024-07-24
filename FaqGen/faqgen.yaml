@@ -1,0 +1,44 @@
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+opea_micro_services:
+  tgi_service:
+    host: ${TGI_SERVICE_IP}
+    ports: ${TGI_SERVICE_PORT}
+    image: ghcr.io/huggingface/tgi-gaudi:1.2.1
+    volumes:
+      - "./data:/data"
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    environment:
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    model-id: ${LLM_MODEL_ID}
+  llm:
+    host: ${LLM_SERVICE_HOST_IP}
+    ports: ${LLM_SERVICE_PORT}
+    image: opea/llm-tgi:latest
+    endpoint: /v1/chat/completions
+    environment:
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+  ui:
+    host: ${UI_SERVICE_HOST_IP}
+    ports:
+      - "5173:5173"
+    image: opea/faqgen-ui:latest
+    environment:
+      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+
+opea_mega_service:
+  host: ${MEGA_SERVICE_HOST_IP}
+  ports: ${MEGA_SERVICE_PORT}
+  image: opea/faqgen:latest
+  endpoint: /v1/faqgen
+  mega_flow:
+    - llm
