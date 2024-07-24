@@ -14,6 +14,8 @@ In the below example we illustrate on Xeon.
 export APP_NAMESPACE=CT
 kubectl create ns $APP_NAMESPACE
 sed -i "s|namespace: searchqa|namespace: $APP_NAMESPACE|g"  ./searchQnA_xeon.yaml
+sed -i "s|insert-your-google-api-key-here|$GOOGLE_API_KEY|g"  ./searchQnA_xeon.yaml
+sed -i "s|insert-your-google-cse-id-here|$GOOGLE_CSE_ID|g"  ./searchQnA_xeon.yaml
 kubectl apply -f ./searchQnA_xeon.yaml
 ```
 
