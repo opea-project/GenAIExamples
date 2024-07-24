@@ -37,7 +37,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-# build tei-gaudi for each test instead of pull from local registry
+    # build tei-gaudi for each test instead of pull from local registry
     cd $WORKPATH
     git clone https://github.com/huggingface/tei-gaudi
     cd tei-gaudi/
