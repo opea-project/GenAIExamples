@@ -23,7 +23,7 @@ Here're some of the project's features:
 
 3. Modify the required .env variables.
    ```
-   BASIC_URL = ''
+   DOC_BASE_URL = ''
    ```
 4. Execute `npm install` to install the corresponding dependencies.
 
