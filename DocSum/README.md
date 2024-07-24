@@ -86,6 +86,12 @@ Please refer to [Kubernetes deployment](./kubernetes/README.md)
 
 Please refer to [Kubernetes deployment](./kubernetes/manifests/README.md)
 
+## Deploy DocSum into Kubernetes using Helm Chart
+
+Install Helm (version >= 3.15) first. Please refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
+
+Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum) for instructions on deploying DocSum into Kubernetes on Xeon & Gaudi.
+
 # Consume Document Summarization Service
 
 Two ways of consuming Document Summarization Service:

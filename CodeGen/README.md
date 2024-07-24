@@ -89,6 +89,12 @@ Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on buil
 
 Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
 
+## Deploy CodeGen into Kubernetes using Helm Chart
+
+Install Helm (version >= 3.15) first. Please refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
+
+Refer to the [CodeGen helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/codegen) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
+
 # Consume CodeGen Service
 
 Two ways of consuming CodeGen Service:

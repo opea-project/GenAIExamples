@@ -83,6 +83,12 @@ Please refer to the [Code Translation Kubernetes Guide](./kubernetes/README.md)
 
 Please refer to the [Code Translation Kubernetes Guide](./kubernetes/manifests/README.md)
 
+## Deploy CodeTrans into Kubernetes using Helm Chart
+
+Install Helm (version >= 3.15) first. Please refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
+
+Refer to the [CodeTrans helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/codetrans) for instructions on deploying CodeTrans into Kubernetes on Xeon & Gaudi.
+
 # Consume Code Translation Service
 
 Two ways of consuming Code Translation Service:

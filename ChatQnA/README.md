@@ -109,6 +109,12 @@ Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for more instructions on
 
 Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
 
+## Deploy ChatQnA into Kubernetes using Helm Chart
+
+Install Helm (version >= 3.15) first. Please refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
+
+Refer to the [ChatQnA helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/chatqna) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
+
 ## Deploy ChatQnA on AI PC
 
 Refer to the [AI PC Guide](./docker/aipc/README.md) for instructions on deploying ChatQnA on AI PC.
