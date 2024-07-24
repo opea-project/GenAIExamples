@@ -22,7 +22,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
         name: tei-embedding-service-deploy
         args:
         - --model-id

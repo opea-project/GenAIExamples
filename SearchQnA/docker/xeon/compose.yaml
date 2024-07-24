@@ -6,7 +6,7 @@ version: "3.8"
 
 services:
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
     ports:
       - "3001:80"
@@ -51,7 +51,7 @@ services:
       GOOGLE_CSE_ID: ${GOOGLE_CSE_ID}
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-reranking-server
     ports:
       - "3004:80"
