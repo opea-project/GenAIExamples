@@ -38,11 +38,21 @@ cd GenAIExamples/CodeGen/docker/ui/
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
+### 5. Build the React UI Docker Image
+
+Construct the React frontend Docker image via the command below:
+
+```bash
+cd GenAIExamples/CodeGen/docker/ui/
+docker build -t opea/codegen-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+```
+
 Then run the command `docker images`, you will have the following 3 Docker images:
 
 - `opea/llm-tgi:latest`
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
+- `opea/codegen-react-ui:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -143,12 +153,12 @@ export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=ls_...
 ```
 
-## 🚀 Launch the UI
+## 🚀 Launch the Svelte Based UI
 
 To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
 
 ```yaml
-  codegen-xeon-ui-server:
+  codegen-gaudi-ui-server:
     image: opea/codegen-ui:latest
     ...
     ports:
@@ -156,6 +166,20 @@ To access the frontend, open the following URL in your browser: `http://{host_ip
 ```
 
 ![project-screenshot](../../assets/img/codeGen_ui_init.jpg)
+
+## 🚀 Launch the React Based UI
+
+To access the frontend, open the following URL in your browser: `http://{host_ip}:5174`. By default, the UI runs on port 5174 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  codegen-gaudi-react-ui-server:
+    image: opea/codegen-react-ui:latest
+    ...
+    ports:
+      - "80:5174"
+```
+
+![project-screenshot](../../assets/img/codegen_react.png)
 
 ## Install Copilot VSCode extension from Plugin Marketplace as the frontend
 
