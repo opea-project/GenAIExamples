@@ -1,0 +1,311 @@
+---
+# Source: docsum/charts/llm-uservice/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docsum-llm-uservice-config
+  labels:
+    helm.sh/chart: llm-uservice-0.8.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  TGI_LLM_ENDPOINT: "http://docsum-tgi"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  HF_HOME: "/tmp/.cache/huggingface"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  LANGCHAIN_TRACING_V2: "false"
+  LANGCHAIN_API_KEY: insert-your-langchain-key-here
+  LANGCHAIN_PROJECT: "opea-llm-uservice"
+---
+# Source: docsum/charts/tgi/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docsum-tgi-config
+  labels:
+    helm.sh/chart: tgi-0.8.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  MODEL_ID: "Intel/neural-chat-7b-v3-3"
+  PORT: "2080"
+  HUGGING_FACE_HUB_TOKEN: "insert-your-huggingface-token-here"
+  HF_TOKEN: "insert-your-huggingface-token-here"
+  MAX_INPUT_TOKENS: "1024"
+  MAX_TOTAL_TOKENS: "4096"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  HABANA_LOGS: "/tmp/habana_logs"
+  NUMBA_CACHE_DIR: "/tmp"
+  TRANSFORMERS_CACHE: "/tmp/transformers_cache"
+  HF_HOME: "/tmp/.cache/huggingface"
+---
+# Source: docsum/charts/llm-uservice/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.8.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: llm-uservice
+  selector:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: docsum
+---
+# Source: docsum/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-tgi
+  labels:
+    helm.sh/chart: tgi-0.8.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 2080
+      protocol: TCP
+      name: tgi
+  selector:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: docsum
+---
+# Source: docsum/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum
+  labels:
+    helm.sh/chart: docsum-0.8.0
+    app.kubernetes.io/name: docsum
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8888
+      targetPort: 8888
+      protocol: TCP
+      name: docsum
+  selector:
+    app.kubernetes.io/name: docsum
+    app.kubernetes.io/instance: docsum
+---
+# Source: docsum/charts/llm-uservice/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.8.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llm-uservice
+      app.kubernetes.io/instance: docsum
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llm-uservice
+        app.kubernetes.io/instance: docsum
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: docsum
+          envFrom:
+            - configMapRef:
+                name: docsum-llm-uservice-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/llm-docsum-tgi:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: llm-uservice
+              containerPort: 9000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          startupProbe:
+            exec:
+              command:
+              - curl
+              - http://docsum-tgi
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 120
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: docsum/charts/tgi/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-tgi
+  labels:
+    helm.sh/chart: tgi-0.8.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tgi
+      app.kubernetes.io/instance: docsum
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tgi
+        app.kubernetes.io/instance: docsum
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: tgi
+          envFrom:
+            - configMapRef:
+                name: docsum-tgi-config
+          securityContext:
+            {}
+          image: "ghcr.io/huggingface/text-generation-inference:2.1.0"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: http
+              containerPort: 2080
+              protocol: TCP
+          resources:
+            {}
+      volumes:
+        - name: model-volume
+          hostPath:
+            path: /mnt/opea-models
+            type: Directory
+        - name: tmp
+          emptyDir: {}
+---
+# Source: docsum/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum
+  labels:
+    helm.sh/chart: docsum-0.8.0
+    app.kubernetes.io/name: docsum
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: docsum
+      app.kubernetes.io/instance: docsum
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: docsum
+        app.kubernetes.io/instance: docsum
+    spec:
+      securityContext:
+        null
+      containers:
+        - name: docsum
+          env:
+            - name: LLM_SERVICE_HOST_IP
+              value: docsum-llm-uservice
+            #- name: MEGA_SERVICE_PORT
+            #  value: 8888
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/docsum:latest"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: docsum
+              containerPort: 8888
+              protocol: TCP
+          resources:
+            null
+      volumes:
+        - name: tmp
+          emptyDir: {}

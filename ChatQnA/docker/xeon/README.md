@@ -40,7 +40,7 @@ reranking
 =========
 Port 8000 - Open to 0.0.0.0/0
 
-tgi_service
+tgi_service or vLLM_service
 ===========
 Port 9009 - Open to 0.0.0.0/0
 
@@ -86,8 +86,26 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 
 ### 4. Build LLM Image
 
+#### Use TGI as backend
+
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+```
+
+### Use vLLM as backend
+
+Build vLLM docker.
+
+```bash
+git clone https://github.com/vllm-project/vllm.git
+cd ./vllm/
+docker build --no-cache -t vllm:cpu --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu .
+```
+
+Build microservice.
+
+```bash
+docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
 ```
 
 ### 5. Build Dataprep Image
@@ -139,7 +157,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 2. `opea/embedding-tei:latest`
 3. `opea/retriever-redis:latest`
 4. `opea/reranking-tei:latest`
-5. `opea/llm-tgi:latest`
+5. `opea/llm-tgi:latest` or `opea/llm-vllm:latest`
 6. `opea/chatqna:latest`
 7. `opea/chatqna-ui:latest`
 
@@ -181,6 +199,8 @@ export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
 export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
+export vLLM_LLM_ENDPOINT="http://${host_ip}:9009"
+export LLM_SERVICE_PORT=9000
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
@@ -203,7 +223,18 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/xeon/
+```
+
+If use TGI backend.
+
+```bash
 docker compose -f docker_compose.yaml up -d
+```
+
+If use vLLM backend.
+
+```bash
+docker compose -f docker_compose_vllm.yaml up -d
 ```
 
 ### Validate Microservices
@@ -226,21 +257,19 @@ curl http://${host_ip}:6000/v1/embeddings\
   -H 'Content-Type: application/json'
 ```
 
-3. Retriever Microservice  
-   To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+3. Retriever Microservice
 
-```Python
-import random
-embedding = [random.uniform(-1, 1) for _ in range(768)]
-print(embedding)
-```
+To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
+is determined by the embedding model.
+Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
 
-Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
+Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
 
 ```bash
+your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${host_ip}:7000/v1/retrieval \
   -X POST \
-  -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
+  -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
   -H 'Content-Type: application/json'
 ```
 
@@ -262,13 +291,21 @@ curl http://${host_ip}:8000/v1/reranking\
   -H 'Content-Type: application/json'
 ```
 
-6. TGI Service
+6. LLM backend Service
 
 ```bash
+# TGI service
 curl http://${host_ip}:9009/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
+```
+
+```bash
+#vLLM Service
+curl http://${your_ip}:9009/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
 ```
 
 7. LLM Microservice
@@ -369,12 +406,30 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
-## 🚀 Launch the Conversational UI (react)
+## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
 
 ```yaml
-  chaqna-xeon-conversation-ui-server:
+chaqna-gaudi-conversation-ui-server:
+  image: opea/chatqna-conversation-ui:latest
+  container_name: chatqna-gaudi-conversation-ui-server
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+  ports:
+    - "5174:80"
+  depends_on:
+    - chaqna-gaudi-backend-server
+  ipc: host
+  restart: always
+```
+
+Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  chaqna-gaudi-conversation-ui-server:
     image: opea/chatqna-conversation-ui:latest
     ...
     ports:

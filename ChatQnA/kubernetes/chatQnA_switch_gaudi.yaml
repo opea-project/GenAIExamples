@@ -1,0 +1,124 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: gmc.opea.io/v1alpha3
+kind: GMConnector
+metadata:
+  labels:
+    app.kubernetes.io/name: gmconnector
+    app.kubernetes.io/managed-by: kustomize
+    gmc/platform: gaudi
+  name: switch
+  namespace: switch
+spec:
+  routerConfig:
+    name: router
+    serviceName: router-service
+  nodes:
+    root:
+      routerType: Sequence
+      steps:
+      - name: Embedding
+        nodeName: node1
+      - name: Reranking
+        data: $response
+        internalService:
+          serviceName: reranking-svc
+          config:
+            endpoint: /v1/reranking
+            TEI_RERANKING_ENDPOINT: tei-reranking-svc
+      - name: TeiReranking
+        internalService:
+          serviceName: tei-reranking-svc
+          config:
+            endpoint: /rerank
+          isDownstreamService: true
+      - name: Llm
+        data: $response
+        nodeName: node2
+    node1:
+      routerType: Switch
+      steps:
+        - name: Embedding
+          condition: embedding-model-id==large
+          internalService:
+            serviceName: embedding-svc-large
+            config:
+              endpoint: /v1/embeddings
+              TEI_EMBEDDING_ENDPOINT: tei-embedding-gaudi-svc-bge15
+        - name: Embedding
+          condition: embedding-model-id==small
+          internalService:
+            serviceName: embedding-svc-small
+            config:
+              endpoint: /v1/embeddings
+              TEI_EMBEDDING_ENDPOINT: tei-embedding-gaudi-svc-bge-small
+        - name: TeiEmbeddingGaudi
+          internalService:
+            serviceName: tei-embedding-gaudi-svc-bge15
+            config:
+              MODEL_ID: BAAI/bge-base-en-v1.5
+            isDownstreamService: true
+        - name: TeiEmbeddingGaudi
+          internalService:
+            serviceName: tei-embedding-gaudi-svc-bge-small
+            config:
+              MODEL_ID: BAAI/bge-base-en-v1.5
+            isDownstreamService: true
+        - name: Retriever
+          condition: embedding-model-id==large
+          data: $response
+          internalService:
+            serviceName: retriever-svc-large
+            config:
+              endpoint: /v1/retrieval
+              REDIS_URL: redis-vector-db-large
+              TEI_EMBEDDING_ENDPOINT: tei-embedding-gaudi-svc-bge15
+        - name: Retriever
+          condition: embedding-model-id==small
+          data: $response
+          internalService:
+            serviceName: retriever-svc-small
+            config:
+              endpoint: /v1/retrieval
+              REDIS_URL: redis-vector-db-small
+              TEI_EMBEDDING_ENDPOINT: tei-embedding-gaudi-svc-bge-small
+        - name: VectorDB
+          internalService:
+            serviceName: redis-vector-db-large
+            isDownstreamService: true
+        - name: VectorDB
+          internalService:
+            serviceName: redis-vector-db-small
+            isDownstreamService: true
+    node2:
+      routerType: Switch
+      steps:
+        - name: Llm
+          condition: model-id==intel
+          internalService:
+            serviceName: llm-svc-intel
+            config:
+              endpoint: /v1/chat/completions
+              TGI_LLM_ENDPOINT: tgi-gaudi-service-intel
+        - name: Llm
+          condition: model-id==llama
+          internalService:
+            serviceName: llm-svc-llama
+            config:
+              endpoint: /v1/chat/completions
+              TGI_LLM_ENDPOINT: tgi-gaudi-service-llama
+        - name: TgiGaudi
+          internalService:
+            serviceName: tgi-gaudi-service-intel
+            config:
+              endpoint: /generate
+              MODEL_ID: Intel/neural-chat-7b-v3-3
+            isDownstreamService: true
+        - name: TgiGaudi
+          internalService:
+            serviceName: tgi-gaudi-service-llama
+            config:
+              endpoint: /generate
+              MODEL_ID: openlm-research/open_llama_3b
+            isDownstreamService: true

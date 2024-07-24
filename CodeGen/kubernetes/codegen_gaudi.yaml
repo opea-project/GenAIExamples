@@ -24,10 +24,11 @@ spec:
           serviceName: llm-service
           config:
             endpoint: /v1/chat/completions
+            TGI_LLM_ENDPOINT: tgi-gaudi-svc
       - name: TgiGaudi
         internalService:
           serviceName: tgi-gaudi-svc
           config:
-            LLM_MODEL_ID: ise-uiuc/Magicoder-S-DS-6.7B
+            MODEL_ID: ise-uiuc/Magicoder-S-DS-6.7B
             endpoint: /generate
           isDownstreamService: true
