@@ -174,6 +174,20 @@ Here is an example of running CodeGen in the UI:
 
 ![project-screenshot](../../assets/img/codeGen_ui_response.png)
 
+## 🚀 Launch the React Based UI
+
+To access the frontend, open the following URL in your browser: `http://{host_ip}:5174`. By default, the UI runs on port 5174 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+
+```yaml
+  codegen-xeon-react-ui-server:
+    image: opea/codegen-react-ui:latest
+    ...
+    ports:
+      - "80:5174"
+```
+
+![project-screenshot](../../assets/img/codegen_react.png)
+
 ## Install Copilot VSCode extension from Plugin Marketplace as the frontend
 
 In addition to the Svelte UI, users can also install the Copilot VSCode extension from the Plugin Marketplace as the frontend.

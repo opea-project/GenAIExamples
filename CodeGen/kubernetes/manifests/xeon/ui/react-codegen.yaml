@@ -1,0 +1,280 @@
+---
+# Source: codegen/charts/llm-uservice/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codegen-tgi
+  labels:
+    helm.sh/chart: tgi-0.1.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.4"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: tgi
+  selector:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codegen
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: codegen-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.1.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: llm-uservice
+  selector:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codegen
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: codegen
+  labels:
+    helm.sh/chart: codegen-0.1.0
+    app.kubernetes.io/name: codegen
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7778
+      targetPort: 7778
+      protocol: TCP
+      name: codegen
+  selector:
+    app.kubernetes.io/name: codegen
+    app.kubernetes.io/instance: codegen
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: codegen-react-ui
+  labels:
+    helm.sh/chart: codegen-react-ui-0.1.0
+    app.kubernetes.io/name: react-ui
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: react-ui
+  selector:
+    app.kubernetes.io/name: react-ui
+    app.kubernetes.io/instance: codegen
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codegen-tgi
+  labels:
+    helm.sh/chart: tgi-0.1.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.4"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tgi
+      app.kubernetes.io/instance: codegen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tgi
+        app.kubernetes.io/instance: codegen
+    spec:
+      securityContext: {}
+      containers:
+        - name: tgi
+          env:
+            - name: MODEL_ID
+              value: ise-uiuc/Magicoder-S-DS-6.7B
+            - name: PORT
+              value: "80"
+            - name: http_proxy
+              value:
+            - name: https_proxy
+              value:
+            - name: no_proxy
+              value:
+          securityContext: {}
+          image: "ghcr.io/huggingface/text-generation-inference:1.4"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources: {}
+      volumes:
+        - name: model-volume
+          hostPath:
+            path: /mnt
+            type: Directory
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codegen-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.1.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llm-uservice
+      app.kubernetes.io/instance: codegen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llm-uservice
+        app.kubernetes.io/instance: codegen
+    spec:
+      securityContext: {}
+      containers:
+        - name: codegen
+          env:
+            - name: TGI_LLM_ENDPOINT
+              value: "http://codegen-tgi:80"
+            - name: HUGGINGFACEHUB_API_TOKEN
+              value: "insert-your-huggingface-token-here"
+            - name: http_proxy
+              value:
+            - name: https_proxy
+              value:
+            - name: no_proxy
+              value:
+          securityContext: {}
+          image: "opea/llm-tgi:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: llm-uservice
+              containerPort: 9000
+              protocol: TCP
+          startupProbe:
+            exec:
+              command:
+                - curl
+                - http://codegen-tgi:80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 120
+          resources: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codegen
+  labels:
+    helm.sh/chart: codegen-0.1.0
+    app.kubernetes.io/name: codegen
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: codegen
+      app.kubernetes.io/instance: codegen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: codegen
+        app.kubernetes.io/instance: codegen
+    spec:
+      securityContext: null
+      containers:
+        - name: codegen
+          env:
+            - name: LLM_SERVICE_HOST_IP
+              value: codegen-llm-uservice
+            - name: http_proxy
+              value:
+            - name: https_proxy
+              value:
+            - name: no_proxy
+              value:
+          securityContext: null
+          image: "opea/codegen:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: codegen
+              containerPort: 7778
+              protocol: TCP
+          resources: null
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codegen-react-ui
+  labels:
+    helm.sh/chart: codegen-react-ui-0.1.0
+    app.kubernetes.io/name: react-ui
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: react-ui
+      app.kubernetes.io/instance: codegen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: react-ui
+        app.kubernetes.io/instance: codegen
+    spec:
+      securityContext: null
+      containers:
+        - name: codegen-react-ui
+          env:
+            - name: BASIC_URL
+              value: "http://codegen:7778/v1/codegen"
+            - name: http_proxy
+              value:
+            - name: https_proxy
+              value:
+            - name: no_proxy
+              value:
+          securityContext: null
+          image: "opea/codegen-react-ui:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: react-ui
+              containerPort: 80
+              protocol: TCP
+          resources: null
