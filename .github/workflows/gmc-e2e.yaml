@@ -44,7 +44,7 @@ jobs:
       - name: Checkout out Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: "refs/pull/${{ github.event.number }}/merge"
 
       - name: Set variables
         run: |
