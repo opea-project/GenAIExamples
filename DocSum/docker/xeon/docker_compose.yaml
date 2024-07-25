@@ -68,6 +68,18 @@ services:
       - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
+  docsum-xeon-react-ui-server:
+    image: opea/docsum-react-ui:latest
+    container_name: docsum-xeon-react-ui-server
+    depends_on:
+      - docsum-xeon-backend-server
+    build:
+      args:
+        - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+    ports:
+      - "5174:80"
+    ipc: host
+    restart: always
 
 networks:
   default:

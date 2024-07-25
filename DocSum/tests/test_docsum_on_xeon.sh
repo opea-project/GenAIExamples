@@ -20,6 +20,7 @@ function build_docker_images() {
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+    docker build --no-cache -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=http://${ip_address}:8888/v1/docsum -f docker/Dockerfile.react .
 
     docker images
 }
@@ -41,6 +42,7 @@ function start_services() {
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/docsum-ui:latest#image: opea/docsum-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/docsum-react-ui:latest#image: opea/docsum-react-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
         echo "cat docker_compose.yaml"
         cat docker_compose.yaml
@@ -49,7 +51,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
 
-    sleep 2m # Waits 2 minutes
+    sleep 5m # Waits 5 minutes
 }
 
 function validate_services() {
