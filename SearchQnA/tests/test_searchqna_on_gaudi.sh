@@ -25,7 +25,7 @@ function build_docker_images() {
 #    cd tei-gaudi/
 #    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     cd $WORKPATH/docker
     docker build --no-cache -t opea/searchqna:latest -f Dockerfile .
