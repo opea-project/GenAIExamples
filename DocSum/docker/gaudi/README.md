@@ -44,12 +44,23 @@ cd GenAIExamples/DocSum/docker/ui/
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
+### 5. Build React UI Docker Image
+
+Build the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/docker/ui/
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+```
+
 Then run the command `docker images`, you will have the following Docker Images:
 
 1. `ghcr.io/huggingface/tgi-gaudi:2.0.1`
 2. `opea/llm-docsum-tgi:latest`
 3. `opea/docsum:latest`
 4. `opea/docsum-ui:latest`
+5. `opea/docsum-react-ui:latest`
 
 ## 🚀 Start Microservices and MegaService
 
@@ -125,7 +136,7 @@ export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=ls_...
 ```
 
-## 🚀 Launch the UI
+## 🚀 Launch the Svelte UI
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
@@ -134,3 +145,9 @@ Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 Here is an example for summarizing a article.
 
 ![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/67ecb2ec-408d-4e81-b124-6ded6b833f55)
+
+## 🚀 Launch the React UI
+
+Open this URL `http://{host_ip}:5175` in your browser to access the frontend.
+
+![project-screenshot](../../assets/img/docsum-ui-react.png)
