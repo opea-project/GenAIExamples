@@ -44,7 +44,7 @@ function start_services() {
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/docsum-ui:latest#image: opea/docsum-ui:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/docsum-react--ui:latest#image: opea/docsum-react-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/docsum-react-ui:latest#image: opea/docsum-react-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
         echo "cat docker_compose.yaml"
         cat docker_compose.yaml
