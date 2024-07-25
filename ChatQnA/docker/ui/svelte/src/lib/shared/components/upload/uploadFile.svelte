@@ -20,19 +20,27 @@
 	import { sineIn } from "svelte/easing";
 	import UploadFile from "./upload-knowledge.svelte";
 	import PasteURL from "./PasteKnowledge.svelte";
-	import { knowledge1, knowledgeName } from "$lib/shared/stores/common/Store";
-	import DeleteIcon from "$lib/assets/avatar/svelte/Delete.svelte";
+	import {
+		knowledge1,
+		knowledgeName,
+		storageFiles,
+	} from "$lib/shared/stores/common/Store";
 	import { getNotificationsContext } from "svelte-notifications";
 	import {
+		fetchAllFile,
 		fetchKnowledgeBaseId,
 		fetchKnowledgeBaseIdByPaste,
 	} from "$lib/network/upload/Network";
+	import DocCard from "../doc_management/docCard.svelte";
+	import NoFile from "$lib/assets/upload/no-file.svelte";
+	import LoadingButton from "$lib/assets/upload/loading-button.svelte";
 
 	const { addNotification } = getNotificationsContext();
-	console.log("allKnowledges", $knowledgeName);
 
+	$: files = $storageFiles ? $storageFiles : [];
 	let hidden6 = true;
-	let selectKnowledge = -1;
+	let uploading = false;
+
 	let transitionParamsRight = {
 		x: 320,
 		duration: 200,
@@ -42,9 +50,10 @@
 	async function handleKnowledgePaste(
 		e: CustomEvent<{ pasteUrlList: string[] }>
 	) {
+		uploading = true;
 		try {
 			const pasteUrlList = e.detail.pasteUrlList;
-			const res = await fetchKnowledgeBaseIdByPaste(pasteUrlList, "url1");
+			const res = await fetchKnowledgeBaseIdByPaste(pasteUrlList);
 			handleUploadResult(res, "knowledge_base");
 		} catch {
 			handleUploadError();
@@ -52,6 +61,7 @@
 	}
 
 	async function handleKnowledgeUpload(e: CustomEvent<any>) {
+		uploading = true;
 		try {
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
 			const fileName = e.detail.fileName;
@@ -62,11 +72,20 @@
 		}
 	}
 
-	function handleUploadResult(res: Response, fileName: string) {
+	async function handleUploadResult(res: Response, fileName: string) {
 		if (res.status === 200) {
 			knowledge1.set({ id: "default" });
 			knowledgeName.set(fileName);
 			showNotification("Uploaded successfully", "success");
+			// update fileStructure
+			const res = await fetchAllFile();
+			uploading = false;
+			console.log('handleUploadResult', res);
+
+			if (res) {
+				storageFiles.set(res);
+				files = $storageFiles;
+			}
 		} else {
 			showNotification("Uploaded failed", "error");
 		}
@@ -83,11 +102,6 @@
 			type: type,
 			removeAfter: 3000,
 		});
-	}
-
-	function handleKnowledgeDelete() {
-		knowledge1.set({ id: "default" });
-		knowledgeName.set("");
 	}
 </script>
 
@@ -139,6 +153,7 @@
 		Please upload your local file or paste a remote file link, and Chat will
 		respond based on the content of the uploaded file.
 	</p>
+
 	<Tabs
 		style="full"
 		defaultClass="flex rounded-lg divide-x rtl:divide-x-reverse divide-gray-200 shadow dark:divide-gray-700 focus:ring-0"
@@ -152,10 +167,18 @@
 			<PasteURL on:paste={handleKnowledgePaste} />
 		</TabItem>
 	</Tabs>
-	{#if $knowledgeName && $knowledgeName !== ""}
-		<div class="relative">
-			<p class="border-b p-6 pb-2">{$knowledgeName}</p>
-			<DeleteIcon on:DeleteAvatar={() => handleKnowledgeDelete()} />
+	{#if uploading}
+		<div class="flex flex-col items-center justify-center">
+			<LoadingButton />
+		</div>
+	{/if}
+
+	{#if files.length > 0}
+		<DocCard {files} />
+	{:else}
+		<div class="flex flex-col items-center justify-center">
+			<NoFile />
+			<p class=" text-sm opacity-70">No files uploaded</p>
 		</div>
 	{/if}
 </Drawer>

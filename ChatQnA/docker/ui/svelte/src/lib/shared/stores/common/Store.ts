@@ -37,3 +37,5 @@ export const knowledge1 = writable<{
 }>();
 
 export const knowledgeName = writable("");
+
+export const storageFiles = writable([]);
