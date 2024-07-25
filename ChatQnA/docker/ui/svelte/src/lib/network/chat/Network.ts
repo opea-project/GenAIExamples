@@ -17,7 +17,7 @@ import { SSE } from "sse.js";
 
 const CHAT_BASE_URL = env.CHAT_BASE_URL;
 
-export async function fetchTextStream(query: string, knowledge_base_id: string) {
+export async function fetchTextStream(query: string) {
 	let payload = {};
 	let url = "";
 
@@ -26,6 +26,7 @@ export async function fetchTextStream(query: string, knowledge_base_id: string) 
 		messages: query,
 	};
 	url = `${CHAT_BASE_URL}`;
+	console.log("fetchTextStream", url);
 
 	return new SSE(url, {
 		headers: { "Content-Type": "application/json" },

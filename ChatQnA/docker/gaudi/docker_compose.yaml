@@ -44,7 +44,9 @@ services:
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       MAX_WARMUP_SEQUENCE_LENGTH: 512
-    command: --model-id ${EMBEDDING_MODEL_ID}
+      INIT_HCCL_ON_ACQUIRE: 0
+      ENABLE_EXPERIMENTAL_FLAGS: true
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
     image: opea/embedding-tei:latest
     container_name: embedding-tei-server
@@ -81,7 +83,7 @@ services:
       LANGCHAIN_PROJECT: "opea-retriever-service"
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-reranking-gaudi-server
     ports:
       - "8808:80"

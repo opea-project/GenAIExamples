@@ -46,7 +46,7 @@ function docker_build() {
 # $1 is like "apple orange pear"
 for MEGA_SVC in $1; do
     case $MEGA_SVC in
-        "ChatQnA"|"CodeGen"|"CodeTrans"|"DocSum"|"Translation"|"AudioQnA"|"SearchQnA")
+        "ChatQnA"|"CodeGen"|"CodeTrans"|"DocSum"|"Translation"|"AudioQnA"|"SearchQnA"|"FaqGen")
             cd $MEGA_SVC/docker
             IMAGE_NAME="$(getImagenameFromMega $MEGA_SVC)"
             docker_build ${IMAGE_NAME}
@@ -54,6 +54,9 @@ for MEGA_SVC in $1; do
             docker_build ${IMAGE_NAME}-ui docker/Dockerfile
             if [ "$MEGA_SVC" == "ChatQnA" ];then
                 docker_build ${IMAGE_NAME}-conversation-ui docker/Dockerfile.react
+            fi
+            if [ "$MEGA_SVC" == "CodeGen" ];then
+                docker_build ${IMAGE_NAME}-react-ui docker/Dockerfile.react
             fi
             ;;
         "VisualQnA")

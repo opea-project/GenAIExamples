@@ -41,10 +41,13 @@ To set up environment variables for deploying SearchQnA services, follow these s
 1. Set the required environment variables:
 
 ```bash
+# Example: host_ip="192.168.1.1"
 export host_ip="External_Public_IP"
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 export no_proxy="Your_No_Proxy"
 export GOOGLE_CSE_ID="Your_CSE_ID"
 export GOOGLE_API_KEY="Your_Google_API_Key"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -52,33 +55,34 @@ export GOOGLE_API_KEY="Your_Google_API_Key"
 ```bash
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 3. Set up other environment variables:
 
 ```bash
-bash ./docker/set_env.sh
+source ./docker/set_env.sh
 ```
 
 ## Deploy SearchQnA on Gaudi
 
-If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start SearchQnA services. Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
+If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start SearchQnA services. Please find corresponding [compose.yaml](./docker/gaudi/compose.yaml).
 
 ```bash
 cd GenAIExamples/SearchQnA/docker/gaudi/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
-If your version of `Habana Driver` >= 1.16.0, refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+> Notice: Currently only the <b>Habana Driver 1.16.x</b> is supported for Gaudi.
+
+Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
 ## Deploy SearchQnA on Xeon
 
-Please find corresponding [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
+Please find corresponding [compose.yaml](./docker/xeon/compose.yaml).
 
 ```bash
 cd GenAIExamples/SearchQnA/docker/xeon/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
@@ -116,6 +120,6 @@ curl http://${host_ip}:3001/embed \
     -H 'Content-Type: application/json'
 ```
 
-2. (Docker only) If all microservices work well, please check the port ${host_ip}:3008, the port may be allocated by other users, you can modify the `docker_compose.yaml`.
+2. (Docker only) If all microservices work well, please check the port ${host_ip}:3008, the port may be allocated by other users, you can modify the `compose.yaml`.
 
-3. (Docker only) If you get errors like "The container name is in use", please change container name in `docker_compose.yaml`.
+3. (Docker only) If you get errors like "The container name is in use", please change container name in `compose.yaml`.
