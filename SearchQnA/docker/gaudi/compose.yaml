@@ -157,6 +157,22 @@ services:
       - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
     ipc: host
     restart: always
+  searchqna-gaudi-ui-server:
+    image: opea/searchqna-ui:latest
+    container_name: searchqna-gaudi-ui-server
+    depends_on:
+      - searchqna-gaudi-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+
 
 networks:
   default:

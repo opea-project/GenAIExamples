@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -22,8 +22,8 @@ function build_docker_images() {
     cd $WORKPATH/docker
     docker build -t opea/searchqna:latest -f Dockerfile .
 
-    # cd $WORKPATH/docker/ui
-    # docker build --no-cache -t opea/searchqna-ui:latest -f docker/Dockerfile .
+    cd $WORKPATH/docker/ui
+    docker build --no-cache -t opea/searchqna-ui:latest -f docker/Dockerfile .
 
     docker images
 }
@@ -52,8 +52,10 @@ function start_services() {
     export WEB_RETRIEVER_SERVICE_PORT=3003
     export RERANK_SERVICE_PORT=3005
     export LLM_SERVICE_PORT=3007
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
 
-    # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
@@ -94,30 +96,30 @@ function validate_megaservice() {
 
 }
 
-#function validate_frontend() {
-#    cd $WORKPATH/docker/ui/svelte
-#    local conda_env_name="OPEA_e2e"
-#    export PATH=${HOME}/miniforge3/bin/:$PATH
-##    conda remove -n ${conda_env_name} --all -y
-##    conda create -n ${conda_env_name} python=3.12 -y
-#    source activate ${conda_env_name}
-#
-#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-#
-##    conda install -c conda-forge nodejs -y
-#    npm install && npm ci && npx playwright install --with-deps
-#    node -v && npm -v && pip list
-#
-#    exit_status=0
-#    npx playwright test || exit_status=$?
-#
-#    if [ $exit_status -ne 0 ]; then
-#        echo "[TEST INFO]: ---------frontend test failed---------"
-#        exit $exit_status
-#    else
-#        echo "[TEST INFO]: ---------frontend test passed---------"
-#    fi
-#}
+function validate_frontend() {
+   cd $WORKPATH/docker/ui/svelte
+   local conda_env_name="OPEA_e2e"
+   export PATH=${HOME}/miniforge3/bin/:$PATH
+#    conda remove -n ${conda_env_name} --all -y
+#    conda create -n ${conda_env_name} python=3.12 -y
+   source activate ${conda_env_name}
+
+   sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+#    conda install -c conda-forge nodejs -y
+   npm install && npm ci && npx playwright install --with-deps
+   node -v && npm -v && pip list
+
+   exit_status=0
+   npx playwright test || exit_status=$?
+
+   if [ $exit_status -ne 0 ]; then
+       echo "[TEST INFO]: ---------frontend test failed---------"
+       exit $exit_status
+   else
+       echo "[TEST INFO]: ---------frontend test passed---------"
+   fi
+}
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
@@ -131,7 +133,7 @@ function main() {
     start_services
 
     validate_megaservice
-    # validate_frontend
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
