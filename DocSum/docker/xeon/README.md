@@ -52,6 +52,23 @@ Then run the command `docker images`, you will have the following Docker Images:
 2. `opea/docsum:latest`
 3. `opea/docsum-ui:latest`
 
+### 4. Build React UI Docker Image
+
+Build the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/docker/ui/
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+```
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+1. `opea/llm-docsum-tgi:latest`
+2. `opea/docsum:latest`
+3. `opea/docsum-ui:latest`
+4. `opea/docsum-react-ui:latest`
+
 ## 🚀 Start Microservices and MegaService
 
 ### Setup Environment Variables
@@ -130,6 +147,13 @@ export LANGCHAIN_API_KEY=ls_...
 
 ## 🚀 Launch the UI
 
-Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+Open this URL `http://{host_ip}:5173` in your browser to access the svelte based frontend.
+Open this URL `http://{host_ip}:5174` in your browser to access the React based frontend.
+
+#### Svelte UI
 
 ![project-screenshot](../../assets/img/docSum_ui_text.png)
+
+#### React UI
+
+![preject-react-screenshot](../../assets/img/docsum-ui-react.png)
