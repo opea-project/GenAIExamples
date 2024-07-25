@@ -58,7 +58,7 @@ services:
       GOOGLE_CSE_ID: ${GOOGLE_CSE_ID}
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-reranking-server
     ports:
       - "3004:80"
@@ -157,6 +157,22 @@ services:
       - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
     ipc: host
     restart: always
+  searchqna-gaudi-ui-server:
+    image: opea/searchqna-ui:latest
+    container_name: searchqna-gaudi-ui-server
+    depends_on:
+      - searchqna-gaudi-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+
 
 networks:
   default:

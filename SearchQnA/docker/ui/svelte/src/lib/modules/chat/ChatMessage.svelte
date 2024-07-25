@@ -31,6 +31,9 @@
 	class={msg.role === 0
 		? "flex w-full gap-3"
 		: "flex w-full items-center gap-3"}
+	data-testid={msg.role === 0
+		? "display-answer"
+		: "display-question"}
 >
 	<div
 		class={msg.role === 0
