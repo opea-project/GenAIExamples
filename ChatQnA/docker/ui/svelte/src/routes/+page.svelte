@@ -16,7 +16,7 @@
 
 <script lang="ts">
 	export let data;
-	import { ifStoreMsg, knowledge1 } from "$lib/shared/stores/common/Store";
+	import { knowledge1, storageFiles } from "$lib/shared/stores/common/Store";
 	import { onMount } from "svelte";
 	import {
 		LOCAL_STORAGE_KEY,
@@ -25,7 +25,6 @@
 		type Message,
 	} from "$lib/shared/constant/Interface";
 	import {
-		fromTimeStampToTime,
 		getCurrentTimeStamp,
 		scrollToBottom,
 		scrollToTop,
@@ -38,12 +37,15 @@
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
+	import { fetchAllFile } from "$lib/network/upload/Network.js";
+	import { getNotificationsContext } from "svelte-notifications";
 
 	let query: string = "";
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
 	// ·········
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
+	const { addNotification } = getNotificationsContext();
 
 	// ··············
 
@@ -53,7 +55,21 @@
 		scrollToDiv = document
 			.querySelector(".chat-scrollbar")
 			?.querySelector(".svlr-viewport")!;
+
+		const res = await fetchAllFile();
+		if (res) {
+			storageFiles.set(res);
+		}
 	});
+
+	function showNotification(text: string, type: string) {
+		addNotification({
+			text: text,
+			position: "top-left",
+			type: type,
+			removeAfter: 3000,
+		});
+	}
 
 	function handleTop() {
 		scrollToTop(scrollToDiv);
@@ -85,73 +101,83 @@
 	}
 
 	const callTextStream = async (query: string, startSendTime: number) => {
-		const eventSource = await fetchTextStream(query, knowledge_1);
-
-		eventSource.addEventListener("message", (e: any) => {
-			let msg = e.data;
-			console.log("msg", msg);
-
-			const handleDecodedMessage = (decodedMsg: string) => {
-				if (decodedMsg !== "</s>") {
-					decodedMsg = decodedMsg.replace(/\\n/g, "\n");
+		try {
+			const eventSource = await fetchTextStream(query);
+			eventSource.addEventListener("error", (e: any) => {
+				if (e.type === "error") {
+					showNotification("Failed to load chat content.", "error");
+					loading = false;
 				}
+			});
 
-				if (chatMessages[chatMessages.length - 1].role === MessageRole.User) {
-					chatMessages.push({
-						role: MessageRole.Assistant,
-						type: MessageType.Text,
-						content: decodedMsg,
-						time: startSendTime,
-					});
+			eventSource.addEventListener("message", (e: any) => {
+				let msg = e.data;
+				console.log("msg", msg);
+
+				const handleDecodedMessage = (decodedMsg: string) => {
+					if (decodedMsg !== "</s>") {
+						decodedMsg = decodedMsg.replace(/\\n/g, "\n");
+					}
+
+					if (chatMessages[chatMessages.length - 1].role === MessageRole.User) {
+						chatMessages.push({
+							role: MessageRole.Assistant,
+							type: MessageType.Text,
+							content: decodedMsg,
+							time: startSendTime,
+						});
+					} else {
+						chatMessages[chatMessages.length - 1].content += decodedMsg;
+					}
+
+					scrollToBottom(scrollToDiv);
+				};
+
+				if (msg.startsWith("b")) {
+					let currentMsg = msg.slice(2, -1);
+
+					if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
+						currentMsg = decodeEscapedBytes(currentMsg);
+					} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
+						currentMsg = decodeUnicode(currentMsg);
+					}
+
+					handleDecodedMessage(currentMsg);
+				} else if (msg === "[DONE]") {
+					console.log("Done");
+
+					let startTime = chatMessages[chatMessages.length - 1].time;
+					loading = false;
+					let totalTime = parseFloat(
+						((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
+					);
+
+					if (chatMessages.length - 1 !== -1) {
+						chatMessages[chatMessages.length - 1].time = totalTime;
+					}
+
+					storeMessages();
 				} else {
-					chatMessages[chatMessages.length - 1].content += decodedMsg;
+					if (/\\x[\dA-Fa-f]{2}/.test(msg)) {
+						msg = decodeEscapedBytes(msg);
+					} else if (/\\u[\dA-Fa-f]{4}/.test(msg)) {
+						msg = decodeUnicode(msg);
+					}
+
+					let currentMsg = msg.replace(/"/g, "").replace(/\\n/g, "\n");
+
+					handleDecodedMessage(currentMsg);
 				}
+			});
 
-				scrollToBottom(scrollToDiv);
-			};
-
-			if (msg.startsWith("b")) {
-				let currentMsg = msg.slice(2, -1);
-
-				if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
-					currentMsg = decodeEscapedBytes(currentMsg);
-				} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
-					currentMsg = decodeUnicode(currentMsg);
-				}
-
-				handleDecodedMessage(currentMsg);
-			} else if (msg === "[DONE]") {
-				console.log("Done");
-
-				let startTime = chatMessages[chatMessages.length - 1].time;
-				loading = false;
-				let totalTime = parseFloat(
-					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
-				);
-
-				if (chatMessages.length - 1 !== -1) {
-					chatMessages[chatMessages.length - 1].time = totalTime;
-				}
-
-				storeMessages();
-			} else {
-				if (/\\x[\dA-Fa-f]{2}/.test(msg)) {
-					msg = decodeEscapedBytes(msg);
-				} else if (/\\u[\dA-Fa-f]{4}/.test(msg)) {
-					msg = decodeUnicode(msg);
-				}
-
-				let currentMsg = msg.replace(/"/g, "").replace(/\\n/g, "\n");
-
-				handleDecodedMessage(currentMsg);
-			}
-		});
-
-		eventSource.stream();
+			eventSource.stream();
+		} catch (error: any) {
+			showNotification("Failed to load chat content.", "error");
+			loading = false;
+		}
 	};
 
 	const handleTextSubmit = async () => {
-
 		loading = true;
 		const newMessage = {
 			role: MessageRole.User,
@@ -173,15 +199,6 @@
 	function handelClearHistory() {
 		localStorage.removeItem(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY);
 		chatMessages = [];
-	}
-
-	function isEmptyObject(obj: any): boolean {
-		for (let key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				return false;
-			}
-		}
-		return true;
 	}
 </script>
 
@@ -248,8 +265,7 @@
 							><path
 								d="M12.6 12 10 9.4 7.4 12 6 10.6 8.6 8 6 5.4 7.4 4 10 6.6 12.6 4 14 5.4 11.4 8l2.6 2.6zm7.4 8V2q0-.824-.587-1.412A1.93 1.93 0 0 0 18 0H2Q1.176 0 .588.588A1.93 1.93 0 0 0 0 2v12q0 .825.588 1.412Q1.175 16 2 16h14zm-3.15-6H2V2h16v13.125z"
 							/></svg
-						><span class="font-medium text-[#0597ff]">CLEAR</span
-						></button
+						><span class="font-medium text-[#0597ff]">CLEAR</span></button
 					>
 				</div>
 			</div>
