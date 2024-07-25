@@ -46,7 +46,7 @@ services:
       MAX_WARMUP_SEQUENCE_LENGTH: 512
       INIT_HCCL_ON_ACQUIRE: 0
       ENABLE_EXPERIMENTAL_FLAGS: true
-    command: --model-id ${EMBEDDING_MODEL_ID}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
     image: opea/embedding-tei:latest
     container_name: embedding-tei-server
