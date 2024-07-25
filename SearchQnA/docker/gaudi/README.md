@@ -128,7 +128,7 @@ curl http://${host_ip}:3002/v1/embeddings\
   -H 'Content-Type: application/json'
 
 # web retriever microservice
-your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${host_ip}:3003/v1/web_retrieval \
   -X POST \
   -d "{\"text\":\"What is the 2024 holiday schedule?\",\"embedding\":${your_embedding}}" \

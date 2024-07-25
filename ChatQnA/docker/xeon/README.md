@@ -266,7 +266,7 @@ Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector
 Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${host_ip}:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
