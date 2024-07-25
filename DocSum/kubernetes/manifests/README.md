@@ -1,4 +1,4 @@
-<h1 align="center" id="title">Deploy DocSum in Kubernetes Cluster</h1>
+# Deploy DocSum in Kubernetes Cluster
 
 > [NOTE]
 > The following values must be set before you can deploy:
