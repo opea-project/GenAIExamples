@@ -10,8 +10,8 @@ import requests
 
 from comps import (
     Base64ByteStrDoc,
+    LLMParamsDoc,
     ServiceType,
-    TextDoc,
     opea_microservices,
     register_microservice,
     register_statistics,
@@ -26,7 +26,7 @@ from comps import (
     host="0.0.0.0",
     port=9099,
     input_datatype=Base64ByteStrDoc,
-    output_datatype=TextDoc,
+    output_datatype=LLMParamsDoc,
 )
 @register_statistics(names=["opea_service@asr"])
 async def audio_to_text(audio: Base64ByteStrDoc):
@@ -37,7 +37,7 @@ async def audio_to_text(audio: Base64ByteStrDoc):
     response = requests.post(url=f"{asr_endpoint}/v1/asr", data=json.dumps(inputs), proxies={"http": None})
 
     statistics_dict["opea_service@asr"].append_latency(time.time() - start, None)
-    return TextDoc(text=response.json()["asr_result"])
+    return LLMParamsDoc(query=response.json()["asr_result"])
 
 
 if __name__ == "__main__":
