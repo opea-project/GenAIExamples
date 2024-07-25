@@ -188,6 +188,7 @@
 						class="text-md block w-full border-0 border-b-2 border-gray-300 px-1 py-4
 						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
 						type="text"
+						data-testid="chat-input"
 						placeholder="Enter prompt here"
 						disabled={loading}
 						maxlength="1200"
