@@ -25,6 +25,7 @@ spec:
           config:
             endpoint: /v1/chat/docsum
             PORT: "9009"
+            TGI_LLM_ENDPOINT: tgi-svc
       - name: Tgi
         internalService:
           serviceName: tgi-svc
