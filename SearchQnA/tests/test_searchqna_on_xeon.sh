@@ -17,7 +17,7 @@ function build_docker_images() {
     docker build -t opea/web-retriever-chroma:latest  -f comps/web_retrievers/langchain/chroma/docker/Dockerfile .
     docker build -t opea/reranking-tei:latest  -f comps/reranks/tei/docker/Dockerfile .
     docker build -t opea/llm-tgi:latest  -f comps/llms/text-generation/tgi/Dockerfile .
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/text-generation-inference:1.4
     cd $WORKPATH/docker
     docker build -t opea/searchqna:latest -f Dockerfile .

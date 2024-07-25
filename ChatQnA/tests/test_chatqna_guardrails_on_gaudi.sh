@@ -27,7 +27,7 @@ function build_docker_images() {
 #    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     cd $WORKPATH/docker
     docker build --no-cache -t opea/chatqna-guardrails:latest -f Dockerfile_guardrails .
