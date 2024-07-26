@@ -85,8 +85,9 @@ function validate_megaservice() {
         docker logs asr-service > $LOG_PATH/asr-service.log
         docker logs speecht5-service > $LOG_PATH/tts-service.log
         docker logs tts-service > $LOG_PATH/tts-service.log
-        docker logs tgi-server > $LOG_PATH/tgi-server.log
+        docker logs tgi-service > $LOG_PATH/tgi-service.log
         docker logs llm-tgi-server > $LOG_PATH/llm-tgi-server.log
+        docker logs audioqna-xeon-backend-server > $LOG_PATH/audioqna-xeon-backend-server.log
 
         echo "Result wrong."
         exit 1
