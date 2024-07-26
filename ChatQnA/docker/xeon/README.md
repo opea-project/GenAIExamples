@@ -300,13 +300,13 @@ curl http://${host_ip}:9009/generate \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 ```
+
 ```bash
 # vLLM Service
 curl http://${your_ip}:9009/v1/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
 ```
-
 
 7. LLM Microservice
 
