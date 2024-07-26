@@ -1,18 +1,18 @@
-<h1 align="center" id="title">FAQ Generation</h1>
+# FAQ Generation
 
-### 📸 Project Screenshots
+## 📸 Project Screenshots
 
 ![project-screenshot](../../../assets/img/faqgen_ui_text.png)
 
-<h2>🧐 Features</h2>
+## 🧐 Features
 
-Here're some of the project's features:
+Here are some of the project's features:
 
 - Generate FAQs from Text via Pasting: Paste the text to into the text box, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box on the right.
 
 - Scroll to Bottom: The FAQ content will automatically scroll to the bottom.
 
-<h2>🛠️ Get it Running:</h2>
+## 🛠️ Get it Running
 
 1. Clone the repo.
 

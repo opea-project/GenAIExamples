@@ -1,13 +1,12 @@
-<h1 align="center" id="title"><img align="center" src="./static/favicon.png" alt="project-image" width="50" height="50">
-Neural Chat</h1>
+# Neural Chat
 
-### 📸 Project Screenshots
+## 📸 Project Screenshots
 
 ![project-screenshot](../../assets/img/search_ui_init.png)
 
-<h2>🧐 Features</h2>
+## 🧐 Features
 
-Here're some of the project's features:
+Here are some of the project's features:
 
 - Start a Text Chat：Initiate a text chat with the ability to input written conversations, where the dialogue content is sourced from web searches.
 - Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
@@ -15,7 +14,7 @@ Here're some of the project's features:
 - Scroll to Bottom / Top: The chat automatically slides to the bottom. Users can also click the top icon to slide to the top of the chat record.
 - End to End Time: Shows the time spent on the current conversation.
 
-<h2>🛠️ Get it Running:</h2>
+## 🛠️ Get it Running
 
 1. Clone the repo.
 
