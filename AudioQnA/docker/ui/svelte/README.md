@@ -2,8 +2,8 @@
 
 ## 📸 Project Screenshots
 
-![project-screenshot](../../assets/img/audio_ui.png)
-![project-screenshot](../../assets/img/audio_ui_record.png)
+![project-screenshot](../../../assets/img/audio_ui.png)
+![project-screenshot](../../../assets/img/audio_ui_record.png)
 
 ## 🧐 Features
 
