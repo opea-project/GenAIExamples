@@ -5,9 +5,9 @@
 version: "3.8"
 
 services:
-  tgi_service:
-    image: ghcr.io/huggingface/text-generation-inference:1.4
-    container_name: tgi_service
+  tgi-service:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+    container_name: tgi-gaudi-server
     ports:
       - "8008:80"
     environment:
@@ -18,13 +18,16 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
       - "./data:/data"
-    shm_size: 1g
-    command: --model-id ${LLM_MODEL_ID}
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
   llm:
     image: opea/llm-docsum-tgi:latest
-    container_name: llm-docsum-server
+    container_name: llm-docsum-gaudi-server
     depends_on:
-      - tgi_service
+      - tgi-service
     ports:
       - "9000:9000"
     ipc: host
@@ -38,11 +41,11 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
-  docsum-xeon-backend-server:
+  docsum-gaudi-backend-server:
     image: opea/docsum:latest
-    container_name: docsum-xeon-backend-server
+    container_name: docsum-gaudi-backend-server
     depends_on:
-      - tgi_service
+      - tgi-service
       - llm
     ports:
       - "8888:8888"
@@ -54,11 +57,11 @@ services:
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  docsum-xeon-ui-server:
+  docsum-gaudi-ui-server:
     image: opea/docsum-ui:latest
-    container_name: docsum-xeon-ui-server
+    container_name: docsum-gaudi-ui-server
     depends_on:
-      - docsum-xeon-backend-server
+      - docsum-gaudi-backend-server
     ports:
       - "5173:5173"
     environment:
@@ -70,16 +73,16 @@ services:
     restart: always
   docsum-xeon-react-ui-server:
     image: opea/docsum-react-ui:latest
-    container_name: docsum-xeon-react-ui-server
+    container_name: docsum-gaudi-react-ui-server
     depends_on:
-      - docsum-xeon-backend-server
+      - docsum-gaudi-backend-server
     build:
       args:
         - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
     ports:
       - "5174:80"
-    ipc: host
-    restart: always
+    environment:
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
 
 networks:
   default:

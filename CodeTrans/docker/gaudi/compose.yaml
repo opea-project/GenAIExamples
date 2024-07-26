@@ -5,11 +5,11 @@
 version: "3.8"
 
 services:
-  tgi_service:
+  tgi-service:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.1
-    container_name: tgi-gaudi-server
+    container_name: codetrans-tgi-service
     ports:
-      - "8028:80"
+      - "8008:80"
     volumes:
       - "./data:/data"
     environment:
@@ -27,8 +27,6 @@ services:
   llm:
     image: opea/llm-tgi:latest
     container_name: llm-tgi-gaudi-server
-    depends_on:
-      - tgi_service
     ports:
       - "9000:9000"
     ipc: host
@@ -42,13 +40,14 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
-  codegen-gaudi-backend-server:
-    image: opea/codegen:latest
-    container_name: codegen-gaudi-backend-server
+  codetrans-gaudi-backend-server:
+    image: opea/codetrans:latest
+    container_name: codetrans-gaudi-backend-server
     depends_on:
+      - tgi-service
       - llm
     ports:
-      - "7778:7778"
+      - "7777:7777"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
@@ -57,31 +56,18 @@ services:
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  codegen-gaudi-ui-server:
-    image: opea/codegen-ui:latest
-    container_name: codegen-gaudi-ui-server
+  codetrans-gaudi-ui-server:
+    image: opea/codetrans-ui:latest
+    container_name: codetrans-gaudi-ui-server
     depends_on:
-      - codegen-gaudi-backend-server
+      - codetrans-gaudi-backend-server
     ports:
       - "5173:5173"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - BASIC_URL=${BACKEND_SERVICE_ENDPOINT}
-    ipc: host
-    restart: always
-
-  codegen-gaudi-react-ui-server:
-    image: opea/codegen-react-ui:latest
-    container_name: codegen-gaudi-react-ui-server
-    depends_on:
-      - codegen-gaudi-backend-server
-    ports:
-      - "5174:80"
-    build:
-      args:
-        - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 

@@ -53,11 +53,11 @@ source ./docker/set_env.sh
 
 ### Deploy Code Translation on Gaudi
 
-Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
+Please find corresponding [compose.yaml](./docker/gaudi/compose.yaml).
 
 ```bash
 cd GenAIExamples/CodeTrans/docker/gaudi
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 > Notice: Currently only the <b>Habana Driver 1.16.x</b> is supported for Gaudi.
@@ -66,11 +66,11 @@ Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker imag
 
 ### Deploy Code Translation on Xeon
 
-Please find corresponding [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
+Please find corresponding [compose.yaml](./docker/xeon/compose.yaml).
 
 ```bash
 cd GenAIExamples/CodeTrans/docker/xeon
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
@@ -119,6 +119,6 @@ curl http://${host_ip}:8008/generate \
   -H 'Content-Type: application/json'
 ```
 
-2. (Docker only) If all microservices work well, please check the port ${host_ip}:7777, the port may be allocated by other users, you can modify the `docker_compose.yaml`.
+2. (Docker only) If all microservices work well, please check the port ${host_ip}:7777, the port may be allocated by other users, you can modify the `compose.yaml`.
 
-3. (Docker only) If you get errors like "The container name is in use", please change container name in `docker_compose.yaml`.
+3. (Docker only) If you get errors like "The container name is in use", please change container name in `compose.yaml`.
