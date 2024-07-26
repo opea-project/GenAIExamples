@@ -212,6 +212,7 @@ If guardrails microservice is enabled in the pipeline, the below environment var
 
 ```bash
 export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+export SAFETY_GUARD_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
 export SAFETY_GUARD_ENDPOINT="http://${host_ip}:8088"
 export GUARDRAIL_SERVICE_HOST_IP=${host_ip}
 ```
