@@ -156,3 +156,10 @@ http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Le
 2. (Docker only) If all microservices work well, please check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `compose.yaml`.
 
 3. (Docker only) If you get errors like "The container name is in use", please change container name in `compose.yaml`.
+
+# Monitoring OPEA Service with Prometheus and Grafana dashboard
+
+OPEA microservice deployment can easily be monitored through Grafana dashboards in conjunction with Prometheus data collection. Please follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to setup Prometheus and Grafana servers and import dashboards to monitor the OPEA service.
+
+![chatqna dashboards](./assets/img/chatqna_dashboards.png)
+![tgi dashboard](./assets/img/tgi_dashboard.png)
