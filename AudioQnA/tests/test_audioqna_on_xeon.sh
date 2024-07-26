@@ -63,20 +63,21 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d
-     n=0
-     until [[ "$n" -ge 200 ]]; do
-         docker logs tgi-service > $LOG_PATH/tgi_service_start.log
-         if grep -q Connected $LOG_PATH/tgi_service_start.log; then
-             break
-         fi
-         sleep 1s
-         n=$((n+1))
-     done
+    n=0
+    until [[ "$n" -ge 200 ]]; do
+       docker logs tgi-service > $LOG_PATH/tgi_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+           break
+       fi
+       sleep 1s
+       n=$((n+1))
+    done
 }
 
 
 function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
+    echo $result
     if [[ $result == *"AAA"* ]]; then
         echo "Result correct."
     else
