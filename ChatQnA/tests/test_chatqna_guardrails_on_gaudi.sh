@@ -72,17 +72,17 @@ function start_services() {
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna-guardrails:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose_guardrails.yaml
-        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose_guardrails.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose_guardrails.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose_guardrails.yaml
-        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" docker_compose_guardrails.yaml
-        echo "cat docker_compose_guardrails.yaml"
-        cat docker_compose_guardrails.yaml
+        sed -i "s#image: opea/chatqna-guardrails:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_guardrails.yaml
+        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_guardrails.yaml
+        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_guardrails.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_guardrails.yaml
+        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose_guardrails.yaml
+        echo "cat compose_guardrails.yaml"
+        cat compose_guardrails.yaml
     fi
 
     # Start Docker Containers
-    docker compose -f docker_compose_guardrails.yaml up -d
+    docker compose -f compose_guardrails.yaml up -d
     n=0
     until [[ "$n" -ge 400 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
@@ -240,11 +240,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    container_list=$(cat docker_compose_guardrails.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose -f compose_guardrails.yaml down
 }
 
 function main() {

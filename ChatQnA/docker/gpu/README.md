@@ -78,7 +78,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -110,7 +110,7 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gpu/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 ### Validate MicroServices and MegaService
@@ -245,7 +245,7 @@ curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
 
 ## Enable LangSmith for Monotoring Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 
@@ -264,7 +264,7 @@ export LANGCHAIN_API_KEY=ls_...
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   chaqna-ui-server:

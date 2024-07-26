@@ -54,29 +54,30 @@ function start_services() {
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/audioqna:latest#image: opea/audioqna:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/audioqna-ui:latest#image: opea/audioqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
-        echo "cat docker_compose.yaml"
-        cat docker_compose.yaml
+        sed -i "s#image: opea/audioqna:latest#image: opea/audioqna:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/audioqna-ui:latest#image: opea/audioqna-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        echo "cat compose.yaml"
+        cat compose.yaml
     fi
 
     # Start Docker Containers
-    docker compose -f docker_compose.yaml up -d
-     n=0
-     until [[ "$n" -ge 200 ]]; do
-         docker logs tgi-service > $LOG_PATH/tgi_service_start.log
-         if grep -q Connected $LOG_PATH/tgi_service_start.log; then
-             break
-         fi
-         sleep 1s
-         n=$((n+1))
-     done
+    docker compose up -d
+    n=0
+    until [[ "$n" -ge 200 ]]; do
+       docker logs tgi-service > $LOG_PATH/tgi_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+           break
+       fi
+       sleep 1s
+       n=$((n+1))
+    done
 }
 
 
 function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
+    echo $result
     if [[ $result == *"AAA"* ]]; then
         echo "Result correct."
     else
@@ -113,11 +114,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose stop && docker compose rm -f
 }
 
 function main() {

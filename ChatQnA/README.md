@@ -28,7 +28,7 @@ docker pull opea/chatqna:latest
 
 Two type of UI are supported now, choose one you like and pull the referred docker image.
 
-If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/gaudi#-launch-the-conversational-ui-optional) and modify the [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
+If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/gaudi#-launch-the-conversational-ui-optional) and modify the [compose.yaml](./docker/xeon/compose.yaml).
 
 ```bash
 docker pull opea/chatqna-ui:latest
@@ -74,11 +74,11 @@ source ./docker/gpu/set_env.sh
 
 ## Deploy ChatQnA on Gaudi
 
-Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
+Please find corresponding [compose.yaml](./docker/gaudi/compose.yaml).
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 > Notice: Currently only the <b>Habana Driver 1.16.x</b> is supported for Gaudi.
@@ -87,11 +87,11 @@ Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker imag
 
 ## Deploy ChatQnA on Xeon
 
-Please find corresponding [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
+Please find corresponding [compose.yaml](./docker/xeon/compose.yaml).
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/xeon/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
@@ -100,7 +100,7 @@ Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on buil
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gpu/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for more instructions on building docker images from source.
@@ -153,6 +153,6 @@ If you choose conversational UI, use this URL: `http://{host_ip}:5174`
 http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'
 ```
 
-2. (Docker only) If all microservices work well, please check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `docker_compose.yaml`.
+2. (Docker only) If all microservices work well, please check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `compose.yaml`.
 
-3. (Docker only) If you get errors like "The container name is in use", please change container name in `docker_compose.yaml`.
+3. (Docker only) If you get errors like "The container name is in use", please change container name in `compose.yaml`.

@@ -172,8 +172,6 @@ services:
     ipc: host
     restart: always
 
-
-
 networks:
   default:
     driver: bridge

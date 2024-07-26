@@ -1,12 +1,13 @@
+
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 version: "3.8"
 
 services:
-  tgi_service:
+  tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:1.4
-    container_name: tgi_xeon_server
+    container_name: tgi-service
     ports:
       - "8008:80"
     environment:
@@ -19,11 +20,11 @@ services:
       - "./data:/data"
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
-  llm_faqgen:
-    image: opea/llm-faqgen-tgi:latest
-    container_name: llm-faqgen-server
+  llm:
+    image: opea/llm-docsum-tgi:latest
+    container_name: llm-docsum-server
     depends_on:
-      - tgi_service
+      - tgi-service
     ports:
       - "9000:9000"
     ipc: host
@@ -37,12 +38,12 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
-  faqgen-xeon-backend-server:
-    image: opea/faqgen:latest
-    container_name: faqgen-xeon-backend-server
+  docsum-xeon-backend-server:
+    image: opea/docsum:latest
+    container_name: docsum-xeon-backend-server
     depends_on:
-      - tgi_service
-      - llm_faqgen
+      - tgi-service
+      - llm
     ports:
       - "8888:8888"
     environment:
@@ -53,11 +54,11 @@ services:
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  faqgen-xeon-ui-server:
-    image: opea/faqgen-ui:latest
-    container_name: faqgen-xeon-ui-server
+  docsum-xeon-ui-server:
+    image: opea/docsum-ui:latest
+    container_name: docsum-xeon-ui-server
     depends_on:
-      - faqgen-xeon-backend-server
+      - docsum-xeon-backend-server
     ports:
       - "5173:5173"
     environment:
@@ -67,6 +68,19 @@ services:
       - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
+  docsum-xeon-react-ui-server:
+    image: opea/docsum-react-ui:latest
+    container_name: docsum-xeon-react-ui-server
+    depends_on:
+      - docsum-xeon-backend-server
+    build:
+      args:
+        - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+    ports:
+      - "5174:80"
+    ipc: host
+    restart: always
+
 networks:
   default:
     driver: bridge

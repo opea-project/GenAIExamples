@@ -15,9 +15,9 @@
 version: "3.8"
 
 services:
-  tgi_service:
+  tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:1.4
-    container_name: tgi_service
+    container_name: tgi-service
     ports:
       - "8008:80"
     environment:
@@ -33,7 +33,7 @@ services:
     image: opea/llm-tgi:latest
     container_name: llm-tgi-server
     depends_on:
-      - tgi_service
+      - tgi-service
     ports:
       - "9000:9000"
     ipc: host
@@ -50,7 +50,7 @@ services:
     image: opea/translation:latest
     container_name: translation-xeon-backend-server
     depends_on:
-      - tgi_service
+      - tgi-service
       - llm
     ports:
       - "8888:8888"

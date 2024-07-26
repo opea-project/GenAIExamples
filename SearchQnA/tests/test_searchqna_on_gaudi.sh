@@ -141,7 +141,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    docker compose down
+    docker compose stop && docker compose rm -f
 }
 
 function main() {

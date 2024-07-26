@@ -65,7 +65,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -85,7 +85,7 @@ Note: Please replace with `host_ip` with your external IP address, do not use lo
 
 ```bash
 cd GenAIExamples/FaqGen/docker/xeon
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 ### Validate Microservices
@@ -120,7 +120,7 @@ Following the validation of all aforementioned microservices, we are now prepare
 
 ## Enable LangSmith to Monitor an Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 
@@ -145,7 +145,7 @@ Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
 ## 🚀 Launch the React UI (Optional)
 
-To access the FAQGen (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `faqgen-xeon-ui-server` service with the `faqgen-xeon-react-ui-server` service as per the config below:
+To access the FAQGen (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `faqgen-xeon-ui-server` service with the `faqgen-xeon-react-ui-server` service as per the config below:
 
 ```bash
   faqgen-xeon-react-ui-server:

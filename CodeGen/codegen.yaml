@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 opea_micro_services:
-  tgi_service:
+  tgi-service:
     host: ${TGI_SERVICE_IP}
     ports: ${TGI_SERVICE_PORT}
     image: ghcr.io/huggingface/tgi-gaudi:2.0.1

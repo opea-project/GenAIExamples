@@ -177,7 +177,7 @@ If Guardrails docker image is built, you will find one more image:
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -227,32 +227,32 @@ cd GenAIExamples/ChatQnA/docker/gaudi/
 If use tgi for llm backend.
 
 ```bash
-docker compose -f docker_compose.yaml up -d
+docker compose -f compose.yaml up -d
 ```
 
 If use vllm for llm backend.
 
 ```bash
-docker compose -f docker_compose_vllm.yaml up -d
+docker compose -f compose_vllm.yaml up -d
 ```
 
 If use vllm-on-ray for llm backend.
 
 ```bash
-docker compose -f docker_compose_vllm_ray.yaml up -d
+docker compose -f compose_vllm_ray.yaml up -d
 ```
 
 If use ray serve for llm backend.
 
 ```bash
-docker compose -f docker_compose_ray_serve.yaml up -d
+docker compose -f compose_ray_serve.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
-docker compose -f docker_compose_guardrails.yaml up -d
+docker compose -f compose_guardrails.yaml up -d
 ```
 
 ### Validate MicroServices and MegaService
@@ -426,7 +426,7 @@ curl http://${host_ip}:9090/v1/guardrails\
 
 ## Enable LangSmith for Monotoring Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 
@@ -445,7 +445,7 @@ export LANGCHAIN_API_KEY=ls_...
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   chaqna-gaudi-ui-server:
@@ -463,7 +463,7 @@ Here is an example of running ChatQnA:
 
 ## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
 
 ```yaml
 chaqna-gaudi-conversation-ui-server:
@@ -481,7 +481,7 @@ chaqna-gaudi-conversation-ui-server:
   restart: always
 ```
 
-Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   chaqna-gaudi-conversation-ui-server:

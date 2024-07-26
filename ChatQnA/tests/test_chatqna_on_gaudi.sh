@@ -68,24 +68,24 @@ function start_services() {
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         if [ "${mode}" == "perf" ]; then
-            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
         else
-            sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-            sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-            sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose.yaml
-            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
-            sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" docker_compose.yaml
+            sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose.yaml
+            sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose.yaml
+            sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose.yaml
+            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+            sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose.yaml
         fi
-        echo "cat docker_compose.yaml"
-        cat docker_compose.yaml
+        echo "cat compose.yaml"
+        cat compose.yaml
     fi
 
     # Start Docker Containers
-    docker compose -f docker_compose.yaml up -d
+    docker compose up -d
     n=0
     until [[ "$n" -ge 400 ]]; do
-        docker logs tgi-gaudi-server > tgi_service_start.log
-        if grep -q Connected tgi_service_start.log; then
+        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
         sleep 1s
@@ -223,11 +223,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose stop && docker compose rm -f
 }
 
 function main() {

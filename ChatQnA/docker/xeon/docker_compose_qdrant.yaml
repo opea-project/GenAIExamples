@@ -108,7 +108,7 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
-  tgi_service:
+  tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.1.0
     container_name: tgi-service
     ports:
@@ -128,7 +128,7 @@ services:
     image: opea/llm-tgi:latest
     container_name: llm-tgi-server
     depends_on:
-      - tgi_service
+      - tgi-service
     ports:
       - "9000:9000"
     ipc: host
@@ -154,7 +154,7 @@ services:
       - retriever
       - tei-reranking-service
       - reranking
-      - tgi_service
+      - tgi-service
       - llm
     ports:
       - "8888:8888"
