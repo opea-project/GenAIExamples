@@ -168,4 +168,4 @@ Open this URL `http://{host_ip}:5174` in your browser to access the react based 
   ![project-screenshot](../../assets/img/faqgen_react_ui_text.png)
 
 - Create FAQs from Text Files
-  ![project-screenshot](../../assets/img/faqgen_react_ui_text_files.png)
+  ![project-screenshot](../../assets/img/faqgen_react_ui_text_file.png)
