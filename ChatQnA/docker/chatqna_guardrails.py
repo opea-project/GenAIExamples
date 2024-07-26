@@ -26,8 +26,8 @@ class ChatQnAService:
         self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
-        guardrail = MicroService(
-            name="guardrail",
+        guardrail_in = MicroService(
+            name="guardrail_in",
             host=GUARDRAIL_SERVICE_HOST_IP,
             port=GUARDRAIL_SERVICE_PORT,
             endpoint="/v1/guardrails",
@@ -66,11 +66,20 @@ class ChatQnAService:
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )
-        self.megaservice.add(guardrail).add(embedding).add(retriever).add(rerank).add(llm)
-        self.megaservice.flow_to(guardrail, embedding)
+        guardrail_out = MicroService(
+            name="guardrail_out",
+            host=GUARDRAIL_SERVICE_HOST_IP,
+            port=GUARDRAIL_SERVICE_PORT,
+            endpoint="/v1/guardrails",
+            use_remote_service=True,
+            service_type=ServiceType.GUARDRAIL,
+        )
+        self.megaservice.add(guardrail_in).add(embedding).add(retriever).add(rerank).add(llm).add(guardrail_out)
+        self.megaservice.flow_to(guardrail_in, embedding)
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, rerank)
         self.megaservice.flow_to(rerank, llm)
+        self.megaservice.flow_to(llm, guardrail_out)
         self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
 
