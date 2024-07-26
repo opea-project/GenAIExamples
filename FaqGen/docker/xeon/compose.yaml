@@ -1,13 +1,12 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 version: "3.8"
 
 services:
-  tgi_service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
-    container_name: tgi-gaudi-server
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:1.4
+    container_name: tgi_xeon_server
     ports:
       - "8008:80"
     environment:
@@ -18,16 +17,13 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
       - "./data:/data"
-    runtime: habana
-    cap_add:
-      - SYS_NICE
-    ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
-  llm:
-    image: opea/llm-docsum-tgi:latest
-    container_name: llm-docsum-gaudi-server
+    shm_size: 1g
+    command: --model-id ${LLM_MODEL_ID}
+  llm_faqgen:
+    image: opea/llm-faqgen-tgi:latest
+    container_name: llm-faqgen-server
     depends_on:
-      - tgi_service
+      - tgi-service
     ports:
       - "9000:9000"
     ipc: host
@@ -41,12 +37,12 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
-  docsum-gaudi-backend-server:
-    image: opea/docsum:latest
-    container_name: docsum-gaudi-backend-server
+  faqgen-xeon-backend-server:
+    image: opea/faqgen:latest
+    container_name: faqgen-xeon-backend-server
     depends_on:
-      - tgi_service
-      - llm
+      - tgi-service
+      - llm_faqgen
     ports:
       - "8888:8888"
     environment:
@@ -57,11 +53,11 @@ services:
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  docsum-gaudi-ui-server:
-    image: opea/docsum-ui:latest
-    container_name: docsum-gaudi-ui-server
+  faqgen-xeon-ui-server:
+    image: opea/faqgen-ui:latest
+    container_name: faqgen-xeon-ui-server
     depends_on:
-      - docsum-gaudi-backend-server
+      - faqgen-xeon-backend-server
     ports:
       - "5173:5173"
     environment:
@@ -71,19 +67,6 @@ services:
       - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
-  docsum-xeon-react-ui-server:
-    image: opea/docsum-react-ui:latest
-    container_name: docsum-gaudi-react-ui-server
-    depends_on:
-      - docsum-gaudi-backend-server
-    build:
-      args:
-        - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
-    ports:
-      - "5174:80"
-    environment:
-      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
-
 networks:
   default:
     driver: bridge

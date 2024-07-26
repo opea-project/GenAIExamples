@@ -50,7 +50,15 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
 
-    sleep 2m # Waits 2 minutes
+    n=0
+    until [[ "$n" -ge 500 ]]; do
+        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 function validate_services() {
@@ -92,7 +100,7 @@ function validate_microservices() {
         "${ip_address}:8008/generate" \
         "generated_text" \
         "tgi-gaudi" \
-        "tgi_gaudi_service" \
+        "tgi-gaudi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
@@ -141,7 +149,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    docker compose down
+    docker compose stop && docker compose rm -f
 }
 
 function main() {

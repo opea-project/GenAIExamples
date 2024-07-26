@@ -40,7 +40,7 @@ reranking
 =========
 Port 8000 - Open to 0.0.0.0/0
 
-tgi_service or vLLM_service
+tgi-service or vLLM_service
 ===========
 Port 9009 - Open to 0.0.0.0/0
 
@@ -92,7 +92,7 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### Use vLLM as backend
+#### Use vLLM as backend
 
 Build vLLM docker.
 
@@ -165,7 +165,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
@@ -228,13 +228,13 @@ cd GenAIExamples/ChatQnA/docker/xeon/
 If use TGI backend.
 
 ```bash
-docker compose -f docker_compose.yaml up -d
+docker compose -f compose.yaml up -d
 ```
 
 If use vLLM backend.
 
 ```bash
-docker compose -f docker_compose_vllm.yaml up -d
+docker compose -f compose_vllm.yaml up -d
 ```
 
 ### Validate Microservices
@@ -302,7 +302,7 @@ curl http://${host_ip}:9009/generate \
 ```
 
 ```bash
-#vLLM Service
+# vLLM Service
 curl http://${your_ip}:9009/v1/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
@@ -377,7 +377,7 @@ curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
 
 ## Enable LangSmith for Monotoring Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 
@@ -396,7 +396,7 @@ export LANGCHAIN_API_KEY=ls_...
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   chaqna-gaudi-ui-server:
@@ -408,7 +408,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 ## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI (react based) frontend, modify the UI service in the `docker_compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
 
 ```yaml
 chaqna-gaudi-conversation-ui-server:
@@ -426,7 +426,7 @@ chaqna-gaudi-conversation-ui-server:
   restart: always
 ```
 
-Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   chaqna-gaudi-conversation-ui-server:

@@ -61,17 +61,17 @@ function start_services() {
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         if [ "${mode}" == "perf" ]; then
-            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose_vllm.yaml
+            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_vllm.yaml
         else
-            sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose_vllm.yaml
-            sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose_vllm.yaml
-            sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose_vllm.yaml
-            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose_vllm.yaml
+            sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_vllm.yaml
+            sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_vllm.yaml
+            sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_vllm.yaml
+            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_vllm.yaml
         fi
     fi
 
     # Start Docker Containers
-    docker compose -f docker_compose_vllm.yaml up -d
+    docker compose -f compose_vllm.yaml up -d
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log
@@ -213,11 +213,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
-    container_list=$(cat docker_compose_vllm.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose -f compose_vllm.yaml down
 }
 
 function main() {

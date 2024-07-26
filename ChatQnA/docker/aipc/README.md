@@ -79,7 +79,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 **Export the value of the public IP address of your AIPC to the `host_ip` environment variable**
 
@@ -160,7 +160,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/aipc/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 
 # let ollama service runs
 # e.g. ollama run llama3
