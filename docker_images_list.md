@@ -82,12 +82,12 @@ Take ChatQnA for example. ChatQnA is a chatbot application service based on the 
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/web-retriever-chroma">opea/web-retriever-chroma</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/langchain/chroma/docker">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA retreival microservice based on chroma vectordb for GenAI application use</td>
+    <td class="tg-cly1">The docker image exposed the OPEA retrieval microservice based on chroma vectordb for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/retriever-redis">opea/retriever-redis</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA retreival microservice based on redis vectordb for GenAI application use</td>
+    <td class="tg-cly1">The docker image exposed the OPEA retrieval microservice based on redis vectordb for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/reranking-tei">opea/reranking-tei</a></td>
