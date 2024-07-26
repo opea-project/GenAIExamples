@@ -2,7 +2,7 @@
 
 ## 📸 Project Screenshots
 
-![project-screenshot](../../assets/img/search_ui_init.png)
+![project-screenshot](../../../assets/img/search_ui_init.png)
 
 ## 🧐 Features
 
