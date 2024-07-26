@@ -77,27 +77,27 @@ Take ChatQnA for example. ChatQnA is a chatbot application service based on the 
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/tei-gaudi/tags">opea/tei-gaudi</a></td>
     <td class="tg-yk8o"><a href="https://github.com/huggingface/tei-gaudi/blob/habana-main/Dockerfile-hpu">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image powered by HuggingFace Text Embedding Inference (TEI) on Gaudi2 for deploying and serving Embedding Models</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/web-retriever-chroma">opea/web-retriever-chroma</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/langchain/chroma/docker">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA retreival microservice based on chroma vectordb for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/retriever-redis">opea/retriever-redis</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA retreival microservice based on redis vectordb for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/reranking-tei">opea/reranking-tei</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/reranks/tei/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA reranking microservice based on tei docker image for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-tgi">opea/llm-tgi</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/tgi/Dockerfile">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA LLM microservice upon TGI docker image for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-docsum-tgi">opea/llm-docsum-tgi</a></td>
@@ -107,32 +107,32 @@ Take ChatQnA for example. ChatQnA is a chatbot application service based on the 
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-vllm">opea/llm-vllm</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/vllm/docker/Dockerfile.microservice">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA LLM microservice upon vLLM docker image for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-ray">opea/llm-ray</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA LLM microservice based on Ray for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/guardrails-pii-detection">opea/guardrails-pii-detection</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/guardrails/pii_detection/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA guardrail microservice to provide PII detection for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/embedding-tei">opea/embedding-tei</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/embeddings/langchain/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA embedding microservice upon tei docker image for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/dataprep-on-ray-redis">opea/dataprep-on-ray-redis</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain_ray/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA dataprep microservice based on redis vectordb and optimized ray for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/dataprep-redis">opea/dataprep-redis</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image exposed the OPEA dataprep microservice based on redis vectordb for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/knowledge_graphs">opea/knowledge_graphs</a></td>
@@ -142,11 +142,12 @@ Take ChatQnA for example. ChatQnA is a chatbot application service based on the 
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/gmcrouter">opea/gmcrouter</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.manager">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">		The docker image served as one of key parts of the OPEA GenAI Microservice Connector(GMC) to route the traffic among the microservices defined in GMC
+		</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/gmcmanager">opea/gmcmanager</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.router">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image served as one of key parts of the OPEA GenAI Microservice Connector(GMC) to be controller manager to handle GMC CRD</td>
   </tr>
 </tbody></table>
