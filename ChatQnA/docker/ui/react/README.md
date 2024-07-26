@@ -1,12 +1,12 @@
-<h1 align="center" id="title"> ChatQnA Conversational UI</h1>
+# ChatQnA Conversational UI
 
-### 📸 Project Screenshots
+## 📸 Project Screenshots
 
 ![project-screenshot](../../../assets/img/conversation_ui_init.png)
 ![project-screenshot](../../../assets/img/conversation_ui_response.png)
 ![project-screenshot](../../../assets/img/conversation_ui_upload.png)
 
-<h2>🧐 Features</h2>
+## 🧐 Features
 
 Here're some of the project's features:
 
@@ -17,7 +17,7 @@ Here're some of the project's features:
 - Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
 - Conversational Chat : The application maintains a history of the conversation, allowing users to review previous messages and the AI to refer back to earlier points in the dialogue when necessary.
 
-<h2>🛠️ Get it Running:</h2>
+## 🛠️ Get it Running
 
 1. Clone the repo.
 

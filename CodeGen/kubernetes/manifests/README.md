@@ -1,4 +1,4 @@
-<h1 align="center" id="title">Deploy CodeGen in Kubernetes Cluster</h1>
+# Deploy CodeGen in Kubernetes Cluster
 
 > [NOTE]
 > The following values must be set before you can deploy:

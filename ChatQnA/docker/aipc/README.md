@@ -193,7 +193,7 @@ curl http://${host_ip}:6000/v1/embeddings\
    To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
 
 ```bash
-your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${host_ip}:7000/v1/retrieval \
   -X POST \
   -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
