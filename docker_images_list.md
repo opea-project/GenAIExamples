@@ -26,7 +26,7 @@ Take ChatQnA for example. ChatQnA is a chatbot application service based on the 
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna-conversation-ui">opea/chatqna-conversation-ui</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/ui/docker/Dockerfile.react">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The purpose of the docker image is to provide a user interface for chat-based Q&A using React. It allows for interaction with users and supports continuing conversations with a history that is stored in the browser's local storage.</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/docsum">opea/docsum</a></td>
@@ -82,12 +82,12 @@ Take ChatQnA for example. ChatQnA is a chatbot application service based on the 
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/web-retriever-chroma">opea/web-retriever-chroma</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/langchain/chroma/docker">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA retrieval microservice based on chroma vectordb for GenAI application use</td>
+    <td class="tg-cly1">The docker image exposed the OPEA retreival microservice based on chroma vectordb for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/retriever-redis">opea/retriever-redis</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA retrieval microservice based on redis vectordb for GenAI application use</td>
+    <td class="tg-cly1">The docker image exposed the OPEA retreival microservice based on redis vectordb for GenAI application use</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/reranking-tei">opea/reranking-tei</a></td>
@@ -102,7 +102,7 @@ Take ChatQnA for example. ChatQnA is a chatbot application service based on the 
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-docsum-tgi">opea/llm-docsum-tgi</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/llms/summarization/tgi/Dockerfile">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">This docker image is designed to build a document summarization microservice using the HuggingFace Text Generation Inference(TGI) framework. The microservice accepts document input and generates a document summary.</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-vllm">opea/llm-vllm</a></td>
@@ -137,12 +137,12 @@ Take ChatQnA for example. ChatQnA is a chatbot application service based on the 
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/knowledge_graphs">opea/knowledge_graphs</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/knowledgegraphs/langchain/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1"></td>
+    <td class="tg-cly1">The docker image served as knowledge graph gateway to enhance  question answering with graph knowledge searching.</td>
   </tr>
   <tr>
     <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/gmcrouter">opea/gmcrouter</a></td>
     <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.manager">Link</a></td>
-    <td class="tg-cly1">		The docker image served as one of key parts of the OPEA GenAI Microservice Connector(GMC) to route the traffic among the microservices defined in GMC
+    <td class="tg-cly1">The docker image served as one of key parts of the OPEA GenAI Microservice Connector(GMC) to route the traffic among the microservices defined in GMC
 		</td>
   </tr>
   <tr>
