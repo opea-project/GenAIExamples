@@ -86,8 +86,26 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 
 ### 4. Build LLM Image
 
+#### Use TGI as backend
+
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+```
+
+#### Use vLLM as backend
+
+Build vLLM docker.
+
+```bash
+git clone https://github.com/vllm-project/vllm.git
+cd ./vllm/
+docker build --no-cache -t vllm:cpu --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu .
+```
+
+Build microservice.
+
+```bash
+docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
 ```
 
 ### 5. Build Dataprep Image
@@ -276,11 +294,19 @@ curl http://${host_ip}:8000/v1/reranking\
 6. LLM backend Service
 
 ```bash
+# TGI service
 curl http://${host_ip}:9009/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 ```
+```bash
+# vLLM Service
+curl http://${your_ip}:9009/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+```
+
 
 7. LLM Microservice
 

@@ -222,7 +222,30 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
+```
+
+If use tgi for llm backend.
+
+```bash
 docker compose -f compose.yaml up -d
+```
+
+If use vllm for llm backend.
+
+```bash
+docker compose -f compose_vllm.yaml up -d
+```
+
+If use vllm-on-ray for llm backend.
+
+```bash
+docker compose -f compose_vllm_ray.yaml up -d
+```
+
+If use ray serve for llm backend.
+
+```bash
+docker compose -f compose_ray_serve.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
