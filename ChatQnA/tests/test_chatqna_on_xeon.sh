@@ -16,7 +16,7 @@ function build_docker_images() {
 
     docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
+    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
 
@@ -54,18 +54,24 @@ function start_services() {
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        if [ "${mode}" == "perf" ]; then
+            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        else
+            sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
+            sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
+            sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" docker_compose.yaml
+            sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        fi
+        echo "cat docker_compose.yaml"
+        cat docker_compose.yaml
     fi
 
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     n=0
-    until [[ "$n" -ge 200 ]]; do
-        docker logs tgi-service > tgi_service_start.log
-        if grep -q Connected tgi_service_start.log; then
+    until [[ "$n" -ge 500 ]]; do
+        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
         sleep 1s
@@ -178,15 +184,16 @@ function validate_megaservice() {
 
 function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
-    local conda_env_name="ChatQnA_e2e"
+    local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-    conda remove -n ${conda_env_name} --all -y
-    conda create -n ${conda_env_name} python=3.12 -y
+#    conda remove -n ${conda_env_name} --all -y
+#    conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+#    conda install -c conda-forge nodejs -y
+    npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
     exit_status=0
@@ -198,7 +205,6 @@ function validate_frontend() {
     else
         echo "[TEST INFO]: ---------frontend test passed---------"
     fi
-
 }
 
 function stop_docker() {
@@ -220,9 +226,13 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
 
-    validate_microservices
-    validate_megaservice
-    validate_frontend
+    if [ "${mode}" == "perf" ]; then
+        python3 $WORKPATH/tests/chatqna_benchmark.py
+    elif [ "${mode}" == "" ]; then
+        validate_microservices
+        validate_megaservice
+        validate_frontend
+    fi
 
     stop_docker
     echo y | docker system prune

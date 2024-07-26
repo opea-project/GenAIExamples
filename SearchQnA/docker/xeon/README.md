@@ -26,7 +26,7 @@ docker build --no-cache -t opea/web-retriever-chroma:latest --build-arg https_pr
 ### 4. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
 ```
 
 ### 5. Build LLM Image
@@ -88,7 +88,7 @@ export LLM_SERVICE_PORT=3007
 
 ```bash
 cd GenAIExamples/SearchQnA/docker/xeon/
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 ## 🚀 Test MicroServices
@@ -107,7 +107,7 @@ curl http://${host_ip}:3002/v1/embeddings\
   -H 'Content-Type: application/json'
 
 # web retriever microservice
-your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${host_ip}:3003/v1/web_retrieval \
   -X POST \
   -d "{\"text\":\"What is the 2024 holiday schedule?\",\"embedding\":${your_embedding}}" \

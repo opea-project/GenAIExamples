@@ -17,7 +17,7 @@ function build_docker_images() {
     cd $WORKPATH/docker
     docker build --no-cache -t opea/translation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
@@ -35,9 +35,20 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
 
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/translation:latest#image: opea/translation:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/translation-ui:latest#image: opea/translation-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        echo "cat compose.yaml"
+        cat compose.yaml
+    fi
+
     # Start Docker Containers
-    # TODO: Replace the container name with a test-specific name
-    docker compose -f docker_compose.yaml up -d
+    docker compose up -d
 
     sleep 2m # Waits 2 minutes
 }
@@ -105,15 +116,16 @@ function validate_megaservice() {
 
 function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
-    local conda_env_name="Translation_e2e"
+    local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-    conda remove -n ${conda_env_name} --all -y
-    conda create -n ${conda_env_name} python=3.12 -y
+#    conda remove -n ${conda_env_name} --all -y
+#    conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+#    conda install -c conda-forge nodejs -y
+    npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
     exit_status=0
@@ -125,27 +137,23 @@ function validate_frontend() {
     else
         echo "[TEST INFO]: ---------frontend test passed---------"
     fi
-
 }
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose down
 }
 
 function main() {
 
     stop_docker
 
-    build_docker_images
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices
     validate_megaservice
+    validate_frontend
 
     stop_docker
     echo y | docker system prune

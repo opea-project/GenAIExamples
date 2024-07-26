@@ -22,14 +22,109 @@ The workflow falls into the following architecture:
 
 The CodeGen service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
 
-## Deploy CodeGen on Gaudi
+Currently we support two ways of deploying ChatQnA services with docker compose:
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying CodeGen on Gaudi.
+1. Start services using the docker image on `docker hub`:
 
-## Deploy CodeGen on Xeon
+```bash
+docker pull opea/codegen:latest
+```
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying CodeGen on Xeon.
+2. Start services using the docker images `built from source`: [Guide](./docker)
 
-## Deploy CodeGen into Kubernetes on Xeon & Gaudi
+## Setup Environment Variable
+
+To set up environment variables for deploying ChatQnA services, follow these steps:
+
+1. Set the required environment variables:
+
+```bash
+# Example: host_ip="192.168.1.1"
+export host_ip="External_Public_IP"
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+export no_proxy="Your_No_Proxy"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+```
+
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+```bash
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+```
+
+3. Set up other environment variables:
+
+```bash
+source ./docker/set_env.sh
+```
+
+## Deploy CodeGen using Docker
+
+### Deploy CodeGen on Gaudi
+
+Please find corresponding [docker_compose.yaml](./docker/gaudi/docker_compose.yaml).
+
+```bash
+cd GenAIExamples/CodeGen/docker/gaudi
+docker compose -f docker_compose.yaml up -d
+```
+
+> Notice: Currently only the <b>Habana Driver 1.16.x</b> is supported for Gaudi.
+
+Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+
+### Deploy CodeGen on Xeon
+
+Please find corresponding [docker_compose.yaml](./docker/xeon/docker_compose.yaml).
+
+```bash
+cd GenAIExamples/CodeGen/docker/xeon
+docker compose -f docker_compose.yaml up -d
+```
+
+Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
+
+## Deploy CodeGen using Kubernetes
 
 Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
+
+## Deploy CodeGen into Kubernetes using Helm Chart
+
+Install Helm (version >= 3.15) first. Please refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
+
+Refer to the [CodeGen helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/codegen) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
+
+# Consume CodeGen Service
+
+Two ways of consuming CodeGen Service:
+
+1. Use cURL command on terminal
+
+```bash
+curl http://${host_ip}:7778/v1/codegen \
+    -H "Content-Type: application/json" \
+    -d '{"messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
+```
+
+2. Access via frontend
+
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173.
+
+By default, the UI runs on port 5173 internally.
+
+# Troubleshooting
+
+1. If you get errors like "Access Denied", please [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen/docker/xeon#validate-microservices) first. A simple example:
+
+```bash
+http_proxy=""
+curl http://${host_ip}:8028/generate \
+  -X POST \
+  -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":256, "do_sample": true}}' \
+  -H 'Content-Type: application/json'
+```
+
+2. (Docker only) If all microservices work well, please check the port ${host_ip}:7778, the port may be allocated by other users, you can modify the `docker_compose.yaml`.
+
+3. (Docker only) If you get errors like "The container name is in use", please change container name in `docker_compose.yaml`.

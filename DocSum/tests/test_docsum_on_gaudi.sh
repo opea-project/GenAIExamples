@@ -15,13 +15,14 @@ function build_docker_images() {
 
     docker build --no-cache -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/Dockerfile .
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 
     cd $WORKPATH/docker
     docker build --no-cache -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+    docker build --no-cache -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=http://${ip_address}:8888/v1/docsum -f docker/Dockerfile.react .
 
     docker images
 }
@@ -43,13 +44,16 @@ function start_services() {
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/docsum-ui:latest#image: opea/docsum-ui:${IMAGE_TAG}#g" docker_compose.yaml
+        sed -i "s#image: opea/docsum-react-ui:latest#image: opea/docsum-react-ui:${IMAGE_TAG}#g" docker_compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        echo "cat docker_compose.yaml"
+        cat docker_compose.yaml
     fi
 
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
 
-    sleep 2m # Waits 2 minutes
+    sleep 5m # Waits 5 minutes
 }
 
 function validate_services() {
@@ -112,15 +116,16 @@ function validate_megaservice() {
 
 function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
-    local conda_env_name="DocSum_e2e"
+    local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-    conda remove -n ${conda_env_name} --all -y
-    conda create -n ${conda_env_name} python=3.12 -y
+#    conda remove -n ${conda_env_name} --all -y
+#    conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+#    conda install -c conda-forge nodejs -y
+    npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
     exit_status=0
@@ -132,7 +137,6 @@ function validate_frontend() {
     else
         echo "[TEST INFO]: ---------frontend test passed---------"
     fi
-
 }
 
 function stop_docker() {

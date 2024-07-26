@@ -16,7 +16,7 @@
 
 <script lang="ts">
 	export let data;
-	import { ifStoreMsg, knowledge1 } from "$lib/shared/stores/common/Store";
+	import { knowledge1, storageFiles } from "$lib/shared/stores/common/Store";
 	import { onMount } from "svelte";
 	import {
 		LOCAL_STORAGE_KEY,
@@ -25,28 +25,27 @@
 		type Message,
 	} from "$lib/shared/constant/Interface";
 	import {
-		fromTimeStampToTime,
 		getCurrentTimeStamp,
 		scrollToBottom,
 		scrollToTop,
 	} from "$lib/shared/Utils";
 	import { fetchTextStream } from "$lib/network/chat/Network";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
-	import { browser } from "$app/environment";
 	import "driver.js/dist/driver.css";
 	import "$lib/assets/layout/css/driver.css";
 	import UploadFile from "$lib/shared/components/upload/uploadFile.svelte";
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
-	import Gallery from "$lib/shared/components/chat/gallery.svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
+	import { fetchAllFile } from "$lib/network/upload/Network.js";
+	import { getNotificationsContext } from "svelte-notifications";
 
 	let query: string = "";
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
 	// ·········
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
-	console.log("chatMessages", chatMessages);
+	const { addNotification } = getNotificationsContext();
 
 	// ··············
 
@@ -56,18 +55,30 @@
 		scrollToDiv = document
 			.querySelector(".chat-scrollbar")
 			?.querySelector(".svlr-viewport")!;
+
+		const res = await fetchAllFile();
+		if (res) {
+			storageFiles.set(res);
+		}
 	});
 
-	function handleTop() {
-		console.log("top");
+	function showNotification(text: string, type: string) {
+		addNotification({
+			text: text,
+			position: "top-left",
+			type: type,
+			removeAfter: 3000,
+		});
+	}
 
+	function handleTop() {
 		scrollToTop(scrollToDiv);
 	}
 
 	function storeMessages() {
 		localStorage.setItem(
 			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
-			JSON.stringify(chatMessages),
+			JSON.stringify(chatMessages)
 		);
 	}
 
@@ -76,68 +87,97 @@
 			.split("\\x")
 			.slice(1)
 			.map((byte) => parseInt(byte, 16));
-		return new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
+		const decoded = new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
+
+		return decoded;
 	}
 
 	function decodeUnicode(str: string): string {
-		return str.replace(/\\u[\dA-Fa-f]{4}/g, (match) => {
+		const decoded = str.replace(/\\u[\dA-Fa-f]{4}/g, (match) => {
 			return String.fromCharCode(parseInt(match.replace(/\\u/g, ""), 16));
 		});
+
+		return decoded;
 	}
 
 	const callTextStream = async (query: string, startSendTime: number) => {
-		const eventSource = await fetchTextStream(query, knowledge_1);
-
-		eventSource.addEventListener("message", (e: any) => {
-			let Msg = e.data;
-			if (Msg.startsWith("b")) {
-				let currentMsg = Msg.slice(2, -1);
-
-				if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
-					currentMsg = decodeEscapedBytes(currentMsg);
-				} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
-					currentMsg = decodeUnicode(currentMsg);
+		try {
+			const eventSource = await fetchTextStream(query);
+			eventSource.addEventListener("error", (e: any) => {
+				if (e.type === "error") {
+					showNotification("Failed to load chat content.", "error");
+					loading = false;
 				}
-				if (currentMsg !== "</s>") {
-					currentMsg = currentMsg.replace(/\\n/g, "\n");
-				}
+			});
 
-				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-					chatMessages = [
-						...chatMessages,
-						{
+			eventSource.addEventListener("message", (e: any) => {
+				let msg = e.data;
+				console.log("msg", msg);
+
+				const handleDecodedMessage = (decodedMsg: string) => {
+					if (decodedMsg !== "</s>") {
+						decodedMsg = decodedMsg.replace(/\\n/g, "\n");
+					}
+
+					if (chatMessages[chatMessages.length - 1].role === MessageRole.User) {
+						chatMessages.push({
 							role: MessageRole.Assistant,
 							type: MessageType.Text,
-							content: currentMsg,
+							content: decodedMsg,
 							time: startSendTime,
-						},
-					];
+						});
+					} else {
+						chatMessages[chatMessages.length - 1].content += decodedMsg;
+					}
+
+					scrollToBottom(scrollToDiv);
+				};
+
+				if (msg.startsWith("b")) {
+					let currentMsg = msg.slice(2, -1);
+
+					if (/\\x[\dA-Fa-f]{2}/.test(currentMsg)) {
+						currentMsg = decodeEscapedBytes(currentMsg);
+					} else if (/\\u[\dA-Fa-f]{4}/.test(currentMsg)) {
+						currentMsg = decodeUnicode(currentMsg);
+					}
+
+					handleDecodedMessage(currentMsg);
+				} else if (msg === "[DONE]") {
+					console.log("Done");
+
+					let startTime = chatMessages[chatMessages.length - 1].time;
+					loading = false;
+					let totalTime = parseFloat(
+						((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
+					);
+
+					if (chatMessages.length - 1 !== -1) {
+						chatMessages[chatMessages.length - 1].time = totalTime;
+					}
+
+					storeMessages();
 				} else {
-					let content = chatMessages[chatMessages.length - 1].content as string;
-					chatMessages[chatMessages.length - 1].content = content + currentMsg;
+					if (/\\x[\dA-Fa-f]{2}/.test(msg)) {
+						msg = decodeEscapedBytes(msg);
+					} else if (/\\u[\dA-Fa-f]{4}/.test(msg)) {
+						msg = decodeUnicode(msg);
+					}
+
+					let currentMsg = msg.replace(/"/g, "").replace(/\\n/g, "\n");
+
+					handleDecodedMessage(currentMsg);
 				}
-				scrollToBottom(scrollToDiv);
-			} else if (Msg === "[DONE]") {
-				let startTime = chatMessages[chatMessages.length - 1].time;
+			});
 
-				loading = false;
-				let totalTime = parseFloat(
-					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2),
-				);
-
-				if (chatMessages.length - 1 !== -1) {
-					chatMessages[chatMessages.length - 1].time = totalTime;
-				}
-
-				storeMessages();
-			}
-		});
-		eventSource.stream();
+			eventSource.stream();
+		} catch (error: any) {
+			showNotification("Failed to load chat content.", "error");
+			loading = false;
+		}
 	};
 
 	const handleTextSubmit = async () => {
-		console.log("handleTextSubmit");
-
 		loading = true;
 		const newMessage = {
 			role: MessageRole.User,
@@ -159,15 +199,6 @@
 	function handelClearHistory() {
 		localStorage.removeItem(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY);
 		chatMessages = [];
-	}
-
-	function isEmptyObject(obj: any): boolean {
-		for (let key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				return false;
-			}
-		}
-		return true;
 	}
 </script>
 

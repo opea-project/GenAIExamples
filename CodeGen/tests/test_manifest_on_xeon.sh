@@ -12,7 +12,7 @@ IMAGE_TAG=${IMAGE_TAG:-latest}
 function init_codegen() {
     # executed under path manifest/codegen/xeon
     # replace the mount dir "path: /mnt/model" with "path: $CHART_MOUNT"
-    find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt#path: $MOUNT_DIR#g" {} \;
+    find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/opea-models#path: $MOUNT_DIR#g" {} \;
     # replace megaservice image tag
     find . -name '*.yaml' -type f -exec sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" {} \;
     # replace the repository "image: opea/*" with "image: $IMAGE_REPO/opea/"

@@ -58,7 +58,7 @@ jobs:
       - name: Set variables
         run: |
           if [ ${{ matrix.hardware }} == "gaudi" ]; then IMAGE_REPO=${{ vars.IMAGE_REPO_GAUDI }}; else IMAGE_REPO=${{ vars.IMAGE_REPO_XEON }}; fi
-          echo "IMAGE_REPO=${IMAGE_REPO}" >> $GITHUB_ENV
+          echo "IMAGE_REPO=$OPEA_IMAGE_REPO" >> $GITHUB_ENV
           echo "IMAGE_TAG=${{needs.mega-image-build.outputs.image_tag}}" >> $GITHUB_ENV
           lower_example=$(echo "${{ matrix.example }}" | tr '[:upper:]' '[:lower:]')
           echo "NAMESPACE=$lower_example-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
