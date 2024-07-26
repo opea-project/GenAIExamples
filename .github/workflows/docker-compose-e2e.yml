@@ -4,7 +4,7 @@
 name: E2E test with docker compose
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -27,18 +27,18 @@ jobs:
     with:
       diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|gmc|assets'
 
-  mega-image-build:
-    needs: job1
-    strategy:
-      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    uses: ./.github/workflows/reuse-image-build.yml
-    with:
-      image_tag: ${{ github.event.pull_request.head.sha }}
-      mega_service: "${{ matrix.example }}"
-      runner_label: "docker-build-${{ matrix.hardware }}"
+#  mega-image-build:
+#    needs: job1
+#    strategy:
+#      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+#    uses: ./.github/workflows/reuse-image-build.yml
+#    with:
+#      image_tag: ${{ github.event.pull_request.head.sha }}
+#      mega_service: "${{ matrix.example }}"
+#      runner_label: "docker-build-${{ matrix.hardware }}"
 
   Example-test:
-    needs: [job1, mega-image-build]
+    needs: [job1]
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     runs-on: ${{ matrix.hardware }}
@@ -63,13 +63,13 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           example: ${{ matrix.example }}
           hardware: ${{ matrix.hardware }}
-          IMAGE_TAG: ${{ needs.mega-image-build.outputs.image_tag }}
+          #IMAGE_TAG: ${{ needs.mega-image-build.outputs.image_tag }}
           IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
           IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
         run: |
           cd ${{ github.workspace }}/$example/tests
-          if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
-          export IMAGE_REPO=${IMAGE_REPO}
+          # if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
+          # export IMAGE_REPO=${IMAGE_REPO}
           example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
           if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 30m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
 
