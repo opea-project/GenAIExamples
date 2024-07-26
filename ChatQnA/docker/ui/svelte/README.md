@@ -1,12 +1,12 @@
-<h1 align="center" id="title"> ChatQnA Customized UI</h1>
+# ChatQnA Customized UI
 
-### 📸 Project Screenshots
+## 📸 Project Screenshots
 
 ![project-screenshot](../../../assets/img/chat_ui_init.png)
 ![project-screenshot](../../../assets/img/chat_ui_response.png)
 ![project-screenshot](../../../assets/img/chat_ui_upload.png)
 
-<h2>🧐 Features</h2>
+## 🧐 Features
 
 Here're some of the project's features:
 
@@ -17,7 +17,7 @@ Here're some of the project's features:
 - Scroll to Bottom / Top: The chat automatically slides to the bottom. Users can also click the top icon to slide to the top of the chat record.
 - End to End Time: Shows the time spent on the current conversation.
 
-<h2>🛠️ Get it Running:</h2>
+## 🛠️ Get it Running
 
 1. Clone the repo.
 
