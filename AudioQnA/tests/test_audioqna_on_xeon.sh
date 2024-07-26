@@ -114,7 +114,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
-    docker compose down
+    docker compose down || true
 }
 
 function main() {

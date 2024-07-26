@@ -97,7 +97,7 @@ function validate_microservices() {
         "${ip_address}:8008/generate" \
         "generated_text" \
         "tgi" \
-        "tgi_service" \
+        "tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
@@ -146,7 +146,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
-    docker compose down
+    docker compose down || true
 }
 
 function main() {

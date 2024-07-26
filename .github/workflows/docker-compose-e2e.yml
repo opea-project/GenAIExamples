@@ -80,7 +80,7 @@ jobs:
         if: cancelled() || failure()
         run: |
           cd ${{ github.workspace }}/$example/docker/$hardware
-          docker compose down
+          docker compose down || true
           echo y | docker system prune
 
       - name: Publish pipeline artifact

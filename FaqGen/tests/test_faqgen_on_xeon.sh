@@ -93,7 +93,7 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:8008/generate" \
         "generated_text" \
-        "tgi_service" \
+        "tgi-service" \
         "tgi_xeon_server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 

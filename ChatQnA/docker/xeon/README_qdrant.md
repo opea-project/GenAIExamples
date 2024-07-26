@@ -40,7 +40,7 @@ reranking
 =========
 Port 8000 - Open to 0.0.0.0/0
 
-tgi_service
+tgi-service
 ===========
 Port 9009 - Open to 0.0.0.0/0
 
