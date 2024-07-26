@@ -146,7 +146,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
-    docker compose down || true
+    docker compose stop && docker compose rm -f
 }
 
 function main() {
