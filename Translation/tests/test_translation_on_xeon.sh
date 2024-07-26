@@ -49,7 +49,15 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
 
-    sleep 2m # Waits 2 minutes
+    n=0
+    until [[ "$n" -ge 500 ]]; do
+        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 function validate_services() {

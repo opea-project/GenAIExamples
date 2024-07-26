@@ -147,7 +147,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 

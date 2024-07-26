@@ -169,7 +169,7 @@ To access the frontend, open the following URL in your browser: `http://{host_ip
 
 ## 🚀 Launch the React Based UI
 
-To access the frontend, open the following URL in your browser: `http://{host_ip}:5174`. By default, the UI runs on port 5174 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: `http://{host_ip}:5174`. By default, the UI runs on port 5174 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   codegen-gaudi-react-ui-server:
