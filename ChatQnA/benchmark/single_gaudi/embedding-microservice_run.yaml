@@ -1,0 +1,57 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embedding-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: embedding-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: embedding-deploy
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: embedding-deploy
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: opea/embedding-tei:latest
+        imagePullPolicy: IfNotPresent
+        name: embedding-deploy
+        args: null
+        ports:
+        - containerPort: 6000
+        resources:
+          limits:
+            cpu: 4
+          requests:
+            cpu: 4
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: embedding-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: embedding-deploy
+  ports:
+  - name: service
+    port: 6000
+    targetPort: 6000
