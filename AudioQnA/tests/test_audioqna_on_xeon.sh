@@ -64,7 +64,7 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
     n=0
-    until [[ "$n" -ge 200 ]]; do
+    until [[ "$n" -ge 500 ]]; do
        docker logs tgi-service > $LOG_PATH/tgi_service_start.log
        if grep -q Connected $LOG_PATH/tgi_service_start.log; then
            break
@@ -81,6 +81,14 @@ function validate_megaservice() {
     if [[ $result == *"AAA"* ]]; then
         echo "Result correct."
     else
+        docker logs whisper-service > $LOG_PATH/whisper-service.log
+        docker logs asr-service > $LOG_PATH/asr-service.log
+        docker logs speecht5-service > $LOG_PATH/tts-service.log
+        docker logs tts-service > $LOG_PATH/tts-service.log
+        docker logs tgi-service > $LOG_PATH/tgi-service.log
+        docker logs llm-tgi-server > $LOG_PATH/llm-tgi-server.log
+        docker logs audioqna-xeon-backend-server > $LOG_PATH/audioqna-xeon-backend-server.log
+
         echo "Result wrong."
         exit 1
     fi
