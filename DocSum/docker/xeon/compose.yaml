@@ -73,9 +73,6 @@ services:
     container_name: docsum-xeon-react-ui-server
     depends_on:
       - docsum-xeon-backend-server
-    build:
-      args:
-        - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
     ports:
       - "5174:80"
     ipc: host

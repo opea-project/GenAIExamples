@@ -67,15 +67,15 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d
-     n=0
-     until [[ "$n" -ge 500 ]]; do
-         docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
-         if grep -q Connected $LOG_PATH/tgi_service_start.log; then
-             break
-         fi
-         sleep 1s
-         n=$((n+1))
-     done
+    n=0
+    until [[ "$n" -ge 500 ]]; do
+       docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+           break
+       fi
+       sleep 1s
+       n=$((n+1))
+    done
 }
 
 
