@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 ENV PYTHONPATH=/home/user:/GPT-SoVITS/GPT_SoVITS
 
 # Install system dependencies

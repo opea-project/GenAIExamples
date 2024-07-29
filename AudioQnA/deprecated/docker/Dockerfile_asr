@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 
 # Install system dependencies
 RUN apt-get update \
