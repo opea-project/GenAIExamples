@@ -41,7 +41,6 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 	};
 
 	return fetchFunc(url, init);
-
 }
 
 export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any) {
@@ -52,7 +51,6 @@ export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any) {
 		method: "POST",
 		body: formData,
 	};
-
 
 	return fetchFunc(url, init);
 }

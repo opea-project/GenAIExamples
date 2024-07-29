@@ -18,7 +18,6 @@ Here're some of the project's features:
 - Upload File: The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
 - Delete File: Delete a certain uploaded file.
 
-
 ## 🛠️ Get it Running
 
 1. Clone the repo.
