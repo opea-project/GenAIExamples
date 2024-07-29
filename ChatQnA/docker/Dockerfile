@@ -20,7 +20,7 @@ RUN cd /home/user/ && \
 
 WORKDIR /home/user/GenAIComps
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install -r /home/user/GenAIComps/requirements.txt
+    pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
 
 COPY ./chatqna.py /home/user/chatqna.py
 
