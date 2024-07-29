@@ -18,7 +18,8 @@ RUN useradd -m -s /bin/bash user && \
 RUN cd /home/user/ && \
     git clone https://github.com/opea-project/GenAIComps.git
 
-RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
+WORKDIR /home/user/GenAIComps
+RUN pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
 COPY ./chatqna.py /home/user/chatqna.py
