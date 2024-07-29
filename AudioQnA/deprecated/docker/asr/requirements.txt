@@ -5,7 +5,7 @@ ffmpeg-python
 numpy
 pydub
 python-multipart
-torch==2.1.0
+torch==2.2.0
 transformers
 uvicorn
 zhconv

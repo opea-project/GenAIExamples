@@ -5,7 +5,7 @@
 version: "3.8"
 
 services:
-  tgi_service:
+  tgi-service:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.1
     container_name: tgi-gaudi-server
     ports:
@@ -27,7 +27,7 @@ services:
     image: opea/llm-docsum-tgi:latest
     container_name: llm-docsum-gaudi-server
     depends_on:
-      - tgi_service
+      - tgi-service
     ports:
       - "9000:9000"
     ipc: host
@@ -45,7 +45,7 @@ services:
     image: opea/docsum:latest
     container_name: docsum-gaudi-backend-server
     depends_on:
-      - tgi_service
+      - tgi-service
       - llm
     ports:
       - "8888:8888"
@@ -76,9 +76,6 @@ services:
     container_name: docsum-gaudi-react-ui-server
     depends_on:
       - docsum-gaudi-backend-server
-    build:
-      args:
-        - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
     ports:
       - "5174:80"
     environment:

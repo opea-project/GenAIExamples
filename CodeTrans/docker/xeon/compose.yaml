@@ -5,26 +5,23 @@
 version: "3.8"
 
 services:
-  tgi_service:
+  tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:1.4
-    container_name: tgi_service
+    container_name: codetrans-tgi-service
     ports:
       - "8008:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    volumes:
-      - "./data:/data"
-    shm_size: 1g
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-docsum-tgi:latest
-    container_name: llm-docsum-server
-    depends_on:
-      - tgi_service
+    image: opea/llm-tgi:latest
+    container_name: llm-tgi-server
     ports:
       - "9000:9000"
     ipc: host
@@ -38,14 +35,14 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
-  docsum-xeon-backend-server:
-    image: opea/docsum:latest
-    container_name: docsum-xeon-backend-server
+  codetrans-xeon-backend-server:
+    image: opea/codetrans:latest
+    container_name: codetrans-xeon-backend-server
     depends_on:
-      - tgi_service
+      - tgi-service
       - llm
     ports:
-      - "8888:8888"
+      - "7777:7777"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
@@ -54,33 +51,20 @@ services:
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  docsum-xeon-ui-server:
-    image: opea/docsum-ui:latest
-    container_name: docsum-xeon-ui-server
+  codetrans-xeon-ui-server:
+    image: opea/codetrans-ui:latest
+    container_name: codetrans-xeon-ui-server
     depends_on:
-      - docsum-xeon-backend-server
+      - codetrans-xeon-backend-server
     ports:
       - "5173:5173"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
-  docsum-xeon-react-ui-server:
-    image: opea/docsum-react-ui:latest
-    container_name: docsum-xeon-react-ui-server
-    depends_on:
-      - docsum-xeon-backend-server
-    build:
-      args:
-        - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
-    ports:
-      - "5174:80"
-    ipc: host
-    restart: always
-
 networks:
   default:
     driver: bridge

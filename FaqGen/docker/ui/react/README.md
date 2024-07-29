@@ -1,11 +1,11 @@
-<h1 align="center" id="title">Doc Summary React</h1>
+# Doc Summary React
 
-### 📸 Project Screenshots
+## 📸 Project Screenshots
 
 ![project-screenshot](../../../assets/img/faqgen_react_ui_text.png)
 ![project-screenshot](../../../assets/img/faqgen_react_ui_text_file.png)
 
-<h2>🧐 Features</h2>
+## 🧐 Features
 
 Here're some of the project's features:
 
@@ -13,7 +13,7 @@ Here're some of the project's features:
 
 - Generate FAQs from Text via txt file Upload: Upload the file in the Upload bar, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
 
-<h2>🛠️ Get it Running:</h2>
+## 🛠️ Get it Running
 
 1. Clone the repo.
 

@@ -1,12 +1,12 @@
-<h1 align="center" id="title"> ChatQnA Customized UI</h1>
+# ChatQnA Customized UI
 
-### 📸 Project Screenshots
+## 📸 Project Screenshots
 
 ![project-screenshot](../../../assets/img/chat_ui_init.png)
 ![project-screenshot](../../../assets/img/chat_ui_response.png)
 ![project-screenshot](../../../assets/img/chat_ui_upload.png)
 
-<h2>🧐 Features</h2>
+## 🧐 Features
 
 Here're some of the project's features:
 
@@ -19,7 +19,7 @@ Here're some of the project's features:
 - Delete File: Delete a certain uploaded file.
 
 
-<h2>🛠️ Get it Running:</h2>
+## 🛠️ Get it Running
 
 1. Clone the repo.
 
