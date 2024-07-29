@@ -26,20 +26,22 @@ async def s2_add(request: TextDoc) -> TextDoc:
 
 
 class TestServiceOrchestrator(unittest.IsolatedAsyncioTestCase):
-    def setUp(self):
-        self.s1 = opea_microservices["s1"]
-        self.s2 = opea_microservices["s2"]
-        self.s1.start()
-        self.s2.start()
+    @classmethod
+    def setUpClass(cls):
+        cls.s1 = opea_microservices["s1"]
+        cls.s2 = opea_microservices["s2"]
+        cls.s1.start()
+        cls.s2.start()
 
-        self.service_builder = ServiceOrchestrator()
+        cls.service_builder = ServiceOrchestrator()
 
-        self.service_builder.add(opea_microservices["s1"]).add(opea_microservices["s2"])
-        self.service_builder.flow_to(self.s1, self.s2)
+        cls.service_builder.add(opea_microservices["s1"]).add(opea_microservices["s2"])
+        cls.service_builder.flow_to(cls.s1, cls.s2)
 
-    def tearDown(self):
-        self.s1.stop()
-        self.s2.stop()
+    @classmethod
+    def tearDownClass(cls):
+        cls.s1.stop()
+        cls.s2.stop()
 
     async def test_schedule(self):
         result_dict, _ = await self.service_builder.schedule(initial_inputs={"text": "hello, "})
