@@ -16,6 +16,7 @@ services:
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
+      - tei-embedding-service
     ports:
       - "6007:6007"
       - "6008:6008"
@@ -26,6 +27,7 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
   tgi-guardrails-service:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.1
     container_name: tgi-guardrails-server
