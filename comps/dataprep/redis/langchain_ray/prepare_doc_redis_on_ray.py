@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Callable, List, Optional, Union
 
 import pandas as pd
-from config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL, TIMEOUT_SECONDS
+from config import EMBED_MODEL, INDEX_NAME, REDIS_URL, TIMEOUT_SECONDS
 from fastapi import Body, File, Form, HTTPException, UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
@@ -195,7 +195,6 @@ def data_to_redis(data):
             texts=batch_texts,
             embedding=embedder,
             index_name=INDEX_NAME,
-            index_schema=INDEX_SCHEMA,
             redis_url=REDIS_URL,
         )
         # print(f"Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")

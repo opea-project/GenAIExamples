@@ -4,7 +4,7 @@
 from langsmith import traceable
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-from comps import EmbedDoc1024, ServiceType, TextDoc, opea_microservices, register_microservice
+from comps import EmbedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
 
 
 @register_microservice(
@@ -14,12 +14,12 @@ from comps import EmbedDoc1024, ServiceType, TextDoc, opea_microservices, regist
     host="0.0.0.0",
     port=6000,
     input_datatype=TextDoc,
-    output_datatype=EmbedDoc1024,
+    output_datatype=EmbedDoc,
 )
 @traceable(run_type="embedding")
-def embedding(input: TextDoc) -> EmbedDoc1024:
+def embedding(input: TextDoc) -> EmbedDoc:
     embed_vector = embeddings.get_text_embedding(input.text)
-    res = EmbedDoc1024(text=input.text, embedding=embed_vector)
+    res = EmbedDoc(text=input.text, embedding=embed_vector)
     return res
 
 

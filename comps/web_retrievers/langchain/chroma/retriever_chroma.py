@@ -12,7 +12,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 from comps import (
-    EmbedDoc768,
+    EmbedDoc,
     SearchedDoc,
     ServiceType,
     TextDoc,
@@ -58,7 +58,7 @@ def dump_docs(docs):
     port=7077,
 )
 @register_statistics(names=["opea_service@web_retriever_chroma", "opea_service@search"])
-def web_retrieve(input: EmbedDoc768) -> SearchedDoc:
+def web_retrieve(input: EmbedDoc) -> SearchedDoc:
     start = time.time()
     query = input.text
     embedding = input.embedding

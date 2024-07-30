@@ -14,7 +14,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
 from PIL import Image
-from redis_config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
+from redis_config import EMBED_MODEL, INDEX_NAME, REDIS_URL
 
 tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
 
@@ -112,7 +112,6 @@ def ingest_documents():
             texts=batch_texts,
             embedding=embedder,
             index_name=INDEX_NAME,
-            index_schema=INDEX_SCHEMA,
             redis_url=REDIS_URL,
         )
         print(f"Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")

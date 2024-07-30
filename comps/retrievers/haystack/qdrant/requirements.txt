@@ -1,12 +1,13 @@
 docarray[full]
 easyocr
 fastapi
-haystack-ai
+haystack-ai==2.2.4
 langchain_community
 langsmith
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+prometheus_fastapi_instrumentator
 pymupdf
 qdrant-haystack
 sentence_transformers

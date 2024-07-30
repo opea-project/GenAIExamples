@@ -3,7 +3,7 @@
 
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 
-from comps import EmbedDoc1024, ServiceType, TextDoc, opea_microservices, opea_telemetry, register_microservice
+from comps import EmbedDoc, ServiceType, TextDoc, opea_microservices, opea_telemetry, register_microservice
 
 
 @register_microservice(
@@ -13,12 +13,12 @@ from comps import EmbedDoc1024, ServiceType, TextDoc, opea_microservices, opea_t
     host="0.0.0.0",
     port=6000,
     input_datatype=TextDoc,
-    output_datatype=EmbedDoc1024,
+    output_datatype=EmbedDoc,
 )
 @opea_telemetry
-def embedding(input: TextDoc) -> EmbedDoc1024:
+def embedding(input: TextDoc) -> EmbedDoc:
     embed_vector = embeddings.embed_query(input.text)
-    res = EmbedDoc1024(text=input.text, embedding=embed_vector)
+    res = EmbedDoc(text=input.text, embedding=embed_vector)
     return res
 
 

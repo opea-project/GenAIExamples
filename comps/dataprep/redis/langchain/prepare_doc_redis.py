@@ -10,7 +10,7 @@ from typing import List, Optional, Union
 
 # from pyspark import SparkConf, SparkContext
 import redis
-from config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, KEY_INDEX_NAME, REDIS_HOST, REDIS_PORT, REDIS_URL
+from config import EMBED_MODEL, INDEX_NAME, KEY_INDEX_NAME, REDIS_HOST, REDIS_PORT, REDIS_URL
 from fastapi import Body, File, Form, HTTPException, UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
@@ -151,7 +151,6 @@ def ingest_data_to_redis(doc_path: DocPath):
             texts=batch_texts,
             embedding=embedder,
             index_name=INDEX_NAME,
-            index_schema=INDEX_SCHEMA,
             redis_url=REDIS_URL,
         )
         print(f"keys: {keys}")
@@ -195,7 +194,6 @@ async def ingest_link_to_redis(link_list: List[str]):
             texts=content,
             embedding=embedder,
             index_name=INDEX_NAME,
-            index_schema=INDEX_SCHEMA,
             redis_url=REDIS_URL,
         )
         print(f"keys: {keys}")

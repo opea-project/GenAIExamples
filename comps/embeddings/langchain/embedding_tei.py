@@ -8,7 +8,7 @@ from langchain_community.embeddings import HuggingFaceHubEmbeddings
 from langsmith import traceable
 
 from comps import (
-    EmbedDoc768,
+    EmbedDoc,
     ServiceType,
     TextDoc,
     opea_microservices,
@@ -25,15 +25,14 @@ from comps import (
     host="0.0.0.0",
     port=6000,
     input_datatype=TextDoc,
-    output_datatype=EmbedDoc768,
+    output_datatype=EmbedDoc,
 )
 @traceable(run_type="embedding")
 @register_statistics(names=["opea_service@embedding_tei_langchain"])
-def embedding(input: TextDoc) -> EmbedDoc768:
+def embedding(input: TextDoc) -> EmbedDoc:
     start = time.time()
     embed_vector = embeddings.embed_query(input.text)
-    embed_vector = embed_vector[:768]  # Keep only the first 768 elements
-    res = EmbedDoc768(text=input.text, embedding=embed_vector)
+    res = EmbedDoc(text=input.text, embedding=embed_vector)
     statistics_dict["opea_service@embedding_tei_langchain"].append_latency(time.time() - start, None)
     return res
 

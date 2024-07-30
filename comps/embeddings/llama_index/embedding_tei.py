@@ -6,7 +6,7 @@ import os
 from langsmith import traceable
 from llama_index.embeddings.text_embeddings_inference import TextEmbeddingsInference
 
-from comps import EmbedDoc768, ServiceType, TextDoc, opea_microservices, register_microservice
+from comps import EmbedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
 
 
 @register_microservice(
@@ -16,13 +16,12 @@ from comps import EmbedDoc768, ServiceType, TextDoc, opea_microservices, registe
     host="0.0.0.0",
     port=6000,
     input_datatype=TextDoc,
-    output_datatype=EmbedDoc768,
+    output_datatype=EmbedDoc,
 )
 @traceable(run_type="embedding")
-def embedding(input: TextDoc) -> EmbedDoc768:
+def embedding(input: TextDoc) -> EmbedDoc:
     embed_vector = embeddings._get_query_embedding(input.text)
-    embed_vector = embed_vector[:768]  # Keep only the first 768 elements
-    res = EmbedDoc768(text=input.text, embedding=embed_vector)
+    res = EmbedDoc(text=input.text, embedding=embed_vector)
     return res
 
 

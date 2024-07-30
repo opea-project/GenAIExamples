@@ -10,7 +10,7 @@ from langchain_community.vectorstores import PGVector
 from langsmith import traceable
 
 from comps import (
-    EmbedDoc768,
+    EmbedDoc,
     SearchedDoc,
     ServiceType,
     TextDoc,
@@ -32,7 +32,7 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
 )
 @traceable(run_type="retriever")
 @register_statistics(names=["opea_service@retriever_pgvector"])
-def retrieve(input: EmbedDoc768) -> SearchedDoc:
+def retrieve(input: EmbedDoc) -> SearchedDoc:
     start = time.time()
     search_res = vector_db.similarity_search_by_vector(embedding=input.embedding)
     searched_docs = []

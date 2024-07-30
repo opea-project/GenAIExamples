@@ -20,7 +20,7 @@ from langchain_milvus.vectorstores import Milvus
 from langsmith import traceable
 
 from comps import (
-    EmbedDoc768,
+    EmbedDoc,
     SearchedDoc,
     ServiceType,
     TextDoc,
@@ -65,7 +65,7 @@ class MosecEmbeddings(OpenAIEmbeddings):
 )
 @traceable(run_type="retriever")
 @register_statistics(names=["opea_service@retriever_milvus"])
-def retrieve(input: EmbedDoc768) -> SearchedDoc:
+def retrieve(input: EmbedDoc) -> SearchedDoc:
     vector_db = Milvus(
         embeddings,
         connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT},

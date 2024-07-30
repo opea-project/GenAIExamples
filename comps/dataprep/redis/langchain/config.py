@@ -5,7 +5,7 @@ import os
 
 # Embedding model
 
-EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-base-en-v1.5")
+EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-large-en-v1.5")
 
 # Redis Connection Information
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
@@ -61,9 +61,4 @@ REDIS_URL = format_redis_conn_from_env()
 INDEX_NAME = os.getenv("INDEX_NAME", "rag-redis")
 KEY_INDEX_NAME = os.getenv("KEY_INDEX_NAME", "file-keys")
 
-current_file_path = os.path.abspath(__file__)
-parent_dir = os.path.dirname(current_file_path)
-REDIS_SCHEMA = os.getenv("REDIS_SCHEMA", "schema_dim_768.yml")
 TIMEOUT_SECONDS = int(os.getenv("TIMEOUT_SECONDS", 600))
-schema_path = os.path.join(parent_dir, REDIS_SCHEMA)
-INDEX_SCHEMA = schema_path

@@ -175,7 +175,7 @@ A `Microservices` can be created by using the decorator `register_microservice`.
 from langchain_community.embeddings import HuggingFaceHubEmbeddings
 from langsmith import traceable
 
-from comps import register_microservice, EmbedDoc768, ServiceType, TextDoc
+from comps import register_microservice, EmbedDoc, ServiceType, TextDoc
 
 
 @register_microservice(
@@ -185,13 +185,12 @@ from comps import register_microservice, EmbedDoc768, ServiceType, TextDoc
     host="0.0.0.0",
     port=6000,
     input_datatype=TextDoc,
-    output_datatype=EmbedDoc768,
+    output_datatype=EmbedDoc,
 )
 @traceable(run_type="embedding")
-def embedding(input: TextDoc) -> EmbedDoc768:
+def embedding(input: TextDoc) -> EmbedDoc:
     embed_vector = embeddings.embed_query(input.text)
-    embed_vector = embed_vector[:768]  # Keep only the first 768 elements
-    res = EmbedDoc768(text=input.text, embedding=embed_vector)
+    res = EmbedDoc(text=input.text, embedding=embed_vector)
     return res
 ```
 

@@ -60,9 +60,4 @@ REDIS_URL = format_redis_conn_from_env()
 # Vector Index Configuration
 INDEX_NAME = os.getenv("INDEX_NAME", "rag-redis")
 
-current_file_path = os.path.abspath(__file__)
-parent_dir = os.path.dirname(current_file_path)
-REDIS_SCHEMA = os.getenv("REDIS_SCHEMA", "schema_dim_768.yml")
 TIMEOUT_SECONDS = int(os.getenv("TIMEOUT_SECONDS", 600))
-schema_path = os.path.join(parent_dir, REDIS_SCHEMA)
-INDEX_SCHEMA = schema_path

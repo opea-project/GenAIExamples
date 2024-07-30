@@ -64,7 +64,7 @@ python prepare_doc_redis_on_ray.py
 
 ## 2.1 Start Redis Stack Server
 
-Please refer to this [readme](../../../vectorstores/langchain/redis/README.md).
+Please refer to this [readme](../../vectorstores/langchain/redis/README.md).
 
 ## 2.2 Setup Environment Variables
 

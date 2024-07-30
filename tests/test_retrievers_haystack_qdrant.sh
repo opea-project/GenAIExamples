@@ -19,7 +19,7 @@ function start_service() {
     # tei endpoint
     tei_endpoint=5008
     model="BAAI/bge-base-en-v1.5"
-    docker run -d --name="test-comps-retriever-tei-endpoint" -p $tei_endpoint:80 -v ./data:/data --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model
+    docker run -d --name="test-comps-retriever-tei-endpoint" -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy -p $tei_endpoint:80 -v ./data:/data --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model
     sleep 30s
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:${tei_endpoint}"
 

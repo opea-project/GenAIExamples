@@ -10,7 +10,7 @@ from langsmith import traceable
 from redis_config import EMBED_MODEL, INDEX_NAME, REDIS_URL
 
 from comps import (
-    EmbedDoc768,
+    EmbedDoc,
     SearchedDoc,
     ServiceType,
     TextDoc,
@@ -32,7 +32,7 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
 )
 @traceable(run_type="retriever")
 @register_statistics(names=["opea_service@retriever_redis"])
-def retrieve(input: EmbedDoc768) -> SearchedDoc:
+def retrieve(input: EmbedDoc) -> SearchedDoc:
     start = time.time()
     # check if the Redis index has data
     if vector_db.client.keys() == []:
