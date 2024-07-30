@@ -126,8 +126,8 @@ class ServiceOrchestrator(DAG):
             if downstream:
                 assert len(downstream) == 1, "Not supported multiple streaming downstreams yet!"
                 cur_node = downstream[0]
-            hitted_ends = [".", "?", "!", "。", "，", "！"]
-            endpoint = self.services[downstream[0]].endpoint_path
+                hitted_ends = [".", "?", "!", "。", "，", "！"]
+                downstream_endpoint = self.services[downstream[0]].endpoint_path
 
             def generate():
                 if response:
@@ -140,7 +140,7 @@ class ServiceOrchestrator(DAG):
                                 is_last = chunk.endswith("[DONE]\n\n")
                                 if (buffered_chunk_str and buffered_chunk_str[-1] in hitted_ends) or is_last:
                                     res = requests.post(
-                                        url=endpoint,
+                                        url=downstream_endpoint,
                                         data=json.dumps({"text": buffered_chunk_str}),
                                         proxies={"http": None},
                                     )

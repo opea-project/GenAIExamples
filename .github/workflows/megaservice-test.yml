@@ -31,7 +31,7 @@ env:
 
 jobs:
   MegaService:
-    runs-on: aise-cluster
+    runs-on: gaudi
     steps:
       - name: Clean Up Working Directory
         run: |
