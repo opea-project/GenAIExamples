@@ -10,7 +10,7 @@ from typing import List, Optional, Union
 
 # from pyspark import SparkConf, SparkContext
 import redis
-from config import EMBED_MODEL, INDEX_NAME, KEY_INDEX_NAME, REDIS_HOST, REDIS_PORT, REDIS_URL
+from config import EMBED_MODEL, INDEX_NAME, KEY_INDEX_NAME, REDIS_URL
 from fastapi import Body, File, Form, HTTPException, UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
@@ -35,7 +35,7 @@ from comps.dataprep.utils import (
 
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 upload_folder = "./uploaded_files/"
-redis_pool = redis.ConnectionPool(host=REDIS_HOST, port=REDIS_PORT)
+redis_pool = redis.ConnectionPool.from_url(REDIS_URL)
 
 
 def check_index_existance(client):
@@ -318,7 +318,7 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
 
     # partially delete files/folders
     if delete_path.exists():
-        r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+        r = redis.Redis(connection_pool=redis_pool)
         client = r.ft(KEY_INDEX_NAME)
         client2 = r.ft(INDEX_NAME)
         doc_id = "file:" + encode_filename(file_path)
