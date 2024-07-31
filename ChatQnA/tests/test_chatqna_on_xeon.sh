@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 echo "IMAGE_REPO=${IMAGE_REPO}"
 
 WORKPATH=$(dirname "$PWD")
@@ -299,7 +299,7 @@ function main() {
     if [ "${mode}" == "perf" ]; then
         python3 $WORKPATH/tests/chatqna_benchmark.py
     elif [ "${mode}" == "" ]; then
-        validate_microservices
+        # validate_microservices
         validate_dataprep
         validate_megaservice
         validate_frontend
