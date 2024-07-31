@@ -115,6 +115,7 @@ function validate_service() {
 function validate_dataprep() {
     # test /v1/dataprep
     URL="http://${ip_address}:6007/v1/dataprep"
+    docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep.log
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
