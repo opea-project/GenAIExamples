@@ -10,66 +10,66 @@ The architecture for document summarization will be illustrated/described below:
 
 ![Workflow](./assets/img/docsum_workflow.png)
 
-# Deploy Document Summarization Service
+## Deploy Document Summarization Service
 
 The Document Summarization service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
-Based on whether you want to use Docker or Kubernetes, please follow the instructions below.
+Based on whether you want to use Docker or Kubernetes, follow the instructions below.
 
 Currently we support two ways of deploying Document Summarization services with docker compose:
 
 1. Start services using the docker image on `docker hub`:
 
-```bash
-docker pull opea/docsum:latest
-```
+   ```bash
+   docker pull opea/docsum:latest
+   ```
 
 2. Start services using the docker images `built from source`: [Guide](./docker)
 
-## Setup Environment Variable
+### Setup Environment Variable
 
 To set up environment variables for deploying Document Summarization services, follow these steps:
 
 1. Set the required environment variables:
 
-```bash
-# Example: host_ip="192.168.1.1"
-export host_ip="External_Public_IP"
-# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-export no_proxy="Your_No_Proxy"
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-```
+   ```bash
+   # Example: host_ip="192.168.1.1"
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
 
-```bash
-export http_proxy="Your_HTTP_Proxy"
-export https_proxy="Your_HTTPs_Proxy"
-```
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   ```
 
 3. Set up other environment variables:
 
-```bash
-source ./docker/set_env.sh
-```
+   ```bash
+   source ./docker/set_env.sh
+   ```
 
-## Deploy using Docker
+### Deploy using Docker
 
-### Deploy on Gaudi
+#### Deploy on Gaudi
 
-Please find corresponding [compose.yaml](./docker/gaudi/compose.yaml).
+Find the corresponding [compose.yaml](./docker/gaudi/compose.yaml).
 
 ```bash
 cd GenAIExamples/DocSum/docker/gaudi/
 docker compose -f compose.yaml up -d
 ```
 
-> Notice: Currently only the <b>Habana Driver 1.16.x</b> is supported for Gaudi.
+> Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-Please refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
-### Deploy on Xeon
+#### Deploy on Xeon
 
-Please find corresponding [compose.yaml](./docker/xeon/compose.yaml).
+Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
 
 ```bash
 cd GenAIExamples/DocSum/docker/xeon/
@@ -78,50 +78,50 @@ docker compose up -d
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
 
-## Deploy using Kubernetes with GMC
+### Deploy using Kubernetes with GMC
 
-Please refer to [Kubernetes deployment](./kubernetes/README.md)
+Refer to [Kubernetes deployment](./kubernetes/README.md)
 
-## Deploy using Kubernetes without GMC
+### Deploy using Kubernetes without GMC
 
-Please refer to [Kubernetes deployment](./kubernetes/manifests/README.md)
+Refer to [Kubernetes deployment](./kubernetes/manifests/README.md)
 
-## Deploy DocSum into Kubernetes using Helm Chart
+### Deploy DocSum into Kubernetes using Helm Chart
 
-Install Helm (version >= 3.15) first. Please refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
+Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
 
 Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum) for instructions on deploying DocSum into Kubernetes on Xeon & Gaudi.
 
-# Consume Document Summarization Service
+## Consume Document Summarization Service
 
 Two ways of consuming Document Summarization Service:
 
 1. Use cURL command on terminal
 
-```bash
-curl http://${host_ip}:8888/v1/docsum \
-    -H "Content-Type: application/json" \
-    -d '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/docsum \
+       -H "Content-Type: application/json" \
+       -d '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+   ```
 
 2. Access via frontend
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173.
+   To access the frontend, open the following URL in your browser: http://{host_ip}:5173.
 
-By default, the UI runs on port 5173 internally.
+   By default, the UI runs on port 5173 internally.
 
-# Troubleshooting
+## Troubleshooting
 
-1. If you get errors like "Access Denied", please [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker/xeon#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker/xeon#validate-microservices) first. A simple example:
 
-```bash
-http_proxy=""
-curl http://${your_ip}:8008/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   http_proxy=""
+   curl http://${your_ip}:8008/generate \
+     -X POST \
+     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -H 'Content-Type: application/json'
+   ```
 
-2. (Docker only) If all microservices work well, please check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `compose.yaml`.
+2. (Docker only) If all microservices work well, check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `compose.yaml`.
 
-3. (Docker only) If you get errors like "The container name is in use", please change container name in `compose.yaml`.
+3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
