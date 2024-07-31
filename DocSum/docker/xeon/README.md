@@ -150,10 +150,10 @@ export LANGCHAIN_API_KEY=ls_...
 Open this URL `http://{host_ip}:5173` in your browser to access the svelte based frontend.
 Open this URL `http://{host_ip}:5174` in your browser to access the React based frontend.
 
-#### Svelte UI
+### Svelte UI
 
 ![project-screenshot](../../assets/img/docSum_ui_text.png)
 
-#### React UI
+### React UI
 
 ![preject-react-screenshot](../../assets/img/docsum-ui-react.png)
