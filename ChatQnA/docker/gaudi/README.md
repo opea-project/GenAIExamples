@@ -69,20 +69,6 @@ Build microservice docker.
 docker build --no-cache -t opea/llm-vllm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice .
 ```
 
-#### 5.4 Use Ray Serve
-
-Build Ray Serve docker.
-
-```bash
-docker build --no-cache -t ray_serve:habana --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.rayserve .
-```
-
-Build microservice docker.
-
-```bash
-docker build --no-cache -t opea/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice .
-```
-
 ### 6. Build Dataprep Image
 
 ```bash
