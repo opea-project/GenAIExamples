@@ -19,12 +19,7 @@ jobs:
       - name: Checkout repo GenAIExamples
         uses: actions/checkout@v4
 
-      - name: Clone repo GenAIComps
-        run: |
-          cd ..
-          git clone https://github.com/opea-project/GenAIComps.git
-
-      - name: Check for missing Dockerfile paths in GenAIComps
+      - name: Check the validity of links
         run: |
           cd ${{github.workspace}}
           miss="FALSE"
