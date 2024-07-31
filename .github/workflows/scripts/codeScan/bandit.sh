@@ -6,7 +6,7 @@
 source /GenAIComps/.github/workflows/scripts/change_color
 pip install bandit==1.7.8
 log_dir=/GenAIComps/.github/workflows/scripts/codeScan
-python -m bandit -r -lll -iii /GenAIComps 2>&1 | tee ${log_dir}/bandit.log
+python -m bandit -r -lll -iii /GenAIComps > ${log_dir}/bandit.log
 exit_code=$?
 
 $BOLD_YELLOW && echo " -----------------  Current log file output start --------------------------"

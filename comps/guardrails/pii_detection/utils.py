@@ -74,7 +74,7 @@ def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
 def generate_log_name(file_list):
     file_set = f"{sorted(file_list)}"
     # print(f"file_set: {file_set}")
-    md5_str = hashlib.md5(file_set.encode()).hexdigest()
+    md5_str = hashlib.md5(file_set.encode(), usedforsecurity=False).hexdigest()
     return f"status/status_{md5_str}.log"
 
 
