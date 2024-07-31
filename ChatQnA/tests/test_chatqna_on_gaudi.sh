@@ -192,6 +192,8 @@ function validate_microservices() {
 }
 
 function validate_dataprep() {
+    cd $LOG_PATH
+    
     # test /v1/dataprep
     URL="http://${ip_address}:6007/v1/dataprep"
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
