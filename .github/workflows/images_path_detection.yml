@@ -1,10 +1,10 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Check for missing Dockerfile paths in repo comps
+name: Check the validity of links in docker_images_list.
 
 on:
-  pull_request:
+  push:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize]
 
