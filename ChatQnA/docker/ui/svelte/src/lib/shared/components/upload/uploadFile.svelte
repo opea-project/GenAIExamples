@@ -168,7 +168,7 @@
 		</TabItem>
 	</Tabs>
 	{#if uploading}
-		<div class="flex flex-col items-center justify-center">
+		<div class="flex flex-col items-center justify-center my-6">
 			<LoadingButton />
 		</div>
 	{/if}
@@ -176,7 +176,7 @@
 	{#if files.length > 0}
 		<DocCard {files} />
 	{:else}
-		<div class="flex flex-col items-center justify-center">
+		<div class="flex flex-col items-center justify-center mt-6">
 			<NoFile />
 			<p class=" text-sm opacity-70">No files uploaded</p>
 		</div>
