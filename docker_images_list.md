@@ -4,7 +4,7 @@ A list of released OPEA docker images in https://hub.docker.com/, contains all r
 
 Take ChatQnA for example. ChatQnA is a chatbot application service based on the Retrieval Augmented Generation (RAG) architecture. It consists of <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/embedding-tei">opea/embedding-tei</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/retriever-redis">opea/retriever-redis</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/reranking-tei">opea/reranking-tei</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-tgi">opea/llm-tgi</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/dataprep-redis">opea/dataprep-redis</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna">opea/chatqna</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna-ui">opea/chatqna-ui</a></td> and <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna-conversation-ui">opea/chatqna-conversation-ui</a></td> (Optional) multiple microservices. Other services are similar, see the corresponding README for details.
 
-# Example images
+## Example images
 
 <table class="tg"><thead>
   <tr>
@@ -65,7 +65,7 @@ Take ChatQnA for example. ChatQnA is a chatbot application service based on the 
   </tr>
 </tbody></table>
 
-# Microservice images
+## Microservice images
 
 <table class="tg"><thead>
   <tr>
