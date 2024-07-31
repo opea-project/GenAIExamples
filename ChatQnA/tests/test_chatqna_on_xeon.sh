@@ -114,7 +114,7 @@ function validate_service() {
 
 function validate_dataprep() {
     cd $LOG_PATH
-    
+
     # test /v1/dataprep
     URL="http://${ip_address}:6007/v1/dataprep"
     docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep.log
