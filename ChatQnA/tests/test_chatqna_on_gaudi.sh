@@ -200,7 +200,7 @@ function validate_dataprep() {
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     SERVICE_NAME="dataprep - upload"
     docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep_upload.log
-    
+
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
@@ -223,7 +223,7 @@ function validate_dataprep() {
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     SERVICE_NAME="dataprep - get"
     docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep_get.log
-    
+
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
@@ -246,7 +246,7 @@ function validate_dataprep() {
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     SERVICE_NAME="dataprep - del"
     docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep_del.log
-    
+
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
