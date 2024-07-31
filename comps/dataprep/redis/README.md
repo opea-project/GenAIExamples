@@ -44,6 +44,32 @@ export LANGCHAIN_PROJECT="opea/gen-ai-comps:dataprep"
 export PYTHONPATH=${path_to_comps}
 ```
 
+## 1.4 Start Embedding Service
+
+First, you need to start a TEI service.
+
+```bash
+your_port=6006
+model="BAAI/bge-large-en-v1.5"
+revision="refs/pr/5"
+docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
+```
+
+Then you need to test your TEI service using the following commands:
+
+```bash
+curl localhost:$your_port/embed \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?"}' \
+    -H 'Content-Type: application/json'
+```
+
+After checking that it works, set up environment variables.
+
+```bash
+export TEI_ENDPOINT="http://localhost:$your_port"
+```
+
 ## 1.4 Start Document Preparation Microservice for Redis with Python Script
 
 Start document preparation microservice for Redis with below command.
@@ -69,6 +95,10 @@ Please refer to this [readme](../../vectorstores/langchain/redis/README.md).
 ## 2.2 Setup Environment Variables
 
 ```bash
+export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+export TEI_ENDPOINT="http://${your_ip}:6006"
+export REDIS_HOST=${your_ip}
+export REDIS_PORT=6379
 export REDIS_URL="redis://${your_ip}:6379"
 export INDEX_NAME=${your_index_name}
 export LANGCHAIN_TRACING_V2=true

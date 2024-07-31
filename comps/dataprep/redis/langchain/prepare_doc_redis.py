@@ -118,7 +118,10 @@ def ingest_data_to_redis(doc_path: DocPath):
         text_splitter = HTMLHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
     else:
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=doc_path.chunk_size, chunk_overlap=100, add_start_index=True, separators=get_separators()
+            chunk_size=doc_path.chunk_size,
+            chunk_overlap=doc_path.chunk_overlap,
+            add_start_index=True,
+            separators=get_separators(),
         )
 
     content = document_loader(path)
