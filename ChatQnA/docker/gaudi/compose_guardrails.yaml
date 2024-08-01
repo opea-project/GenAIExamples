@@ -27,6 +27,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tgi-guardrails-service:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.1
     container_name: tgi-guardrails-server
