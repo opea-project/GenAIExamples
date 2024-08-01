@@ -15,9 +15,9 @@ GenAIComps-based Generative AI examples offer streamlined deployment, testing, a
 
 ## Architecture
 
-GenAIExample utilizes all microservice components from GenAIComps. This approach allows for flexible, modular service deployment in cloud-native environments. 
+GenAIExample utilizes all microservice components from GenAIComps. This approach allows for flexible, modular service deployment in cloud-native environments.
 
-GenAIInfra, part of the OPEA containerization and cloud-native suite, enables quick and efficient deployment of GenAIExamples in the cloud. 
+GenAIInfra, part of the OPEA containerization and cloud-native suite, enables quick and efficient deployment of GenAIExamples in the cloud.
 
 GenAIEvals measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
 
@@ -37,9 +37,9 @@ Users can choose the most suitable approach based on ease of setup, scalability 
 
 ### Prerequisites
 
-| Startup Methods | Docker Compose            | Kubernetes |
-|-----------------|---------------------------|------------|
-| **Environment Prepare** | [Docker](#) |  [Xeon]() <br> [Gaudi](#)  |
+| Startup Methods         | Docker Compose | Kubernetes               |
+| ----------------------- | -------------- | ------------------------ |
+| **Environment Prepare** | [Docker](#)    | [Xeon]() <br> [Gaudi](#) |
 
 ### Deployment
 
