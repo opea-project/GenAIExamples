@@ -1,0 +1,17 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+services:
+  llm-tgi:
+    build:
+      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+    image: ${REGISTRY}opea/llm-tgi:${TAG:-latest}
+  llm-docsum-tgi:
+    build:
+      dockerfile: comps/llms/summarization/tgi/Dockerfile
+    image: ${REGISTRY}opea/llm-docsum-tgi:${TAG:-latest}
+  llm-faqgen-tgi:
+    build:
+      dockerfile: comps/llms/faq-generation/tgi/Dockerfile
+    image: ${REGISTRY}opea/llm-faqgen-tgi:${TAG:-latest}

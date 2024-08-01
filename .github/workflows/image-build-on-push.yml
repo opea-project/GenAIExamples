@@ -17,13 +17,59 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  job1:
-    uses: ./.github/workflows/reuse-get-test-matrix.yml
+  get-build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.get-services.outputs.services }}
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Test Services
+        id: get-services
+        run: |
+          base_commit=$(git rev-parse HEAD~1)
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')" || true
+          services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u | jq -R '.' | jq -sc '.') || true
+          echo "services=$services"
+          echo "services=$services" >> $GITHUB_OUTPUT
 
   image-build:
-    needs: job1
+    needs: get-build-matrix
     strategy:
-      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    uses: ./.github/workflows/reuse-image-build.yml
-    with:
-      micro_service: "${{ matrix.service }}"
+      matrix:
+        service: ${{ fromJSON(needs.get-build-matrix.outputs.services) }}
+        node: [docker-build-xeon, docker-build-gaudi]
+    runs-on: ${{ matrix.node }}
+    continue-on-error: true
+    steps:
+      - name: Clean up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Check Docker Compose File Exists
+        env:
+          service: ${{ matrix.service }}
+        run: |
+          docker_compose_path="${{ github.workspace }}/.github/workflows/docker/compose/${service}-compose.yaml"
+          if [ -e $docker_compose_path ]; then
+            echo "file_exists=true" >> $GITHUB_ENV
+            echo "docker_compose_path=${docker_compose_path}" >> $GITHUB_ENV
+          else
+            echo "file_exists=false" >> $GITHUB_ENV
+            echo "docker_compose_path=${docker_compose_path} for this service does not exist, so skipping image build for this service!!!"
+          fi
+
+      - name: Build Image
+        if: env.file_exists == 'true'
+        uses: opea-project/validation/actions/image-build@main
+        with:
+          work_dir: ${{ github.workspace }}
+          docker_compose_path: ${{ env.docker_compose_path }}
+          registry: ${OPEA_IMAGE_REPO}

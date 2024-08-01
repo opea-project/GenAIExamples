@@ -1,0 +1,17 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+services:
+  asr:
+    build:
+      dockerfile: comps/tts/Dockerfile
+    image: ${REGISTRY}opea/asr:${TAG:-latest}
+  speecht5:
+    build:
+      dockerfile: comps/tts/speecht5/Dockerfile
+    image: ${REGISTRY}opea/speecht5:${TAG:-latest}
+  speecht5-gaudi:
+    build:
+      dockerfile: comps/tts/speecht5/Dockerfile_hpu
+    image: ${REGISTRY}opea/speecht5-gaudi:${TAG:-latest}

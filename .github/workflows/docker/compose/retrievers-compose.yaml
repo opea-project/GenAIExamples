@@ -1,0 +1,8 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  retriever-redis:
+    build:
+      dockerfile: comps/retrievers/langchain/redis/docker/Dockerfile
+    image: ${REGISTRY}opea/retriever-redis:${TAG:-latest}

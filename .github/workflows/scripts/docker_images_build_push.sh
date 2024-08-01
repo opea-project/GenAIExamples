@@ -42,7 +42,7 @@ case ${micro_service} in
     "embeddings/langchain")
         IMAGE_NAME="opea/embedding-tei"
         ;;
-    "retrievers/langchain")
+    "retrievers/langchain/redis")
         IMAGE_NAME="opea/retriever-redis"
         ;;
     "reranks/tei")

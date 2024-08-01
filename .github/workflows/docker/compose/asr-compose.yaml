@@ -1,0 +1,17 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+services:
+  asr:
+    build:
+      dockerfile: comps/asr/Dockerfile
+    image: ${REGISTRY}opea/asr:${TAG:-latest}
+  whisper:
+    build:
+      dockerfile: comps/asr/whisper/Dockerfile
+    image: ${REGISTRY}opea/whisper:${TAG:-latest}
+  whisper-gaudi:
+    build:
+      dockerfile: comps/asr/whisper/Dockerfile_hpu
+    image: ${REGISTRY}opea/whisper-gaudi:${TAG:-latest}

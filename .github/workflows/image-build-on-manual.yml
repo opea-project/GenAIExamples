@@ -1,0 +1,60 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build latest images on manual event
+
+on:
+  workflow_dispatch:
+    inputs:
+      services:
+        default: "asr,dataprep,retrievers"
+        description: "List of services to build"
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+      node:
+        default: "docker-build-gaudi"
+        description: "Node to run the build on [docker-build-xeon, docker-build-gaudi]"
+        required: true
+        type: string
+
+jobs:
+  get-build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.get-services.outputs.services }}
+    steps:
+      - name: Get test Services
+        id: get-services
+        run: |
+          services=$(echo ${{ github.event.inputs.services }} | jq -R 'split(",") | map(gsub(" "; ""))')
+          echo "services=$services" >> $GITHUB_OUTPUT
+
+  image-build:
+    needs: get-build-matrix
+    strategy:
+      matrix:
+        service: ${{ fromJSON(needs.get-build-matrix.outputs.services) }}
+    runs-on: ${{ github.event.inputs.node }}
+    continue-on-error: true
+    steps:
+      - name: Clean Up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Build image
+        env:
+          service: ${{ matrix.service }}
+        uses: opea-project/validation/actions/image-build/action.yml@main
+        with:
+          work_dir: ${{ github.workspace }}
+          docker_compose_path: ${{ github.workspace }}/.github/workflows/docker/compose/${service}-compose.yaml
+          registry: ${OPEA_IMAGE_REPO}
+        secrets: inherit

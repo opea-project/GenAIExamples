@@ -1,0 +1,9 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+services:
+  reranking-tei:
+    build:
+      dockerfile: comps/reranks/tei/docker/Dockerfile
+    image: ${REGISTRY}opea/reranking-tei:${TAG:-latest}
