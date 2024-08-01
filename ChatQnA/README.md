@@ -145,7 +145,7 @@ Two ways of consuming ChatQnA Service:
 
    If you choose conversational UI, use this URL: `http://{host_ip}:5174`
 
-# Troubleshooting
+## Troubleshooting
 
 1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/xeon#validate-microservices) first. A simple example:
 
