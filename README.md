@@ -26,7 +26,7 @@ All the examples are well-validated on Intel platforms. In addition, these examp
 
 ### ChatQnA
 
-[ChatQnA](./ChatQnA/README.md) is an example of chatbot for question and answering through retrieval argumented generation (RAG).
+[ChatQnA](./ChatQnA/README.md) is an example of chatbot for question and answering through retrieval augmented generation (RAG).
 
 <table>
 	<tbody>
