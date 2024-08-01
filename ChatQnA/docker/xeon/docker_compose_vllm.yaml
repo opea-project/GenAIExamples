@@ -26,6 +26,7 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-embedding-server
