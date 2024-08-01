@@ -2,27 +2,125 @@
 
 # Generative AI Examples
 
-This project provides a collective list of Generative AI (GenAI) and Retrieval-Augmented Generation (RAG) examples such as chatbot with question and answering (ChatQnA), code generation (CodeGen), document summary (DocSum), etc.
-
-[![version](https://img.shields.io/badge/release-0.6-green)](https://github.com/opea-project/GenAIExamples/releases)
+[![version](https://img.shields.io/badge/release-0.8-green)](https://github.com/opea-project/GenAIExamples/releases)
 [![license](https://img.shields.io/badge/license-Apache%202-blue)](https://github.com/intel/neural-compressor/blob/master/LICENSE)
 
 ---
 
 <div align="left">
 
-## GenAI Examples
+## Introduction
 
-All the examples are well-validated on Intel platforms. In addition, these examples are:
+GenAIComps-based Generative AI examples offer streamlined deployment, testing, and scalability. All examples are fully compatible with Docker and Kubernetes, supporting a wide range of hardware platforms such as Xeon, Gaudi, and GPUs.
 
-- <b>Easy to use</b>. Use ecosystem-compliant APIs to build the end-to-end GenAI examples
+## Architecture
 
-- <b>Easy to customize</b>. Customize the example using different framework, LLM, embedding, serving etc.
+GenAIExample utilizes all microservice components from GenAIComps. This approach allows for flexible, modular service deployment in cloud-native environments. 
 
-- <b>Easy to deploy</b>. Deploy the GenAI examples with performance on Intel platforms
+GenAIInfra, part of the OPEA containerization and cloud-native suite, enables quick and efficient deployment of GenAIExamples in the cloud. 
 
-> **Note**:
-> The below support matrix gives the validated configurations. Feel free to customize per your needs.
+GenAIEvals measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
+
+The Architecture of OPEA is as below.
+
+![architecture](./assets/2.png)
+
+## Getting Started
+
+GenAIExamples offers flexible deployment options that cater to different user needs, enabling efficient use and deployment in various environments. Here’s a brief overview of the three primary methods: Python startup, Docker Compose, and Kubernetes.
+
+1. <b>Python Startup</b>: Allows developers to quickly test and modify GenAIExamples on their local machines.
+2. <b>Docker Compose</b>: Utilizes a YAML file to manage multi-container Docker applications for GenAIExamples simultaneously.
+3. <b>Kubernetes</b>: Orchestrates containers for efficient deployment of GenAIExamples across distributed environments.
+
+Users can choose the most suitable approach based on ease of setup, scalability needs, and the environment in which they are operating.
+
+### Prerequisites
+
+| Startup Methods | Docker Compose            | Kubernetes |
+|-----------------|---------------------------|------------|
+| **Environment Prepare** | [Docker](#) |  [Xeon]() <br> [Gaudi](#)  |
+
+### Deployment
+
+<table>
+    <tr>
+        <th rowspan="3" style="text-align:center;">Use Cases</th>
+        <th colspan="4" style="text-align:center;">Deployment</th>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:center;">Docker Compose</td>
+        <td rowspan="2" style="text-align:center;">Kubernetes</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">Xeon</td>
+        <td style="text-align:center;">Gaudi</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">ChatQnA</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">CodeGen</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">CodeTrans</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">DocSum</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">SearchQnA</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">FaqGen</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/FaqGen/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/FaqGen/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/FaqGen/kubernetes/manifests/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">Translation</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/Translation/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/Translation/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/tree/main/Translation/kubernetes">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">AudioQnA</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td>Not support yet</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">VisualQnA</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/tree/main/VisualQnA">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/tree/main/VisualQnA">Gaudi Link</a></td>
+        <td>Not support yet</td>
+    </tr>
+</table>
+
+## Benchmark
+
+TBD
+
+## Development Documents
+
+TBD
+
+## Support Examples
 
 ### ChatQnA
 
