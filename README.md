@@ -23,7 +23,7 @@ GenAIEvals measures service performance metrics such as throughput, latency, and
 
 The Architecture of OPEA is as below.
 
-![architecture](./assets/opea_architecture.png)
+![architecture](./assets/architecture.png)
 
 ## Getting Started
 
