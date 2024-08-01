@@ -52,6 +52,7 @@ function start_services() {
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export REDIS_URL="redis://${ip_address}:6379"
+    export REDIS_HOST=${ip_address}
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
@@ -194,23 +195,42 @@ function validate_microservices() {
 function validate_dataprep() {
     cd $LOG_PATH
 
-    # test /v1/dataprep
+    # test /v1/dataprep upload file
     URL="http://${ip_address}:6007/v1/dataprep"
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
-    SERVICE_NAME="dataprep - upload"
-    docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep_upload.log
+    SERVICE_NAME="dataprep - upload - file"
+    docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep_upload_file.log
 
-    # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
         exit 1
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
-    # check response body
+    if [[ "$RESPONSE_BODY" != *"Data preparation succeeded"* ]]; then
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
+    # test /v1/dataprep upload link
+    URL="http://${ip_address}:6007/v1/dataprep"
+    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'link_list=["https://www.ces.tech/"]' "$URL")
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+    SERVICE_NAME="dataprep - upload - link"
+    docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep_upload_link.log
+
+    if [ "$HTTP_STATUS" -ne "200" ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    fi
     if [[ "$RESPONSE_BODY" != *"Data preparation succeeded"* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
         exit 1
@@ -226,14 +246,12 @@ function validate_dataprep() {
     SERVICE_NAME="dataprep - get"
     docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep_get.log
 
-    # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
         exit 1
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
-    # check response body
     if [[ "$RESPONSE_BODY" != *'{"name":'* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
         exit 1
@@ -249,14 +267,12 @@ function validate_dataprep() {
     SERVICE_NAME="dataprep - del"
     docker logs dataprep-redis-server >> ${LOG_PATH}/dataprep_del.log
 
-    # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
         exit 1
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
-    # check response body
     if [[ "$RESPONSE_BODY" != *'{"status":true}'* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
         exit 1
