@@ -2,6 +2,7 @@ beautifulsoup4
 detect_secrets
 docarray[full]
 easyocr
+einops
 fastapi
 gibberish-detector
 huggingface_hub
@@ -21,6 +22,7 @@ pymupdf
 python-docx
 ray
 redis
+scikit-learn
 sentence_transformers
 shortuuid
 virtualenv

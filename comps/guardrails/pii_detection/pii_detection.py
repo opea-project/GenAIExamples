@@ -20,12 +20,7 @@ from tqdm import tqdm
 
 from comps import DocPath, opea_microservices, register_microservice
 from comps.guardrails.pii_detection.data_utils import document_loader, parse_html
-from comps.guardrails.pii_detection.pii.pii_utils import (
-    PIIDetector,
-    PIIDetectorWithLLM,
-    PIIDetectorWithML,
-    PIIDetectorWithNER,
-)
+from comps.guardrails.pii_detection.pii.pii_utils import PIIDetector, PIIDetectorWithML, PIIDetectorWithNER
 from comps.guardrails.pii_detection.ray_utils import ray_execute, ray_runner_initialization, rayds_initialization
 from comps.guardrails.pii_detection.utils import (
     Timer,
@@ -38,14 +33,13 @@ from comps.guardrails.pii_detection.utils import (
 
 def get_pii_detection_inst(strategy="dummy", settings=None):
     if strategy == "ner":
+        print("invoking NER detector.......")
         return PIIDetectorWithNER()
     elif strategy == "ml":
+        print("invoking ML detector.......")
         return PIIDetectorWithML()
-    elif strategy == "llm":
-        return PIIDetectorWithLLM()
     else:
-        # Default strategy - dummy
-        return PIIDetector()
+        raise ValueError(f"Invalid strategy: {strategy}")
 
 
 def file_based_pii_detect(file_list: List[DocPath], strategy, enable_ray=False, debug=False):
@@ -67,7 +61,7 @@ def file_based_pii_detect(file_list: List[DocPath], strategy, enable_ray=False, 
         for file in tqdm(file_list, total=len(file_list)):
             with Timer(f"read document {file}."):
                 data = document_loader(file)
-            with Timer(f"detect pii on document {file} to Redis."):
+            with Timer(f"detect pii on document {file}"):
                 ret.append(pii_detector.detect_pii(data))
     return ret
 
@@ -95,7 +89,7 @@ def link_based_pii_detect(link_list: List[str], strategy, enable_ray=False, debu
                 data = _parse_html(link)
             if debug:
                 print("content is: ", data)
-            with Timer(f"detect pii on document {link} to Redis."):
+            with Timer(f"detect pii on document {link}"):
                 ret.append(pii_detector.detect_pii(data))
     return ret
 
@@ -117,7 +111,7 @@ def text_based_pii_detect(text_list: List[str], strategy, enable_ray=False, debu
         for data in tqdm(text_list, total=len(text_list)):
             if debug:
                 print("content is: ", data)
-            with Timer(f"detect pii on document {data[:50]} to Redis."):
+            with Timer(f"detect pii on document {data[:50]}"):
                 ret.append(pii_detector.detect_pii(data))
     return ret
 
@@ -125,11 +119,20 @@ def text_based_pii_detect(text_list: List[str], strategy, enable_ray=False, debu
 @register_microservice(
     name="opea_service@guardrails-pii-detection", endpoint="/v1/piidetect", host="0.0.0.0", port=6357
 )
-async def pii_detection(files: List[UploadFile] = File(None), link_list: str = Form(None), text_list: str = Form(None)):
+async def pii_detection(
+    files: List[UploadFile] = File(None),
+    link_list: str = Form(None),
+    text_list: str = Form(None),
+    strategy: str = Form(None),
+):
     if not files and not link_list and not text_list:
         raise HTTPException(status_code=400, detail="Either files, link_list, or text_list must be provided.")
 
-    strategy = "ner"  # Default strategy
+    if strategy is None:
+        strategy = "ner"
+
+    print("PII detection using strategy: ", strategy)
+
     pip_requirement = ["detect-secrets", "phonenumbers", "gibberish-detector"]
 
     if files:
@@ -147,7 +150,7 @@ async def pii_detection(files: List[UploadFile] = File(None), link_list: str = F
                 await save_file_to_local_disk(save_path, file)
                 saved_path_list.append(DocPath(path=save_path))
 
-            enable_ray = False if len(saved_path_list) <= 10 else True
+            enable_ray = False if (len(text_list) <= 10 or strategy == "ml") else True
             if enable_ray:
                 prepare_env(enable_ray=enable_ray, pip_requirements=pip_requirement, comps_path=comps_path)
             ret = file_based_pii_detect(saved_path_list, strategy, enable_ray=enable_ray)
@@ -160,7 +163,7 @@ async def pii_detection(files: List[UploadFile] = File(None), link_list: str = F
             text_list = json.loads(text_list)  # Parse JSON string to list
             if not isinstance(text_list, list):
                 text_list = [text_list]
-            enable_ray = False if len(text_list) <= 10 else True
+            enable_ray = False if (len(text_list) <= 10 or strategy == "ml") else True
             if enable_ray:
                 prepare_env(enable_ray=enable_ray, pip_requirements=pip_requirement, comps_path=comps_path)
             ret = text_based_pii_detect(text_list, strategy, enable_ray=enable_ray)
@@ -175,7 +178,7 @@ async def pii_detection(files: List[UploadFile] = File(None), link_list: str = F
             link_list = json.loads(link_list)  # Parse JSON string to list
             if not isinstance(link_list, list):
                 link_list = [link_list]
-            enable_ray = False if len(link_list) <= 10 else True
+            enable_ray = False if (len(text_list) <= 10 or strategy == "ml") else True
             if enable_ray:
                 prepare_env(enable_ray=enable_ray, pip_requirements=pip_requirement, comps_path=comps_path)
             ret = link_based_pii_detect(link_list, strategy, enable_ray=enable_ray)

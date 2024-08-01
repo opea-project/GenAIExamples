@@ -25,11 +25,16 @@ function validate_microservice() {
     echo "Validate microservice started"
     export PATH="${HOME}/miniforge3/bin:$PATH"
     source activate
-    echo "test 1 - single task"
-    python comps/guardrails/pii_detection/test.py --test_text --batch_size 1 --ip_addr $ip_address
-    echo "test 2 - 20 tasks in parallel"
-    python comps/guardrails/pii_detection/test.py --test_text --batch_size 20 --ip_addr $ip_address
+    echo "test 1 - single task - ner"
+    python comps/guardrails/pii_detection/test.py --test_text --batch_size 1 --ip_addr $ip_address --strategy ner
+    echo "test 2 - 20 tasks in parallel - ner"
+    python comps/guardrails/pii_detection/test.py --test_text --batch_size 20 --ip_addr $ip_address --strategy ner
+    echo "test 3 - single task - ml"
+    python comps/guardrails/pii_detection/test.py --test_text --batch_size 1 --ip_addr $ip_address --strategy ml
+    echo "test 4 - 20 tasks in parallel - ml"
+    python comps/guardrails/pii_detection/test.py --test_text --batch_size 20 --ip_addr $ip_address --strategy ml
     echo "Validate microservice completed"
+    docker logs test-guardrails-pii-detection-endpoint
 }
 
 function stop_docker() {

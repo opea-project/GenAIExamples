@@ -22,14 +22,6 @@ class PIIDetector:
         return random.choice([True, False])
 
 
-class PIIDetectorWithLLM(PIIDetector):
-    def __init__(self):
-        super().__init__()
-
-    def detect_pii(self, text):
-        return True
-
-
 class PIIDetectorWithNER(PIIDetector):
     def __init__(self, model_path=None):
         super().__init__()
@@ -42,11 +34,13 @@ class PIIDetectorWithNER(PIIDetector):
             self.pipeline = pipeline(
                 model=_model_key, task="token-classification", tokenizer=tokenizer, grouped_entities=True
             )
+            print("NER detector instantiated successfully!")
         except Exception as e:
             print("Failed to load model, skip NER classification", e)
             self.pipeline = None
 
     def detect_pii(self, text):
+        print("Scanning text with NER detector...")
         result = []
         # use a regex to detect ip addresses
 
@@ -71,7 +65,26 @@ class PIIDetectorWithNER(PIIDetector):
 
 class PIIDetectorWithML(PIIDetector):
     def __init__(self):
+        import joblib
+        from huggingface_hub import hf_hub_download
+        from sentence_transformers import SentenceTransformer
+
         super().__init__()
+        print("Loading embedding model...")
+        embed_model_id = "nomic-ai/nomic-embed-text-v1"
+        self.model = SentenceTransformer(model_name_or_path=embed_model_id, trust_remote_code=True)
+
+        print("Loading classifier model...")
+        REPO_ID = "Intel/business_safety_logistic_regression_classifier"
+        FILENAME = "lr_clf.joblib"
+
+        self.clf = joblib.load(hf_hub_download(repo_id=REPO_ID, filename=FILENAME))
+
+        print("ML detector instantiated successfully!")
 
     def detect_pii(self, text):
-        return True
+        # text is a string
+        print("Scanning text with ML detector...")
+        embeddings = self.model.encode(text, convert_to_tensor=True).reshape(1, -1).cpu()
+        predictions = self.clf.predict(embeddings)
+        return True if predictions[0] == 1 else False
