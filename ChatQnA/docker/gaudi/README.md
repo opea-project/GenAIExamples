@@ -69,20 +69,6 @@ Build microservice docker.
 docker build --no-cache -t opea/llm-vllm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice .
 ```
 
-#### 5.4 Use Ray Serve
-
-Build Ray Serve docker.
-
-```bash
-docker build --no-cache -t ray_serve:habana --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.rayserve .
-```
-
-Build microservice docker.
-
-```bash
-docker build --no-cache -t opea/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice .
-```
-
 ### 6. Build Dataprep Image
 
 ```bash
@@ -159,7 +145,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 1. `opea/embedding-tei:latest`
 2. `opea/retriever-redis:latest`
 3. `opea/reranking-tei:latest`
-4. `opea/llm-tgi:latest` or `opea/llm-vllm:latest` or `opea/llm-vllm-ray:latest` or `opea/llm-ray:latest`
+4. `opea/llm-tgi:latest` or `opea/llm-vllm:latest` or `opea/llm-vllm-ray:latest`
 5. `opea/tei-gaudi:latest`
 6. `opea/dataprep-redis:latest`
 7. `opea/chatqna:latest` or `opea/chatqna-guardrails:latest`
@@ -192,7 +178,6 @@ export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export vLLM_LLM_ENDPOINT="http://${host_ip}:8008"
 export vLLM_RAY_LLM_ENDPOINT="http://${host_ip}:8008"
-export RAY_Serve_LLM_ENDPOINT="http://${host_ip}:8008"
 export LLM_SERVICE_PORT=9000
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
@@ -241,12 +226,6 @@ If use vllm-on-ray for llm backend.
 
 ```bash
 docker compose -f compose_vllm_ray.yaml up -d
-```
-
-If use ray serve for llm backend.
-
-```bash
-docker compose -f compose_ray_serve.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
@@ -340,13 +319,6 @@ curl http://${your_ip}:8008/v1/completions \
 curl http://${your_ip}:8008/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "${LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
-```
-
-```bash
-#Ray Serve Service
-curl http://${your_ip}:8008/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model": "${LLM_MODEL_ID_NAME}", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 32 }'
 ```
 
 7. LLM Microservice
