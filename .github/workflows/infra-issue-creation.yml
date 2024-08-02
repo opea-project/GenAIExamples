@@ -1,0 +1,59 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+on:
+  push:
+    branches: [ 'main','issue' ]
+    paths:
+      - "**/docker/*/compose.yaml"
+
+name: Create an issue to GenAIInfra on push
+jobs:
+  job1:
+    name: Create issue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: get-changed-files
+        run: |
+          set -xe
+          base_commit=$(git rev-parse HEAD~1)
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
+          grep -E '.*/docker/.*/compose.yaml')" || true
+
+          examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
+          format_examples=$(echo "$examples" | tr '\n' ',')
+          format_examples=${format_examples%,}
+          echo "examples=$format_examples" >> $GITHUB_ENV
+
+          format_changed_files=$(echo "$changed_files" | awk '{print "- "$0}')
+          echo "changed_files<<EOF" >> $GITHUB_ENV
+          echo "$format_changed_files" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create Issue
+        uses: daisy-ycguo/create-issue-action@stable
+        with:
+          token: ${{ secrets.Infra_Issue_Token }}
+          owner: opea-project
+          repo: GenAIInfra
+          title: |
+            [ci-auto] GenAIExample ${{ env.examples }} compose.yaml got changed.
+          assignees: lianhao
+          labels: helm
+          body: |
+            ## GenAIExample ${{ env.examples }} compose.yaml got changed
+
+            Below files are changed in [this commit](https://github.com/opea-project/GenAIExamples/commit/${{ github.sha }})
+
+            ${{ env.changed_files }}
+
+            Please verify if the helm charts and manifests need to be changed accordingly.
+
+            > This issue was created automatically by CI.
