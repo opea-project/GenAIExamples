@@ -72,7 +72,7 @@ export TGI_LLM_ENDPOINT=http://$host_ip:3006
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
 export ASR_ENDPOINT=http://$host_ip:7066
 export TTS_ENDPOINT=http://$host_ip:7055
-export ANIMATION_ENDPOINT=http://$host_ip:9060
+export ANIMATION_ENDPOINT=http://$host_ip:3008
 
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export ASR_SERVICE_HOST_IP=${host_ip}
