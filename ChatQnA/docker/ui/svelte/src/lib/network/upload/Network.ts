@@ -15,6 +15,21 @@
 import { env } from "$env/dynamic/public";
 
 const UPLOAD_FILE_BASE_URL = env.UPLOAD_FILE_BASE_URL;
+const GET_FILE = env.GET_FILE;
+const DELETE_FILE = env.DELETE_FILE;
+
+async function fetchFunc(url, init) {
+	try {
+		const response = await fetch(url, init);
+		if (!response.ok) throw response.status;
+
+		return await response.json();
+	} catch (error) {
+		console.error("network error: ", error);
+
+		return undefined;
+	}
+}
 
 export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 	const url = `${UPLOAD_FILE_BASE_URL}`;
@@ -25,17 +40,10 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 		body: formData,
 	};
 
-	try {
-		const response = await fetch(url, init);
-		if (!response.ok) throw response.status;
-		return await response.json();
-	} catch (error) {
-		console.error("network error: ", error);
-		return undefined;
-	}
+	return fetchFunc(url, init);
 }
 
-export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: string | undefined) {
+export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any) {
 	const url = `${UPLOAD_FILE_BASE_URL}`;
 	const formData = new FormData();
 	formData.append("link_list", JSON.stringify(pasteUrlList));
@@ -44,12 +52,31 @@ export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: st
 		body: formData,
 	};
 
-	try {
-		const response = await fetch(url, init);
-		if (!response.ok) throw response.status;
-		return await response.json();
-	} catch (error) {
-		console.error("network error: ", error);
-		return undefined;
-	}
+	return fetchFunc(url, init);
+}
+
+export async function fetchAllFile() {
+	const url = `${GET_FILE}`;
+	const init: RequestInit = {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+	};
+
+	return fetchFunc(url, init);
+}
+
+export async function deleteFiles(path) {
+	const UploadKnowledge_URL = DELETE_FILE;
+
+	const data = {
+		file_path: path,
+	};
+
+	const init: RequestInit = {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(data),
+	};
+
+	return fetchFunc(UploadKnowledge_URL, init);
 }

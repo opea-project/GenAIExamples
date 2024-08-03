@@ -38,17 +38,51 @@ cd GenAIExamples/CodeGen/docker/ui/
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
+### 5. Build the React UI Docker Image
+
+Construct the React frontend Docker image via the command below:
+
+```bash
+cd GenAIExamples/CodeGen/docker/ui/
+docker build -t opea/codegen-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+```
+
 Then run the command `docker images`, you will have the following 3 Docker images:
 
 - `opea/llm-tgi:latest`
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
+- `opea/codegen-react-ui:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
+The CodeGen megaservice manages a single microservice called LLM within a Directed Acyclic Graph (DAG). In the diagram above, the LLM microservice is a language model microservice that generates code snippets based on the user's input query. The TGI service serves as a text generation interface, providing a RESTful API for the LLM microservice. The CodeGen Gateway acts as the entry point for the CodeGen application, invoking the Megaservice to generate code snippets in response to the user's input query.
+
+The mega flow of the CodeGen application, from user's input query to the application's output response, is as follows:
+
+```mermaid
+flowchart LR
+    subgraph CodeGen
+        direction LR
+        A[User] --> |Input query| B[CodeGen Gateway]
+        B --> |Invoke| Megaservice
+        subgraph Megaservice["Megaservice"]
+            direction TB
+            C((LLM<br>9000)) -. Post .-> D{{TGI Service<br>8028}}
+        end
+        Megaservice --> |Output| E[Response]
+    end
+
+    subgraph Legend
+        direction LR
+        G([Microservice]) ==> H([Microservice])
+        I([Microservice]) -.-> J{{Server API}}
+    end
+```
+
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -69,7 +103,7 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7778/v1/codegen"
 
 ```bash
 cd GenAIExamples/CodeGen/docker/gaudi
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 ### Validate the MicroServices and MegaService
@@ -102,7 +136,7 @@ curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
 
 ## Enable LangSmith to Monitor Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 
@@ -119,12 +153,12 @@ export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=ls_...
 ```
 
-## 🚀 Launch the UI
+## 🚀 Launch the Svelte Based UI
 
-To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  codegen-xeon-ui-server:
+  codegen-gaudi-ui-server:
     image: opea/codegen-ui:latest
     ...
     ports:
@@ -132,6 +166,20 @@ To access the frontend, open the following URL in your browser: `http://{host_ip
 ```
 
 ![project-screenshot](../../assets/img/codeGen_ui_init.jpg)
+
+## 🚀 Launch the React Based UI
+
+To access the frontend, open the following URL in your browser: `http://{host_ip}:5174`. By default, the UI runs on port 5174 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
+
+```yaml
+  codegen-gaudi-react-ui-server:
+    image: opea/codegen-react-ui:latest
+    ...
+    ports:
+      - "80:5174"
+```
+
+![project-screenshot](../../assets/img/codegen_react.png)
 
 ## Install Copilot VSCode extension from Plugin Marketplace as the frontend
 

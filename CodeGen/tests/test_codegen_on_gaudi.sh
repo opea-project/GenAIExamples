@@ -15,13 +15,14 @@ function build_docker_images() {
 
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 
     cd $WORKPATH/docker
     docker build --no-cache -t opea/codegen:latest -f Dockerfile .
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/codegen-ui:latest -f docker/Dockerfile .
+    docker build --no-cache --build-arg BACKEND_SERVICE_ENDPOINT=http://${ip_address}:7778/v1/codegen -t opea/codegen--react-ui:latest -f docker/Dockerfile.react .
 
     docker images
 }
@@ -41,15 +42,26 @@ function start_services() {
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/codegen-ui:latest#image: opea/codegen-ui:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/codegen-ui:latest#image: opea/codegen-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/codegen-react-ui:latest#image: opea/codegen-react-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        echo "cat compose.yaml"
+        cat compose.yaml
     fi
 
     # Start Docker Containers
-    docker compose -f docker_compose.yaml up -d
+    docker compose up -d
 
-    sleep 2m # Waits 2 minutes
+    n=0
+    until [[ "$n" -ge 400 ]]; do
+        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 function validate_services() {
@@ -112,15 +124,16 @@ function validate_megaservice() {
 
 function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
-    local conda_env_name="CodeGen_e2e"
+    local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-    conda remove -n ${conda_env_name} --all -y
-    conda create -n ${conda_env_name} python=3.12 -y
+#    conda remove -n ${conda_env_name} --all -y
+#    conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y && npm install && npm ci && npx playwright install --with-deps
+#    conda install -c conda-forge nodejs -y
+    npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
     exit_status=0
@@ -132,16 +145,11 @@ function validate_frontend() {
     else
         echo "[TEST INFO]: ---------frontend test passed---------"
     fi
-
 }
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose stop && docker compose rm -f
 }
 
 function main() {

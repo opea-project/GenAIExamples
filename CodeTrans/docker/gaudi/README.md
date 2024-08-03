@@ -44,7 +44,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below. Notice that the `LLM_MODEL_ID` indicates the LLM model used for TGI service.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below. Notice that the `LLM_MODEL_ID` indicates the LLM model used for TGI service.
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -62,7 +62,7 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7777/v1/codetrans"
 
 ```bash
 cd GenAIExamples/CodeTrans/docker/gaudi
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 ### Validate Microservices
@@ -95,7 +95,7 @@ curl http://${host_ip}:7777/v1/codetrans \
 
 ## Enable LangSmith to Monitor an Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 
