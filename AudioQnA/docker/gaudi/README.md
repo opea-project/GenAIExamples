@@ -34,7 +34,7 @@ docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy 
 docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/Dockerfile .
 ```
 
-### 6. Build MegaService Docker Image
+### 5. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `audioqna.py` Python script. Build the MegaService Docker image using the command below:
 

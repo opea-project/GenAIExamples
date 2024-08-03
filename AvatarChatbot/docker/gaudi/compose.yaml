@@ -93,7 +93,7 @@ services:
     image: opea/animation:latest
     container_name: animation-service
     ports:
-      - "7860:7860"
+      - "3008:9060"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -114,7 +114,7 @@ services:
       - tts
       - animation
     ports:
-      - "3008:8888"
+      - "3009:8888"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
