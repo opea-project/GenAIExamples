@@ -47,7 +47,7 @@ To constrcut the Megaservice, we utilize the [GenAIComps](https://github.com/ope
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/AvatarChatbot/docker/gaudi
+cd GenAIExamples/AvatarChatbot/docker
 docker build --no-cache -t opea/avatarchatbot:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
