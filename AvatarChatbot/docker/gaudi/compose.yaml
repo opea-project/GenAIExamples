@@ -96,7 +96,7 @@ services:
       - "3008:7860"
     ipc: host
     volumes:
-      - "${pwd}:/outputs"
+      - "${PWD}:/outputs"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
