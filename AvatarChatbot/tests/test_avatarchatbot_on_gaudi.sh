@@ -59,6 +59,19 @@ function start_services() {
     export LLM_SERVICE_PORT=3007
     export ANIMATION_SERVICE_PORT=3008
 
+    export ANIMATION_PORT=7860
+    # export INFERENCE_MODE='wav2clip+gfpgan'
+    export INFERENCE_MODE='wav2clip_only'
+    export CHECKPOINT_PATH='src/Wav2Lip/checkpoints/wav2lip_gan.pth'
+    export FACE='assets/avatar1.jpg'
+    # export AUDIO='assets/eg3_ref.wav' # audio file path is optional, will use base64str as input if is 'None'
+    export AUDIO='None'
+    export FACESIZE=96
+    export OUTFILE='/outputs/result.mp4'
+    export GFPGAN_MODEL_VERSION=1.3
+    export UPSCALE_FACTOR=1
+    export FPS=10
+
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     if [[ "$IMAGE_REPO" != "" ]]; then
