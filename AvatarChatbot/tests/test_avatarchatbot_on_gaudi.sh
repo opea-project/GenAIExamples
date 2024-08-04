@@ -13,20 +13,21 @@ function build_docker_images() {
     cd $WORKPATH
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
+    git checkout ctao/animation
 
     docker build -t opea/whisper-gaudi:latest  -f comps/asr/whisper/Dockerfile_hpu .
-
     docker build -t opea/asr:latest  -f comps/asr/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/speecht5-gaudi:latest  -f comps/tts/speecht5/Dockerfile_hpu .
     docker build -t opea/tts:latest  -f comps/tts/Dockerfile .
+    docker build -t opea/animation:latest -f comps/animation/Dockerfile_hpu .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 
     cd ..
 
     cd $WORKPATH/docker
-    docker build --no-cache -t opea/audioqna:latest -f Dockerfile .
+    docker build --no-cache -t opea/avatarchatbot:latest -f Dockerfile .
 
     # cd $WORKPATH/docker/ui
     # docker build --no-cache -t opea/audioqna-ui:latest -f docker/Dockerfile .
@@ -36,22 +37,27 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker/gaudi
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+
+    export ip_address=$(hostname -I | awk '{print $1}')
+    export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
 
     export TGI_LLM_ENDPOINT=http://$ip_address:3006
     export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-
     export ASR_ENDPOINT=http://$ip_address:7066
     export TTS_ENDPOINT=http://$ip_address:7055
+    export ANIMATION_ENDPOINT=http://$ip_address:3008
 
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export ASR_SERVICE_HOST_IP=${ip_address}
     export TTS_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export ANIMATION_SERVICE_HOST_IP=${ip_address}
 
+    export MEGA_SERVICE_PORT=8888
     export ASR_SERVICE_PORT=3001
     export TTS_SERVICE_PORT=3002
     export LLM_SERVICE_PORT=3007
+    export ANIMATION_SERVICE_PORT=3008
 
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
@@ -60,7 +66,7 @@ function start_services() {
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         sed -i "s#image: opea/audioqna:latest#image: opea/audioqna:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/audioqna-ui:latest#image: opea/audioqna-ui:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}/#g" compose.yaml
         echo "cat compose.yaml"
         cat compose.yaml
     fi
@@ -80,7 +86,7 @@ function start_services() {
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${ip_address}:3009/v1/avatarchatbot -X POST -d @sample_whoareyou.json -H 'Content-Type: application/json')
     echo "result is === $result"
     if [[ $result == *"AAA"* ]]; then
         echo "Result correct."
@@ -91,6 +97,7 @@ function validate_megaservice() {
         docker logs tts-service > $LOG_PATH/tts-service.log
         docker logs tgi-gaudi-server > $LOG_PATH/tgi-gaudi-server.log
         docker logs llm-tgi-gaudi-server > $LOG_PATH/llm-tgi-gaudi-server.log
+        docker logs animation-service > $LOG_PATH/animation-service.log
 
         echo "Result wrong."
         exit 1

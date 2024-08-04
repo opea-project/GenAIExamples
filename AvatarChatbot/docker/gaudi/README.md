@@ -11,6 +11,7 @@ The AvatarChatbot service can be effortlessly deployed on either Intel Gaudi2 or
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
+git checkout ctao/animation
 ```
 
 ### 2. Build ASR Image
@@ -183,5 +184,10 @@ The output file will be saved in the current directory, because `${PWD}` is mapp
 ## Troubleshooting
 
 ```bash
-docker logs <service_name>
+cd GenAIExamples/AvatarChatbot/tests
+export IMAGE_REPO="opea"
+export IMAGE_TAG="latest"
+export HUGGINGFACEHUB_API_TOKEN=<your_hf_token>
+
+bash test_avatarchatbot_on_gaudi.sh
 ```
