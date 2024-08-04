@@ -93,7 +93,7 @@ services:
     image: opea/animation:latest
     container_name: animation-service
     ports:
-      - "3008:9060"
+      - "3008:7860"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -130,6 +130,7 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - MEGA_SERVICE_PORT=${MEGA_SERVICE_PORT}
       - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
       - ASR_SERVICE_PORT=${ASR_SERVICE_PORT}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
