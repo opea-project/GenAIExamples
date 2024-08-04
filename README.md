@@ -25,8 +25,8 @@ GenAIEvals measures service performance metrics such as throughput, latency, and
 
 GenAIExamples offers flexible deployment options that cater to different user needs, enabling efficient use and deployment in various environments. Here’s a brief overview of the three primary methods: Python startup, Docker Compose, and Kubernetes.
 
-1. <b>Docker Compose</b>: Check the released docker images [here](./docker_images_list.md) for detailed information.
-2. <b>Kubernetes</b>: Orchestrates containers for efficient deployment of GenAIExamples across distributed environments.
+1. <b>Docker Compose</b>: Check the released docker images in [docker image list](./docker_images_list.md) for detailed information.
+2. <b>Kubernetes</b>: Follow the steps at [K8s Install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install) and [GMC Install](https://github.com/opea-project/docs/blob/main/guide/installation/gmc_install/gmc_install.md) to setup k8s and GenAI environment .
 
 Users can choose the most suitable approach based on ease of setup, scalability needs, and the environment in which they are operating.
 
