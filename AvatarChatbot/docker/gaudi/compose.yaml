@@ -95,6 +95,8 @@ services:
     ports:
       - "3008:7860"
     ipc: host
+    volumes:
+      - "${pwd}:/outputs"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
