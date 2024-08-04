@@ -101,10 +101,13 @@ function start_services() {
        sleep 1s
        n=$((n+1))
     done
+    echo "All services are up and running"
+    sleep 5s
 }
 
 
 function validate_megaservice() {
+    cd $WORKPATH/docker/gaudi
     result=$(http_proxy="" curl http://${ip_address}:3009/v1/avatarchatbot -X POST -d @sample_whoareyou.json -H 'Content-Type: application/json')
     echo "result is === $result"
     if [[ $result == *"mp4"* ]]; then
