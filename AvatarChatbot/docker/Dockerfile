@@ -16,11 +16,10 @@ RUN useradd -m -s /bin/bash user && \
     chown -R user /home/user/
 
 WORKDIR /home/user/
-RUN git clone https://github.com/ctao456/GenAIComps.git && \
-    cd GenAIComps && \
-    git checkout ctao/animation
-
+RUN git clone https://github.com/ctao456/GenAIComps.git
 WORKDIR /home/user/GenAIComps
+RUN git checkout ctao/animation
+
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
 
