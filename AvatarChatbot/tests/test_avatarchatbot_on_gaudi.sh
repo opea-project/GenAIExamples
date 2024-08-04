@@ -12,6 +12,7 @@ if ls $LOG_PATH/*.log 1> /dev/null 2>&1; then
     echo "Log files removed."
 else
     echo "No log files to remove."
+fi
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
