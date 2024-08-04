@@ -3,8 +3,8 @@
 
 import asyncio
 import os
-from comps import AvatarChatbotGateway, MicroService, ServiceOrchestrator, ServiceType
 
+from comps import AvatarChatbotGateway, MicroService, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
@@ -23,7 +23,7 @@ class AvatarChatbotService:
         self.host = host
         self.port = port
         self.megaservice = ServiceOrchestrator()
-    
+
     def add_remote_service(self):
         asr = MicroService(
             name="asr",

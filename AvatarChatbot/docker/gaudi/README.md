@@ -1,8 +1,8 @@
 # AvatarChatbot Application
+
 The AvatarChatbot service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
 ## 🚀 Megaservice flow
-
 
 ## 🚀 Build Docker images
 
@@ -23,7 +23,7 @@ docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg
 ```
 
 ### 3. Build LLM Image
-   
+
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
@@ -43,7 +43,8 @@ docker build -t opea/animation:latest --build-arg https_proxy=$https_proxy --bui
 ```
 
 ### 6. Build MegaService Docker Image
-To constrcut the Megaservice, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `avatarchatbot.py` Python script. Build the MegaService Docker image using the command below:
+
+To construct the Megaservice, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `avatarchatbot.py` Python script. Build the MegaService Docker image using the command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -52,6 +53,7 @@ docker build --no-cache -t opea/avatarchatbot:latest --build-arg https_proxy=$ht
 ```
 
 Then run the command `docker images`, you will have following images ready:
+
 1. `opea/whisper-gaudi:latest`
 2. `opea/asr:latest`
 3. `opea/llm-tgi:latest`
@@ -163,16 +165,19 @@ curl http://${host_ip}:3009/v1/avatarchatbot \
   -d @sample_whoareyou.json \
   -H 'Content-Type: application/json'
 ```
+
 If the megaservice is running properly, you should see the following output:
 
 ```bash
 "/outputs/result.mp4"
 ```
+
 The output file will be saved in the current directory, because `${PWD}` is mapped to `/outputs` inside the avatarchatbot-backend-service Docker container.
 
 ## Gradio UI
 
 ```bash
+
 ```
 
 ## Troubleshooting
