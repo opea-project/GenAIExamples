@@ -30,7 +30,7 @@ function build_docker_images() {
     docker build --no-cache -t opea/avatarchatbot:latest -f Dockerfile .
 
     # cd $WORKPATH/docker/ui
-    # docker build --no-cache -t opea/audioqna-ui:latest -f docker/Dockerfile .
+    # docker build --no-cache -t opea/avatarchatbot-ui:latest -f docker/Dockerfile .
 
     docker images
 }
@@ -77,8 +77,8 @@ function start_services() {
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/audioqna:latest#image: opea/audioqna:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/audioqna-ui:latest#image: opea/audioqna-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/avatarchatbot:latest#image: opea/avatarchatbot:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/avatarchatbot-ui:latest#image: opea/avatarchatbot-ui:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}/#g" compose.yaml
         echo "cat compose.yaml"
         cat compose.yaml
@@ -107,7 +107,7 @@ function start_services() {
 function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3009/v1/avatarchatbot -X POST -d @sample_whoareyou.json -H 'Content-Type: application/json')
     echo "result is === $result"
-    if [[ $result == *"AAA"* ]]; then
+    if [[ $result == *"mp4"* ]]; then
         echo "Result correct."
     else
         docker logs whisper-service > $LOG_PATH/whisper-service.log
