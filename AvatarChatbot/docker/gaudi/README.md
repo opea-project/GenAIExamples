@@ -89,7 +89,8 @@ export ANIMATION_SERVICE_PORT=3008
 
 ```bash
 export ANIMATION_PORT=7860
-export INFERENCE_MODE='wav2clip+gfpgan'
+# export INFERENCE_MODE='wav2clip+gfpgan'
+export INFERENCE_MODE='wav2clip_only'
 export CHECKPOINT_PATH='src/Wav2Lip/checkpoints/wav2lip_gan.pth'
 export FACE='assets/avatar1.jpg'
 # export AUDIO='assets/eg3_ref.wav' # audio file path is optional, will use base64str as input if is 'None'

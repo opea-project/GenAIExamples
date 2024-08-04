@@ -61,7 +61,7 @@ class AvatarChatbotService:
         self.megaservice.flow_to(asr, llm)
         self.megaservice.flow_to(llm, tts)
         self.megaservice.flow_to(tts, animation)
-        self.gateway = AvatarChatbotGateway(megaservice=self.megaservice, host=self.host, port=self.port)
+        self.gateway = AvatarChatbotGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
 
 if __name__ == "__main__":
