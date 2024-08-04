@@ -94,8 +94,8 @@ function start_services() {
         docker logs speecht5-service > $LOG_PATH/speecht5_service_start.log
 
         if grep -q Connected $LOG_PATH/tgi_service_start.log && \
-            grep -q Uvicorn running $LOG_PATH/whisper_service_start.log && \
-            grep -q Uvicorn running $LOG_PATH/speecht5_service_start.log; then
+            grep -q "Uvicorn running" $LOG_PATH/whisper_service_start.log && \
+            grep -q "Uvicorn running" $LOG_PATH/speecht5_service_start.log; then
             break
         fi
        sleep 1s
