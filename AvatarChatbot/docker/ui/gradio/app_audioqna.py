@@ -122,7 +122,7 @@ async def final_update(audio, image):
 # %% Main
 if __name__ == "__main__":
     HOST_IP = os.getenv("host_ip")
-    
+
     # Fetch the AudioQnA backend server
     ai_chatbot_url = f"http://{HOST_IP}:3008/v1/audioqna"
 

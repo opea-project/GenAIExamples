@@ -34,7 +34,6 @@ flowchart LR
     end
 ```
 
-
 ## 🚀 Build Docker images
 
 ### 1. Source Code install GenAIComps
@@ -207,12 +206,13 @@ If the megaservice is running properly, you should see the following output:
 The output file will be saved in the current directory, because `${PWD}` is mapped to `/outputs` inside the avatarchatbot-backend-service Docker container.
 
 ## Gradio UI
+
 Follow the instructions in [Set the environment variables](#set-the-environment-variables) to set the environment variables. Follow [Start the MegaService](#start-the-megaservice) to start the MegaService. Then run the following command to start the Gradio UI:
+
 ```bash
 cd GenAIExamples/AvatarChatbot/docker/ui/gradio
 python3 app.py
 ```
-
 
 ## Troubleshooting
 

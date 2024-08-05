@@ -122,7 +122,7 @@ async def final_update(audio, image):
 # %% Main
 if __name__ == "__main__":
     HOST_IP = os.getenv("host_ip")
-    
+
     # Fetch the AvatarChatbot backend server
     ai_chatbot_url = f"http://{HOST_IP}:3009/v1/avatarchatbot"
 
@@ -280,4 +280,4 @@ if __name__ == "__main__":
             outputs=[video_output, video_time_text],
         )
 
-        demo.queue().launch(server_name="0.0.0.0", server_port=65535) # demo port is 65535
+        demo.queue().launch(server_name="0.0.0.0", server_port=65535)  # demo port is 65535
