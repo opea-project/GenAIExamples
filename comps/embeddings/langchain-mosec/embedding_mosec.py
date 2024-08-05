@@ -67,7 +67,7 @@ if __name__ == "__main__":
     MOSEC_EMBEDDING_ENDPOINT = os.environ.get("MOSEC_EMBEDDING_ENDPOINT", "http://127.0.0.1:8080")
     os.environ["OPENAI_API_BASE"] = MOSEC_EMBEDDING_ENDPOINT
     os.environ["OPENAI_API_KEY"] = "Dummy key"
-    MODEL_ID = "/root/bge-large-zh"
+    MODEL_ID = "/root/bge-large-zh-v1.5"
     embeddings = MosecEmbeddings(model=MODEL_ID)
     print("Mosec Embedding initialized.")
     opea_microservices["opea_service@embedding_mosec"].start()
