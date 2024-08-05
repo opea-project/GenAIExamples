@@ -4,6 +4,37 @@ The AvatarChatbot service can be effortlessly deployed on either Intel Gaudi2 or
 
 ## 🚀 Megaservice flow
 
+```Mermaid
+flowchart LR
+    subgraph AvatarChatbot
+        direction LR
+        A[User] --> |Input query| B[AvatarChatbot Gateway]
+        B --> |Invoke| Megaservice
+        subgraph Megaservice["AvatarChatbot Megaservice"]
+            direction LR
+            subgraph AudioQnA["AudioQnA"]
+                direction TB
+                C((ASR<br>3001)) -. Post .-> D{{whisper-service<br>7066}}
+                E((LLM<br>3007)) -. Post .-> F{{tgi-service<br>3006}}
+                G((TTS<br>3002)) -. Post .-> H{{speecht5-service<br>7055}}
+            end
+            subgraph AvatarAnimation["Avatar Animation"]
+                direction TB
+                I((AvatarAnime<br>3010)) -. Post .-> J{{animation<br>3009}}
+            end
+            AudioQnA ==> AvatarAnimation
+        end
+        Megaservice --> |Output| K[Response]
+    end
+
+    subgraph Legend
+        direction LR
+        L([Microservice]) ==> M([Microservice])
+        N([Microservice]) -.-> O{{Server API}}
+    end
+```
+
+
 ## 🚀 Build Docker images
 
 ### 1. Source Code install GenAIComps
@@ -176,10 +207,12 @@ If the megaservice is running properly, you should see the following output:
 The output file will be saved in the current directory, because `${PWD}` is mapped to `/outputs` inside the avatarchatbot-backend-service Docker container.
 
 ## Gradio UI
-
+Follow the instructions in [Set the environment variables](#set-the-environment-variables) to set the environment variables. Follow [Start the MegaService](#start-the-megaservice) to start the MegaService. Then run the following command to start the Gradio UI:
 ```bash
-
+cd GenAIExamples/AvatarChatbot/docker/ui/gradio
+python3 app.py
 ```
+
 
 ## Troubleshooting
 

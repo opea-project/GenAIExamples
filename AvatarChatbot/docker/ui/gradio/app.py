@@ -121,19 +121,15 @@ async def final_update(audio, image):
 
 # %% Main
 if __name__ == "__main__":
-    # HOST_IP = os.getenv("host_ip")
-    HOST_IP = "198.175.88.246"
-
-    # Fetch the AudioQnA backend server
-    ai_chatbot_url = f"http://{HOST_IP}:3008/v1/audioqna"
+    HOST_IP = os.getenv("host_ip")
+    
+    # Fetch the AvatarChatbot backend server
+    ai_chatbot_url = f"http://{HOST_IP}:3009/v1/avatarchatbot"
 
     # Collect chat history to print in the interface
     chat_history = ""
 
     # Prepare 3 image paths
-    # HOME = os.getenv("HOME")
-    # HOME="/mnt/localdisk4"
-    HOME = "/home/demo/"
     image_paths = [
         Image.open(os.path.join("./assets/avatar1.jpg")),
         Image.open(os.path.join("./assets/avatar5.png")),
@@ -284,4 +280,4 @@ if __name__ == "__main__":
             outputs=[video_output, video_time_text],
         )
 
-        demo.queue().launch(server_name="0.0.0.0", server_port=7861)
+        demo.queue().launch(server_name="0.0.0.0", server_port=65535) # demo port is 65535
