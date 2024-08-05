@@ -104,6 +104,46 @@ def delete_by_id(client, id):
     return True
 
 
+def ingest_chunks_to_redis(file_name: str, chunks: List):
+    print(f"[ ingest chunks ] file name: {file_name}")
+    # Create vectorstore
+    if tei_embedding_endpoint:
+        # create embeddings using TEI endpoint service
+        embedder = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
+    else:
+        # create embeddings using local embedding model
+        embedder = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
+
+    # Batch size
+    batch_size = 32
+    num_chunks = len(chunks)
+
+    file_ids = []
+    for i in range(0, num_chunks, batch_size):
+        print(f"[ ingest chunks ] Current batch: {i}")
+        batch_chunks = chunks[i : i + batch_size]
+        batch_texts = batch_chunks
+
+        _, keys = Redis.from_texts_return_keys(
+            texts=batch_texts,
+            embedding=embedder,
+            index_name=INDEX_NAME,
+            redis_url=REDIS_URL,
+        )
+        print(f"[ ingest chunks ] keys: {keys}")
+        file_ids.extend(keys)
+        print(f"[ ingest chunks ] Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
+
+    # store file_ids into index file-keys
+    r = redis.Redis(connection_pool=redis_pool)
+    client = r.ft(KEY_INDEX_NAME)
+    if not check_index_existance(client):
+        assert create_index(client)
+    assert store_by_id(client, key=file_name, value="#".join(file_ids))
+
+    return True
+
+
 def ingest_data_to_redis(doc_path: DocPath):
     """Ingest document to Redis."""
     path = doc_path.path
@@ -132,80 +172,8 @@ def ingest_data_to_redis(doc_path: DocPath):
         chunks = chunks + table_chunks
     print("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
 
-    # Create vectorstore
-    if tei_embedding_endpoint:
-        # create embeddings using TEI endpoint service
-        embedder = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
-    else:
-        # create embeddings using local embedding model
-        embedder = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
-
-    # Batch size
-    batch_size = 32
-    num_chunks = len(chunks)
-
-    file_ids = []
-    for i in range(0, num_chunks, batch_size):
-        print(f"Current batch: {i}")
-        batch_chunks = chunks[i : i + batch_size]
-        batch_texts = batch_chunks
-
-        _, keys = Redis.from_texts_return_keys(
-            texts=batch_texts,
-            embedding=embedder,
-            index_name=INDEX_NAME,
-            redis_url=REDIS_URL,
-        )
-        print(f"keys: {keys}")
-        file_ids.extend(keys)
-        print(f"Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
-
-    # store file_ids into index file-keys
-    r = redis.Redis(connection_pool=redis_pool)
-    client = r.ft(KEY_INDEX_NAME)
-    if not check_index_existance(client):
-        assert create_index(client)
     file_name = doc_path.path.split("/")[-1]
-    assert store_by_id(client, key=file_name, value="#".join(file_ids))
-
-    return True
-
-
-async def ingest_link_to_redis(link_list: List[str]):
-    # Create embedding obj
-    if tei_embedding_endpoint:
-        # create embeddings using TEI endpoint service
-        embedder = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
-    else:
-        # create embeddings using local embedding model
-        embedder = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
-
-    # Create redis connection obj
-    r = redis.Redis(connection_pool=redis_pool)
-    client = r.ft(KEY_INDEX_NAME)
-
-    # save link contents and doc_ids one by one
-    for link in link_list:
-        content = parse_html([link])[0][0]
-        print(f"[ ingest link ] link: {link} content: {content}")
-        encoded_link = encode_filename(link)
-        save_path = upload_folder + encoded_link + ".txt"
-        print(f"[ ingest link ] save_path: {save_path}")
-        await save_content_to_local_disk(save_path, content)
-
-        _, keys = Redis.from_texts_return_keys(
-            texts=content,
-            embedding=embedder,
-            index_name=INDEX_NAME,
-            redis_url=REDIS_URL,
-        )
-        print(f"keys: {keys}")
-        if not check_index_existance(client):
-            assert create_index(client)
-        file_name = encoded_link + ".txt"
-        assert store_by_id(client, key=file_name, value="#".join(keys))
-
-    return True
+    return ingest_chunks_to_redis(file_name, chunks)
 
 
 @register_microservice(name="opea_service@prepare_doc_redis", endpoint="/v1/dataprep", host="0.0.0.0", port=6007)
@@ -270,7 +238,20 @@ async def ingest_documents(
             link_list = json.loads(link_list)  # Parse JSON string to list
             if not isinstance(link_list, list):
                 raise HTTPException(status_code=400, detail="link_list should be a list.")
-            await ingest_link_to_redis(link_list)
+            for link in link_list:
+                encoded_link = encode_filename(link)
+                save_path = upload_folder + encoded_link + ".txt"
+                content = parse_html([link])[0][0]
+                await save_content_to_local_disk(save_path, content)
+                ingest_data_to_redis(
+                    DocPath(
+                        path=save_path,
+                        chunk_size=chunk_size,
+                        chunk_overlap=chunk_overlap,
+                        process_table=process_table,
+                        table_strategy=table_strategy,
+                    )
+                )
             print(f"Successfully saved link list {link_list}")
             return {"status": 200, "message": "Data preparation succeeded"}
         except json.JSONDecodeError:
