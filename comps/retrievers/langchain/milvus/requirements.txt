@@ -22,3 +22,4 @@ python-docx==0.8.11
 sentence_transformers
 shortuuid
 tiktoken
+uvicorn

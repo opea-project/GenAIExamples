@@ -23,3 +23,4 @@ python-docx
 python-pptx
 sentence_transformers
 shortuuid
+uvicorn

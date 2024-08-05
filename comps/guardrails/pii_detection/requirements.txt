@@ -25,4 +25,5 @@ redis
 scikit-learn
 sentence_transformers
 shortuuid
+uvicorn
 virtualenv

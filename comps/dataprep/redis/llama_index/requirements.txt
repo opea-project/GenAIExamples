@@ -15,3 +15,4 @@ python-bidi==0.4.2
 redis
 sentence_transformers
 shortuuid
+uvicorn

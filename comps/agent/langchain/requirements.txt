@@ -29,6 +29,8 @@ tavily-python
 transformers
 transformers[sentencepiece]
 
+uvicorn
+
 # used by document loader
 # beautifulsoup4
 # easyocr

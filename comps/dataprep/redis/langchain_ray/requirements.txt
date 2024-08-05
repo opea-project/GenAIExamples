@@ -24,4 +24,5 @@ ray
 redis
 sentence_transformers
 shortuuid
+uvicorn
 virtualenv

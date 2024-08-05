@@ -11,3 +11,4 @@ prometheus-fastapi-instrumentator
 ragas
 shortuuid
 transformers
+uvicorn

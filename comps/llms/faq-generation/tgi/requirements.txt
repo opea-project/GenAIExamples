@@ -10,3 +10,4 @@ opentelemetry-sdk
 prometheus-fastapi-instrumentator
 shortuuid
 transformers
+uvicorn

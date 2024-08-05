@@ -12,3 +12,4 @@ psycopg2-binary
 pymupdf
 sentence_transformers
 shortuuid
+uvicorn

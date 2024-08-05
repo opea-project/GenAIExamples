@@ -9,3 +9,4 @@ prometheus-fastapi-instrumentator
 pydantic==2.7.2
 pydub
 shortuuid
+uvicorn

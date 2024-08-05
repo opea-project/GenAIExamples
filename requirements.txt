@@ -9,3 +9,4 @@ prometheus-fastapi-instrumentator
 pyyaml
 requests
 shortuuid
+uvicorn

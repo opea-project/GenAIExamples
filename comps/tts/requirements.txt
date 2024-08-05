@@ -11,3 +11,4 @@ shortuuid
 soundfile
 torch
 transformers
+uvicorn

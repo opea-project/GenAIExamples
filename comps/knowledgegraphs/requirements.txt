@@ -23,3 +23,4 @@ redis
 sentence-transformers
 shortuuid
 tiktoken
+uvicorn
