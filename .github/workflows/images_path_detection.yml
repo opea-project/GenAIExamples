@@ -1,0 +1,49 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Check the validity of links in docker_images_list.
+
+on:
+  push:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
+
+jobs:
+  check-dockerfile-paths:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout repo GenAIExamples
+        uses: actions/checkout@v4
+
+      - name: Check the validity of links
+        run: |
+          cd ${{github.workspace}}
+          miss="FALSE"
+          while IFS=: read -r line link; do
+            http_status=$(curl -o /dev/null -s -w "%{http_code}" "$link")
+            if [ "$http_status" -eq 200 ]; then
+              echo "Valid link: $link (Line $line)"
+            else
+              echo "Broken link: $link (Line $line) (Status $http_status) "
+              echo "-----------------retry strat----------------------"
+              retry_http_status=$(curl -o /dev/null -s -w "%{http_code}" "$link")
+              if [ "$retry_http_status" -eq 200 ]; then
+                miss="FALSE"
+                echo "Valid link: $link (Line $line)"
+                echo "---------------Retry is valid---------------------"
+              else
+                miss="TRUE"
+                echo "Retry broken link: $link (Line $line) (Status $http_status) "
+                echo "-------------Retry is not valid-------------------"
+              fi
+            fi
+          done < <(grep -n -oP '(?<=a href=")[^"]*(?=">)' ../../docker_images_list.md)
+
+          if [[ "$miss" == "TRUE" ]]; then
+            exit 1
+          fi
+        shell: bash
