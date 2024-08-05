@@ -2,240 +2,108 @@
 
 # Generative AI Examples
 
-This project provides a collective list of Generative AI (GenAI) and Retrieval-Augmented Generation (RAG) examples such as chatbot with question and answering (ChatQnA), code generation (CodeGen), document summary (DocSum), etc.
-
-[![version](https://img.shields.io/badge/release-0.6-green)](https://github.com/opea-project/GenAIExamples/releases)
+[![version](https://img.shields.io/badge/release-0.8-green)](https://github.com/opea-project/GenAIExamples/releases)
 [![license](https://img.shields.io/badge/license-Apache%202-blue)](https://github.com/intel/neural-compressor/blob/master/LICENSE)
 
 ---
 
 <div align="left">
 
-## GenAI Examples
+## Introduction
 
-All the examples are well-validated on Intel platforms. In addition, these examples are:
+GenAIComps-based Generative AI examples offer streamlined deployment, testing, and scalability. All examples are fully compatible with Docker and Kubernetes, supporting a wide range of hardware platforms such as Gaudi, Xeon, and other hardwares.
 
-- <b>Easy to use</b>. Use ecosystem-compliant APIs to build the end-to-end GenAI examples
+## Architecture
 
-- <b>Easy to customize</b>. Customize the example using different framework, LLM, embedding, serving etc.
+GenAIComps is a service-based tool that includes microservice components such as llm, embedding, reranking, and so on. Using these components, various examples in GenAIExample can be constructed, including ChatQnA, DocSum, etc.
 
-- <b>Easy to deploy</b>. Deploy the GenAI examples with performance on Intel platforms
+GenAIInfra, part of the OPEA containerization and cloud-native suite, enables quick and efficient deployment of GenAIExamples in the cloud.
 
-> **Note**:
-> The below support matrix gives the validated configurations. Feel free to customize per your needs.
+GenAIEvals measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
 
-### ChatQnA
+## Getting Started
 
-[ChatQnA](./ChatQnA/README.md) is an example of chatbot for question and answering through retrieval argumented generation (RAG).
+GenAIExamples offers flexible deployment options that cater to different user needs, enabling efficient use and deployment in various environments. Here’s a brief overview of the three primary methods: Python startup, Docker Compose, and Kubernetes.
 
-<table>
-	<tbody>
-		<tr>
-			<td>Framework</td>
-			<td>LLM</td>
-			<td>Embedding</td>
-			<td>Vector Database</td>
-			<td>Serving</td>
-			<td>HW</td>
-			<td>Description</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
-			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
-			<td><a href="https://redis.io/">Redis</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
-			<td>Xeon/Gaudi2/GPU</td>
-			<td>Chatbot</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
-			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
-			<td><a href="https://www.trychroma.com/">Chroma</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
-			<td>Xeon/Gaudi2</td>
-			<td>Chatbot</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
-			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
-			<td><a href="https://redis.io/">Redis</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
-			<td>Xeon/Gaudi2</td>
-			<td>Chatbot</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
-			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
-			<td><a href="https://qdrant.tech/">Qdrant</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a> <a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
-			<td>Xeon/Gaudi2</td>
-			<td>Chatbot</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/Qwen/Qwen2-7B">Qwen2-7B</a></td>
-			<td><a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
-			<td><a href="https://redis.io/">Redis</a></td>
-			<td><a href=<a href="https://github.com/huggingface/text-embeddings-inference">TEI</td>
-			<td>Xeon/Gaudi2</td>
-			<td>Chatbot</td>
-		</tr>
-	</tbody>
-</table>
+1. <b>Docker Compose</b>: Check the released docker images in [docker image list](./docker_images_list.md) for detailed information.
+2. <b>Kubernetes</b>: Follow the steps at [K8s Install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install) and [GMC Install](https://github.com/opea-project/docs/blob/main/guide/installation/gmc_install/gmc_install.md) to setup k8s and GenAI environment .
 
-### CodeGen
+Users can choose the most suitable approach based on ease of setup, scalability needs, and the environment in which they are operating.
 
-[CodeGen](./CodeGen/README.md) is an example of copilot designed for code generation in Visual Studio Code.
+### Deployment
 
 <table>
-	<tbody>
-		<tr>
-			<td>Framework</td>
-			<td>LLM</td>
-			<td>Serving</td>
-			<td>HW</td>
-			<td>Description</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/meta-llama/CodeLlama-7b-hf">meta-llama/CodeLlama-7b-hf</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
-			<td>Xeon/Gaudi2</td>
-			<td>Copilot</td>
-		</tr>
-	</tbody>
+    <tr>
+        <th rowspan="3" style="text-align:center;">Use Cases</th>
+        <th colspan="4" style="text-align:center;">Deployment</th>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:center;">Docker Compose</td>
+        <td rowspan="2" style="text-align:center;">Kubernetes</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">Xeon</td>
+        <td style="text-align:center;">Gaudi</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">ChatQnA</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">CodeGen</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">CodeTrans</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">DocSum</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">SearchQnA</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/kubernetes/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">FaqGen</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/FaqGen/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/FaqGen/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/FaqGen/kubernetes/manifests/README.md">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">Translation</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/Translation/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/Translation/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/tree/main/Translation/kubernetes">K8s Link</a></td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">AudioQnA</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/xeon/README.md">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/gaudi/README.md">Gaudi Link</a></td>
+        <td>Not supported yet</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">VisualQnA</td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/tree/main/VisualQnA">Xeon Link</a></td>
+        <td><a href="https://github.com/opea-project/GenAIExamples/tree/main/VisualQnA">Gaudi Link</a></td>
+        <td>Not supported yet</td>
+    </tr>
 </table>
 
-### CodeTrans
+## Support Examples
 
-[CodeTrans](./CodeTrans/README.md) is an example of chatbot for converting code written in one programming language to another programming language while maintaining the same functionality.
-
-<table>
-	<tbody>
-		<tr>
-			<td>Framework</td>
-			<td>LLM</td>
-			<td>Serving</td>
-			<td>HW</td>
-			<td>Description</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/HuggingFaceH4/mistral-7b-grok">HuggingFaceH4/mistral-7b-grok</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
-			<td>Xeon/Gaudi2</td>
-			<td>Code Translation</td>
-		</tr>
-	</tbody>
-</table>
-
-### DocSum
-
-[DocSum](./DocSum/README.md) is an example of chatbot for summarizing the content of documents or reports.
-
-<table>
-	<tbody>
-		<tr>
-			<td>Framework</td>
-			<td>LLM</td>
-			<td>Serving</td>
-			<td>HW</td>
-			<td>Description</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
-			<td>Xeon/Gaudi2</td>
-			<td>Chatbot</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
-			<td>Xeon/Gaudi2</td>
-			<td>Chatbot</td>
-		</tr>
-	</tbody>
-</table>
-
-### Language Translation
-
-[Language Translation](./Translation/README.md) is an example of chatbot for converting a source-language text to an equivalent target-language text.
-
-<table>
-	<tbody>
-		<tr>
-			<td>Framework</td>
-			<td>LLM</td>
-			<td>Serving</td>
-			<td>HW</td>
-			<td>Description</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/haoranxu/ALMA-13B">haoranxu/ALMA-13B</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
-			<td>Xeon/Gaudi2</td>
-			<td>Language Translation</td>
-		</tr>
-	</tbody>
-</table>
-
-### SearchQnA
-
-[SearchQnA](./SearchQnA/README.md) is an example of chatbot for using search engine to enhance QA quality.
-
-<table>
-	<tbody>
-		<tr>
-			<td>Framework</td>
-			<td>LLM</td>
-			<td>Serving</td>
-			<td>HW</td>
-			<td>Description</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
-			<td>Xeon/Gaudi2</td>
-			<td>Chatbot</td>
-		</tr>
-		<tr>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/mistralai/Mistral-7B-v0.1">Mistral-7B</a></td>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
-			<td>Xeon/Gaudi2</td>
-			<td>Chatbot</td>
-		</tr>
-	</tbody>
-</table>
-
-### VisualQnA
-
-[VisualQnA](./VisualQnA/README.md) is an example of chatbot for question and answering based on the images.
-
-<table>
-	<tbody>
-		<tr>
-			<td>LLM</td>
-			<td>HW</td>
-			<td>Description</td>
-		</tr>
-		<tr>
-			<td><a href="https://huggingface.co/llava-hf/llava-1.5-7b-hf">LLaVA-1.5-7B</a></td>
-			<td>Gaudi2</td>
-			<td>Chatbot</td>
-		</tr>
-	</tbody>
-</table>
-
-> **_NOTE:_** The `Language Translation`, `SearchQnA`, `VisualQnA` and other use cases not listing here are in active development. The code structure of these use cases are subject to change.
+Check [here](./supported_examples.md) for detailed information of supported examples, models, hardwares, etc.
 
 ## Additional Content
 
