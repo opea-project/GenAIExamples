@@ -4,7 +4,7 @@ The AvatarChatbot service can be effortlessly deployed on either Intel Gaudi2 or
 
 ## 🚀 Megaservice flow
 
-```Mermaid
+```mermaid
 flowchart LR
     subgraph AvatarChatbot
         direction LR
