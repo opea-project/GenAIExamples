@@ -49,14 +49,8 @@ def llm_generate(input: LLMParamsDoc):
             chat_response = ""
             for text in llm.stream(input.query):
                 chat_response += text
-                processed_text = post_process_text(text)
-                if text and processed_text:
-                    if "</s>" in text:
-                        res = text.split("</s>")[0]
-                        if res != "":
-                            yield res
-                        break
-                    yield processed_text
+                chunk_repr = repr(text.encode("utf-8"))
+                yield f"data: {chunk_repr}\n\n"
             print(f"[llm - chat_stream] stream response: {chat_response}")
             yield "data: [DONE]\n\n"
 
