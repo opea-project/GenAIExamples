@@ -16,6 +16,7 @@ services:
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
+      - tei-embedding-service
     ports:
       - "6007:6007"
       - "6008:6008"
@@ -25,7 +26,10 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${REDIS_HOST}
       INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
