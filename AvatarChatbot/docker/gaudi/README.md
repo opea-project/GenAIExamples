@@ -3,7 +3,6 @@
 The AvatarChatbot service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
 ## 🚀 Megaservice flow
-
 ```Mermaid
 flowchart LR
     subgraph AvatarChatbot
@@ -20,7 +19,7 @@ flowchart LR
             end
             subgraph AvatarAnimation["Avatar Animation"]
                 direction TB
-                I((AvatarAnime<br>3010)) -. Post .-> J{{animation<br>3009}}
+                I((AvatarAnime<br>3008)) -. Post .-> J{{animation<br>7860}}
             end
             AudioQnA ==> AvatarAnimation
         end
@@ -206,13 +205,12 @@ If the megaservice is running properly, you should see the following output:
 The output file will be saved in the current directory, because `${PWD}` is mapped to `/outputs` inside the avatarchatbot-backend-service Docker container.
 
 ## Gradio UI
-
 Follow the instructions in [Set the environment variables](#set-the-environment-variables) to set the environment variables. Follow [Start the MegaService](#start-the-megaservice) to start the MegaService. Then run the following command to start the Gradio UI:
-
 ```bash
 cd GenAIExamples/AvatarChatbot/docker/ui/gradio
 python3 app.py
 ```
+
 
 ## Troubleshooting
 
