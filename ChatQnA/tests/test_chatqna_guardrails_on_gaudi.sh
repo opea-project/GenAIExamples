@@ -19,7 +19,7 @@ function build_docker_images() {
     docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
-    docker build -t opea/guardrails-tgi:latest -f comps/guardrails/langchain/docker/Dockerfile .
+    docker build -t opea/guardrails-tgi:latest -f comps/guardrails/llama_guard/docker/Dockerfile .
 
 #    cd ..
 #    git clone https://github.com/huggingface/tei-gaudi

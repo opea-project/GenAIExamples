@@ -136,7 +136,7 @@ To fortify AI initiatives in production, Guardrails microservice can secure mode
 
 ```bash
 cd GenAIExamples/ChatQnA/docker
-docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/langchain/docker/Dockerfile .
+docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/docker/Dockerfile .
 cd ../../..
 ```
 
