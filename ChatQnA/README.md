@@ -10,7 +10,69 @@ ChatQnA architecture shows below:
 
 ChatQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the ChatQnA Flow Chart shows below:
 
-![Flow Chart](./assets/img/chatqna_flow_chart.png)
+```mermaid
+graph LR
+    subgraph ChatQnA Mega Service
+        direction LR
+        EM([OPEA Embedding<br>6000])
+        RET([OPEA Retrieval<br>7000])
+        RER([OPEA Reranking<br>8000])
+        LLM([OPEA LLM 'text generate'<br>8008])
+    end
+
+    direction TB
+    TEI_EM{{TEI embedding service<br>8090}}
+    VDB{{Vector DB<br>8001}}
+    %% Vector DB interaction
+    TEI_EM -.->|d|VDB
+
+    DP([OPEA Data Preparation<br>6007])
+    LLM_gen{{TGI/vLLM/ollama Service}}
+
+    direction TB
+    RER([OPEA Reranking<br>8000])
+    TEI_RER{{TEI Reranking service<br>8808}}
+
+    subgraph User Inteface
+        direction TB
+        a[User Input Query]
+        Ingest[Ingest data]
+        UI[UI server<br>Port: 5173]
+    end
+
+    subgraph ChatQnA GateWay
+        direction LR
+        GW[ChatQnA GateWay<br>Port: 8888]
+    end
+
+    %% Data Preparation flow
+    %% Ingest data flow
+    direction LR
+    Ingest[Ingest data] -->|a| UI
+    UI -->|b| DP
+    DP -.->|c| TEI_EM
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] -->|1| UI
+    UI -->|2| GW
+    GW ==>|3| EM
+    EM ==>|4| RET
+    RET ==>|5| RER
+    RER ==>|6| LLM
+    LLM ==>|7| GW 
+
+    %% Embedding service flow
+    direction TB
+    EM -.->|3'| TEI_EM
+    RER -.->|5'| TEI_RER
+    LLM -.->|6'| LLM_gen
+
+    subgraph Legend
+        X([Micsrservice])
+        Y{{Server API}}
+    end
+```
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
 
