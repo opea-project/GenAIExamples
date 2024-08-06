@@ -16,6 +16,7 @@ services:
     container_name: dataprep-qdrant-server
     depends_on:
       - qdrant-vector-db
+      - tei-embedding-service
     ports:
       - "6000:6000"
     environment:
@@ -25,6 +26,7 @@ services:
       QDRANT: ${host_ip}
       QDRANT_PORT: 6333
       COLLECTION_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-embedding-server
