@@ -5,7 +5,7 @@ version: "3.8"
 
 services:
   tgi_service:
-    image: ghcr.io/huggingface/text-generation-inference:1.4
+    image: ghcr.io/huggingface/text-generation-inference:2.1.0
     container_name: tgi-service
     ports:
       - "8008:80"
@@ -16,8 +16,8 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/gen-ai-comps:llm-tgi-server
-    container_name: llm-tgi-server
+    image: opea/llm-docsum-tgi:latest
+    container_name: llm-docsum-tgi-server
     ports:
       - "9000:9000"
     ipc: host
@@ -27,7 +27,6 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
     restart: unless-stopped
 
 networks:
