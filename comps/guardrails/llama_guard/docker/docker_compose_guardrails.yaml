@@ -5,7 +5,7 @@ version: "3.8"
 
 services:
   tgi_gaudi_service:
-    image: ghcr.io/huggingface/tgi-gaudi:1.2.1
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
     container_name: tgi-service
     ports:
       - "8088:80"
@@ -14,9 +14,9 @@ services:
     environment:
       HF_TOKEN: ${HF_TOKEN}
     shm_size: 1g
-    command: --model-id ${LLM_MODEL_ID}
+    command: --model-id ${LLM_MODEL_ID} --max-input-tokens 1024 --max-total-tokens 2048
   guardrails:
-    image: opea/gen-ai-comps:guardrails-tgi-gaudi-server
+    image: opea/guardrails-tgi:latest
     container_name: guardrails-tgi-gaudi-server
     ports:
       - "9090:9090"

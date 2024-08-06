@@ -54,7 +54,7 @@ def get_tgi_service_model_id(endpoint_url, default=DEFAULT_MODEL):
 
 
 @register_microservice(
-    name="opea_service@guardrails_tgi_gaudi",
+    name="opea_service@guardrails_tgi",
     service_type=ServiceType.GUARDRAIL,
     endpoint="/v1/guardrails",
     host="0.0.0.0",
@@ -94,4 +94,4 @@ if __name__ == "__main__":
     # chat engine for server-side prompt templating
     llm_engine_hf = ChatHuggingFace(llm=llm_guard, model_id=safety_guard_model)
     print("guardrails - router] LLM initialized.")
-    opea_microservices["opea_service@guardrails_tgi_gaudi"].start()
+    opea_microservices["opea_service@guardrails_tgi"].start()
