@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faq-tgi-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: faq-tgi-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: faq-tgi-deploy
+    spec:
+      hostIPC: true
+      nodeSelector:
+        disktype: yyy
+      containers:
+      - name: faq-tgi-deploy-demo
+        env:
+          - name: HUGGING_FACE_HUB_TOKEN
+            value: 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
+          - name: HF_TOKEN
+            value: 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
+          - name: OMPI_MCA_btl_vader_single_copy_mechanism
+            value: none
+          - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+            value: 'true'
+          - name: runtime
+            value: habana
+          - name: HABANA_VISIBLE_DEVICES
+            value: all
+          - name: PREFILL_BATCH_BUCKET_SIZE
+            value: "1"
+          - name: BATCH_BUCKET_SIZE
+            value: "8"
+          - name: PORT
+            value: "80"
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          capabilities:
+            add:
+            - SYS_NICE
+        args:
+        - --model-id
+        - 'meta-llama/Meta-Llama-3-8B-Instruct'
+        - --max-input-length
+        - '2048'
+        - --max-total-tokens
+        - '4096'
+        - --max-batch-total-tokens 
+        - '65536'
+        - --max-batch-prefill-tokens 
+        - '4096'
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            habana.ai/gaudi: 1
+      serviceAccountName: default
+      volumes:
+      - name: model-volume
+        hostPath:
+          path: /home/sdp/cesg
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: faq-tgi-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: faq-tgi-deploy
+  ports:
+  - name: service
+    port: 8010
+    targetPort: 80

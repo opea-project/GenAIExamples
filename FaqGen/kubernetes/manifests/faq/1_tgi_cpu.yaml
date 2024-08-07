@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faq-tgi-cpu-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: faq-tgi-cpu-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: faq-tgi-cpu-deploy
+    spec:
+      hostIPC: true
+      nodeSelector:
+        disktype: yyy
+      securityContext: {}
+      containers:
+      - name: faq-tgi-cpu-deploy-demo
+        env:
+          - name: HUGGING_FACE_HUB_TOKEN
+            value: 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
+          - name: HF_TOKEN
+            value: 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
+          - name: PORT
+            value: "80"
+        image: ghcr.io/huggingface/text-generation-inference:1.4
+        imagePullPolicy: IfNotPresent
+        securityContext: {}
+        args:
+        - --model-id
+        - 'meta-llama/Meta-Llama-3-8B-Instruct'
+        - --max-input-length
+        - '2048'
+        - --max-total-tokens
+        - '4096'
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+      serviceAccountName: default
+      volumes:
+      - name: model-volume
+        hostPath:
+          path: /home/sdp/cesg
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: faq-tgi-cpu-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: faq-tgi-cpu-deploy
+  ports:
+  - name: service
+    port: 8011
+    targetPort: 80

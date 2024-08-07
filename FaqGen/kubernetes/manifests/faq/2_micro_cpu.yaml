@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faq-micro-cpu-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: faq-micro-cpu-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: faq-micro-cpu-deploy
+    spec:
+      hostIPC: true
+      nodeSelector:
+        disktype: yyy
+      containers:
+        - name: faq-micro-cpu-deploy
+          env:
+            - name: TGI_LLM_ENDPOINT
+              value: "http://faq-tgi-cpu-svc.default.svc.cluster.local:8011"
+            - name: HUGGINGFACEHUB_API_TOKEN
+              value: "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"
+          image: opea/llm-faqgen-tgi:latest
+          imagePullPolicy: IfNotPresent
+          args: null
+          ports:
+          - containerPort: 9000
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: faq-micro-cpu-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: faq-micro-cpu-deploy
+  ports:
+  - name: service
+    port: 9004
+    targetPort: 9000
