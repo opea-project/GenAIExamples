@@ -47,7 +47,7 @@ class ServiceOrchestrator(DAG):
         timeout = aiohttp.ClientTimeout(total=1000)
         async with aiohttp.ClientSession(trust_env=True, timeout=timeout) as session:
             pending = {
-                asyncio.create_task(self.execute(session, node, initial_inputs, runtime_graph))
+                asyncio.create_task(self.execute(session, node, initial_inputs, runtime_graph, llm_parameters))
                 for node in self.ind_nodes()
             }
             ind_nodes = self.ind_nodes()
