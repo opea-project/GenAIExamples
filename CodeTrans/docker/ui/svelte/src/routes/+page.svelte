@@ -16,26 +16,26 @@
 
 <script lang="ts">
   import Highlight, { LineNumbers } from "svelte-highlight";
-  import typescript from "svelte-highlight/languages/typescript";
+  // import typescript from "svelte-highlight/languages/typescript";
   import c from "svelte-highlight/languages/c";
   import cpp from "svelte-highlight/languages/cpp";
-  import csharp from "svelte-highlight/languages/csharp";
+  // import csharp from "svelte-highlight/languages/csharp";
   import go from "svelte-highlight/languages/go";
   import java from "svelte-highlight/languages/java";
   import python from "svelte-highlight/languages/python";
   import javascript from "svelte-highlight/languages/javascript";
-  import swift from "svelte-highlight/languages/swift";
-  import ruby from "svelte-highlight/languages/ruby";
+  // import swift from "svelte-highlight/languages/swift";
+  // import ruby from "svelte-highlight/languages/ruby";
   import rust from "svelte-highlight/languages/rust";
-  import php from "svelte-highlight/languages/php";
-  import kotlin from "svelte-highlight/languages/kotlin";
-  import objectivec from "svelte-highlight/languages/objectivec";
-  import perl from "svelte-highlight/languages/perl";
-  import matlab from "svelte-highlight/languages/matlab";
-  import r from "svelte-highlight/languages/r";
-  import lua from "svelte-highlight/languages/lua";
-  import bash from "svelte-highlight/languages/bash";
-  import sql from "svelte-highlight/languages/sql";
+  // import php from "svelte-highlight/languages/php";
+  // import kotlin from "svelte-highlight/languages/kotlin";
+  // import objectivec from "svelte-highlight/languages/objectivec";
+  // import perl from "svelte-highlight/languages/perl";
+  // import matlab from "svelte-highlight/languages/matlab";
+  // import r from "svelte-highlight/languages/r";
+  // import lua from "svelte-highlight/languages/lua";
+  // import bash from "svelte-highlight/languages/bash";
+  // import sql from "svelte-highlight/languages/sql";
 
   import atomOneDark from "svelte-highlight/styles/atom-one-dark";
   import Header from "$lib/header.svelte";
@@ -95,15 +95,10 @@
     inputClick = !inputClick;
   }
 
-  const handelTranslate = async () => {
-    console.log('1');
-    
+  const handelTranslate = async () => {    
     loading = true;
     output = "";
     inputClick = false;
-    console.log('11',langFrom);
-    console.log('111', langTo, languages[langTo]);
-    
 
     const eventSource = await fetchTextStream(input, langFrom, langTo);
 
@@ -128,14 +123,10 @@
     eventSource.stream();
   };
 
-  $: if ((input || langFrom || langTo) && input !== "") {
-    console.log('langFrom1', langFrom);
-    
+  $: if ((input || langFrom || langTo) && input !== "") {    
     clearTimeout(timer);
     timer = setTimeout(handelTranslate, 1000);
   } else {
-    console.log('langFrom2', langFrom);
-
     handelTranslate;
   }
 </script>
