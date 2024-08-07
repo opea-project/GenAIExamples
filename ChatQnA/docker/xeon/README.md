@@ -314,7 +314,7 @@ curl http://${your_ip}:9009/v1/completions \
 
 7. LLM Microservice
 
-This service will depend on above LLM backend service startup. It will be ready after long time when first startup too.
+This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
 ```bash
 curl http://${host_ip}:9000/v1/chat/completions\
