@@ -33,7 +33,7 @@ graph LR
     RER([OPEA Reranking<br>8000])
     TEI_RER{{TEI Reranking service<br>8808}}
 
-    subgraph User Inteface
+    subgraph User Interface
         direction TB
         a[User Input Query]
         Ingest[Ingest data]
@@ -60,7 +60,7 @@ graph LR
     EM ==>|4| RET
     RET ==>|5| RER
     RER ==>|6| LLM
-    LLM ==>|7| GW 
+    LLM ==>|7| GW
 
     %% Embedding service flow
     direction TB
