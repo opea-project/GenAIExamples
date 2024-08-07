@@ -1,0 +1,15 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+services:
+  codetrans:
+    build:
+      context: docker
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY}opea/codetrans:${TAG:-latest}
+  codetrans-ui:
+    build:
+      context: docker/ui
+      dockerfile: ./docker/Dockerfile
+    image: ${REGISTRY}opea/codetrans-ui:${TAG:-latest}
