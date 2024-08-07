@@ -103,7 +103,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: {}
-          image: "ghcr.io/huggingface/text-generation-inference:1.4"
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.1"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data

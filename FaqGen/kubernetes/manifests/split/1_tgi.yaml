@@ -23,8 +23,6 @@ spec:
         env:
           - name: HUGGING_FACE_HUB_TOKEN
             value: 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
-          - name: HF_TOKEN
-            value: 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
           - name: OMPI_MCA_btl_vader_single_copy_mechanism
             value: none
           - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
@@ -47,7 +45,7 @@ spec:
             - SYS_NICE
         args:
         - --model-id
-        - 'meta-llama/Meta-Llama-3-8B-Instruct'
+        - 'meta-llama/Meta-Llama-3.1-8B-Instruct'
         - --max-input-length
         - '2048'
         - --max-total-tokens
