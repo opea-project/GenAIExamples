@@ -293,7 +293,7 @@ curl http://${host_ip}:8000/v1/reranking\
 
 6. LLM backend Service
 
-In first startup, this service will take more time to download the LLM file. Before it's down, the service won't be ready.
+In first startup, this service will take more time to download the LLM file. After it's finished, the service will be ready.
 
 Use `docker logs CONTAINER_ID` to check if the download is finished.
 
