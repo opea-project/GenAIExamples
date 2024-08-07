@@ -43,7 +43,6 @@ cd GenAIComps
 
 ### 1. Build LVM Image
 
-
 ```bash
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/Dockerfile_tgi .
 ```
@@ -75,14 +74,12 @@ cd ../../../..
 docker pull ghcr.io/huggingface/text-generation-inference:2.2.0
 ```
 
-
 Then run the command `docker images`, you will have the following 4 Docker Images:
 
 1. `ghcr.io/huggingface/text-generation-inference:2.2.0`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`
-
 
 ## 🚀 Start Microservices
 
@@ -130,9 +127,7 @@ cd GenAIExamples/VisualQnA/docker/xeon/
 docker compose -f compose.yaml up -d
 ```
 
-
 ### Validate Microservices
-
 
 Follow the instructions to validate MicroServices.
 
@@ -166,7 +161,6 @@ curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d 
     "max_tokens": 300
     }'
 ```
-
 
 ## 🚀 Launch the UI
 
