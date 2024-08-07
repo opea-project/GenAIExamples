@@ -148,7 +148,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 ### Setup Environment Variables
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `docker_compose_pinecone.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
@@ -213,7 +213,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/xeon/
-docker compose up -d
+docker compose -f docker_compose_pinecone.yaml up -d
 ```
 
 ### Validate Microservices
@@ -329,28 +329,9 @@ curl -X POST "http://${host_ip}:6008/v1/dataprep/get_file" \
      -H "Content-Type: application/json"
 ```
 
-To delete the file/link you uploaded:
-
-```bash
-# delete link
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
-     -d '{"file_path": "https://opea.dev"}' \
-     -H "Content-Type: application/json"
-
-# delete file
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
-     -d '{"file_path": "nke-10k-2023.pdf"}' \
-     -H "Content-Type: application/json"
-
-# delete all uploaded files and links
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
-     -d '{"file_path": "all"}' \
-     -H "Content-Type: application/json"
-```
-
 ## Enable LangSmith for Monotoring Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose_pinecone.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 
