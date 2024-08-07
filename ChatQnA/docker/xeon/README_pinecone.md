@@ -172,8 +172,7 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
-
-**Get the PINECONE_API_KEY and the INDEX_NAME
+\*\*Get the PINECONE_API_KEY and the INDEX_NAME
 
 ```
 export pinecone_api_key=${api_key}
