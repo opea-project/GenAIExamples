@@ -16,7 +16,7 @@ function build_docker_images() {
 
     docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/retriever-qdrant:latest -f comps/retrievers/haystack/qdrant/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
+    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-qdrant:latest -f comps/dataprep/qdrant/docker/Dockerfile .
 
