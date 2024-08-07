@@ -1,0 +1,25 @@
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+opea_micro_services:
+  llm:
+    opea/llm-faqgen-tgi:
+      tag: latest
+      type: cpu
+      dependency:
+        ghcr.io/huggingface/tgi-gaudi:
+          tag: 2.0.1
+          type: hpu
+          requirements:
+            model_id: "meta-llama/Meta-Llama-3-8B-Instruct"
+        ghcr.io/huggingface/text-gene-cration-inference:
+          tag: 1.4.0
+          type: cpu
+          requirements:
+            model_id: "meta-llama/Meta-Llama-3-8B-Instruct"
+
+opea_mega_service:
+  opea/faqgen:
+    tag: latest
+    type: cpu
