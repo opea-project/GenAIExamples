@@ -39,7 +39,8 @@ jobs:
     if: ${{ needs.check-build.outputs.run_build == 'true' }}
     strategy:
       matrix:
-        service: ["asr", "dataprep", "embeddings", "llms", "reranks", "retrievers", "tts", "web_retrievers"]
+        service:
+          ["asr", "dataprep", "embeddings", "guardrails", "llms", "reranks", "retrievers", "tts", "web_retrievers"]
         node: ["docker-build-xeon", "docker-build-gaudi"]
     runs-on: ${{ matrix.node }}
     continue-on-error: true

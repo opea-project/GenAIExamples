@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # this file should be run in the root of the repo
+# images used by GenAIExamples: embedding-tei
 services:
   embedding-tei:
     build:

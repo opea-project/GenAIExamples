@@ -1,0 +1,15 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+# images used by GenAIExamples: guardrails-tgi
+# others: guardrails-pii-detection
+services:
+  guardrails-tgi:
+    build:
+      dockerfile: comps/guardrails/llama_guard/docker/Dockerfile
+    image: ${REGISTRY}opea/guardrails-tgi:${TAG:-latest}
+  guardrails-pii-detection:
+    build:
+      dockerfile: comps/guardrails/pii_detection/docker/Dockerfile
+    image: ${REGISTRY}opea/guardrails-pii-detection:${TAG:-latest}
