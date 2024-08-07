@@ -30,7 +30,7 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
    docker pull opea/codegen:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker)
+2. Start services using the docker images built from source. See the [Gaudi Guide](./docker/gaudi/README.md) or [Xeon Guide](./docker/xeon/README.md) for more information.
 
 ### Setup Environment Variable
 
@@ -55,6 +55,10 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 3. Set up other environment variables:
 
+   > Note: By default, the [`docker/set_env.sh`](docker/set_env.sh) file will configure your environment
+   > variables to use [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf). This
+   > is a gated model that requires submitting an access request through Hugging Face.
+
    ```bash
    source ./docker/set_env.sh
    ```
@@ -70,7 +74,7 @@ cd GenAIExamples/CodeGen/docker/gaudi
 docker compose up -d
 ```
 
-> Notice: Currently only the **Habana Driver 1.16.xi** is supported for Gaudi.
+> Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
 Refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
 
