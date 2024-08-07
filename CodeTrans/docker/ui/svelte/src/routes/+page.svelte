@@ -46,26 +46,26 @@
   import TranslateIcon from "$lib/assets/translateIcon.svelte";
 
   const languagesTag = {
-    Typescript: typescript,
-    Python: python,
-    C: c,
-    Cpp: cpp,
-    Csharp: csharp,
-    Go: go,
-    Java: java,
-    Javascript: javascript,
-    Swift: swift,
-    Ruby: ruby,
-    Rust: rust,
-    Php: php,
-    Kotlin: kotlin,
-    Objectivec: objectivec,
-    Perl: perl,
-    Matlab: matlab,
-    R: r,
-    Lua: lua,
-    Bash: bash,
-    Sql: sql,
+    // 'TypeScript': typescript,
+    'Python': python,
+    'C': c,
+    'C++': cpp,
+    // 'C#': csharp,
+    'Go': go,
+    'Java': java,
+    'JavaScript': javascript,
+    // 'Swift': swift,
+    // 'Ruby': ruby,
+    'Rust': rust,
+    // 'PHP': php,
+    // 'Kotlin': kotlin,
+    // 'Objective-C': objectivec,
+    // 'Perl': perl,
+    // 'MATLAB': matlab,
+    // 'R': r,
+    // 'Lua': lua,
+    // 'Bash': bash,
+    // 'SQL': sql,
   } as { [key: string]: any };
 
   let copyText = "copy";
@@ -96,9 +96,15 @@
   }
 
   const handelTranslate = async () => {
+    console.log('1');
+    
     loading = true;
     output = "";
     inputClick = false;
+    console.log('11',langFrom);
+    console.log('111', langTo, languages[langTo]);
+    
+
     const eventSource = await fetchTextStream(input, langFrom, langTo);
 
     eventSource.addEventListener("message", (e: any) => {
@@ -123,9 +129,13 @@
   };
 
   $: if ((input || langFrom || langTo) && input !== "") {
+    console.log('langFrom1', langFrom);
+    
     clearTimeout(timer);
     timer = setTimeout(handelTranslate, 1000);
   } else {
+    console.log('langFrom2', langFrom);
+
     handelTranslate;
   }
 </script>
