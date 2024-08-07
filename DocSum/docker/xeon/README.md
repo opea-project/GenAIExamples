@@ -126,7 +126,6 @@ curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
-
 ## 🚀 Launch the UI
 
 Open this URL `http://{host_ip}:5173` in your browser to access the svelte based frontend.
