@@ -106,8 +106,14 @@ flowchart LR
         end
         Megaservice --> |Output| E[Response]
     end
-
+    subgraph Legend
+        X([Micsrservice])
+        Y{{Service from industry peers}}
+        Z[Gateway]
+    end
 ```
+
+
 ## Consume Document Summarization Service
 
 Two ways of consuming Document Summarization Service:
