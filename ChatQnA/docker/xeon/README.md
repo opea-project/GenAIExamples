@@ -335,7 +335,7 @@ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
 
 If you want to update the default knowledge base, you can use the following commands:
 
-Update Knowledge Base via Local File  [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) Upload:
+Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) Upload:
 
 ```bash
 curl -X POST "http://${host_ip}:6007/v1/dataprep" \
