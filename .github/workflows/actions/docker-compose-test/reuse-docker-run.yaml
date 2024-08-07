@@ -1,0 +1,78 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Image Build
+permissions: read-all
+on:
+  workflow_call:
+    inputs:
+      registry:
+        description: Container Registry URL
+        required: false
+        default: ""
+        type: string
+      tag:
+        description: Container Tag
+        required: false
+        default: "latest"
+        type: string
+      example:
+        description: Example to test
+        required: true
+        type: string
+      hardware:
+        description: Hardware to run the test on
+        required: true
+        type: string
+jobs:
+  Get-test-case:
+    runs-on: ubuntu-latest
+    outputs:
+      test_cases: ${{ steps.test-case-matrix.outputs.test_cases }}
+      CHECKOUT_REF: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
+    steps:
+      - name: Get checkout ref
+        id: get-checkout-ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_OUTPUT
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_OUTPUT
+          fi
+          echo "checkout ref ${{ env.CHECKOUT_REF }}"
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
+          fetch-depth: 0
+
+      - name: Get test matrix
+        id: test-case-matrix
+        run: |
+          example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
+          cd ${{ github.workspace }}/${{ inputs.example }}/tests
+          test_cases=$(find . -type f -name 'test_${example_l}*on_${{ inputs.hardware }}.sh' -print | cut -d/ -f2 | jq -R '.' | jq -sc '.')
+          echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
+
+  Run-test:
+      needs: [Get-test-case]
+      strategy:
+        matrix:
+          test_case: ${{ fromJSON(needs.Get-test-case.outputs.test_cases) }}
+      runs-on: ${{ inputs.hardware }}
+      continue-on-error: true
+      steps:
+        - name: Checkout out Repo
+          uses: actions/checkout@v4
+          with:
+            ref: ${{ needs.Get-test-case.outputs.CHECKOUT_REF }}
+            fetch-depth: 0
+        - name: Run test
+          uses: ./.github/workflows/actions/docker-compose-test
+          with:
+              registry: ${{ inputs.registry }}
+              tag: ${{ inputs.tag }}
+              example: ${{ inputs.example }}
+              test_case: ${{ matrix.test_case }}
+              hardware: ${{ inputs.hardware }}
