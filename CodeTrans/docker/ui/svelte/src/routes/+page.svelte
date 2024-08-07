@@ -95,7 +95,7 @@
     inputClick = !inputClick;
   }
 
-  const handelTranslate = async () => {    
+  const handelTranslate = async () => {
     loading = true;
     output = "";
     inputClick = false;
@@ -123,7 +123,7 @@
     eventSource.stream();
   };
 
-  $: if ((input || langFrom || langTo) && input !== "") {    
+  $: if ((input || langFrom || langTo) && input !== "") {
     clearTimeout(timer);
     timer = setTimeout(handelTranslate, 1000);
   } else {
