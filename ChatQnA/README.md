@@ -60,7 +60,7 @@ graph LR
     EM ==>|4| RET
     RET ==>|5| RER
     RER ==>|6| LLM
-    
+
 
     %% Embedding service flow
     direction TB
