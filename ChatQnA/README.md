@@ -15,7 +15,7 @@ graph LR
     subgraph ChatQnA-MegaService["ChatQnA-MegaService"]
         direction LR
         EM([Embedding 'LangChain TEI' <br>6000])
-        RET([OPEA Retrieval<br>7000])
+        RET([Retrieval 'LangChain Redis'<br>7000])
         RER([OPEA Reranking<br>8000])
         LLM([OPEA LLM 'text generate'<br>8008])
     end
