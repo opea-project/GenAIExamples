@@ -1,6 +1,7 @@
 datasets
 docarray[full]
 fastapi
+huggingface_hub
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
