@@ -17,7 +17,7 @@ graph LR
         EM([Embedding 'LangChain TEI' <br>6000])
         RET([Retrieval 'LangChain Redis'<br>7000])
         RER([Rerank 'TEI'<br>8000])
-       LLM([LLM 'text-generation TGI'<br>8008])
+       LLM([LLM 'text-generation TGI'<br>9000])
     end
 
     direction TB
