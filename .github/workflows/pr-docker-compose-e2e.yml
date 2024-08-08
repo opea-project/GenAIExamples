@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   job1:
-    uses: ./.github/workflows/reuse-get-test-matrix.yml
+    uses: ./.github/workflows/_get-test-matrix.yml
     with:
       diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|gmc|assets'
 
@@ -31,7 +31,7 @@ jobs:
     needs: job1
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    uses: ./.github/workflows/reuse-image-build.yml
+    uses: ./.github/workflows/_image-build.yml
     with:
       image_tag: ${{ github.event.pull_request.head.sha }}
       mega_service: "${{ matrix.example }}"

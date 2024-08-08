@@ -303,7 +303,7 @@ curl http://${host_ip}:9009/generate \
 
 ```bash
 # vLLM Service
-curl http://${your_ip}:9009/v1/completions \
+curl http://${host_ip}:9009/v1/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
 ```
@@ -373,25 +373,6 @@ curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
 curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
-```
-
-## Enable LangSmith for Monotoring Application (Optional)
-
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
-
-Here's how you can do it:
-
-1. Install the latest version of LangSmith:
-
-```bash
-pip install -U langsmith
-```
-
-2. Set the necessary environment variables:
-
-```bash
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=ls_...
 ```
 
 ## 🚀 Launch the UI
