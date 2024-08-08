@@ -12,7 +12,7 @@ ChatQnA is implemented on top of [GenAIComps](https://github.com/opea-project/Ge
 
 ```mermaid
 graph LR
-    subgraph ChatQnA Mega Service
+    subgraph ChatQnA-MegaService["ChatQnA-MegaService"]
         direction LR
         EM([OPEA Embedding<br>6000])
         RET([OPEA Retrieval<br>7000])
