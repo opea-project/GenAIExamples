@@ -14,7 +14,6 @@ on:
       - "!**.md"
       - "!**.txt"
       - .github/workflows/pr-docker-compose-e2e.yml
-  workflow_dispatch:
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
