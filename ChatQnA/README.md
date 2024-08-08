@@ -71,7 +71,8 @@ graph LR
 
     subgraph Legend
         X([Micsrservice])
-        Y{{Server API}}
+        Y{{Service from industry peers}}
+        Z[Gateway]
     end
 ```
 
