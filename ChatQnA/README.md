@@ -14,7 +14,7 @@ ChatQnA is implemented on top of [GenAIComps](https://github.com/opea-project/Ge
 graph LR
     subgraph ChatQnA-MegaService["ChatQnA-MegaService"]
         direction LR
-        EM([OPEA Embedding<br>6000])
+        EM([Embedding 'LangChain TEI' <br>6000])
         RET([OPEA Retrieval<br>7000])
         RER([OPEA Reranking<br>8000])
         LLM([OPEA LLM 'text generate'<br>8008])
