@@ -16,7 +16,7 @@ graph LR
         direction LR
         EM([Embedding 'LangChain TEI' <br>6000])
         RET([Retrieval 'LangChain Redis'<br>7000])
-        RER([OPEA Reranking<br>8000])
+        RER([Rerank 'TEI'<br>8000])
         LLM([OPEA LLM 'text generate'<br>8008])
     end
 
