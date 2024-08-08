@@ -4,7 +4,7 @@
 name: E2E test with docker compose
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -41,7 +41,7 @@ jobs:
     needs: [job1, mega-image-build]
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    runs-on: ${{ matrix.hardware }}
+    runs-on: "trellix"
     continue-on-error: true
     steps:
       - name: Test example

@@ -40,7 +40,7 @@ jobs:
     needs: [job1, mega-image-build]
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    runs-on: "k8s-${{ matrix.hardware }}"
+    runs-on: "new-k8s-gaudi"
     continue-on-error: true
     steps:
       - name: E2e test manifest

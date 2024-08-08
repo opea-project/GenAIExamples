@@ -4,7 +4,7 @@
 name: E2E test with GMC
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -31,7 +31,7 @@ jobs:
     needs: [job1]
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    runs-on: "k8s-${{ matrix.hardware }}"
+    runs-on: "new-k8s-gaudi"
     continue-on-error: true
     steps:
       - name: E2e test gmc
