@@ -19,8 +19,6 @@ services:
       - tei-embedding-service
     ports:
       - "6007:6007"
-      - "6008:6008"
-      - "6009:6009"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -28,6 +26,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-embedding-server
