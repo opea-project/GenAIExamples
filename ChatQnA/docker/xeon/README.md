@@ -303,7 +303,7 @@ curl http://${host_ip}:9009/generate \
 
 ```bash
 # vLLM Service
-curl http://${your_ip}:9009/v1/completions \
+curl http://${host_ip}:9009/v1/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
 ```
