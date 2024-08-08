@@ -64,7 +64,9 @@ jobs:
       continue-on-error: true
       steps:
         - name: Clean up Working Directory
-          run: sudo rm -rf ${{github.workspace}}/*
+          run: |
+            sudo rm -rf ${{github.workspace}}/*
+            echo y | docker system prune --all
 
         - name: Checkout out Repo
           uses: actions/checkout@v4
