@@ -19,12 +19,12 @@ class VisualQnAService:
 
     def add_remote_service(self):
         llm = MicroService(
-            name="llm",
+            name="lvm",
             host=LVM_SERVICE_HOST_IP,
             port=LVM_SERVICE_PORT,
             endpoint="/v1/lvm",
             use_remote_service=True,
-            service_type=ServiceType.LLM,
+            service_type=ServiceType.LVM,
         )
         self.megaservice.add(llm)
         self.gateway = VisualQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
