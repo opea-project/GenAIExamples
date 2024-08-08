@@ -31,9 +31,6 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-embedding-service"
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   web-retriever:
@@ -77,9 +74,6 @@ services:
       https_proxy: ${https_proxy}
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:1.4
@@ -109,9 +103,6 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
   searchqna-xeon-backend-server:
     image: opea/searchqna:latest

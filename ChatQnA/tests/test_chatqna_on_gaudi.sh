@@ -176,14 +176,14 @@ function validate_microservices() {
 
     # test /v1/dataprep/get_file
     validate_service \
-        "http://${ip_address}:6008/v1/dataprep/get_file" \
+        "http://${ip_address}:6007/v1/dataprep/get_file" \
         '{"name":' \
         "dataprep_get" \
         "dataprep-redis-server"
 
     # test /v1/dataprep/delete_file
     validate_service \
-        "http://${ip_address}:6009/v1/dataprep/delete_file" \
+        "http://${ip_address}:6007/v1/dataprep/delete_file" \
         '{"status":true}' \
         "dataprep_del" \
         "dataprep-redis-server"

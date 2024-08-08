@@ -5,7 +5,7 @@ name: Build latest images on push event
 
 on:
   push:
-    branches: [ 'main','daisyonpush' ]
+    branches: [ 'main' ]
     paths:
       - "**/docker/*.py"
       - "**/docker/Dockerfile"
@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   job1:
-    uses: ./.github/workflows/reuse-get-test-matrix.yml
+    uses: ./.github/workflows/_get-test-matrix.yml
 
   mega-image-build:
     needs: job1

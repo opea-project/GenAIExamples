@@ -68,8 +68,6 @@ docker compose up -d
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-
-
 ## Deploy VisualQnA on Xeon
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
@@ -80,6 +78,3 @@ Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
 cd GenAIExamples/VisualQnA/docker/xeon/
 docker compose up -d
 ```
-
-
-

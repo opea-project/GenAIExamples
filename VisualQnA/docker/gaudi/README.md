@@ -15,7 +15,6 @@ cd GenAIComps
 
 ### 2. Build LLM Image
 
-
 ```bash
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/Dockerfile_tgi .
 ```
@@ -43,7 +42,6 @@ docker build --no-cache -t opea/visualqna:latest --build-arg https_proxy=$https_
 cd ../../..
 ```
 
-
 ### 5. Build UI Docker Image
 
 Build frontend Docker image via below command:
@@ -54,14 +52,12 @@ docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$htt
 cd ../../../..
 ```
 
-
 Then run the command `docker images`, you will have the following 4 Docker Images:
 
 1. `opea/llava-tgi:latest`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`
-
 
 ## 🚀 Start MicroServices and MegaService
 
