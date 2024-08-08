@@ -36,7 +36,6 @@ jobs:
     steps:
       - name: build example images
         uses: ./.github/workflows/_image-build.yml
-        id: mega-image-build
         with:
           image_tag: ${{ github.event.pull_request.head.sha }}
           mega_service: ${{ matrix.example }}
