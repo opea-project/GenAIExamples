@@ -6,7 +6,7 @@ version: "3.8"
 services:
   tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:1.4
-    container_name: tgi_xeon_server
+    container_name: tgi-xeon-server
     ports:
       - "8008:80"
     environment:
