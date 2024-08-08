@@ -19,8 +19,6 @@ services:
       - tei-embedding-service
     ports:
       - "6007:6007"
-      - "6008:6008"
-      - "6009:6009"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
