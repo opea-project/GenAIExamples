@@ -65,6 +65,7 @@ graph LR
     %% Embedding service flow
     direction TB
     EM -.->|3'| TEI_EM
+    RET -.->|4'| TEI_EM
     RER -.->|5'| TEI_RER
     LLM -.->|6'| LLM_gen
 
