@@ -56,7 +56,7 @@ graph LR
     direction LR
     a[User Input Query] -->|1| UI
     UI -->|2| GW
-    GW ==>|3| EM
+    GW ==>|3|  ChatQnA-MegaService
     EM ==>|4| RET
     RET ==>|5| RER
     RER ==>|6| LLM
