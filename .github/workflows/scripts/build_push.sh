@@ -6,6 +6,7 @@ set -xe
 
 IMAGE_REPO=${IMAGE_REPO:-$OPEA_IMAGE_REPO}
 IMAGE_TAG=${IMAGE_TAG:-latest}
+if [ "$IMAGE_TAG" != "latest" ]; then IMAGE_TAG=$(git rev-parse --short ${IMAGE_TAG}); fi
 
 function getImagenameFromMega() {
     echo $(echo "$1" | tr '[:upper:]' '[:lower:]')
