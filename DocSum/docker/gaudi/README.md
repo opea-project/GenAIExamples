@@ -117,25 +117,6 @@ curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
      }'
 ```
 
-## Enable LangSmith to Monitor an Application (Optional)
-
-LangSmith offers a suite of tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
-
-Here's how you can do it:
-
-1. Install the latest version of LangSmith:
-
-```bash
-pip install -U langsmith
-```
-
-2. Set the necessary environment variables:
-
-```bash
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=ls_...
-```
-
 ## 🚀 Launch the Svelte UI
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
