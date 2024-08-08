@@ -27,6 +27,7 @@ services:
       QDRANT_PORT: 6333
       COLLECTION_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-embedding-server
