@@ -18,10 +18,8 @@ function start_service() {
     REDIS_PORT=6380
     docker run -d --name="test-comps-dataprep-redis-langchain" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p $REDIS_PORT:6379 -p 8002:8001 --ipc=host redis/redis-stack:7.2.0-v9
     dataprep_service_port=5013
-    dataprep_file_service_port=5016
-    dataprep_del_service_port=5020
     REDIS_URL="redis://${ip_address}:${REDIS_PORT}"
-    docker run -d --name="test-comps-dataprep-redis-langchain-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e REDIS_HOST=$ip_address -e REDIS_PORT=$REDIS_PORT -p ${dataprep_service_port}:6007 -p ${dataprep_file_service_port}:6008 -p ${dataprep_del_service_port}:6009 --ipc=host opea/dataprep-redis:comps
+    docker run -d --name="test-comps-dataprep-redis-langchain-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e REDIS_HOST=$ip_address -e REDIS_PORT=$REDIS_PORT -p ${dataprep_service_port}:6007 --ipc=host opea/dataprep-redis:comps
     sleep 1m
 }
 
@@ -72,8 +70,7 @@ function validate_microservice() {
     fi
 
     # test /v1/dataprep/get_file
-    dataprep_file_service_port=5016
-    URL="http://${ip_address}:$dataprep_file_service_port/v1/dataprep/get_file"
+    URL="http://${ip_address}:$dataprep_service_port/v1/dataprep/get_file"
     HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST "$URL")
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
@@ -94,8 +91,7 @@ function validate_microservice() {
     fi
 
     # test /v1/dataprep/delete_file
-    dataprep_del_service_port=5020
-    URL="http://${ip_address}:$dataprep_del_service_port/v1/dataprep/delete_file"
+    URL="http://${ip_address}:$dataprep_service_port/v1/dataprep/delete_file"
     HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "dataprep_file.txt"}' -H 'Content-Type: application/json' "$URL")
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')

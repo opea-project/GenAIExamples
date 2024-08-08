@@ -156,23 +156,24 @@ def register_microservice(
     provider_endpoint: Optional[str] = None,
 ):
     def decorator(func):
-        micro_service = MicroService(
-            name=name,
-            service_role=service_role,
-            service_type=service_type,
-            protocol=protocol,
-            host=host,
-            port=port,
-            ssl_keyfile=ssl_keyfile,
-            ssl_certfile=ssl_certfile,
-            endpoint=endpoint,
-            input_datatype=input_datatype,
-            output_datatype=output_datatype,
-            provider=provider,
-            provider_endpoint=provider_endpoint,
-        )
-        micro_service.app.router.add_api_route(endpoint, func, methods=["POST"])
-        opea_microservices[name] = micro_service
+        if name not in opea_microservices:
+            micro_service = MicroService(
+                name=name,
+                service_role=service_role,
+                service_type=service_type,
+                protocol=protocol,
+                host=host,
+                port=port,
+                ssl_keyfile=ssl_keyfile,
+                ssl_certfile=ssl_certfile,
+                endpoint=endpoint,
+                input_datatype=input_datatype,
+                output_datatype=output_datatype,
+                provider=provider,
+                provider_endpoint=provider_endpoint,
+            )
+            opea_microservices[name] = micro_service
+        opea_microservices[name].app.router.add_api_route(endpoint, func, methods=["POST"])
         return func
 
     return decorator
