@@ -43,7 +43,7 @@
 		on:change={handleInput}
 		class="focus:border-blue-700 focus:ring-0"
 		data-testid="file-upload"
-		accept=".txt,.pdf,.json"
+		accept=".txt,.pdf,.json,.md"
 	  />
 	</Label>
   </div>
