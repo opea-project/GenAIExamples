@@ -189,8 +189,8 @@ export RERANK_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
 ```
 
 If guardrails microservice is enabled in the pipeline, the below environment variables are necessary to be set.
@@ -367,7 +367,7 @@ This command updates a knowledge base by submitting a list of HTTP links for pro
 Also, you are able to get the file/link list that you uploaded:
 
 ```bash
-curl -X POST "http://${host_ip}:6008/v1/dataprep/get_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
      -H "Content-Type: application/json"
 ```
 
@@ -375,17 +375,17 @@ To delete the file/link you uploaded:
 
 ```bash
 # delete link
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -d '{"file_path": "https://opea.dev"}' \
      -H "Content-Type: application/json"
 
 # delete file
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -d '{"file_path": "nke-10k-2023.pdf"}' \
      -H "Content-Type: application/json"
 
 # delete all uploaded files and links
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```
