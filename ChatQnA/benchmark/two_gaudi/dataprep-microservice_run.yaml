@@ -44,8 +44,6 @@ spec:
         args: null
         ports:
         - containerPort: 6007
-        - containerPort: 6008
-        - containerPort: 6009
       serviceAccountName: default
 ---
 kind: Service
@@ -60,9 +58,3 @@ spec:
   - name: port1
     port: 6007
     targetPort: 6007
-  - name: port2
-    port: 6008
-    targetPort: 6008
-  - name: port3
-    port: 6009
-    targetPort: 6009
