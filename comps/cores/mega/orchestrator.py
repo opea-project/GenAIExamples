@@ -117,7 +117,10 @@ class ServiceOrchestrator(DAG):
             if inputs.get(field) != value:
                 inputs[field] = value
 
-        if self.services[cur_node].service_type == ServiceType.LLM and llm_parameters.streaming:
+        if (
+            self.services[cur_node].service_type == ServiceType.LLM
+            or self.services[cur_node].service_type == ServiceType.LVM
+        ) and llm_parameters.streaming:
             # Still leave to sync requests.post for StreamingResponse
             response = requests.post(
                 url=endpoint, data=json.dumps(inputs), proxies={"http": None}, stream=True, timeout=1000
