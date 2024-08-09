@@ -51,7 +51,7 @@ spec:
         - --model-id
         - 'meta-llama/Meta-Llama-3-8B-Instruct'
         - --max-input-length
-        - '2048'
+        - '3096'
         - --max-total-tokens
         - '4096'
         - --max-batch-total-tokens 
