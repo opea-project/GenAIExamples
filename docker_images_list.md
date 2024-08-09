@@ -2,152 +2,39 @@
 
 A list of released OPEA docker images in https://hub.docker.com/, contains all relevant images from the GenAIExamples, GenAIComps and GenAIInfra projects. Please expect more public available images in the future release.
 
-Take ChatQnA for example. ChatQnA is a chatbot application service based on the Retrieval Augmented Generation (RAG) architecture. It consists of <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/embedding-tei">opea/embedding-tei</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/retriever-redis">opea/retriever-redis</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/reranking-tei">opea/reranking-tei</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-tgi">opea/llm-tgi</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/dataprep-redis">opea/dataprep-redis</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna">opea/chatqna</a></td>, <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna-ui">opea/chatqna-ui</a></td> and <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna-conversation-ui">opea/chatqna-conversation-ui</a></td> (Optional) multiple microservices. Other services are similar, see the corresponding README for details.
+Take ChatQnA for example. ChatQnA is a chatbot application service based on the Retrieval Augmented Generation (RAG) architecture. It consists of [opea/embedding-tei](https://hub.docker.com/r/opea/embedding-tei), [opea/retriever-redis](https://hub.docker.com/r/opea/retriever-redis), [opea/reranking-tei](https://hub.docker.com/r/opea/reranking-tei), [opea/llm-tgi](https://hub.docker.com/r/opea/llm-tgi), [opea/dataprep-redis](https://hub.docker.com/r/opea/dataprep-redis), [opea/chatqna](https://hub.docker.com/r/opea/chatqna), [opea/chatqna-ui](https://hub.docker.com/r/opea/chatqna-ui) and [opea/chatqna-conversation-ui](https://hub.docker.com/r/opea/chatqna-conversation-ui) (Optional) multiple microservices. Other services are similar, see the corresponding README for details.
 
 ## Example images
 
-<table class="tg"><thead>
-  <tr>
-    <th class="tg-cly1">Example Images</th>
-    <th class="tg-cly1">Dockerfile</th>
-    <th class="tg-cly1">Description</th>
-  </tr></thead>
-<tbody>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna">opea/chatqna</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image served as a chatqna gateway and interacted with users by understanding their questions and providing relevant answers.</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna-ui">opea/chatqna-ui</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/ui/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image acted as the chatqna UI entry for facilitating interaction with users for question answering</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/chatqna-conversation-ui">opea/chatqna-conversation-ui</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/ui/docker/Dockerfile.react">Link</a></td>
-    <td class="tg-cly1">The purpose of the docker image is to provide a user interface for chat-based Q&A using React. It allows for interaction with users and supports continuing conversations with a history that is stored in the browser's local storage.</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/docsum">opea/docsum</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image served as a docsum gateway to provide service of capturing the main points and essential details of the original text</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/docsum-ui">opea/docsum-ui</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/ui/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image acted as the docsum UI entry for facilitating interaction with users for document summarization</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/codetrans">opea/codetrans</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image served as a codetrans gateway to provide service of converting source code written in one programming language into an equivalent version in another programming language</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/codetrans-ui">opea/codetrans-ui</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/ui/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image acted as the codetrans UI entry for facilitating interaction with users for translating one programming language to another one</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/codegen">opea/codegen</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image served as the codegen gateway to provide service of the automatic creation of source code from a higher-level representation</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/codegen-ui">opea/codegen-ui</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/ui/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image acted as the codegen UI entry for facilitating interaction with users for automatically generating code from user's description</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/searchqna/tags">opea/searchqna</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image served as the searchqna gateway to provide service of retrieving accurate and relevant answers to user queries from a knowledge base or dataset</td>
-  </tr>
-</tbody></table>
+| Example Images                                                                        | Dockerfile                                                                                                | Description                                                                                                                                                                                                                             |
+| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [opea/chatqna](https://hub.docker.com/r/opea/chatqna)                                 | [Link](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/Dockerfile)                 | The docker image served as a chatqna gateway and interacted with users by understanding their questions and providing relevant answers.                                                                                                 |
+| [opea/chatqna-ui](https://hub.docker.com/r/opea/chatqna-ui)                           | [Link](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/ui/docker/Dockerfile)       | The docker image acted as the chatqna UI entry for facilitating interaction with users for question answering                                                                                                                           |
+| [opea/chatqna-conversation-ui](https://hub.docker.com/r/opea/chatqna-conversation-ui) | [Link](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/ui/docker/Dockerfile.react) | The purpose of the docker image is to provide a user interface for chat-based Q&A using React. It allows for interaction with users and supports continuing conversations with a history that is stored in the browser's local storage. |
+| [opea/docsum](https://hub.docker.com/r/opea/docsum)                                   | [Link](https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/Dockerfile)                  | The docker image served as a docsum gateway to provide service of capturing the main points and essential details of the original text                                                                                                  |
+| [opea/docsum-ui](https://hub.docker.com/r/opea/docsum-ui)                             | [Link](https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/ui/docker/Dockerfile)        | The docker image acted as the docsum UI entry for facilitating interaction with users for document summarization                                                                                                                        |
+| [opea/codetrans](https://hub.docker.com/r/opea/codetrans)                             | [Link](https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/Dockerfile)               | The docker image served as a codetrans gateway to provide service of converting source code written in one programming language into an equivalent version in another programming language                                              |
+| [opea/codetrans-ui](https://hub.docker.com/r/opea/codetrans-ui)                       | [Link](https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/ui/docker/Dockerfile)     | The docker image acted as the codetrans UI entry for facilitating interaction with users for translating one programming language to another one                                                                                        |
+| [opea/codegen](https://hub.docker.com/r/opea/codegen)                                 | [Link](https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/Dockerfile)                 | The docker image served as the codegen gateway to provide service of the automatic creation of source code from a higher-level representation                                                                                           |
+| [opea/codegen-ui](https://hub.docker.com/r/opea/codegen-ui)                           | [Link](https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/ui/docker/Dockerfile)       | The docker image acted as the codegen UI entry for facilitating interaction with users for automatically generating code from user's description                                                                                        |
+| [opea/searchqna](https://hub.docker.com/r/opea/searchqna/tags)                        | [Link](https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/Dockerfile)               | The docker image served as the searchqna gateway to provide service of retrieving accurate and relevant answers to user queries from a knowledge base or dataset                                                                        |
 
 ## Microservice images
 
-<table class="tg"><thead>
-  <tr>
-    <th class="tg-cly1">Microservice Images</th>
-    <th class="tg-cly1">Dockerfile</th>
-    <th class="tg-cly1">Description</th>
-  </tr></thead>
-<tbody>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/tei-gaudi/tags">opea/tei-gaudi</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/huggingface/tei-gaudi/blob/habana-main/Dockerfile-hpu">Link</a></td>
-    <td class="tg-cly1">The docker image powered by HuggingFace Text Embedding Inference (TEI) on Gaudi2 for deploying and serving Embedding Models</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/web-retriever-chroma">opea/web-retriever-chroma</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/langchain/chroma/docker">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA retrieval microservice based on chroma vectordb for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/retriever-redis">opea/retriever-redis</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA retrieval microservice based on redis vectordb for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/reranking-tei">opea/reranking-tei</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/reranks/tei/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA reranking microservice based on tei docker image for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-tgi">opea/llm-tgi</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/tgi/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA LLM microservice upon TGI docker image for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-docsum-tgi">opea/llm-docsum-tgi</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/llms/summarization/tgi/Dockerfile">Link</a></td>
-    <td class="tg-cly1">This docker image is designed to build a document summarization microservice using the HuggingFace Text Generation Inference(TGI) framework. The microservice accepts document input and generates a document summary.</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-vllm">opea/llm-vllm</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/vllm/docker/Dockerfile.microservice">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA LLM microservice upon vLLM docker image for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/llm-ray">opea/llm-ray</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA LLM microservice based on Ray for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/guardrails-pii-detection">opea/guardrails-pii-detection</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/guardrails/pii_detection/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA guardrail microservice to provide PII detection for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/embedding-tei">opea/embedding-tei</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/embeddings/langchain/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA embedding microservice upon tei docker image for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/dataprep-on-ray-redis">opea/dataprep-on-ray-redis</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain_ray/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA dataprep microservice based on redis vectordb and optimized ray for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/dataprep-redis">opea/dataprep-redis</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image exposed the OPEA dataprep microservice based on redis vectordb for GenAI application use</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/knowledge_graphs">opea/knowledge_graphs</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/knowledgegraphs/langchain/docker/Dockerfile">Link</a></td>
-    <td class="tg-cly1">The docker image served as knowledge graph gateway to enhance  question answering with graph knowledge searching.</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/gmcrouter">opea/gmcrouter</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.manager">Link</a></td>
-    <td class="tg-cly1">The docker image served as one of key parts of the OPEA GenAI Microservice Connector(GMC) to route the traffic among the microservices defined in GMC
-		</td>
-  </tr>
-  <tr>
-    <td class="tg-yk8o"><a href="https://hub.docker.com/r/opea/gmcmanager">opea/gmcmanager</a></td>
-    <td class="tg-yk8o"><a href="https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.router">Link</a></td>
-    <td class="tg-cly1">The docker image served as one of key parts of the OPEA GenAI Microservice Connector(GMC) to be controller manager to handle GMC CRD</td>
-  </tr>
-</tbody></table>
+| Microservice Images                                                                     | Dockerfile                                                                                                                       | Description                                                                                                                                                                                                            |
+| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [opea/tei-gaudi](https://hub.docker.com/r/opea/tei-gaudi/tags)                          | [Link](https://github.com/huggingface/tei-gaudi/blob/habana-main/Dockerfile-hpu)                                                 | The docker image powered by HuggingFace Text Embedding Inference (TEI) on Gaudi2 for deploying and serving Embedding Models                                                                                            |
+| [opea/web-retriever-chroma](https://hub.docker.com/r/opea/web-retriever-chroma)         | [Link](https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/langchain/chroma/docker)                        | The docker image exposed the OPEA retrieval microservice based on chroma vectordb for GenAI application use                                                                                                            |
+| [opea/retriever-redis](https://hub.docker.com/r/opea/retriever-redis)                   | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/docker/Dockerfile)                  | The docker image exposed the OPEA retrieval microservice based on redis vectordb for GenAI application use                                                                                                             |
+| [opea/reranking-tei](https://hub.docker.com/r/opea/reranking-tei)                       | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/reranks/tei/docker/Dockerfile)                                 | The docker image exposed the OPEA reranking microservice based on tei docker image for GenAI application use                                                                                                           |
+| [opea/llm-tgi](https://hub.docker.com/r/opea/llm-tgi)                                   | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/tgi/Dockerfile)                           | The docker image exposed the OPEA LLM microservice upon TGI docker image for GenAI application use                                                                                                                     |
+| [opea/llm-docsum-tgi](https://hub.docker.com/r/opea/llm-docsum-tgi)                     | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/llms/summarization/tgi/Dockerfile)                             | This docker image is designed to build a document summarization microservice using the HuggingFace Text Generation Inference(TGI) framework. The microservice accepts document input and generates a document summary. |
+| [opea/llm-vllm](https://hub.docker.com/r/opea/llm-vllm)                                 | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/vllm/docker/Dockerfile.microservice)      | The docker image exposed the OPEA LLM microservice upon vLLM docker image for GenAI application use                                                                                                                    |
+| [opea/llm-ray](https://hub.docker.com/r/opea/llm-ray)                                   | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/llms/text-generation/ray_serve/docker/Dockerfile.microservice) | The docker image exposed the OPEA LLM microservice based on Ray for GenAI application use                                                                                                                              |
+| [opea/guardrails-pii-detection](https://hub.docker.com/r/opea/guardrails-pii-detection) | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/guardrails/pii_detection/docker/Dockerfile)                    | The docker image exposed the OPEA guardrail microservice to provide PII detection for GenAI application use                                                                                                            |
+| [opea/embedding-tei](https://hub.docker.com/r/opea/embedding-tei)                       | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/embeddings/langchain/docker/Dockerfile)                        | The docker image exposed the OPEA embedding microservice upon tei docker image for GenAI application use                                                                                                               |
+| [opea/dataprep-on-ray-redis](https://hub.docker.com/r/opea/dataprep-on-ray-redis)       | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain_ray/docker/Dockerfile)                | The docker image exposed the OPEA dataprep microservice based on redis vectordb and optimized ray for GenAI application use                                                                                            |
+| [opea/dataprep-redis](https://hub.docker.com/r/opea/dataprep-redis)                     | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/redis/langchain/docker/Dockerfile)                    | The docker image exposed the OPEA dataprep microservice based on redis vectordb for GenAI application use                                                                                                              |
+| [opea/knowledge_graphs](https://hub.docker.com/r/opea/knowledge_graphs)                 | [Link](https://github.com/opea-project/GenAIComps/blob/main/comps/knowledgegraphs/langchain/docker/Dockerfile)                   | The docker image served as knowledge graph gateway to enhance question answering with graph knowledge searching.                                                                                                       |
+| [opea/gmcrouter](https://hub.docker.com/r/opea/gmcrouter)                               | [Link](https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.manager)                          | The docker image served as one of key parts of the OPEA GenAI Microservice Connector(GMC) to route the traffic among the microservices defined in GMC                                                                  |
+| [opea/gmcmanager](https://hub.docker.com/r/opea/gmcmanager)                             | [Link](https://github.com/opea-project/GenAIInfra/blob/main/microservices-connector/Dockerfile.router)                           | The docker image served as one of key parts of the OPEA GenAI Microservice Connector(GMC) to be controller manager to handle GMC CRD                                                                                   |
