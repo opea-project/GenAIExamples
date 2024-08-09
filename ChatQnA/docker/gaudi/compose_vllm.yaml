@@ -109,7 +109,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
   vllm-service:
-    image: vllm:hpu
+    image: opea/llm-vllm-hpu:latest
     container_name: vllm-gaudi-server
     ports:
       - "8008:80"

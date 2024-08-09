@@ -62,3 +62,4 @@ jobs:
           fi
           echo "IMAGE_TAG=${IMAGE_TAG}"
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image_repo=${IMAGE_REPO}" >> $GITHUB_OUTPUT

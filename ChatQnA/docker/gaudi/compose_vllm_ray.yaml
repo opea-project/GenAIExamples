@@ -109,7 +109,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
   vllm-ray-service:
-    image: vllm_ray:habana
+    image: opea/llm-vllm-ray-hpu:latest
     container_name: vllm-ray-gaudi-server
     ports:
       - "8008:8000"

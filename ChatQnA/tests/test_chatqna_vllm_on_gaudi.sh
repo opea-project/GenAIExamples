@@ -17,7 +17,7 @@ function build_docker_images() {
     docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
     docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
-    docker build -t vllm:hpu -f comps/llms/text-generation/vllm/docker/Dockerfile.hpu .
+    docker build -t opea/llm-vllm-hpu:latest -f comps/llms/text-generation/vllm/docker/Dockerfile.hpu .
     docker build -t opea/llm-vllm:latest -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
 
@@ -42,7 +42,7 @@ function start_services() {
     cd $WORKPATH
     git clone https://github.com/huggingface/tei-gaudi
     cd tei-gaudi/
-    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+    docker build --no-cache -q -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
     cd $WORKPATH/docker/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
