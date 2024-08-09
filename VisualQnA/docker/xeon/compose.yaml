@@ -1,0 +1,72 @@
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  llava-tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.2.0
+    container_name: tgi-llava-xeon-server
+    ports:
+      - "9399:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${LVM_MODEL_ID}
+  lvm-tgi:
+    image: opea/lvm-tgi:latest
+    container_name: lvm-tgi-server
+    depends_on:
+      - llava-tgi-service
+    ports:
+      - "9399:9399"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    restart: unless-stopped
+  visualqna-xeon-backend-server:
+    image: opea/visualqna:latest
+    container_name: visualqna-xeon-backend-server
+    depends_on:
+      - llava-tgi-service
+      - lvm-tgi
+    ports:
+      - "8888:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LVM_SERVICE_HOST_IP=${LVM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  visualqna-xeon-ui-server:
+    image: opea/visualqna-ui:latest
+    container_name: visualqna-xeon-ui-server
+    depends_on:
+      - visualqna-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
