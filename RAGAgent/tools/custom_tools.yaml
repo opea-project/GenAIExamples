@@ -1,0 +1,13 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# duckduckgo_search:
+#   callable_api: ddg-search
+opea_index_retriever:
+  description: Retrieve related information of Intel OPEA project based on input query.
+  callable_api: tools.py:opea_rag_query
+  args_schema:
+    query:
+      type: str
+      description: Question query
+  return_output: retrieved_data
