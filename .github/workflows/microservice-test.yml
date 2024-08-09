@@ -43,6 +43,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
           service_path: ${{ matrix.service }}
           hardware: ${{ matrix.hardware }}
         run: |
