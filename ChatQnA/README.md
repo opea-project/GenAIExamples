@@ -123,6 +123,10 @@ Refer to the [ChatQnA helm chart](https://github.com/opea-project/GenAIInfra/tre
 
 Refer to the [AI PC Guide](./docker/aipc/README.md) for instructions on deploying ChatQnA on AI PC.
 
+### Deploy ChatQnA on Red Hat OpenShift Container Platform (RHOCP)
+
+Refer to the [Intel Technology enabling for Openshift readme](https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/workloads/opea/chatqna/README.md) for instructions to deploy ChatQnA prototype on RHOCP with [Red Hat OpenShift AI (RHOAI)](https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai).
+
 ## Consume ChatQnA Service
 
 Two ways of consuming ChatQnA Service:
