@@ -45,3 +45,4 @@ jobs:
       tag: ${{ needs.mega-image-build.outputs.image_tag }}
       example: ${{ matrix.example }}
       hardware: ${{ matrix.hardware }}
+    secrets: inherit
