@@ -10,7 +10,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_mosec_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --no-cache -t reranking-langchain-mosec:comps -f comps/reranks/langchain-mosec/mosec-docker/Dockerfile .
+    docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --no-cache -t opea/reranking-langchain-mosec-endpoint:comps -f comps/reranks/langchain-mosec/mosec-docker/Dockerfile .
 }
 
 function build_docker_images() {
@@ -23,7 +23,7 @@ function start_service() {
     mosec_endpoint=5006
     model="BAAI/bge-reranker-large"
     unset http_proxy
-    docker run -d --name="test-comps-reranking-langchain-mosec-endpoint" -p $mosec_endpoint:8000  reranking-langchain-mosec:comps
+    docker run -d --name="test-comps-reranking-langchain-mosec-endpoint" -p $mosec_endpoint:8000  opea/reranking-langchain-mosec-endpoint:comps
     export MOSEC_RERANKING_ENDPOINT="http://${ip_address}:${mosec_endpoint}"
     mosec_service_port=5007
     docker run -d --name="test-comps-reranking-langchain-mosec-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p ${mosec_service_port}:8000 --ipc=host -e MOSEC_RERANKING_ENDPOINT=$MOSEC_RERANKING_ENDPOINT  opea/reranking-langchain-mosec:comps
