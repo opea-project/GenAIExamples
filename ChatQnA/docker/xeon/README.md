@@ -146,7 +146,7 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 cd GenAIExamples/ChatQnA/docker/ui/
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT --build-arg DATAPREP_GET_FILE_ENDPOINT=$DATAPREP_GET_FILE_ENDPOINT -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
@@ -211,8 +211,8 @@ export RERANK_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -303,7 +303,7 @@ curl http://${host_ip}:9009/generate \
 
 ```bash
 # vLLM Service
-curl http://${your_ip}:9009/v1/completions \
+curl http://${host_ip}:9009/v1/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
 ```
@@ -352,7 +352,7 @@ This command updates a knowledge base by submitting a list of HTTP links for pro
 Also, you are able to get the file list that you uploaded:
 
 ```bash
-curl -X POST "http://${host_ip}:6008/v1/dataprep/get_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
      -H "Content-Type: application/json"
 ```
 
@@ -360,38 +360,19 @@ To delete the file/link you uploaded:
 
 ```bash
 # delete link
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -d '{"file_path": "https://opea.dev"}' \
      -H "Content-Type: application/json"
 
 # delete file
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -d '{"file_path": "nke-10k-2023.pdf"}' \
      -H "Content-Type: application/json"
 
 # delete all uploaded files and links
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
-```
-
-## Enable LangSmith for Monotoring Application (Optional)
-
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
-
-Here's how you can do it:
-
-1. Install the latest version of LangSmith:
-
-```bash
-pip install -U langsmith
-```
-
-2. Set the necessary environment variables:
-
-```bash
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=ls_...
 ```
 
 ## 🚀 Launch the UI

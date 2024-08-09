@@ -9,9 +9,10 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/../../
+    cd $WORKPATH
 
     git clone https://github.com/opea-project/GenAIComps.git
+    cd GenAIComps
 
     docker build --no-cache -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/Dockerfile .
 
@@ -94,7 +95,7 @@ function validate_microservices() {
         "${ip_address}:8008/generate" \
         "generated_text" \
         "tgi-service" \
-        "tgi_xeon_server" \
+        "tgi-xeon-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
