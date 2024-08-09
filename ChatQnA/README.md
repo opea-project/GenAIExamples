@@ -10,7 +10,71 @@ ChatQnA architecture shows below:
 
 ChatQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the ChatQnA Flow Chart shows below:
 
-![Flow Chart](./assets/img/chatqna_flow_chart.png)
+```mermaid
+graph LR
+    subgraph ChatQnA-MegaService["ChatQnA-MegaService"]
+        direction LR
+        EM([Embedding 'LangChain TEI' <br>6000])
+        RET([Retrieval 'LangChain Redis'<br>7000])
+        RER([Rerank 'TEI'<br>8000])
+       LLM([LLM 'text-generation TGI'<br>9000])
+    end
+
+    direction TB
+    TEI_EM{{TEI embedding service<br>8090}}
+    VDB{{Vector DB<br>8001}}
+    %% Vector DB interaction
+    TEI_EM -.->|d|VDB
+
+    DP([OPEA Data Preparation<br>6007])
+    LLM_gen{{TGI/vLLM/ollama Service}}
+
+    direction TB
+    RER([OPEA Reranking<br>8000])
+    TEI_RER{{TEI Reranking service<br>8808}}
+
+    subgraph User Interface
+        direction TB
+        a[User Input Query]
+        Ingest[Ingest data]
+        UI[UI server<br>Port: 5173]
+    end
+
+    subgraph ChatQnA GateWay
+        direction LR
+        GW[ChatQnA GateWay<br>Port: 8888]
+    end
+
+    %% Data Preparation flow
+    %% Ingest data flow
+    direction LR
+    Ingest[Ingest data] -->|a| UI
+    UI -->|b| DP
+    DP -.->|c| TEI_EM
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] -->|1| UI
+    UI -->|2| GW
+    GW ==>|3| ChatQnA-MegaService
+    EM ==>|4| RET
+    RET ==>|5| RER
+    RER ==>|6| LLM
+
+
+    %% Embedding service flow
+    direction TB
+    EM -.->|3'| TEI_EM
+    RET -.->|4'| TEI_EM
+    RER -.->|5'| TEI_RER
+    LLM -.->|6'| LLM_gen
+
+    subgraph Legend
+        X([Micsrservice])
+        Y{{Service from industry peers}}
+        Z[Gateway]
+    end
+```
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
 
