@@ -30,9 +30,9 @@ fi
 
 # Build the docker image for vLLM based on the hardware mode
 if [ "$hw_mode" = "hpu" ]; then
-    docker build -f docker/Dockerfile.hpu -t vllm:hpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    docker build -f docker/Dockerfile.hpu -t opea/vllm:hpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
 else
     git clone https://github.com/vllm-project/vllm.git
     cd ./vllm/
-    docker build -f Dockerfile.cpu -t vllm:cpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    docker build -f Dockerfile.cpu -t opea/vllm:cpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
 fi

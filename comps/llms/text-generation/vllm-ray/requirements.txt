@@ -11,7 +11,7 @@ opentelemetry-exporter-otlp
 opentelemetry-sdk
 prometheus-fastapi-instrumentator
 ray[serve]>=2.10
-setuptools==69.5.1
+setuptools
 shortuuid
 transformers
 uvicorn

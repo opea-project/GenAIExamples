@@ -9,7 +9,7 @@ RUN pip install --upgrade-strategy eager optimum[habana]
 
 RUN pip install -v git+https://github.com/HabanaAI/vllm-fork.git@cf6952d
 
-RUN pip install setuptools==69.5.1
+RUN pip install setuptools
 
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     service ssh restart

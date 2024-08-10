@@ -32,7 +32,7 @@ docker run -p 8008:80 -v ./data:/data --name tgi_service --shm-size 1g ghcr.io/h
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-docker run -it --name vllm_service -p 8008:80 -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -v ./data:/data vllm:cpu /bin/bash -c "cd / && export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --model ${your_hf_llm_model} --port 80"
+docker run -it --name vllm_service -p 8008:80 -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -v ./data:/data opea/vllm:cpu /bin/bash -c "cd / && export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --model ${your_hf_llm_model} --port 80"
 ```
 
 ## 1.2.3 Start Ray Service

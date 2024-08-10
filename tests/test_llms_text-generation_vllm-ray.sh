@@ -12,7 +12,7 @@ function build_docker_images() {
     cd $WORKPATH
     docker build \
         -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray  \
-        -t vllm_ray:habana --network=host .
+        -t opea/vllm_ray:habana --network=host .
 
     ## Build OPEA microservice docker
     cd $WORKPATH
@@ -34,7 +34,7 @@ function start_service() {
         --ipc=host \
         -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN \
         -p $port_number:8000 \
-        vllm_ray:habana \
+        opea/vllm_ray:habana \
         /bin/bash -c "ray start --head && python vllm_ray_openai.py --port_number 8000 --model_id_or_path $LLM_MODEL --tensor_parallel_size 2 --enforce_eager False"
 
     export vLLM_RAY_ENDPOINT="http://${ip_address}:${port_number}"

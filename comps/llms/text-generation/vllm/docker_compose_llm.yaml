@@ -5,7 +5,7 @@ version: "3.8"
 
 services:
   vllm-service:
-    image: vllm:hpu
+    image: opea/vllm:hpu
     container_name: vllm-gaudi-server
     ports:
       - "8008:80"

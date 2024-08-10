@@ -5,7 +5,7 @@ version: "3.8"
 
 services:
   vllm-ray-service:
-    image: vllm_ray:habana
+    image: opea/vllm_ray:habana
     container_name: vllm-ray-gaudi-server
     ports:
       - "8006:8000"
