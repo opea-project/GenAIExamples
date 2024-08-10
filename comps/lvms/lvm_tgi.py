@@ -48,7 +48,7 @@ async def lvm(request: LVMDoc):
         async def stream_generator():
             chat_response = ""
             text_generation = await lvm_client.text_generation(
-                prompt=prompt,
+                prompt=image_prompt,
                 stream=streaming,
                 max_new_tokens=max_new_tokens,
                 repetition_penalty=repetition_penalty,
