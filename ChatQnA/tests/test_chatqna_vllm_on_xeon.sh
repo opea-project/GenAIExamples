@@ -26,15 +26,21 @@ function build_docker_images() {
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
-    cd $WORKPATH
-    git clone https://github.com/vllm-project/vllm.git
-    cd vllm
-    docker build --no-cache -t vllm:cpu -f Dockerfile.cpu .
+#    cd $WORKPATH
+#    git clone https://github.com/vllm-project/vllm.git
+#    cd vllm
+#    docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
 
     docker images
 }
 
 function start_services() {
+    # build vllm for each test instead of pull from local registry
+    cd $WORKPATH
+    git clone https://github.com/vllm-project/vllm.git
+    cd vllm
+    docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
+
     cd $WORKPATH/docker/xeon
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
