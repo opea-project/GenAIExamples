@@ -60,7 +60,7 @@ curl -X 'POST' \
 
 ```bash
 curl -X 'POST' \
-  http://${host_ip}:6013/v1/chathistory/get \
+  http://${host_ip}:6012/v1/chathistory/get \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -71,7 +71,7 @@ curl -X 'POST' \
 
 ```bash
 curl -X 'POST' \
-  http://${host_ip}:6013/v1/chathistory/get \
+  http://${host_ip}:6012/v1/chathistory/get \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -97,7 +97,7 @@ curl -X 'POST' \
 
 ```bash
 curl -X 'POST' \
-  http://${host_ip}:6014/v1/chathistory/delete \
+  http://${host_ip}:6012/v1/chathistory/delete \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
