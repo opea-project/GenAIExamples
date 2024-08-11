@@ -62,7 +62,7 @@ function start_services() {
     fi
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose -f compose_qdrant.yaml up -d
     n=0
     until [[ "$n" -ge 200 ]]; do
         docker logs tgi-service > tgi_service_start.log
