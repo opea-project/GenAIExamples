@@ -113,7 +113,7 @@ services:
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   vllm_service:
-    image: vllm:cpu
+    image: opea/vllm:latest
     container_name: vllm-service
     ports:
       - "9009:80"
@@ -188,19 +188,6 @@ services:
       - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
       - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
       - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
-    ipc: host
-    restart: always
-  chaqna-xeon-conversation-ui-server:
-    image: opea/chatqna-conversation-ui:latest
-    container_name: chatqna-xeon-conversation-ui-server
-    environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-    ports:
-        - 5174:80
-    depends_on:
-        - chaqna-xeon-backend-server
     ipc: host
     restart: always
 

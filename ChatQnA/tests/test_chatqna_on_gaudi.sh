@@ -42,7 +42,7 @@ function start_services() {
     cd $WORKPATH
     git clone https://github.com/huggingface/tei-gaudi
     cd tei-gaudi/
-    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+    docker build --no-cache -q -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
     cd $WORKPATH/docker/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"

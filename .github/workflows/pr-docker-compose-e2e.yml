@@ -13,8 +13,7 @@ on:
       - "**/ui/**"
       - "!**.md"
       - "!**.txt"
-      - .github/workflows/docker-compose-e2e.yml
-  workflow_dispatch:
+      - .github/workflows/pr-docker-compose-e2e.yml
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
@@ -37,55 +36,13 @@ jobs:
       mega_service: "${{ matrix.example }}"
       runner_label: "docker-build-${{ matrix.hardware }}"
 
-  Example-test:
+  example-test:
     needs: [job1, mega-image-build]
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    runs-on: ${{ matrix.hardware }}
-    continue-on-error: true
-    steps:
-      - name: Test example
-        run: |
-          echo "Matrix - example ${{ matrix.example }}, hardware ${{ matrix.hardware }}"
-
-      - name: Clean Up Working Directory
-        run: sudo rm -rf ${{github.workspace}}/*
-
-      - name: Checkout out Repo
-        uses: actions/checkout@v4
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-
-      - name: Run test
-        env:
-          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
-          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          example: ${{ matrix.example }}
-          hardware: ${{ matrix.hardware }}
-          IMAGE_TAG: ${{ needs.mega-image-build.outputs.image_tag }}
-          IMAGE_REPO_GAUDI: ${{ vars.IMAGE_REPO_GAUDI }}
-          IMAGE_REPO_XEON: ${{ vars.IMAGE_REPO_XEON }}
-        run: |
-          cd ${{ github.workspace }}/$example/tests
-          if [ "$hardware" == "gaudi" ]; then IMAGE_REPO=$IMAGE_REPO_GAUDI; else IMAGE_REPO=$IMAGE_REPO_XEON; fi
-          export IMAGE_REPO=${IMAGE_REPO}
-          example_l=$(echo $example | tr '[:upper:]' '[:lower:]')
-          if [ -f test_${example_l}_on_${hardware}.sh ]; then timeout 30m bash test_${example_l}_on_${hardware}.sh; else echo "Test script not found, skip test!"; fi
-
-      - name: Clean up container
-        env:
-          example: ${{ matrix.example }}
-          hardware: ${{ matrix.hardware }}
-        if: cancelled() || failure()
-        run: |
-          cd ${{ github.workspace }}/$example/docker/$hardware
-          docker compose stop && docker compose rm -f
-          echo y | docker system prune
-
-      - name: Publish pipeline artifact
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.example }}-${{ matrix.hardware }}
-          path: ${{ github.workspace }}/${{ matrix.example }}/tests/*.log
+    uses: ./.github/workflows/_run-docker-compose.yml
+    with:
+      tag: ${{ needs.mega-image-build.outputs.image_tag }}
+      example: ${{ matrix.example }}
+      hardware: ${{ matrix.hardware }}
+    secrets: inherit
