@@ -46,7 +46,7 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 Build vllm docker.
 
 ```bash
-docker build --no-cache -t vllm:hpu --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.hpu .
+docker build --no-cache -t opea/llm-vllm-hpu:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.hpu .
 ```
 
 Build microservice docker.
@@ -60,7 +60,7 @@ docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_p
 Build vllm-on-ray docker.
 
 ```bash
-docker build --no-cache -t vllm_ray:habana --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray .
+docker build --no-cache -t opea/llm-vllm-ray-hpu:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray .
 ```
 
 Build microservice docker.

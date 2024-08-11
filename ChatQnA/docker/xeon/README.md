@@ -99,7 +99,7 @@ Build vLLM docker.
 ```bash
 git clone https://github.com/vllm-project/vllm.git
 cd ./vllm/
-docker build --no-cache -t vllm:cpu --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu .
+docker build --no-cache -t opea/vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu .
 ```
 
 Build microservice.

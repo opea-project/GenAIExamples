@@ -34,6 +34,10 @@ jobs:
       image_repo: ${{ steps.build-megaservice-image.outputs.image_repo }}
       image_tag: ${{ steps.build-megaservice-image.outputs.image_tag }}
     steps:
+      - name: Clean up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/* || true
+
       - name: Get checkout ref
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
@@ -62,3 +66,4 @@ jobs:
           fi
           echo "IMAGE_TAG=${IMAGE_TAG}"
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image_repo=${IMAGE_REPO}" >> $GITHUB_OUTPUT

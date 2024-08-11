@@ -16,7 +16,7 @@ function build_docker_images() {
 
     docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/retriever-qdrant:latest -f comps/retrievers/haystack/qdrant/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/langchain/docker/Dockerfile .
+    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
     docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-qdrant:latest -f comps/dataprep/qdrant/docker/Dockerfile .
 
@@ -55,14 +55,15 @@ function start_services() {
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_qdrant.yaml
+        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_qdrant.yaml
+        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_qdrant.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_qdrant.yaml
+        cat compose_qdrant.yaml
     fi
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose -f compose_qdrant.yaml up -d
     n=0
     until [[ "$n" -ge 200 ]]; do
         docker logs tgi-service > tgi_service_start.log
