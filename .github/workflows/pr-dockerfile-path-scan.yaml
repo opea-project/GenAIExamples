@@ -14,7 +14,68 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  file-change-detection:
+  Dockerfile-path-change-detection-in-GenAIComps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changed Dockerfile paths in yaml
+        run: |
+          set -xe
+          shopt -s globstar
+          cd ${{github.workspace}}
+          is_use="FALSE"
+          used_files=""
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-status --diff-filter=DR ${{ github.event.pull_request.base.sha }} ${merged_commit} -- '**/Dockerfile**' | cut -f2)"
+          if [ -n "$changed_files" ]; then
+            for file in $changed_files; do
+              if grep -q "$file" .github/workflows/docker/compose/*.yaml; then
+                is_use="TRUE"
+                used_files+="$file "
+              fi
+            done
+          fi
+
+          if [[ "$is_use" == "TRUE" ]]; then
+            echo "Warning: Changed Dockerfile paths:"
+            echo "$used_files"
+            echo "Please modify the corresponding yaml in GenAIComps/.github/workflows/docker/compose and ask suyue.chen@intel.com for final confirmation."
+            exit 1
+          fi
+
+      - name: Check for changed Dockerfile paths in readme
+        run: |
+          set -xe
+          shopt -s globstar
+          cd ${{github.workspace}}
+          is_use="FALSE"
+          used_files=""
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-status --diff-filter=DR ${{ github.event.pull_request.base.sha }} ${merged_commit} -- '**/Dockerfile**' | cut -f2)"
+          if [ -n "$changed_files" ]; then
+            for file in $changed_files; do
+              if grep -q "$file" ./**/*.md; then
+                is_use="TRUE"
+                used_files+="$file "
+              fi
+            done
+          fi
+
+          if [[ "$is_use" == "TRUE" ]]; then
+            echo "Warning: Changed Dockerfile paths:"
+            echo "$used_files"
+            echo "Please modify the corresponding README in GenAIComps and ask suyue.chen@intel.com for final confirmation."
+            exit 1
+          fi
+
+  Dockerfile-path-change-detection-in-GenAIExamples:
     runs-on: ubuntu-latest
     steps:
       - name: Clean Up Working Directory
@@ -32,6 +93,7 @@ jobs:
 
       - name: Check for changed Dockerfile paths
         run: |
+          set -xe
           shopt -s globstar
           cd ${{github.workspace}}
           is_use="FALSE"
