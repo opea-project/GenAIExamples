@@ -45,7 +45,7 @@ jobs:
           merged_commit=$(git log -1 --format='%H')
 
           changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
-          grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')" || true
+          grep 'comps/' | grep -vE '*.md|comps/cores')" || true
           services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u) || true
           run_matrix="{\"include\":["
           for service in ${services}; do
