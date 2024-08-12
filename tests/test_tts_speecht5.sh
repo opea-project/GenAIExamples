@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
@@ -10,14 +10,14 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build -t opea/speecht5:latest -f comps/tts/speecht5/Dockerfile .
-    docker build -t opea/tts:latest -f comps/tts/Dockerfile .
+    docker build -t opea/speecht5:comps -f comps/tts/speecht5/Dockerfile .
+    docker build -t opea/tts:comps -f comps/tts/Dockerfile .
 }
 
 function start_service() {
     unset http_proxy
-    docker run -d --name="test-comps-tts-speecht5" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 7055:7055 --ipc=host opea/speecht5:latest
-    docker run -d --name="test-comps-tts" -e TTS_ENDPOINT=http://$ip_address:7055 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 9088:9088 --ipc=host opea/tts:latest
+    docker run -d --name="test-comps-tts-speecht5" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 7055:7055 --ipc=host opea/speecht5:comps
+    docker run -d --name="test-comps-tts" -e TTS_ENDPOINT=http://$ip_address:7055 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 9088:9088 --ipc=host opea/tts:comps
     sleep 3m
 }
 
@@ -27,6 +27,8 @@ function validate_microservice() {
         echo "Result correct."
     else
         echo "Result wrong."
+        docker logs test-comps-tts-speecht5
+        docker logs test-comps-tts
         exit 1
     fi
 

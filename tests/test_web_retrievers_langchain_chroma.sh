@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
@@ -36,6 +36,7 @@ function validate_microservice() {
         -d "{\"text\":\"What is OPEA?\",\"embedding\":${test_embedding}}" \
         -H 'Content-Type: application/json'
     docker logs test-comps-web-retriever-tei-endpoint
+    docker logs test-comps-web-retriever-chroma-server
 }
 
 function stop_docker() {

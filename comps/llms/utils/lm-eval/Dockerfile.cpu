@@ -1,6 +1,8 @@
 ARG UBUNTU_VER=22.04
 FROM ubuntu:${UBUNTU_VER} as devel
-
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
 ARG REPO_COMPS=https://github.com/opea-project/GenAIComps.git
 ARG BRANCH=main
 ENV LANG=C.UTF-8
@@ -16,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
     git \
     vim \
     wget
-
+USER user
 RUN git clone --single-branch --branch=${BRANCH} ${REPO_COMPS} /home/user/GenAIComps/ && \
     cd /home/user/GenAIComps/ && python3 setup.py install && \
     pip install --no-cache-dir -r /home/user/GenAIComps/comps/llms/utils/lm-eval/requirements.txt

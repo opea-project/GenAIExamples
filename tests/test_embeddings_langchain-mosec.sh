@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
@@ -36,6 +36,14 @@ function validate_microservice() {
         -X POST \
         -d '{"text":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json'
+    if [ $? -eq 0 ]; then
+        echo "curl command executed successfully"
+    else
+        echo "curl command failed"
+        docker logs test-comps-embedding-langchain-mosec-endpoint
+        docker logs test-comps-embedding-langchain-mosec-server
+        exit 1
+    fi
 }
 
 function stop_docker() {
