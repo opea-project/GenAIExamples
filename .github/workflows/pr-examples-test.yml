@@ -1,0 +1,72 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Example-test
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths:
+      - .github/workflows/pr-examples-test.yml
+      - comps/cores/**
+      - comps/embeddings/langchain/**
+      - comps/retrievers/langchain/redis/**
+      - comps/reranks/tei/**
+      - comps/llms/text-generation/tgi/**
+      - comps/dataprep/redis/langchain/**
+      - requirements.txt
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  example-test:
+    runs-on: gaudi-01-3
+    steps:
+      - name: Clean Up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/* || true
+          echo y | docker system prune
+          docker rmi $(docker images --filter reference="*/*:comps" -q) || true
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+
+      - name: Run ChatQnA
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+        run: |
+          git clone https://github.com/opea-project/GenAIExamples.git
+          cd ${{ github.workspace }}/GenAIExamples/ChatQnA/docker/gaudi
+          sed -i "s#:latest#:comps#g" compose.yaml
+          cat compose.yaml
+
+          cd ${{ github.workspace }}/GenAIExamples/ChatQnA/tests
+          GenAIComps_dir=${{github.workspace}}
+          sed -i '/GenAIComps.git/d' test_chatqna_on_gaudi.sh
+          sed -i "s#cd GenAIComps#cd ${GenAIComps_dir}#g" test_chatqna_on_gaudi.sh
+          sed -i "s#docker build -t#docker build --no-cache -q -t#g" test_chatqna_on_gaudi.sh
+          sed -i "s#:latest#:comps#g" test_chatqna_on_gaudi.sh
+          cat test_chatqna_on_gaudi.sh
+
+          echo "Run test..."
+          timeout 50m bash test_chatqna_on_gaudi.sh
+
+      - name: Clean up container
+        if: cancelled() || failure()
+        run: |
+          cd ${{ github.workspace }}/GenAIExamples/ChatQnA/docker/gaudi
+          docker compose stop && docker compose rm -f
+          docker system prune -f
+
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "Examples-Test-Logs"
+          path: ${{ github.workspace }}/GenAIExamples/ChatQnA/tests/*.log

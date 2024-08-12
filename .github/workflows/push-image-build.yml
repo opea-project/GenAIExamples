@@ -10,7 +10,7 @@ on:
       - comps/**
       - "!**.md"
       - "!**.txt"
-      - .github/workflows/image-build-on-push.yml
+      - .github/workflows/push-image-build.yml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-on-push

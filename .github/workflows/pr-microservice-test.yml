@@ -12,7 +12,7 @@ on:
       - tests/**
       - "!**.md"
       - "!**.txt"
-      - .github/workflows/microservice-test.yml
+      - .github/workflows/pr-microservice-test.yml
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   job1:
-    uses: ./.github/workflows/reuse-get-test-matrix.yml
+    uses: ./.github/workflows/_get-test-matrix.yml
 
   Microservice-test:
     needs: job1
@@ -31,7 +31,9 @@ jobs:
     continue-on-error: true
     steps:
       - name: Clean Up Working Directory
-        run: sudo rm -rf ${{github.workspace}}/*
+        run: |
+          sudo rm -rf ${{github.workspace}}/*
+          docker system prune -f
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
@@ -57,7 +59,7 @@ jobs:
         run: |
           cid=$(docker ps -aq --filter "name=test-comps-*")
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-          echo y | docker system prune --all
+          docker system prune -f
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
