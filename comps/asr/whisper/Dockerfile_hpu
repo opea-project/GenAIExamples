@@ -11,6 +11,7 @@ RUN useradd -m -s /bin/bash user && \
 # Set environment variables
 ENV LANG=en_US.UTF-8
 ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/optimum-habana
+ENV LD_LIBRARY_PATH=/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
 # Install system dependencies
 RUN apt-get update \
