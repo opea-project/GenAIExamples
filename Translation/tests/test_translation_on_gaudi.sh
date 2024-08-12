@@ -35,11 +35,30 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
 
-    # Start Docker Containers
-    # TODO: Replace the container name with a test-specific name
-    docker compose -f docker_compose.yaml up -d
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    sleep 2m # Waits 2 minutes
+    if [[ "$IMAGE_REPO" != "" ]]; then
+        # Replace the container name with a test-specific name
+        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
+        sed -i "s#image: opea/translation:latest#image: opea/translation:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/translation-ui:latest#image: opea/translation-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        echo "cat compose.yaml"
+        cat compose.yaml
+    fi
+
+    # Start Docker Containers
+    docker compose up -d
+
+    n=0
+    until [[ "$n" -ge 500 ]]; do
+        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 function validate_services() {
@@ -81,7 +100,7 @@ function validate_microservices() {
         "${ip_address}:8008/generate" \
         "generated_text" \
         "tgi-gaudi" \
-        "tgi_gaudi_service" \
+        "tgi-gaudi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
@@ -130,22 +149,19 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose stop && docker compose rm -f
 }
 
 function main() {
 
     stop_docker
 
-    build_docker_images
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices
     validate_megaservice
+    validate_frontend
 
     stop_docker
     echo y | docker system prune

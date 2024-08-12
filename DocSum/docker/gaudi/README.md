@@ -44,18 +44,29 @@ cd GenAIExamples/DocSum/docker/ui/
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
+### 5. Build React UI Docker Image
+
+Build the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/docker/ui/
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+```
+
 Then run the command `docker images`, you will have the following Docker Images:
 
 1. `ghcr.io/huggingface/tgi-gaudi:2.0.1`
 2. `opea/llm-docsum-tgi:latest`
 3. `opea/docsum:latest`
 4. `opea/docsum-ui:latest`
+5. `opea/docsum-react-ui:latest`
 
 ## 🚀 Start Microservices and MegaService
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -75,7 +86,7 @@ Note: Please replace with `host_ip` with your external IP address, do not use lo
 
 ```bash
 cd GenAIExamples/DocSum/docker/gaudi
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 ### Validate Microservices
@@ -106,26 +117,7 @@ curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
      }'
 ```
 
-## Enable LangSmith to Monitor an Application (Optional)
-
-LangSmith offers a suite of tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
-
-Here's how you can do it:
-
-1. Install the latest version of LangSmith:
-
-```bash
-pip install -U langsmith
-```
-
-2. Set the necessary environment variables:
-
-```bash
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=ls_...
-```
-
-## 🚀 Launch the UI
+## 🚀 Launch the Svelte UI
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
@@ -134,3 +126,9 @@ Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 Here is an example for summarizing a article.
 
 ![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/67ecb2ec-408d-4e81-b124-6ded6b833f55)
+
+## 🚀 Launch the React UI
+
+Open this URL `http://{host_ip}:5175` in your browser to access the frontend.
+
+![project-screenshot](../../assets/img/docsum-ui-react.png)

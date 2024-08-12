@@ -22,6 +22,7 @@ function build_docker_images() {
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+    docker build --no-cache -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=http://${ip_address}:8888/v1/docsum -f docker/Dockerfile.react .
 
     docker images
 }
@@ -41,15 +42,26 @@ function start_services() {
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/docsum-ui:latest#image: opea/docsum-ui:${IMAGE_TAG}#g" docker_compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
+        sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/docsum-ui:latest#image: opea/docsum-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/docsum-react-ui:latest#image: opea/docsum-react-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
+        echo "cat compose.yaml"
+        cat compose.yaml
     fi
 
     # Start Docker Containers
-    docker compose -f docker_compose.yaml up -d
+    docker compose up -d
 
-    sleep 2m # Waits 2 minutes
+    n=0
+    until [[ "$n" -ge 400 ]]; do
+        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 function validate_services() {
@@ -137,11 +149,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose stop && docker compose rm -f
 }
 
 function main() {

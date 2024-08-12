@@ -16,26 +16,26 @@
 
 <script lang="ts">
   import Highlight, { LineNumbers } from "svelte-highlight";
-  import typescript from "svelte-highlight/languages/typescript";
+  // import typescript from "svelte-highlight/languages/typescript";
   import c from "svelte-highlight/languages/c";
   import cpp from "svelte-highlight/languages/cpp";
-  import csharp from "svelte-highlight/languages/csharp";
+  // import csharp from "svelte-highlight/languages/csharp";
   import go from "svelte-highlight/languages/go";
   import java from "svelte-highlight/languages/java";
   import python from "svelte-highlight/languages/python";
   import javascript from "svelte-highlight/languages/javascript";
-  import swift from "svelte-highlight/languages/swift";
-  import ruby from "svelte-highlight/languages/ruby";
+  // import swift from "svelte-highlight/languages/swift";
+  // import ruby from "svelte-highlight/languages/ruby";
   import rust from "svelte-highlight/languages/rust";
-  import php from "svelte-highlight/languages/php";
-  import kotlin from "svelte-highlight/languages/kotlin";
-  import objectivec from "svelte-highlight/languages/objectivec";
-  import perl from "svelte-highlight/languages/perl";
-  import matlab from "svelte-highlight/languages/matlab";
-  import r from "svelte-highlight/languages/r";
-  import lua from "svelte-highlight/languages/lua";
-  import bash from "svelte-highlight/languages/bash";
-  import sql from "svelte-highlight/languages/sql";
+  // import php from "svelte-highlight/languages/php";
+  // import kotlin from "svelte-highlight/languages/kotlin";
+  // import objectivec from "svelte-highlight/languages/objectivec";
+  // import perl from "svelte-highlight/languages/perl";
+  // import matlab from "svelte-highlight/languages/matlab";
+  // import r from "svelte-highlight/languages/r";
+  // import lua from "svelte-highlight/languages/lua";
+  // import bash from "svelte-highlight/languages/bash";
+  // import sql from "svelte-highlight/languages/sql";
 
   import atomOneDark from "svelte-highlight/styles/atom-one-dark";
   import Header from "$lib/header.svelte";
@@ -46,26 +46,26 @@
   import TranslateIcon from "$lib/assets/translateIcon.svelte";
 
   const languagesTag = {
-    Typescript: typescript,
-    Python: python,
-    C: c,
-    Cpp: cpp,
-    Csharp: csharp,
-    Go: go,
-    Java: java,
-    Javascript: javascript,
-    Swift: swift,
-    Ruby: ruby,
-    Rust: rust,
-    Php: php,
-    Kotlin: kotlin,
-    Objectivec: objectivec,
-    Perl: perl,
-    Matlab: matlab,
-    R: r,
-    Lua: lua,
-    Bash: bash,
-    Sql: sql,
+    // 'TypeScript': typescript,
+    'Python': python,
+    'C': c,
+    'C++': cpp,
+    // 'C#': csharp,
+    'Go': go,
+    'Java': java,
+    'JavaScript': javascript,
+    // 'Swift': swift,
+    // 'Ruby': ruby,
+    'Rust': rust,
+    // 'PHP': php,
+    // 'Kotlin': kotlin,
+    // 'Objective-C': objectivec,
+    // 'Perl': perl,
+    // 'MATLAB': matlab,
+    // 'R': r,
+    // 'Lua': lua,
+    // 'Bash': bash,
+    // 'SQL': sql,
   } as { [key: string]: any };
 
   let copyText = "copy";
@@ -99,6 +99,7 @@
     loading = true;
     output = "";
     inputClick = false;
+
     const eventSource = await fetchTextStream(input, langFrom, langTo);
 
     eventSource.addEventListener("message", (e: any) => {

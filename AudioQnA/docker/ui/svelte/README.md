@@ -1,19 +1,18 @@
-<h1 align="center" id="title">AudioQnA</h1>
+# AudioQnA
 
-### 📸 Project Screenshots
+## 📸 Project Screenshots
 
-![project-screenshot](../../assets/img/audio_ui.png)
-![project-screenshot](../../assets/img/audio_ui_record.png)
+![project-screenshot](../../../assets/img/audio_ui.png)
+![project-screenshot](../../../assets/img/audio_ui_record.png)
 
-<h2>🧐 Features</h2>
+## 🧐 Features
 
 Here're some of the project's features:
 
 - Start a Talking Chat：Initiate voice chat, able to input voice content, and customize the conversation sound based on the uploaded file.
-- Upload File: Select local upload of voice file. Chat based on the uploaded sound.
 - Scroll to Bottom: The chat automatically slides to the bottom.
 
-<h2>🛠️ Get it Running:</h2>
+## 🛠️ Get it Running
 
 1. Clone the repo.
 
@@ -22,13 +21,7 @@ Here're some of the project's features:
 3. Modify the required .env variables.
 
    ```
-    TTS_URL = ''
-
-    UPLOAD_URL = ''
-
-    CHAT_URL = ''
-
-    ASR_URL = ''
+   CHAT_URL = ''
    ```
 
 4. Execute `npm install` to install the corresponding dependencies.
