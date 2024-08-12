@@ -34,7 +34,7 @@ class PromptId(BaseModel):
 
 
 @register_microservice(
-    name="opea_service@prompt_mongo_create",
+    name="opea_service@prompt_mongo",
     endpoint="/v1/prompt/create",
     host="0.0.0.0",
     input_datatype=PromptCreate,
@@ -62,11 +62,11 @@ async def create_prompt(prompt: PromptCreate):
 
 
 @register_microservice(
-    name="opea_service@prompt_mongo_get",
+    name="opea_service@prompt_mongo",
     endpoint="/v1/prompt/get",
     host="0.0.0.0",
     input_datatype=PromptId,
-    port=6013,
+    port=6012,
 )
 async def get_prompt(prompt: PromptId):
     """Retrieves prompt from prompt store based on provided PromptId or user.
@@ -95,11 +95,11 @@ async def get_prompt(prompt: PromptId):
 
 
 @register_microservice(
-    name="opea_service@prompt_mongo_delete",
+    name="opea_service@prompt_mongo",
     endpoint="/v1/prompt/delete",
     host="0.0.0.0",
     input_datatype=PromptId,
-    port=6014,
+    port=6012,
 )
 async def delete_prompt(prompt: PromptId):
     """Delete a prompt from prompt store by given PromptId.
@@ -125,6 +125,4 @@ async def delete_prompt(prompt: PromptId):
 
 
 if __name__ == "__main__":
-    opea_microservices["opea_service@prompt_mongo_get"].start()
-    opea_microservices["opea_service@prompt_mongo_create"].start()
-    opea_microservices["opea_service@prompt_mongo_delete"].start()
+    opea_microservices["opea_service@prompt_mongo"].start()
