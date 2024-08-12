@@ -39,7 +39,7 @@ jobs:
           else
             CHECKOUT_REF=${{ github.ref }}
           fi
-          echo "CHECHOUT_REF=${CHECKOUT_REF}" >> $GITHUB_OUTPUT
+          echo "CHECKOUT_REF=${CHECKOUT_REF}" >> $GITHUB_OUTPUT
           echo "checkout ref ${CHECKOUT_REF}"
 
       - name: Checkout out Repo
