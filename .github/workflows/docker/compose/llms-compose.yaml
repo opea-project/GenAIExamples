@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # this file should be run in the root of the repo
-# images used by GenAIExamples: llm-tgi,llm-ollama,llm-docsum-tgi,llm-faqgen-tgi,llm-vllm,llm-vllm-ray
+# images used by GenAIExamples: llm-tgi,llm-ollama,llm-docsum-tgi,llm-faqgen-tgi,llm-vllm,llm-vllm-hpu,llm-vllm-ray,llm-vllm-ray-hpu
 services:
   llm-tgi:
     build:
@@ -24,7 +24,15 @@ services:
     build:
       dockerfile: comps/llms/text-generation/vllm/docker/Dockerfile.microservice
     image: ${REGISTRY}opea/llm-vllm:${TAG:-latest}
+  llm-vllm-hpu:
+    build:
+      dockerfile: comps/llms/text-generation/vllm/docker/Dockerfile.hpu
+    image: ${REGISTRY}opea/llm-vllm-hpu:${TAG:-latest}
   llm-vllm-ray:
     build:
       dockerfile: comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice
     image: ${REGISTRY}opea/llm-vllm-ray:${TAG:-latest}
+  llm-vllm-ray-hpu:
+    build:
+      dockerfile: comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray
+    image: ${REGISTRY}opea/llm-vllm-ray-hpu:${TAG:-latest}
