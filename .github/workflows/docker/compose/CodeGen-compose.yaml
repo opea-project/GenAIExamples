@@ -7,14 +7,14 @@ services:
     build:
       context: docker
       dockerfile: ./Dockerfile
-    image: ${REGISTRY}opea/codegen:${TAG:-latest}
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
   codegen-ui:
     build:
       context: docker/ui
       dockerfile: ./docker/Dockerfile
-    image: ${REGISTRY}opea/codegen-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
   codegen-react-ui:
     build:
       context: docker/ui
       dockerfile: ./docker/Dockerfile.react
-    image: ${REGISTRY}opea/codegen-conversation-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/codegen-conversation-ui:${TAG:-latest}
