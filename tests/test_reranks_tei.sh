@@ -34,7 +34,7 @@ function validate_microservice() {
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
         -H 'Content-Type: application/json')
 
-    if echo "$CONTENT" | grep -q "### Search results:"; then
+    if echo "$CONTENT" | grep -q "documents"; then
         echo "Content is as expected."
     else
         echo "Content does not match the expected result: $CONTENT"

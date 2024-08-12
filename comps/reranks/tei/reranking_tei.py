@@ -6,6 +6,7 @@ import json
 import os
 import re
 import time
+from typing import Union
 
 import requests
 from langsmith import traceable
@@ -18,6 +19,12 @@ from comps import (
     register_microservice,
     register_statistics,
     statistics_dict,
+)
+from comps.cores.proto.api_protocol import (
+    ChatCompletionRequest,
+    RerankingRequest,
+    RerankingResponse,
+    RerankingResponseData,
 )
 
 
@@ -32,42 +39,44 @@ from comps import (
 )
 @traceable(run_type="llm")
 @register_statistics(names=["opea_service@reranking_tgi_gaudi"])
-def reranking(input: SearchedDoc) -> LLMParamsDoc:
+def reranking(
+    input: Union[SearchedDoc, RerankingRequest, ChatCompletionRequest]
+) -> Union[LLMParamsDoc, RerankingResponse, ChatCompletionRequest]:
+
     start = time.time()
+    reranking_results = []
     if input.retrieved_docs:
         docs = [doc.text for doc in input.retrieved_docs]
         url = tei_reranking_endpoint + "/rerank"
-        data = {"query": input.initial_query, "texts": docs}
+        if isinstance(input, SearchedDoc):
+            query = input.initial_query
+        else:
+            # for RerankingRequest, ChatCompletionRequest
+            query = input.input
+        data = {"query": query, "texts": docs}
         headers = {"Content-Type": "application/json"}
         response = requests.post(url, data=json.dumps(data), headers=headers)
         response_data = response.json()
-        best_response_list = heapq.nlargest(input.top_n, response_data, key=lambda x: x["score"])
-        context_str = ""
-        for best_response in best_response_list:
-            context_str = context_str + " " + input.retrieved_docs[best_response["index"]].text
-        if context_str and len(re.findall("[\u4E00-\u9FFF]", context_str)) / len(context_str) >= 0.3:
-            # chinese context
-            template = """
-### 你将扮演一个乐于助人、尊重他人并诚实的助手，你的目标是帮助用户解答问题。有效地利用来自本地知识库的搜索结果。确保你的回答中只包含相关信息。如果你不确定问题的答案，请避免分享不准确的信息。
-### 搜索结果：{context}
-### 问题：{question}
-### 回答：
-"""
-        else:
-            template = """
-### You are a helpful, respectful and honest assistant to help the user with questions. \
-Please refer to the search results obtained from the local knowledge base. \
-But be careful to not incorporate the information that you think is not relevant to the question. \
-If you don't know the answer to a question, please don't share false information. \
-### Search results: {context} \n
-### Question: {question} \n
-### Answer:
-"""
-        final_prompt = template.format(context=context_str, question=input.initial_query)
-        statistics_dict["opea_service@reranking_tgi_gaudi"].append_latency(time.time() - start, None)
-        return LLMParamsDoc(query=final_prompt.strip())
+
+        for best_response in response_data[: input.top_n]:
+            reranking_results.append(
+                {"text": input.retrieved_docs[best_response["index"]].text, "score": best_response["score"]}
+            )
+
+    statistics_dict["opea_service@reranking_tgi_gaudi"].append_latency(time.time() - start, None)
+    if isinstance(input, SearchedDoc):
+        return LLMParamsDoc(query=input.initial_query, documents=[doc["text"] for doc in reranking_results])
     else:
-        return LLMParamsDoc(query=input.initial_query)
+        reranking_docs = []
+        for doc in reranking_results:
+            reranking_docs.append(RerankingResponseData(text=doc["text"], score=doc["score"]))
+        if isinstance(input, RerankingRequest):
+            return RerankingResponse(reranked_docs=reranking_docs)
+
+        if isinstance(input, ChatCompletionRequest):
+            input.reranked_docs = reranking_docs
+            input.documents = [doc["text"] for doc in reranking_results]
+            return input
 
 
 if __name__ == "__main__":

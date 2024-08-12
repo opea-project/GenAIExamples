@@ -163,6 +163,7 @@ class ChatQnAGateway(Gateway):
             temperature=chat_request.temperature if chat_request.temperature else 0.01,
             repetition_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 1.03,
             streaming=stream_opt,
+            chat_template=chat_request.chat_template if chat_request.chat_template else None,
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
             initial_inputs={"text": prompt}, llm_parameters=parameters

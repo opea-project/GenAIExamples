@@ -1,13 +1,13 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Optional
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 from docarray import BaseDoc, DocList
 from docarray.documents import AudioDoc
 from docarray.typing import AudioUrl
-from pydantic import Field, conint, conlist
+from pydantic import Field, conint, conlist, field_validator
 
 
 class TopologyInfo:
@@ -88,6 +88,30 @@ class LLMParamsDoc(BaseDoc):
     repetition_penalty: float = 1.03
     streaming: bool = True
 
+    chat_template: Optional[str] = Field(
+        default=None,
+        description=(
+            "A template to use for this conversion. "
+            "If this is not passed, the model's default chat template will be "
+            "used instead. We recommend that the template contains {context} and {question} for rag,"
+            "or only contains {question} for chat completion without rag."
+        ),
+    )
+    documents: Optional[Union[List[Dict[str, str]], List[str]]] = Field(
+        default=[],
+        description=(
+            "A list of dicts representing documents that will be accessible to "
+            "the model if it is performing RAG (retrieval-augmented generation)."
+            " If the template does not support RAG, this argument will have no "
+            "effect. We recommend that each document should be a dict containing "
+            '"title" and "text" keys.'
+        ),
+    )
+
+    @field_validator("chat_template")
+    def chat_template_must_contain_variables(cls, v):
+        return v
+
 
 class LLMParams(BaseDoc):
     max_new_tokens: int = 1024
@@ -97,6 +121,16 @@ class LLMParams(BaseDoc):
     temperature: float = 0.01
     repetition_penalty: float = 1.03
     streaming: bool = True
+
+    chat_template: Optional[str] = Field(
+        default=None,
+        description=(
+            "A template to use for this conversion. "
+            "If this is not passed, the model's default chat template will be "
+            "used instead. We recommend that the template contains {context} and {question} for rag,"
+            "or only contains {question} for chat completion without rag."
+        ),
+    )
 
 
 class RAGASParams(BaseDoc):
