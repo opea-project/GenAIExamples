@@ -46,7 +46,7 @@ cd ..
 
 ### 6. Build MegaService Docker Images
 
-The Productivity Suite is composed of multiple GenAIExample reference solutions composed together. 
+The Productivity Suite is composed of multiple GenAIExample reference solutions composed together.
 
 ### 6.1 Build ChatQnA MegaService Docker Images
 
@@ -81,7 +81,7 @@ docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_pro
 cd ../../..
 ```
 
-### 7. Build  UI Docker Image (Optional)
+### 7. Build UI Docker Image (Optional)
 
 Build frontend Docker image that enables via below command:
 
@@ -316,6 +316,7 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```
+
 ## 🚀 Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:

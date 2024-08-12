@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 export MONGO_HOST=10.223.24.231
 export MONGO_PORT=27017
 export DB_NAME="test"
@@ -36,4 +39,3 @@ export LLM_SERVICE_HOST_PORT_FAQGEN=9002
 export LLM_SERVICE_HOST_PORT_CODEGEN=9001
 export LLM_SERVICE_HOST_PORT_DOCSUM=9003
 export PROMPT_COLLECTION_NAME="prompt"
-
