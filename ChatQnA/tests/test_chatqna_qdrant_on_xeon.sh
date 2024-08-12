@@ -14,17 +14,17 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/retriever-qdrant:latest -f comps/retrievers/haystack/qdrant/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
-    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/dataprep-qdrant:latest -f comps/dataprep/qdrant/docker/Dockerfile .
+    # docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
+    docker build -t opea/retriever-qdrant:latest  --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/haystack/qdrant/docker/Dockerfile .
+    # docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
+    # docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build -t opea/dataprep-qdrant:latest  --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/docker/Dockerfile .
 
     cd $WORKPATH/docker
-    docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
+    # docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
 
     cd $WORKPATH/docker/ui
-    docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
+    # docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
     docker images
 }
@@ -47,7 +47,6 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
-    export MEGA_SERVICE_PORT=8912
     export EMBEDDING_SERVICE_PORT=6044
     export RETRIEVER_SERVICE_PORT=6045
     export RERANK_SERVICE_PORT=6046
@@ -117,7 +116,7 @@ function validate_microservices() {
     # tei for embedding service
     validate_services \
         "${ip_address}:6040/embed" \
-        "\[\[" \
+        "[[" \
         "tei-embedding" \
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
@@ -125,18 +124,18 @@ function validate_microservices() {
     # embedding microservice
     validate_services \
         "${ip_address}:6044/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":\[' \
+        '"text":"What is Deep Learning?","embedding":[' \
         "embedding" \
         "embedding-tei-server" \
         '{"text":"What is Deep Learning?"}'
 
-    sleep 1m # retrieval can't curl as expected, try to wait for more time
+    # sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_services \
         "${ip_address}:6045/v1/retrieval" \
-        " " \
+        "retrieved_docs" \
         "retrieval" \
         "retriever-qdrant-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
@@ -190,13 +189,10 @@ function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-#    conda remove -n ${conda_env_name} --all -y
-#    conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-#    conda install -c conda-forge nodejs -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
@@ -236,3 +232,4 @@ function main() {
 }
 
 main
+
