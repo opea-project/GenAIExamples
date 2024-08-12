@@ -306,7 +306,7 @@ curl http://${host_ip}:8008/generate \
 
 ```bash
 #vLLM Service
-curl http://${your_ip}:8008/v1/completions \
+curl http://${host_ip}:8008/v1/completions \
   -H "Content-Type: application/json" \
   -d '{
   "model": "${LLM_MODEL_ID}",
@@ -318,7 +318,7 @@ curl http://${your_ip}:8008/v1/completions \
 
 ```bash
 #vLLM-on-Ray Service
-curl http://${your_ip}:8008/v1/chat/completions \
+curl http://${host_ip}:8008/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "${LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 ```
