@@ -17,19 +17,20 @@ function build_docker_images() {
     docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
     docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
-    docker build -t vllm_ray:habana -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray .
-    docker build -t opea/llm-vllm-ray:latest -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice .
+    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
+    docker build -t opea/guardrails-tgi:latest -f comps/guardrails/llama_guard/docker/Dockerfile .
 
 #    cd ..
 #    git clone https://github.com/huggingface/tei-gaudi
 #    cd tei-gaudi/
 #    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     cd $WORKPATH/docker
-    docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
+    docker build --no-cache -t opea/chatqna-guardrails:latest -f Dockerfile_guardrails .
 
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
@@ -42,7 +43,7 @@ function start_services() {
     cd $WORKPATH
     git clone https://github.com/huggingface/tei-gaudi
     cd tei-gaudi/
-    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+    docker build --no-cache -q -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 
     cd $WORKPATH/docker/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
@@ -50,8 +51,7 @@ function start_services() {
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export vLLM_RAY_LLM_ENDPOINT="http://${ip_address}:8008"
-    export LLM_SERVICE_PORT=9000
+    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -60,29 +60,33 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export GUARDRAIL_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
+    export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+    export SAFETY_GUARD_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+    export SAFETY_GUARD_ENDPOINT="http://${ip_address}:8088"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_vllm_ray.yaml
-        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_vllm_ray.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_vllm_ray.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_vllm_ray.yaml
-        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose_vllm_ray.yaml
-        echo "cat compose_vllm_ray.yaml"
-        cat compose_vllm_ray.yaml
+        sed -i "s#image: opea/chatqna-guardrails:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_guardrails.yaml
+        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_guardrails.yaml
+        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_guardrails.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_guardrails.yaml
+        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose_guardrails.yaml
+        echo "cat compose_guardrails.yaml"
+        cat compose_guardrails.yaml
     fi
 
     # Start Docker Containers
-    docker compose -f compose_vllm_ray.yaml up -d
+    docker compose -f compose_guardrails.yaml up -d
     n=0
     until [[ "$n" -ge 400 ]]; do
-        docker logs vllm-ray-gaudi-server > vllm_ray_service_start.log
-        if grep -q Connected vllm_ray_service_start.log; then
+        docker logs tgi-gaudi-server > tgi_service_start.log
+        if grep -q Connected tgi_service_start.log; then
             break
         fi
         sleep 1s
@@ -164,21 +168,37 @@ function validate_microservices() {
         "reranking-tei-gaudi-server" \
         '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}'
 
-    # vllm-on-ray for llm service
+    # tgi for llm service
     validate_services \
-        "${ip_address}:8008/v1/chat/completions" \
-        "content" \
-        "vllm-ray-llm" \
-        "vllm-ray-gaudi-server" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi-llm" \
+        "tgi-gaudi-server" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "llm-vllm-ray-gaudi-server" \
+        "llm-tgi-gaudi-server" \
         '{"query":"What is Deep Learning?"}'
+
+    # tgi for guardrails service
+    validate_services \
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi-guardrails" \
+        "tgi-guardrails-server" \
+        '{"inputs":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}'
+
+    # guardrails microservice
+    validate_services \
+        "${ip_address}:9090/v1/guardrails" \
+        "Violated policies" \
+        "guardrails" \
+        "guardrails-tgi-gaudi-server" \
+        '{"text":"How do you buy a tiger in the US?"}'
 
 }
 
@@ -186,9 +206,9 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
         "${ip_address}:8888/v1/chatqna" \
-        "data: " \
+        "billion" \
         "mega-chatqna" \
-        "chatqna-gaudi-backend-server" \
+        "chatqna-gaudi-guardrails-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
@@ -220,7 +240,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    docker compose -f compose_vllm_ray.yaml down
+    docker compose -f compose_guardrails.yaml down
 }
 
 function main() {
