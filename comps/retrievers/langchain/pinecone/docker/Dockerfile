@@ -4,6 +4,8 @@
 
 FROM langchain/langchain:latest
 
+ARG ARCH="cpu"
+
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
     libjemalloc-dev \
@@ -15,15 +17,15 @@ RUN useradd -m -s /bin/bash user && \
 
 COPY comps /home/user/comps
 
-RUN chmod +x /home/user/comps/retrievers/langchain/pinecone/run.sh
-
 USER user
 
 RUN pip install --no-cache-dir --upgrade pip && \
+    if [ ${ARCH} = "cpu" ]; then pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
     pip install --no-cache-dir -r /home/user/comps/retrievers/langchain/pinecone/requirements.txt
+
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/retrievers/langchain/pinecone
 
-ENTRYPOINT ["/home/user/comps/retrievers/langchain/pinecone/run.sh"]
+ENTRYPOINT ["python", "retriever_pinecone.py"]
