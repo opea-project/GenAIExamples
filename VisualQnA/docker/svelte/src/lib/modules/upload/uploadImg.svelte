@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script lang="ts">
 	import { Dropzone } from "flowbite-svelte";
 
@@ -19,7 +24,7 @@
 			});
 		}
     console.log('dropHandle', value);
-    
+
 	};
 
 	const handleChange = (event) => {

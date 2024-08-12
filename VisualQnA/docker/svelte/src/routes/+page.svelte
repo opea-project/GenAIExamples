@@ -266,7 +266,7 @@
 		<!-- gallery -->
 	</div>
   </div>
-	
+
 </div>
 
 <style>

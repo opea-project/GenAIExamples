@@ -1,3 +1,8 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script lang="ts">
 	import { Card, Button, Hr, Label, Input } from "flowbite-svelte";
 	import UploadImg from "./uploadImg.svelte";
