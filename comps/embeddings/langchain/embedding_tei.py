@@ -5,7 +5,7 @@ import os
 import time
 from typing import Union
 
-from langchain_community.embeddings import HuggingFaceHubEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langsmith import traceable
 
 from comps import (
@@ -61,6 +61,6 @@ def embedding(
 
 if __name__ == "__main__":
     tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT", "http://localhost:8080")
-    embeddings = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
+    embeddings = HuggingFaceEndpointEmbeddings(model=tei_embedding_endpoint)
     print("TEI Gaudi Embedding initialized.")
     opea_microservices["opea_service@embedding_tei_langchain"].start()

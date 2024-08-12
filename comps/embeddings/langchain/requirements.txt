@@ -2,6 +2,7 @@ docarray[full]
 fastapi
 huggingface_hub
 langchain
+langchain_huggingface
 langsmith
 opentelemetry-api
 opentelemetry-exporter-otlp

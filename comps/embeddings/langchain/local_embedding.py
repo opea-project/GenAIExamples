@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 from comps import EmbedDoc, ServiceType, TextDoc, opea_microservices, opea_telemetry, register_microservice
 
@@ -23,5 +23,5 @@ def embedding(input: TextDoc) -> EmbedDoc:
 
 
 if __name__ == "__main__":
-    embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+    embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
     opea_microservices["opea_service@local_embedding"].start()
