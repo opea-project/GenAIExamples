@@ -18,7 +18,7 @@ services:
       - qdrant-vector-db
       - tei-embedding-service
     ports:
-      - "6000:6000"
+      - "6043:6000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -32,7 +32,7 @@ services:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-embedding-server
     ports:
-      - "6006:80"
+      - "6040:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -47,7 +47,7 @@ services:
     depends_on:
       - tei-embedding-service
     ports:
-      - "6000:6000"
+      - "6044:6000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -64,7 +64,7 @@ services:
     depends_on:
       - qdrant-vector-db
     ports:
-      - "7000:7000"
+      - "6045:7000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -79,7 +79,7 @@ services:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-reranking-server
     ports:
-      - "8808:80"
+      - "6041:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -97,7 +97,7 @@ services:
     depends_on:
       - tei-reranking-service
     ports:
-      - "8000:8000"
+      - "6046:8000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -115,7 +115,7 @@ services:
     image: ghcr.io/huggingface/text-generation-inference:2.1.0
     container_name: tgi-service
     ports:
-      - "9009:80"
+      - "6042:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -133,7 +133,7 @@ services:
     depends_on:
       - tgi-service
     ports:
-      - "9000:9000"
+      - "6047:9000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -160,16 +160,21 @@ services:
       - tgi-service
       - llm
     ports:
-      - "8888:8888"
+      - "8912:8888"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - MEGA_SERVICE_PORT=${MEGA_SERVICE_PORT}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
+      - EMBEDDING_SERVICE_PORT=${EMBEDDING_SERVICE_PORT}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
+      - RETRIEVER_SERVICE_PORT=${RETRIEVER_SERVICE_PORT}
       - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
+      - RERANK_SERVICE_PORT=${RERANK_SERVICE_PORT}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
     ipc: host
     restart: always
   chaqna-xeon-ui-server:
