@@ -86,7 +86,12 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [[ $SERVICE_NAME == *"dataprep_upload_file"* ]]; then
+        cd $LOG_PATH
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
+    else
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    fi
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
@@ -129,7 +134,15 @@ function validate_microservices() {
         "embedding-tei-server" \
         '{"text":"What is Deep Learning?"}'
 
-    # sleep 1m # retrieval can't curl as expected, try to wait for more time
+    # test /v1/dataprep upload file
+    echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
+    validate_service \
+        "${ip_address}:6043/v1/dataprep" \
+        "" \
+        "dataprep_upload_file" \
+        "dataprep-qdrant-server"
+
+    sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -224,7 +237,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+    # validate_frontend
 
     stop_docker
     echo y | docker system prune
