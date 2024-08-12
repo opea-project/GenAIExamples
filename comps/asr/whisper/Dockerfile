@@ -10,6 +10,7 @@ RUN useradd -m -s /bin/bash user && \
 
 # Set environment variables
 ENV LANG=en_US.UTF-8
+ARG ARCH=cpu
 
 # Install system dependencies
 RUN apt-get update \
@@ -21,6 +22,11 @@ USER user
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/comps/asr/requirements.txt && \
+    if [ "${ARCH}" = "cpu" ]; then \
+        pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r /home/user/comps/asr/requirements.txt ; \
+    else \
+        pip install --no-cache-dir -r /home/user/comps/asr/requirements.txt ; \
+    fi
     pip list
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
