@@ -129,7 +129,7 @@ jobs:
     if: ${{ fromJSON(inputs.test_compose) }}
     strategy:
       matrix:
-        hardware: ["docker-build-xeon", "docker-build-gaudi"]
+        hardware: ["xeon", "gaudi"]
       fail-fast: false
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
