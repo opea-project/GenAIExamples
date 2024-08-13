@@ -25,9 +25,7 @@ spec:
       - name: faq-tgi-cpu-deploy-demo
         env:
           - name: HUGGING_FACE_HUB_TOKEN
-            value: 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
-          - name: HF_TOKEN
-            value: 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
+            value: "insert-your-huggingface-token-here"
           - name: PORT
             value: "80"
         image: ghcr.io/huggingface/text-generation-inference:1.4

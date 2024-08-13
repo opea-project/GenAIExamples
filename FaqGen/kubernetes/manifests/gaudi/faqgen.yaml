@@ -24,7 +24,7 @@ spec:
       - name: faq-tgi-deploy-demo
         env:
           - name: HUGGING_FACE_HUB_TOKEN
-            value: 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
+            value: "insert-your-huggingface-token-here"
           - name: OMPI_MCA_btl_vader_single_copy_mechanism
             value: none
           - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
