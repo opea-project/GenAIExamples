@@ -22,22 +22,22 @@ on:
         type: boolean
       scan:
         default: true
-        description: 'Scan all examples with Trivy'
+        description: 'Scan all images with Trivy'
         required: false
         type: boolean
       test_compose:
         default: true
-        description: 'Test Examples with docker compose'
+        description: 'Test examples with docker compose'
         required: false
         type: boolean
       test_k8s:
         default: false
-        description: 'Test Examples with k8s'
+        description: 'Test examples with k8s'
         required: false
         type: boolean
       publish:
         default: false
-        description: 'Publish Images to Dockerhub'
+        description: 'Publish images to docker hub'
         required: false
         type: boolean
       publish_tags:
