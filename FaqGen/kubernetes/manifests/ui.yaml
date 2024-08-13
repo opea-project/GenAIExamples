@@ -1,0 +1,46 @@
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faq-mega-ui-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: faq-mega-ui-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: faq-mega-ui-deploy
+    spec:
+      hostIPC: true
+      containers:
+        - name: faq-mega-ui-deploy
+          env:
+            - name: DOC_BASE_URL
+              value: http://{insert_your_ip_here}:7779/v1/faqgen
+          image: opea/faqgen-ui:latest
+          imagePullPolicy: IfNotPresent
+          args: null
+          ports:
+          - containerPort: 5173
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: faq-mega-ui-svc
+spec:
+  type: NodePort
+  selector:
+    app: faq-mega-ui-deploy
+  ports:
+  - name: service
+    port: 5175
+    targetPort: 5173
+    nodePort: 30175
