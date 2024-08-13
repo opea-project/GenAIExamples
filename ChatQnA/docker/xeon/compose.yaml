@@ -119,7 +119,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-    command: --model-id ${LLM_MODEL_ID}
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
     image: opea/llm-tgi:latest
     container_name: llm-tgi-server

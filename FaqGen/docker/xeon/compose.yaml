@@ -18,7 +18,7 @@ services:
     volumes:
       - "./data:/data"
     shm_size: 1g
-    command: --model-id ${LLM_MODEL_ID}
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm_faqgen:
     image: opea/llm-faqgen-tgi:latest
     container_name: llm-faqgen-server

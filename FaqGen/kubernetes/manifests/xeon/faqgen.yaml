@@ -96,6 +96,8 @@ spec:
               value: Intel/neural-chat-7b-v3-3
             - name: PORT
               value: "80"
+            - name: CUDA_GRAPHS
+              value: "0"
             - name: http_proxy
               value:
             - name: https_proxy

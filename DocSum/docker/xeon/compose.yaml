@@ -19,7 +19,7 @@ services:
     volumes:
       - "./data:/data"
     shm_size: 1g
-    command: --model-id ${LLM_MODEL_ID}
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
     image: opea/llm-docsum-tgi:latest
     container_name: llm-docsum-server

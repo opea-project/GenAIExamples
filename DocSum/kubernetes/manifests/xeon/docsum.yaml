@@ -41,6 +41,7 @@ metadata:
 data:
   MODEL_ID: "Intel/neural-chat-7b-v3-3"
   PORT: "2080"
+  CUDA_GRAPHS: "0"
   HUGGING_FACE_HUB_TOKEN: "insert-your-huggingface-token-here"
   HF_TOKEN: "insert-your-huggingface-token-here"
   MAX_INPUT_TOKENS: "1024"
