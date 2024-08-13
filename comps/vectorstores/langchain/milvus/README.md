@@ -6,7 +6,7 @@ Configure your Milvus instance to suit your application scenarios by adjusting c
 Customized the path to store data, default is /volumes
 
 ```bash
-export DOCKER_VOLUME_DIRECTORY=./your_path
+export DOCKER_VOLUME_DIRECTORY=${your_path}
 ```
 
 ## 2. Run Milvus service
