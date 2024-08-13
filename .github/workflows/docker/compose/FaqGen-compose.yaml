@@ -7,14 +7,14 @@ services:
     build:
       context: docker
       dockerfile: ./Dockerfile
-    image: ${REGISTRY}opea/faqgen:${TAG:-latest}
+    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
   faqgen-ui:
     build:
       context: docker/ui
       dockerfile: ./docker/Dockerfile
-    image: ${REGISTRY}opea/faqgen-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
   faqgen-react-ui:
     build:
       context: docker/ui
       dockerfile: ./docker/Dockerfile.react
-    image: ${REGISTRY}opea/faqgen-react-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/faqgen-react-ui:${TAG:-latest}

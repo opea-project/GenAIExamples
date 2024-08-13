@@ -48,7 +48,7 @@ function start_services() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export LLM_MODEL_ID_CODEGEN="codellama/CodeLlama-7b-hf"
+    export LLM_MODEL_ID_CODEGEN="meta-llama/CodeLlama-7b-hf"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:9009"
@@ -69,9 +69,6 @@ function start_services() {
     export TGI_LLM_ENDPOINT_CODEGEN="http://${ip_address}:8028"
     export TGI_LLM_ENDPOINT_FAQGEN="http://${ip_address}:9009"
     export TGI_LLM_ENDPOINT_DOCSUM="http://${ip_address}:9009"
-    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get_file"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/delete_file"
     export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${ip_address}:8888/v1/chatqna"
     export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${ip_address}:8889/v1/faqgen"
     export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
@@ -89,9 +86,9 @@ function start_services() {
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/chatqna:latest#image: opea/faqgen:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/chatqna:latest#image: opea/codegen:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/chatqna:latest#image: opea/faqgen:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/faqgen:latest#image: opea/faqgen:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/faqgen:latest#image: opea/faqgen:${IMAGE_TAG}#g" compose.yaml
         # TODO
         # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose.yaml
@@ -183,9 +180,6 @@ function validate_microservices() {
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-redis-server"
-    
-    #TODO test Chat History
-    #TODO test prompt Registry
 
     # test /v1/dataprep upload link
     validate_service \
@@ -381,8 +375,8 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    # if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
-    # start_time=$(date +%s)
+    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
     duration=$((end_time-start_time))

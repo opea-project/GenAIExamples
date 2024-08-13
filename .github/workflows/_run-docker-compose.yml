@@ -63,6 +63,7 @@ jobs:
     strategy:
       matrix:
         test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
+      fail-fast: false
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
     steps:
@@ -84,6 +85,7 @@ jobs:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
           example: ${{ inputs.example }}
@@ -99,7 +101,10 @@ jobs:
         if: cancelled() || failure()
         run: |
           cd ${{ github.workspace }}/${{ inputs.example }}/docker/${{ inputs.hardware }}
-          docker compose stop && docker compose rm -f
+          yaml_files=$(find . -type f -name "*compose*yaml")
+          for file in $yaml_files; do
+              docker compose -f ${file} stop && docker compose -f ${file} rm -f || true
+          done
           docker system prune -f
           docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
 
