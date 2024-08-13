@@ -20,8 +20,6 @@ spec:
         app: faq-tgi-cpu-deploy
     spec:
       hostIPC: true
-      nodeSelector:
-        disktype: yyy
       securityContext: {}
       containers:
       - name: faq-tgi-cpu-deploy-demo
@@ -91,8 +89,6 @@ spec:
         app: faq-micro-cpu-deploy
     spec:
       hostIPC: true
-      nodeSelector:
-        disktype: yyy
       containers:
         - name: faq-micro-cpu-deploy
           env:
@@ -137,8 +133,6 @@ spec:
       labels:
         app: faq-mega-server-cpu-deploy
     spec:
-      nodeSelector:
-        disktype: yyy
       hostIPC: true
       containers:
         - name: faq-mega-server-cpu-deploy

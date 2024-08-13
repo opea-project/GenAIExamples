@@ -18,8 +18,6 @@ spec:
       labels:
         app: faq-mega-ui-deploy
     spec:
-      nodeSelector:
-        disktype: yyy
       hostIPC: true
       containers:
         - name: faq-mega-ui-deploy
