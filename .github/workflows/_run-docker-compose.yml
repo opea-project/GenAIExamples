@@ -84,6 +84,7 @@ jobs:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
           example: ${{ inputs.example }}
