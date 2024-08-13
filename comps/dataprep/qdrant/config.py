@@ -7,7 +7,7 @@ import os
 EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 
 # Qdrant configuration
-QDRANT_HOST = os.getenv("QDRANT", "localhost")
+QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", 6333))
 COLLECTION_NAME = os.getenv("COLLECTION_NAME", "rag-qdrant")
 

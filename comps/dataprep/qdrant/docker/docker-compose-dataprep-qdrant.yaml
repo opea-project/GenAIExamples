@@ -9,19 +9,36 @@ services:
     ports:
       - "6333:6333"
       - "6334:6334"
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-embedding-server
+    ports:
+      - "6006:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   dataprep-qdrant:
     image: opea/gen-ai-comps:dataprep-qdrant-xeon-server
     container_name: dataprep-qdrant-server
+    depends_on:
+      - qdrant-vector-db
+      - tei-embedding-service
     ports:
-      - "6000:6000"
+      - "6007:6007"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      QDRANT: ${QDRANT}
+      QDRANT_HOST: ${QDRANT_HOST}
       QDRANT_PORT: ${QDRANT_PORT}
       COLLECTION_NAME: ${COLLECTION_NAME}
+      TEI_ENDPOINT: ${TEI_ENDPOINT}
     restart: unless-stopped
 
 networks:
