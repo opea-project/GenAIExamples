@@ -100,6 +100,7 @@ Build vLLM docker.
 git clone https://github.com/vllm-project/vllm.git
 cd ./vllm/
 docker build --no-cache -t opea/vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu .
+cd ..
 ```
 
 Build microservice.
@@ -293,6 +294,10 @@ curl http://${host_ip}:8000/v1/reranking\
 
 6. LLM backend Service
 
+In first startup, this service will take more time to download the LLM file. After it's finished, the service will be ready.
+
+Use `docker logs CONTAINER_ID` to check if the download is finished.
+
 ```bash
 # TGI service
 curl http://${host_ip}:9009/generate \
@@ -309,6 +314,8 @@ curl http://${host_ip}:9009/v1/completions \
 ```
 
 7. LLM Microservice
+
+This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
 ```bash
 curl http://${host_ip}:9000/v1/chat/completions\
@@ -329,7 +336,7 @@ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
 
 If you want to update the default knowledge base, you can use the following commands:
 
-Update Knowledge Base via Local File Upload:
+Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) Upload:
 
 ```bash
 curl -X POST "http://${host_ip}:6007/v1/dataprep" \

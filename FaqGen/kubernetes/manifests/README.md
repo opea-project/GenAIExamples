@@ -23,13 +23,24 @@ sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" faqg
 kubectl apply -f faqgen.yaml
 ```
 
+## Deploy UI
+
+```
+cd GenAIExamples/FaqGen/kubernetes/manifests/
+kubectl get svc # get ip address
+ip_address="" # according to your svc address
+sed -i "s/insert_your_ip_here/${ip_address}/g" ui.yaml
+kubectl apply -f ui.yaml
+```
+
 ## Verify Services
 
 Make sure all the pods are running, and restart the faqgen-xxxx pod if necessary.
 
 ```
 kubectl get pods
-curl http://${host_ip}:8888/v1/faqgen -H "Content-Type: application/json" -d '{
+port=7779 # 7779 for gaudi, 7778 for xeon
+curl http://${host_ip}:7779/v1/faqgen -H "Content-Type: application/json" -d '{
      "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
      }'
 ```
