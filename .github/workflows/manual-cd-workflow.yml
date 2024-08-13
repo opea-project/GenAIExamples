@@ -41,7 +41,7 @@ on:
         required: false
         type: boolean
       publish_tags:
-        default: "latest,v0.9"
+        default: "latest,v1.0"
         description: 'Tag list apply to publish images'
         required: false
         type: string
@@ -75,5 +75,5 @@ jobs:
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_k8s: ${{ fromJSON(inputs.test_k8s) }}
       publish: ${{ fromJSON(inputs.publish) }}
-      publish_tags: ${{ fromJSON(inputs.publish_tags) }}
+      publish_tags: ${{ inputs.publish_tags }}
     secrets: inherit
