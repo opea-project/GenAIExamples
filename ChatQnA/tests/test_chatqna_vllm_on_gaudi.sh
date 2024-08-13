@@ -50,7 +50,7 @@ function start_services() {
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export vLLM_LLM_ENDPOINT="http://${ip_address}:8008"
+    export vLLM_LLM_ENDPOINT="http://${ip_address}:8007"
     export LLM_SERVICE_PORT=9000
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
@@ -166,7 +166,7 @@ function validate_microservices() {
 
     # vllm for llm service
     validate_services \
-        "${ip_address}:8008/v1/completions" \
+        "${ip_address}:8007/v1/completions" \
         "text" \
         "vllm-llm" \
         "vllm-gaudi-server" \
@@ -186,7 +186,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
         "${ip_address}:8888/v1/chatqna" \
-        "billion" \
+        "data:" \
         "mega-chatqna" \
         "chatqna-gaudi-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'

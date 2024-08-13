@@ -50,7 +50,7 @@ function start_services() {
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export vLLM_RAY_LLM_ENDPOINT="http://${ip_address}:8008"
+    export vLLM_RAY_LLM_ENDPOINT="http://${ip_address}:8006"
     export LLM_SERVICE_PORT=9000
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
@@ -167,7 +167,7 @@ function validate_microservices() {
 
     # vllm-on-ray for llm service
     validate_services \
-        "${ip_address}:8008/v1/chat/completions" \
+        "${ip_address}:8006/v1/chat/completions" \
         "content" \
         "vllm-ray-llm" \
         "vllm-ray-gaudi-server" \

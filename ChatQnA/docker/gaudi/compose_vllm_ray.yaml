@@ -112,7 +112,7 @@ services:
     image: opea/llm-vllm-ray-hpu:latest
     container_name: vllm-ray-gaudi-server
     ports:
-      - "8008:8000"
+      - "8006:8000"
     volumes:
       - "./data:/data"
     environment:
