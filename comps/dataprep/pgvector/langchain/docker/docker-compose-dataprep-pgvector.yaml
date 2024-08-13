@@ -16,6 +16,9 @@ services:
       - POSTGRES_USER=testuser
       - POSTGRES_PASSWORD=testpwd
       - POSTGRES_HOST_AUTH_METHOD=trust
+      - no_proxy= ${no_proxy}
+      - http_proxy= ${http_proxy}
+      - https_proxy= ${https_proxy}
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
