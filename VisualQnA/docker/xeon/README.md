@@ -68,15 +68,20 @@ docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$htt
 cd ../../../..
 ```
 
-### 4. Pull TGI image
+### 5. Build TGI Xeon Image
+
+Since TGI official image has not supported llava-next for CPU, we'll need to build it based on Dockerfile_intel.
 
 ```bash
-docker pull ghcr.io/huggingface/text-generation-inference:2.2.0
+git clone https://github.com/huggingface/text-generation-inference
+cd text-generation-inference/
+docker build -t opea/llava-tgi-xeon:latest --build-arg PLATFORM=cpu --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} . -f Dockerfile_intel
+cd ../
 ```
 
 Then run the command `docker images`, you will have the following 4 Docker Images:
 
-1. `ghcr.io/huggingface/text-generation-inference:2.2.0`
+1. `opea/llava-tgi-xeon:latest`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`
