@@ -107,14 +107,17 @@ jobs:
         run: docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
 
       - name: Scan Container
+        env:
+          OPEA_IMAGE_REPO: ${OPEA_IMAGE_REPO}
         uses: opea-project/validation/actions/trivy-scan@main
         with:
-          image-ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output: ${{ inputs.example }}-${{ matrix.image }}-scan.txt
 
       - name: Cleanup
         if: always()
         run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+
       - uses: actions/upload-artifact@v4.3.4
         with:
           name: ${{ inputs.example }}-scan
