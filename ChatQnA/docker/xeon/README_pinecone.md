@@ -148,7 +148,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 ### Setup Environment Variables
 
-Since the `docker_compose_pinecone.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose_pinecone.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
@@ -212,7 +212,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/xeon/
-docker compose -f docker_compose_pinecone.yaml up -d
+docker compose -f compose_pinecone.yaml up -d
 ```
 
 ### Validate Microservices
@@ -330,7 +330,7 @@ curl -X POST "http://${host_ip}:6008/v1/dataprep/get_file" \
 
 ## Enable LangSmith for Monotoring Application (Optional)
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose_pinecone.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
+LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose_pinecone.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
 
 Here's how you can do it:
 
