@@ -42,12 +42,12 @@ jobs:
 # Image Build
 ####################################################################################################
   build-images:
-    if: ${{ fromJSON(inputs.build) }}
     strategy:
       matrix:
         node: ["docker-build-xeon", "docker-build-gaudi"]
     runs-on: ${{ matrix.node }}
     continue-on-error: true
+    if: ${{ fromJSON(inputs.build) }}
     steps:
       - name: Clean Up Working Directory
         run: |
@@ -69,7 +69,7 @@ jobs:
 ####################################################################################################
   image-list:
     needs: [ build-images ]
-    if: always() && ${{ fromJSON(inputs.scan) }}
+    if: ${{ fromJSON(inputs.scan) }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.scan-matrix.outputs.matrix }}
@@ -91,7 +91,7 @@ jobs:
 
   scan-images:
     needs: [image-list]
-    if: always() && ${{ fromJSON(inputs.scan) }}
+    if: ${{ fromJSON(inputs.scan) }}
     runs-on: "docker-build-gaudi"
     strategy:
       matrix:
@@ -120,7 +120,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4.3.4
         with:
-          name: ${{ inputs.example }}-scan
+          name: ${{ inputs.example }}-${{ matrix.image }}-scan
           path: ${{ inputs.example }}-${{ matrix.image }}-scan.txt
           overwrite: true
 
