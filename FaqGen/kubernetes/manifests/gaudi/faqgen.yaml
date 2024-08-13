@@ -52,9 +52,9 @@ spec:
         - '3096'
         - --max-total-tokens
         - '4096'
-        - --max-batch-total-tokens 
+        - --max-batch-total-tokens
         - '65536'
-        - --max-batch-prefill-tokens 
+        - --max-batch-prefill-tokens
         - '4096'
         volumeMounts:
         - mountPath: /data
