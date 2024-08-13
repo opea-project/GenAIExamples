@@ -2,6 +2,7 @@ docarray[full]
 fastapi
 huggingface_hub
 langsmith
+llama-index-embeddings-huggingface-api
 llama-index-embeddings-text-embeddings-inference
 opentelemetry-api
 opentelemetry-exporter-otlp
