@@ -16,7 +16,7 @@ from sentence_transformers import CrossEncoder
 from torch.utils.data import DataLoader
 from tqdm.autonotebook import tqdm, trange
 
-DEFAULT_MODEL = "/root/bge-reranker-large"
+DEFAULT_MODEL = "/home/user/bge-reranker-large"
 
 
 class MyCrossEncoder(CrossEncoder):

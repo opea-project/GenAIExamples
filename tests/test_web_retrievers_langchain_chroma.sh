@@ -31,12 +31,18 @@ function validate_microservice() {
     retriever_port=5019
     export PATH="${HOME}/miniforge3/bin:$PATH"
     test_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-    http_proxy='' curl http://${ip_address}:$retriever_port/v1/web_retrieval \
+    result=$(http_proxy='' curl http://${ip_address}:$retriever_port/v1/web_retrieval \
         -X POST \
         -d "{\"text\":\"What is OPEA?\",\"embedding\":${test_embedding}}" \
-        -H 'Content-Type: application/json'
-    docker logs test-comps-web-retriever-tei-endpoint
-    docker logs test-comps-web-retriever-chroma-server
+        -H 'Content-Type: application/json')
+    if [[ $result == *"title"* ]]; then
+        echo "Result correct."
+    else
+        echo "Result wrong. Received status was $result"
+        docker logs test-comps-web-retriever-tei-endpoint
+        docker logs test-comps-web-retriever-chroma-server
+        exit 1
+    fi
 }
 
 function stop_docker() {

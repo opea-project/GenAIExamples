@@ -32,12 +32,18 @@ function start_service() {
 
 function validate_microservice() {
     mosec_service_port=5007
-    http_proxy="" curl http://${ip_address}:${mosec_service_port}/v1/reranking\
+    result=$(http_proxy="" curl http://${ip_address}:${mosec_service_port}/v1/reranking\
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-        -H 'Content-Type: application/json'
-    docker logs test-comps-reranking-langchain-mosec-server
-    docker logs test-comps-reranking-langchain-mosec-endpoint
+        -H 'Content-Type: application/json')
+    if [[ $result == *"Human"* ]]; then
+        echo "Result correct."
+    else
+        echo "Result wrong. Received was $result"
+        docker logs test-comps-reranking-langchain-mosec-endpoint
+        docker logs test-comps-reranking-langchain-mosec-server
+        exit 1
+    fi
 }
 
 function stop_docker() {
