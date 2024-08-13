@@ -29,8 +29,8 @@ kubectl apply -f faqgen.yaml
 cd GenAIExamples/FaqGen/kubernetes/manifests/
 kubectl get svc # get ip address
 ip_address="" # according to your svc address
-sed -i "s/insert_your_ip_here/${ip_address}/g" faqgen.yaml
-kubectl apply -f faqgen.yaml
+sed -i "s/insert_your_ip_here/${ip_address}/g" ui.yaml
+kubectl apply -f ui.yaml
 ```
 
 ## Verify Services
