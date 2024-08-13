@@ -4,28 +4,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: faq-mega-cpu-ui-deploy
+  name: faq-mega-ui-deploy
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: faq-mega-cpu-ui-deploy
+      app: faq-mega-ui-deploy
   template:
     metadata:
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: 'true'
       labels:
-        app: faq-mega-cpu-ui-deploy
+        app: faq-mega-ui-deploy
     spec:
       nodeSelector:
         disktype: yyy
       hostIPC: true
       containers:
-        - name: faq-mega-cpu-ui-deploy
+        - name: faq-mega-ui-deploy
           env:
             - name: DOC_BASE_URL
-              value: http://10.99.191.196:7779/v1/faqgen
+              value: http://{insert_your_ip_here}:7779/v1/faqgen
           image: opea/faqgen-ui:latest
           imagePullPolicy: IfNotPresent
           args: null
@@ -36,13 +36,13 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: faq-mega-cpu-ui-svc
+  name: faq-mega-ui-svc
 spec:
   type: NodePort
   selector:
-    app: faq-mega-cpu-ui-deploy
+    app: faq-mega-ui-deploy
   ports:
   - name: service
-    port: 5176
+    port: 5175
     targetPort: 5173
-    nodePort: 30176
+    nodePort: 30175
