@@ -22,6 +22,7 @@ psycopg2-binary
 pymupdf
 pyspark
 python-docx
+python-multipart
 python-pptx
 sentence_transformers
 shortuuid
