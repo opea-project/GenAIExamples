@@ -26,20 +26,15 @@ function build_docker_images() {
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
-#    cd $WORKPATH
-#    git clone https://github.com/vllm-project/vllm.git
-#    cd vllm
-#    docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
+    cd $WORKPATH
+    git clone https://github.com/vllm-project/vllm.git
+    cd vllm
+    docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
 
     docker images
 }
 
 function start_services() {
-    # build vllm for each test instead of pull from local registry
-    cd $WORKPATH
-    git clone https://github.com/vllm-project/vllm.git
-    cd vllm
-    docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
 
     cd $WORKPATH/docker/xeon
 
@@ -79,12 +74,12 @@ function start_services() {
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d
     n=0
-    until [[ "$n" -ge 100 ]]; do
+    until [[ "$n" -ge 10 ]]; do
         docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log
         if grep -q Connected ${LOG_PATH}/vllm_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 10s
         n=$((n+1))
     done
 }
