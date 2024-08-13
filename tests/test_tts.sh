@@ -10,8 +10,8 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build -t opea/speecht5:comps -f comps/tts/speecht5/Dockerfile .
-    docker build -t opea/tts:comps -f comps/tts/Dockerfile .
+    docker build --no-cache -t opea/speecht5:comps -f comps/tts/speecht5/Dockerfile .
+    docker build --no-cache -t opea/tts:comps -f comps/tts/Dockerfile .
 }
 
 function start_service() {

@@ -10,8 +10,8 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build -t opea/whisper:comps -f comps/asr/whisper/Dockerfile .
-    docker build -t opea/asr:comps -f comps/asr/Dockerfile .
+    docker build --no-cache -t opea/whisper:comps -f comps/asr/whisper/Dockerfile .
+    docker build --no-cache -t opea/asr:comps -f comps/asr/Dockerfile .
 }
 
 function start_service() {

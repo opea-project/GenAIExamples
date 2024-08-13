@@ -33,6 +33,7 @@ jobs:
         run: |
           sudo rm -rf ${{github.workspace}}/*
           docker system prune -f
+          docker rmi $(docker images --filter reference="*/*:comps" -q) || true
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
