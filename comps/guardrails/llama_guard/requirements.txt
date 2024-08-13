@@ -1,6 +1,7 @@
 docarray[full]
 fastapi
-huggingface_hub
+# Fix for issue with langchain-huggingface not using InferenceClient `base_url` kwarg
+huggingface-hub<=0.24.0
 langchain-community
 langchain-huggingface
 langsmith

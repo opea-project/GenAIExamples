@@ -36,7 +36,7 @@ pip install -r requirements.txt
 export HF_TOKEN=${your_hf_api_token}
 export LANGCHAIN_TRACING_V2=true
 export LANGCHAIN_API_KEY=${your_langchain_api_key}
-export LANGCHAIN_PROJECT="opea/gaurdrails"
+export LANGCHAIN_PROJECT="opea/guardrails"
 volume=$PWD/data
 model_id="meta-llama/Meta-Llama-Guard-2-8B"
 docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1

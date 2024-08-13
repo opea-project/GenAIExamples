@@ -2,13 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from typing import List, Union
 
 from langchain_community.utilities.requests import JsonRequestsWrapper
 from langchain_huggingface import ChatHuggingFace
 from langchain_huggingface.llms import HuggingFaceEndpoint
 from langsmith import traceable
 
-from comps import ServiceType, TextDoc, opea_microservices, register_microservice
+from comps import GeneratedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
 
 DEFAULT_MODEL = "meta-llama/LlamaGuard-7b"
 
@@ -59,12 +60,17 @@ def get_tgi_service_model_id(endpoint_url, default=DEFAULT_MODEL):
     endpoint="/v1/guardrails",
     host="0.0.0.0",
     port=9090,
-    input_datatype=TextDoc,
+    input_datatype=Union[GeneratedDoc, TextDoc],
     output_datatype=TextDoc,
 )
 @traceable(run_type="llm")
-def safety_guard(input: TextDoc) -> TextDoc:
-    response_input_guard = llm_engine_hf.invoke([{"role": "user", "content": input.text}]).content
+def safety_guard(input: Union[GeneratedDoc, TextDoc]) -> TextDoc:
+    if isinstance(input, GeneratedDoc):
+        messages = [{"role": "user", "content": input.prompt}, {"role": "assistant", "content": input.text}]
+    else:
+        messages = [{"role": "user", "content": input.text}]
+    response_input_guard = llm_engine_hf.invoke(messages).content
+
     if "unsafe" in response_input_guard:
         unsafe_dict = get_unsafe_dict(llm_engine_hf.model_id)
         policy_violation_level = response_input_guard.split("\n")[1].strip()
@@ -75,7 +81,6 @@ def safety_guard(input: TextDoc) -> TextDoc:
         )
     else:
         res = TextDoc(text=input.text)
-
     return res
 
 
