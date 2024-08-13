@@ -69,7 +69,7 @@ jobs:
 ####################################################################################################
   image-list:
     needs: [ build-images ]
-    if: ${{ fromJSON(inputs.scan) }}
+    if: always() && ${{ fromJSON(inputs.scan) }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.scan-matrix.outputs.matrix }}
@@ -91,7 +91,7 @@ jobs:
 
   scan-images:
     needs: [image-list]
-    if: ${{ fromJSON(inputs.scan) }}
+    if: always() && ${{ fromJSON(inputs.scan) }}
     runs-on: "docker-build-gaudi"
     strategy:
       matrix:
@@ -104,11 +104,11 @@ jobs:
           egress-policy: audit
 
       - name: Pull Image
-        run: docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+        run: |
+          docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
 
       - name: Scan Container
-        env:
-          OPEA_IMAGE_REPO: ${OPEA_IMAGE_REPO}
         uses: opea-project/validation/actions/trivy-scan@main
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
@@ -129,7 +129,7 @@ jobs:
 ####################################################################################################
   test-example-compose:
     needs: [build-images]
-    if: ${{ fromJSON(inputs.test_compose) }}
+    if: always() && ${{ fromJSON(inputs.test_compose) }}
     strategy:
       matrix:
         hardware: ["xeon", "gaudi"]
@@ -153,7 +153,7 @@ jobs:
 ####################################################################################################
   publish:
     needs: [image-list, build-images, scan-images, test-example-compose]
-    if: ${{ fromJSON(inputs.publish) }}
+    if: always() && ${{ fromJSON(inputs.publish) }}
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
