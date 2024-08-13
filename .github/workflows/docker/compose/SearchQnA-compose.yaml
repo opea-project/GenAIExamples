@@ -7,9 +7,9 @@ services:
     build:
       context: docker
       dockerfile: ./Dockerfile
-    image: ${REGISTRY}opea/searchqna:${TAG:-latest}
+    image: ${REGISTRY:-opea}/searchqna:${TAG:-latest}
   searchqna-ui:
     build:
       context: docker/ui
       dockerfile: ./docker/Dockerfile
-    image: ${REGISTRY}opea/searchqna-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}

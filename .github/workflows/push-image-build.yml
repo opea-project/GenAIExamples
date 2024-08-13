@@ -54,4 +54,4 @@ jobs:
         with:
           work_dir: ${{ github.workspace }}/${{ matrix.workload }}
           docker_compose_path: ${{ env.docker_compose_path }}
-          registry: ${OPEA_IMAGE_REPO}
+          registry: ${OPEA_IMAGE_REPO}opea

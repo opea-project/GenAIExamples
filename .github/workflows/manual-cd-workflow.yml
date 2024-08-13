@@ -1,0 +1,79 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Examples CD workflow on manual event
+on:
+  workflow_dispatch:
+    inputs:
+      examples:
+        default: "AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation"
+        description: 'List of examples to test'
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+      build:
+        default: true
+        description: 'Build test required images for Examples'
+        required: false
+        type: boolean
+      scan:
+        default: true
+        description: 'Scan all images with Trivy'
+        required: false
+        type: boolean
+      test_compose:
+        default: true
+        description: 'Test examples with docker compose'
+        required: false
+        type: boolean
+      test_k8s:
+        default: false
+        description: 'Test examples with k8s'
+        required: false
+        type: boolean
+      publish:
+        default: false
+        description: 'Publish images to docker hub'
+        required: false
+        type: boolean
+      publish_tags:
+        default: "latest,v0.9"
+        description: 'Tag list apply to publish images'
+        required: false
+        type: string
+
+permissions: read-all
+jobs:
+  get-test-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.get-matrix.outputs.matrix }}
+    steps:
+    - name: Create Matrix
+      id: get-matrix
+      run: |
+        examples=($(echo ${{ github.event.inputs.examples }} | tr ',' ' '))
+        examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "matrix=$examples_json" >> $GITHUB_OUTPUT
+
+  run-examples:
+    needs: [get-test-matrix]
+    strategy:
+      matrix:
+        example: ${{ fromJson(needs.get-test-matrix.outputs.matrix) }}
+      fail-fast: false
+    uses: ./.github/workflows/_example-workflow.yml
+    with:
+      example: ${{ matrix.example }}
+      tag: ${{ inputs.tag }}
+      build: ${{ fromJSON(inputs.build) }}
+      scan: ${{ fromJSON(inputs.scan) }}
+      test_compose: ${{ fromJSON(inputs.test_compose) }}
+      test_k8s: ${{ fromJSON(inputs.test_k8s) }}
+      publish: ${{ fromJSON(inputs.publish) }}
+      publish_tags: ${{ fromJSON(inputs.publish_tags) }}
+    secrets: inherit

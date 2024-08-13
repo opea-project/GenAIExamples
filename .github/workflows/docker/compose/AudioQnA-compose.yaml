@@ -7,4 +7,4 @@ services:
     build:
       context: docker
       dockerfile: ./Dockerfile
-    image: ${REGISTRY}opea/audioqna:${TAG:-latest}
+    image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}

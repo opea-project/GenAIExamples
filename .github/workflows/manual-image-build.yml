@@ -74,5 +74,5 @@ jobs:
         with:
           work_dir: ${{ github.workspace }}/${{ matrix.service }}
           docker_compose_path: ${{ github.workspace }}/.github/workflows/docker/compose/${{ matrix.service }}-compose.yaml
-          registry: ${{ env.image_repo }}
+          registry: ${{ env.image_repo }}opea
           tag: ${{ github.event.inputs.tag }}
