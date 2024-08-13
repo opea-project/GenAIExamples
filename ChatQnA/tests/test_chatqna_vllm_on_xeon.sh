@@ -26,15 +26,19 @@ function build_docker_images() {
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
-    cd $WORKPATH
-    git clone https://github.com/vllm-project/vllm.git
-    cd vllm
-    docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
+    # cd $WORKPATH
+    # git clone https://github.com/vllm-project/vllm.git
+    # cd vllm
+    # docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
 
     docker images
 }
 
 function start_services() {
+    cd $WORKPATH
+    git clone https://github.com/vllm-project/vllm.git
+    cd vllm
+    docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
 
     cd $WORKPATH/docker/xeon
 
