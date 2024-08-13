@@ -17,7 +17,7 @@ function start_service() {
     export POSTGRES_PASSWORD=testpwd
     export POSTGRES_DB=vectordb
 
-    docker run --name test-vectorstore-postgres -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=${POSTGRES_DB} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d -v $WORKPATH/comps/vectorstores/langchain/pgvector/init.sql:/docker-entrypoint-initdb.d/init.sql -p 5432:5432 pgvector/pgvector:0.7.0-pg16
+    docker run --name test-comps-vectorstore-postgres -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=${POSTGRES_DB} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d -v $WORKPATH/comps/vectorstores/langchain/pgvector/init.sql:/docker-entrypoint-initdb.d/init.sql -p 5432:5432 pgvector/pgvector:0.7.0-pg16
     sleep 10s
 
     # tei endpoint
@@ -41,7 +41,7 @@ function validate_microservice() {
         -X POST \
         -d "{\"text\":\"test\",\"embedding\":${test_embedding}}" \
         -H 'Content-Type: application/json'
-    docker logs test-vectorstore-postgres
+    docker logs test-comps-vectorstore-postgres
     docker logs test-comps-retriever-tei-endpoint
 }
 
@@ -51,7 +51,7 @@ function stop_docker() {
         docker stop $cid_retrievers && docker rm $cid_retrievers && sleep 1s
     fi
 
-    cid_redis=$(docker ps -aq --filter "name=test-vectorstore-postgres")
+    cid_redis=$(docker ps -aq --filter "name=test-comps-vectorstore-postgres")
     if [[ ! -z "$cid_redis" ]]; then
         docker stop $cid_redis && docker rm $cid_redis && sleep 1s
     fi

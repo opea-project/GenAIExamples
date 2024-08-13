@@ -13,7 +13,7 @@ function build_docker_images() {
     docker build \
         -f comps/llms/text-generation/ray_serve/docker/Dockerfile.rayserve \
         --network=host \
-        -t ray_serve:habana .
+        -t ray_serve_habana:comps .
 
     ## Build OPEA microservice docker
     cd $WORKPATH

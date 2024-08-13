@@ -12,7 +12,7 @@ function build_docker_images() {
     echo "Building the docker images"
     cd $WORKPATH
     echo $WORKPATH
-    docker build -t opea/comps-agent-langchain:latest -f comps/agent/langchain/docker/Dockerfile .
+    docker build -t opea/comps-agent-langchain:comps -f comps/agent/langchain/docker/Dockerfile .
 
 }
 
@@ -24,19 +24,19 @@ function start_service() {
 
     #single card
     echo "start tgi gaudi service"
-    docker run -d --runtime=habana --name "comps-tgi-gaudi-service" -p 8080:80 -v ./data:/data -e HF_TOKEN=$HF_TOKEN -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:latest --model-id $model --max-input-tokens 4096 --max-total-tokens 8092
+    docker run -d --runtime=habana --name "test-comps-tgi-gaudi-service" -p 8080:80 -v ./data:/data -e HF_TOKEN=$HF_TOKEN -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:latest --model-id $model --max-input-tokens 4096 --max-total-tokens 8092
     sleep 5s
-    docker logs comps-tgi-gaudi-service
+    docker logs test-comps-tgi-gaudi-service
 
     echo "Starting agent microservice"
-    docker run -d --runtime=runc --name="comps-langchain-agent-endpoint" -v $WORKPATH/comps/agent/langchain/tools:/home/user/comps/agent/langchain/tools -p 9090:9090 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e strategy=react -e llm_endpoint_url=http://${ip_address}:8080 -e llm_engine=tgi -e recursion_limit=5 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/comps-agent-langchain:latest
+    docker run -d --runtime=runc --name="test-comps-langchain-agent-endpoint" -v $WORKPATH/comps/agent/langchain/tools:/home/user/comps/agent/langchain/tools -p 9090:9090 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e strategy=react -e llm_endpoint_url=http://${ip_address}:8080 -e llm_engine=tgi -e recursion_limit=5 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/comps-agent-langchain:comps
     sleep 5s
-    docker logs comps-langchain-agent-endpoint
+    docker logs test-comps-langchain-agent-endpoint
 
     echo "Waiting tgi gaudi ready"
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
-        docker logs comps-tgi-gaudi-service > ${WORKPATH}/tests/tgi-gaudi-service.log
+        docker logs test-comps-tgi-gaudi-service > ${WORKPATH}/tests/tgi-gaudi-service.log
         n=$((n+1))
         if grep -q Connected ${WORKPATH}/tests/tgi-gaudi-service.log; then
             break
@@ -44,7 +44,7 @@ function start_service() {
         sleep 5s
     done
     sleep 5s
-    docker logs comps-tgi-gaudi-service
+    docker logs test-comps-tgi-gaudi-service
     echo "Service started successfully"
 }
 
@@ -72,17 +72,17 @@ function validate_microservice() {
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
-        docker logs comps-tgi-gaudi-service &> ${LOG_PATH}/test-comps-tgi-gaudi-service.log
-        docker logs comps-langchain-agent-endpoint &> ${LOG_PATH}/test-comps-langchain-agent-endpoint.log
+        docker logs test-comps-tgi-gaudi-service &> ${LOG_PATH}/test-comps-tgi-gaudi-service.log
+        docker logs test-comps-langchain-agent-endpoint &> ${LOG_PATH}/test-comps-langchain-agent-endpoint.log
         exit 1
     fi
 }
 
 function stop_docker() {
-    cid=$(docker ps -aq --filter "name=comps-tgi-gaudi-service")
+    cid=$(docker ps -aq --filter "name=test-comps-tgi-gaudi-service")
     echo "Stopping the docker containers "${cid}
     if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
-    cid=$(docker ps -aq --filter "name=comps-langchain-agent-endpoint")
+    cid=$(docker ps -aq --filter "name=test-comps-langchain-agent-endpoint")
     echo "Stopping the docker containers "${cid}
     if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
     echo "Docker containers stopped successfully"

@@ -10,13 +10,13 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     echo "Start building docker images for microservice"
     cd $WORKPATH
-    docker build -t opea/guardrails-pii-detection:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/pii_detection/docker/Dockerfile .
+    docker build -t opea/guardrails-pii-detection:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/pii_detection/docker/Dockerfile .
     echo "Docker images built"
 }
 
 function start_service() {
     echo "Starting microservice"
-    docker run -d --runtime=runc --name="test-guardrails-pii-detection-endpoint" -p 6357:6357 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/guardrails-pii-detection:latest
+    docker run -d --runtime=runc --name="test-comps-guardrails-pii-detection-endpoint" -p 6357:6357 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/guardrails-pii-detection:comps
     sleep 5
     echo "Microservice started"
 }
@@ -34,11 +34,11 @@ function validate_microservice() {
     echo "test 4 - 20 tasks in parallel - ml"
     python comps/guardrails/pii_detection/test.py --test_text --batch_size 20 --ip_addr $ip_address --strategy ml
     echo "Validate microservice completed"
-    docker logs test-guardrails-pii-detection-endpoint
+    docker logs test-comps-guardrails-pii-detection-endpoint
 }
 
 function stop_docker() {
-    cid=$(docker ps -aq --filter "name=test-guardrails-pii-detection-endpoint")
+    cid=$(docker ps -aq --filter "name=test-comps-guardrails-pii-detection-endpoint")
     echo "Shutdown legacy containers "$cid
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 }

@@ -12,7 +12,7 @@ function build_docker_images() {
     cd $WORKPATH/comps/llms/text-generation/vllm
     docker build \
         -f docker/Dockerfile.hpu \
-        -t opea/vllm:hpu \
+        -t opea/vllm-hpu:comps \
         --shm-size=128g .
 
     ## Build OPEA microservice docker
@@ -35,7 +35,7 @@ function start_service() {
         --cap-add=sys_nice \
         --ipc=host \
         -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
-        opea/vllm:hpu \
+        opea/vllm-hpu:comps \
         /bin/bash -c "export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --enforce-eager --model $LLM_MODEL  --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048"
 
     export vLLM_ENDPOINT="http://${ip_address}:${port_number}"
