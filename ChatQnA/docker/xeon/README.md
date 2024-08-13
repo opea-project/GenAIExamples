@@ -113,6 +113,7 @@ docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_p
 
 ```bash
 docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/docker/Dockerfile .
+cd ..
 ```
 
 ### 6. Build MegaService Docker Image
