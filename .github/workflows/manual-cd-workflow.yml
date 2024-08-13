@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       examples:
-        default: "AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation"
-        description: 'List of examples to test'
+        default: "ChatQnA"
+        description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
         required: true
         type: string
       tag:
