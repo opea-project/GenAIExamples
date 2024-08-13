@@ -17,12 +17,14 @@ services:
       https_proxy: ${https_proxy}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      PREFILL_BATCH_BUCKET_SIZE: 1
+      BATCH_BUCKET_SIZE: 8
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096 --max-batch-total-tokens 65536 --max-batch-prefill-tokens 4096
   llm_faqgen:
     image: opea/llm-faqgen-tgi:latest
     container_name: llm-faqgen-server
