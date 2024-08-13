@@ -116,6 +116,7 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       OLLAMA_ENDPOINT: ${OLLAMA_ENDPOINT}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
   chaqna-aipc-backend-server:
     image: opea/chatqna:latest
     container_name: chatqna-aipc-backend-server
