@@ -40,6 +40,7 @@ jobs:
     needs: [job1, mega-image-build]
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+      fail-fast: false
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       tag: ${{ needs.mega-image-build.outputs.image_tag }}
