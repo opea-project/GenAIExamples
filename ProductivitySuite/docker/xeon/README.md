@@ -148,13 +148,13 @@ export COLLECTION_NAME="Conversations"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export LLM_MODEL_ID_CODEGEN=codellama/CodeLlama-7b-hf
+export LLM_MODEL_ID_CODEGEN="meta-llama/CodeLlama-7b-hf"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
 export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
@@ -188,12 +188,21 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/xeon/
+cd GenAIExamples/ProductivitySuite/docker/xeon/
 ```
 
 ```bash
 docker compose -f compose.yaml up -d
 ```
+### Setup Keycloak
+
+The user management is done via Keycloak and the configuration steps look like this:
+
+1. Access the keycloak admin console via url http:${host_ip}:8080 to configure user. Use default username(admin) and password(admin) to login.
+2. Create a new realm named istio within Keycloak.
+3. Create a new client called istio with default configurations.
+4. From the left pane select the Realm roles and create a new role name as user and another new role as viewer.
+5. Create a new user name as for example mary and another user as bob. Set passwords for both users (set 'Temporary' to 'Off'). Select Role mapping on the top, assign the user role to mary and assign the viewer role to bob.
 
 ### Validate Microservices
 
@@ -249,29 +258,57 @@ curl http://${host_ip}:8000/v1/reranking\
   -H 'Content-Type: application/json'
 ```
 
-6. LLM backend Service
+6. LLM backend Service (ChatQnA, DocSum, FAQGen)
 
 ```bash
-# TGI service
 curl http://${host_ip}:9009/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 ```
 
+7. LLM backend Service (CodeGen)
+
 ```bash
-# vLLM Service
-curl http://${host_ip}:9009/v1/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+curl http://${host_ip}:8028/generate \
+  -X POST \
+  -d '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}' \
+  -H 'Content-Type: application/json'
 ```
 
-7. LLM Microservice
+7. ChatQnA LLM Microservice
 
 ```bash
 curl http://${host_ip}:9000/v1/chat/completions\
   -X POST \
   -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+  -H 'Content-Type: application/json'
+```
+
+7. CodeGen LLM Microservice
+
+```bash
+curl http://${host_ip}:9001/v1/chat/completions\
+  -X POST \
+  -d '{"query":"def print_hello_world():"}' \
+  -H 'Content-Type: application/json'
+```
+
+7. DocSum LLM Microservice
+
+```bash
+curl http://${host_ip}:9002/v1/chat/docsum\
+  -X POST \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
+  -H 'Content-Type: application/json'
+```
+
+7. FAQGen LLM Microservice
+
+```bash
+curl http://${host_ip}:9003/v1/faqgen\
+  -X POST \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
   -H 'Content-Type: application/json'
 ```
 
@@ -283,7 +320,33 @@ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
      }'
 ```
 
-9. Dataprep Microservice（Optional）
+
+9. FAQGen MegaService
+
+```bash
+curl http://${host_ip}:8889/v1/faqgen -H "Content-Type: application/json" -d '{
+     "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+     }'
+```
+
+10. DocSum MegaService
+
+```bash
+curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
+     "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+     }'
+```
+
+11. CodeGen MegaService
+
+```bash
+curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
+     "messages": "def print_hello_world():"
+     }'
+```
+
+
+12. Dataprep Microservice
 
 If you want to update the default knowledge base, you can use the following commands:
 
@@ -332,6 +395,97 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```
+
+13. Prompt Registry Microservice
+
+If you want to update the default Prompts in the application for your user, you can use the following commands:
+
+```bash
+curl -X 'POST' \
+  http://{host_ip}:6015/v1/prompt/create \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "prompt_text": "test prompt", "user": "test"
+}'
+```
+
+Retrieve prompt from database based on user or prompt_id
+
+```bash
+curl -X 'POST' \
+  http://{host_ip}:6015/v1/prompt/get \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test"}'
+
+curl -X 'POST' \
+  http://{host_ip}:6015/v1/prompt/get \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test", "prompt_id":"{prompt_id returned from save prompt route above}"}'
+```
+
+Delete prompt from database based on prompt_id provided
+
+```bash
+curl -X 'POST' \
+  http://{host_ip}:6015/v1/prompt/delete \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test", "prompt_id":"{prompt_id to be deleted}"}'
+```
+
+14. Chat History Microservice
+
+To validate the chatHistory Microservice, you can use the following commands. 
+
+Create a sample conversation and get the message ID. 
+
+```bash
+curl -X 'POST' \
+  http://${host_ip}:6012/v1/chathistory/create \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "data": {
+    "messages": "test Messages", "user": "test"
+  }
+}'
+```
+
+Retrieve the conversation based on user or conversation id
+
+```bash
+curl -X 'POST' \
+  http://${host_ip}:6012/v1/chathistory/get \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test"}'
+
+curl -X 'POST' \
+  http://${host_ip}:6012/v1/chathistory/get \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test", "id":"{Conversation id to retrieve }"}'
+```
+
+Delete Conversation from database based on conversation id provided.
+
+```bash
+curl -X 'POST' \
+  http://${host_ip}:6012/v1/chathistory/delete \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test", "id":"{Conversation id to Delete}"}'
+```
+
 ## 🚀 Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
