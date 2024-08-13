@@ -5,10 +5,10 @@ docx2txt
 easyocr
 fastapi
 huggingface_hub
-langchain
+langchain==0.2.12
 langchain-community
 langchain-text-splitters
-langsmith
+langchain_huggingface
 markdown
 numpy
 opentelemetry-api

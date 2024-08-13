@@ -717,6 +717,19 @@ def get_file_structure(root_path: str, parent_path: str = "") -> List[Dict[str, 
     return result
 
 
+def format_search_results(response, file_list: list):
+    for i in range(1, len(response), 2):
+        file_name = response[i].decode()[5:]
+        file_dict = {
+            "name": decode_filename(file_name),
+            "id": decode_filename(file_name),
+            "type": "File",
+            "parent": "",
+        }
+        file_list.append(file_dict)
+    return file_list
+
+
 def remove_folder_with_ignore(folder_path: str, except_patterns: List = []):
     """Remove the specific folder, and ignore some files/folders.
 

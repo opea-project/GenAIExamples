@@ -27,8 +27,6 @@ services:
     container_name: dataprep-redis-server
     ports:
       - "6007:6007"
-      - "6008:6008"
-      - "6009:6009"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -39,7 +37,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_ENDPOINT}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
 
 networks:

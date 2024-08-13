@@ -38,9 +38,6 @@ Please refer to this [readme](../../vectorstores/langchain/redis/README.md).
 ```bash
 export REDIS_URL="redis://${your_ip}:6379"
 export INDEX_NAME=${your_index_name}
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=${your_langchain_api_key}
-export LANGCHAIN_PROJECT="opea/gen-ai-comps:dataprep"
 export PYTHONPATH=${path_to_comps}
 ```
 
@@ -97,13 +94,9 @@ Please refer to this [readme](../../vectorstores/langchain/redis/README.md).
 ```bash
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export TEI_ENDPOINT="http://${your_ip}:6006"
-export REDIS_HOST=${your_ip}
-export REDIS_PORT=6379
 export REDIS_URL="redis://${your_ip}:6379"
 export INDEX_NAME=${your_index_name}
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=${your_langchain_api_key}
-export LANGCHAIN_PROJECT="opea/dataprep"
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
 
 ## 2.3 Build Docker Image
@@ -136,13 +129,13 @@ docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https
 - option 1: Start single-process version (for 1-10 files processing)
 
 ```bash
-docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT opea/dataprep-redis:latest
+docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/dataprep-redis:latest
 ```
 
 - option 2: Start multi-process version (for >10 files processing)
 
 ```bash
-docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT -e TIMEOUT_SECONDS=600 opea/dataprep-on-ray-redis:latest
+docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e TIMEOUT_SECONDS=600 opea/dataprep-on-ray-redis:latest
 ```
 
 ## 2.5 Run with Docker Compose (Option B - deprecated, will move to genAIExample in future)
