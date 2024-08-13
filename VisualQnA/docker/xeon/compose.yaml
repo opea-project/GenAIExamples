@@ -6,7 +6,7 @@ version: "3.8"
 
 services:
   llava-tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.2.0
+    image: ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
     container_name: tgi-llava-xeon-server
     ports:
       - "9399:80"

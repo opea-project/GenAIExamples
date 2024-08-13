@@ -993,7 +993,7 @@ spec:
                 name: chatqna-tgi-config
           securityContext:
             {}
-          image: "ghcr.io/huggingface/text-generation-inference:2.1.0"
+          image: "ghcr.io/huggingface/text-generation-inference:latest-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data

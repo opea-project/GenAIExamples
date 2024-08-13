@@ -71,12 +71,12 @@ cd ../../../..
 ### 4. Pull TGI image
 
 ```bash
-docker pull ghcr.io/huggingface/text-generation-inference:2.2.0
+docker pull ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
 ```
 
 Then run the command `docker images`, you will have the following 4 Docker Images:
 
-1. `ghcr.io/huggingface/text-generation-inference:2.2.0`
+1. `ghcr.io/huggingface/text-generation-inference:latest-intel-cpu`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`
