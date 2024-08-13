@@ -27,7 +27,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
     else \
         pip install --no-cache-dir -r /home/user/comps/asr/requirements.txt ; \
     fi
-    pip list
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
