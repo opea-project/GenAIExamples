@@ -7,14 +7,14 @@ services:
     build:
       context: docker
       dockerfile: ./Dockerfile
-    image: ${REGISTRY}opea/docsum:${TAG:-latest}
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
   docsum-ui:
     build:
       context: docker/ui
       dockerfile: ./docker/Dockerfile
-    image: ${REGISTRY}opea/docsum-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
   docsum-react-ui:
     build:
       context: docker/ui
       dockerfile: ./docker/Dockerfile.react
-    image: ${REGISTRY}opea/docsum-react-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
