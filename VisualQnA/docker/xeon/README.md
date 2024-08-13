@@ -68,7 +68,7 @@ docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$htt
 cd ../../../..
 ```
 
-### 4. Pull TGI image
+### 4. Pull TGI Xeon Image
 
 ```bash
 docker pull ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
@@ -152,7 +152,7 @@ curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d 
           {
             "type": "image_url",
             "image_url": {
-              "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+              "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
             }
           }
         ]
