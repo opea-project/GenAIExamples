@@ -1,4 +1,4 @@
-# Build Mega Service of ChatQnA on Xeon
+# Build Mega Service of Productivity Suite on Xeon
 
 This document outlines the deployment process for OPEA Productivity Suite utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server and [GenAIExamples](https://github.com/opea-project/GenAIExamppes.git) solutions. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
@@ -97,17 +97,23 @@ docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_pro
 cd ../../..
 ```
 
-### 9. Build  UI Docker Image (Optional)
+### 9. Build  UI Docker Image
 
 Build frontend Docker image that enables via below command:
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/ui/
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
+cd GenAIExamples/ProductivitySuite/docker/ui/
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export CHAT_HISTORY_CREATE = "http://${host_ip}:6012/v1/chathistory/create";
+export CHAT_HISTORY_GET = "http://${host_ip}:6012/v1/chathistory/get";
+export CHAT_HISTORY_DELETE = "http://${host_ip}:6012/v1/chathistory/delete";
+export PROMPT_CREATE = "http://${host_ip}:6015/v1/prompt/create";
+export PROMPT_GET = "http://${host_ip}:6015/v1/prompt/get";
+export PROMPT_DELETE = "http://${host_ip}:6015/v1/prompt/delete";
 docker build --no-cache -t opea/productivity-suite-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT --build-arg DATAPREP_GET_FILE_ENDPOINT=$DATAPREP_GET_FILE_ENDPOINT -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
@@ -173,9 +179,6 @@ export TGI_LLM_ENDPOINT_CODEGEN="http://${host_ip}:8028"
 export TGI_LLM_ENDPOINT_FAQGEN="http://${host_ip}:8008"
 export TGI_LLM_ENDPOINT_DOCSUM="http://${host_ip}:8018"
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
 export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${host_ip}:8889/v1/faqgen"
 export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
 export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
@@ -494,7 +497,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 #TODO
   comboapp-ui-server:
-    image: opea/chatqna-ui:latest
+    image: opea/ProductivitySuite-ui:latest
     ...
     ports:
       - "80:5173"
