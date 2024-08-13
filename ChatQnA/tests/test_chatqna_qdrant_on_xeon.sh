@@ -14,17 +14,17 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
 
-    # docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/retriever-qdrant:latest  --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/haystack/qdrant/docker/Dockerfile .
-    # docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
-    # docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/dataprep-qdrant:latest  --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/docker/Dockerfile .
+    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
+    docker build -t opea/retriever-qdrant:latest -f comps/retrievers/haystack/qdrant/docker/Dockerfile .
+    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
+    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
+    docker build -t opea/dataprep-qdrant:latest -f comps/dataprep/qdrant/docker/Dockerfile .
 
     cd $WORKPATH/docker
-    # docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
+    docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
 
     cd $WORKPATH/docker/ui
-    # docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
+    docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
     docker images
 }
@@ -89,6 +89,8 @@ function validate_services() {
     if [[ $SERVICE_NAME == *"dataprep_upload_file"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep_upload_link"* ]]; then
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'link_list=["https://www.ces.tech/"]' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
@@ -138,11 +140,16 @@ function validate_microservices() {
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_services \
         "${ip_address}:6043/v1/dataprep" \
-        "" \
+        "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-qdrant-server"
 
-    sleep 1m # retrieval can't curl as expected, try to wait for more time
+    # test upload link
+    validate_services \
+        "${ip_address}:6043/v1/dataprep" \
+        "Data preparation succeeded" \
+        "dataprep_upload_link" \
+        "dataprep-qdrant-server"
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -151,7 +158,7 @@ function validate_microservices() {
         "retrieved_docs" \
         "retrieval" \
         "retriever-qdrant-server" \
-        "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
+        "{\"text\":\"What is Deep Learning?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
     validate_services \
@@ -183,7 +190,7 @@ function validate_microservices() {
         "data: " \
         "llm" \
         "llm-tgi-server" \
-        '{"query":"What is Deep Learning?"}'
+        '{"query":"Deep Learning"}'
 
 }
 
@@ -222,7 +229,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_qdrant.yaml stop && docker compose -f compose_qdrant.yaml rm -f
 }
 
 function main() {
@@ -237,7 +244,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    # validate_frontend
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
