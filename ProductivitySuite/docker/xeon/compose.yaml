@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3.8"
+version: "3.3"
 
 services:
   redis-vector-db:
@@ -342,6 +342,28 @@ services:
       - KC_PROXY=edge
     ipc: host
     command: start-dev
+    restart: always
+  
+  productivity-suite-xeon-react-ui-server:
+    image: opea/productivity-suite-react-ui-server:latest
+    container_name: productivity-suite-xeon-react-ui-server
+    ports:
+      - "5174:80"
+    environment:
+      - APP_BACKEND_SERVICE_ENDPOINT_CHATQNA=${BACKEND_SERVICE_ENDPOINT_CHATQNA}
+      - APP_BACKEND_SERVICE_ENDPOINT_CODEGEN=${BACKEND_SERVICE_ENDPOINT_CODEGEN}
+      - APP_BACKEND_SERVICE_ENDPOINT_DOCSUM=${BACKEND_SERVICE_ENDPOINT_DOCSUM}
+      - APP_BACKEND_SERVICE_ENDPOINT_FAQGEN=${BACKEND_SERVICE_ENDPOINT_FAQGEN}
+      - APP_DATAPREP_SERVICE_ENDPOINT=${DATAPREP_SERVICE_ENDPOINT}
+      - APP_DATAPREP_GET_FILE_ENDPOINT=${DATAPREP_GET_FILE_ENDPOINT}
+      - APP_DATAPREP_DELETE_FILE_ENDPOINT=${DATAPREP_DELETE_FILE_ENDPOINT}
+      - APP_CHAT_HISTORY_CREATE_ENDPOINT=${CHAT_HISTORY_CREATE_ENDPOINT}
+      - APP_CHAT_HISTORY_DELETE_ENDPOINT=${CHAT_HISTORY_DELETE_ENDPOINT}
+      - APP_CHAT_HISTORY_GET_ENDPOINT=${CHAT_HISTORY_GET_ENDPOINT}
+      - APP_PROMPT_SERVICE_GET_ENDPOINT=${PROMPT_SERVICE_GET_ENDPOINT}
+      - APP_PROMPT_SERVICE_CREATE_ENDPOINT=${PROMPT_SERVICE_CREATE_ENDPOINT}
+      - APP_KEYCLOAK_SERVICE_ENDPOINT=${KEYCLOAK_SERVICE_ENDPOINT}
+    ipc: host
     restart: always
 networks:
   default:
