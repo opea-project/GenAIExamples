@@ -80,7 +80,7 @@ function start_services() {
     docker compose -f compose_vllm.yaml up -d
     n=0
     until [[ "$n" -ge 18 ]]; do
-        docker logs vllm-gaudi-server 
+        docker logs vllm-gaudi-server
         # if grep -q Connected vllm_service_start.log; then
         #     break
         # fi
