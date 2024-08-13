@@ -160,7 +160,7 @@ class ChatCompletionRequest(BaseModel):
     logit_bias: Optional[Dict[str, float]] = None
     logprobs: Optional[bool] = False
     top_logprobs: Optional[int] = 0
-    max_tokens: Optional[int] = 16  # use https://platform.openai.com/docs/api-reference/completions/create
+    max_tokens: Optional[int] = 1024  # use https://platform.openai.com/docs/api-reference/completions/create
     n: Optional[int] = 1
     presence_penalty: Optional[float] = 0.0
     response_format: Optional[ResponseFormat] = None
