@@ -1,0 +1,164 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Example jobs
+permissions: read-all
+on:
+  workflow_call:
+    inputs:
+      example:
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        required: false
+        type: string
+      build:
+        default: true
+        required: false
+        type: boolean
+      scan:
+        default: true
+        required: false
+        type: boolean
+      test_compose:
+        default: false
+        required: false
+        type: boolean
+      test_k8s:
+        default: false
+        required: false
+        type: boolean
+      publish:
+        default: false
+        required: false
+        type: boolean
+      publish_tags:
+        default: "latest"
+        required: false
+        type: string
+jobs:
+####################################################################################################
+# Image Build
+####################################################################################################
+  build-images:
+    if: ${{ fromJSON(inputs.build) }}
+    strategy:
+      matrix:
+        node: ["docker-build-xeon", "docker-build-gaudi"]
+    runs-on: ${{ matrix.node }}
+    continue-on-error: true
+    steps:
+      - name: Clean Up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Build Image
+        uses: opea-project/validation/actions/image-build@main
+        with:
+          work_dir: ${{ github.workspace }}/${{ inputs.example }}
+          docker_compose_path: ${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.example }}-compose.yaml
+          registry: ${OPEA_IMAGE_REPO}opea
+          tag: ${{ inputs.tag }}
+
+####################################################################################################
+# Trivy Scan
+####################################################################################################
+  image-list:
+    needs: [ build-images ]
+    if: ${{ fromJSON(inputs.scan) }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.scan-matrix.outputs.matrix }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.8.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Set Matrix
+        id: scan-matrix
+        run: |
+          pip install yq
+          compose_path=${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.example }}-compose.yaml
+          echo "matrix=$(cat ${compose_path} | yq -r '.[]' | jq 'keys' | jq -c '.')" >> $GITHUB_OUTPUT
+
+  scan-images:
+    needs: [image-list]
+    if: ${{ fromJSON(inputs.scan) }}
+    runs-on: "docker-build-gaudi"
+    strategy:
+      matrix:
+        image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2.8.1
+        with:
+          egress-policy: audit
+
+      - name: Pull Image
+        run: docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+
+      - name: Scan Container
+        uses: opea-project/validation/actions/trivy-scan@main
+        with:
+          image-ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          output: ${{ inputs.example }}-${{ matrix.image }}-scan.txt
+
+      - name: Cleanup
+        if: always()
+        run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+      - uses: actions/upload-artifact@v4.3.4
+        with:
+          name: ${{ inputs.example }}-scan
+          path: ${{ inputs.example }}-${{ matrix.image }}-scan.txt
+          overwrite: true
+
+####################################################################################################
+# Docker Compose Test
+####################################################################################################
+  test-example-compose:
+    needs: [build-images]
+    if: ${{ fromJSON(inputs.test_compose) }}
+    strategy:
+      matrix:
+        hardware: ["xeon", "gaudi"]
+      fail-fast: false
+    uses: ./.github/workflows/_run-docker-compose.yml
+    with:
+      tag: ${{ inputs.tag }}
+      example: ${{ inputs.example }}
+      hardware: ${{ matrix.hardware }}
+    secrets: inherit
+
+
+####################################################################################################
+# K8S Test
+####################################################################################################
+# TODO
+
+
+####################################################################################################
+# Publish
+####################################################################################################
+  publish:
+    needs: [image-list, build-images, scan-images, test-example-compose]
+    if: ${{ fromJSON(inputs.publish) }}
+    strategy:
+      matrix:
+        image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
+    runs-on: "docker-build-gaudi"
+    steps:
+      - name: Image Publish
+        uses: opea-project/validation/actions/image-publish@main
+        with:
+          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          image_name: opea/${{ matrix.image }}
+          publish_tags: ${{ inputs.publish_tags }}
