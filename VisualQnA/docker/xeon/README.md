@@ -68,7 +68,7 @@ docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$htt
 cd ../../../..
 ```
 
-### 5. Build TGI Xeon Image
+### 4. Build TGI Xeon Image
 
 Since TGI official image has not supported llava-next for CPU, we'll need to build it based on Dockerfile_intel.
 

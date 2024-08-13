@@ -29,6 +29,6 @@ spec:
         internalService:
           serviceName: visualqna-tgi-svc
           config:
-            LVM_MODEL_ID: llava-hf/llava-v1.6-mistral-7b-hf
+            MODEL_ID: llava-hf/llava-v1.6-mistral-7b-hf
             endpoint: /generate
           isDownstreamService: true
