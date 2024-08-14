@@ -496,6 +496,53 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "5715:80" # Map port 5715 on the host to port 80 in the container.
 ```
 
-![project-screenshot](../../assets/img/chat_qna_init.png)
-
 Here is an example of running Productivity Suite
+![project-screenshot](../../assets/img/chat_qna_init.png)
+![project-screenshot](../../assets/img/chat_qna_init.png)
+![project-screenshot](../../assets/img/chat_qna_init.png)
+![project-screenshot](../../assets/img/Login_page.png)
+
+<h2>🧐 Features</h2>
+
+Here're some of the project's features:
+#### CHAT QNA
+- Start a Text Chat：Initiate a text chat with the ability to input written conversations, where the dialogue content can also be customized based on uploaded files.
+- Context Awareness: The AI assistant maintains the context of the conversation, understanding references to previous statements or questions. This allows for more natural and coherent exchanges.
+   ##### DATA SOURCE
+   - The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
+   - Uploaded File would get listed and user would be able add or remove file/links
+
+   ###### Screen Shot
+   ![project-screenshot](../../assets/img/data_source.png)
+
+- Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
+- Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
+- Conversational Chat : The application maintains a history of the conversation, allowing users to review previous messages and the AI to refer back to earlier points in the dialogue when necessary.
+   ###### Screen Shots
+   ![project-screenshot](../../assets/img/chat_qna_init.png)
+   ![project-screenshot](../../assets/img/chatqna_with_conversation.png)
+
+
+#### CODEGEN
+
+- Generate code: generate the corresponding code based on the current user's input.
+   ###### Screen Shot
+   ![project-screenshot](../../assets/img/codegen.png)
+
+#### DOC SUMMARY
+
+- Summarizing Uploaded Files: Upload files from their local device, then click 'Generate Summary' to summarize the content of the uploaded file. The summary will be displayed on the 'Summary' box.
+- Summarizing Text via Pasting: Paste the text to be summarized into the text box, then click 'Generate Summary' to produce a condensed summary of the content, which will be displayed in the 'Summary' box on the right.
+- Scroll to Bottom: The summarized content will automatically scroll to the bottom.
+   ###### Screen Shot
+   ![project-screenshot](../../assets/img/doc_summary_paste.png)
+   ![project-screenshot](../../assets/img/doc_summary_file.png)
+
+#### FAQ Generator
+
+- Generate FAQs from Text via Pasting: Paste the text to into the text box, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
+
+- Generate FAQs from Text via txt file Upload: Upload the file in the Upload bar, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
+   ###### Screen Shot
+   ![project-screenshot](../../assets/img/faq_generator.png)
+
