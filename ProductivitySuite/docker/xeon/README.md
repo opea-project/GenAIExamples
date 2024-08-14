@@ -200,7 +200,7 @@ docker compose -f compose.yaml up -d
 ```
 ### Setup Keycloak
 
-Please refer to [keycloak_setup_guide](ProductivitySuite/docker/xeon/keycloak_setup_guide.md) for more detail related to Keycloak configuration setup.
+Please refer to [keycloak_setup_guide](keycloak_setup_guide.md) for more detail related to Keycloak configuration setup.
 
 ### Validate Microservices
 
