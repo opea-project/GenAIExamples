@@ -1,6 +1,6 @@
-export MONGO_HOST=10.223.24.231
+export MONGO_HOST=${host_ip}
 export MONGO_PORT=27017
-export DB_NAME="test"
+export DB_NAME="opea"
 export COLLECTION_NAME="Conversations"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"

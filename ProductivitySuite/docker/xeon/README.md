@@ -151,7 +151,7 @@ export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
 export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
@@ -493,7 +493,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
     image: opea/productivity-suite-react-ui-server:latest
     ...
     ports:
-      - "5714:80"
+      - "5715:80" # Map port 5715 on the host to port 80 in the container.
 ```
 
 ![project-screenshot](../../assets/img/chat_qna_init.png)

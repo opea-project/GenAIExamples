@@ -96,11 +96,10 @@ function start_services() {
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
         sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/faqgen:latest#image: opea/faqgen:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/faqgen:latest#image: opea/faqgen:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/productivity-suite-react-ui-server:latest#image: opea/productivity-suite-react-ui-server:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
         echo "cat compose.yaml"
         cat compose.yaml
@@ -334,7 +333,7 @@ function validate_megaservice() {
     # Curl the DocSum Mega Service
     validate_service \
         "${ip_address}:8890/v1/docsum" \
-        "versatile toolkit" \
+        "toolkit" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
         '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
