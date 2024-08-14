@@ -6,7 +6,7 @@
 
 > You can also customize the "MODEL_ID" if needed.
 
-> You need to make sure you have created the directory `/mnt/opea-models` to save the cached model on the node where the CodeGEn workload is running. Otherwise, you need to modify the `codegen.yaml` file to change the `model-volume` to a directory that exists on the node.
+> You need to make sure you have created the directory `/mnt/opea-models` to save the cached model on the node where the CodeGen workload is running. Otherwise, you need to modify the `codegen.yaml` file to change the `model-volume` to a directory that exists on the node.
 
 ## Deploy On Xeon
 
@@ -30,7 +30,7 @@ kubectl apply -f codegen.yaml
 
 To verify the installation, run the command `kubectl get pod` to make sure all pods are running.
 
-Then run the command `kubectl port-forward svc/codegen 7778:7778` to expose the CodeGEn service for access.
+Then run the command `kubectl port-forward svc/codegen 7778:7778` to expose the CodeGen service for access.
 
 Open another terminal and run the following command to verify the service if working:
 
@@ -40,3 +40,4 @@ curl http://localhost:7778/v1/codegen -H "Content-Type: application/json" -d '{
      "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
      }'
 ```
+
