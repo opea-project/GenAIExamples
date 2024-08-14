@@ -105,16 +105,7 @@ Build frontend Docker image that enables via below command:
 
 ```bash
 cd GenAIExamples/ProductivitySuite/docker/ui/
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
-export CHAT_HISTORY_CREATE = "http://${host_ip}:6012/v1/chathistory/create";
-export CHAT_HISTORY_GET = "http://${host_ip}:6012/v1/chathistory/get";
-export CHAT_HISTORY_DELETE = "http://${host_ip}:6012/v1/chathistory/delete";
-export PROMPT_CREATE = "http://${host_ip}:6015/v1/prompt/create";
-export PROMPT_GET = "http://${host_ip}:6015/v1/prompt/get";
-export PROMPT_DELETE = "http://${host_ip}:6015/v1/prompt/delete";
-docker build --no-cache -t opea/productivity-suite-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT --build-arg DATAPREP_GET_FILE_ENDPOINT=$DATAPREP_GET_FILE_ENDPOINT -f ./docker/Dockerfile.react .
+docker build --no-cache -t ProductivitySuite/docker/xeon/compose.yaml ./docker/Dockerfile.react .
 cd ../../../..
 ```
 
@@ -147,9 +138,9 @@ export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
 ```bash
-export MONGO_HOST=${host_ip}
+export MONGO_HOST=10.223.24.231
 export MONGO_PORT=27017
-export DB_NAME="opea"
+export DB_NAME="test"
 export COLLECTION_NAME="Conversations"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -160,7 +151,7 @@ export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
 export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
@@ -170,18 +161,28 @@ export LLM_SERVICE_HOST_IP_DOCSUM=${host_ip}
 export LLM_SERVICE_HOST_IP_FAQGEN=${host_ip}
 export LLM_SERVICE_HOST_IP_CODEGEN=${host_ip}
 export LLM_SERVICE_HOST_IP_CHATQNA=${host_ip}
-export LLM_SERVICE_HOST_PORT_FAQGEN=9002
-export LLM_SERVICE_HOST_PORT_CODEGEN=9001
-export LLM_SERVICE_HOST_PORT_DOCSUM=9003
-export PROMPT_COLLECTION_NAME="prompt"
 export TGI_LLM_ENDPOINT_CHATQNA="http://${host_ip}:9009"
 export TGI_LLM_ENDPOINT_CODEGEN="http://${host_ip}:8028"
 export TGI_LLM_ENDPOINT_FAQGEN="http://${host_ip}:8008"
 export TGI_LLM_ENDPOINT_DOCSUM="http://${host_ip}:8018"
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
 export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${host_ip}:8889/v1/faqgen"
 export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
 export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
+export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
+export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delete"
+export CHAT_HISTORY_GET_ENDPOINT="http://${host_ip}:6012/v1/chathistory/get"
+export PROMPT_SERVICE_GET_ENDPOINT="http://${host_ip}:6015/v1/prompt/get"
+export PROMPT_SERVICE_CREATE_ENDPOINT="http://${host_ip}:6015/v1/prompt/create"
+export KEYCLOAK_SERVICE_ENDPOINT="http://${host_ip}:8080"
+export LLM_SERVICE_HOST_PORT_FAQGEN=9002
+export LLM_SERVICE_HOST_PORT_CODEGEN=9001
+export LLM_SERVICE_HOST_PORT_DOCSUM=9003
+export PROMPT_COLLECTION_NAME="prompt"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -491,19 +492,16 @@ curl -X 'POST' \
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-
-#TODO
   comboapp-ui-server:
     image: opea/ProductivitySuite-ui:latest
     ...
     ports:
-      - "80:5173"
+      - "5714:80"
 ```
 
-#TODO
-![project-screenshot](../../assets/img/chat_ui_init.png)
+![project-screenshot](../../assets/img/chat_qna_init.png)
 
 Here is an example of running Productivity Suite
