@@ -72,6 +72,7 @@ function start_services() {
             sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_vllm.yaml
             sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_vllm.yaml
             sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_vllm.yaml
+            sed -i "s#image: ${IMAGE_REPO}opea/vllm:latest#image: opea/vllm:latest#g" compose_vllm.yaml
         fi
     fi
 
