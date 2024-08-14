@@ -95,7 +95,7 @@ jobs:
 
   scan-images:
     needs: [image-list]
-    if: ${{ fromJSON(inputs.scan) }} && ${{ inputs.node }} == "gaudi"
+    if: inputs.scan == 'true' && inputs.node == 'gaudi'
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
@@ -153,7 +153,7 @@ jobs:
 ####################################################################################################
   publish:
     needs: [image-list, build-images, scan-images, test-example-compose]
-    if: ${{ fromJSON(inputs.publish) }} && ${{ inputs.node }} == "gaudi"
+    if: inputs.publish == 'true' && inputs.node == 'gaudi'
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
