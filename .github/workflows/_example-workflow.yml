@@ -77,7 +77,7 @@ jobs:
 ####################################################################################################
   image-list:
     needs: [ build-images ]
-    if: ${{ fromJSON(inputs.scan) }}
+    if: ${{ fromJSON(inputs.scan) && success() }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.scan-matrix.outputs.matrix }}
@@ -94,7 +94,7 @@ jobs:
 
   scan-images:
     needs: [image-list]
-    if: success() && ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi'}}
+    if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi'}}
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
