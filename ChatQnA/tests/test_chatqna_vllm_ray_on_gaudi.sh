@@ -17,8 +17,8 @@ function build_docker_images() {
     docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
     docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
     docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
-    docker build -t opea/llm-vllm-hpu:latest -f comps/llms/text-generation/vllm/docker/Dockerfile.hpu .
-    docker build -t opea/llm-vllm:latest -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
+    docker build -t opea/llm-vllm-ray-hpu:latest -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray .
+    docker build -t opea/llm-vllm-ray:latest -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice .
     docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
 
 #    cd ..
@@ -50,7 +50,8 @@ function start_services() {
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export vLLM_LLM_ENDPOINT="http://${ip_address}:8008"
+    export vLLM_RAY_LLM_ENDPOINT="http://${ip_address}:8006"
+    export LLM_SERVICE_PORT=9000
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -67,24 +68,25 @@ function start_services() {
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
         echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_vllm.yaml
-        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_vllm.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_vllm.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_vllm.yaml
-        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose_vllm.yaml
-        echo "cat compose_vllm.yaml"
-        cat compose_vllm.yaml
+        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_vllm_ray.yaml
+        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_vllm_ray.yaml
+        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_vllm_ray.yaml
+        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_vllm_ray.yaml
+        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose_vllm_ray.yaml
+        echo "cat compose_vllm_ray.yaml"
+        cat compose_vllm_ray.yaml
     fi
 
     # Start Docker Containers
-    docker compose -f compose_vllm.yaml up -d
+    docker compose -f compose_vllm_ray.yaml up -d
     n=0
-    until [[ "$n" -ge 180 ]]; do
-        docker logs vllm-gaudi-server > vllm_service_start.log
-        if grep -q Connected vllm_service_start.log; then
+    until [[ "$n" -ge 25 ]]; do
+        echo "n=$n"
+        docker logs vllm-ray-gaudi-server > vllm_ray_service_start.log
+        if grep -q "Warmup finished" vllm_ray_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 20s
         n=$((n+1))
     done
 }
@@ -163,20 +165,20 @@ function validate_microservices() {
         "reranking-tei-gaudi-server" \
         '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}'
 
-    # vllm for llm service
+    # vllm-on-ray for llm service
     validate_services \
-        "${ip_address}:8008/v1/completions" \
-        "text" \
-        "vllm-llm" \
-        "vllm-gaudi-server" \
-        '{"model": "Intel/neural-chat-7b-v3-3","prompt": "What is Deep Learning?","max_tokens": 32,"temperature": 0}'
+        "${ip_address}:8006/v1/chat/completions" \
+        "content" \
+        "vllm-ray-llm" \
+        "vllm-ray-gaudi-server" \
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "llm-vllm-gaudi-server" \
+        "llm-vllm-ray-gaudi-server" \
         '{"query":"What is Deep Learning?"}'
 
 }
@@ -185,7 +187,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
         "${ip_address}:8888/v1/chatqna" \
-        "billion" \
+        "data: " \
         "mega-chatqna" \
         "chatqna-gaudi-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
@@ -219,7 +221,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/gaudi
-    docker compose -f compose_vllm.yaml down
+    docker compose -f compose_vllm_ray.yaml down
 }
 
 function main() {

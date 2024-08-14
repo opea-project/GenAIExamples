@@ -173,9 +173,9 @@ export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export LLM_MODEL_ID_NAME="neural-chat-7b-v3-3"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
-export vLLM_LLM_ENDPOINT="http://${host_ip}:8008"
-export vLLM_RAY_LLM_ENDPOINT="http://${host_ip}:8008"
+export TGI_LLM_ENDPOINT="http://${host_ip}:8005"
+export vLLM_LLM_ENDPOINT="http://${host_ip}:8007"
+export vLLM_RAY_LLM_ENDPOINT="http://${host_ip}:8006"
 export LLM_SERVICE_PORT=9000
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
@@ -296,7 +296,7 @@ curl http://${host_ip}:8000/v1/reranking \
 
 ```bash
 #TGI Service
-curl http://${host_ip}:8008/generate \
+curl http://${host_ip}:8005/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
   -H 'Content-Type: application/json'
@@ -304,7 +304,7 @@ curl http://${host_ip}:8008/generate \
 
 ```bash
 #vLLM Service
-curl http://${host_ip}:8008/v1/completions \
+curl http://${host_ip}:8007/v1/completions \
   -H "Content-Type: application/json" \
   -d '{
   "model": "${LLM_MODEL_ID}",
@@ -316,7 +316,7 @@ curl http://${host_ip}:8008/v1/completions \
 
 ```bash
 #vLLM-on-Ray Service
-curl http://${host_ip}:8008/v1/chat/completions \
+curl http://${host_ip}:8006/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "${LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 ```
