@@ -63,6 +63,7 @@ cd GenAIExamples/ChatQnA/docker/ui/
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 cd ../../../..
 ```
+
 ### 9. Build React UI Docker Image (Optional)
 
 Construct the frontend Docker image using the command below:
@@ -82,7 +83,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 5. `opea/dataprep-redis:latest`
 6. `opea/chatqna:latest`
 7. `opea/chatqna-ui:latest`
-8. `opea/chatqna-react-ui:latest` 
+8. `opea/chatqna-react-ui:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
