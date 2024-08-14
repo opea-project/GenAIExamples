@@ -489,8 +489,8 @@ curl -X 'POST' \
 To access the frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  comboapp-ui-server:
-    image: opea/ProductivitySuite-ui:latest
+  productivity-suite-xeon-react-ui-server:
+    image: opea/productivity-suite-react-ui-server:latest
     ...
     ports:
       - "5714:80"
