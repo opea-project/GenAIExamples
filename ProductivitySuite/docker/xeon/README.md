@@ -270,7 +270,7 @@ curl http://${host_ip}:9009/generate \
   -H 'Content-Type: application/json'
 ```
 
-7. LLM backend Service (CodeGen)
+8. LLM backend Service (CodeGen)
 
 ```bash
 curl http://${host_ip}:8028/generate \
@@ -279,7 +279,7 @@ curl http://${host_ip}:8028/generate \
   -H 'Content-Type: application/json'
 ```
 
-7. ChatQnA LLM Microservice
+9. ChatQnA LLM Microservice
 
 ```bash
 curl http://${host_ip}:9000/v1/chat/completions\
@@ -288,7 +288,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
   -H 'Content-Type: application/json'
 ```
 
-7. CodeGen LLM Microservice
+10. CodeGen LLM Microservice
 
 ```bash
 curl http://${host_ip}:9001/v1/chat/completions\
@@ -297,7 +297,7 @@ curl http://${host_ip}:9001/v1/chat/completions\
   -H 'Content-Type: application/json'
 ```
 
-7. DocSum LLM Microservice
+11. DocSum LLM Microservice
 
 ```bash
 curl http://${host_ip}:9002/v1/chat/docsum\
@@ -306,7 +306,7 @@ curl http://${host_ip}:9002/v1/chat/docsum\
   -H 'Content-Type: application/json'
 ```
 
-7. FAQGen LLM Microservice
+12. FAQGen LLM Microservice
 
 ```bash
 curl http://${host_ip}:9003/v1/faqgen\
@@ -315,7 +315,7 @@ curl http://${host_ip}:9003/v1/faqgen\
   -H 'Content-Type: application/json'
 ```
 
-8. ChatQnA MegaService
+13. ChatQnA MegaService
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -324,7 +324,7 @@ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
 ```
 
 
-9. FAQGen MegaService
+14. FAQGen MegaService
 
 ```bash
 curl http://${host_ip}:8889/v1/faqgen -H "Content-Type: application/json" -d '{
@@ -332,7 +332,7 @@ curl http://${host_ip}:8889/v1/faqgen -H "Content-Type: application/json" -d '{
      }'
 ```
 
-10. DocSum MegaService
+15. DocSum MegaService
 
 ```bash
 curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
@@ -340,7 +340,7 @@ curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
      }'
 ```
 
-11. CodeGen MegaService
+16. CodeGen MegaService
 
 ```bash
 curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
@@ -349,7 +349,7 @@ curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
 ```
 
 
-12. Dataprep Microservice
+17. Dataprep Microservice
 
 If you want to update the default knowledge base, you can use the following commands:
 
@@ -385,7 +385,7 @@ To delete the file/link you uploaded:
 ```bash
 # delete link
 curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "https://opea.dev"}' \
+     -d '{"file_path": "https://opea.dev.txt"}' \
      -H "Content-Type: application/json"
 
 # delete file
@@ -399,7 +399,7 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -H "Content-Type: application/json"
 ```
 
-13. Prompt Registry Microservice
+18. Prompt Registry Microservice
 
 If you want to update the default Prompts in the application for your user, you can use the following commands:
 
@@ -442,7 +442,7 @@ curl -X 'POST' \
   "user": "test", "prompt_id":"{prompt_id to be deleted}"}'
 ```
 
-14. Chat History Microservice
+19. Chat History Microservice
 
 To validate the chatHistory Microservice, you can use the following commands. 
 

@@ -13,5 +13,7 @@ OPEA Productivity Suite, is a powerful tool designed to streamline your workflow
 
 - User Context Management: Maintain a seamless workflow by managing your user's context within the application. Our context management system keeps track of your documents and chat history, allowing for personalized experiences.
 
+- Identity and access management: uses OpenSource platform (Keycloak) for single sign-on identity and access management. 
+
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source and running the application.
