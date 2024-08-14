@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
     git clone https://github.com/huggingface/tei-gaudi
 
-    # build all the images
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f docker_build_compose.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
