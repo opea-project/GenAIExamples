@@ -67,7 +67,7 @@ jobs:
         if: ${{ fromJSON(inputs.build) }}
         uses: opea-project/validation/actions/image-build@main
         with:
-          work_dir: ${{ github.workspace }}/${{ inputs.example }}
+          work_dir: ${{ github.workspace }}/${{ inputs.example }}/docker
           docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
           registry: ${OPEA_IMAGE_REPO}opea
           tag: ${{ inputs.tag }}
