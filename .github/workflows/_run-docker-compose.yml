@@ -95,7 +95,6 @@ jobs:
         run: |
           cd ${{ github.workspace }}/$example/tests
           if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
-          env
           if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container
