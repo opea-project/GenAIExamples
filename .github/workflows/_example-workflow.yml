@@ -49,12 +49,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Clean Up Working Directory
-        run: |
-          if [ "${{ inputs.build }}" == "true" ]; then
-            sudo rm -rf ${{github.workspace}}/*
-          else
-            echo "No need to build images, exiting..."
-          fi
+        run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
@@ -90,7 +85,7 @@ jobs:
 
   scan-images:
     needs: [image-list]
-    if: inputs.node == 'gaudi' && inputs.scan == 'true'
+    if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi' }}
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
@@ -143,7 +138,7 @@ jobs:
 ####################################################################################################
   publish:
     needs: [image-list, build-images, scan-images, test-example-compose]
-    if: inputs.node == 'gaudi' && inputs.publish == 'true'
+    if: ${{ fromJSON(inputs.scan) }}
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
