@@ -62,7 +62,7 @@ cd ..
 
 ### 8. Build MegaService Docker Images
 
-The Productivity Suite is composed of multiple GenAIExample reference solutions composed together. 
+The Productivity Suite is composed of multiple GenAIExample reference solutions composed together.
 
 ### 8.1 Build ChatQnA MegaService Docker Images
 
@@ -138,7 +138,7 @@ export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
 ```bash
-export MONGO_HOST=10.223.24.231
+export MONGO_HOST=${host_ip}
 export MONGO_PORT=27017
 export DB_NAME="test"
 export COLLECTION_NAME="Conversations"
@@ -445,9 +445,9 @@ curl -X 'POST' \
 
 19. Chat History Microservice
 
-To validate the chatHistory Microservice, you can use the following commands. 
+To validate the chatHistory Microservice, you can use the following commands.
 
-Create a sample conversation and get the message ID. 
+Create a sample conversation and get the message ID.
 
 ```bash
 curl -X 'POST' \
