@@ -228,7 +228,7 @@ curl http://${host_ip}:6044/v1/embeddings\
   -H 'Content-Type: application/json'
 ```
 
-3. Retriever Microservice  
+3. Retriever Microservice
 
 To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
 is determined by the embedding model.
