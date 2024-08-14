@@ -58,7 +58,7 @@ To verify the installation, run command 'kubectl get pod' to make sure all pods 
 
 To view all the available services, run command 'kubectl get svc' to obtain ports that need to used as backend service endpoint in productivity_suite_reactui.yaml.
 
-You may use 'kubectl port-forward service/<service_name> <forwarded_port>/<service_port>' to forward the port of all the services if necessary.
+You may use `kubectl port-forward service/<service_name> <forwarded_port>/<service_port>` to forward the port of all the services if necessary.
 ```
 # For example, 'kubectl get svc | grep productivity'
 productivity-suite-react-ui   ClusterIP      10.96.3.236     <none>        80/TCP

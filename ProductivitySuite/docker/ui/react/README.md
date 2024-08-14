@@ -4,8 +4,6 @@
 
 ![project-screenshot](../../../assets/img/chat_qna_init.png)
 ![project-screenshot](../../../assets/img/chat_qna_init.png)
-![project-screenshot](../../../assets/img/conversation_ui_response.png)
-![project-screenshot](../../../assets/img/conversation_ui_upload.png)
 ![project-screenshot](../../../assets/img/Login_page.png)
 
 <h2>🧐 Features</h2>
