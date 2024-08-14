@@ -36,7 +36,7 @@ Then run the command `kubectl port-forward svc/codegen 7778:7778` to expose the 
 Open another terminal and run the following command to verify the service if working:
 
 > Note that it may take a couple of minutes for the service to be ready. If the `curl` command below fails, you
-> can check the logs of the codegen-tgi pod to see it's status or check for errors.
+> can check the logs of the codegen-tgi pod to see its status or check for errors.
 
 ```
 kubectl get pods
