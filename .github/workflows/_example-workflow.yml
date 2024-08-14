@@ -142,7 +142,19 @@ jobs:
 ####################################################################################################
 # K8S Test
 ####################################################################################################
-# TODO
+  test-k8s-manifest:
+    needs: [build-images]
+    if: ${{ fromJSON(inputs.test_k8s) }}
+    strategy:
+      matrix:
+        hardware: ["xeon", "gaudi"]
+      fail-fast: false
+    uses: ./.github/workflows/_manifest-e2e.yml
+    with:
+      example: ${{ inputs.example }}
+      hardware: ${{ matrix.hardware }}
+      tag: ${{ inputs.tag }}
+    secrets: inherit
 
 
 ####################################################################################################
