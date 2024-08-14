@@ -94,7 +94,7 @@ jobs:
 
   scan-images:
     needs: [image-list]
-    if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi' && failure() }}
+    if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi' && success() }}
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
