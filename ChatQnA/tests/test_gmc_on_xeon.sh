@@ -7,8 +7,10 @@ USER_ID=$(whoami)
 LOG_PATH=/home/$(whoami)/logs
 MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
+CHATQNA_DATAPREP_NAMESPACE="${APP_NAMESPACE}-chatqna-dataprep"
 
 function install_chatqna() {
+   # Create namespace APP_NAMESPACE
    kubectl create ns $APP_NAMESPACE
    sed -i "s|namespace: chatqa|namespace: $APP_NAMESPACE|g"  ./chatQnA_xeon.yaml
    kubectl apply -f ./chatQnA_xeon.yaml
@@ -23,6 +25,22 @@ function install_chatqna() {
    TGI_POD_NAME=$(kubectl get pods --namespace=$APP_NAMESPACE | grep ^tgi-service | awk '{print $1}')
    kubectl describe pod $TGI_POD_NAME -n $APP_NAMESPACE
    kubectl wait --for=condition=ready pod/$TGI_POD_NAME --namespace=$APP_NAMESPACE --timeout=300s
+
+   # Create namespace CHATQNA_DATAPREP_NAMESPACE
+   kubectl create ns $CHATQNA_DATAPREP_NAMESPACE
+   sed -i "s|namespace: chatqa|namespace: $CHATQNA_DATAPREP_NAMESPACE|g"  ./chatQnA_dataprep_xeon.yaml
+   kubectl apply -f ./chatQnA_dataprep_xeon.yaml
+
+   # Wait until the router service is ready
+   echo "Waiting for the chatqa-dataprep router service to be ready..."
+   wait_until_pod_ready "chatqa-dataprep router" $CHATQNA_DATAPREP_NAMESPACE "router-service"
+   output=$(kubectl get pods -n $CHATQNA_DATAPREP_NAMESPACE)
+   echo $output
+
+   # Wait until the tgi pod is ready
+   TGI_POD_NAME=$(kubectl get pods --namespace=$CHATQNA_DATAPREP_NAMESPACE | grep ^tgi-service | awk '{print $1}')
+   kubectl describe pod $TGI_POD_NAME -n $CHATQNA_DATAPREP_NAMESPACE
+   kubectl wait --for=condition=ready pod/$TGI_POD_NAME --namespace=$CHATQNA_DATAPREP_NAMESPACE --timeout=300s
 }
 
 function validate_chatqna() {
@@ -32,23 +50,6 @@ function validate_chatqna() {
    # wait for client pod ready
    wait_until_pod_ready "client-test" $APP_NAMESPACE "client-test"
    # giving time to populating data
-
-   max_retry=20
-   # make sure microservice retriever is ready
-   # try to curl retriever-svc for max_retry times
-   for ((i=1; i<=max_retry; i++))
-   do
-     curl http://retriever-svc.$APP_NAMESPACE:7000/v1/retrieval -X POST \
-       -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
-       -H 'Content-Type: application/json' && break
-     sleep 10
-   done
-
-   # if i is bigger than max_retry, then exit with error
-   if [ $i -gt $max_retry ]; then
-       echo "Microservice failed, exit with error."
-       exit 1
-   fi
 
    kubectl get pods -n $APP_NAMESPACE
    # send request to chatqnA
@@ -79,6 +80,70 @@ function validate_chatqna() {
    fi
 
    rm -f ./gmc.opea.io_gmconnectors.yaml ./gmc-manager-rbac.yaml ./gmc-manager.yaml manifests/gmc-router.yaml
+}
+
+
+function validate_chatqna_dataprep() {
+   # deploy client pod for testing
+   kubectl create deployment client-test -n $CHATQNA_DATAPREP_NAMESPACE --image=python:3.8.13 -- sleep infinity
+
+   # wait for client pod ready
+   wait_until_pod_ready "client-test" $CHATQNA_DATAPREP_NAMESPACE "client-test"
+   # giving time to populating data
+
+   kubectl get pods -n $CHATQNA_DATAPREP_NAMESPACE
+   # send request to chatqnA
+   export CLIENT_POD=$(kubectl get pod -n $CHATQNA_DATAPREP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
+   echo "$CLIENT_POD"
+   accessUrl=$(kubectl get gmc -n $CHATQNA_DATAPREP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='chatqa')].status.accessUrl}")
+   kubectl exec "$CLIENT_POD" -n $CHATQNA_DATAPREP_NAMESPACE -- curl "$accessUrl/dataprep"  -X POST  -F 'link_list=["https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/test/data/gaudi.txt"]' -H "Content-Type: multipart/form-data" > $LOG_PATH/curl_dataprep.log
+   exit_code=$?
+   if [ $exit_code -ne 0 ]; then
+       echo "chatqna failed, please check the logs in ${LOG_PATH}!"
+       exit 1
+   fi
+
+   echo "Checking response results, make sure the output is reasonable. "
+   local status=false
+   if [[ -f $LOG_PATH/curl_dataprep.log ]] && \
+   [[ $(grep -c "Data preparation succeeded" $LOG_PATH/curl_dataprep.log) != 0 ]]; then
+       status=true
+   fi
+   if [ $status == false ]; then
+       if [[ -f $LOG_PATH/curl_dataprep.log ]]; then
+           cat $LOG_PATH/curl_dataprep.log
+       fi
+       echo "Response check failed, please check the logs in artifacts!"
+       exit 1
+   else
+       echo "Response check succeed!"
+   fi
+
+   kubectl exec "$CLIENT_POD" -n $CHATQNA_DATAPREP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"text":"What are the key features of Intel Gaudi?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json' > $LOG_PATH/curl_chatqna_dataprep.log
+   exit_code=$?
+   if [ $exit_code -ne 0 ]; then
+       echo "chatqna failed, please check the logs in ${LOG_PATH}!"
+       exit 1
+   fi
+
+   echo "Checking response results, make sure the output is reasonable. "
+   local status=false
+   if [[ -f $LOG_PATH/curl_chatqna_dataprep.log ]] && \
+   [[ $(grep -c "[DONE]" $LOG_PATH/curl_chatqna_dataprep.log) != 0 ]]; then
+       status=true
+   fi
+   if [ $status == false ]; then
+       if [[ -f $LOG_PATH/curl_chatqna_dataprep.log ]]; then
+           cat $LOG_PATH/curl_chatqna_dataprep.log
+       fi
+       echo "Response check failed, please check the logs in artifacts!"
+       exit 1
+   else
+       echo "Response check succeed!"
+   fi
+
+   rm -f ./gmc.opea.io_gmconnectors.yaml ./gmc-manager-rbac.yaml ./gmc-manager.yaml manifests/gmc-router.yaml
+   kubectl delete ns $CHATQNA_DATAPREP_NAMESPACE
 }
 
 function wait_until_pod_ready() {
@@ -141,6 +206,7 @@ case "$1" in
     validate_ChatQnA)
         pushd ChatQnA/kubernetes
         validate_chatqna
+        validate_chatqna_dataprep
         popd
         ;;
     *)
