@@ -24,14 +24,14 @@ export interface Conversation {
   first_query?: string;
 }
 
-type file= {
-  name: string
-}
+type file = {
+  name: string;
+};
 
 export interface ConversationReducer {
   selectedConversationId: string;
   conversations: Conversation[];
   selectedConversationHistory: Message[];
   onGoingResult: string;
-  filesInDataSource: file[]
+  filesInDataSource: file[];
 }
