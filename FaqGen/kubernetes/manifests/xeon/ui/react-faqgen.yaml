@@ -177,7 +177,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: {}
-          image: "opea/llm-faqgen-tgi:latest"
+          image: "${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: llm-uservice
@@ -228,7 +228,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: null
-          image: "opea/faqgen:latest"
+          image: "${REGISTRY:-opea}/faqgen:${TAG:-latest}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: faqgen
@@ -271,7 +271,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: null
-          image: "opea/faqgen-react-ui:latest"
+          image: "${REGISTRY:-opea}/faqgen-react-ui:${TAG:-latest}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: react-ui

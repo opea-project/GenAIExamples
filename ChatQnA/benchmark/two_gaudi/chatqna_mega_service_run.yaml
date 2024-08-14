@@ -30,7 +30,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/chatqna:latest
+        image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: chatqna-backend-server-deploy
         args: null

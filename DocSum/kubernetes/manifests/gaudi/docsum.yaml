@@ -171,7 +171,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/llm-docsum-tgi:latest"
+          image: "${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: llm-uservice
@@ -296,7 +296,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/docsum:latest"
+          image: "${REGISTRY:-opea}/docsum:${TAG:-latest}"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /tmp

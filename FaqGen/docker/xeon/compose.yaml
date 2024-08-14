@@ -20,7 +20,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm_faqgen:
-    image: opea/llm-faqgen-tgi:latest
+    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
     container_name: llm-faqgen-server
     depends_on:
       - tgi-service
@@ -35,7 +35,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   faqgen-xeon-backend-server:
-    image: opea/faqgen:latest
+    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
     container_name: faqgen-xeon-backend-server
     depends_on:
       - tgi-service
@@ -51,7 +51,7 @@ services:
     ipc: host
     restart: always
   faqgen-xeon-ui-server:
-    image: opea/faqgen-ui:latest
+    image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
     container_name: faqgen-xeon-ui-server
     depends_on:
       - faqgen-xeon-backend-server

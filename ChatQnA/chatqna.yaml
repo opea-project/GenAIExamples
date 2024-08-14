@@ -12,14 +12,14 @@ opea_micro_services:
   dataprep-redis-service:
     host: ${DATAPREP_SERVICE_HOST_IP}
     ports: ${DATAPREP_SERVICE_PORT}
-    image: opea/dataprep-redis:latest
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
     environment:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
   tei-embedding-service:
     host: ${TEI_EMBEDDING_SERVICE_IP}
     ports: ${TEI_EMBEDDING_SERVICE_PORT}
-    image: opea/tei-gaudi:latest
+    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}
     volumes:
       - "./data:/data"
     runtime: habana
@@ -33,17 +33,17 @@ opea_micro_services:
   embedding:
     host: ${EMBEDDING_SERVICE_HOST_IP}
     ports: ${EMBEDDING_SERVICE_PORT}
-    image: opea/embedding-tei:latest
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     endpoint: /v1/embeddings
   retrieval:
     host: ${RETRIEVER_SERVICE_HOST_IP}
     ports: ${RETRIEVER_SERVICE_PORT}
-    image: opea/retriever-redis:latest
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     endpoint: /v1/retrieval
   reranking:
     host: ${RERANK_SERVICE_HOST_IP}
     ports: ${RERANK_SERVICE_PORT}
-    image: opea/reranking-tei:latest
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     endpoint: /v1/reranking
   tgi-service:
     host: ${TGI_SERVICE_IP}
@@ -64,13 +64,13 @@ opea_micro_services:
   llm:
     host: ${LLM_SERVICE_HOST_IP}
     ports: ${LLM_SERVICE_PORT}
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     endpoint: /v1/chat/completions
   ui:
     host: ${UI_SERVICE_HOST_IP}
     ports:
       - "5173:5173"
-    image: opea/chatqna-ui:latest
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     environment:
       - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
       - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
@@ -78,7 +78,7 @@ opea_micro_services:
 opea_mega_service:
   host: ${MEGA_SERVICE_HOST_IP}
   ports: ${MEGA_SERVICE_PORT}
-  image: opea/chatqna:latest
+  image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
   endpoint: /v1/chatqna
   mega_flow:
     - embedding >> retrieval >> reranking >> llm

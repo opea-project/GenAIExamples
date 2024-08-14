@@ -30,7 +30,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/embedding-tei:latest
+        image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: embedding-deploy
         args: null

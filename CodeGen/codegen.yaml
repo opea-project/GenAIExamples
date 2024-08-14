@@ -22,7 +22,7 @@ opea_micro_services:
   llm:
     host: ${LLM_SERVICE_HOST_IP}
     ports: ${LLM_SERVICE_PORT}
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     endpoint: /v1/chat/completions
     environment:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
@@ -31,7 +31,7 @@ opea_micro_services:
     host: ${UI_SERVICE_HOST_IP}
     ports:
       - "5173:5173"
-    image: opea/codegen-ui:latest
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
     environment:
       - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
 
@@ -39,6 +39,6 @@ opea_mega_service:
   host: ${MEGA_SERVICE_HOST_IP}
   ports: ${MEGA_SERVICE_PORT}
   endpoint: /v1/codegen
-  image: opea/codegen:latest
+  image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
   mega_flow:
     - llm

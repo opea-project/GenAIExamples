@@ -30,7 +30,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/reranking-tei:latest
+        image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: reranking-deploy
         args: null

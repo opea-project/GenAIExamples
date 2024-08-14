@@ -50,7 +50,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: audio-qna-config
-        image: opea/asr:latest
+        image: ${REGISTRY:-opea}/asr:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: asr-deploy
         args: null
@@ -101,7 +101,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: audio-qna-config
-        image: opea/whisper-gaudi:latest
+        image: ${REGISTRY:-opea}/whisper-gaudi:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: whisper-deploy
         args: null
@@ -164,7 +164,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: audio-qna-config
-        image: opea/tts:latest
+        image: ${REGISTRY:-opea}/tts:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: tts-deploy
         args: null
@@ -215,7 +215,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: audio-qna-config
-        image: opea/speecht5-gaudi:latest
+        image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: speecht5-deploy
         args: null
@@ -365,7 +365,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: audio-qna-config
-        image: opea/llm-tgi:latest
+        image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: llm-deploy
         args: null
@@ -416,7 +416,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: audio-qna-config
-        image: opea/audioqna:latest
+        image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: audioqna-backend-server-deploy
         args: null

@@ -38,7 +38,7 @@ spec:
             configMapKeyRef:
               name: qna-config
               key: INDEX_NAME
-        image: opea/dataprep-redis:latest
+        image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
         imagePullPolicy: IfNotPresent
         name: dataprep-deploy
         args: null

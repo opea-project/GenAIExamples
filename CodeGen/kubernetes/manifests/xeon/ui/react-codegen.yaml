@@ -177,7 +177,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: {}
-          image: "opea/llm-tgi:latest"
+          image: "${REGISTRY:-opea}/llm-tgi:${TAG:-latest}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: llm-uservice
@@ -228,7 +228,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: null
-          image: "opea/codegen:latest"
+          image: "${REGISTRY:-opea}/codegen:${TAG:-latest}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: codegen
@@ -271,7 +271,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: null
-          image: "opea/codegen-react-ui:latest"
+          image: "${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: react-ui
