@@ -124,9 +124,7 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/ui/
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
 
@@ -426,9 +424,8 @@ chaqna-gaudi-conversation-ui-server:
   image: opea/chatqna-conversation-ui:latest
   container_name: chatqna-gaudi-conversation-ui-server
   environment:
-    - no_proxy=${no_proxy}
-    - https_proxy=${https_proxy}
-    - http_proxy=${http_proxy}
+    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
   ports:
     - "5174:80"
   depends_on:
