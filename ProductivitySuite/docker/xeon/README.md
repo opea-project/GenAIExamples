@@ -498,8 +498,6 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 Here is an example of running Productivity Suite
 ![project-screenshot](../../assets/img/chat_qna_init.png)
-![project-screenshot](../../assets/img/chat_qna_init.png)
-![project-screenshot](../../assets/img/chat_qna_init.png)
 ![project-screenshot](../../assets/img/Login_page.png)
 
 <h2>🧐 Features</h2>

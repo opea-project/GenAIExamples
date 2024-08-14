@@ -1,8 +1,7 @@
-<h1 align="center" id="title"> Production Suite UI</h1>
+<h1 align="center" id="title"> Productivity Suite React UI</h1>
 
 ### 📸 Project Screenshots
 
-![project-screenshot](../../../assets/img/chat_qna_init.png)
 ![project-screenshot](../../../assets/img/chat_qna_init.png)
 ![project-screenshot](../../../assets/img/Login_page.png)
 
