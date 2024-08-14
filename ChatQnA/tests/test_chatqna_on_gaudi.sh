@@ -20,7 +20,7 @@ function build_docker_images() {
     git clone https://github.com/huggingface/tei-gaudi
 
     # build all the images
-    docker compose -f docker_build_compose.yaml build --no-cache
+    docker compose -f docker_build_compose.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5

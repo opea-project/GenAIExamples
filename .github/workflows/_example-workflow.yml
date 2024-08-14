@@ -60,7 +60,7 @@ jobs:
           if [ "${{ inputs.example }}" == "ChatQnA" ]; then
               # git clone https://github.com/opea-project/GenAIComps.git
               git clone https://github.com/huggingface/tei-gaudi.git
-              git clone https://github.com/vllm-project/vllm.git.git
+              git clone https://github.com/vllm-project/vllm.git
           fi
 
       - name: Build Image
