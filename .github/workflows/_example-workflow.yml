@@ -6,6 +6,9 @@ permissions: read-all
 on:
   workflow_call:
     inputs:
+      node:
+        required: true
+        type: string
       example:
         required: true
         type: string
@@ -42,16 +45,17 @@ jobs:
 # Image Build
 ####################################################################################################
   build-images:
-    strategy:
-      matrix:
-        node: ["docker-build-xeon", "docker-build-gaudi"]
-    runs-on: ${{ matrix.node }}
+    runs-on: "docker-build-${{ inputs.node }}"
     continue-on-error: true
-    if: ${{ fromJSON(inputs.build) }}
     steps:
       - name: Clean Up Working Directory
         run: |
-          sudo rm -rf ${{github.workspace}}/*
+          if [ "${{ inputs.build }}" == "true" ]; then
+            sudo rm -rf ${{github.workspace}}/*
+          else
+            echo "No need to build images, exiting..."
+            exit 0
+          fi
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
@@ -91,8 +95,8 @@ jobs:
 
   scan-images:
     needs: [image-list]
-    if: ${{ fromJSON(inputs.scan) }}
-    runs-on: "docker-build-gaudi"
+    if: ${{ fromJSON(inputs.scan) }} && ${{ inputs.node }} == "gaudi"
+    runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
@@ -129,16 +133,12 @@ jobs:
 ####################################################################################################
   test-example-compose:
     needs: [build-images]
-    if: always() && ${{ fromJSON(inputs.test_compose) }}
-    strategy:
-      matrix:
-        hardware: ["xeon", "gaudi"]
-      fail-fast: false
+    if: ${{ fromJSON(inputs.test_compose) }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       tag: ${{ inputs.tag }}
       example: ${{ inputs.example }}
-      hardware: ${{ matrix.hardware }}
+      hardware: ${{ inputs.node }}
     secrets: inherit
 
 
@@ -153,7 +153,7 @@ jobs:
 ####################################################################################################
   publish:
     needs: [image-list, build-images, scan-images, test-example-compose]
-    if: always() && ${{ fromJSON(inputs.publish) }}
+    if: ${{ fromJSON(inputs.publish) }} && ${{ inputs.node }} == "gaudi"
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
