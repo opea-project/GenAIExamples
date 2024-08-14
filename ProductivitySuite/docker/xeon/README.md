@@ -200,13 +200,7 @@ docker compose -f compose.yaml up -d
 ```
 ### Setup Keycloak
 
-The user management is done via Keycloak and the configuration steps look like this:
-
-1. Access the keycloak admin console via url http:${host_ip}:8080 to configure user. Use default username(admin) and password(admin) to login.
-2. Create a new realm named istio within Keycloak.
-3. Create a new client called istio with default configurations.
-4. From the left pane select the Realm roles and create a new role name as user and another new role as viewer.
-5. Create a new user name as for example mary and another user as bob. Set passwords for both users (set 'Temporary' to 'Off'). Select Role mapping on the top, assign the user role to mary and assign the viewer role to bob.
+Please refer to [keycloak_setup_guide](ProductivitySuite/docker/xeon/keycloak_setup_guide.md) for more detail related to Keycloak configuration setup.
 
 ### Validate Microservices
 
