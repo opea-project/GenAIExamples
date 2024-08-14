@@ -359,8 +359,6 @@ function validate_frontend() {
     source activate ${conda_env_name}
     echo "[ TEST INFO ]: --------- conda env activated ---------"
 
-    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
 #    conda install -c conda-forge nodejs -y
     npm install && npm ci
     node -v && npm -v && pip list
