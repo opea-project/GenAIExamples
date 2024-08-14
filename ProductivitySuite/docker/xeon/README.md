@@ -62,7 +62,7 @@ cd ..
 
 ### 8. Build MegaService Docker Images
 
-The Productivity Suite is composed of multiple GenAIExample reference solutions composed together. 
+The Productivity Suite is composed of multiple GenAIExample reference solutions composed together.
 
 ### 8.1 Build ChatQnA MegaService Docker Images
 
@@ -138,7 +138,7 @@ export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
 ```bash
-export MONGO_HOST=10.223.24.231
+export MONGO_HOST=${host_ip}
 export MONGO_PORT=27017
 export DB_NAME="test"
 export COLLECTION_NAME="Conversations"
@@ -200,13 +200,7 @@ docker compose -f compose.yaml up -d
 ```
 ### Setup Keycloak
 
-The user management is done via Keycloak and the configuration steps look like this:
-
-1. Access the keycloak admin console via url http:${host_ip}:8080 to configure user. Use default username(admin) and password(admin) to login.
-2. Create a new realm named istio within Keycloak.
-3. Create a new client called istio with default configurations.
-4. From the left pane select the Realm roles and create a new role name as user and another new role as viewer.
-5. Create a new user name as for example mary and another user as bob. Set passwords for both users (set 'Temporary' to 'Off'). Select Role mapping on the top, assign the user role to mary and assign the viewer role to bob.
+Please refer to [keycloak_setup_guide](keycloak_setup_guide.md) for more detail related to Keycloak configuration setup.
 
 ### Validate Microservices
 
@@ -445,9 +439,9 @@ curl -X 'POST' \
 
 19. Chat History Microservice
 
-To validate the chatHistory Microservice, you can use the following commands. 
+To validate the chatHistory Microservice, you can use the following commands.
 
-Create a sample conversation and get the message ID. 
+Create a sample conversation and get the message ID.
 
 ```bash
 curl -X 'POST' \
@@ -495,8 +489,8 @@ curl -X 'POST' \
 To access the frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  comboapp-ui-server:
-    image: opea/ProductivitySuite-ui:latest
+  productivity-suite-xeon-react-ui-server:
+    image: opea/productivity-suite-react-ui-server:latest
     ...
     ports:
       - "5714:80"

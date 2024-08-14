@@ -1,0 +1,243 @@
+---
+# Source: faqgen/charts/llm-uservice/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: faqgen-llm-uservice-config
+  labels:
+    helm.sh/chart: llm-uservice-0.8.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: faqgen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  TGI_LLM_ENDPOINT: "http://faqgen-tgi:80"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+---
+# Source: faqgen/charts/tgi/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: faqgen-tgi-config
+  labels:
+    helm.sh/chart: tgi-0.8.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: faqgen
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  MODEL_ID: "Intel/neural-chat-7b-v3-3"
+  PORT: "80"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+---
+# Source: faqgen/charts/llm-uservice/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: faqgen-tgi
+  labels:
+    helm.sh/chart: tgi-0.8.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: faqgen
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: tgi
+  selector:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: faqgen
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: faqgen-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.8.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: faqgen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: llm-uservice
+  selector:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: faqgen
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: faqgen
+  labels:
+    helm.sh/chart: faqgen-0.8.0
+    app.kubernetes.io/name: faqgen
+    app.kubernetes.io/instance: faqgen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8888
+      targetPort: 8888
+      protocol: TCP
+      name: faqgen
+  selector:
+    app.kubernetes.io/name: faqgen
+    app.kubernetes.io/instance: faqgen
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faqgen-tgi
+  labels:
+    helm.sh/chart: tgi-0.8.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: faqgen
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tgi
+      app.kubernetes.io/instance: faqgen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tgi
+        app.kubernetes.io/instance: faqgen
+    spec:
+      securityContext: {}
+      containers:
+        - name: tgi
+          envFrom:
+            - configMapRef:
+                name: faqgen-tgi-config
+          securityContext: {}
+          image: "ghcr.io/huggingface/text-generation-inference:2.1.0"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources: {}
+      volumes:
+        - name: model-volume
+          hostPath:
+            path: /mnt/opea-models
+            type: Directory
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faqgen-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.8.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: faqgen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llm-uservice
+      app.kubernetes.io/instance: faqgen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llm-uservice
+        app.kubernetes.io/instance: faqgen
+    spec:
+      securityContext: {}
+      containers:
+        - name: faqgen
+          envFrom:
+            - configMapRef:
+                name: faqgen-llm-uservice-config
+          securityContext: {}
+          image: "opea/llm-faqgen-tgi:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: llm-uservice
+              containerPort: 9000
+              protocol: TCP
+          startupProbe:
+            exec:
+              command:
+                - curl
+                - http://faqgen-tgi:80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 120
+          resources: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faqgen
+  labels:
+    helm.sh/chart: faqgen-0.8.0
+    app.kubernetes.io/name: faqgen
+    app.kubernetes.io/instance: faqgen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: faqgen
+      app.kubernetes.io/instance: faqgen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: faqgen
+        app.kubernetes.io/instance: faqgen
+    spec:
+      securityContext: null
+      containers:
+        - name: faqgen
+          env:
+            - name: LLM_SERVICE_HOST_IP
+              value: faqgen-llm-uservice
+            - name: http_proxy
+              value: ""
+            - name: https_proxy
+              value: ""
+            - name: no_proxy
+              value: ""
+          securityContext: null
+          image: "opea/faqgen:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: faqgen
+              containerPort: 8888
+              protocol: TCP
+          resources: null
