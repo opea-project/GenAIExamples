@@ -142,6 +142,7 @@ jobs:
       example: ${{ inputs.example }}
       hardware: ${{ matrix.hardware }}
       tag: ${{ inputs.tag }}
+      registry: ${OPEA_IMAGE_REPO}
     secrets: inherit
 
 
