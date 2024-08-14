@@ -59,7 +59,7 @@ jobs:
         uses: opea-project/validation/actions/image-build@main
         with:
           work_dir: ${{ github.workspace }}/${{ inputs.example }}
-          docker_compose_path: ${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.example }}-compose.yaml
+          docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
           registry: ${OPEA_IMAGE_REPO}opea
           tag: ${{ inputs.tag }}
 
@@ -133,16 +133,11 @@ jobs:
   test-k8s-manifest:
     needs: [build-images]
     if: ${{ fromJSON(inputs.test_k8s) }}
-    strategy:
-      matrix:
-        hardware: ["xeon", "gaudi"]
-      fail-fast: false
     uses: ./.github/workflows/_manifest-e2e.yml
     with:
       example: ${{ inputs.example }}
-      hardware: ${{ matrix.hardware }}
+      hardware: ${{ inputs.node }}
       tag: ${{ inputs.tag }}
-      registry: ${OPEA_IMAGE_REPO}
     secrets: inherit
 
 
