@@ -54,13 +54,13 @@ jobs:
             sudo rm -rf ${{github.workspace}}/*
           else
             echo "No need to build images, exiting..."
-            exit 0
           fi
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
       - name: Build Image
+        if: ${{ fromJSON(inputs.build) }}
         uses: opea-project/validation/actions/image-build@main
         with:
           work_dir: ${{ github.workspace }}/${{ inputs.example }}
