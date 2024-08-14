@@ -81,6 +81,7 @@ function start_services() {
     docker compose -f compose_vllm.yaml up -d
     n=0
     until [[ "$n" -ge 25 ]]; do
+        echo "n=$n"
         docker logs vllm-gaudi-server > vllm_service_start.log
         if grep -q "Warmup finished" vllm_service_start.log; then
             break
