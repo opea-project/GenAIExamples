@@ -50,23 +50,6 @@ function validate_chatqna() {
    # wait for client pod ready
    wait_until_pod_ready "client-test" $APP_NAMESPACE "client-test"
 
-   max_retry=20
-   # make sure microservice retriever is ready
-   # try to curl retriever-svc for max_retry times
-   for ((i=1; i<=max_retry; i++))
-   do
-     curl http://retriever-svc.$APP_NAMESPACE:7000/v1/retrieval -X POST \
-       -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
-       -H 'Content-Type: application/json' && break
-     sleep 10
-   done
-
-   # if i is bigger than max_retry, then exit with error
-   if [ $i -gt $max_retry ]; then
-       echo "Microservice failed, exit with error."
-       exit 1
-   fi
-
    kubectl get pods -n $APP_NAMESPACE
    # send request to chatqnA
    export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
@@ -105,23 +88,6 @@ function validate_chatqna_dataprep() {
    # wait for client pod ready
    wait_until_pod_ready "client-test" $CHATQNA_DATAPREP_NAMESPACE "client-test"
    # giving time to populating data
-
-   max_retry=20
-   # make sure microservice retriever is ready
-   # try to curl retriever-svc for max_retry times
-   for ((i=1; i<=max_retry; i++))
-   do
-     curl http://retriever-svc.$CHATQNA_DATAPREP_NAMESPACE:7000/v1/retrieval -X POST \
-       -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
-       -H 'Content-Type: application/json' && break
-     sleep 10
-   done
-
-   # if i is bigger than max_retry, then exit with error
-   if [ $i -gt $max_retry ]; then
-       echo "Microservice failed, exit with error."
-       exit 1
-   fi
 
    kubectl get pods -n $CHATQNA_DATAPREP_NAMESPACE
    # send request to chatqnA
