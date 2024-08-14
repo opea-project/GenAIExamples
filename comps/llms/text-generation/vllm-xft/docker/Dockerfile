@@ -58,13 +58,13 @@ RUN cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/oneCCL \
 
 RUN echo "source /usr/local/oneCCL/env/setvars.sh" >> ~/.bashrc
 
-WORKDIR /root/
+WORKDIR /home/user/
 RUN rm -rf /tmp/oneCCL
 
 RUN git clone https://github.com/intel/xFasterTransformer.git
 
 SHELL ["/bin/bash", "-c"]
-WORKDIR /root/xFasterTransformer
+WORKDIR /home/user/xFasterTransformer
 RUN git checkout ${TAG} \
     && export "LD_LIBRARY_PATH=/usr/local/mklml_lnx_2019.0.5.20190502/lib:$LD_LIBRARY_PATH" \
     && export "PATH=/usr/bin/python3.8:$PATH" \
@@ -75,23 +75,23 @@ RUN git checkout ${TAG} \
     && pip install --no-cache-dir dist/*
 
 RUN mkdir -p /usr/local/xft/lib \
-    && cp /root/xFasterTransformer/build/libxfastertransformer.so /usr/local/xft/lib \
-    && cp /root/xFasterTransformer/build/libxft_comm_helper.so /usr/local/xft/lib \
-    && cp -r /root/xFasterTransformer/include /usr/local/xft/ \
+    && cp /home/user/xFasterTransformer/build/libxfastertransformer.so /usr/local/xft/lib \
+    && cp /home/user/xFasterTransformer/build/libxft_comm_helper.so /usr/local/xft/lib \
+    && cp -r /home/user/xFasterTransformer/include /usr/local/xft/ \
     && mkdir -p  /usr/local/include/xft/ \
     && ln -s /usr/local/xft/include /usr/local/include/xft/include
 
 RUN echo "export \$(python -c 'import xfastertransformer as xft; print(xft.get_env())')" >> ~/.bashrc
 
-COPY comps /root/comps
+COPY comps /home/user/comps
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /root/comps/llms/text-generation/vllm-xft/requirements.txt
+    pip install --no-cache-dir -r /home/user/comps/llms/text-generation/vllm-xft/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/root
 
-RUN chmod +x /root/comps/llms/text-generation/vllm-xft/run.sh
+RUN chmod +x /home/user/comps/llms/text-generation/vllm-xft/run.sh
 
-WORKDIR /root/comps/llms/text-generation/vllm-xft/
+WORKDIR /home/user/comps/llms/text-generation/vllm-xft/
 
-ENTRYPOINT ["/root/comps/llms/text-generation/vllm-xft/run.sh"]
+ENTRYPOINT ["/home/user/comps/llms/text-generation/vllm-xft/run.sh"]

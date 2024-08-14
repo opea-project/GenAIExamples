@@ -6,10 +6,10 @@ FROM vault.habana.ai/gaudi-docker/1.16.0/ubuntu22.04/habanalabs/pytorch-installe
 
 ENV LANG=en_US.UTF-8
 
-WORKDIR /root/vllm-ray
+WORKDIR /home/user/vllm-ray
 
 # copy the source code to the package directory
-COPY comps/llms/text-generation/vllm-ray /root/vllm-ray
+COPY comps/llms/text-generation/vllm-ray /home/user/vllm-ray
 
 RUN pip install --upgrade-strategy eager optimum[habana] && \
     pip install git+https://github.com/HabanaAI/DeepSpeed.git@1.15.1
@@ -21,7 +21,7 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
     service ssh restart
 
 ENV no_proxy=localhost,127.0.0.1
-ENV PYTHONPATH=$PYTHONPATH:/root:/root/vllm-ray
+ENV PYTHONPATH=$PYTHONPATH:/root:/home/user/vllm-ray
 
 # Required by DeepSpeed
 ENV RAY_EXPERIMENTAL_NOSET_HABANA_VISIBLE_MODULES=1

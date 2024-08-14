@@ -4,7 +4,7 @@
 
 from openai import Client
 
-DEFAULT_MODEL = "/root/bge-large-zh-v1.5/"
+DEFAULT_MODEL = "/home/user/bge-large-zh-v1.5/"
 SERVICE_URL = "http://127.0.0.1:8000"
 INPUT_STR = "Hello world!"
 

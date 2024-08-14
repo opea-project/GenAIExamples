@@ -51,7 +51,7 @@ docker run -d --rm --name="vllm-openvino-server" \
   -e HTTPS_PROXY=$https_proxy \
   -e HTTP_PROXY=$https_proxy \
   -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
-  -v $HOME/.cache/huggingface:/root/.cache/huggingface \
+  -v $HOME/.cache/huggingface:/home/user/.cache/huggingface \
   vllm:openvino /bin/bash -c "\
     cd / && \
     export VLLM_CPU_KVCACHE_SPACE=50 && \

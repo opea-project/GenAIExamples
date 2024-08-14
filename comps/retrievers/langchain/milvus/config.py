@@ -16,4 +16,4 @@ COLLECTION_NAME = os.getenv("COLLECTION_NAME", "rag_milvus")
 MOSEC_EMBEDDING_ENDPOINT = os.environ.get("MOSEC_EMBEDDING_ENDPOINT", "")
 os.environ["OPENAI_API_BASE"] = MOSEC_EMBEDDING_ENDPOINT
 os.environ["OPENAI_API_KEY"] = "Dummy key"
-MODEL_ID = "/root/bce-embedding-base_v1"
+MODEL_ID = "/home/user/bce-embedding-base_v1"
