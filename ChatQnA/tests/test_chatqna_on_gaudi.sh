@@ -5,20 +5,22 @@
 set -e
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
-echo "IMAGE_REPO=${IMAGE_REPO}"
-echo "IMAGE_TAG=${IMAGE_TAG}"
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH
+    cd $WORKPATH/docker
     git clone https://github.com/opea-project/GenAIComps.git
     git clone https://github.com/huggingface/tei-gaudi
 
-    # CI build all the images
-    IMAGE_REPO=${IMAGE_REPO} TAG=${IMAGE_TAG} docker compose build --no-cache
+    # build all the images
+    docker compose -f build_docker_compose.yaml build --no-cache
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -51,7 +53,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    TAG=${IMAGE_TAG} docker compose up -d
+    docker compose up -d
 
     n=0
     until [[ "$n" -ge 400 ]]; do
