@@ -64,6 +64,16 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 cd ../../../..
 ```
 
+### 9. Build React UI Docker Image (Optional)
+
+Construct the frontend Docker image using the command below:
+
+```bash
+cd GenAIExamples/ChatQnA/docker/ui/
+docker build --no-cache -t opea/chatqna-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
+cd ../../../..
+```
+
 Then run the command `docker images`, you will have the following 7 Docker Images:
 
 1. `opea/embedding-tei:latest`
@@ -73,6 +83,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 5. `opea/dataprep-redis:latest`
 6. `opea/chatqna:latest`
 7. `opea/chatqna-ui:latest`
+8. `opea/chatqna-react-ui:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -253,6 +264,35 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
     ...
     ports:
       - "80:5173"
+```
+
+## 🚀 Launch the Conversational UI (Optional)
+
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
+
+```yaml
+chaqna-xeon-conversation-ui-server:
+  image: opea/chatqna-conversation-ui:latest
+  container_name: chatqna-xeon-conversation-ui-server
+  environment:
+    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
+  ports:
+    - "5174:80"
+  depends_on:
+    - chaqna-xeon-backend-server
+  ipc: host
+  restart: always
+```
+
+Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
+
+```yaml
+  chaqna-xeon-conversation-ui-server:
+    image: opea/chatqna-conversation-ui:latest
+    ...
+    ports:
+      - "80:80"
 ```
 
 ![project-screenshot](../../assets/img/chat_ui_init.png)
