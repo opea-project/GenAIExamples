@@ -138,7 +138,7 @@ jobs:
 ####################################################################################################
   publish:
     needs: [image-list, build-images, scan-images, test-example-compose]
-    if: ${{ fromJSON(inputs.scan) }}
+    if: ${{ fromJSON(inputs.publish) && inputs.node == 'gaudi' }}
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
