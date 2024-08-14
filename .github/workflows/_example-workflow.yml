@@ -78,11 +78,6 @@ jobs:
     outputs:
       matrix: ${{ steps.scan-matrix.outputs.matrix }}
     steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@v2.8.1
-        with:
-          egress-policy: audit
-
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
@@ -95,18 +90,13 @@ jobs:
 
   scan-images:
     needs: [image-list]
-    if: inputs.scan == 'true' && inputs.node == 'gaudi'
+    if: inputs.node == 'gaudi' && inputs.scan == 'true'
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
       fail-fast: false
     steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@v2.8.1
-        with:
-          egress-policy: audit
-
       - name: Pull Image
         run: |
           docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
@@ -153,7 +143,7 @@ jobs:
 ####################################################################################################
   publish:
     needs: [image-list, build-images, scan-images, test-example-compose]
-    if: inputs.publish == 'true' && inputs.node == 'gaudi'
+    if: inputs.node == 'gaudi' && inputs.publish == 'true'
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
