@@ -162,7 +162,7 @@ export const deleteInDataSource = createAsyncThunkWrapper(
   "conversation/deleteInDataSource",
   async ({ file }: { file: any }, { dispatch }) => {
     const response = await client.post(DATA_PREP_DELETE_URL, {
-      file_path: file.name,
+      file_path: file,
     });
     dispatch(getAllFilesInDataSource({ knowledgeBaseId: "default" }));
     return response.data;
