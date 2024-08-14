@@ -116,7 +116,7 @@ curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d 
           {
             "type": "image_url",
             "image_url": {
-              "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+              "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
             }
           }
         ]
