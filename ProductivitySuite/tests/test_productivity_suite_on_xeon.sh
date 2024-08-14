@@ -139,7 +139,7 @@ function validate_service() {
     fi
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
-        
+
     docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
 
     # check response status

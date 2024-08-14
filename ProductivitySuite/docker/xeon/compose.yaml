@@ -343,7 +343,7 @@ services:
     ipc: host
     command: start-dev
     restart: always
-  
+
   productivity-suite-xeon-react-ui-server:
     image: opea/productivity-suite-react-ui-server:latest
     container_name: productivity-suite-xeon-react-ui-server

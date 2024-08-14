@@ -3,9 +3,10 @@
 OPEA Productivity Suite, is a powerful tool designed to streamline your workflow and boost productivity. This application leverages the cutting-edge OPEA microservices to provide a comprehensive suite of features that cater to the diverse needs of modern enterprises.
 
 ### Key Features
+
 - Chat with Documents: Engage in intelligent conversations with your documents using our advanced RAG Capabilities. Our Retrieval-Augmented Generation (RAG) model allows you to ask questions, receive relevant information, and gain insights from your documents in real-time.
 
-- Content Summarization: Save time and effort by automatically summarizing lengthy documents or articles,  enabling you to quickly grasp the key takeaways.
+- Content Summarization: Save time and effort by automatically summarizing lengthy documents or articles, enabling you to quickly grasp the key takeaways.
 
 - FAQ Generation: Effortlessly create comprehensive FAQs based on your documents, ensuring that your users have access to the information they need.
 

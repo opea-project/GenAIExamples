@@ -44,11 +44,11 @@
         width: 100%;
         // padding: 16px 32px;
         .newConversation {
-          @include flex(row, nowrap, flex-start,flex-start);
+          @include flex(row, nowrap, flex-start, flex-start);
           .infoMessages {
-           padding: 16px 32px;
+            padding: 16px 32px;
 
-            flex:80;
+            flex: 80;
           }
         }
         & > * {
@@ -69,6 +69,5 @@
       @include flex(column, nowrap, center, center);
       font-size: 32px;
     }
-    
   }
 }
