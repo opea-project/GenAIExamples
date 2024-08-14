@@ -18,21 +18,21 @@ services:
       - qdrant-vector-db
       - tei-embedding-service
     ports:
-      - "6000:6000"
+      - "6043:6007"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      QDRANT: ${host_ip}
+      QDRANT_HOST: ${QDRANT_HOST}
       QDRANT_PORT: 6333
       COLLECTION_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
     ports:
-      - "6006:80"
+      - "6040:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -47,16 +47,13 @@ services:
     depends_on:
       - tei-embedding-service
     ports:
-      - "6000:6000"
+      - "6044:6000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-embedding-service"
     restart: unless-stopped
   retriever:
     image: opea/retriever-qdrant:latest
@@ -64,22 +61,21 @@ services:
     depends_on:
       - qdrant-vector-db
     ports:
-      - "7000:7000"
+      - "6045:7000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      QDRANT_HOST: ${host_ip}
+      QDRANT_HOST: ${QDRANT_HOST}
       QDRANT_PORT: 6333
       INDEX_NAME: ${INDEX_NAME}
-      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-reranking-server
     ports:
-      - "8808:80"
+      - "6041:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -97,7 +93,7 @@ services:
     depends_on:
       - tei-reranking-service
     ports:
-      - "8000:8000"
+      - "6046:8000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -107,15 +103,12 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.1.0
     container_name: tgi-service
     ports:
-      - "9009:80"
+      - "6042:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -133,7 +126,7 @@ services:
     depends_on:
       - tgi-service
     ports:
-      - "9000:9000"
+      - "6047:9000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -143,9 +136,6 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
   chaqna-xeon-backend-server:
     image: opea/chatqna:latest
@@ -160,16 +150,20 @@ services:
       - tgi-service
       - llm
     ports:
-      - "8888:8888"
+      - "8912:8888"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
+      - EMBEDDING_SERVICE_PORT=${EMBEDDING_SERVICE_PORT}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
+      - RETRIEVER_SERVICE_PORT=${RETRIEVER_SERVICE_PORT}
       - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
+      - RERANK_SERVICE_PORT=${RERANK_SERVICE_PORT}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
     ipc: host
     restart: always
   chaqna-xeon-ui-server:
