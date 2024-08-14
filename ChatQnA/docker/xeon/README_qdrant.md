@@ -20,37 +20,41 @@ qdrant-vector-db
 Port 6333 - Open to 0.0.0.0/0
 Port 6334 - Open to 0.0.0.0/0
 
+dataprep-qdrant-server
+======================
+Port 6043 - Open to 0.0.0.0/0
+
 tei_embedding_service
 =====================
-Port 6006 - Open to 0.0.0.0/0
+Port 6040 - Open to 0.0.0.0/0
 
 embedding
 =========
-Port 6000 - Open to 0.0.0.0/0
+Port 6044 - Open to 0.0.0.0/0
 
 retriever
 =========
-Port 7000 - Open to 0.0.0.0/0
+Port 6045 - Open to 0.0.0.0/0
 
-tei_xeon_service
+tei_reranking_service
 ================
-Port 8808 - Open to 0.0.0.0/0
+Port 6041 - Open to 0.0.0.0/0
 
 reranking
 =========
-Port 8000 - Open to 0.0.0.0/0
+Port 6046 - Open to 0.0.0.0/0
 
 tgi-service
 ===========
-Port 9009 - Open to 0.0.0.0/0
+Port 6042 - Open to 0.0.0.0/0
 
 llm
 ===
-Port 9000 - Open to 0.0.0.0/0
+Port 6047 - Open to 0.0.0.0/0
 
 chaqna-xeon-backend-server
 ==========================
-Port 8888 - Open to 0.0.0.0/0
+Port 8912 - Open to 0.0.0.0/0
 
 chaqna-xeon-ui-server
 =====================
@@ -126,10 +130,9 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/ui/
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT --build-arg DATAPREP_GET_FILE_ENDPOINT=$DATAPREP_GET_FILE_ENDPOINT -f ./docker/Dockerfile.react .
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep"
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
 
@@ -178,9 +181,9 @@ export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
-export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
+export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6040"
+export TEI_RERANKING_ENDPOINT="http://${host_ip}:6041"
+export TGI_LLM_ENDPOINT="http://${host_ip}:6042"
 export QDRANT_HOST=${host_ip}
 export QDRANT_PORT=6333
 export INDEX_NAME="rag-qdrant"
@@ -190,10 +193,8 @@ export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -204,7 +205,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/xeon/
-docker compose up -d
+docker compose -f compose_qdrant.yaml up -d
 ```
 
 ### Validate Microservices
@@ -212,7 +213,7 @@ docker compose up -d
 1. TEI Embedding Service
 
 ```bash
-curl ${host_ip}:6006/embed \
+curl ${host_ip}:6040/embed \
     -X POST \
     -d '{"inputs":"What is Deep Learning?"}' \
     -H 'Content-Type: application/json'
@@ -221,25 +222,23 @@ curl ${host_ip}:6006/embed \
 2. Embedding Microservice
 
 ```bash
-curl http://${host_ip}:6000/v1/embeddings\
+curl http://${host_ip}:6044/v1/embeddings\
   -X POST \
   -d '{"text":"hello"}' \
   -H 'Content-Type: application/json'
 ```
 
-3. Retriever Microservice  
-   To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
+3. Retriever Microservice
 
-```Python
-import random
-embedding = [random.uniform(-1, 1) for _ in range(768)]
-print(embedding)
-```
+To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
+is determined by the embedding model.
+Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
 
-Then substitute your mock embedding vector for the `${your_embedding}` in the following cURL command:
+Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
 
 ```bash
-curl http://${host_ip}:7000/v1/retrieval \
+export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+curl http://${host_ip}:6045/v1/retrieval \
   -X POST \
   -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
   -H 'Content-Type: application/json'
@@ -248,7 +247,7 @@ curl http://${host_ip}:7000/v1/retrieval \
 4. TEI Reranking Service
 
 ```bash
-curl http://${host_ip}:8808/rerank \
+curl http://${host_ip}:6041/rerank \
     -X POST \
     -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
     -H 'Content-Type: application/json'
@@ -257,7 +256,7 @@ curl http://${host_ip}:8808/rerank \
 5. Reranking Microservice
 
 ```bash
-curl http://${host_ip}:8000/v1/reranking\
+curl http://${host_ip}:6046/v1/reranking\
   -X POST \
   -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
   -H 'Content-Type: application/json'
@@ -266,7 +265,7 @@ curl http://${host_ip}:8000/v1/reranking\
 6. TGI Service
 
 ```bash
-curl http://${host_ip}:9009/generate \
+curl http://${host_ip}:6042/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
@@ -275,7 +274,7 @@ curl http://${host_ip}:9009/generate \
 7. LLM Microservice
 
 ```bash
-curl http://${host_ip}:9000/v1/chat/completions\
+curl http://${host_ip}:6047/v1/chat/completions\
   -X POST \
   -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
   -H 'Content-Type: application/json'
@@ -284,7 +283,7 @@ curl http://${host_ip}:9000/v1/chat/completions\
 8. MegaService
 
 ```bash
-curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:8912/v1/chatqna -H "Content-Type: application/json" -d '{
      "messages": "What is the revenue of Nike in 2023?"
      }'
 ```
@@ -296,9 +295,9 @@ If you want to update the default knowledge base, you can use the following comm
 Update Knowledge Base via Local File Upload:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6043/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
-     -F "files=@./nke-10k-2023.pdf"
+     -F "files=@./your_file.pdf"
 ```
 
 This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
@@ -306,37 +305,9 @@ This command updates a knowledge base by uploading a local file for processing. 
 Add Knowledge Base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6043/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
-```
-
-This command updates a knowledge base by submitting a list of HTTP links for processing.
-
-Also, you are able to get the file list that you uploaded:
-
-```bash
-curl -X POST "http://${host_ip}:6008/v1/dataprep/get_file" \
-     -H "Content-Type: application/json"
-```
-
-To delete the file/link you uploaded:
-
-```bash
-# delete link
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
-     -d '{"file_path": "https://opea.dev"}' \
-     -H "Content-Type: application/json"
-
-# delete file
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
-     -d '{"file_path": "nke-10k-2023.pdf"}' \
-     -H "Content-Type: application/json"
-
-# delete all uploaded files and links
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
-     -d '{"file_path": "all"}' \
-     -H "Content-Type: application/json"
 ```
 
 ## 🚀 Launch the UI
