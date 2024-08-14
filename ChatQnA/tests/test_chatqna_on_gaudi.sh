@@ -50,7 +50,7 @@ function start_services() {
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export TGI_LLM_ENDPOINT="http://${ip_address}:8005"
     export REDIS_URL="redis://${ip_address}:6379"
     export REDIS_HOST=${ip_address}
     export INDEX_NAME="rag-redis"
@@ -215,7 +215,7 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_service \
-        "${ip_address}:8008/generate" \
+        "${ip_address}:8005/generate" \
         "generated_text" \
         "tgi-llm" \
         "tgi-gaudi-server" \

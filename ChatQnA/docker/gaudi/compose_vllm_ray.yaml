@@ -112,7 +112,7 @@ services:
     image: opea/llm-vllm-ray-hpu:latest
     container_name: vllm-ray-gaudi-server
     ports:
-      - "8008:8000"
+      - "8006:8000"
     volumes:
       - "./data:/data"
     environment:
@@ -122,12 +122,12 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
-      LLM_MODEL: ${LLM_MODEL_ID}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
-    command: /bin/bash -c "ray start --head && python vllm_ray_openai.py --port_number 8000 --model_id_or_path $LLM_MODEL --tensor_parallel_size 2 --enforce_eager True"
+    command: /bin/bash -c "ray start --head && python vllm_ray_openai.py --port_number 8000 --model_id_or_path $LLM_MODEL_ID --tensor_parallel_size 2 --enforce_eager True"
   llm:
     image: opea/llm-vllm-ray:latest
     container_name: llm-vllm-ray-gaudi-server

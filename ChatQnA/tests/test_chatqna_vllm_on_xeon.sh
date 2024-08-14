@@ -26,16 +26,15 @@ function build_docker_images() {
     cd $WORKPATH/docker/ui
     docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
-#    cd $WORKPATH
-#    git clone https://github.com/vllm-project/vllm.git
-#    cd vllm
-#    docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
+    # cd $WORKPATH
+    # git clone https://github.com/vllm-project/vllm.git
+    # cd vllm
+    # docker build --no-cache -t opea/vllm:latest -f Dockerfile.cpu .
 
     docker images
 }
 
 function start_services() {
-    # build vllm for each test instead of pull from local registry
     cd $WORKPATH
     git clone https://github.com/vllm-project/vllm.git
     cd vllm
@@ -73,18 +72,19 @@ function start_services() {
             sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_vllm.yaml
             sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_vllm.yaml
             sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_vllm.yaml
+            sed -i "s#image: ${IMAGE_REPO}opea/vllm:latest#image: opea/vllm:latest#g" compose_vllm.yaml
         fi
     fi
 
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d
     n=0
-    until [[ "$n" -ge 100 ]]; do
+    until [[ "$n" -ge 10 ]]; do
         docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log
         if grep -q Connected ${LOG_PATH}/vllm_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 10s
         n=$((n+1))
     done
 }
@@ -185,7 +185,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
         "${ip_address}:8888/v1/chatqna" \
-        "billion" \
+        "data" \
         "mega-chatqna" \
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
