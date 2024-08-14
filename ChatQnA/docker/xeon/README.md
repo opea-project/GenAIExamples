@@ -144,10 +144,7 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/ui/
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT --build-arg DATAPREP_GET_FILE_ENDPOINT=$DATAPREP_GET_FILE_ENDPOINT -f ./docker/Dockerfile.react .
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
 
@@ -293,6 +290,10 @@ curl http://${host_ip}:8000/v1/reranking\
 
 6. LLM backend Service
 
+In first startup, this service will take more time to download the LLM file. After it's finished, the service will be ready.
+
+Use `docker logs CONTAINER_ID` to check if the download is finished.
+
 ```bash
 # TGI service
 curl http://${host_ip}:9009/generate \
@@ -303,12 +304,14 @@ curl http://${host_ip}:9009/generate \
 
 ```bash
 # vLLM Service
-curl http://${your_ip}:9009/v1/completions \
+curl http://${host_ip}:9009/v1/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
 ```
 
 7. LLM Microservice
+
+This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
 ```bash
 curl http://${host_ip}:9000/v1/chat/completions\
@@ -329,7 +332,7 @@ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
 
 If you want to update the default knowledge base, you can use the following commands:
 
-Update Knowledge Base via Local File Upload:
+Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) Upload:
 
 ```bash
 curl -X POST "http://${host_ip}:6007/v1/dataprep" \
@@ -375,25 +378,6 @@ curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
      -H "Content-Type: application/json"
 ```
 
-## Enable LangSmith for Monotoring Application (Optional)
-
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
-
-Here's how you can do it:
-
-1. Install the latest version of LangSmith:
-
-```bash
-pip install -U langsmith
-```
-
-2. Set the necessary environment variables:
-
-```bash
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=ls_...
-```
-
 ## 🚀 Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
@@ -408,20 +392,19 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 ## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
 
 ```yaml
-chaqna-gaudi-conversation-ui-server:
+chaqna-xeon-conversation-ui-server:
   image: opea/chatqna-conversation-ui:latest
-  container_name: chatqna-gaudi-conversation-ui-server
+  container_name: chatqna-xeon-conversation-ui-server
   environment:
-    - no_proxy=${no_proxy}
-    - https_proxy=${https_proxy}
-    - http_proxy=${http_proxy}
+    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
   ports:
     - "5174:80"
   depends_on:
-    - chaqna-gaudi-backend-server
+    - chaqna-xeon-backend-server
   ipc: host
   restart: always
 ```
