@@ -26,6 +26,7 @@ services:
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-worker-agent-service"
+      port: 9095
     
   supervisor-react-agent:
     image: opea/comps-agent-langchain:latest
@@ -54,3 +55,6 @@ services:
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-supervisor-agent-service"
+      CRAG_SERVER: $CRAG_SERVER
+      WORKER_AGENT_URL: $WORKER_AGENT_URL
+      port: 9090

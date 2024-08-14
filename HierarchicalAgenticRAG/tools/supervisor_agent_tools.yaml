@@ -46,7 +46,7 @@ get_members:
       description: band name
   return_output: members
 
-get_grammy_best_artist_by_year
+get_grammy_best_artist_by_year:
   description: Get the Grammy Best New Artist for a specific year.
   callable_api: tools.py:get_grammy_best_artist_by_year
   args_schema:
