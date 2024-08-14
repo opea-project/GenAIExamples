@@ -36,7 +36,7 @@ function build_docker_images() {
     docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 
     cd $WORKPATH/docker/ui
-    # TODO
+    docker build -t opea/productivity-suite-react-ui-server:latest -f docker/Dockerfile.react .
 
     docker images
 
@@ -69,10 +69,20 @@ function start_services() {
     export TGI_LLM_ENDPOINT_CODEGEN="http://${ip_address}:8028"
     export TGI_LLM_ENDPOINT_FAQGEN="http://${ip_address}:9009"
     export TGI_LLM_ENDPOINT_DOCSUM="http://${ip_address}:9009"
-    export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${ip_address}:8888/v1/chatqna"
-    export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${ip_address}:8889/v1/faqgen"
-    export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
-    export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${ip_address}:8890/v1/docsum"
+    export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
+    export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${host_ip}:8889/v1/faqgen"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
+    export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
+    export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
+    export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
+    export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
+    export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
+    export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delete"
+    export CHAT_HISTORY_GET_ENDPOINT="http://${host_ip}:6012/v1/chathistory/get"
+    export PROMPT_SERVICE_GET_ENDPOINT="http://${host_ip}:6015/v1/prompt/get"
+    export PROMPT_SERVICE_CREATE_ENDPOINT="http://${host_ip}:6015/v1/prompt/create"
+    export KEYCLOAK_SERVICE_ENDPOINT="http://${host_ip}:8080"
     export MONGO_HOST=${ip_address}
     export MONGO_PORT=27017
     export DB_NAME="opea"
@@ -89,8 +99,7 @@ function start_services() {
         sed -i "s#image: opea/faqgen:latest#image: opea/faqgen:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/faqgen:latest#image: opea/faqgen:${IMAGE_TAG}#g" compose.yaml
-        # TODO
-        # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose.yaml
+        sed -i "s#image: opea/productivity-suite-react-ui-server:latest#image: opea/productivity-suite-react-ui-server:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose.yaml
         sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
         echo "cat compose.yaml"
@@ -342,7 +351,7 @@ function validate_megaservice() {
 
 function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
-    cd $WORKPATH/docker/ui/svelte
+    cd $WORKPATH/docker/ui/react
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
 #    conda remove -n ${conda_env_name} --all -y
@@ -353,11 +362,11 @@ function validate_frontend() {
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
 #    conda install -c conda-forge nodejs -y
-    npm install && npm ci && npx playwright install --with-deps
+    npm install && npm ci
     node -v && npm -v && pip list
 
     exit_status=0
-    npx playwright test || exit_status=$?
+    npm run test || exit_status=$?
 
     if [ $exit_status -ne 0 ]; then
         echo "[TEST INFO]: ---------frontend test failed---------"
@@ -386,8 +395,7 @@ function main() {
     echo "==== microservices validated ===="
     validate_megaservice
     echo "==== megaservices validated ===="
-    #TODO
-    #validate_frontend
+    validate_frontend
     echo "==== frontend validated ===="
 
     stop_docker
