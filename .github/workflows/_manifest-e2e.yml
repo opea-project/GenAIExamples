@@ -10,7 +10,7 @@ on:
         description: "The example to test on K8s"
         required: true
         type: string
-      node:
+      hardware:
         default: "xeon"
         description: "Nodes to run the test, xeon or gaudi"
         required: true
@@ -23,7 +23,7 @@ on:
 
 jobs:
   manifest-test:
-    runs-on: "k8s-${{ inputs.node }}"
+    runs-on: "k8s-${{ inputs.hardware }}"
     continue-on-error: true
     steps:
       - name: Clean Up Working Directory
@@ -60,14 +60,14 @@ jobs:
       - name: Kubectl install
         id: install
         run: |
-          if [[ ! -f ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.node }}.sh ]]; then
+          if [[ ! -f ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh ]]; then
             echo "No test script found, exist test!"
             exit 0
           else
-            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.node }}.sh init_${{ inputs.example }}
+            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh init_${{ inputs.example }}
             echo "should_cleanup=true" >> $GITHUB_ENV
             kubectl create ns $NAMESPACE
-            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.node }}.sh install_${{ inputs.example }} $NAMESPACE
+            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh install_${{ inputs.example }} $NAMESPACE
             echo "Testing ${{ inputs.example }}, waiting for pod ready..."
             if kubectl rollout status deployment --namespace "$NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
               echo "Testing manifests ${{ inputs.example }}, waiting for pod ready done!"
@@ -85,7 +85,7 @@ jobs:
           if $skip_validate; then
             echo "Skip validate"
           else
-            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.node }}.sh validate_${{ inputs.example }} $NAMESPACE
+            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh validate_${{ inputs.example }} $NAMESPACE
           fi
 
       - name: Kubectl uninstall
