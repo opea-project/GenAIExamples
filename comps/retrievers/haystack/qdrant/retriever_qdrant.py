@@ -31,7 +31,7 @@ def initialize_qdrant_retriever() -> QdrantEmbeddingRetriever:
 @traceable(run_type="retriever")
 def retrieve(input: EmbedDoc) -> SearchedDoc:
     search_res = retriever.run(query_embedding=input.embedding)["documents"]
-    searched_docs = [TextDoc(text=r.content) for r in search_res]
+    searched_docs = [TextDoc(text=r.content) for r in search_res if r.content]
     result = SearchedDoc(retrieved_docs=searched_docs, initial_query=input.text)
     return result
 
