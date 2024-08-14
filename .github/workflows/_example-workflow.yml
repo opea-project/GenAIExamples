@@ -76,8 +76,8 @@ jobs:
 # Trivy Scan
 ####################################################################################################
   image-list:
-    needs: [ build-images ]
-    if: success() && ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi' }}
+    needs: [build-images]
+    if: ${{ success() && fromJSON(inputs.scan) && inputs.node == 'gaudi' }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.scan-matrix.outputs.matrix }}
@@ -93,8 +93,8 @@ jobs:
           echo "matrix=$(cat ${compose_path} | yq -r '.[]' | jq 'keys' | jq -c '.')" >> $GITHUB_OUTPUT
 
   scan-images:
-    needs: [image-list]
-    if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi'}}
+    needs: [image-list, build-images]
+    if: ${{ success() && fromJSON(inputs.scan) && inputs.node == 'gaudi'}}
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
@@ -127,7 +127,7 @@ jobs:
 ####################################################################################################
   test-example-compose:
     needs: [build-images]
-    if: ${{ fromJSON(inputs.test_compose) }}
+    if: ${{ success() && fromJSON(inputs.test_compose) }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       tag: ${{ inputs.tag }}
