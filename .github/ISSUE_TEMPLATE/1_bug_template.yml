@@ -28,7 +28,7 @@ body:
   - type: dropdown
     id: customer-impact
     attributes:
-      label: Customer Impact
+      label: Customer impact level
       options:
         - Undecided
         - P1-Stopper
@@ -125,7 +125,7 @@ body:
   - type: textarea
     id: problem
     attributes:
-      label: Description the problem
+      label: Problem
       description:
     validations:
       required: true
@@ -133,7 +133,7 @@ body:
   - type: textarea
     id: log
     attributes:
-      label: Raw logs
+      label: Raw log
       description: Provide the log of RESTFul API or docker for micro-service by `docker logs CONTAINER`
       render: shell
     validations:
