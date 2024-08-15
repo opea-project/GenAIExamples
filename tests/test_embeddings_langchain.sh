@@ -37,6 +37,14 @@ function validate_microservice() {
         -X POST \
         -d '{"text":"What is Deep Learning?"}' \
         -H 'Content-Type: application/json')
+    if [[ $result == *"embedding"* ]]; then
+        echo "Result correct."
+    else
+        echo "Result wrong. Received was $result"
+        docker logs test-comps-embedding-tei-endpoint
+        docker logs test-comps-embedding-tei-server
+        exit 1
+    fi
 }
 
 function stop_docker() {

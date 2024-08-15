@@ -102,6 +102,7 @@ function test_api_endpoint {
     else
         echo "FAIL: $endpoint returned unexpected status code: $response (expected: $expected_status)"
         docker logs $CONTAINER_NAME
+        exit 1
     fi
 }
 # Main function

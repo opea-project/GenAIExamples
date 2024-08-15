@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -30,6 +30,7 @@ function validate_vectorstore() {
         echo "[ test create ] create collection succeed"
     else
         echo "[ test create ] create collection failed"
+        docker logs milvus-standalone
         exit 1
     fi
 
@@ -41,6 +42,7 @@ function validate_vectorstore() {
         echo "[ test insert ] insert data succeed"
     else
         echo "[ test insert ] insert data failed"
+        docker logs milvus-standalone
         exit 1
     fi
 
@@ -52,6 +54,7 @@ function validate_vectorstore() {
         echo "[ test search ] search data succeed"
     else
         echo "[ test search ] search data failed"
+        docker logs milvus-standalone
         exit 1
     fi
 }

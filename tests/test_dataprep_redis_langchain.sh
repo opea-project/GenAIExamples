@@ -39,16 +39,17 @@ function validate_microservice() {
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     SERVICE_NAME="dataprep - upload - file"
-    docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_upload_file.log
 
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_upload_file.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
     if [[ "$RESPONSE_BODY" != *"Data preparation succeeded"* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_upload_file.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] Content is as expected."
@@ -60,16 +61,18 @@ function validate_microservice() {
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     SERVICE_NAME="dataprep - upload - link"
-    docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_upload_link.log
+
 
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_upload_link.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
     if [[ "$RESPONSE_BODY" != *"Data preparation succeeded"* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_upload_link.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] Content is as expected."
@@ -81,16 +84,17 @@ function validate_microservice() {
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     SERVICE_NAME="dataprep - get"
-    docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_file.log
 
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_file.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
     if [[ "$RESPONSE_BODY" != *'{"name":'* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_file.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] Content is as expected."
@@ -102,11 +106,11 @@ function validate_microservice() {
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     SERVICE_NAME="dataprep - del"
-    docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_del.log
 
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_del.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
@@ -114,6 +118,7 @@ function validate_microservice() {
     # check response body
     if [[ "$RESPONSE_BODY" != *'{"status":true}'* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        docker logs test-comps-dataprep-redis-langchain-server >> ${LOG_PATH}/dataprep_del.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] Content is as expected."

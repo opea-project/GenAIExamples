@@ -34,7 +34,7 @@ function start_service() {
     docker logs test-comps-tgi-gaudi-service
 
     echo "Starting agent microservice"
-    docker run -d --runtime=runc --name="test-comps-langchain-agent-endpoint" -v $WORKPATH/comps/agent/langchain/tools:/home/user/comps/agent/langchain/tools -p 9090:9090 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e strategy=react -e llm_endpoint_url=http://${ip_address}:8080 -e llm_engine=tgi -e recursion_limit=5 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/comps-agent-langchain:comps
+    docker run -d --runtime=runc --name="test-comps-langchain-agent-endpoint" -v $WORKPATH/comps/agent/langchain/tools:/home/user/comps/agent/langchain/tools -p 5042:9090 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e strategy=react -e llm_endpoint_url=http://${ip_address}:8080 -e llm_engine=tgi -e recursion_limit=5 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/comps-agent-langchain:comps
     sleep 5s
     docker logs test-comps-langchain-agent-endpoint
 
@@ -69,7 +69,7 @@ function validate() {
 
 function validate_microservice() {
     echo "Testing agent service"
-    local CONTENT=$(curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+    local CONTENT=$(curl http://${ip_address}:5042/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "What is Intel OPEA project?"
     }' | tee ${LOG_PATH}/test-agent-langchain.log)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-agent-langchain")

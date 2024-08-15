@@ -31,7 +31,13 @@ function validate_microservice() {
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
         -H 'Content-Type: application/json')
-    docker logs test-comps-reranking-fastrag-server
+    if [[ $result == *"reranked_docs"* ]]; then
+        echo "Result correct."
+    else
+        echo "Result wrong. Received was $result"
+        docker logs test-comps-reranking-fastrag-server
+        exit 1
+    fi
 }
 
 function stop_docker() {

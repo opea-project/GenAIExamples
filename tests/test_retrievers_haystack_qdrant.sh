@@ -49,8 +49,14 @@ function validate_microservice() {
         -X POST \
         -d "{\"text\":\"test\",\"embedding\":${test_embedding}}" \
         -H 'Content-Type: application/json')
-    docker logs test-comps-retriever-qdrant-server
-    docker logs test-comps-retriever-tei-endpoint
+    if [[ $result == *"retrieved_docs"* ]]; then
+        echo "Result correct."
+    else
+        echo "Result wrong. Received was $result"
+        docker logs test-comps-retriever-qdrant-server
+        docker logs test-comps-retriever-tei-endpoint
+        exit 1
+    fi
 }
 
 function stop_docker() {
