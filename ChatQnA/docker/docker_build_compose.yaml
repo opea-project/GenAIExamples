@@ -55,7 +55,7 @@ services:
     build:
       context: GenAIComps
       dockerfile: comps/llms/text-generation/vllm/docker/Dockerfile.hpu
-    image: ${REGISTRY}opea/llm-vllm-hpu:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-vllm-hpu:${TAG:-latest}
   llm-vllm-ray:
     build:
       context: GenAIComps
