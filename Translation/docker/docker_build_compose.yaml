@@ -16,3 +16,9 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: translation
     image: ${REGISTRY:-opea}/translation-ui:${TAG:-latest}
+  llm-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+    extends: translation
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
