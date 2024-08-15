@@ -72,6 +72,7 @@ jobs:
           sudo rm -rf ${{github.workspace}}/* || true
           docker system prune -f
           docker rmi $(docker images --filter reference="*/*/*:latest" -q) || true
+          docker rmi $(docker images --filter reference="*/*:ci" -q) || true
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
@@ -93,7 +94,7 @@ jobs:
           test_case: ${{ matrix.test_case }}
         run: |
           cd ${{ github.workspace }}/$example/tests
-          export IMAGE_REPO=${OPEA_IMAGE_REPO}
+          if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
           if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container

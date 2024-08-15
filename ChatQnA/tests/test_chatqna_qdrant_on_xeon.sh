@@ -3,28 +3,24 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-echo "IMAGE_REPO=${IMAGE_REPO}"
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH
-    git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
-
-    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/retriever-qdrant:latest -f comps/retrievers/haystack/qdrant/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
-    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/dataprep-qdrant:latest -f comps/dataprep/qdrant/docker/Dockerfile .
-
     cd $WORKPATH/docker
-    docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
+    git clone https://github.com/opea-project/GenAIComps.git
 
-    cd $WORKPATH/docker/ui
-    docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="chatqna chatqna-ui dataprep-qdrant embedding-tei retriever-qdrant reranking-tei llm-tgi"
+    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images
 }
@@ -55,16 +51,6 @@ function start_services() {
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6043/v1/dataprep"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
-
-    if [[ "$IMAGE_REPO" != "" ]]; then
-        # Replace the container name with a test-specific name
-        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_qdrant.yaml
-        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_qdrant.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_qdrant.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_qdrant.yaml
-        cat compose_qdrant.yaml
-    fi
 
     # Start Docker Containers
     docker compose -f compose_qdrant.yaml up -d
@@ -235,7 +221,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)

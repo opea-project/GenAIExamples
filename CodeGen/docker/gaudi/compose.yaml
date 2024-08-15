@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   tgi-service:
@@ -25,7 +22,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
   llm:
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-gaudi-server
     depends_on:
       - tgi-service
@@ -40,7 +37,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codegen-gaudi-backend-server:
-    image: opea/codegen:latest
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
     container_name: codegen-gaudi-backend-server
     depends_on:
       - llm
@@ -55,7 +52,7 @@ services:
     ipc: host
     restart: always
   codegen-gaudi-ui-server:
-    image: opea/codegen-ui:latest
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
     container_name: codegen-gaudi-ui-server
     depends_on:
       - codegen-gaudi-backend-server
@@ -66,16 +63,6 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - BASIC_URL=${BACKEND_SERVICE_ENDPOINT}
-    ipc: host
-    restart: always
-
-  codegen-gaudi-react-ui-server:
-    image: opea/codegen-react-ui:latest
-    container_name: codegen-gaudi-react-ui-server
-    depends_on:
-      - codegen-gaudi-backend-server
-    ports:
-      - "5174:80"
     ipc: host
     restart: always
 

@@ -1,0 +1,24 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  codetrans:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}
+  codetrans-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile
+    extends: codetrans
+    image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}
+  llm-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+    extends: codetrans
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}

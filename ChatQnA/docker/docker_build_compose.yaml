@@ -1,0 +1,108 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  chatqna:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+  chatqna-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+  chatqna-conversation-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile.react
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}
+  embedding-tei:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/langchain/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+  retriever-redis:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/langchain/redis/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+  retriever-qdrant:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/haystack/qdrant/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}
+  reranking-tei:
+    build:
+      context: GenAIComps
+      dockerfile: comps/reranks/tei/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+  llm-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+  llm-ollama:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/ollama/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
+  llm-vllm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/vllm/docker/Dockerfile.microservice
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
+  llm-vllm-hpu:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/vllm/docker/Dockerfile.hpu
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-vllm-hpu:${TAG:-latest}
+  llm-vllm-ray:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-vllm-ray:${TAG:-latest}
+  llm-vllm-ray-hpu:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-vllm-ray-hpu:${TAG:-latest}
+  dataprep-redis:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/redis/langchain/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+  dataprep-qdrant:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/qdrant/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
+  tei-gaudi:
+    build:
+      context: tei-gaudi
+      dockerfile: Dockerfile-hpu
+    extends: chatqna
+    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: Dockerfile.cpu
+    extends: chatqna
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}

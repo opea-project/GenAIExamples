@@ -4,7 +4,7 @@
 name: E2E test with docker compose
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -21,29 +21,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  job1:
+  get-test-matrix:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
       diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|gmc|assets'
 
-  mega-image-build:
-    needs: job1
-    strategy:
-      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    uses: ./.github/workflows/_image-build.yml
-    with:
-      image_tag: ${{ github.event.pull_request.head.sha }}
-      mega_service: "${{ matrix.example }}"
-      runner_label: "docker-build-${{ matrix.hardware }}"
-
   example-test:
-    needs: [job1, mega-image-build]
+    needs: [get-test-matrix]
     strategy:
-      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+      matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
-      tag: ${{ needs.mega-image-build.outputs.image_tag }}
+      registry: "opea"
+      tag: "ci"
       example: ${{ matrix.example }}
       hardware: ${{ matrix.hardware }}
     secrets: inherit

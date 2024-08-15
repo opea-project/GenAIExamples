@@ -127,7 +127,24 @@ Here is an example for summarizing a article.
 
 ![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/67ecb2ec-408d-4e81-b124-6ded6b833f55)
 
-## 🚀 Launch the React UI
+## 🚀 Launch the React UI (Optional)
+
+To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `docsum-xeon-ui-server` service with the `docsum-xeon-react-ui-server` service as per the config below:
+
+```yaml
+docsum-gaudi-react-ui-server:
+  image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
+  container_name: docsum-gaudi-react-ui-server
+  depends_on:
+    - docsum-gaudi-backend-server
+  ports:
+    - "5174:80"
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+    - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+```
 
 Open this URL `http://{host_ip}:5175` in your browser to access the frontend.
 

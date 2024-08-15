@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   tgi-service:
@@ -24,7 +21,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
   llm:
-    image: opea/llm-docsum-tgi:latest
+    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
     container_name: llm-docsum-gaudi-server
     depends_on:
       - tgi-service
@@ -39,7 +36,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   docsum-gaudi-backend-server:
-    image: opea/docsum:latest
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-gaudi-backend-server
     depends_on:
       - tgi-service
@@ -55,7 +52,7 @@ services:
     ipc: host
     restart: always
   docsum-gaudi-ui-server:
-    image: opea/docsum-ui:latest
+    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
     container_name: docsum-gaudi-ui-server
     depends_on:
       - docsum-gaudi-backend-server
@@ -68,15 +65,6 @@ services:
       - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
-  docsum-xeon-react-ui-server:
-    image: opea/docsum-react-ui:latest
-    container_name: docsum-gaudi-react-ui-server
-    depends_on:
-      - docsum-gaudi-backend-server
-    ports:
-      - "5174:80"
-    environment:
-      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
 
 networks:
   default:

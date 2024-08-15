@@ -1,0 +1,48 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  searchqna:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/searchqna:${TAG:-latest}
+  searchqna-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile
+    extends: searchqna
+    image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
+  embedding-tei:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/langchain/docker/Dockerfile
+    extends: searchqna
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+  web-retriever-chroma:
+    build:
+      context: GenAIComps
+      dockerfile: comps/web_retrievers/langchain/chroma/docker/Dockerfile
+    extends: searchqna
+    image: ${REGISTRY:-opea}/web-retriever-chroma:${TAG:-latest}
+  reranking-tei:
+    build:
+      context: GenAIComps
+      dockerfile: comps/reranks/tei/docker/Dockerfile
+    extends: searchqna
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+  llm-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+    extends: searchqna
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+  tei-gaudi:
+    build:
+      context: tei-gaudi
+      dockerfile: Dockerfile-hpu
+    extends: searchqna
+    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}

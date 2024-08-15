@@ -1,0 +1,30 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  faqgen:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
+  faqgen-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile
+    extends: faqgen
+    image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
+  faqgen-react-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile.react
+    extends: faqgen
+    image: ${REGISTRY:-opea}/faqgen-react-ui:${TAG:-latest}
+  llm-faqgen-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/faq-generation/tgi/Dockerfile
+    extends: faqgen
+    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}

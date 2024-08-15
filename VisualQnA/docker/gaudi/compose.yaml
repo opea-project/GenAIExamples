@@ -1,12 +1,9 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3.8"
-
 services:
   llava-tgi-service:
-    image: opea/llava-tgi:latest
+    image: ${REGISTRY:-opea}/llava-tgi:${TAG:-latest}
     container_name: tgi-llava-gaudi-server
     ports:
       - "8399:80"
@@ -26,7 +23,7 @@ services:
     ipc: host
     command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
   lvm-tgi:
-    image: opea/lvm-tgi:latest
+    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
     container_name: lvm-tgi-gaudi-server
     depends_on:
       - llava-tgi-service
@@ -42,7 +39,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
   visualqna-gaudi-backend-server:
-    image: opea/visualqna:latest
+    image: ${REGISTRY:-opea}/visualqna:${TAG:-latest}
     container_name: visualqna-gaudi-backend-server
     depends_on:
       - llava-tgi-service
@@ -58,7 +55,7 @@ services:
     ipc: host
     restart: always
   visualqna-gaudi-ui-server:
-    image: opea/visualqna-ui:latest
+    image: ${REGISTRY:-opea}/visualqna-ui:${TAG:-latest}
     container_name: visualqna-gaudi-ui-server
     depends_on:
       - visualqna-gaudi-backend-server

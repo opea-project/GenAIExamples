@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   tgi-service:
@@ -20,7 +17,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
     ports:
       - "9000:9000"
@@ -33,7 +30,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codetrans-xeon-backend-server:
-    image: opea/codetrans:latest
+    image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}
     container_name: codetrans-xeon-backend-server
     depends_on:
       - tgi-service
@@ -49,7 +46,7 @@ services:
     ipc: host
     restart: always
   codetrans-xeon-ui-server:
-    image: opea/codetrans-ui:latest
+    image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}
     container_name: codetrans-xeon-ui-server
     depends_on:
       - codetrans-xeon-backend-server

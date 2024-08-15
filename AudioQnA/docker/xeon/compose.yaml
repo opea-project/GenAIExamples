@@ -1,12 +1,9 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3.8"
-
 services:
   whisper-service:
-    image: opea/whisper:latest
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
     container_name: whisper-service
     ports:
       - "7066:7066"
@@ -17,7 +14,7 @@ services:
       https_proxy: ${https_proxy}
     restart: unless-stopped
   asr:
-    image: opea/asr:latest
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
     container_name: asr-service
     ports:
       - "3001:9099"
@@ -25,7 +22,7 @@ services:
     environment:
       ASR_ENDPOINT: ${ASR_ENDPOINT}
   speecht5-service:
-    image: opea/speecht5:latest
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
     container_name: speecht5-service
     ports:
       - "7055:7055"
@@ -36,7 +33,7 @@ services:
       https_proxy: ${https_proxy}
     restart: unless-stopped
   tts:
-    image: opea/tts:latest
+    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
     container_name: tts-service
     ports:
       - "3002:9088"
@@ -58,7 +55,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
     depends_on:
       - tgi-service
@@ -73,7 +70,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   audioqna-xeon-backend-server:
-    image: opea/audioqna:latest
+    image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
     container_name: audioqna-xeon-backend-server
     depends_on:
       - asr

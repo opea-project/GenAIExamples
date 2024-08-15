@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   redis-vector-db:
@@ -12,7 +9,7 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: opea/dataprep-redis:latest
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
@@ -41,7 +38,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
-    image: opea/embedding-tei:latest
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
     depends_on:
       - tei-embedding-service
@@ -58,7 +55,7 @@ services:
       LANGCHAIN_PROJECT: "opea-embedding-service"
     restart: unless-stopped
   retriever:
-    image: opea/retriever-redis:latest
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -93,7 +90,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
-    image: opea/reranking-tei:latest
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-xeon-server
     depends_on:
       - tei-reranking-service
@@ -113,7 +110,7 @@ services:
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   vllm_service:
-    image: opea/vllm:latest
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
     container_name: vllm-service
     ports:
       - "9009:80"
@@ -128,7 +125,7 @@ services:
       LLM_MODEL_ID: ${LLM_MODEL_ID}
     command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
   llm:
-    image: opea/llm-vllm:latest
+    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
     container_name: llm-vllm-server
     depends_on:
       - vllm_service
@@ -149,7 +146,7 @@ services:
       LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
   chaqna-xeon-backend-server:
-    image: opea/chatqna:latest
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
@@ -174,7 +171,7 @@ services:
     ipc: host
     restart: always
   chaqna-xeon-ui-server:
-    image: opea/chatqna-ui:latest
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     container_name: chatqna-xeon-ui-server
     depends_on:
       - chaqna-xeon-backend-server

@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   tgi-service:
@@ -21,7 +18,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-docsum-tgi:latest
+    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
     container_name: llm-docsum-server
     depends_on:
       - tgi-service
@@ -36,7 +33,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   docsum-xeon-backend-server:
-    image: opea/docsum:latest
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-xeon-backend-server
     depends_on:
       - tgi-service
@@ -52,7 +49,7 @@ services:
     ipc: host
     restart: always
   docsum-xeon-ui-server:
-    image: opea/docsum-ui:latest
+    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
     container_name: docsum-xeon-ui-server
     depends_on:
       - docsum-xeon-backend-server
@@ -63,15 +60,6 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
-    ipc: host
-    restart: always
-  docsum-xeon-react-ui-server:
-    image: opea/docsum-react-ui:latest
-    container_name: docsum-xeon-react-ui-server
-    depends_on:
-      - docsum-xeon-backend-server
-    ports:
-      - "5174:80"
     ipc: host
     restart: always
 

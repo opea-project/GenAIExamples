@@ -1,0 +1,54 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  audioqna:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+  whisper-gaudi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/asr/whisper/Dockerfile_hpu
+    extends: audioqna
+    image: ${REGISTRY:-opea}/whisper-gaudi:${TAG:-latest}
+  whisper:
+    build:
+      context: GenAIComps
+      dockerfile: comps/asr/whisper/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+  asr:
+    build:
+      context: GenAIComps
+      dockerfile: comps/asr/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+  llm-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+  speecht5-gaudi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/speecht5/Dockerfile_hpu
+    extends: audioqna
+    image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
+  speecht5:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/speecht5/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+  tts:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
