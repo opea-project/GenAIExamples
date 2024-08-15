@@ -6,6 +6,9 @@ permissions: read-all
 on:
   workflow_call:
     inputs:
+      node:
+        required: true
+        type: string
       example:
         required: true
         type: string
@@ -37,30 +40,43 @@ on:
         default: "latest"
         required: false
         type: string
+      GenAIComps_branch:
+        default: "main"
+        required: false
+        type: string
 jobs:
 ####################################################################################################
 # Image Build
 ####################################################################################################
   build-images:
-    if: ${{ fromJSON(inputs.build) }}
-    strategy:
-      matrix:
-        node: ["docker-build-xeon", "docker-build-gaudi"]
-    runs-on: ${{ matrix.node }}
+    runs-on: "docker-build-${{ inputs.node }}"
     continue-on-error: true
     steps:
       - name: Clean Up Working Directory
-        run: |
-          sudo rm -rf ${{github.workspace}}/*
+        run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
+      - name: Clone required Repo
+        run: |
+          cd ${{ github.workspace }}/${{ inputs.example }}/docker
+          build_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
+          if [[ $(grep -c "tei-gaudi:" ${docker_compose_path}) != 0 ]]; then
+              git clone https://github.com/huggingface/tei-gaudi.git
+          fi
+          if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
+              git clone https://github.com/huggingface/tei-gaudi.git
+          fi
+          git clone https://github.com/opea-project/GenAIComps.git
+          cd GenAIComps && checkout ${{ inputs.GenAIComps_branch }} && cd ../
+
       - name: Build Image
+        if: ${{ fromJSON(inputs.build) }}
         uses: opea-project/validation/actions/image-build@main
         with:
-          work_dir: ${{ github.workspace }}/${{ inputs.example }}
-          docker_compose_path: ${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.example }}-compose.yaml
+          work_dir: ${{ github.workspace }}/${{ inputs.example }}/docker
+          docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
           registry: ${OPEA_IMAGE_REPO}opea
           tag: ${{ inputs.tag }}
 
@@ -68,17 +84,12 @@ jobs:
 # Trivy Scan
 ####################################################################################################
   image-list:
-    needs: [ build-images ]
-    if: ${{ fromJSON(inputs.scan) }}
+    needs: [build-images]
+    if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi' }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.scan-matrix.outputs.matrix }}
     steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@v2.8.1
-        with:
-          egress-policy: audit
-
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
@@ -90,34 +101,32 @@ jobs:
           echo "matrix=$(cat ${compose_path} | yq -r '.[]' | jq 'keys' | jq -c '.')" >> $GITHUB_OUTPUT
 
   scan-images:
-    needs: [image-list]
-    if: ${{ fromJSON(inputs.scan) }}
-    runs-on: "docker-build-gaudi"
+    needs: [image-list, build-images]
+    if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi'}}
+    runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
       fail-fast: false
     steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@v2.8.1
-        with:
-          egress-policy: audit
-
       - name: Pull Image
-        run: docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+        run: |
+          docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
 
       - name: Scan Container
         uses: opea-project/validation/actions/trivy-scan@main
         with:
-          image-ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output: ${{ inputs.example }}-${{ matrix.image }}-scan.txt
 
       - name: Cleanup
         if: always()
         run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+
       - uses: actions/upload-artifact@v4.3.4
         with:
-          name: ${{ inputs.example }}-scan
+          name: ${{ inputs.example }}-${{ matrix.image }}-scan
           path: ${{ inputs.example }}-${{ matrix.image }}-scan.txt
           overwrite: true
 
@@ -127,15 +136,11 @@ jobs:
   test-example-compose:
     needs: [build-images]
     if: ${{ fromJSON(inputs.test_compose) }}
-    strategy:
-      matrix:
-        hardware: ["xeon", "gaudi"]
-      fail-fast: false
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       tag: ${{ inputs.tag }}
       example: ${{ inputs.example }}
-      hardware: ${{ matrix.hardware }}
+      hardware: ${{ inputs.node }}
     secrets: inherit
 
 
@@ -145,14 +150,10 @@ jobs:
   test-k8s-manifest:
     needs: [build-images]
     if: ${{ fromJSON(inputs.test_k8s) }}
-    strategy:
-      matrix:
-        hardware: ["xeon", "gaudi"]
-      fail-fast: false
     uses: ./.github/workflows/_manifest-e2e.yml
     with:
       example: ${{ inputs.example }}
-      hardware: ${{ matrix.hardware }}
+      hardware: ${{ inputs.node }}
       tag: ${{ inputs.tag }}
     secrets: inherit
 
@@ -162,7 +163,7 @@ jobs:
 ####################################################################################################
   publish:
     needs: [image-list, build-images, scan-images, test-example-compose]
-    if: ${{ fromJSON(inputs.publish) }}
+    if: ${{ fromJSON(inputs.publish) && inputs.node == 'gaudi' }}
     strategy:
       matrix:
         image: ${{ fromJSON(needs.image-list.outputs.matrix) }}

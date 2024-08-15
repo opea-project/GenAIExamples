@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   tgi-service:
@@ -20,7 +17,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
     depends_on:
       - tgi-service
@@ -35,7 +32,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codegen-xeon-backend-server:
-    image: opea/codegen:latest
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
     container_name: codegen-xeon-backend-server
     depends_on:
       - llm
@@ -50,7 +47,7 @@ services:
     ipc: host
     restart: always
   codegen-xeon-ui-server:
-    image: opea/codegen-ui:latest
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
     container_name: codegen-xeon-ui-server
     depends_on:
       - codegen-xeon-backend-server
@@ -61,15 +58,6 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - BASIC_URL=${BACKEND_SERVICE_ENDPOINT}
-    ipc: host
-    restart: always
-  codegen-xeon-react-ui-server:
-    image: opea/codegen-react-ui:latest
-    container_name: codegen-xeon-react-ui-server
-    depends_on:
-      - codegen-xeon-backend-server
-    ports:
-      - "5174:80"
     ipc: host
     restart: always
 

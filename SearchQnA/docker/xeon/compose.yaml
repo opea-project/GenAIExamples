@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   tei-embedding-service:
@@ -19,7 +16,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
-    image: opea/embedding-tei:latest
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
     depends_on:
       - tei-embedding-service
@@ -34,7 +31,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   web-retriever:
-    image: opea/web-retriever-chroma:latest
+    image: ${REGISTRY:-opea}/web-retriever-chroma:${TAG:-latest}
     container_name: web-retriever-chroma-server
     ports:
       - "3003:7077"
@@ -61,7 +58,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
-    image: opea/reranking-tei:latest
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-xeon-server
     depends_on:
       - tei-reranking-service
@@ -90,7 +87,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
     depends_on:
       - tgi-service
@@ -105,7 +102,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   searchqna-xeon-backend-server:
-    image: opea/searchqna:latest
+    image: ${REGISTRY:-opea}/searchqna:${TAG:-latest}
     container_name: searchqna-xeon-backend-server
     depends_on:
       - tei-embedding-service
@@ -133,7 +130,7 @@ services:
     ipc: host
     restart: always
   searchqna-gaudi-ui-server:
-    image: opea/searchqna-ui:latest
+    image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
     container_name: searchqna-xeon-ui-server
     depends_on:
       - searchqna-xeon-backend-server
