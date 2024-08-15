@@ -1,7 +1,21 @@
 name: Report Bug
 description: Used to report bug
-title: "Bug"
+title: "Bug:"
 body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Undecided
+        - P1-Stopper
+        - P2-High
+        - P3-Medium
+        - P4-Low
+      default: 0
+    validations:
+      required: true
+
   - type: checkboxes
     id: os
     attributes:
@@ -72,20 +86,6 @@ body:
       options:
         - Single Node
         - Multiple Nodes
-      default: 0
-    validations:
-      required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      options:
-        - Undecided
-        - P1-Stopper
-        - P2-High
-        - P3-Medium
-        - P4-Low
       default: 0
     validations:
       required: true
