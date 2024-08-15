@@ -1,85 +1,7 @@
 name: Report Feature
 description: Used to report feature
-title: ""
+title: "Feature:"
 body:
-  - type: checkboxes
-    id: os
-    attributes:
-      label: OS type
-      options:
-        - Ubuntu
-        - RedHat
-        - SUSE
-        - Windows
-        - Mac
-        - BSD
-        - Other
-      default: 0
-    validations:
-      required: true
-
-  - type: checkboxes
-    id: hardware
-    attributes:
-      label: Hardware type
-      options:
-        - Xeon-GNR
-        - Xeon-EMR
-        - Xeon-SPR
-        - Xeon-ICX
-        - Xeon-CLX
-        - Xeon-other
-        - Gaudi3
-        - Gaudi2
-        - Gaudi1
-        - GPU-PVC
-        - GPU-Flex
-        - GPU-Arc
-        - GPU-Arc-MTL
-        - GPU-Nvidia
-        - GPU-AMD
-        - GPU-other
-        - AI-PC (Please let us know in description)
-        - CPU-other (Please let us know in description)
-      default: 0
-    validations:
-      required: true
-
-  - type: checkboxes
-    id: install
-    attributes:
-      label: Installation method
-      options:
-        - Pull docker images from hub.docker.com
-        - Build docker images from source
-      default: 0
-    validations:
-      required: true
-
-  - type: checkboxes
-    id: deploy
-    attributes:
-      label: Deploy method
-      options:
-        - Docker compose
-        - Docker
-        - Kubernetes
-        - Helm
-      default: 0
-    validations:
-      required: true
-
-  - type: dropdown
-    id: node
-    attributes:
-      label: Multiple nodes
-      options:
-        - Single Node
-        - Multiple Nodes
-      default: 0
-    validations:
-      required: true
-
   - type: dropdown
     id: priority
     attributes:
@@ -95,19 +17,85 @@ body:
       required: true
 
   - type: textarea
+    id: Customer
+    attributes:
+      label: Description the customer info
+      description: Customer name, business impact, potential deal (Chip Number, Money) and other.
+      placeholder: Name, business impact, money.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: customer-impact
+    attributes:
+      label: Customer Impact
+      options:
+        - Undecided
+        - P1-Stopper
+        - P2-High
+        - P3-Medium
+        - P4-Low
+      default: 0
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: os
+    attributes:
+      label: OS type
+      options:
+        - label: Ubuntu
+        - label: RedHat
+        - label: SUSE
+        - label: Windows
+        - label: Mac
+        - label: BSD
+        - label: Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: hardware
+    attributes:
+      label: Hardware type
+      options:
+        - label: Xeon-GNR
+        - label: Xeon-EMR
+        - label: Xeon-SPR
+        - label: Xeon-ICX
+        - label: Xeon-CLX
+        - label: Xeon-other
+        - label: Gaudi3
+        - label: Gaudi2
+        - label: Gaudi1
+        - label: GPU-PVC
+        - label: GPU-Flex
+        - label: GPU-Arc
+        - label: GPU-Arc-MTL
+        - label: GPU-Nvidia
+        - label: GPU-AMD
+        - label: GPU-other
+        - label: AI-PC (Please let us know in description)
+        - label: CPU-other (Please let us know in description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: node
+    attributes:
+      label: Multiple nodes
+      options:
+        - Single Node
+        - Multiple Nodes
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
     id: problem
     attributes:
       label: Description the problem
       description: Describe your problem and expectation, avoid to ask solution (we would provide better solution).
       placeholder: As cloud/AI PC user, I want xxxx, so that I/customer can xxx.
-    validations:
-      required: true
-
-  - type: textarea
-    id: log
-    attributes:
-      label: Description the problem
-      description: Provide the log of RESTFul API or docker for micro-service by `docker logs CONTAINER`
-      render: shell
     validations:
       required: true
