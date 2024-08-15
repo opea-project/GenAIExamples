@@ -32,14 +32,6 @@ on:
         default: false
         required: false
         type: boolean
-      publish:
-        default: false
-        required: false
-        type: boolean
-      publish_tags:
-        default: "latest"
-        required: false
-        type: string
       GenAIComps_branch:
         default: "main"
         required: false
@@ -83,7 +75,7 @@ jobs:
 ####################################################################################################
 # Trivy Scan
 ####################################################################################################
-  image-list:
+  get-image-list:
     needs: [build-images]
     if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi' }}
     runs-on: ubuntu-latest
@@ -101,12 +93,12 @@ jobs:
           echo "matrix=$(cat ${compose_path} | yq -r '.[]' | jq 'keys' | jq -c '.')" >> $GITHUB_OUTPUT
 
   scan-images:
-    needs: [image-list, build-images]
+    needs: [get-image-list, build-images]
     if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi'}}
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
-        image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
+        image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
       fail-fast: false
     steps:
       - name: Pull Image
@@ -118,7 +110,7 @@ jobs:
         uses: opea-project/validation/actions/trivy-scan@main
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
-          output: ${{ inputs.example }}-${{ matrix.image }}-scan.txt
+          output: ${{ matrix.image }}-scan.txt
 
       - name: Cleanup
         if: always()
@@ -157,21 +149,3 @@ jobs:
       tag: ${{ inputs.tag }}
     secrets: inherit
 
-
-####################################################################################################
-# Publish
-####################################################################################################
-  publish:
-    needs: [image-list, build-images, scan-images, test-example-compose]
-    if: ${{ fromJSON(inputs.publish) && inputs.node == 'gaudi' }}
-    strategy:
-      matrix:
-        image: ${{ fromJSON(needs.image-list.outputs.matrix) }}
-    runs-on: "docker-build-gaudi"
-    steps:
-      - name: Image Publish
-        uses: opea-project/validation/actions/image-publish@main
-        with:
-          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
-          image_name: opea/${{ matrix.image }}
-          publish_tags: ${{ inputs.publish_tags }}
