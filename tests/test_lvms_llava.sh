@@ -10,7 +10,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build -t opea/llava:comps -f comps/lvms/llava/Dockerfile .
+    docker build --no-cache -t opea/llava:comps -f comps/lvms/llava/Dockerfile .
     if $? ; then
         echo "opea/llava built fail"
         exit 1

@@ -11,13 +11,14 @@ function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
     git clone https://github.com/yuanwu2017/tgi-gaudi.git && cd tgi-gaudi && git checkout v2.0.4
-    docker build -t opea/llava-tgi:comps .
+    docker build --no-cache -t opea/llava-tgi:comps .
     if $? ; then
         echo "opea/llava-tgi built fail"
         exit 1
     else
         echo "opea/llava-tgi built successful"
     fi
+
     cd ..
     docker build --no-cache -t opea/lvm-tgi:comps -f comps/lvms/Dockerfile_tgi .
     if $? ; then

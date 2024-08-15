@@ -16,7 +16,7 @@ function build_container() {
     cd $WORKPATH
     git clone https://github.com/vllm-project/vllm.git vllm-openvino
     cd ./vllm-openvino/
-    docker build -t $DOCKER_IMAGE \
+    docker build --no-cache -t $DOCKER_IMAGE \
       -f Dockerfile.openvino \
       . \
       --build-arg https_proxy=$https_proxy \

@@ -11,7 +11,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     echo "Building the docker images"
     cd $WORKPATH
-    docker build -t opea/dataprep-on-ray-redis:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
+    docker build --no-cache -t opea/dataprep-on-ray-redis:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
     if $? ; then
         echo "opea/dataprep-on-ray-redis built fail"
         exit 1

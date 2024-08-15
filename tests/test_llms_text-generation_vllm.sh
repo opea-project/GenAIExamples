@@ -12,7 +12,7 @@ function build_docker_images() {
     cd $WORKPATH/comps/llms/text-generation/vllm
     docker build \
         -f docker/Dockerfile.hpu \
-        -t opea/vllm-hpu:comps \
+        --no-cache -t opea/vllm-hpu:comps \
         --shm-size=128g .
     if $? ; then
         echo "opea/vllm-hpu built fail"
@@ -24,7 +24,7 @@ function build_docker_images() {
     ## Build OPEA microservice docker
     cd $WORKPATH
     docker build  \
-        -t opea/llm-vllm:comps \
+        --no-cache -t opea/llm-vllm:comps \
         -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
     if $? ; then
         echo "opea/llm-vllm built fail"

@@ -12,7 +12,7 @@ function build_docker_images() {
     cd $WORKPATH
     docker build \
         -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray  \
-        -t opea/vllm_ray-habana:comps --network=host .
+        --no-cache -t opea/vllm_ray-habana:comps --network=host .
     if $? ; then
         echo "opea/vllm_ray-habana built fail"
         exit 1
@@ -23,7 +23,7 @@ function build_docker_images() {
     ## Build OPEA microservice docker
     cd $WORKPATH
     docker build \
-        -t opea/llm-vllm-ray:comps \
+        --no-cache -t opea/llm-vllm-ray:comps \
         -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice .
     if $? ; then
         echo "opea/llm-vllm-ray built fail"
