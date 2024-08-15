@@ -148,4 +148,3 @@ jobs:
       hardware: ${{ inputs.node }}
       tag: ${{ inputs.tag }}
     secrets: inherit
-
