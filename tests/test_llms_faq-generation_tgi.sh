@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
@@ -11,6 +11,12 @@ LOG_PATH="$WORKPATH/tests"
 function build_docker_images() {
     cd $WORKPATH
     docker build --no-cache -t opea/llm-faqgen-tgi:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/Dockerfile .
+    if $? ; then
+        echo "opea/llm-faqgen-tgi built fail"
+        exit 1
+    else
+        echo "opea/llm-faqgen-tgi built successful"
+    fi
 }
 
 function start_service() {
@@ -44,7 +50,6 @@ function validate_microservice() {
         -d '{"query":"Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data."}' \
         -H 'Content-Type: application/json'
     docker logs test-comps-llm-tgi-endpoint
-    docker logs test-comps-llm-tgi-server
 
     cd $LOG_PATH
     tei_service_port=5015

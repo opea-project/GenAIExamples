@@ -2,29 +2,35 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t opea/reranking-fastrag:comps -f comps/reranks/fastrag/docker/Dockerfile .
+    if $? ; then
+        echo "opea/reranking-fastrag built fail"
+        exit 1
+    else
+        echo "opea/reranking-fastrag built successful"
+    fi
 }
 
 function start_service() {
     export EMBED_MODEL="Intel/bge-small-en-v1.5-rag-int8-static"
-    fastrag_service_port=8000
+    fastrag_service_port=5020
     unset http_proxy
     docker run -d --name="test-comps-reranking-fastrag-server" -p ${fastrag_service_port}:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e EMBED_MODEL=$EMBED_MODEL opea/reranking-fastrag:comps
     sleep 3m
 }
 
 function validate_microservice() {
-    fastrag_service_port=8000
-    http_proxy="" curl http://${ip_address}:${fastrag_service_port}/v1/reranking\
+    fastrag_service_port=5020
+    result=$(http_proxy="" curl http://${ip_address}:${fastrag_service_port}/v1/reranking\
         -X POST \
         -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-        -H 'Content-Type: application/json'
+        -H 'Content-Type: application/json')
     docker logs test-comps-reranking-fastrag-server
 }
 

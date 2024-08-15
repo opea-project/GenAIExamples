@@ -11,7 +11,19 @@ function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
     docker build --no-cache -t opea/whisper:comps -f comps/asr/whisper/Dockerfile .
+    if $? ; then
+        echo "opea/whisper built fail"
+        exit 1
+    else
+        echo "opea/whisper built successful"
+    fi
     docker build --no-cache -t opea/asr:comps -f comps/asr/Dockerfile .
+    if $? ; then
+        echo "opea/asr built fail"
+        exit 1
+    else
+        echo "opea/asr built successful"
+    fi
 }
 
 function start_service() {

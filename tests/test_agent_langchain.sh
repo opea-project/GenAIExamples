@@ -13,7 +13,12 @@ function build_docker_images() {
     cd $WORKPATH
     echo $WORKPATH
     docker build -t opea/comps-agent-langchain:comps -f comps/agent/langchain/docker/Dockerfile .
-
+    if $? ; then
+        echo "opea/comps-agent-langchain built fail"
+        exit 1
+    else
+        echo "opea/comps-agent-langchain built successful"
+    fi
 }
 
 function start_service() {

@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
@@ -18,6 +18,12 @@ function build_docker_images() {
     docker run -d -p 27017:27017 --name=test-comps-mongo mongo:latest
 
     docker build --no-cache -t opea/chathistory-mongo-server:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/mongo/docker/Dockerfile .
+    if $? ; then
+        echo "opea/chathistory-mongo-server built fail"
+        exit 1
+    else
+        echo "opea/chathistory-mongo-server built successful"
+    fi
 }
 
 function start_service() {
@@ -42,6 +48,7 @@ function validate_microservice() {
         echo "Result correct."
     else
         echo "Result wrong."
+        docker logs test-comps-chathistory-mongo-server
         exit 1
     fi
 

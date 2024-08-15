@@ -11,19 +11,31 @@ function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
     docker build -t opea/llava:comps -f comps/lvms/llava/Dockerfile .
+    if $? ; then
+        echo "opea/llava built fail"
+        exit 1
+    else
+        echo "opea/llava built successful"
+    fi
     docker build --no-cache -t opea/lvm:comps -f comps/lvms/Dockerfile .
+    if $? ; then
+        echo "opea/lvm built fail"
+        exit 1
+    else
+        echo "opea/lvm built successful"
+    fi
 }
 
 function start_service() {
     unset http_proxy
-    docker run -d --name="test-comps-lvm-llava" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 8399:8399 --ipc=host opea/llava:comps
-    docker run -d --name="test-comps-lvm" -e LVM_ENDPOINT=http://$ip_address:8399 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 9399:9399 --ipc=host opea/lvm:comps
+    docker run -d --name="test-comps-lvm-llava" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 5029:8399 --ipc=host opea/llava:comps
+    docker run -d --name="test-comps-lvm" -e LVM_ENDPOINT=http://$ip_address:5029 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 5028:9399 --ipc=host opea/lvm:comps
     sleep 8m
 }
 
 function validate_microservice() {
 
-    result=$(http_proxy="" curl http://localhost:9399/v1/lvm -XPOST -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://localhost:5028/v1/lvm -XPOST -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}' -H 'Content-Type: application/json')
     if [[ $result == *"yellow"* ]]; then
         echo "Result correct."
     else

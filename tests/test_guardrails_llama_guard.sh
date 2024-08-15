@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
@@ -12,18 +12,23 @@ function build_docker_images() {
     cd $WORKPATH
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker build --no-cache -t opea/guardrails-tgi:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/docker/Dockerfile .
-    echo "Docker images built"
+    if $? ; then
+        echo "opea/guardrails-tgi built fail"
+        exit 1
+    else
+        echo "opea/guardrails-tgi built successful"
+    fi
 }
 
 function start_service() {
     echo "Starting microservice"
     export model_id="meta-llama/Meta-Llama-Guard-2-8B"
     export SAFETY_GUARD_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
-    export SAFETY_GUARD_ENDPOINT=http://${ip_address}:8088/v1/chat/completions
+    export SAFETY_GUARD_ENDPOINT=http://${ip_address}:5035/v1/chat/completions
 
-    docker run -d --name="test-comps-guardrails-langchain-tgi-server" -p 8088:80 --runtime=habana -e HF_TOKEN=$HF_TOKEN -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy ghcr.io/huggingface/tgi-gaudi:2.0.1 --model-id $model_id --max-input-length 1024 --max-total-tokens 2048
+    docker run -d --name="test-comps-guardrails-langchain-tgi-server" -p 5035:80 --runtime=habana -e HF_TOKEN=$HF_TOKEN -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy ghcr.io/huggingface/tgi-gaudi:2.0.1 --model-id $model_id --max-input-length 1024 --max-total-tokens 2048
     sleep 4m
-    docker run -d --name="test-comps-guardrails-langchain-service" -p 9090:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e SAFETY_GUARD_MODEL_ID=$SAFETY_GUARD_MODEL_ID -e SAFETY_GUARD_ENDPOINT=$SAFETY_GUARD_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HF_TOKEN opea/guardrails-tgi:comps
+    docker run -d --name="test-comps-guardrails-langchain-service" -p 5036:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e SAFETY_GUARD_MODEL_ID=$SAFETY_GUARD_MODEL_ID -e SAFETY_GUARD_ENDPOINT=$SAFETY_GUARD_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HF_TOKEN opea/guardrails-tgi:comps
     sleep 10s
     echo "Microservice started"
 }
@@ -31,21 +36,23 @@ function start_service() {
 function validate_microservice() {
     echo "Validate microservice started"
     echo "test 1 - violated policies"
-    docker logs test-comps-guardrails-langchain-tgi-server
-    docker logs test-comps-guardrails-langchain-service
-    result=$(http_proxy= curl http://localhost:9090/v1/guardrails  -X POST   -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}'   -H 'Content-Type: application/json')
+    result=$(http_proxy= curl http://localhost:5036/v1/guardrails  -X POST   -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}'   -H 'Content-Type: application/json')
     if [[ $result == *"Violated"* ]]; then
         echo "Result correct."
     else
         echo "Result wrong."
+        docker logs test-comps-guardrails-langchain-tgi-server
+        docker logs test-comps-guardrails-langchain-service
         exit 1
     fi
     echo "test 2 - safe"
-    result=$(http_proxy= curl http://localhost:9090/v1/guardrails  -X POST   -d '{"text":"How do you buy a car in the US?","parameters":{"max_new_tokens":32}}'   -H 'Content-Type: application/json')
+    result=$(http_proxy= curl http://localhost:5036/v1/guardrails  -X POST   -d '{"text":"How do you buy a car in the US?","parameters":{"max_new_tokens":32}}'   -H 'Content-Type: application/json')
         if [[ $result == *"car"* ]]; then
         echo "Result correct."
     else
         echo "Result wrong."
+        docker logs test-comps-guardrails-langchain-tgi-server
+        docker logs test-comps-guardrails-langchain-service
         exit 1
     fi
 

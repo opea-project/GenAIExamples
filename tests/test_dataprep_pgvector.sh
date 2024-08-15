@@ -17,6 +17,12 @@ function build_docker_images() {
 
     # build dataprep image for pgvector
     docker build -t opea/dataprep-pgvector:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f $WORKPATH/comps/dataprep/pgvector/langchain/docker/Dockerfile .
+    if $? ; then
+        echo "opea/dataprep-pgvector built fail"
+        exit 1
+    else
+        echo "opea/dataprep-pgvector built successful"
+    fi
 }
 
 function start_service() {

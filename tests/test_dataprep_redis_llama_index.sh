@@ -12,6 +12,12 @@ function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
     docker build --no-cache -t opea/dataprep-redis-llama-index:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/llama_index/docker/Dockerfile .
+    if $? ; then
+        echo "opea/dataprep-redis-llama-index built fail"
+        exit 1
+    else
+        echo "opea/dataprep-redis-llama-index built successful"
+    fi
 }
 
 function start_service() {
