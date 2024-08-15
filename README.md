@@ -32,17 +32,17 @@ Users can choose the most suitable approach based on ease of setup, scalability 
 
 ### Deployment
 
-| Use Case | Docker Compose<br/>Deployment on Xeon | Docker Compose<br/>Deployment on Gaudi | Kubernetes Deployment |
-| ------ | ------| ------ | ------|
-| ChatQnA     | [Xeon Instructions](ChatQnA/docker/xeon/README.md) | [Gaudi Instructions](ChatQnA/docker/gaudi/README.md) | [K8s Instructions](ChatQnA/kubernetes/README.md) |
-| CodeGen     | [Xeon Instructions](CodeGen/docker/xeon/README.md) | [Gaudi Instructions](CodeGen/docker/gaudi/README.md) | [K8s Instructions](Codegen/kubernetes/README.md) |
-| CodeTrans   | [Xeon Instructions](CodeTrans/docker/xeon/README.md) | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md) | [K8s Instructions](CodeTrans/kubernetes/README.md) |
-| DocSum      | [Xeon Instructions](CodeTrans/docker/xeon/README.md) | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md) | [K8s Instructions](CodeTrans/kubernetes/README.md) |
-| SearchQnA   | [Xeon Instructions](SearchQnA/docker/xeon/README.md) | [Gaudi Instructions](SearchQnA/docker/gaudi/README.md) | [K8s Instructions](SearchQnA/kubernetes/README.md) |
-| FaqGen      | [Xeon Instructions](FaqGen/docker/xeon/README.md) | [Gaudi Instructions](FaqGen/docker/gaudi/README.md) | [K8s Instructions](FaqGen/kubernetes/manifests/README.md) |
-| Translation | [Xeon Instructions](Translation/docker/xeon/README.md) | [Gaudi Instructions](Translation/docker/gaudi/README.md) | [K8s Instructions](Translation/kubernetes/README.md) |
-| AudioQnA    | [Xeon Instructions](AudioQnA/docker/xeon/README.md) | [Gaudi Instructions](AudioQnA/docker/gaudi/README.md) | K8s Not Supported |
-| VisualQnA   | [Xeon Instructions](VisualQnA/docker/xeon/README.md) | [Gaudi Instructions](VisualQnA/docker/gaudi/README.md) | K8s Not Supported |
+| Use Case    | Docker Compose<br/>Deployment on Xeon                  | Docker Compose<br/>Deployment on Gaudi                   | Kubernetes Deployment                                     |
+| ----------- | ------------------------------------------------------ | -------------------------------------------------------- | --------------------------------------------------------- |
+| ChatQnA     | [Xeon Instructions](ChatQnA/docker/xeon/README.md)     | [Gaudi Instructions](ChatQnA/docker/gaudi/README.md)     | [K8s Instructions](ChatQnA/kubernetes/README.md)          |
+| CodeGen     | [Xeon Instructions](CodeGen/docker/xeon/README.md)     | [Gaudi Instructions](CodeGen/docker/gaudi/README.md)     | [K8s Instructions](Codegen/kubernetes/README.md)          |
+| CodeTrans   | [Xeon Instructions](CodeTrans/docker/xeon/README.md)   | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md)   | [K8s Instructions](CodeTrans/kubernetes/README.md)        |
+| DocSum      | [Xeon Instructions](CodeTrans/docker/xeon/README.md)   | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md)   | [K8s Instructions](CodeTrans/kubernetes/README.md)        |
+| SearchQnA   | [Xeon Instructions](SearchQnA/docker/xeon/README.md)   | [Gaudi Instructions](SearchQnA/docker/gaudi/README.md)   | [K8s Instructions](SearchQnA/kubernetes/README.md)        |
+| FaqGen      | [Xeon Instructions](FaqGen/docker/xeon/README.md)      | [Gaudi Instructions](FaqGen/docker/gaudi/README.md)      | [K8s Instructions](FaqGen/kubernetes/manifests/README.md) |
+| Translation | [Xeon Instructions](Translation/docker/xeon/README.md) | [Gaudi Instructions](Translation/docker/gaudi/README.md) | [K8s Instructions](Translation/kubernetes/README.md)      |
+| AudioQnA    | [Xeon Instructions](AudioQnA/docker/xeon/README.md)    | [Gaudi Instructions](AudioQnA/docker/gaudi/README.md)    | K8s Not Supported                                         |
+| VisualQnA   | [Xeon Instructions](VisualQnA/docker/xeon/README.md)   | [Gaudi Instructions](VisualQnA/docker/gaudi/README.md)   | K8s Not Supported                                         |
 
 ## Support Examples
 
