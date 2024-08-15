@@ -1,0 +1,74 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Examples docker images BoM scan
+on:
+  workflow_dispatch:
+    inputs:
+      node:
+        default: "gaudi"
+        description: "Hardware to run test"
+        required: true
+        type: string
+      examples:
+        default: "ChatQnA"
+        description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+
+permissions: read-all
+jobs:
+  get-image-list:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.scan-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Set Matrix
+        id: scan-matrix
+        run: |
+          pip install yq
+          examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
+          image_list=[]
+          for example in ${examples[@]}
+          do
+              images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
+              image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
+          done
+          echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
+
+  scan-license:
+    needs: get-image-list
+    runs-on: "docker-build-${{ inputs.node }}"
+    strategy:
+      matrix:
+        image: ${{ fromJson(needs.get-image-list.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - name: Pull Image
+        run: |
+          docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
+
+      - name: Scan Container
+        uses: opea-project/validation/actions/license-scan@main # TODO
+        with:
+          image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
+          output: ${{ matrix.image }}-scan.txt
+
+      - name: Cleanup
+        if: always()
+        run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+
+      - uses: actions/upload-artifact@v4.3.4
+        with:
+          name: ${{ matrix.image }}-scan
+          path: ${{ matrix.image }}-scan.txt
+          overwrite: true

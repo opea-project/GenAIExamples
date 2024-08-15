@@ -40,16 +40,6 @@ on:
         description: 'Test examples with k8s'
         required: false
         type: boolean
-      publish:
-        default: false
-        description: 'Publish images to docker hub'
-        required: false
-        type: boolean
-      publish_tags:
-        default: "latest,v1.0"
-        description: 'Tag list apply to publish images'
-        required: false
-        type: string
       GenAIComps_branch:
         default: "main"
         description: 'GenAIComps branch for image build'
@@ -67,10 +57,10 @@ jobs:
     - name: Create Matrix
       id: get-matrix
       run: |
-        examples=($(echo ${{ github.event.inputs.examples }} | tr ',' ' '))
+        examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
         examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "examples=$examples_json" >> $GITHUB_OUTPUT
-        nodes=($(echo ${{ github.event.inputs.nodes }} | tr ',' ' '))
+        nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
         nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
@@ -90,7 +80,5 @@ jobs:
       scan: ${{ fromJSON(inputs.scan) }}
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_k8s: ${{ fromJSON(inputs.test_k8s) }}
-      publish: ${{ fromJSON(inputs.publish) }}
-      publish_tags: ${{ inputs.publish_tags }}
       GenAIComps_branch: ${{ inputs.GenAIComps_branch }}
     secrets: inherit
