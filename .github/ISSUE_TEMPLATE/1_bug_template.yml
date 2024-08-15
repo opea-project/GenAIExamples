@@ -70,8 +70,23 @@ body:
     attributes:
       label: Multiple nodes
       options:
-        - label: Single Node
-        - label: Multiple Nodes
+        - Single Node
+        - Multiple Nodes
+      default: 0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Undecided
+        - P1-Stopper
+        - P2-High
+        - P3-Medium
+        - P4-Low
+      default: 0
     validations:
       required: true
 
@@ -81,19 +96,6 @@ body:
       label: What's version?
       description: Docker ID in hub.docker.com or commit ID of Dockerfile.
       placeholder:
-    validations:
-      required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      options:
-        - label: Undecided
-        - label: P1-Stopper
-        - label: P2-High
-        - label: P3-Medium
-        - label: P4-Low
     validations:
       required: true
 
