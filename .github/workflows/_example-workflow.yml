@@ -36,10 +36,6 @@ on:
         default: "main"
         required: false
         type: string
-      GenAIComps_branch:
-        default: "main"
-        required: false
-        type: string
 jobs:
 ####################################################################################################
 # Image Build

@@ -50,11 +50,6 @@ on:
         description: 'OPEA branch for image build'
         required: false
         type: string
-      GenAIComps_branch:
-        default: "main"
-        description: 'GenAIComps branch for image build'
-        required: false
-        type: string
 
 permissions: read-all
 jobs:
