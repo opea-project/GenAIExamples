@@ -160,19 +160,19 @@ Here is an example of running CodeGen in the UI:
 To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `codegen-xeon-ui-server` service with the `codegen-xeon-react-ui-server` service as per the config below:
 
 ```yaml
-  codegen-xeon-react-ui-server:
-    image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
-    container_name: codegen-xeon-react-ui-server
-    environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-    depends_on:
-      - codegen-xeon-backend-server
-    ports:
-      - "5174:80"
-    ipc: host
-    restart: always
+codegen-xeon-react-ui-server:
+  image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
+  container_name: codegen-xeon-react-ui-server
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+  depends_on:
+    - codegen-xeon-backend-server
+  ports:
+    - "5174:80"
+  ipc: host
+  restart: always
 ```
 
 ![project-screenshot](../../assets/img/codegen_react.png)
