@@ -30,7 +30,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
     depends_on:
       - tgi-service
@@ -44,7 +44,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   translation-xeon-backend-server:
-    image: opea/translation:latest
+    image: ${REGISTRY:-opea}/translation:${TAG:-latest}
     container_name: translation-xeon-backend-server
     depends_on:
       - tgi-service
@@ -59,7 +59,7 @@ services:
     ipc: host
     restart: always
   translation-xeon-ui-server:
-    image: opea/translation-ui:latest
+    image: ${REGISTRY:-opea}/translation-ui:${TAG:-latest}
     container_name: translation-xeon-ui-server
     depends_on:
       - translation-xeon-backend-server
