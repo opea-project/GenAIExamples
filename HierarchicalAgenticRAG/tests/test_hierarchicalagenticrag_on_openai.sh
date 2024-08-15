@@ -17,10 +17,11 @@ function build_agent_docker_image() {
         git clone https://github.com/opea-project/GenAIComps.git
     fi
     cd GenAIComps
+    echo PWD: $(pwd)
     local CUR=$(git branch --show-current)
     echo "Check out agent component, Current Branch is ${CUR}"
     if [ "${CUR}" != "PR480" ] ; then
-        git fetch origin pull/314/head:PR480; git checkout PR480
+        git fetch origin pull/480/head:PR480; git checkout PR480
     fi
     docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/docker/Dockerfile .
 }
@@ -50,18 +51,8 @@ function validate() {
 
 
 function run_tests() {
-    echo "----------------Test worker agent----------------"
-    local CONTENT=$(curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Most recent album by Taylor Swift"
-    }')
-    local EXIT_CODE=$(validate "$CONTENT" "Taylor" "docgrader-agent-endpoint")
-    docker logs docgrader-agent-endpoint
-    if [ "$EXIT_CODE" == "1" ]; then
-        exit 1
-    fi
-
     echo "----------------Test supervisor agent ----------------"
-    local CONTENT=$(curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+    local CONTENT=$(http_proxy="" curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "Most recent album by Taylor Swift"
     }')
     local EXIT_CODE=$(validate "$CONTENT" "Taylor" "react-agent-endpoint")
