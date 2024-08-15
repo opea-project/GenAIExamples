@@ -23,24 +23,24 @@ body:
     attributes:
       label: Hardware type
       options:
-        - Xeon-GNR
-        - Xeon-EMR
-        - Xeon-SPR
-        - Xeon-ICX
-        - Xeon-CLX
-        - Xeon-other
-        - Gaudi3
-        - Gaudi2
-        - Gaudi1
-        - GPU-PVC
-        - GPU-Flex
-        - GPU-Arc
-        - GPU-Arc-MTL
-        - GPU-Nvidia
-        - GPU-AMD
-        - GPU-other
-        - AI-PC (Please let us know in description)
-        - CPU-other (Please let us know in description)
+        - label: Xeon-GNR
+        - label: Xeon-EMR
+        - label: Xeon-SPR
+        - label: Xeon-ICX
+        - label: Xeon-CLX
+        - label: Xeon-other
+        - label: Gaudi3
+        - label: Gaudi2
+        - label: Gaudi1
+        - label: GPU-PVC
+        - label: GPU-Flex
+        - label: GPU-Arc
+        - label: GPU-Arc-MTL
+        - label: GPU-Nvidia
+        - label: GPU-AMD
+        - label: GPU-other
+        - label: AI-PC (Please let us know in description)
+        - label: CPU-other (Please let us know in description)
       default: 0
     validations:
       required: true
@@ -50,8 +50,8 @@ body:
     attributes:
       label: Installation method
       options:
-        - Pull docker images from hub.docker.com
-        - Build docker images from source
+        - label: Pull docker images from hub.docker.com
+        - label: Build docker images from source
       default: 0
     validations:
       required: true
@@ -61,10 +61,10 @@ body:
     attributes:
       label: Deploy method
       options:
-        - Docker compose
-        - Docker
-        - Kubernetes
-        - Helm
+        - label: Docker compose
+        - label: Docker
+        - label: Kubernetes
+        - label: Helm
       default: 0
     validations:
       required: true
@@ -74,8 +74,8 @@ body:
     attributes:
       label: Multiple nodes
       options:
-        - Single Node
-        - Multiple Nodes
+        - label: Single Node
+        - label: Multiple Nodes
       default: 0
     validations:
       required: true
@@ -94,11 +94,11 @@ body:
     attributes:
       label: Priority
       options:
-        - Undecided
-        - P1-Stopper
-        - P2-High
-        - P3-Medium
-        - P4-Low
+        - label: Undecided
+        - label: P1-Stopper
+        - label: P2-High
+        - label: P3-Medium
+        - label: P4-Low
       default: 0
     validations:
       required: true
