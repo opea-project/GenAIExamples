@@ -1,0 +1,68 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Examples CD workflow on manual event
+on:
+  workflow_dispatch:
+    inputs:
+      nodes:
+        default: "gaudi"
+        description: "Hardware to run test"
+        required: true
+        type: string
+      examples:
+        default: "ChatQnA"
+        description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+      publish:
+        default: false
+        description: 'Publish images to docker hub'
+        required: false
+        type: boolean
+      publish_tags:
+        default: "latest,v1.0"
+        description: 'Tag list apply to publish images'
+        required: false
+        type: string
+
+permissions: read-all
+jobs:
+  get-image-list:
+    runs-on: ${{ inputs.node }}
+    outputs:
+      matrix: ${{ steps.scan-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Set Matrix
+        id: scan-matrix
+        run: |
+          examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
+          image_list=[]
+          for example in ${examples[@]}
+          do
+              images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
+              image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
+          done
+          echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
+
+  publish:
+    needs: [get-image-list]
+    strategy:
+      matrix:
+        image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
+    runs-on: "docker-build-${{ inputs.node }}"
+    steps:
+      - name: Image Publish
+        uses: opea-project/validation/actions/image-publish@main
+        with:
+          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          image_name: opea/${{ matrix.image }}
+          publish_tags: ${{ inputs.publish_tags }}
