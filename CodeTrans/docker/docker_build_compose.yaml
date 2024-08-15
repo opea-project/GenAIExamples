@@ -15,4 +15,4 @@ services:
     build:
       context: GenAIComps
       dockerfile: comps/llms/text-generation/tgi/Dockerfile
-    image: ${REGISTRY}opea/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
