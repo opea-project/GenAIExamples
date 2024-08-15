@@ -46,3 +46,8 @@ services:
       context: tei-gaudi
       dockerfile: Dockerfile-hpu
     image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: Dockerfile-hpu
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
