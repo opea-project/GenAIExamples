@@ -1,6 +1,6 @@
 name: Report Feature
 description: Used to report feature
-title: "Feature:"
+title: "[Feature]"
 body:
   - type: dropdown
     id: priority
@@ -19,7 +19,7 @@ body:
   - type: textarea
     id: Customer
     attributes:
-      label: Description the customer info
+      label: Customer info
       description: Customer name, business impact, potential deal (Chip Number, Money) and other.
       placeholder: Name, business impact, money.
     validations:

@@ -1,11 +1,34 @@
 name: Report Bug
 description: Used to report bug
-title: "Bug:"
+title: "[Bug]"
 body:
   - type: dropdown
     id: priority
     attributes:
       label: Priority
+      options:
+        - Undecided
+        - P1-Stopper
+        - P2-High
+        - P3-Medium
+        - P4-Low
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: Customer
+    attributes:
+      label: Customer info
+      description: Customer name, business impact, potential deal (Chip Number, Money) and other.
+      placeholder: Name, business impact, money.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: customer-impact
+    attributes:
+      label: Customer Impact
       options:
         - Undecided
         - P1-Stopper
@@ -114,4 +137,4 @@ body:
       description: Provide the log of RESTFul API or docker for micro-service by `docker logs CONTAINER`
       render: shell
     validations:
-      required: true
+      required: false
