@@ -97,7 +97,7 @@ jobs:
         id: scan-matrix
         run: |
           pip install yq
-          compose_path=${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.example }}-compose.yaml
+          compose_path=${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
           echo "matrix=$(cat ${compose_path} | yq -r '.[]' | jq 'keys' | jq -c '.')" >> $GITHUB_OUTPUT
 
   scan-images:
@@ -126,8 +126,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4.3.4
         with:
-          name: ${{ inputs.example }}-${{ matrix.image }}-scan
-          path: ${{ inputs.example }}-${{ matrix.image }}-scan.txt
+          name: ${{ matrix.image }}-scan
+          path: ${{ matrix.image }}-scan.txt
           overwrite: true
 
 ####################################################################################################
