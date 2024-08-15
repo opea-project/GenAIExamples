@@ -1,8 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3.8"
-
 services:
   tgi-service:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.1
