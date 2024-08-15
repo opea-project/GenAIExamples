@@ -50,6 +50,11 @@ on:
         description: 'Tag list apply to publish images'
         required: false
         type: string
+      GenAIComps_branch:
+        default: "main"
+        description: 'GenAIComps branch for image build'
+        required: false
+        type: string
 
 permissions: read-all
 jobs:
@@ -87,4 +92,5 @@ jobs:
       test_k8s: ${{ fromJSON(inputs.test_k8s) }}
       publish: ${{ fromJSON(inputs.publish) }}
       publish_tags: ${{ inputs.publish_tags }}
+      GenAIComps_branch: ${{ inputs.GenAIComps_branch }}
     secrets: inherit
