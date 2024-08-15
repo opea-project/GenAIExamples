@@ -27,4 +27,4 @@ services:
       context: GenAIComps
       dockerfile: comps/llms/text-generation/tgi/Dockerfile
     extends: codegen
-    image: ${REGISTRY}opea/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}

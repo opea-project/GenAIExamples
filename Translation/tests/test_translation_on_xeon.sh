@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -x
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
