@@ -13,3 +13,8 @@ services:
       context: docker/ui
       dockerfile: ./docker/Dockerfile
     image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
+  llm-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}

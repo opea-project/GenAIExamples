@@ -1,0 +1,14 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  translation:
+    build:
+      context: docker
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/translation:${TAG:-latest}
+  translation-ui:
+    build:
+      context: docker/ui
+      dockerfile: ./docker/Dockerfile
+    image: ${REGISTRY:-opea}/translation-ui:${TAG:-latest}

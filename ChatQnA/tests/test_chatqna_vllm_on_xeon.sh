@@ -55,12 +55,12 @@ function start_services() {
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d
     n=0
-    until [[ "$n" -ge 10 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log
         if grep -q Connected ${LOG_PATH}/vllm_service_start.log; then
             break
         fi
-        sleep 10s
+        sleep 5s
         n=$((n+1))
     done
 }
@@ -172,13 +172,17 @@ function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-#    conda remove -n ${conda_env_name} --all -y
-#    conda create -n ${conda_env_name} python=3.12 -y
+    if conda info --envs | grep -q "$conda_env_name"; then
+        echo "$conda_env_name exist!"
+    else
+        conda create -n ${conda_env_name} python=3.12 -y
+    fi
+
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-#    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
