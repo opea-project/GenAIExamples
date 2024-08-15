@@ -36,11 +36,36 @@ services:
       context: GenAIComps
       dockerfile: comps/llms/text-generation/tgi/Dockerfile
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+  llm-ollama:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/ollama/Dockerfile
+    image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
+  llm-vllm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/vllm/docker/Dockerfile.microservice
+    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
+  llm-vllm-ray:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice
+    image: ${REGISTRY:-opea}/llm-vllm-ray:${TAG:-latest}
+  llm-vllm-ray-hpu:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray
+    image: ${REGISTRY:-opea}/llm-vllm-ray-hpu:${TAG:-latest}
   dataprep-redis:
     build:
       context: GenAIComps
       dockerfile: comps/dataprep/redis/langchain/docker/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+  dataprep-qdrant:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/qdrant/docker/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
   tei-gaudi:
     build:
       context: tei-gaudi
