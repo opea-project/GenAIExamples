@@ -1,6 +1,6 @@
 name: Report Bug
 description: Used to report bug
-title: ""
+title: "Bug"
 body:
   - type: checkboxes
     id: os
