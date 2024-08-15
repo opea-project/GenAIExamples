@@ -1,8 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3.8"
-
 services:
   redis-vector-db:
     image: redis/redis-stack:7.2.0-v9
@@ -11,7 +9,7 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: opea/dataprep-redis:latest
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
@@ -39,7 +37,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
-    image: opea/embedding-tei:latest
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
     depends_on:
       - tei-embedding-service
@@ -53,7 +51,7 @@ services:
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   retriever:
-    image: opea/retriever-redis:latest
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -85,7 +83,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
-    image: opea/reranking-tei:latest
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-aipc-server
     depends_on:
       - tei-reranking-service
@@ -102,7 +100,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
   llm:
-    image: opea/llm-ollama
+    image: ${REGISTRY:-opea}/llm-ollama
     container_name: llm-ollama
     ports:
       - "9000:9000"
@@ -118,7 +116,7 @@ services:
       OLLAMA_ENDPOINT: ${OLLAMA_ENDPOINT}
       OLLAMA_MODEL: ${OLLAMA_MODEL}
   chaqna-aipc-backend-server:
-    image: opea/chatqna:latest
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-aipc-backend-server
     depends_on:
       - redis-vector-db
@@ -142,7 +140,7 @@ services:
     ipc: host
     restart: always
   chaqna-aipc-ui-server:
-    image: opea/chatqna-ui:latest
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     container_name: chatqna-aipc-ui-server
     depends_on:
       - chaqna-aipc-backend-server

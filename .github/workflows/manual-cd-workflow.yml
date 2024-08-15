@@ -5,9 +5,14 @@ name: Examples CD workflow on manual event
 on:
   workflow_dispatch:
     inputs:
+      nodes:
+        default: "gaudi,xeon"
+        description: "Hardware to run test"
+        required: true
+        type: string
       examples:
-        default: "AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation"
-        description: 'List of examples to test'
+        default: "ChatQnA"
+        description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
         required: true
         type: string
       tag:
@@ -41,8 +46,13 @@ on:
         required: false
         type: boolean
       publish_tags:
-        default: "latest,v0.9"
+        default: "latest,v1.0"
         description: 'Tag list apply to publish images'
+        required: false
+        type: string
+      GenAIComps_branch:
+        default: "main"
+        description: 'GenAIComps branch for image build'
         required: false
         type: string
 
@@ -51,23 +61,29 @@ jobs:
   get-test-matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.get-matrix.outputs.matrix }}
+      examples: ${{ steps.get-matrix.outputs.examples }}
+      nodes: ${{ steps.get-matrix.outputs.nodes }}
     steps:
     - name: Create Matrix
       id: get-matrix
       run: |
         examples=($(echo ${{ github.event.inputs.examples }} | tr ',' ' '))
         examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
-        echo "matrix=$examples_json" >> $GITHUB_OUTPUT
+        echo "examples=$examples_json" >> $GITHUB_OUTPUT
+        nodes=($(echo ${{ github.event.inputs.nodes }} | tr ',' ' '))
+        nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
   run-examples:
     needs: [get-test-matrix]
     strategy:
       matrix:
-        example: ${{ fromJson(needs.get-test-matrix.outputs.matrix) }}
+        example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
+        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
       fail-fast: false
     uses: ./.github/workflows/_example-workflow.yml
     with:
+      node: ${{ matrix.node }}
       example: ${{ matrix.example }}
       tag: ${{ inputs.tag }}
       build: ${{ fromJSON(inputs.build) }}
@@ -75,5 +91,6 @@ jobs:
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_k8s: ${{ fromJSON(inputs.test_k8s) }}
       publish: ${{ fromJSON(inputs.publish) }}
-      publish_tags: ${{ fromJSON(inputs.publish_tags) }}
+      publish_tags: ${{ inputs.publish_tags }}
+      GenAIComps_branch: ${{ inputs.GenAIComps_branch }}
     secrets: inherit
