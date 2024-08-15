@@ -4,10 +4,15 @@
 services:
   translation:
     build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/translation:${TAG:-latest}
   translation-ui:
     build:
       context: ui
       dockerfile: ./docker/Dockerfile
+    extends: translation
     image: ${REGISTRY:-opea}/translation-ui:${TAG:-latest}
