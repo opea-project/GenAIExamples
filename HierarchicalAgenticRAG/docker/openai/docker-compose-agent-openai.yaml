@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 services:
   worker-docgrader-agent:
     image: opea/comps-agent-langchain:latest
@@ -27,7 +30,7 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-worker-agent-service"
       port: 9095
-    
+
   supervisor-react-agent:
     image: opea/comps-agent-langchain:latest
     container_name: react-agent-endpoint

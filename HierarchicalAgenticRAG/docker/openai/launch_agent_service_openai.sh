@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 export ip_address=$(hostname -I | awk '{print $1}')
 export recursion_limit=12
 export model="gpt-4o-mini-2024-07-18"
