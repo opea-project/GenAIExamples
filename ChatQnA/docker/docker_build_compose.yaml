@@ -30,7 +30,7 @@ services:
     build:
       context: GenAIComps
       dockerfile: comps/retrievers/haystack/qdrant/docker/Dockerfile
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}
   reranking-tei:
     build:
       context: GenAIComps

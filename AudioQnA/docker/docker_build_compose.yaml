@@ -1,0 +1,44 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  audioqna:
+    build:
+      context: docker
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+  whisper-gaudi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/asr/whisper/Dockerfile_hpu
+    image: ${REGISTRY:-opea}/whisper-gaudi:${TAG:-latest}
+  whisper:
+    build:
+      context: GenAIComps
+      dockerfile: comps/asr/whisper/Dockerfile
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+  asr:
+    build:
+      context: GenAIComps
+      dockerfile: comps/asr/Dockerfile
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+  llm-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+  speecht5-gaudi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/speecht5/Dockerfile_hpu
+    image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
+  speecht5:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/speecht5/Dockerfile
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+  tts:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/Dockerfile
+    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
