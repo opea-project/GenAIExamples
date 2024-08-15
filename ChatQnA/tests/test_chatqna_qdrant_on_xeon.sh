@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-qdrant embedding-tei retriever-redis reranking-tei llm-tgi"
+    service_list="chatqna chatqna-ui dataprep-qdrant embedding-tei retriever-qdrant reranking-tei llm-tgi"
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images
