@@ -4,7 +4,6 @@
 services:
   audioqna:
     build:
-      context: docker
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
   whisper-gaudi:
