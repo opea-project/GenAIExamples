@@ -69,16 +69,6 @@ services:
     ipc: host
     restart: always
 
-  codegen-gaudi-react-ui-server:
-    image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
-    container_name: codegen-gaudi-react-ui-server
-    depends_on:
-      - codegen-gaudi-backend-server
-    ports:
-      - "5174:80"
-    ipc: host
-    restart: always
-
 networks:
   default:
     driver: bridge

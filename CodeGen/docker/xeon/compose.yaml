@@ -63,15 +63,6 @@ services:
       - BASIC_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
-  codegen-xeon-react-ui-server:
-    image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
-    container_name: codegen-xeon-react-ui-server
-    depends_on:
-      - codegen-xeon-backend-server
-    ports:
-      - "5174:80"
-    ipc: host
-    restart: always
 
 networks:
   default:
