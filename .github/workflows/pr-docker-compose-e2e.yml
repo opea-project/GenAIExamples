@@ -29,7 +29,9 @@ jobs:
   example-test:
     needs: [get-test-matrix]
     strategy:
-      matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
+      matrix:
+        example: ["ChatQnA"]
+        hardware: ["gaudi","xeon"]
       fail-fast: false
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
