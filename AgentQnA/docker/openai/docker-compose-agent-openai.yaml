@@ -10,7 +10,7 @@ services:
     ipc: host
     environment:
       ip_address: ${ip_address}
-      strategy: docgrader
+      strategy: rag_agent
       recursion_limit: ${recursion_limit}
       llm_engine: openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}

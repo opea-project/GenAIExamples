@@ -1,10 +1,10 @@
-# Hierarchical Agentic RAG
+# Agents for Question Answering
 ## Overview
 This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to the worker agent and other tools to gather information and come up with answers. The worker agent uses the retrieval tool to generate answers to the queries posted by the supervisor agent. Other tools used by the supervisor agent may include APIs to interface knowledge graphs, SQL databases, external knowledge bases, etc.
 ![Architecture Overview](assets/hierarchical_agentic_rag_arch.png)
-### Why Agentic RAG?
+### Why Agent for question answering?
 1. Improve relevancy of retrieved context.
-Agent can rephrase user queries, decompose user queries, and iterate to get the most relevant context for answering user's questions.
+Agent can rephrase user queries, decompose user queries, and iterate to get the most relevant context for answering user's questions. Compared to conventional RAG, RAG agent can significantly improve the correctness and relevancy of the answer.
 2. Use tools to get additional knowledge.
 For example, knowledge graphs and SQL databases can be exposed as APIs for Agents to gather knowledge that may be missing in the retrieval vector database.
 3. Hierarchical agent can further improve performance.
@@ -12,7 +12,7 @@ Expert worker agents, such as retrieval agent, knowledge graph agent, SQL agent,
 
 ### Roadmap
 * v0.9: Worker agent uses open-source websearch tool (duckduckgo), agents use OpenAI GPT-4o-mini as llm backend.
-* v1.0: Worker agent uses OPEA retrieval megaservice as tool, 
+* v1.0: Worker agent uses OPEA retrieval megaservice as tool. 
 * v1.0 or later: agents use open-source llm backend.
 * v1.1 or later: add safeguards
 
@@ -42,7 +42,7 @@ git clone https://github.com/opea-project/GenAIExamples.git
 ```
 Second, set up env vars
 ```
-export TOOLSET_PATH=$WORKDIR/GenAIExamples/HierarchicalAgenticRAG/tools/
+export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
 # optional: OPANAI_API_KEY
 export OPENAI_API_KEY=<your-openai-key>
 ```

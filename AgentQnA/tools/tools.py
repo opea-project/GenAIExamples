@@ -12,7 +12,8 @@ def search_knowledge_base(query: str) -> str:
         "query":query,
         } 
     response = requests.post(url, json=payload, proxies=proxies)
-    return response.json()["text"]
+    answer = response.json()["text"]
+    return answer
     
 
 

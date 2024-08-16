@@ -7,9 +7,10 @@ echo "IMAGE_REPO=${IMAGE_REPO}"
 echo "OPENAI_API_KEY=${OPENAI_API_KEY}"
 
 WORKPATH=$(dirname "$PWD")
-WORKDIR=$WORKPATH/../../
+export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
+export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
 
 function build_agent_docker_image() {
     cd $WORKDIR
@@ -30,8 +31,7 @@ function start_services() {
     echo "Starting CRAG server"
     docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
     echo "Starting Agent services"
-    export TOOLSET_PATH=$WORKDIR/GenAIExamples/HierarchicalAgenticRAG/tools/
-    cd $WORKDIR/GenAIExamples/HierarchicalAgenticRAG/docker/openai
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker/openai
     bash launch_agent_service_openai.sh
 }
 
