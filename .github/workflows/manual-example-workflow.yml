@@ -5,9 +5,14 @@ name: Examples CD workflow on manual event
 on:
   workflow_dispatch:
     inputs:
+      nodes:
+        default: "gaudi,xeon"
+        description: "Hardware to run test"
+        required: true
+        type: string
       examples:
-        default: "AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation"
-        description: 'List of examples to test'
+        default: "ChatQnA"
+        description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
         required: true
         type: string
       tag:
@@ -15,6 +20,11 @@ on:
         description: "Tag to apply to images"
         required: true
         type: string
+      deploy_gmc:
+        default: false
+        description: 'Whether to deploy gmc'
+        required: true
+        type: boolean
       build:
         default: true
         description: 'Build test required images for Examples'
@@ -35,14 +45,9 @@ on:
         description: 'Test examples with k8s'
         required: false
         type: boolean
-      publish:
-        default: false
-        description: 'Publish images to docker hub'
-        required: false
-        type: boolean
-      publish_tags:
-        default: "latest,v0.9"
-        description: 'Tag list apply to publish images'
+      opea_branch:
+        default: "main"
+        description: 'OPEA branch for image build'
         required: false
         type: string
 
@@ -51,29 +56,46 @@ jobs:
   get-test-matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.get-matrix.outputs.matrix }}
+      examples: ${{ steps.get-matrix.outputs.examples }}
+      nodes: ${{ steps.get-matrix.outputs.nodes }}
     steps:
     - name: Create Matrix
       id: get-matrix
       run: |
-        examples=($(echo ${{ github.event.inputs.examples }} | tr ',' ' '))
+        examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
         examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
-        echo "matrix=$examples_json" >> $GITHUB_OUTPUT
+        echo "examples=$examples_json" >> $GITHUB_OUTPUT
+        nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
+        nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+
+  build-deploy-gmc:
+    strategy:
+      matrix:
+        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+      fail-fast: false
+    uses: ./.github/workflows/_gmc-workflow.yml
+    with:
+      node: ${{ matrix.node }}
+      tag: ${{ inputs.tag }}
+      deploy: ${{ fromJSON(inputs.deploy_gmc) }}
+    secrets: inherit
 
   run-examples:
     needs: [get-test-matrix]
     strategy:
       matrix:
-        example: ${{ fromJson(needs.get-test-matrix.outputs.matrix) }}
+        example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
+        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
       fail-fast: false
     uses: ./.github/workflows/_example-workflow.yml
     with:
+      node: ${{ matrix.node }}
       example: ${{ matrix.example }}
       tag: ${{ inputs.tag }}
       build: ${{ fromJSON(inputs.build) }}
       scan: ${{ fromJSON(inputs.scan) }}
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_k8s: ${{ fromJSON(inputs.test_k8s) }}
-      publish: ${{ fromJSON(inputs.publish) }}
-      publish_tags: ${{ fromJSON(inputs.publish_tags) }}
+      opea_branch: ${{ inputs.opea_branch }}
     secrets: inherit

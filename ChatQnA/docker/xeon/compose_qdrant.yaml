@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   qdrant-vector-db:
@@ -12,7 +9,7 @@ services:
       - "6333:6333"
       - "6334:6334"
   dataprep-qdrant-service:
-    image: opea/dataprep-qdrant:latest
+    image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
     container_name: dataprep-qdrant-server
     depends_on:
       - qdrant-vector-db
@@ -42,7 +39,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
-    image: opea/embedding-tei:latest
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
     depends_on:
       - tei-embedding-service
@@ -56,7 +53,7 @@ services:
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   retriever:
-    image: opea/retriever-qdrant:latest
+    image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}
     container_name: retriever-qdrant-server
     depends_on:
       - qdrant-vector-db
@@ -88,7 +85,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
-    image: opea/reranking-tei:latest
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-xeon-server
     depends_on:
       - tei-reranking-service
@@ -121,7 +118,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
     depends_on:
       - tgi-service
@@ -138,7 +135,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
   chaqna-xeon-backend-server:
-    image: opea/chatqna:latest
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
       - qdrant-vector-db
@@ -167,7 +164,7 @@ services:
     ipc: host
     restart: always
   chaqna-xeon-ui-server:
-    image: opea/chatqna-ui:latest
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     container_name: chatqna-xeon-ui-server
     depends_on:
       - chaqna-xeon-backend-server

@@ -1,8 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3.8"
-
 services:
   tgi-service:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.1
@@ -26,7 +24,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096 --max-batch-total-tokens 65536 --max-batch-prefill-tokens 4096
   llm_faqgen:
-    image: opea/llm-faqgen-tgi:latest
+    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
     container_name: llm-faqgen-server
     depends_on:
       - tgi-service
@@ -41,7 +39,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   faqgen-gaudi-backend-server:
-    image: opea/faqgen:latest
+    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
     container_name: faqgen-gaudi-backend-server
     depends_on:
       - tgi-service
@@ -57,7 +55,7 @@ services:
     ipc: host
     restart: always
   faqgen-gaudi-ui-server:
-    image: opea/faqgen-ui:latest
+    image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
     container_name: faqgen-gaudi-ui-server
     depends_on:
       - faqgen-gaudi-backend-server
