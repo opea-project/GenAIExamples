@@ -32,7 +32,7 @@ on:
         default: false
         required: false
         type: boolean
-      GenAIComps_branch:
+      opea_branch:
         default: "main"
         required: false
         type: string
@@ -42,7 +42,6 @@ jobs:
 ####################################################################################################
   build-images:
     runs-on: "docker-build-${{ inputs.node }}"
-    continue-on-error: true
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
@@ -61,7 +60,7 @@ jobs:
               git clone https://github.com/vllm-project/vllm.git
           fi
           git clone https://github.com/opea-project/GenAIComps.git
-          cd GenAIComps && git checkout ${{ inputs.GenAIComps_branch }} && cd ../
+          cd GenAIComps && git checkout ${{ inputs.opea_branch }} && cd ../
 
       - name: Build Image
         if: ${{ fromJSON(inputs.build) }}
