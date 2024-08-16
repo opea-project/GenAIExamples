@@ -1,0 +1,38 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Freeze-images
+
+on:
+  workflow_dispatch:
+
+jobs:
+  freeze-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "NeuralChatBot"
+          git config --global user.email "grp_neural_chat_bot@intel.com"
+          git remote set-url origin https://NeuralChatBot:"${{ secrets.ACTION_TOKEN }}"@github.com/opea-project/GenAIExamples.git
+
+      - name: Run script
+        run: |
+          bash .github/workflows/scripts/freeze_images.sh
+
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -s -m "Freeze images tag"
+          git push
