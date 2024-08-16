@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Examples docker images BoM scan
+name: Examples docker images BoM scan on manual event
 on:
   workflow_dispatch:
     inputs:
