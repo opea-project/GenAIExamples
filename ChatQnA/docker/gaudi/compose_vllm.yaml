@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   redis-vector-db:
@@ -12,7 +9,7 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: opea/dataprep-redis:latest
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
@@ -28,7 +25,7 @@ services:
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
-    image: opea/tei-gaudi:latest
+    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}
     container_name: tei-embedding-gaudi-server
     ports:
       - "8090:80"
@@ -47,7 +44,7 @@ services:
       MAX_WARMUP_SEQUENCE_LENGTH: 512
     command: --model-id ${EMBEDDING_MODEL_ID}
   embedding:
-    image: opea/embedding-tei:latest
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
     depends_on:
       - tei-embedding-service
@@ -61,7 +58,7 @@ services:
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
   retriever:
-    image: opea/retriever-redis:latest
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -92,7 +89,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
-    image: opea/reranking-tei:latest
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-gaudi-server
     depends_on:
       - tei-reranking-service
@@ -109,7 +106,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
   vllm-service:
-    image: opea/llm-vllm-hpu:latest
+    image: ${REGISTRY:-opea}/llm-vllm-hpu:${TAG:-latest}
     container_name: vllm-gaudi-server
     ports:
       - "8007:80"
@@ -129,7 +126,7 @@ services:
     ipc: host
     command: /bin/bash -c "export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --enforce-eager --model $LLM_MODEL_ID --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048"
   llm:
-    image: opea/llm-vllm:latest
+    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
     container_name: llm-vllm-gaudi-server
     depends_on:
       - vllm-service
@@ -145,7 +142,7 @@ services:
       LLM_MODEL: ${LLM_MODEL_ID}
     restart: unless-stopped
   chaqna-gaudi-backend-server:
-    image: opea/chatqna:latest
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-gaudi-backend-server
     depends_on:
       - redis-vector-db
@@ -171,7 +168,7 @@ services:
     ipc: host
     restart: always
   chaqna-gaudi-ui-server:
-    image: opea/chatqna-ui:latest
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     container_name: chatqna-gaudi-ui-server
     depends_on:
       - chaqna-gaudi-backend-server
