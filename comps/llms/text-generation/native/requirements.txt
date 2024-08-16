@@ -1,10 +1,10 @@
-docarray[full]
+docarray
 fastapi
-langsmith
+httpx
+langchain_core
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
 prometheus-fastapi-instrumentator
 shortuuid
-transformers
 uvicorn

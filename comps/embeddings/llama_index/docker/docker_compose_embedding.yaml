@@ -5,7 +5,7 @@ version: "3.8"
 
 services:
   embedding:
-    image: opea/embedding-tei:latest
+    image: opea/embedding-tei-llama-index:latest
     container_name: embedding-tei-server
     ports:
       - "6000:6000"
@@ -16,7 +16,6 @@ services:
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       TEI_EMBEDDING_MODEL_NAME: ${TEI_EMBEDDING_MODEL_NAME}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
     restart: unless-stopped
 
 networks:

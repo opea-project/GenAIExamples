@@ -45,7 +45,7 @@ First, you need to start a TEI service.
 your_port=8090
 model="BAAI/bge-large-en-v1.5"
 revision="refs/pr/5"
-docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
+docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $model --revision $revision
 ```
 
 Then you need to test your TEI service using the following commands:
@@ -66,9 +66,6 @@ cd langchain
 cd llama_index
 export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
 export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-large-en-v1.5"
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=${your_langchain_api_key}
-export LANGCHAIN_PROJECT="opea/gen-ai-comps:embeddings"
 python embedding_tei.py
 ```
 
@@ -92,7 +89,7 @@ First, you need to start a TEI service.
 your_port=8090
 model="BAAI/bge-large-en-v1.5"
 revision="refs/pr/5"
-docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
+docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $model --revision $revision
 ```
 
 Then you need to test your TEI service using the following commands:
@@ -124,13 +121,16 @@ docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy -
 
 ```bash
 cd ../../
-docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/llama_index/docker/Dockerfile .
+docker build -t opea/embedding-tei-llama-index:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/llama_index/docker/Dockerfile .
 ```
 
 ## 2.3 Run Docker with CLI
 
 ```bash
+# run with langchain docker
 docker run -d --name="embedding-tei-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e TEI_EMBEDDING_MODEL_NAME=$TEI_EMBEDDING_MODEL_NAME opea/embedding-tei:latest
+# run with llama-index docker
+docker run -d --name="embedding-tei-llama-index-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e TEI_EMBEDDING_MODEL_NAME=$TEI_EMBEDDING_MODEL_NAME opea/embedding-tei-llama-index:latest
 ```
 
 ## 2.4 Run Docker with Docker Compose
