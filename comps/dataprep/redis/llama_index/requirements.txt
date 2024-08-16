@@ -2,7 +2,7 @@ docarray[full]
 fastapi
 huggingface_hub
 langsmith
-llama-index 
+llama-index
 llama-index-embeddings-huggingface==0.2.0
 llama-index-readers-file
 llama-index-vector-stores-redis

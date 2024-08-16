@@ -34,5 +34,5 @@ jobs:
       - name: Commit changes
         run: |
           git add .
-          git commit -m "Freeze requirements"
+          git commit -s -m "Freeze requirements"
           git push

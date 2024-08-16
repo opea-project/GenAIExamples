@@ -15,16 +15,20 @@ function freeze() {
         --output-file "$folder/freeze.txt" \
         "$file"
     echo "::endgroup::"
+
     if [[ -e "$folder/freeze.txt" ]]; then
         if [[ "$keep_origin_packages" == "true" ]]; then
-            sed -i '/^\s*#/d; s/#.*//; /^\s*$/d' "$file"
-            sed -i '/^\s*#/d; s/#.*//; /^\s*$/d' "$folder/freeze.txt"
-
-            packages1=$(cut -d'=' -f1 "$file" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]/-/g')
+            # fix corner cases
+            sed -i '/^\s*#/d; s/#.*//; /^\s*$/d; s/ //g' "$file"
+            sed -i '/^\s*#/d; s/#.*//; /^\s*$/d; s/ //g; s/huggingface-hub\[inference\]/huggingface-hub/g; s/uvicorn\[standard\]/uvicorn/g' "$folder/freeze.txt"
+            if grep -q '^transformers$' $file && ! grep -q '^transformers\[sentencepiece\]$' $file; then
+                sed -i "s/transformers\[sentencepiece\]/transformers/" "$folder/freeze.txt"
+            fi
+            packages1=$(tr '><' '=' <"$file" | cut -d'=' -f1 | tr '[:upper:]' '[:lower:]' | sed 's/[-_]/-/g')
             packages2=$(cut -d'=' -f1 "$folder/freeze.txt" | tr '[:upper:]' '[:lower:]' | sed 's/[-_]/-/g')
             common_packages=$(comm -12 <(echo "$packages2" | sort) <(echo "$packages1" | sort))
-
-            rm "$file"
+            grep '^git\+' "$file" >temp_file || touch temp_file
+            rm -rf "$file" && mv temp_file "$file"
             while IFS= read -r line; do
                 package=$(echo "$line" | cut -d'=' -f1)
                 package_transformed=$(echo "$package" | tr '[:upper:]' '[:lower:]' | sed 's/[_-]/-/g')
