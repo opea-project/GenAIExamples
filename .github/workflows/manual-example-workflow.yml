@@ -20,6 +20,11 @@ on:
         description: "Tag to apply to images"
         required: true
         type: string
+      deploy_gmc:
+        default: false
+        description: 'Whether to deploy gmc'
+        required: true
+        type: boolean
       build:
         default: true
         description: 'Build test required images for Examples'
@@ -63,6 +68,18 @@ jobs:
         nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
         nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+
+  build-deploy-gmc:
+    strategy:
+      matrix:
+        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+      fail-fast: false
+    uses: ./.github/workflows/_gmc-workflow.yml
+    with:
+      node: ${{ matrix.node }}
+      tag: ${{ inputs.tag }}
+      deploy: ${{ fromJSON(inputs.deploy_gmc) }}
+    secrets: inherit
 
   run-examples:
     needs: [get-test-matrix]
