@@ -14,6 +14,8 @@ repos:
       - id: check-json
       - id: check-yaml
       - id: debug-statements
+      - id: mixed-line-ending
+        args: [--fix=lf]
       - id: requirements-txt-fixer
       - id: trailing-whitespace
         files: (.*\.(py|rst|cmake|yaml|yml|json|ts|js|html|svelte|sh))$
