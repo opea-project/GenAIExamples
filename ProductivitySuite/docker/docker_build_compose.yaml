@@ -82,4 +82,3 @@ services:
         no_proxy: ${no_proxy}
       dockerfile: ../../FaqGen/docker/Dockerfile
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
-
