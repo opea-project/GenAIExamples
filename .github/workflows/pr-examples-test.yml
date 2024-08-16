@@ -41,26 +41,25 @@ jobs:
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
         run: |
+          cd ../ && rm -rf GenAIExamples
           git clone https://github.com/opea-project/GenAIExamples.git
-          cd ${{ github.workspace }}/GenAIExamples/ChatQnA/docker/gaudi
-          sed -i "s#:latest#:comps#g" compose.yaml
-          cat compose.yaml
+          cd GenAIExamples/ChatQnA/docker
+          cp -r ${{ github.workspace }}/../GenAIComps .
 
-          cd ${{ github.workspace }}/GenAIExamples/ChatQnA/tests
-          GenAIComps_dir=${{github.workspace}}
+          cd ../tests
           sed -i '/GenAIComps.git/d' test_chatqna_on_gaudi.sh
-          sed -i "s#cd GenAIComps#cd ${GenAIComps_dir}#g" test_chatqna_on_gaudi.sh
-          sed -i "s#docker build -t#docker build --no-cache -q -t#g" test_chatqna_on_gaudi.sh
-          sed -i "s#:latest#:comps#g" test_chatqna_on_gaudi.sh
           cat test_chatqna_on_gaudi.sh
 
           echo "Run test..."
+          export IMAGE_TAG="comps"
           timeout 50m bash test_chatqna_on_gaudi.sh
+
+          echo "LOG_PATH=$(pwd)/*.log" >> $GITHUB_ENV
 
       - name: Clean up container
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/GenAIExamples/ChatQnA/docker/gaudi
+          cd ${{ github.workspace }}/../GenAIExamples/ChatQnA/docker/gaudi
           docker compose stop && docker compose rm -f
           docker system prune -f
 
@@ -69,4 +68,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "Examples-Test-Logs"
-          path: ${{ github.workspace }}/GenAIExamples/ChatQnA/tests/*.log
+          path: ${{ env.LOG_PATH }}
