@@ -20,6 +20,11 @@ on:
         description: "Tag to apply to images, default is latest"
         required: false
         type: string
+      context:
+        default: "CI"
+        description: "CI or CD"
+        required: false
+        type: string
 
 jobs:
   manifest-test:
@@ -55,6 +60,7 @@ jobs:
           echo "continue_test=true" >> $GITHUB_ENV
           echo "should_cleanup=false" >> $GITHUB_ENV
           echo "skip_validate=true" >> $GITHUB_ENV
+          echo "CONTEXT=${{ inputs.context }}" >> $GITHUB_ENV
           echo "NAMESPACE=$NAMESPACE"
 
       - name: Kubectl install
