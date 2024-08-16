@@ -148,7 +148,7 @@ class WhisperModel:
                 return_tensors="pt",
                 sampling_rate=16000,
             )
-        elif self.device == "hpu":
+        elif self.device == "hpu" and processed_inputs.input_features.shape[-1] > 3000:
             processed_inputs["input_features"] = torch.nn.functional.pad(
                 processed_inputs.input_features,
                 (0, self.hpu_max_len - processed_inputs.input_features.size(-1)),
