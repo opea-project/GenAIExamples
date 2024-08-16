@@ -40,9 +40,9 @@ on:
         description: 'Test examples with k8s'
         required: false
         type: boolean
-      GenAIComps_branch:
+      opea_branch:
         default: "main"
-        description: 'GenAIComps branch for image build'
+        description: 'OPEA branch for image build'
         required: false
         type: string
 
@@ -80,5 +80,5 @@ jobs:
       scan: ${{ fromJSON(inputs.scan) }}
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_k8s: ${{ fromJSON(inputs.test_k8s) }}
-      GenAIComps_branch: ${{ inputs.GenAIComps_branch }}
+      opea_branch: ${{ inputs.opea_branch }}
     secrets: inherit
