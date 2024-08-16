@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -14,6 +14,12 @@ function build_docker_images() {
         --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy \
         -t opea/llm-native:comps \
         -f comps/llms/text-generation/native/docker/Dockerfile .
+    if $? ; then
+        echo "opea/llm-native built fail"
+        exit 1
+    else
+        echo "opea/llm-native built successful"
+    fi
 }
 
 function start_service() {
@@ -47,11 +53,10 @@ function validate_microservice() {
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     SERVICE_NAME="llm-native"
 
-    docker logs test-comps-llm-native-server >> ${LOG_PATH}/${SERVICE_NAME}.log
-
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs test-comps-llm-native-server >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
@@ -59,6 +64,7 @@ function validate_microservice() {
     # check response body
     if [[ "$RESPONSE_BODY" != *'"text":"What'* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        docker logs test-comps-llm-native-server >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
     else
         echo "[ $SERVICE_NAME ] Content is as expected."
