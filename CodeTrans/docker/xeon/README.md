@@ -142,7 +142,6 @@ If you want to launch the UI using Nginx, open this URL: `http://{host_ip}:{NGIN
 
 ![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/71214938-819c-4979-89cb-c03d937cd7b5)
 
-
 Here is an example for summarizing a article.
 
 ![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/be543e96-ddcd-4ee0-9f2c-4e99fee77e37)
