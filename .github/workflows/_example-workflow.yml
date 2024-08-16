@@ -146,4 +146,5 @@ jobs:
       example: ${{ inputs.example }}
       hardware: ${{ inputs.node }}
       tag: ${{ inputs.tag }}
+      context: "CD"
     secrets: inherit
