@@ -18,10 +18,6 @@ function replace_image_version() {
     find . -name "Dockerfile" | xargs sed -i "s|$repo_image:latest|$repo_image:$version|g"
 }
 
-function freeze_tag_in_markdown() {
-    find . -name "*.md" | xargs sed -i "s|^docker\ compose|TAG=$GITHUB_REF_NAME\ docker\ compose|g"
-}
-
 function check_branch_name() {
     if [[ "$GITHUB_REF_NAME" == "main" ]]; then
         echo "$GITHUB_REF_NAME is protected branch"

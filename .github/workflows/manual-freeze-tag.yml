@@ -1,13 +1,19 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Freeze-images
+name: Freeze-tag
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
 
 jobs:
-  freeze-images:
+  freeze-tag:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +35,7 @@ jobs:
 
       - name: Run script
         run: |
-          bash .github/workflows/scripts/freeze_images.sh
+          find . -name "*.md" | xargs sed -i "s|^docker\ compose|TAG=${{ github.event.inputs.tag }}\ docker\ compose|g"
 
       - name: Commit changes
         run: |
