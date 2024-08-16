@@ -3,43 +3,28 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
-echo "IMAGE_REPO=${IMAGE_REPO}"
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH
+    cd $WORKPATH/docker
     git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
 
-    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
-    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
-    docker build -t opea/promptregistry-mongo-server:latest -f comps/prompt_registry/mongo/docker/Dockerfile .
-    docker build -t opea/chathistory-mongo-server:latest -f comps/chathistory/mongo/docker/Dockerfile .
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="chatqna dataprep-redis embedding-tei retriever-redis reranking-tei llm-tgi productivity-suite-react-ui codegen docsum faqgen"
+    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-
-    cd $WORKPATH/../ChatQnA/docker
-    docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-
-    cd $WORKPATH/../CodeGen/docker
-    docker build --no-cache -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-
-    cd $WORKPATH/../DocSum/docker
-    docker build --no-cache -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-
-    cd $WORKPATH/../FaqGen/docker
-    docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-
-    cd $WORKPATH/docker/ui
-    docker build -t opea/productivity-suite-react-ui-server:latest -f docker/Dockerfile.react .
-
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/text-generation-inference:2.1.0
     docker images
-
 }
 
 function start_services() {
@@ -91,19 +76,6 @@ function start_services() {
     export LLM_SERVICE_HOST_PORT_CODEGEN=9001
     export LLM_SERVICE_HOST_PORT_DOCSUM=9003
     export PROMPT_COLLECTION_NAME="prompt"
-
-    if [[ "$IMAGE_REPO" != "" ]]; then
-        # Replace the container name with a test-specific name
-        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/codegen:latest#image: opea/codegen:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/faqgen:latest#image: opea/faqgen:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/productivity-suite-react-ui-server:latest#image: opea/productivity-suite-react-ui-server:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
-        echo "cat compose.yaml"
-        cat compose.yaml
-    fi
 
     # Start Docker Containers
     docker compose up -d
@@ -272,7 +244,7 @@ function validate_microservices() {
         "${ip_address}:${LLM_SERVICE_HOST_PORT_CODEGEN}/v1/chat/completions" \
         "data: " \
         "llm_codegen" \
-        ""llm-tgi-server-codegen \
+        "llm-tgi-server-codegen" \
         '{"query":"def print_hello_world():"}'
 
     result=$(curl -X 'POST' \
@@ -381,7 +353,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
