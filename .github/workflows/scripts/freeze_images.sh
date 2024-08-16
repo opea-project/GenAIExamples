@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 function get_latest_version() {
     repo_image=$1
     versions=$(curl -s "https://registry.hub.docker.com/v2/repositories/$repo_image/tags/" | jq '."results"[]["name"]' | tr -d '"')
