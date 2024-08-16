@@ -53,15 +53,15 @@ jobs:
       - name: Clone required Repo
         run: |
           cd ${{ github.workspace }}/${{ inputs.example }}/docker
-          build_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
+          docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
           if [[ $(grep -c "tei-gaudi:" ${docker_compose_path}) != 0 ]]; then
               git clone https://github.com/huggingface/tei-gaudi.git
           fi
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
-              git clone https://github.com/huggingface/tei-gaudi.git
+              git clone https://github.com/vllm-project/vllm.git
           fi
           git clone https://github.com/opea-project/GenAIComps.git
-          cd GenAIComps && checkout ${{ inputs.GenAIComps_branch }} && cd ../
+          cd GenAIComps && git checkout ${{ inputs.GenAIComps_branch }} && cd ../
 
       - name: Build Image
         if: ${{ fromJSON(inputs.build) }}
