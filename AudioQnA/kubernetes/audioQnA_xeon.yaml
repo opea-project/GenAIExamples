@@ -1,0 +1,58 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: gmc.opea.io/v1alpha3
+kind: GMConnector
+metadata:
+  labels:
+    app.kubernetes.io/name: gmconnector
+    app.kubernetes.io/managed-by: kustomize
+    gmc/platform: xeon
+  name: audioqa
+  namespace: audioqa
+spec:
+  routerConfig:
+    name: router
+    serviceName: router-service
+  nodes:
+    root:
+      routerType: Sequence
+      steps:
+      - name: Asr
+        internalService:
+          serviceName: asr-svc
+          config:
+            endpoint: /v1/audio/transcriptions
+            ASR_ENDPOINT: whisper-svc
+      - name: Whisper
+        internalService:
+          serviceName: whisper-svc
+          config:
+            endpoint: /v1/asr
+          isDownstreamService: true
+      - name: Llm
+        data: $response
+        internalService:
+          serviceName: llm-svc
+          config:
+            endpoint: /v1/chat/completions
+            TGI_LLM_ENDPOINT: tgi-svc
+      - name: Tgi
+        internalService:
+          serviceName: tgi-svc
+          config:
+            endpoint: /generate
+          isDownstreamService: true
+      - name: Tts
+        data: $response
+        internalService:
+          serviceName: tts-svc
+          config:
+            endpoint: /v1/audio/speech
+            TTS_ENDPOINT: speecht5-svc
+      - name: SpeechT5
+        internalService:
+          serviceName: speecht5-svc
+          config:
+            endpoint: /v1/tts
+          isDownstreamService: true
