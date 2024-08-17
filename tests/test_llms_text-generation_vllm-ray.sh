@@ -13,7 +13,7 @@ function build_docker_images() {
     docker build \
         -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray  \
         --no-cache -t opea/vllm_ray-habana:comps --network=host .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/vllm_ray-habana built fail"
         exit 1
     else
@@ -25,7 +25,7 @@ function build_docker_images() {
     docker build \
         --no-cache -t opea/llm-vllm-ray:comps \
         -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/llm-vllm-ray built fail"
         exit 1
     else

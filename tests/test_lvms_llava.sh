@@ -11,14 +11,14 @@ function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
     docker build --no-cache -t opea/llava:comps -f comps/lvms/llava/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/llava built fail"
         exit 1
     else
         echo "opea/llava built successful"
     fi
     docker build --no-cache -t opea/lvm:comps -f comps/lvms/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/lvm built fail"
         exit 1
     else

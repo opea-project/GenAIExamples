@@ -11,7 +11,7 @@ function build_docker_images() {
     echo "Start building docker images for microservice"
     cd $WORKPATH
     docker build --no-cache -t opea/guardrails-pii-detection:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/pii_detection/docker/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/guardrails-pii-detection built fail"
         exit 1
     else

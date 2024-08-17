@@ -9,7 +9,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     docker build --no-cache -t opea/reranking-tei:comps -f comps/reranks/tei/docker/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/reranking-tei built fail"
         exit 1
     else

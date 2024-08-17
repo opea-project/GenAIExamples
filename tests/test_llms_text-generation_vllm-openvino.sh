@@ -21,7 +21,7 @@ function build_container() {
       . \
       --build-arg https_proxy=$https_proxy \
       --build-arg http_proxy=$http_proxy
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "vllm-openvino built fail"
         exit 1
     else

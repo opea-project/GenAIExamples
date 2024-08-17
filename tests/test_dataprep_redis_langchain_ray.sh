@@ -12,7 +12,7 @@ function build_docker_images() {
     echo "Building the docker images"
     cd $WORKPATH
     docker build --no-cache -t opea/dataprep-on-ray-redis:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/dataprep-on-ray-redis built fail"
         exit 1
     else

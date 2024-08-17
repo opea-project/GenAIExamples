@@ -11,7 +11,7 @@ function build_mosec_docker_images() {
     cd $WORKPATH
     echo $(pwd)
     docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --no-cache -t opea/reranking-langchain-mosec-endpoint:comps -f comps/reranks/langchain-mosec/mosec-docker/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/reranking-langchain-mosec-endpoint built fail"
         exit 1
     else
@@ -23,7 +23,7 @@ function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
     docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --no-cache -t opea/reranking-langchain-mosec:comps -f comps/reranks/langchain-mosec/docker/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/reranking-langchain-mosec built fail"
         exit 1
     else

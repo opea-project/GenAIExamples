@@ -11,14 +11,14 @@ function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
     docker build --no-cache -t opea/speecht5:comps -f comps/tts/speecht5/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/speecht5 built fail"
         exit 1
     else
         echo "opea/speecht5 built successful"
     fi
     docker build --no-cache -t opea/tts:comps -f comps/tts/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/tts built fail"
         exit 1
     else

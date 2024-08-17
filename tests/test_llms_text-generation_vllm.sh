@@ -14,7 +14,7 @@ function build_docker_images() {
         -f docker/Dockerfile.hpu \
         --no-cache -t opea/vllm-hpu:comps \
         --shm-size=128g .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/vllm-hpu built fail"
         exit 1
     else
@@ -26,7 +26,7 @@ function build_docker_images() {
     docker build  \
         --no-cache -t opea/llm-vllm:comps \
         -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/llm-vllm built fail"
         exit 1
     else

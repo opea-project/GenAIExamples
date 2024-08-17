@@ -18,7 +18,7 @@ function build_docker_images() {
     docker run -d -p 27017:27017 --name=test-comps-mongo mongo:latest
 
     docker build --no-cache -t opea/promptregistry-mongo-server:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/mongo/docker/Dockerfile .
-    if $? ; then
+    if [ $? -ne 0 ]; then
         echo "opea/promptregistry-mongo-server built fail"
         exit 1
     else
