@@ -18,7 +18,7 @@ docker compose up -d
 
 Upon starting the server, you should see log outputs similar to the following:
 
-```log
+```
 server-1  | Starting 'uvicorn chromadb.app:app' with args: --workers 1 --host 0.0.0.0 --port 8000 --proxy-headers --log-config chromadb/log_config.yml --timeout-keep-alive 30
 server-1  | INFO:     [02-08-2024 07:03:19] Set chroma_server_nofile to 65536
 server-1  | INFO:     [02-08-2024 07:03:19] Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
