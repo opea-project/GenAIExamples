@@ -1,8 +1,8 @@
 # Dataprep Microservice with Qdrant
 
-# 🚀Start Microservice with Python
+## 🚀Start Microservice with Python
 
-## Install Requirements
+### Install Requirements
 
 ```bash
 pip install -r requirements.txt
@@ -11,11 +11,11 @@ apt-get install libtesseract-dev -y
 apt-get install poppler-utils -y
 ```
 
-## Start Qdrant Server
+### Start Qdrant Server
 
 Please refer to this [readme](../../vectorstores/langchain/qdrant/README.md).
 
-## Setup Environment Variables
+### Setup Environment Variables
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -27,7 +27,7 @@ export COLLECTION_NAME=${your_collection_name}
 export PYTHONPATH=${path_to_comps}
 ```
 
-## Start Document Preparation Microservice for Qdrant with Python Script
+### Start Document Preparation Microservice for Qdrant with Python Script
 
 Start document preparation microservice for Qdrant with below command.
 
@@ -35,22 +35,22 @@ Start document preparation microservice for Qdrant with below command.
 python prepare_doc_qdrant.py
 ```
 
-# 🚀Start Microservice with Docker
+## 🚀Start Microservice with Docker
 
-## Build Docker Image
+### Build Docker Image
 
 ```bash
 cd ../../../../
 docker build -t opea/dataprep-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/docker/Dockerfile .
 ```
 
-## Run Docker with CLI
+### Run Docker with CLI
 
 ```bash
 docker run -d --name="dataprep-qdrant-server" -p 6007:6007 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/dataprep-qdrant:latest
 ```
 
-## Setup Environment Variables
+### Setup Environment Variables
 
 ```bash
 export http_proxy=${your_http_proxy}
@@ -60,14 +60,14 @@ export QDRANT_PORT=6333
 export COLLECTION_NAME=${your_collection_name}
 ```
 
-## Run Docker with Docker Compose
+### Run Docker with Docker Compose
 
 ```bash
 cd comps/dataprep/qdrant/docker
 docker compose -f docker-compose-dataprep-qdrant.yaml up -d
 ```
 
-# Invoke Microservice
+## Invoke Microservice
 
 Once document preparation microservice for Qdrant is started, user can use below command to invoke the microservice to convert the document to embedding and save to the database.
 

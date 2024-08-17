@@ -4,32 +4,32 @@ The langchain agent model refers to a framework that integrates the reasoning ca
 
 ![Architecture Overview](agent_arch.jpg)
 
-# 🚀1. Start Microservice with Python（Option 1）
+## 🚀1. Start Microservice with Python（Option 1）
 
-## 1.1 Install Requirements
+### 1.1 Install Requirements
 
 ```bash
 cd comps/agent/langchain/
 pip install -r requirements.txt
 ```
 
-## 1.2 Start Microservice with Python Script
+### 1.2 Start Microservice with Python Script
 
 ```bash
 cd comps/agent/langchain/
 python agent.py
 ```
 
-# 🚀2. Start Microservice with Docker (Option 2)
+## 🚀2. Start Microservice with Docker (Option 2)
 
-## Build Microservices
+### Build Microservices
 
 ```bash
 cd GenAIComps/ # back to GenAIComps/ folder
 docker build -t opea/comps-agent-langchain:latest -f comps/agent/langchain/docker/Dockerfile .
 ```
 
-## start microservices
+### start microservices
 
 ```bash
 export ip_address=$(hostname -I | awk '{print $1}')
@@ -56,7 +56,7 @@ docker logs comps-langchain-agent-endpoint
 > docker run --rm --runtime=runc --name="comps-langchain-agent-endpoint" -v ./comps/agent/langchain/:/home/user/comps/agent/langchain/ -p 9090:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} --env-file ${agent_env} opea/comps-agent-langchain:latest
 > ```
 
-# 🚀3. Validate Microservice
+## 🚀3. Validate Microservice
 
 Once microservice starts, user can use below script to invoke.
 
@@ -73,7 +73,7 @@ data: [DONE]
 
 ```
 
-# 🚀4. Provide your own tools
+## 🚀4. Provide your own tools
 
 - Define tools
 

@@ -16,9 +16,9 @@ A prerequisite for using this microservice is that users must have a knowledge g
 
 Overall, this microservice provides efficient support for applications related with graph dataset, especially for answering multi-part questions, or any other conditions including comples relationship between entities.
 
-# 🚀1. Start Microservice with Docker
+## 🚀1. Start Microservice with Docker
 
-## 1.1 Setup Environment Variables
+### 1.1 Setup Environment Variables
 
 ```bash
 export NEO4J_ENDPOINT="neo4j://${your_ip}:7687"
@@ -30,7 +30,7 @@ export LLM_MODEL="meta-llama/Llama-2-7b-hf"
 export AGENT_LLM="HuggingFaceH4/zephyr-7b-beta"
 ```
 
-## 1.2 Start Neo4j Service
+### 1.2 Start Neo4j Service
 
 ```bash
 docker pull neo4j
@@ -43,7 +43,7 @@ docker run --rm \
     neo4j
 ```
 
-## 1.3 Start LLM Service for "rag"/"query" mode
+### 1.3 Start LLM Service for "rag"/"query" mode
 
 You can start any LLM microserve, here we take TGI as an example.
 
@@ -70,7 +70,7 @@ curl $LLM_ENDPOINT/generate \
   -H 'Content-Type: application/json'
 ```
 
-## 1.4 Start Microservice
+### 1.4 Start Microservice
 
 ```bash
 cd ../..
@@ -93,9 +93,9 @@ docker run --rm \
     opea/knowledge_graphs:latest
 ```
 
-# 🚀2. Consume Knowledge Graph Service
+## 🚀2. Consume Knowledge Graph Service
 
-## 2.1 Cypher mode
+### 2.1 Cypher mode
 
 ```bash
 curl http://${your_ip}:8060/v1/graphs \
@@ -107,7 +107,7 @@ curl http://${your_ip}:8060/v1/graphs \
 Example output:
 ![Cypher Output](doc/output_cypher.png)
 
-## 2.2 Rag mode
+### 2.2 Rag mode
 
 ```bash
 curl http://${your_ip}:8060/v1/graphs \
@@ -119,7 +119,7 @@ curl http://${your_ip}:8060/v1/graphs \
 Example output:
 ![Cypher Output](doc/output_rag.png)
 
-## 2.3 Query mode
+### 2.3 Query mode
 
 First example:
 

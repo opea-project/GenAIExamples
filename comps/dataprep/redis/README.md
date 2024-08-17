@@ -4,9 +4,9 @@ For dataprep microservice, we provide two frameworks: `Langchain` and `LlamaInde
 
 We organized these two folders in the same way, so you can use either framework for dataprep microservice with the following constructions.
 
-# 🚀1. Start Microservice with Python（Option 1）
+## 🚀1. Start Microservice with Python（Option 1）
 
-## 1.1 Install Requirements
+### 1.1 Install Requirements
 
 - option 1: Install Single-process version (for 1-10 files processing)
 
@@ -29,11 +29,11 @@ pip install -r requirements.txt
 cd langchain_ray; pip install -r requirements_ray.txt
 ```
 
-## 1.2 Start Redis Stack Server
+### 1.2 Start Redis Stack Server
 
 Please refer to this [readme](../../vectorstores/langchain/redis/README.md).
 
-## 1.3 Setup Environment Variables
+### 1.3 Setup Environment Variables
 
 ```bash
 export REDIS_URL="redis://${your_ip}:6379"
@@ -41,7 +41,7 @@ export INDEX_NAME=${your_index_name}
 export PYTHONPATH=${path_to_comps}
 ```
 
-## 1.4 Start Embedding Service
+### 1.4 Start Embedding Service
 
 First, you need to start a TEI service.
 
@@ -67,7 +67,7 @@ After checking that it works, set up environment variables.
 export TEI_ENDPOINT="http://localhost:$your_port"
 ```
 
-## 1.4 Start Document Preparation Microservice for Redis with Python Script
+### 1.4 Start Document Preparation Microservice for Redis with Python Script
 
 Start document preparation microservice for Redis with below command.
 
@@ -83,13 +83,13 @@ python prepare_doc_redis.py
 python prepare_doc_redis_on_ray.py
 ```
 
-# 🚀2. Start Microservice with Docker (Option 2)
+## 🚀2. Start Microservice with Docker (Option 2)
 
-## 2.1 Start Redis Stack Server
+### 2.1 Start Redis Stack Server
 
 Please refer to this [readme](../../vectorstores/langchain/redis/README.md).
 
-## 2.2 Setup Environment Variables
+### 2.2 Setup Environment Variables
 
 ```bash
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
@@ -99,7 +99,7 @@ export INDEX_NAME=${your_index_name}
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
 
-## 2.3 Build Docker Image
+### 2.3 Build Docker Image
 
 - Build docker image with langchain
 
@@ -124,7 +124,7 @@ cd ../../../../
 docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
 ```
 
-## 2.4 Run Docker with CLI (Option A)
+### 2.4 Run Docker with CLI (Option A)
 
 - option 1: Start single-process version (for 1-10 files processing)
 
@@ -138,7 +138,7 @@ docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=h
 docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e TIMEOUT_SECONDS=600 opea/dataprep-on-ray-redis:latest
 ```
 
-## 2.5 Run with Docker Compose (Option B - deprecated, will move to genAIExample in future)
+### 2.5 Run with Docker Compose (Option B - deprecated, will move to genAIExample in future)
 
 ```bash
 # for langchain
@@ -148,15 +148,15 @@ cd comps/dataprep/redis/llama_index/docker
 docker compose -f docker-compose-dataprep-redis.yaml up -d
 ```
 
-# 🚀3. Status Microservice
+## 🚀3. Status Microservice
 
 ```bash
 docker container logs -f dataprep-redis-server
 ```
 
-# 🚀4. Consume Microservice
+## 🚀4. Consume Microservice
 
-## 4.1 Consume Upload API
+### 4.1 Consume Upload API
 
 Once document preparation microservice for Redis is started, user can use below command to invoke the microservice to convert the document to embedding and save to the database.
 
@@ -236,7 +236,7 @@ except requests.exceptions.RequestException as e:
     print("An error occurred:", e)
 ```
 
-## 4.2 Consume get_file API
+### 4.2 Consume get_file API
 
 To get uploaded file structures, use the following command:
 
@@ -265,7 +265,7 @@ Then you will get the response JSON like this:
 ]
 ```
 
-## 4.3 Consume delete_file API
+### 4.3 Consume delete_file API
 
 To delete uploaded file/link, use the following command.
 

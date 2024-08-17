@@ -30,13 +30,13 @@ python tts.py
 curl http://localhost:9088/v1/audio/speech -XPOST -d '{"text": "Who are you?"}' -H 'Content-Type: application/json'
 ```
 
-# 🚀2. Start Microservice with Docker (Option 2)
+## 🚀2. Start Microservice with Docker (Option 2)
 
 Alternatively, you can start the TTS microservice with Docker.
 
-## 2.1 Build Images
+### 2.1 Build Images
 
-### 2.1.1 Whisper Server Image
+#### 2.1.1 Whisper Server Image
 
 - Xeon CPU
 
@@ -52,15 +52,15 @@ cd ../..
 docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile_hpu .
 ```
 
-### 2.1.2 TTS Service Image
+#### 2.1.2 TTS Service Image
 
 ```bash
 docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/Dockerfile .
 ```
 
-## 2.2 Start SpeechT5 and TTS Service
+### 2.2 Start SpeechT5 and TTS Service
 
-### 2.2.1 Start SpeechT5 Server
+#### 2.2.1 Start SpeechT5 Server
 
 - Xeon
 
@@ -74,7 +74,7 @@ docker run -p 7055:7055 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$htt
 docker run -p 7055:7055 --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/speecht5-gaudi:latest
 ```
 
-### 2.2.2 Start TTS service
+#### 2.2.2 Start TTS service
 
 ```bash
 ip_address=$(hostname -I | awk '{print $1}')
@@ -82,7 +82,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 docker run -p 9088:9088 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TTS_ENDPOINT=http://$ip_address:7055 opea/tts:latest
 ```
 
-### 2.2.3 Test
+#### 2.2.3 Test
 
 ```bash
 # curl

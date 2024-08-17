@@ -19,7 +19,7 @@ The classifiler model is used together with an embedding model to make predictio
 
 Currently this strategy can detect both personal sensitive and business sensitive information such as financial figures and performance reviews. Please refer to the [model card](<(https://huggingface.co/Intel/business_safety_logistic_regression_classifier)>) to see the performance of our demo model on the Patronus EnterprisePII dataset.
 
-# Input and output
+## Input and output
 
 Users can send a list of files, a list of text strings, or a list of urls to the microservice, and the microservice will return a list of True or False for each piece of text following the original sequence.
 
@@ -27,15 +27,15 @@ For a concrete example of what input should look like, please refer to [Consume 
 
 The output will be a list of booleans, which can be parsed and used as conditions in a bigger application.
 
-# 🚀1. Start Microservice with Python（Option 1）
+## 🚀1. Start Microservice with Python（Option 1）
 
-## 1.1 Install Requirements
+### 1.1 Install Requirements
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 1.2 Start PII Detection Microservice with Python Script
+### 1.2 Start PII Detection Microservice with Python Script
 
 Start pii detection microservice with below command.
 
@@ -43,24 +43,24 @@ Start pii detection microservice with below command.
 python pii_detection.py
 ```
 
-# 🚀2. Start Microservice with Docker (Option 2)
+## 🚀2. Start Microservice with Docker (Option 2)
 
-## 2.1 Prepare PII detection model
+### 2.1 Prepare PII detection model
 
 export HUGGINGFACEHUB_API_TOKEN=${HP_TOKEN}
 
-## 2.1.1 use LLM endpoint (will add later)
+#### 2.1.1 use LLM endpoint (will add later)
 
 intro placeholder
 
-## 2.2 Build Docker Image
+### 2.2 Build Docker Image
 
 ```bash
 cd ../../../ # back to GenAIComps/ folder
 docker build -t opea/guardrails-pii-detection:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/pii_detection/docker/Dockerfile .
 ```
 
-## 2.3 Run Docker with CLI
+### 2.3 Run Docker with CLI
 
 ```bash
 docker run -d --rm --runtime=runc --name="guardrails-pii-detection-endpoint" -p 6357:6357 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} opea/guardrails-pii-detection:latest
@@ -72,13 +72,13 @@ docker run -d --rm --runtime=runc --name="guardrails-pii-detection-endpoint" -p 
 docker run --rm --runtime=runc --name="guardrails-pii-detection-endpoint" -p 6357:6357 -v ./comps/guardrails/pii_detection/:/home/user/comps/guardrails/pii_detection/ --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}  -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} opea/guardrails-pii-detection:latest
 ```
 
-# 🚀3. Get Status of Microservice
+## 🚀3. Get Status of Microservice
 
 ```bash
 docker container logs -f guardrails-pii-detection-endpoint
 ```
 
-# 🚀4. Consume Microservice
+## 🚀4. Consume Microservice
 
 Once microservice starts, user can use below script to invoke the microservice for pii detection.
 

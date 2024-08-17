@@ -1,8 +1,8 @@
 # Dataprep Microservice with Milvus
 
-# 🚀Start Microservice with Python
+## 🚀Start Microservice with Python
 
-## Install Requirements
+### Install Requirements
 
 ```bash
 pip install -r requirements.txt
@@ -11,11 +11,11 @@ apt-get install libtesseract-dev -y
 apt-get install poppler-utils -y
 ```
 
-## Start Milvus Server
+### Start Milvus Server
 
 Please refer to this [readme](../../../vectorstores/langchain/milvus/README.md).
 
-## Setup Environment Variables
+### Setup Environment Variables
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -27,7 +27,7 @@ export COLLECTION_NAME=${your_collection_name}
 export MOSEC_EMBEDDING_ENDPOINT=${your_embedding_endpoint}
 ```
 
-## Start Document Preparation Microservice for Milvus with Python Script
+### Start Document Preparation Microservice for Milvus with Python Script
 
 Start document preparation microservice for Milvus with below command.
 
@@ -35,22 +35,22 @@ Start document preparation microservice for Milvus with below command.
 python prepare_doc_milvus.py
 ```
 
-# 🚀Start Microservice with Docker
+## 🚀Start Microservice with Docker
 
-## Build Docker Image
+### Build Docker Image
 
 ```bash
 cd ../../../../
 docker build -t opea/dataprep-milvus:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg no_proxy=$no_proxy -f comps/dataprep/milvus/docker/Dockerfile .
 ```
 
-## Run Docker with CLI
+### Run Docker with CLI
 
 ```bash
 docker run -d --name="dataprep-milvus-server" -p 6010:6010 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MOSEC_EMBEDDING_ENDPOINT=${your_embedding_endpoint} -e MILVUS=${your_milvus_host_ip} opea/dataprep-milvus:latest
 ```
 
-# Invoke Microservice
+## Invoke Microservice
 
 Once document preparation microservice for Milvus is started, user can use below command to invoke the microservice to convert the document to embedding and save to the database.
 

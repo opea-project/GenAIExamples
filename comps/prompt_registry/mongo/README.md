@@ -21,16 +21,16 @@ Start document preparation microservice for Milvus with below command.
 python prompt.py
 ```
 
-# 🚀Start Microservice with Docker
+## 🚀Start Microservice with Docker
 
-## Build Docker Image
+### Build Docker Image
 
 ```bash
 cd ~/GenAIComps
 docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/mongo/docker/Dockerfile .
 ```
 
-## Run Docker with CLI
+### Run Docker with CLI
 
 1. Run mongoDB image
 
@@ -44,7 +44,7 @@ docker run -d -p 27017:27017 --name=mongo mongo:latest
 docker run -d --name="promptregistry-mongo-server" -p 6012:6012 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MONGO_HOST=${MONGO_HOST} -e MONGO_PORT=${MONGO_PORT} -e DB_NAME=${DB_NAME} -e COLLECTION_NAME=${COLLECTION_NAME} opea/promptregistry-mongo-server:latest
 ```
 
-## Invoke Microservice
+### Invoke Microservice
 
 Once prompt_registry service is up and running, users can access the database by using API endpoint below. Each API serves different purpose and return appropriate response.
 

@@ -2,9 +2,9 @@
 
 [Ollama](https://github.com/ollama/ollama) allows you to run open-source large language models, such as Llama 3, locally. Ollama bundles model weights, configuration, and data into a single package, defined by a Modelfile. Ollama is a lightweight, extensible framework for building and running language models on the local machine. It provides a simple API for creating, running, and managing models, as well as a library of pre-built models that can be easily used in a variety of applications. It's the best choice to deploy large language models on AIPC locally.
 
-# Get Started
+## Get Started
 
-## Setup
+### Setup
 
 Follow [these instructions](https://github.com/ollama/ollama) to set up and run a local Ollama instance.
 
@@ -35,15 +35,15 @@ Special settings are necessary to pull models behind the proxy.
   sudo systemctl restart ollama
   ```
 
-## Usage
+### Usage
 
 Here are a few ways to interact with pulled local models:
 
-### In the terminal
+#### In the terminal
 
 All of your local models are automatically served on localhost:11434. Run ollama run <name-of-model> to start interacting via the command line directly.
 
-### API access
+#### API access
 
 Send an application/json request to the API endpoint of Ollama to interact.
 
@@ -54,20 +54,20 @@ curl http://localhost:11434/api/generate -d '{
 }'
 ```
 
-# Build Docker Image
+## Build Docker Image
 
 ```bash
 cd GenAIComps/
 docker build --no-cache -t opea/llm-ollama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ollama/Dockerfile .
 ```
 
-# Run the Ollama Microservice
+## Run the Ollama Microservice
 
 ```bash
 docker run --network host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/llm-ollama:latest
 ```
 
-# Consume the Ollama Microservice
+## Consume the Ollama Microservice
 
 ```bash
 curl http://127.0.0.1:9000/v1/chat/completions  -X POST   -d '{"model": "llama3", "query":"What is Deep Learning?","max_new_tokens":32,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}'   -H 'Content-Type: application/json'

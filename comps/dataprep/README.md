@@ -17,22 +17,22 @@ Occasionally unstructured data will contain image data, to convert the image dat
 export SUMMARIZE_IMAGE_VIA_LVM=1
 ```
 
-# Dataprep Microservice with Redis
+## Dataprep Microservice with Redis
 
 For details, please refer to this [readme](redis/README.md)
 
-# Dataprep Microservice with Milvus
+## Dataprep Microservice with Milvus
 
 For details, please refer to this [readme](milvus/README.md)
 
-# Dataprep Microservice with Qdrant
+## Dataprep Microservice with Qdrant
 
 For details, please refer to this [readme](qdrant/README.md)
 
-# Dataprep Microservice with Pinecone
+## Dataprep Microservice with Pinecone
 
 For details, please refer to this [readme](pinecone/README.md)
 
-# Dataprep Microservice with PGVector
+## Dataprep Microservice with PGVector
 
 For details, please refer to this [readme](pgvector/README.md)

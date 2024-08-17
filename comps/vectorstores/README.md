@@ -2,18 +2,18 @@
 
 The Vectorstores Microservice provides convenient way to start various vector database servers.
 
-# Vectorstores Microservice with Redis
+## Vectorstores Microservice with Redis
 
 For details, please refer to this [readme](langchain/redis/README.md)
 
-# Vectorstores Microservice with Qdrant
+## Vectorstores Microservice with Qdrant
 
 For details, please refer to this [readme](langchain/qdrant/README.md)
 
-# Vectorstores Microservice with PGVector
+## Vectorstores Microservice with PGVector
 
 For details, please refer to this [readme](langchain/pgvector/README.md)
 
-# Vectorstores Microservice with Pinecone
+## Vectorstores Microservice with Pinecone
 
 For details, please refer to this [readme](langchain/pinecone/README.md)

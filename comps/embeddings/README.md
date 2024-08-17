@@ -14,7 +14,7 @@ Key Features:
 
 Users are albe to configure and build embedding-related services according to their actual needs.
 
-# 🚀1. Start Microservice with Python (Option 1)
+## 🚀1. Start Microservice with Python (Option 1)
 
 Currently, we provide two ways to implement the embedding service:
 
@@ -24,7 +24,7 @@ Currently, we provide two ways to implement the embedding service:
 
 For both of the implementations, you need to install requirements first.
 
-## 1.1 Install Requirements
+### 1.1 Install Requirements
 
 ```bash
 # run with langchain
@@ -33,11 +33,11 @@ pip install -r langchain/requirements.txt
 pip install -r llama_index/requirements.txt
 ```
 
-## 1.2 Start Embedding Service
+### 1.2 Start Embedding Service
 
 You can select one of following ways to start the embedding service:
 
-### Start Embedding Service with TEI
+#### Start Embedding Service with TEI
 
 First, you need to start a TEI service.
 
@@ -69,7 +69,7 @@ export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-large-en-v1.5"
 python embedding_tei.py
 ```
 
-### Start Embedding Service with Local Model
+#### Start Embedding Service with Local Model
 
 ```bash
 # run with langchain
@@ -79,9 +79,9 @@ cd llama_index
 python local_embedding.py
 ```
 
-# 🚀2. Start Microservice with Docker (Optional 2)
+## 🚀2. Start Microservice with Docker (Optional 2)
 
-## 2.1 Start Embedding Service with TEI
+### 2.1 Start Embedding Service with TEI
 
 First, you need to start a TEI service.
 
@@ -108,23 +108,23 @@ export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
 export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-large-en-v1.5"
 ```
 
-## 2.2 Build Docker Image
+### 2.2 Build Docker Image
 
-### Build Langchain Docker (Option a)
+#### Build Langchain Docker (Option a)
 
 ```bash
 cd ../../
 docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
 ```
 
-### Build LlamaIndex Docker (Option b)
+#### Build LlamaIndex Docker (Option b)
 
 ```bash
 cd ../../
 docker build -t opea/embedding-tei-llama-index:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/llama_index/docker/Dockerfile .
 ```
 
-## 2.3 Run Docker with CLI
+### 2.3 Run Docker with CLI
 
 ```bash
 # run with langchain docker
@@ -133,16 +133,16 @@ docker run -d --name="embedding-tei-server" -p 6000:6000 --ipc=host -e http_prox
 docker run -d --name="embedding-tei-llama-index-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e TEI_EMBEDDING_MODEL_NAME=$TEI_EMBEDDING_MODEL_NAME opea/embedding-tei-llama-index:latest
 ```
 
-## 2.4 Run Docker with Docker Compose
+### 2.4 Run Docker with Docker Compose
 
 ```bash
 cd docker
 docker compose -f docker_compose_embedding.yaml up -d
 ```
 
-# 🚀3. Consume Embedding Service
+## 🚀3. Consume Embedding Service
 
-## 3.1 Check Service Status
+### 3.1 Check Service Status
 
 ```bash
 curl http://localhost:6000/v1/health_check\
@@ -150,7 +150,7 @@ curl http://localhost:6000/v1/health_check\
   -H 'Content-Type: application/json'
 ```
 
-## 3.2 Consume Embedding Service
+### 3.2 Consume Embedding Service
 
 ```bash
 curl http://localhost:6000/v1/embeddings\

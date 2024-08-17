@@ -20,17 +20,17 @@ Any content that is detected in the following categories is determined as unsafe
 - Regulated or Controlled Substances
 - Suicide & Self Harm
 
-# 🚀1. Start Microservice with Python (Option 1)
+## 🚀1. Start Microservice with Python (Option 1)
 
 To start the Guardrails microservice, you need to install python packages first.
 
-## 1.1 Install Requirements
+### 1.1 Install Requirements
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 1.2 Start TGI Gaudi Service
+### 1.2 Start TGI Gaudi Service
 
 ```bash
 export HF_TOKEN=${your_hf_api_token}
@@ -43,7 +43,7 @@ docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 docker run -p 8088:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy -e HF_TOKEN=$HF_TOKEN ghcr.io/huggingface/tgi-gaudi:2.0.1 --model-id $model_id --max-input-length 1024 --max-total-tokens 2048
 ```
 
-## 1.3 Verify the TGI Gaudi Service
+### 1.3 Verify the TGI Gaudi Service
 
 ```bash
 curl 127.0.0.1:8088/generate \
@@ -52,7 +52,7 @@ curl 127.0.0.1:8088/generate \
   -H 'Content-Type: application/json'
 ```
 
-## 1.4 Start Guardrails Service
+### 1.4 Start Guardrails Service
 
 Optional: If you have deployed a Guardrails model with TGI Gaudi Service other than default model (i.e., `meta-llama/Meta-Llama-Guard-2-8B`) [from section 1.2](## 1.2 Start TGI Gaudi Service), you will need to add the eviornment variable `SAFETY_GUARD_MODEL_ID` containing the model id. For example, the following informs the Guardrails Service the deployed model used LlamaGuard2:
 
@@ -65,11 +65,11 @@ export SAFETY_GUARD_ENDPOINT="http://${your_ip}:8088"
 python langchain/guardrails_tgi.py
 ```
 
-# 🚀2. Start Microservice with Docker (Option 2)
+## 🚀2. Start Microservice with Docker (Option 2)
 
 If you start an Guardrails microservice with docker, the `docker_compose_guardrails.yaml` file will automatically start a TGI gaudi service with docker.
 
-## 2.1 Setup Environment Variables
+### 2.1 Setup Environment Variables
 
 In order to start TGI and LLM services, you need to setup the following environment variables first.
 
@@ -79,29 +79,29 @@ export SAFETY_GUARD_ENDPOINT="http://${your_ip}:8088"
 export LLM_MODEL_ID=${your_hf_llm_model}
 ```
 
-## 2.2 Build Docker Image
+### 2.2 Build Docker Image
 
 ```bash
 cd ../../
 docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/docker/Dockerfile .
 ```
 
-## 2.3 Run Docker with CLI
+### 2.3 Run Docker with CLI
 
 ```bash
 docker run -d --name="guardrails-tgi-server" -p 9090:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e SAFETY_GUARD_ENDPOINT=$SAFETY_GUARD_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/guardrails-tgi:latest
 ```
 
-## 2.4 Run Docker with Docker Compose
+### 2.4 Run Docker with Docker Compose
 
 ```bash
 cd langchain/docker
 docker compose -f docker_compose_guardrails.yaml up -d
 ```
 
-# 🚀3. Consume Guardrails Service
+## 🚀3. Consume Guardrails Service
 
-## 3.1 Check Service Status
+### 3.1 Check Service Status
 
 ```bash
 curl http://localhost:9090/v1/health_check\
@@ -109,7 +109,7 @@ curl http://localhost:9090/v1/health_check\
   -H 'Content-Type: application/json'
 ```
 
-## 3.2 Consume Guardrails Service
+### 3.2 Consume Guardrails Service
 
 ```bash
 curl http://localhost:9090/v1/guardrails\

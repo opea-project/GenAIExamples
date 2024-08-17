@@ -1,18 +1,18 @@
 # Retriever Microservice with Milvus
 
-# 🚀Start Microservice with Python
+## 🚀Start Microservice with Python
 
-## Install Requirements
+### Install Requirements
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Start Milvus Server
+### Start Milvus Server
 
 Please refer to this [readme](../../../vectorstores/langchain/milvus/README.md).
 
-## Setup Environment Variables
+### Setup Environment Variables
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -24,31 +24,31 @@ export COLLECTION_NAME=${your_collection_name}
 export MOSEC_EMBEDDING_ENDPOINT=${your_emdding_endpoint}
 ```
 
-## Start Retriever Service
+### Start Retriever Service
 
 ```bash
 export MOSEC_EMBEDDING_ENDPOINT="http://${your_ip}:6060"
 python langchain/retriever_redis.py
 ```
 
-# 🚀Start Microservice with Docker
+## 🚀Start Microservice with Docker
 
-## Build Docker Image
+### Build Docker Image
 
 ```bash
 cd ../../
 docker build -t opea/retriever-milvus:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/milvus/docker/Dockerfile .
 ```
 
-## Run Docker with CLI
+### Run Docker with CLI
 
 ```bash
 docker run -d --name="retriever-milvus-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e MOSEC_EMBEDDING_ENDPOINT=${your_emdding_endpoint} -e MILVUS=${your_milvus_host_ip}  opea/retriever-milvus:latest
 ```
 
-# 🚀3. Consume Retriever Service
+## 🚀3. Consume Retriever Service
 
-## 3.1 Check Service Status
+### 3.1 Check Service Status
 
 ```bash
 curl http://${your_ip}:7000/v1/health_check \
@@ -56,7 +56,7 @@ curl http://${your_ip}:7000/v1/health_check \
   -H 'Content-Type: application/json'
 ```
 
-## 3.2 Consume Embedding Service
+### 3.2 Consume Embedding Service
 
 To consume the Retriever Microservice, you can generate a mock embedding vector of length 768 with Python.
 

@@ -6,17 +6,17 @@ The service primarily utilizes similarity measures in vector space to rapidly re
 
 Overall, this microservice provides robust backend support for applications requiring efficient similarity searches, playing a vital role in scenarios such as recommendation systems, information retrieval, or any other context where precise measurement of document similarity is crucial.
 
-# 🚀1. Start Microservice with Python (Option 1)
+## 🚀1. Start Microservice with Python (Option 1)
 
 To start the retriever microservice, you must first install the required python packages.
 
-## 1.1 Install Requirements
+### 1.1 Install Requirements
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 1.2 Setup VectorDB Service
+### 1.2 Setup VectorDB Service
 
 You need to setup your own VectorDB service (Redis in this example), and ingest your knowledge documents into the vector database.
 
@@ -29,15 +29,15 @@ docker run -d --name="redis-vector-db" -p 6379:6379 -p 8001:8001 redis/redis-sta
 
 And then ingest data into the Redis VectorDB using the methods described in the dataprep microservice.
 
-## 1.3 Start Retriever Service
+### 1.3 Start Retriever Service
 
 ```bash
 python retriever_redis.py
 ```
 
-# 🚀2. Start Microservice with Docker (Option 2)
+## 🚀2. Start Microservice with Docker (Option 2)
 
-## 2.1 Setup Environment Variables
+### 2.1 Setup Environment Variables
 
 ```bash
 export REDIS_URL="redis://${your_ip}:6379"
@@ -47,7 +47,7 @@ export LANGCHAIN_API_KEY=${your_langchain_api_key}
 export LANGCHAIN_PROJECT="opea/retrievers"
 ```
 
-## 2.2 Build Docker Image
+### 2.2 Build Docker Image
 
 ```bash
 cd ../../
@@ -61,22 +61,22 @@ To start a docker container, you have two options:
 
 You can choose one as needed.
 
-## 2.3 Run Docker with CLI (Option A)
+### 2.3 Run Docker with CLI (Option A)
 
 ```bash
 docker run -d --name="retriever-redis-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME opea/retriever-redis:latest
 ```
 
-## 2.4 Run Docker with Docker Compose (Option B)
+### 2.4 Run Docker with Docker Compose (Option B)
 
 ```bash
 cd llamaindex/docker
 docker compose -f docker_compose_retriever.yaml up -d
 ```
 
-# 🚀3. Consume Retriever Service
+## 🚀3. Consume Retriever Service
 
-## 3.1 Check Service Status
+### 3.1 Check Service Status
 
 ```bash
 curl http://localhost:7000/v1/health_check \
@@ -84,7 +84,7 @@ curl http://localhost:7000/v1/health_check \
   -H 'Content-Type: application/json'
 ```
 
-## 3.2 Consume Retriever Service
+### 3.2 Consume Retriever Service
 
 To consume the Retriever Microservice, you can generate a mock embedding vector of length 768 with Python.
 
