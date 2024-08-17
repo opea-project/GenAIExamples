@@ -32,74 +32,17 @@ Users can choose the most suitable approach based on ease of setup, scalability 
 
 ### Deployment
 
-<table>
-    <tr>
-        <th rowspan="3" style="text-align:center;">Use Cases</th>
-        <th colspan="4" style="text-align:center;">Deployment</th>
-    </tr>
-    <tr>
-        <td colspan="2" style="text-align:center;">Docker Compose</td>
-        <td rowspan="2" style="text-align:center;">Kubernetes</td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">Xeon</td>
-        <td style="text-align:center;">Gaudi</td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">ChatQnA</td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/xeon/README.md">Xeon Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker/gaudi/README.md">Gaudi Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/kubernetes/README.md">K8s Link</a></td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">CodeGen</td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/xeon/README.md">Xeon Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/docker/gaudi/README.md">Gaudi Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeGen/kubernetes/README.md">K8s Link</a></td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">CodeTrans</td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/xeon/README.md">Xeon Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/docker/gaudi/README.md">Gaudi Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/CodeTrans/kubernetes/README.md">K8s Link</a></td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">DocSum</td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/xeon/README.md">Xeon Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker/gaudi/README.md">Gaudi Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/DocSum/kubernetes/README.md">K8s Link</a></td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">SearchQnA</td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/xeon/README.md">Xeon Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/docker/gaudi/README.md">Gaudi Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/SearchQnA/kubernetes/README.md">K8s Link</a></td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">FaqGen</td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/FaqGen/docker/xeon/README.md">Xeon Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/FaqGen/docker/gaudi/README.md">Gaudi Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/FaqGen/kubernetes/manifests/README.md">K8s Link</a></td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">Translation</td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/Translation/docker/xeon/README.md">Xeon Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/Translation/docker/gaudi/README.md">Gaudi Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/tree/main/Translation/kubernetes">K8s Link</a></td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">AudioQnA</td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/xeon/README.md">Xeon Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/gaudi/README.md">Gaudi Link</a></td>
-        <td>Not supported yet</td>
-    </tr>
-    <tr>
-        <td style="text-align:center;">VisualQnA</td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/tree/main/VisualQnA">Xeon Link</a></td>
-        <td><a href="https://github.com/opea-project/GenAIExamples/tree/main/VisualQnA">Gaudi Link</a></td>
-        <td>Not supported yet</td>
-    </tr>
-</table>
+| Use Case    | Docker Compose<br/>Deployment on Xeon                  | Docker Compose<br/>Deployment on Gaudi                   | Kubernetes Deployment                                     |
+| ----------- | ------------------------------------------------------ | -------------------------------------------------------- | --------------------------------------------------------- |
+| ChatQnA     | [Xeon Instructions](ChatQnA/docker/xeon/README.md)     | [Gaudi Instructions](ChatQnA/docker/gaudi/README.md)     | [K8s Instructions](ChatQnA/kubernetes/README.md)          |
+| CodeGen     | [Xeon Instructions](CodeGen/docker/xeon/README.md)     | [Gaudi Instructions](CodeGen/docker/gaudi/README.md)     | [K8s Instructions](Codegen/kubernetes/README.md)          |
+| CodeTrans   | [Xeon Instructions](CodeTrans/docker/xeon/README.md)   | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md)   | [K8s Instructions](CodeTrans/kubernetes/README.md)        |
+| DocSum      | [Xeon Instructions](CodeTrans/docker/xeon/README.md)   | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md)   | [K8s Instructions](CodeTrans/kubernetes/README.md)        |
+| SearchQnA   | [Xeon Instructions](SearchQnA/docker/xeon/README.md)   | [Gaudi Instructions](SearchQnA/docker/gaudi/README.md)   | [K8s Instructions](SearchQnA/kubernetes/README.md)        |
+| FaqGen      | [Xeon Instructions](FaqGen/docker/xeon/README.md)      | [Gaudi Instructions](FaqGen/docker/gaudi/README.md)      | [K8s Instructions](FaqGen/kubernetes/manifests/README.md) |
+| Translation | [Xeon Instructions](Translation/docker/xeon/README.md) | [Gaudi Instructions](Translation/docker/gaudi/README.md) | [K8s Instructions](Translation/kubernetes/README.md)      |
+| AudioQnA    | [Xeon Instructions](AudioQnA/docker/xeon/README.md)    | [Gaudi Instructions](AudioQnA/docker/gaudi/README.md)    | K8s Not Supported                                         |
+| VisualQnA   | [Xeon Instructions](VisualQnA/docker/xeon/README.md)   | [Gaudi Instructions](VisualQnA/docker/gaudi/README.md)   | K8s Not Supported                                         |
 
 ## Support Examples
 
