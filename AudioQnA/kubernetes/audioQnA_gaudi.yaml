@@ -1,0 +1,58 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: gmc.opea.io/v1alpha3
+kind: GMConnector
+metadata:
+  labels:
+    app.kubernetes.io/name: gmconnector
+    app.kubernetes.io/managed-by: kustomize
+    gmc/platform: gaudi
+  name: audioqa
+  namespace: audioqa
+spec:
+  routerConfig:
+    name: router
+    serviceName: router-service
+  nodes:
+    root:
+      routerType: Sequence
+      steps:
+      - name: Asr
+        internalService:
+          serviceName: asr-svc
+          config:
+            endpoint: /v1/audio/transcriptions
+            ASR_ENDPOINT: whisper-gaudi-svc
+      - name: WhisperGaudi
+        internalService:
+          serviceName: whisper-gaudi-svc
+          config:
+            endpoint: /v1/asr
+          isDownstreamService: true
+      - name: Llm
+        data: $response
+        internalService:
+          serviceName: llm-svc
+          config:
+            endpoint: /v1/chat/completions
+            TGI_LLM_ENDPOINT: tgi-gaudi-svc
+      - name: TgiGaudi
+        internalService:
+          serviceName: tgi-gaudi-svc
+          config:
+            endpoint: /generate
+          isDownstreamService: true
+      - name: Tts
+        data: $response
+        internalService:
+          serviceName: tts-svc
+          config:
+            endpoint: /v1/audio/speech
+            TTS_ENDPOINT: speecht5-gaudi-svc
+      - name: SpeechT5Gaudi
+        internalService:
+          serviceName: speecht5-gaudi-svc
+          config:
+            endpoint: /v1/tts
+          isDownstreamService: true

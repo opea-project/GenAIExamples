@@ -1,8 +1,5 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-version: "3.8"
 
 services:
   tgi-service:
@@ -25,7 +22,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
   llm:
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-gaudi-server
     ports:
       - "9000:9000"
@@ -38,7 +35,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codetrans-gaudi-backend-server:
-    image: opea/codetrans:latest
+    image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}
     container_name: codetrans-gaudi-backend-server
     depends_on:
       - tgi-service
@@ -54,7 +51,7 @@ services:
     ipc: host
     restart: always
   codetrans-gaudi-ui-server:
-    image: opea/codetrans-ui:latest
+    image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}
     container_name: codetrans-gaudi-ui-server
     depends_on:
       - codetrans-gaudi-backend-server

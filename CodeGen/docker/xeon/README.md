@@ -155,16 +155,24 @@ Here is an example of running CodeGen in the UI:
 
 ![project-screenshot](../../assets/img/codeGen_ui_response.png)
 
-## 🚀 Launch the React Based UI
+## 🚀 Launch the React Based UI (Optional)
 
-To access the frontend, open the following URL in your browser: `http://{host_ip}:5174`. By default, the UI runs on port 5174 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
+To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `codegen-xeon-ui-server` service with the `codegen-xeon-react-ui-server` service as per the config below:
 
 ```yaml
-  codegen-xeon-react-ui-server:
-    image: opea/codegen-react-ui:latest
-    ...
-    ports:
-      - "80:5174"
+codegen-xeon-react-ui-server:
+  image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
+  container_name: codegen-xeon-react-ui-server
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+  depends_on:
+    - codegen-xeon-backend-server
+  ports:
+    - "5174:80"
+  ipc: host
+  restart: always
 ```
 
 ![project-screenshot](../../assets/img/codegen_react.png)
