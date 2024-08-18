@@ -4,7 +4,6 @@ huggingface_hub
 langchain==0.1.16
 langchain_openai
 langserve
-langsmith
 openai
 opentelemetry-api
 opentelemetry-exporter-otlp

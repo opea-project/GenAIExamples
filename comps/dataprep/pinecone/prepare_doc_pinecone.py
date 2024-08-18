@@ -14,7 +14,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceEmbeddings, HuggingFaceHubEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain_text_splitters import HTMLHeaderTextSplitter
-from langsmith import traceable
 from pinecone import Pinecone, ServerlessSpec
 
 from comps import DocPath, opea_microservices, opea_telemetry, register_microservice
@@ -172,7 +171,6 @@ async def ingest_link_to_pinecone(link_list: List[str]):
 
 
 @register_microservice(name="opea_service@prepare_doc_pinecone", endpoint="/v1/dataprep", host="0.0.0.0", port=6007)
-@traceable(run_type="tool")
 async def ingest_documents(
     files: Optional[Union[UploadFile, List[UploadFile]]] = File(None),
     link_list: Optional[str] = Form(None),
@@ -223,7 +221,6 @@ async def ingest_documents(
 @register_microservice(
     name="opea_service@prepare_doc_pinecone_file", endpoint="/v1/dataprep/get_file", host="0.0.0.0", port=6008
 )
-@traceable(run_type="tool")
 async def rag_get_file_structure():
     print("[ dataprep - get file ] start to get file structure")
 
@@ -238,7 +235,6 @@ async def rag_get_file_structure():
 @register_microservice(
     name="opea_service@prepare_doc_pinecone_del", endpoint="/v1/dataprep/delete_file", host="0.0.0.0", port=6009
 )
-@traceable(run_type="tool")
 async def delete_all(file_path: str = Body(..., embed=True)):
     """Delete file according to `file_path`.
 

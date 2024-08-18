@@ -8,7 +8,6 @@ from typing import Union
 from fastapi.responses import StreamingResponse
 from huggingface_hub import AsyncInferenceClient
 from langchain_core.prompts import PromptTemplate
-from langsmith import traceable
 from openai import OpenAI
 from template import ChatTemplate
 
@@ -37,7 +36,6 @@ llm = AsyncInferenceClient(
     host="0.0.0.0",
     port=9000,
 )
-@traceable(run_type="llm")
 @register_statistics(names=["opea_service@llm_tgi"])
 async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest]):
 

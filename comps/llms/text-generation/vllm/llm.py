@@ -5,7 +5,6 @@ import os
 
 from fastapi.responses import StreamingResponse
 from langchain_community.llms import VLLMOpenAI
-from langsmith import traceable
 
 from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, opea_telemetry, register_microservice
 
@@ -29,7 +28,6 @@ def post_process_text(text: str):
     host="0.0.0.0",
     port=9000,
 )
-@traceable(run_type="llm")
 def llm_generate(input: LLMParamsDoc):
     llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8008")
     model_name = os.getenv("LLM_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct")

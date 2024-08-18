@@ -3,7 +3,6 @@ docarray[full]
 easyocr
 fastapi
 httpx
-langsmith
 llama-index-vector-stores-redis
 llama_index
 opentelemetry-api

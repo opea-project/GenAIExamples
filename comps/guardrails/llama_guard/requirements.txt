@@ -4,7 +4,6 @@ fastapi
 huggingface-hub<=0.24.0
 langchain-community
 langchain-huggingface
-langsmith
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk

@@ -4,7 +4,6 @@
 from haystack.components.embedders import HuggingFaceTEITextEmbedder, SentenceTransformersTextEmbedder
 from haystack_integrations.components.retrievers.qdrant import QdrantEmbeddingRetriever
 from haystack_integrations.document_stores.qdrant import QdrantDocumentStore
-from langsmith import traceable
 from qdrant_config import EMBED_DIMENSION, EMBED_ENDPOINT, EMBED_MODEL, INDEX_NAME, QDRANT_HOST, QDRANT_PORT
 
 from comps import EmbedDoc, SearchedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
@@ -28,7 +27,6 @@ def initialize_qdrant_retriever() -> QdrantEmbeddingRetriever:
     host="0.0.0.0",
     port=7000,
 )
-@traceable(run_type="retriever")
 def retrieve(input: EmbedDoc) -> SearchedDoc:
     search_res = retriever.run(query_embedding=input.embedding)["documents"]
     searched_docs = [TextDoc(text=r.content) for r in search_res if r.content]

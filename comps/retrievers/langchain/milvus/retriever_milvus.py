@@ -15,9 +15,8 @@ from config import (
     MODEL_ID,
     MOSEC_EMBEDDING_ENDPOINT,
 )
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings, OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, OpenAIEmbeddings
 from langchain_milvus.vectorstores import Milvus
-from langsmith import traceable
 
 from comps import (
     EmbedDoc,
@@ -63,7 +62,6 @@ class MosecEmbeddings(OpenAIEmbeddings):
     host="0.0.0.0",
     port=7000,
 )
-@traceable(run_type="retriever")
 @register_statistics(names=["opea_service@retriever_milvus"])
 def retrieve(input: EmbedDoc) -> SearchedDoc:
     vector_db = Milvus(

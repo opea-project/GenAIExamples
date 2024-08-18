@@ -7,7 +7,6 @@ import time
 from config import EMBED_MODEL, INDEX_NAME, PG_CONNECTION_STRING, PORT
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import PGVector
-from langsmith import traceable
 
 from comps import (
     EmbedDoc,
@@ -30,7 +29,6 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
     host="0.0.0.0",
     port=PORT,
 )
-@traceable(run_type="retriever")
 @register_statistics(names=["opea_service@retriever_pgvector"])
 def retrieve(input: EmbedDoc) -> SearchedDoc:
     start = time.time()

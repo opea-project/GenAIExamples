@@ -7,7 +7,6 @@ import time
 from config import EMBED_MODEL, PINECONE_API_KEY, PINECONE_INDEX_NAME
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_pinecone import PineconeVectorStore
-from langsmith import traceable
 from pinecone import Pinecone, ServerlessSpec
 
 from comps import (
@@ -31,7 +30,6 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
     host="0.0.0.0",
     port=7000,
 )
-@traceable(run_type="retriever")
 @register_statistics(names=["opea_service@retriever_pinecone"])
 def retrieve(input: EmbedDoc) -> SearchedDoc:
     start = time.time()

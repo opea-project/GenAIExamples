@@ -3,7 +3,6 @@
 
 import os
 
-from langsmith import traceable
 from llama_index.core.vector_stores.types import VectorStoreQuery
 from llama_index.vector_stores.redis import RedisVectorStore
 from redis_config import INDEX_NAME, REDIS_URL
@@ -20,7 +19,6 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
     host="0.0.0.0",
     port=7000,
 )
-@traceable(run_type="retriever")
 def retrieve(input: EmbedDoc) -> SearchedDoc:
     vector_store_query = VectorStoreQuery(query_embedding=input.embedding)
     search_res = vector_store.query(query=vector_store_query)

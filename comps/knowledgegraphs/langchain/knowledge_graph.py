@@ -22,7 +22,6 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.graphs import Neo4jGraph
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores.neo4j_vector import Neo4jVector
-from langsmith import traceable
 
 from comps import GeneratedDoc, GraphDoc, ServiceType, opea_microservices, register_microservice
 

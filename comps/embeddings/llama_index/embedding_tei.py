@@ -3,7 +3,6 @@
 
 import os
 
-from langsmith import traceable
 from llama_index.embeddings.text_embeddings_inference import TextEmbeddingsInference
 
 from comps import EmbedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
@@ -18,7 +17,6 @@ from comps import EmbedDoc, ServiceType, TextDoc, opea_microservices, register_m
     input_datatype=TextDoc,
     output_datatype=EmbedDoc,
 )
-@traceable(run_type="embedding")
 def embedding(input: TextDoc) -> EmbedDoc:
     embed_vector = embeddings._get_query_embedding(input.text)
     res = EmbedDoc(text=input.text, embedding=embed_vector)

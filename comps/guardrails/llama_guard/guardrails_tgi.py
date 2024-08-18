@@ -7,7 +7,6 @@ from typing import List, Union
 from langchain_community.utilities.requests import JsonRequestsWrapper
 from langchain_huggingface import ChatHuggingFace
 from langchain_huggingface.llms import HuggingFaceEndpoint
-from langsmith import traceable
 
 from comps import GeneratedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
 
@@ -63,7 +62,6 @@ def get_tgi_service_model_id(endpoint_url, default=DEFAULT_MODEL):
     input_datatype=Union[GeneratedDoc, TextDoc],
     output_datatype=TextDoc,
 )
-@traceable(run_type="llm")
 def safety_guard(input: Union[GeneratedDoc, TextDoc]) -> TextDoc:
     if isinstance(input, GeneratedDoc):
         messages = [{"role": "user", "content": input.prompt}, {"role": "assistant", "content": input.text}]

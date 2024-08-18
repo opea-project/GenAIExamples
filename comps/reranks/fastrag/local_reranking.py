@@ -4,7 +4,6 @@
 from config import RANKER_MODEL
 from fastrag.rankers import IPEXBiEncoderSimilarityRanker
 from haystack import Document
-from langsmith import traceable
 
 from comps.cores.mega.micro_service import ServiceType, opea_microservices, register_microservice
 from comps.cores.proto.docarray import RerankedDoc, SearchedDoc, TextDoc
@@ -19,7 +18,6 @@ from comps.cores.proto.docarray import RerankedDoc, SearchedDoc, TextDoc
     input_datatype=SearchedDoc,
     output_datatype=RerankedDoc,
 )
-@traceable(run_type="llm")
 def reranking(input: SearchedDoc) -> RerankedDoc:
     documents = []
     for i, d in enumerate(input.retrieved_docs):

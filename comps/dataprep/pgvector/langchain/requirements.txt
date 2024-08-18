@@ -8,7 +8,6 @@ huggingface_hub
 langchain
 langchain-community
 langchain-text-splitters
-langsmith
 markdown
 numpy
 opentelemetry-api

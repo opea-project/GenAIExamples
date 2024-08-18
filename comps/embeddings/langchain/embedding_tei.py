@@ -6,7 +6,6 @@ import time
 from typing import Union
 
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
-from langsmith import traceable
 
 from comps import (
     EmbedDoc,
@@ -32,7 +31,6 @@ from comps.cores.proto.api_protocol import (
     host="0.0.0.0",
     port=6000,
 )
-@traceable(run_type="embedding")
 @register_statistics(names=["opea_service@embedding_tei_langchain"])
 def embedding(
     input: Union[TextDoc, EmbeddingRequest, ChatCompletionRequest]

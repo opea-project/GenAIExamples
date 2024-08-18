@@ -10,7 +10,6 @@ langchain-community
 langchain-openai
 langchain-pinecone
 langchain-text-splitters
-langsmith
 markdown
 numpy
 opentelemetry-api

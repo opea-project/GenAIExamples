@@ -26,7 +26,6 @@ from fastapi import Body, File, Form, HTTPException, UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
-from langsmith import traceable
 
 cur_path = pathlib.Path(__file__).parent.resolve()
 comps_path = os.path.join(cur_path, "../../../../")
@@ -322,7 +321,6 @@ async def ingest_documents(files: List[UploadFile] = File(None), link_list: str 
 @register_microservice(
     name="opea_service@prepare_doc_redis_file", endpoint="/v1/dataprep/get_file", host="0.0.0.0", port=6008
 )
-@traceable(run_type="tool")
 async def rag_get_file_structure():
     print("[ get_file_structure] ")
 
@@ -337,7 +335,6 @@ async def rag_get_file_structure():
 @register_microservice(
     name="opea_service@prepare_doc_redis_del", endpoint="/v1/dataprep/delete_file", host="0.0.0.0", port=6009
 )
-@traceable(run_type="tool")
 async def delete_single_file(file_path: str = Body(..., embed=True)):
     """Delete file according to `file_path`.
 

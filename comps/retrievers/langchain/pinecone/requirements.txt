@@ -6,7 +6,6 @@ huggingface_hub
 langchain
 langchain-community
 langchain-pinecone
-langsmith
 numpy
 opentelemetry-api
 opentelemetry-exporter-otlp

@@ -6,7 +6,6 @@ import time
 from typing import List, Optional
 
 from langchain_community.embeddings import OpenAIEmbeddings
-from langsmith import traceable
 
 from comps import (
     EmbedDoc,
@@ -53,7 +52,6 @@ class MosecEmbeddings(OpenAIEmbeddings):
     input_datatype=TextDoc,
     output_datatype=EmbedDoc,
 )
-@traceable(run_type="embedding")
 @register_statistics(names=["opea_service@embedding_mosec"])
 def embedding(input: TextDoc) -> EmbedDoc:
     start = time.time()

@@ -6,7 +6,6 @@ langchain-huggingface
 langchain-openai
 langchain_community
 langchainhub
-langsmith
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk

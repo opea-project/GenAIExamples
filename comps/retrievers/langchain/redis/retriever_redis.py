@@ -7,7 +7,6 @@ from typing import Union
 
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import Redis
-from langsmith import traceable
 from redis_config import EMBED_MODEL, INDEX_NAME, REDIS_URL
 
 from comps import (
@@ -37,7 +36,6 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
     host="0.0.0.0",
     port=7000,
 )
-@traceable(run_type="retriever")
 @register_statistics(names=["opea_service@retriever_redis"])
 def retrieve(
     input: Union[EmbedDoc, RetrievalRequest, ChatCompletionRequest]
