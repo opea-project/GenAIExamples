@@ -20,7 +20,7 @@ The ChatQnA uses the below prebuilt images if you choose a Xeon deployment
 - retriever: opea/retriever-redis:latest
 - tei_xeon_service: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 - reranking: opea/reranking-tei:latest
-- tgi-service: ghcr.io/huggingface/text-generation-inference:1.4
+- tgi-service: ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
 - llm: opea/llm-tgi:latest
 - chaqna-xeon-backend-server: opea/chatqna:latest
 

@@ -3,7 +3,7 @@
 
 services:
   llava-tgi-service:
-    image: ${REGISTRY:-opea}/llava-tgi-xeon:${TAG:-latest}
+    image: ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
     container_name: tgi-llava-xeon-server
     ports:
       - "9399:80"

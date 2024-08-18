@@ -34,6 +34,8 @@ spec:
         args:
         - --model-id
         - 'meta-llama/Meta-Llama-3-8B-Instruct'
+        - --cuda_graphs
+        - '0'
         - --max-input-length
         - '3096'
         - --max-total-tokens
