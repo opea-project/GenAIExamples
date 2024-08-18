@@ -16,6 +16,7 @@ on:
       - comps/llms/text-generation/tgi/**
       - comps/dataprep/redis/langchain/**
       - requirements.txt
+      - "!**.md"
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
