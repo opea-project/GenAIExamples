@@ -32,6 +32,10 @@ on:
         default: false
         required: false
         type: boolean
+      test_gmc:
+        default: false
+        required: false
+        type: boolean
       opea_branch:
         default: "main"
         required: false
@@ -147,4 +151,16 @@ jobs:
       hardware: ${{ inputs.node }}
       tag: ${{ inputs.tag }}
       context: "CD"
+    secrets: inherit
+
+####################################################################################################
+# GMC Test
+####################################################################################################
+  test-gmc-pipeline:
+    needs: [build-images]
+    if: ${{ fromJSON(inputs.test_gmc) }}
+    uses: ./.github/workflows/_gmc-e2e.yml
+    with:
+      example: ${{ inputs.example }}
+      hardware: ${{ inputs.node }}
     secrets: inherit
