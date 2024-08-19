@@ -54,8 +54,7 @@ services:
     image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
   productivity-suite-react-ui:
     build:
-      context: ui
-      dockerfile: ./ui/docker/Dockerfile.react
+      dockerfile: ../docker/ui/docker/Dockerfile.react
     extends: chatqna
     image: ${REGISTRY:-opea}/productivity-suite-react-ui-server:${TAG:-latest}
   codegen:
