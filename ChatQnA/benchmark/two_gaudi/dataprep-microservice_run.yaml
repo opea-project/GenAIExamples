@@ -1,6 +1,3 @@
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,6 +15,8 @@ spec:
       labels:
         app: dataprep-deploy
     spec:
+      nodeSelector:
+        node-type: chatqna-opea
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -44,6 +43,8 @@ spec:
         args: null
         ports:
         - containerPort: 6007
+        - containerPort: 6008
+        - containerPort: 6009
       serviceAccountName: default
 ---
 kind: Service
@@ -58,3 +59,9 @@ spec:
   - name: port1
     port: 6007
     targetPort: 6007
+  - name: port2
+    port: 6008
+    targetPort: 6008
+  - name: port3
+    port: 6009
+    targetPort: 6009
