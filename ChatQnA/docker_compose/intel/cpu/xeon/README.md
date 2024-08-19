@@ -500,8 +500,8 @@ chaqna-xeon-conversation-ui-server:
   image: opea/chatqna-conversation-ui:latest
   container_name: chatqna-xeon-conversation-ui-server
   environment:
-    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
-    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
+    - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
   ports:
     - "5174:80"
   depends_on:
