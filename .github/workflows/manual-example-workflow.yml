@@ -85,6 +85,7 @@ jobs:
     with:
       node: ${{ matrix.node }}
       tag: ${{ inputs.tag }}
+      opea_branch: ${{ inputs.opea_branch }}
     secrets: inherit
 
   run-examples:
