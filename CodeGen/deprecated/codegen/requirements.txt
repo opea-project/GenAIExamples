@@ -1,5 +1,0 @@
-huggingface_hub
-langchain==0.1.11
-langchain-cli
-pydantic==1.10.13
-shortuuid

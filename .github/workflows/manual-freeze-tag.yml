@@ -1,0 +1,46 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Freeze OPEA images release tag in readme on manual event
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+
+jobs:
+  freeze-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "NeuralChatBot"
+          git config --global user.email "grp_neural_chat_bot@intel.com"
+          git remote set-url origin https://NeuralChatBot:"${{ secrets.ACTION_TOKEN }}"@github.com/opea-project/GenAIExamples.git
+
+      - name: Run script
+        run: |
+          find . -name "*.md" | xargs sed -i "s|^docker\ compose|TAG=${{ github.event.inputs.tag }}\ docker\ compose|g"
+          find . -type f -name "*.yaml" \( -path "*/benchmark/*" -o -path "*/kubernetes/*" \) | xargs sed -i -E 's/(opea\/[A-Za-z0-9\-]*:)latest/\1${{ github.event.inputs.tag }}/g'
+          find . -type f -name "*.md" \( -path "*/benchmark/*" -o -path "*/kubernetes/*" \) | xargs sed -i -E 's/(opea\/[A-Za-z0-9\-]*:)latest/\1${{ github.event.inputs.tag }}/g'
+
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -s -m "Freeze OPEA images tag"
+          git push

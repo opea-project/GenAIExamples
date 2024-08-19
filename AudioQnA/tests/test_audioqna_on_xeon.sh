@@ -3,30 +3,26 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH
+    cd $WORKPATH/docker
     git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
 
-    docker build -t opea/whisper:latest -f comps/asr/whisper/Dockerfile .
-    docker build -t opea/asr:latest -f comps/asr/Dockerfile .
-    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/speecht5:latest -f comps/tts/speecht5/Dockerfile .
-    docker build -t opea/tts:latest -f comps/tts/Dockerfile .
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="audioqna whisper asr llm-tgi speecht5 tts"
+    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
-
-    cd $WORKPATH/docker
-    docker build --no-cache -t opea/audioqna:latest -f Dockerfile .
-
-    # cd $WORKPATH/docker/ui
-    # docker build --no-cache -t opea/audioqna-ui:latest -f docker/Dockerfile .
-
     docker images
 }
 
@@ -50,31 +46,34 @@ function start_services() {
 
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    # Replace the container name with a test-specific name
-    # echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-    # sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" docker_compose.yaml
-    # sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" docker_compose.yaml
     # Start Docker Containers
-    docker compose -f docker_compose.yaml up -d
-    sleep 3m
-    # n=0
-    # until [[ "$n" -ge 200 ]]; do
-    #     docker logs tgi-service > tgi_service_start.log
-    #     if grep -q Connected tgi_service_start.log; then
-    #         break
-    #     fi
-    #     sleep 1s
-    #     n=$((n+1))
-    # done
+    docker compose up -d
+    n=0
+    until [[ "$n" -ge 500 ]]; do
+       docker logs tgi-service > $LOG_PATH/tgi_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+           break
+       fi
+       sleep 1s
+       n=$((n+1))
+    done
 }
 
 
 function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
+    echo $result
     if [[ $result == *"AAA"* ]]; then
         echo "Result correct."
     else
+        docker logs whisper-service > $LOG_PATH/whisper-service.log
+        docker logs asr-service > $LOG_PATH/asr-service.log
+        docker logs speecht5-service > $LOG_PATH/tts-service.log
+        docker logs tts-service > $LOG_PATH/tts-service.log
+        docker logs tgi-service > $LOG_PATH/tgi-service.log
+        docker logs llm-tgi-server > $LOG_PATH/llm-tgi-server.log
+        docker logs audioqna-xeon-backend-server > $LOG_PATH/audioqna-xeon-backend-server.log
+
         echo "Result wrong."
         exit 1
     fi
@@ -108,22 +107,14 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    done
+    docker compose stop && docker compose rm -f
 }
 
 function main() {
 
     stop_docker
-    build_docker_images
-    # begin_time=$(date +%s)
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
-    # end_time=$(date +%s)
-    # maximal_duration=$((end_time-begin_time))
-    # echo "Mega service start duration is "$maximal_duration"s" && sleep 1s
 
     validate_megaservice
     # validate_frontend

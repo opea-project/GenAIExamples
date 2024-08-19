@@ -1,0 +1,20 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+services:
+  codegen:
+    build:
+      context: docker
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
+  codegen-ui:
+    build:
+      context: docker/ui
+      dockerfile: ./docker/Dockerfile
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
+  codegen-react-ui:
+    build:
+      context: docker/ui
+      dockerfile: ./docker/Dockerfile.react
+    image: ${REGISTRY:-opea}/codegen-conversation-ui:${TAG:-latest}

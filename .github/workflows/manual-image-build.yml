@@ -1,0 +1,78 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build latest images on manual event
+
+on:
+  workflow_dispatch:
+    inputs:
+      registry:
+        default: ""
+        description: "Registry to store images,e.g., docker.io, default is empty"
+        required: false
+        type: string
+      services:
+        default: "AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation"
+        description: "List of examples to build"
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+      nodes:
+        default: "docker-build-xeon,docker-build-gaudi"
+        description: "List of node to run the build on"
+        required: true
+        type: string
+
+jobs:
+  get-build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.get-services.outputs.services }}
+      nodes: ${{ steps.get-services.outputs.nodes }}
+    steps:
+      - name: Get test Services
+        id: get-services
+        run: |
+          set -x
+          service_list=($(echo ${{ github.event.inputs.services }} | tr ',' ' '))
+          services=$(printf '%s\n' "${service_list[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "services=$services" >> $GITHUB_OUTPUT
+          node_list=($(echo ${{ github.event.inputs.nodes }} | tr ',' ' '))
+          nodes=$(printf '%s\n' "${node_list[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "nodes=$nodes" >> $GITHUB_OUTPUT
+
+  image-build:
+    needs: get-build-matrix
+    strategy:
+      matrix:
+        service: ${{ fromJSON(needs.get-build-matrix.outputs.services) }}
+        node: ${{ fromJSON(needs.get-build-matrix.outputs.nodes) }}
+    runs-on: ${{ matrix.node }}
+    continue-on-error: true
+    steps:
+      - name: Clean Up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Config image repo
+        run: |
+          if [[ -z "${{ github.event.inputs.registry }}" ]]; then
+            echo "image_repo=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
+          else
+            echo "image_repo=${{ github.event.inputs.registry }}/" >> $GITHUB_ENV
+          fi
+
+      - name: Build image
+        uses: opea-project/validation/actions/image-build@main
+        with:
+          work_dir: ${{ github.workspace }}/${{ matrix.service }}
+          docker_compose_path: ${{ github.workspace }}/.github/workflows/docker/compose/${{ matrix.service }}-compose.yaml
+          registry: ${{ env.image_repo }}opea
+          tag: ${{ github.event.inputs.tag }}

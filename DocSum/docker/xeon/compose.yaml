@@ -1,0 +1,68 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
+    container_name: tgi-service
+    ports:
+      - "8008:80"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+  llm:
+    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    container_name: llm-docsum-server
+    depends_on:
+      - tgi-service
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  docsum-xeon-backend-server:
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+    container_name: docsum-xeon-backend-server
+    depends_on:
+      - tgi-service
+      - llm
+    ports:
+      - "8888:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  docsum-xeon-ui-server:
+    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+    container_name: docsum-xeon-ui-server
+    depends_on:
+      - docsum-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

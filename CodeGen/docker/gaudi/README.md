@@ -38,11 +38,21 @@ cd GenAIExamples/CodeGen/docker/ui/
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
+### 5. Build the React UI Docker Image
+
+Construct the React frontend Docker image via the command below:
+
+```bash
+cd GenAIExamples/CodeGen/docker/ui/
+docker build -t opea/codegen-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+```
+
 Then run the command `docker images`, you will have the following 3 Docker images:
 
 - `opea/llm-tgi:latest`
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
+- `opea/codegen-react-ui:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -72,7 +82,7 @@ flowchart LR
 
 ### Setup Environment Variables
 
-Since the `docker_compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
 export no_proxy=${your_no_proxy}
@@ -93,7 +103,7 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7778/v1/codegen"
 
 ```bash
 cd GenAIExamples/CodeGen/docker/gaudi
-docker compose -f docker_compose.yaml up -d
+docker compose up -d
 ```
 
 ### Validate the MicroServices and MegaService
@@ -124,31 +134,12 @@ curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
      }'
 ```
 
-## Enable LangSmith to Monitor Application (Optional)
+## 🚀 Launch the Svelte Based UI
 
-LangSmith offers tools to debug, evaluate, and monitor language models and intelligent agents. It can be used to assess benchmark data for each microservice. Before launching your services with `docker compose -f docker_compose.yaml up -d`, you need to enable LangSmith tracing by setting the `LANGCHAIN_TRACING_V2` environment variable to true and configuring your LangChain API key.
-
-Here's how you can do it:
-
-1. Install the latest version of LangSmith:
-
-```bash
-pip install -U langsmith
-```
-
-2. Set the necessary environment variables:
-
-```bash
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=ls_...
-```
-
-## 🚀 Launch the UI
-
-To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `docker_compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  codegen-xeon-ui-server:
+  codegen-gaudi-ui-server:
     image: opea/codegen-ui:latest
     ...
     ports:
@@ -156,6 +147,28 @@ To access the frontend, open the following URL in your browser: `http://{host_ip
 ```
 
 ![project-screenshot](../../assets/img/codeGen_ui_init.jpg)
+
+## 🚀 Launch the React Based UI (Optional)
+
+To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `codegen-gaudi-ui-server` service with the `codegen-gaudi-react-ui-server` service as per the config below:
+
+```yaml
+codegen-gaudi-react-ui-server:
+  image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
+  container_name: codegen-gaudi-react-ui-server
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+  depends_on:
+    - codegen-gaudi-backend-server
+  ports:
+    - "5174:80"
+  ipc: host
+  restart: always
+```
+
+![project-screenshot](../../assets/img/codegen_react.png)
 
 ## Install Copilot VSCode extension from Plugin Marketplace as the frontend
 

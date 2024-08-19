@@ -1,0 +1,34 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: gmc.opea.io/v1alpha3
+kind: GMConnector
+metadata:
+  labels:
+    app.kubernetes.io/name: gmconnector
+    app.kubernetes.io/managed-by: kustomize
+    gmc/platform: xeon
+  name: visualqna
+  namespace: visualqna
+spec:
+  routerConfig:
+    name: router
+    serviceName: router-service
+  nodes:
+    root:
+      routerType: Sequence
+      steps:
+      - name: Lvm
+        data: $response
+        internalService:
+          serviceName: visualqna-service
+          config:
+            endpoint: /v1/lvm
+            LVM_ENDPOINT: visualqna-tgi-svc
+      - name: Tgi
+        internalService:
+          serviceName: visualqna-tgi-svc
+          config:
+            MODEL_ID: llava-hf/llava-v1.6-mistral-7b-hf
+            endpoint: /generate
+          isDownstreamService: true

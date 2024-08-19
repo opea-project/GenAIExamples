@@ -1,0 +1,105 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Single Kubernetes Manifest E2e Test For Call
+on:
+  workflow_call:
+    inputs:
+      example:
+        default: "ChatQnA"
+        description: "The example to test on K8s"
+        required: true
+        type: string
+      hardware:
+        default: "xeon"
+        description: "Nodes to run the test, xeon or gaudi"
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag to apply to images, default is latest"
+        required: false
+        type: string
+      context:
+        default: "CI"
+        description: "CI or CD"
+        required: false
+        type: string
+
+jobs:
+  manifest-test:
+    runs-on: "k8s-${{ inputs.hardware }}"
+    continue-on-error: true
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Get checkout ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+          echo "checkout ref ${{ env.CHECKOUT_REF }}"
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
+          fetch-depth: 0
+
+      - name: Set variables
+        run: |
+          echo "IMAGE_REPO=$OPEA_IMAGE_REPO" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${{ inputs.tag }}" >> $GITHUB_ENV
+          lower_example=$(echo "${{ inputs.example }}" | tr '[:upper:]' '[:lower:]')
+          echo "NAMESPACE=$lower_example-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+          echo "ROLLOUT_TIMEOUT_SECONDS=1800s" >> $GITHUB_ENV
+          echo "KUBECTL_TIMEOUT_SECONDS=60s" >> $GITHUB_ENV
+          echo "continue_test=true" >> $GITHUB_ENV
+          echo "should_cleanup=false" >> $GITHUB_ENV
+          echo "skip_validate=true" >> $GITHUB_ENV
+          echo "CONTEXT=${{ inputs.context }}" >> $GITHUB_ENV
+          echo "NAMESPACE=$NAMESPACE"
+
+      - name: Kubectl install
+        id: install
+        run: |
+          if [[ ! -f ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh ]]; then
+            echo "No test script found, exist test!"
+            exit 0
+          else
+            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh init_${{ inputs.example }}
+            echo "should_cleanup=true" >> $GITHUB_ENV
+            kubectl create ns $NAMESPACE
+            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh install_${{ inputs.example }} $NAMESPACE
+            echo "Testing ${{ inputs.example }}, waiting for pod ready..."
+            if kubectl rollout status deployment --namespace "$NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
+              echo "Testing manifests ${{ inputs.example }}, waiting for pod ready done!"
+              echo "skip_validate=false" >> $GITHUB_ENV
+            else
+              echo "Timeout waiting for pods in namespace $NAMESPACE to be ready!"
+              exit 1
+            fi
+            sleep 60
+          fi
+
+      - name: Validate e2e test
+        if: always()
+        run: |
+          if $skip_validate; then
+            echo "Skip validate"
+          else
+            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh validate_${{ inputs.example }} $NAMESPACE
+          fi
+
+      - name: Kubectl uninstall
+        if: always()
+        run: |
+          if $should_cleanup; then
+            if ! kubectl delete ns $NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
+              kubectl delete pods --namespace $NAMESPACE --force --grace-period=0 --all
+              kubectl delete ns $NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
+            fi
+          fi

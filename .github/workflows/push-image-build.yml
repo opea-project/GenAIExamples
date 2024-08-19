@@ -1,0 +1,57 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+# Test
+name: Build latest images on push event
+
+on:
+  push:
+    branches: [ 'main' ]
+    paths:
+      - "**/docker/*.py"
+      - "**/docker/Dockerfile"
+      - "**/docker/ui/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-on-push
+  cancel-in-progress: true
+
+jobs:
+  job1:
+    uses: ./.github/workflows/_get-test-matrix.yml
+
+  mega-image-build:
+    needs: job1
+    strategy:
+      matrix:
+        workload: ${{ fromJSON(needs.job1.outputs.run_matrix).include.*.example }}
+        hardware: ["gaudi","xeon"]
+    runs-on: docker-build-${{ matrix.hardware }}
+    steps:
+      - name: Clean up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Check Docker Compose File Exists
+        env:
+          service: ${{ matrix.workload }}
+        run: |
+          docker_compose_path="${{ github.workspace }}/.github/workflows/docker/compose/${service}-compose.yaml"
+          if [ -e $docker_compose_path ]; then
+            echo "file_exists=true" >> $GITHUB_ENV
+            echo "docker_compose_path=${docker_compose_path}" >> $GITHUB_ENV
+          else
+            echo "file_exists=false" >> $GITHUB_ENV
+            echo "docker_compose_path=${docker_compose_path} for this service does not exist, so skipping image build for this service!!!"
+          fi
+
+      - name: Build Image
+        if: env.file_exists == 'true'
+        uses: opea-project/validation/actions/image-build@main
+        with:
+          work_dir: ${{ github.workspace }}/${{ matrix.workload }}
+          docker_compose_path: ${{ env.docker_compose_path }}
+          registry: ${OPEA_IMAGE_REPO}opea

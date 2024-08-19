@@ -1,0 +1,40 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: E2E test with docker compose
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths:
+      - "**/docker/**"
+      - "**/tests/**"
+      - "**/ui/**"
+      - "!**.md"
+      - "!**.txt"
+      - .github/workflows/pr-docker-compose-e2e.yml
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  get-test-matrix:
+    uses: ./.github/workflows/_get-test-matrix.yml
+    with:
+      diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|gmc|assets'
+
+  example-test:
+    needs: [get-test-matrix]
+    strategy:
+      matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
+      fail-fast: false
+    uses: ./.github/workflows/_run-docker-compose.yml
+    with:
+      registry: "opea"
+      tag: "ci"
+      example: ${{ matrix.example }}
+      hardware: ${{ matrix.hardware }}
+    secrets: inherit

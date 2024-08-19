@@ -1,0 +1,74 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  tgi-service:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+    container_name: tgi-gaudi-server
+    ports:
+      - "8008:80"
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      PREFILL_BATCH_BUCKET_SIZE: 1
+      BATCH_BUCKET_SIZE: 8
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096 --max-batch-total-tokens 65536 --max-batch-prefill-tokens 4096
+  llm_faqgen:
+    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+    container_name: llm-faqgen-server
+    depends_on:
+      - tgi-service
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  faqgen-gaudi-backend-server:
+    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
+    container_name: faqgen-gaudi-backend-server
+    depends_on:
+      - tgi-service
+      - llm_faqgen
+    ports:
+      - "8888:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  faqgen-gaudi-ui-server:
+    image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
+    container_name: faqgen-gaudi-ui-server
+    depends_on:
+      - faqgen-gaudi-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
