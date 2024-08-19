@@ -1,0 +1,29 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+
+server {
+    listen       80;
+    listen  [::]:80;
+
+    location /home {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    location / {
+        proxy_pass http://${FRONTEND_SERVICE_IP}:${FRONTEND_SERVICE_PORT};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /v1/${BACKEND_SERVICE_NAME} {
+        proxy_pass http://${BACKEND_SERVICE_IP}:${BACKEND_SERVICE_PORT};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
