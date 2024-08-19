@@ -17,3 +17,6 @@ class BaseAgent:
 
     def execute(self, state: dict):
         pass
+
+    def non_streaming_run(self, query, config):
+        raise NotImplementedError

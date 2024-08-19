@@ -68,7 +68,7 @@ def setup_openai_client(args):
     from langchain_openai import ChatOpenAI
 
     params = {
-        "temperature": 0.5,
+        "temperature": args.temperature,
         "max_tokens": args.max_new_tokens,
         "streaming": args.streaming,
     }
