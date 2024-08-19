@@ -41,6 +41,7 @@ metadata:
 data:
   MODEL_ID: "HuggingFaceH4/mistral-7b-grok"
   PORT: "2080"
+  CUDA_GRAPHS: "0"
   HUGGING_FACE_HUB_TOKEN: "insert-your-huggingface-token-here"
   HF_TOKEN: "insert-your-huggingface-token-here"
   MAX_INPUT_TOKENS: "1024"
@@ -229,7 +230,7 @@ spec:
                 name: codetrans-tgi-config
           securityContext:
             {}
-          image: "ghcr.io/huggingface/text-generation-inference:2.1.0"
+          image: "ghcr.io/huggingface/text-generation-inference:latest-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data

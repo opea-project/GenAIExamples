@@ -8,7 +8,7 @@ Install GMC in your Kubernetes cluster, if you have not already done so, by foll
 The DocSum application is defined as a Custom Resource (CR) file that the above GMC operator acts upon. It first checks if the microservices listed in the CR yaml file are running, if not it starts them and then proceeds to connect them. When the DocSum RAG pipeline is ready, the service endpoint details are returned, letting you use the application. Should you use "kubectl get pods" commands you will see all the component microservices, in particular embedding, retriever, rerank, and llm.
 
 The DocSum pipeline uses  prebuilt images. The Xeon version uses the prebuilt image llm-docsum-tgi:latest which internally leverages the
-the image ghcr.io/huggingface/text-generation-inference:1.4. The service is called tgi-svc. Meanwhile, the Gaudi version launches the
+the image ghcr.io/huggingface/text-generation-inference:latest-intel-cpu. The service is called tgi-svc. Meanwhile, the Gaudi version launches the
 service tgi-gaudi-svc, which uses the image ghcr.io/huggingface/tgi-gaudi:1.2.1. Both TGI model services serve the model specified in the LLM_MODEL_ID variable that is exported by you. In the below example we use Intel/neural-chat-7b-v3-3.
 
 [NOTE]
