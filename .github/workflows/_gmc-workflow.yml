@@ -16,11 +16,6 @@ on:
         required: true
         type: string
         description: "Hardware to run test"
-      deploy:
-        default: true
-        required: true
-        type: boolean
-        description: 'Whether to deploy gmc'
   workflow_call:
     inputs:
       tag:
@@ -33,11 +28,6 @@ on:
         required: true
         type: string
         description: "Hardware to run test"
-      deploy:
-        default: true
-        required: true
-        type: boolean
-        description: 'Whether to deploy gmc'
 
 jobs:
 ####################################################################################################
@@ -113,7 +103,6 @@ jobs:
 ####################################################################################################
   gmc-install:
     needs: image-build
-    if: ${{ fromJSON(inputs.deploy) }}
     runs-on: "k8s-${{ inputs.node }}"
     steps:
       - name: Checkout GenAIInfra repository
