@@ -24,7 +24,7 @@ function replace_image_version() {
     else
         echo "replace $repo_image:latest with $repo_image:$version"
         find . -name "Dockerfile" | xargs sed -i "s|$repo_image:latest.*|$repo_image:$version|g"
-        find . -name "*.yaml" | xargs sed -i "s|$repo_image:latest[a-Z0-9\-]*|$repo_image:$version|g"
+        find . -name "*.yaml" | xargs sed -i "s|$repo_image:latest[\w\-]*|$repo_image:$version|g"
     fi
 }
 
