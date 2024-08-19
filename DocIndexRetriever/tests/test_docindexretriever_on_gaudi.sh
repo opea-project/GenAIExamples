@@ -11,10 +11,9 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/../../
-    if [ -d "GenAIComps" ] ; then
-        rm -rf GenAIComps
+    if [ ! -d "GenAIComps" ] ; then
+        git clone https://github.com/opea-project/GenAIComps.git
     fi
-    git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
     git status
 
@@ -46,6 +45,7 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export RERANK_SERVICE_PORT=18000
 
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
@@ -85,7 +85,7 @@ function validate_megaservice() {
     local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "text": "Explain the OPEA project?"
     }')
-    local EXIT_CODE=$(validate "$CONTENT" "reranked_docs" "doc-index-retriever-service-gaudi")
+    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
