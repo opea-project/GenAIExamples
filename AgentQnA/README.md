@@ -3,7 +3,7 @@
 ## Overview
 
 This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to the worker agent and other tools to gather information and come up with answers. The worker agent uses the retrieval tool to generate answers to the queries posted by the supervisor agent. Other tools used by the supervisor agent may include APIs to interface knowledge graphs, SQL databases, external knowledge bases, etc.
-![Architecture Overview](assets/hierarchical_agentic_rag_arch.png)
+![Architecture Overview](assets/agent_qna_arch.png)
 
 ### Why Agent for question answering?
 
@@ -14,6 +14,7 @@ This example showcases a hierarchical multi-agent system for question-answering 
 3. Hierarchical agent can further improve performance.
    Expert worker agents, such as retrieval agent, knowledge graph agent, SQL agent, etc., can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information together to provide a comprehensive answer.
 
+### Roadmap
 - v0.9: Worker agent uses open-source websearch tool (duckduckgo), agents use OpenAI GPT-4o-mini as llm backend.
 - v1.0: Worker agent uses OPEA retrieval megaservice as tool.
 - v1.0 or later: agents use open-source llm backend.
@@ -101,4 +102,4 @@ curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: app
 
 ## How to register your own tools with agent
 
-You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/minmin-intel/GenAIComps/tree/agent-comp-dev/comps/agent/langchain#4-provide-your-own-tools).
+You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/minmin-intel/GenAIComps/tree/agent-comp-dev/comps/agent/langchain#-4-provide-your-own-tools).
