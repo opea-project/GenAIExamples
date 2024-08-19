@@ -89,6 +89,7 @@ jobs:
 
   run-examples:
     needs: [get-test-matrix, build-deploy-gmc]
+    if: always()
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
