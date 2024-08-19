@@ -1,0 +1,161 @@
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  redis-vector-db: # TODO
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  dataprep-redis-service: # TODO
+    image: opea/dataprep-redis:latest
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+    ports:
+      - "6007:6007"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+  tei-embedding-service: # TODO
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-embedding-server
+    ports:
+      - "6006:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+  embedding: # TODO
+    image: opea/embedding-tei:latest
+    container_name: embedding-tei-server
+    depends_on:
+      - tei-embedding-service
+    ports:
+      - "6000:6000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+    restart: unless-stopped
+  retriever: # TODO
+    image: opea/retriever-redis:latest
+    container_name: retriever-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+    restart: unless-stopped
+  reranking:
+    image: opea/reranking-videoragqna:latest
+    container_name: reranking-videoragqna-server
+    ports:
+      - "8000:8000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      CHUNK_DURATION: ${CHUNK_DURATION}
+      FILE_SERVER_URL: ${FILE_SERVER_URL}
+    restart: unless-stopped
+  lvm-video-llama:
+    image: opea/video-llama-lvm-server:latest
+    container_name: video-llama-lvm-server
+    ports:
+      - "9009:9009"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+      llm_download: "True"
+    volumes:
+      - "/home/$USER/.cache:/home/user/.cache" # RECOMMENDED: use local cache to avoid download
+      - video-llama-model:/home/user/model
+    restart: unless-stopped
+  lvm:
+    image: opea/lvm-video-llama:latest
+    container_name: lvm-video-llama
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
+    restart: unless-stopped
+    depends_on:
+      - lvm-video-llama
+  videoragqna-xeon-backend-server:
+    image: opea/chatqna:latest
+    container_name: chatqna-xeon-backend-server
+    depends_on:
+      - redis-vector-db # FIXME
+      - tei-embedding-service
+      - embedding
+      - dataprep-redis-service
+      - retriever
+      - reranking
+      - lvm-video-llama
+      - lvm
+    ports:
+      - "8888:8888"
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      EMBEDDING_SERVICE_HOST_IP: ${EMBEDDING_SERVICE_HOST_IP}
+      RETRIEVER_SERVICE_HOST_IP: ${RETRIEVER_SERVICE_HOST_IP}
+      RERANK_SERVICE_HOST_IP: ${RERANK_SERVICE_HOST_IP}
+      LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  videoragqna-xeon-ui-server:
+    image: opea/chatqna-ui:latest
+    container_name: chatqna-xeon-ui-server
+    depends_on:
+      - videoragqna-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      no_proxy: ${no_proxy}
+      # CHAT_BASE_URL: ${BACKEND_SERVICE_ENDPOINT}
+      # UPLOAD_FILE_BASE_URL: ${DATAPREP_SERVICE_ENDPOINT}
+      # GET_FILE: ${DATAPREP_GET_FILE_ENDPOINT}
+      # DELETE_FILE: ${DATAPREP_DELETE_FILE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
