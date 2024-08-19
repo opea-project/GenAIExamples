@@ -3,7 +3,7 @@
 
 services:
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:1.4
+    image: ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
     container_name: tgi-service
     ports:
       - "8008:80"
@@ -15,7 +15,7 @@ services:
     volumes:
       - "./data:/data"
     shm_size: 1g
-    command: --model-id ${LLM_MODEL_ID}
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
