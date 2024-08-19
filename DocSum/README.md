@@ -90,8 +90,8 @@ Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](htt
 
 Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum) for instructions on deploying DocSum into Kubernetes on Xeon & Gaudi.
 
-
 ### Workflow of the deployed Document Summarization Service
+
 The workflow of the Document Summarization Service, from user's input query to the application's output response, is as follows:
 
 ```mermaid
@@ -112,7 +112,6 @@ flowchart LR
         Z[Gateway]
     end
 ```
-
 
 ## Consume Document Summarization Service
 
