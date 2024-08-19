@@ -23,7 +23,7 @@ function build_docker_images() {
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/text-generation-inference:1.4
+    docker pull ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
     docker images
 }
 
