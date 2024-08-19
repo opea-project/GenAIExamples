@@ -5,13 +5,13 @@
 
 declare -A dict
 dict["langchain/langchain"]="docker://docker.io/langchain/langchain"
-# dict["ghcr.io/huggingface/text-generation-inference"]="docker://ghcr.io/huggingface/text-generation-inference"
+dict["ghcr.io/huggingface/text-generation-inference"]="docker://ghcr.io/huggingface/text-generation-inference"
 
 function get_latest_version() {
     repo_image=$1
     versions=$(skopeo list-tags ${dict[$repo_image]} | jq -r '.Tags[]')
     printf "version list:\n$versions\n"
-    latest_version=$(printf "%s\n" "${versions[@]}" | grep -E '^[\.rc0-9\-]+$' | sort -V | tail -n 1)
+    latest_version=$(printf "%s\n" "${versions[@]}" | grep -E '^[\.0-9\-]+$' | sort -V | tail -n 1)
     echo "latest version: $latest_version"
     replace_image_version $repo_image $latest_version
 }
@@ -23,7 +23,9 @@ function replace_image_version() {
         echo "version is empty"
     else
         echo "replace $repo_image:latest with $repo_image:$version"
-        find . -name "Dockerfile" | xargs sed -i "s|$repo_image:latest|$repo_image:$version|g"
+        find . -name "Dockerfile" | xargs sed -i "s|$repo_image:latest.*|$repo_image:$version|g"
+        find . -name "*.yaml" | xargs sed -i "s|$repo_image:latest[A-Za-z0-9\-]*|$repo_image:$version|g"
+        find . -name "*.md" | xargs sed -i "s|$repo_image:latest[A-Za-z0-9\-]*|$repo_image:$version|g"
     fi
 }
 
