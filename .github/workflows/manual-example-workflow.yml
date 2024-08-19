@@ -75,6 +75,7 @@ jobs:
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
   build-deploy-gmc:
+    needs: [get-test-matrix]
     if: ${{ fromJSON(inputs.deploy_gmc) }}
     strategy:
       matrix:
