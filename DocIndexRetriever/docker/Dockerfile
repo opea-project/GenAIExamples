@@ -15,9 +15,11 @@ RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/
 
-RUN cd /home/user/ 
+WORKDIR /home/user/
+RUN git clone https://github.com/opea-project/GenAIComps.git
 
-RUN cd /home/user/GenAIComps && pip install --no-cache-dir --upgrade pip && \
+WORKDIR /home/user/GenAIComps
+RUN pip install --no-cache-dir --upgrade pip && \
     pip install -r /home/user/GenAIComps/requirements.txt
 
 COPY GenAIExamples/DocIndexRetriever/docker/retrieval_tool.py /home/user/retrieval_tool.py
