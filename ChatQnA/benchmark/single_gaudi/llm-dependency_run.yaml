@@ -18,6 +18,8 @@ spec:
       labels:
         app: llm-dependency-deploy
     spec:
+      nodeSelector:
+        node-type: chatqna-opea
       hostIPC: true
       containers:
       - envFrom:
@@ -33,8 +35,12 @@ spec:
         - --model-id
         - $(LLM_MODEL_ID)
         - --max-input-length
-        - '2048'
+        - '1024'
         - --max-total-tokens
+        - '2048'
+        - --max-batch-total-tokens
+        - '65536'
+        - --max-batch-prefill-tokens
         - '4096'
         volumeMounts:
         - mountPath: /data

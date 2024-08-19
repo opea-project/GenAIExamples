@@ -18,6 +18,8 @@ spec:
       labels:
         app: reranking-dependency-deploy
     spec:
+      nodeSelector:
+        node-type: chatqna-opea
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
