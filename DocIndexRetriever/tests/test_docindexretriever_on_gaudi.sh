@@ -11,9 +11,10 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/../../
-    if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git
+    if [ -d "GenAIComps" ] ; then
+        rm -rf GenAIComps
     fi
+    git clone https://github.com/opea-project/GenAIComps.git
     cd GenAIComps
     git status
 
