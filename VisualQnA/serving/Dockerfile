@@ -16,7 +16,8 @@
 
 
 # HABANA environment
-FROM vault.habana.ai/gaudi-docker/1.14.0/ubuntu22.04/habanalabs/pytorch-installer-2.1.1 AS hpu
+# FROM vault.habana.ai/gaudi-docker/1.14.0/ubuntu22.04/habanalabs/pytorch-installer-2.1.1 AS hpu
+FROM opea/habanalabs:1.14.0-pytorch-installer-2.1.1 as hpu
 RUN rm -rf /etc/ssh/ssh_host*
 
 # Set environment variables
