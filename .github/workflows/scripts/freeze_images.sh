@@ -3,11 +3,15 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+declare -A dict
+dict["langchain/langchain"]="docker://docker.io/langchain/langchain"
+# dict["ghcr.io/huggingface/text-generation-inference"]="docker://ghcr.io/huggingface/text-generation-inference"
+
 function get_latest_version() {
     repo_image=$1
-    versions=$(curl -s "https://registry.hub.docker.com/v2/repositories/$repo_image/tags/" | jq '."results"[]["name"]' | tr -d '"')
-    echo "version list: $versions"
-    latest_version=$(printf "%s\n" "${versions[@]}" | grep -v "latest" | sort -V | tail -n 1)
+    versions=$(skopeo list-tags ${dict[$repo_image]} | jq -r '.Tags[]')
+    printf "version list:\n$versions\n"
+    latest_version=$(printf "%s\n" "${versions[@]}" | grep -E '^[\.rc0-9\-]+$' | sort -V | tail -n 1)
     echo "latest version: $latest_version"
     replace_image_version $repo_image $latest_version
 }
@@ -15,7 +19,12 @@ function get_latest_version() {
 function replace_image_version() {
     repo_image=$1
     version=$2
-    find . -name "Dockerfile" | xargs sed -i "s|$repo_image:latest|$repo_image:$version|g"
+    if [[ -z "$version" ]]; then
+        echo "version is empty"
+    else
+        echo "replace $repo_image:latest with $repo_image:$version"
+        find . -name "Dockerfile" | xargs sed -i "s|$repo_image:latest|$repo_image:$version|g"
+    fi
 }
 
 function check_branch_name() {
@@ -29,13 +38,11 @@ function check_branch_name() {
 
 function main() {
     check_branch_name
-    repo_image_list="langchain/langchain"
-    for repo_image in $repo_image_list; do
+    for repo_image in "${!dict[@]}"; do
         echo "::group::check $repo_image"
         get_latest_version $repo_image
         echo "::endgroup::"
     done
-    freeze_tag_in_markdown
 }
 
 main
