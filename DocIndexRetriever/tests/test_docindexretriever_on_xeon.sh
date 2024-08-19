@@ -13,7 +13,6 @@ function build_docker_images() {
     cd $WORKPATH/../../
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git
-        cd GenAIComps; git fetch origin pull/314/head:PR314; git checkout PR314
     fi
     cd GenAIComps
 
@@ -36,7 +35,7 @@ function start_services() {
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
-    export REDIS_URL="redis://${ip_address}:6379"
+    export REDIS_URL="redis://${ip_address}:16379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
@@ -48,7 +47,6 @@ function start_services() {
     # Start Docker Containers
     docker compose -f docker_compose.yaml up -d
     sleep 20
-    docker ps
 }
 
 function validate() {
@@ -58,9 +56,10 @@ function validate() {
 
     if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
         echo "[ $SERVICE_NAME ] Content is as expected: $CONTENT."
+        echo 0
     else
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-        exit 1
+        echo 1
     fi
 }
 
@@ -68,9 +67,12 @@ function validate_megaservice() {
     echo "Testing DataPrep Service"
     local CONTENT=$(curl -X POST "http://${ip_address}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
-     -F 'link_list=["https://opea.dev"]' | tee ${LOG_PATH}/dataprep-redis-service-xeon.log)
-    validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon" || EXIT_CODE=$?
-    if [ "$EXIT_CODE" -eq 1 ]; then
+     -F 'link_list=["https://opea.dev"]')
+    local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon")
+    echo "$EXIT_CODE"
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    echo "return value is $EXIT_CODE"
+    if [ "$EXIT_CODE" == "1" ]; then
         docker logs dataprep-redis-server | tee -a ${LOG_PATH}/dataprep-redis-service-xeon.log
         return 1
     fi
@@ -79,9 +81,12 @@ function validate_megaservice() {
     echo "Testing retriever service"
     local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "text": "Explain the OPEA project?"
-    }' | tee ${LOG_PATH}/doc-index-retriever-service-xeon.log)
-    validate "$CONTENT" "reranked_docs" "doc-index-retriever-service-xeon" || EXIT_CODE=$?
-    if [ "$EXIT_CODE" -eq 1 ]; then
+    }')
+    local EXIT_CODE=$(validate "$CONTENT" "reranked_docs" "doc-index-retriever-service-xeon")
+    echo "$EXIT_CODE"
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    echo "return value is $EXIT_CODE"
+    if [ "$EXIT_CODE" == "1" ]; then
         docker logs tei-embedding-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
