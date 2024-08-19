@@ -17,4 +17,4 @@ FROM nginx:alpine
 COPY --from=vite-app /usr/app/react/dist /usr/share/nginx/html
 
 COPY ./react/nginx.conf /tmp/nginx.conf
-ENTRYPOINT envsubst < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf && /usr/sbin/nginx -g "daemon off;"
+ENTRYPOINT ["sh", "-c", "envsubst < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf && /usr/sbin/nginx -g 'daemon off;'"]
