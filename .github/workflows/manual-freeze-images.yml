@@ -21,6 +21,11 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: install skopeo
+        run: |
+          sudo apt update
+          sudo apt -y install skopeo
+
       - name: Set up Git
         run: |
           git config --global user.name "NeuralChatBot"
