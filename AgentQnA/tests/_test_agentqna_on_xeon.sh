@@ -19,11 +19,6 @@ function build_agent_docker_image() {
     fi
     cd GenAIComps
     echo PWD: $(pwd)
-    local CUR=$(git branch --show-current)
-    echo "Check out agent component, Current Branch is ${CUR}"
-    if [ "${CUR}" != "PR480" ] ; then
-        git fetch origin pull/480/head:PR480; git checkout PR480
-    fi
     docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/docker/Dockerfile .
 }
 
