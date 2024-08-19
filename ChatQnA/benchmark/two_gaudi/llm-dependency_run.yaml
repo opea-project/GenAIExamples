@@ -25,7 +25,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: tgi_gaudi:2.0.1
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.1
         name: llm-dependency-deploy-demo
         securityContext:
           capabilities:

@@ -50,7 +50,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: chaqna-backend-server-svc
+  name: chatqna-backend-server-svc
 spec:
   type: NodePort
   selector:
