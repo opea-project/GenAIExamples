@@ -11,11 +11,6 @@ on:
         description: "Tag to apply to images"
         required: true
         type: string
-      text-generation-inference-tag:
-        default: "latest"
-        description: "Tag of ghcr.io/huggingface/text-generation-inference"
-        required: true
-        type: string
 
 jobs:
   freeze-tag:
@@ -41,7 +36,6 @@ jobs:
       - name: Run script
         run: |
           find . -name "*.md" | xargs sed -i "s|^docker\ compose|TAG=${{ github.event.inputs.tag }}\ docker\ compose|g"
-          find . -name "*.md" | xargs sed -i "s|ghcr.io/huggingface/text-generation-inference:latest[A-Za-z0-9\-]*|ghcr.io/huggingface/text-generation-inference:${{ github.event.inputs.text-generation-inference-tag }}|g"
 
       - name: Commit changes
         run: |
