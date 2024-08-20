@@ -8,7 +8,8 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      dockerfile: ../../ChatQnA/docker/Dockerfile
+      context: ../../ChatQnA/docker/
+      dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
   embedding-tei:
     build:
@@ -64,7 +65,8 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      dockerfile: ../../CodeGen/docker/Dockerfile
+      context: ../../CodeGen/docker/
+      dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
   docsum:
     build:
@@ -72,7 +74,8 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      dockerfile: ../../DocSum/docker/Dockerfile
+      context: ../../DocSum/docker/
+      dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
   faqgen:
     build:
@@ -80,5 +83,6 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      dockerfile: ../../FaqGen/docker/Dockerfile
+      context: ../../FaqGen/docker/
+      dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
