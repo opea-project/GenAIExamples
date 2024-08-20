@@ -29,6 +29,18 @@ services:
       dockerfile: comps/reranks/tei/docker/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+  llm-faqgen-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/faq-generation/tgi/Dockerfile
+    extends: faqgen
+    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+  llm-docsum-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/summarization/tgi/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
   llm-tgi:
     build:
       context: GenAIComps
