@@ -5,12 +5,13 @@ docarray[full]
 duckduckgo-search
 fastapi
 huggingface_hub==0.24.0
-langchain #==0.1.12
+langchain==0.2.9
 langchain-huggingface
 langchain-openai
-langchain_community
-langchainhub
+langchain_community==0.2.7
+langchainhub==0.1.20
 langgraph
+langsmith
 numpy
 
 # used by cloud native

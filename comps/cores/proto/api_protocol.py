@@ -389,6 +389,82 @@ class ErrorResponse(BaseModel):
     code: int
 
 
+class ThreadObject(BaseModel):
+    id: str
+    object: str = "thread"
+    created_at: int
+
+
+class AssistantsObject(BaseModel):
+    id: str
+    object: str = "assistant"
+    created_at: int
+    name: Optional[str] = None
+    description: Optional[str] = None
+    model: Optional[str] = "Intel/neural-chat-7b-v3-3"
+    instructions: Optional[str] = None
+    tools: Optional[List[ChatCompletionToolsParam]] = None
+
+
+class Attachments(BaseModel):
+    file_list: List[UploadFile] = []
+
+
+class MessageContent(BaseModel):
+    type: str = "text"
+    text: Optional[str] = None
+
+
+class MessageObject(BaseModel):
+    id: str
+    object: str = "thread.message"
+    created_at: int
+    thread_id: str
+    role: str
+    status: Optional[str] = None
+    content: List[MessageContent]
+    assistant_id: Optional[str] = None
+    run_id: Optional[str] = None
+    attachments: Attachments = None
+
+
+class RunObject(BaseModel):
+    id: str
+    object: str = "run"
+    created_at: int
+    thread_id: str
+    assistant_id: str
+    status: Optional[str] = None
+    last_error: Optional[str] = None
+
+
+class CreateAssistantsRequest(BaseModel):
+    model: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    instructions: Optional[str] = None
+    tools: Optional[List[ChatCompletionToolsParam]] = None
+
+
+class CreateMessagesRequest(BaseModel):
+    role: str = "user"
+    content: Union[str, List[MessageContent]]
+    attachments: Attachments = None
+
+
+class CreateThreadsRequest(BaseModel):
+    messages: Optional[List[CreateMessagesRequest]] = None
+
+
+class CreateRunResponse(BaseModel):
+    assistant_id: str
+
+
+class ListAssistantsRequest(BaseModel):
+    limit: int = 10
+    order: Optional[str] = "desc"
+
+
 class ApiErrorCode(IntEnum):
     """
     https://platform.openai.com/docs/guides/error-codes/api-errors

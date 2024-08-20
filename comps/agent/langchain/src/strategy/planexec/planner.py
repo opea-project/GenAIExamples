@@ -16,9 +16,11 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.utils.json import parse_partial_json
 from langchain_huggingface import ChatHuggingFace
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 
+from ...global_var import threads_global_kv
 from ...utils import has_multi_tool_inputs, tool_renderer
 from ..base_agent import BaseAgent
 from .prompt import (
@@ -221,7 +223,7 @@ class Replanner:
 
 
 class PlanExecuteAgentWithLangGraph(BaseAgent):
-    def __init__(self, args):
+    def __init__(self, args, with_memory=False):
         super().__init__(args)
 
         # Define Node
@@ -231,37 +233,39 @@ class PlanExecuteAgentWithLangGraph(BaseAgent):
         execute_step = Executor(self.llm_endpoint, args.model, self.tools_descriptions)
         make_answer = AnswerMaker(self.llm_endpoint, args.model)
 
-        # answer_checker = FinalAnswerChecker(self.llm_endpoint, args.model)
-        # replan_step = Replanner(self.llm_endpoint, args.model, answer_checker)
-
         # Define Graph
         workflow = StateGraph(PlanExecute)
         workflow.add_node("planner", plan_step)
         workflow.add_node("plan_executor", execute_step)
         workflow.add_node("answer_maker", make_answer)
-        # workflow.add_node("replan", replan_step)
 
         # Define edges
         workflow.add_edge(START, "planner")
         workflow.add_edge("planner", "plan_executor")
         workflow.add_edge("plan_executor", "answer_maker")
         workflow.add_edge("answer_maker", END)
-        # workflow.add_conditional_edges(
-        #     "answer_maker",
-        #     answer_checker,
-        #     {END: END, "replan": "replan"},
-        # )
-        # workflow.add_edge("replan", "plan_executor")
 
-        # Finally, we compile it!
-        self.app = workflow.compile()
+        if with_memory:
+            self.app = workflow.compile(checkpointer=MemorySaver())
+        else:
+            self.app = workflow.compile()
 
     def prepare_initial_state(self, query):
         return {"messages": [("user", query)]}
 
-    async def stream_generator(self, query, config):
+    async def stream_generator(self, query, config, thread_id=None):
         initial_state = self.prepare_initial_state(query)
+        if thread_id is not None:
+            config["configurable"] = {"thread_id": thread_id}
         async for event in self.app.astream(initial_state, config=config):
+            if thread_id is not None:
+                with threads_global_kv as g_threads:
+                    thread_inst, created_at, status = g_threads[thread_id]
+                    if status == "try_cancel":
+                        yield "[thread_completion_callback] signal to cancel! Changed status to ready"
+                        print("[thread_completion_callback] signal to cancel! Changed status to ready")
+                        g_threads[thread_id] = (thread_inst, created_at, "ready")
+                        break
             for node_name, node_state in event.items():
                 yield f"--- CALL {node_name} ---\n"
                 for k, v in node_state.items():
