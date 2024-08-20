@@ -1,9 +1,22 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 from sentence_transformers import CrossEncoder
 
-from comps import RerankedDoc, SearchedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
+from comps import (
+    CustomLogger,
+    RerankedDoc,
+    SearchedDoc,
+    ServiceType,
+    TextDoc,
+    opea_microservices,
+    register_microservice,
+)
+
+logger = CustomLogger("local_reranking")
+logflag = os.getenv("LOGFLAG", False)
 
 
 @register_microservice(
@@ -16,10 +29,14 @@ from comps import RerankedDoc, SearchedDoc, ServiceType, TextDoc, opea_microserv
     output_datatype=RerankedDoc,
 )
 def reranking(input: SearchedDoc) -> RerankedDoc:
+    if logflag:
+        logger.info(input)
     query_and_docs = [(input.initial_query, doc.text) for doc in input.retrieved_docs]
     scores = reranker_model.predict(query_and_docs)
     first_passage = sorted(list(zip(input.retrieved_docs, scores)), key=lambda x: x[1], reverse=True)[0][0]
     res = RerankedDoc(initial_query=input.initial_query, reranked_docs=[first_passage])
+    if logflag:
+        logger.info(res)
     return res
 
 

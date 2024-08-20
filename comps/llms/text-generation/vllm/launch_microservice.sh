@@ -10,4 +10,5 @@ docker run -d --rm \
     -e vLLM_ENDPOINT=$vLLM_ENDPOINT \
     -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN \
     -e LLM_MODEL=$LLM_MODEL \
+    -e LOGFLAG=$LOGFLAG \
     opea/llm-vllm:latest

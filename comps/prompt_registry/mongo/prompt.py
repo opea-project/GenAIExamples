@@ -1,11 +1,16 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+import os
 from typing import Optional
 
 from mongo_store import PromptStore
 from pydantic import BaseModel
 
+from comps import CustomLogger
 from comps.cores.mega.micro_service import opea_microservices, register_microservice
+
+logger = CustomLogger("prompt_mongo")
+logflag = os.getenv("LOGFLAG", False)
 
 
 class PromptCreate(BaseModel):
@@ -49,15 +54,18 @@ async def create_prompt(prompt: PromptCreate):
     Returns:
         JSON (PromptResponse): PromptResponse class object, None otherwise.
     """
+    if logflag:
+        logger.info(prompt)
     try:
         prompt_store = PromptStore(prompt.user)
         prompt_store.initialize_storage()
         response = await prompt_store.save_prompt(prompt)
-
+        if logflag:
+            logger.info(response)
         return response
 
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        logger.info(f"An error occurred: {str(e)}")
         return None
 
 
@@ -77,6 +85,8 @@ async def get_prompt(prompt: PromptId):
     Returns:
         JSON: Retrieved prompt data if successful, None otherwise.
     """
+    if logflag:
+        logger.info(prompt)
     try:
         prompt_store = PromptStore(prompt.user)
         prompt_store.initialize_storage()
@@ -86,11 +96,12 @@ async def get_prompt(prompt: PromptId):
             response = await prompt_store.prompt_search(prompt.prompt_text)
         else:
             response = await prompt_store.get_all_prompt_of_user()
-
+        if logflag:
+            logger.info(response)
         return response
 
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        logger.info(f"An error occurred: {str(e)}")
         return None
 
 
@@ -110,6 +121,8 @@ async def delete_prompt(prompt: PromptId):
     Returns:
         Result of deletion if successful, None otherwise.
     """
+    if logflag:
+        logger.info(prompt)
     try:
         prompt_store = PromptStore(prompt.user)
         prompt_store.initialize_storage()
@@ -117,10 +130,12 @@ async def delete_prompt(prompt: PromptId):
             raise Exception("Prompt id is required.")
         else:
             response = await prompt_store.delete_prompt(prompt.prompt_id)
+        if logflag:
+            logger.info(response)
         return response
 
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        logger.info(f"An error occurred: {str(e)}")
         return None
 
 

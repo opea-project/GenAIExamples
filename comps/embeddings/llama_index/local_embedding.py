@@ -1,9 +1,14 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 from llama_index.embeddings.huggingface_api import HuggingFaceInferenceAPIEmbedding
 
-from comps import EmbedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
+from comps import CustomLogger, EmbedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
+
+logger = CustomLogger("local_embedding")
+logflag = os.getenv("LOGFLAG", False)
 
 
 @register_microservice(
@@ -16,8 +21,12 @@ from comps import EmbedDoc, ServiceType, TextDoc, opea_microservices, register_m
     output_datatype=EmbedDoc,
 )
 def embedding(input: TextDoc) -> EmbedDoc:
+    if logflag:
+        logger.info(input)
     embed_vector = embeddings.get_text_embedding(input.text)
     res = EmbedDoc(text=input.text, embedding=embed_vector)
+    if logflag:
+        logger.info(res)
     return res
 
 

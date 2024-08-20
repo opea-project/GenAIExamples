@@ -11,6 +11,7 @@ from typing import Union
 import requests
 
 from comps import (
+    CustomLogger,
     LLMParamsDoc,
     SearchedDoc,
     ServiceType,
@@ -26,6 +27,9 @@ from comps.cores.proto.api_protocol import (
     RerankingResponseData,
 )
 
+logger = CustomLogger("reranking_tgi_gaudi")
+logflag = os.getenv("LOGFLAG", False)
+
 
 @register_microservice(
     name="opea_service@reranking_tgi_gaudi",
@@ -40,7 +44,8 @@ from comps.cores.proto.api_protocol import (
 def reranking(
     input: Union[SearchedDoc, RerankingRequest, ChatCompletionRequest]
 ) -> Union[LLMParamsDoc, RerankingResponse, ChatCompletionRequest]:
-
+    if logflag:
+        logger.info(input)
     start = time.time()
     reranking_results = []
     if input.retrieved_docs:
@@ -63,17 +68,25 @@ def reranking(
 
     statistics_dict["opea_service@reranking_tgi_gaudi"].append_latency(time.time() - start, None)
     if isinstance(input, SearchedDoc):
-        return LLMParamsDoc(query=input.initial_query, documents=[doc["text"] for doc in reranking_results])
+        result = [doc["text"] for doc in reranking_results]
+        if logflag:
+            logger.info(result)
+        return LLMParamsDoc(query=input.initial_query, documents=result)
     else:
         reranking_docs = []
         for doc in reranking_results:
             reranking_docs.append(RerankingResponseData(text=doc["text"], score=doc["score"]))
         if isinstance(input, RerankingRequest):
-            return RerankingResponse(reranked_docs=reranking_docs)
+            result = RerankingResponse(reranked_docs=reranking_docs)
+            if logflag:
+                logger.info(result)
+            return result
 
         if isinstance(input, ChatCompletionRequest):
             input.reranked_docs = reranking_docs
             input.documents = [doc["text"] for doc in reranking_results]
+            if logflag:
+                logger.info(input)
             return input
 
 

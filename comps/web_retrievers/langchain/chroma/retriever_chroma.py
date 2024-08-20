@@ -12,6 +12,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 from comps import (
+    CustomLogger,
     EmbedDoc,
     SearchedDoc,
     ServiceType,
@@ -21,6 +22,9 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+
+logger = CustomLogger("web_retriever_chroma")
+logflag = os.getenv("LOGFLAG", False)
 
 tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
 
@@ -37,7 +41,8 @@ def retrieve_htmls(all_urls):
 
 
 def parse_htmls(docs):
-    print("Indexing new urls...")
+    if logflag:
+        logger.info("Indexing new urls...")
 
     html2text = Html2TextTransformer()
     docs = list(html2text.transform_documents(docs))
@@ -59,6 +64,8 @@ def dump_docs(docs):
 )
 @register_statistics(names=["opea_service@web_retriever_chroma", "opea_service@search"])
 def web_retrieve(input: EmbedDoc) -> SearchedDoc:
+    if logflag:
+        logger.info(input)
     start = time.time()
     query = input.text
     embedding = input.embedding
@@ -70,10 +77,12 @@ def web_retrieve(input: EmbedDoc) -> SearchedDoc:
         if res.get("link", None):
             urls_to_look.append(res["link"])
     urls = list(set(urls_to_look))
-    print(f"urls: {urls}")
+    if logflag:
+        logger.info(f"urls: {urls}")
     docs = retrieve_htmls(urls)
     docs = parse_htmls(docs)
-    print(docs)
+    if logflag:
+        logger.info(docs)
     # Remove duplicated docs
     unique_documents_dict = {(doc.page_content, tuple(sorted(doc.metadata.items()))): doc for doc in docs}
     unique_documents = list(unique_documents_dict.values())
@@ -101,6 +110,8 @@ def web_retrieve(input: EmbedDoc) -> SearchedDoc:
     # For Now history is banned
     if vector_db.get()["ids"]:
         vector_db.delete(vector_db.get()["ids"])
+    if logflag:
+        logger.info(result)
     return result
 
 

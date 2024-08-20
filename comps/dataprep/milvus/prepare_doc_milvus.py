@@ -24,7 +24,7 @@ from langchain_milvus.vectorstores import Milvus
 from langchain_text_splitters import HTMLHeaderTextSplitter
 from pyspark import SparkConf, SparkContext
 
-from comps import DocPath, opea_microservices, register_microservice
+from comps import CustomLogger, DocPath, opea_microservices, register_microservice
 from comps.dataprep.utils import (
     create_upload_folder,
     document_loader,
@@ -36,6 +36,9 @@ from comps.dataprep.utils import (
     remove_folder_with_ignore,
     save_content_to_local_disk,
 )
+
+logger = CustomLogger("prepare_doc_milvus")
+logflag = os.getenv("LOGFLAG", False)
 
 # workaround notes: cp comps/dataprep/utils.py ./milvus/utils.py
 # from utils import document_loader, get_tables_result, parse_html
@@ -73,7 +76,8 @@ def ingest_data_to_milvus(doc_path: DocPath):
     """Ingest document to Milvus."""
     path = doc_path.path
     file_name = path.split("/")[-1]
-    print(f"[ ingest data ] Parsing document {path}, file name: {file_name}.")
+    if logflag:
+        logger.info(f"[ ingest data ] Parsing document {path}, file name: {file_name}.")
 
     if path.endswith(".html"):
         headers_to_split_on = [
@@ -92,22 +96,26 @@ def ingest_data_to_milvus(doc_path: DocPath):
     if doc_path.process_table and path.endswith(".pdf"):
         table_chunks = get_tables_result(path, doc_path.table_strategy)
         chunks = chunks + table_chunks
-    print("[ ingest data ] Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
+    if logflag:
+        logger.info("[ ingest data ] Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
 
     # Create vectorstore
     if MOSEC_EMBEDDING_ENDPOINT:
         # create embeddings using MOSEC endpoint service
-        print(
-            f"[ ingest data ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT}, MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}"
-        )
+        if logflag:
+            logger.info(
+                f"[ ingest data ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT}, MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}"
+            )
         embedder = MosecEmbeddings(model=MOSEC_EMBEDDING_MODEL)
     elif TEI_EMBEDDING_ENDPOINT:
         # create embeddings using TEI endpoint service
-        print(f"[ ingest data ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
+        if logflag:
+            logger.info(f"[ ingest data ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
         embedder = HuggingFaceHubEmbeddings(model=TEI_EMBEDDING_ENDPOINT)
     else:
         # create embeddings using local embedding model
-        print(f"[ ingest data ] Local TEI_EMBEDDING_MODEL:{TEI_EMBEDDING_MODEL}")
+        if logflag:
+            logger.info(f"[ ingest data ] Local TEI_EMBEDDING_MODEL:{TEI_EMBEDDING_MODEL}")
         embedder = HuggingFaceBgeEmbeddings(model_name=TEI_EMBEDDING_MODEL)
 
     # insert documents to Milvus
@@ -124,10 +132,12 @@ def ingest_data_to_milvus(doc_path: DocPath):
             partition_key_field=partition_field_name,
         )
     except Exception as e:
-        print(f"[ ingest data ] fail to ingest data into Milvus. error: {e}")
+        if logflag:
+            logger.info(f"[ ingest data ] fail to ingest data into Milvus. error: {e}")
         return False
 
-    print(f"[ ingest data ] Docs ingested from {path} to Milvus collection {COLLECTION_NAME}.")
+    if logflag:
+        logger.info(f"[ ingest data ] Docs ingested from {path} to Milvus collection {COLLECTION_NAME}.")
 
     return True
 
@@ -136,23 +146,30 @@ async def ingest_link_to_milvus(link_list: List[str]):
     # Create vectorstore
     if MOSEC_EMBEDDING_ENDPOINT:
         # create embeddings using MOSEC endpoint service
-        print(f"MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT},MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}")
+        if logflag:
+            logger.info(
+                f"MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT},MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}"
+            )
         embedder = MosecEmbeddings(model=MOSEC_EMBEDDING_MODEL)
     elif TEI_EMBEDDING_ENDPOINT:
         # create embeddings using TEI endpoint service
-        print(f"TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
+        if logflag:
+            logger.info(f"TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
         embedder = HuggingFaceHubEmbeddings(model=TEI_EMBEDDING_ENDPOINT)
     else:
         # create embeddings using local embedding model
-        print(f"Local TEI_EMBEDDING_MODEL:{TEI_EMBEDDING_MODEL}")
+        if logflag:
+            logger.info(f"Local TEI_EMBEDDING_MODEL:{TEI_EMBEDDING_MODEL}")
         embedder = HuggingFaceBgeEmbeddings(model_name=TEI_EMBEDDING_MODEL)
 
     for link in link_list:
         content = parse_html([link])[0][0]
-        print(f"[ ingest link ] link: {link} content: {content}")
+        if logflag:
+            logger.info(f"[ ingest link ] link: {link} content: {content}")
         encoded_link = encode_filename(link)
         save_path = upload_folder + encoded_link + ".txt"
-        print(f"[ ingest link ] save_path: {save_path}")
+        if logflag:
+            logger.info(f"[ ingest link ] save_path: {save_path}")
         await save_content_to_local_disk(save_path, content)
 
         document = Document(page_content=content, metadata={partition_field_name: encoded_link + ".txt"})
@@ -174,8 +191,9 @@ async def ingest_documents(
     process_table: bool = Form(False),
     table_strategy: str = Form("fast"),
 ):
-    print(f"files:{files}")
-    print(f"link_list:{link_list}")
+    if logflag:
+        logger.info(f"files:{files}")
+        logger.info(f"link_list:{link_list}")
     if files and link_list:
         raise HTTPException(status_code=400, detail="Provide either a file or a string list, not both.")
 
@@ -187,7 +205,8 @@ async def ingest_documents(
             save_path = upload_folder + file.filename
             await save_content_to_local_disk(save_path, file)
             uploaded_files.append(save_path)
-            print(f"Successfully saved file {save_path}")
+            if logflag:
+                logger.info(f"Successfully saved file {save_path}")
 
         def process_files_wrapper(files):
             if not isinstance(files, list):
@@ -218,7 +237,10 @@ async def ingest_documents(
         except:
             # Stop the SparkContext
             sc.stop()
-        return {"status": 200, "message": "Data preparation succeeded"}
+        results = {"status": 200, "message": "Data preparation succeeded"}
+        if logflag:
+            logger.info(results)
+        return results
 
     if link_list:
         try:
@@ -226,8 +248,12 @@ async def ingest_documents(
             if not isinstance(link_list, list):
                 raise HTTPException(status_code=400, detail="link_list should be a list.")
             await ingest_link_to_milvus(link_list)
-            print(f"Successfully saved link list {link_list}")
-            return {"status": 200, "message": "Data preparation succeeded"}
+            if logflag:
+                logger.info(f"Successfully saved link list {link_list}")
+            results = {"status": 200, "message": "Data preparation succeeded"}
+            if logflag:
+                logger.info(results)
+            return results
         except json.JSONDecodeError:
             raise HTTPException(status_code=400, detail="Invalid JSON format for link_list.")
 
@@ -238,30 +264,39 @@ async def ingest_documents(
     name="opea_service@prepare_doc_milvus_file", endpoint="/v1/dataprep/get_file", host="0.0.0.0", port=6011
 )
 async def rag_get_file_structure():
-    print("[ dataprep - get file ] start to get file structure")
+    if logflag:
+        logger.info("[ dataprep - get file ] start to get file structure")
 
     if not Path(upload_folder).exists():
-        print("No file uploaded, return empty list.")
+        if logflag:
+            logger.info("No file uploaded, return empty list.")
         return []
 
     file_content = get_file_structure(upload_folder)
+    if logflag:
+        logger.info(file_content)
     return file_content
 
 
 def delete_all_data(my_milvus):
-    print("[ delete ] deleting all data in milvus")
+    if logflag:
+        logger.info("[ delete ] deleting all data in milvus")
     my_milvus.delete(expr="pk >= 0")
     my_milvus.col.flush()
-    print("[ delete ] delete success: all data")
+    if logflag:
+        logger.info("[ delete ] delete success: all data")
 
 
 def delete_by_partition_field(my_milvus, partition_field):
-    print(f"[ delete ] deleting {partition_field_name} {partition_field}")
+    if logflag:
+        logger.info(f"[ delete ] deleting {partition_field_name} {partition_field}")
     pks = my_milvus.get_pks(f'{partition_field_name} == "{partition_field}"')
-    print(f"[ delete ] target pks: {pks}")
+    if logflag:
+        logger.info(f"[ delete ] target pks: {pks}")
     res = my_milvus.delete(pks)
     my_milvus.col.flush()
-    print(f"[ delete ] delete success: {res}")
+    if logflag:
+        logger.info(f"[ delete ] delete success: {res}")
 
 
 @register_microservice(
@@ -274,20 +309,25 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
         - file/link path (e.g. /path/to/file.txt)
         - "all": delete all files uploaded
     """
+    if logflag:
+        logger.info(file_path)
     # create embedder obj
     if MOSEC_EMBEDDING_ENDPOINT:
         # create embeddings using MOSEC endpoint service
-        print(
-            f"[ dataprep - del ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT},MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}"
-        )
+        if logflag:
+            logger.info(
+                f"[ dataprep - del ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT},MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}"
+            )
         embedder = MosecEmbeddings(model=MOSEC_EMBEDDING_MODEL)
     elif TEI_EMBEDDING_ENDPOINT:
         # create embeddings using TEI endpoint service
-        print(f"[ dataprep - del ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
+        if logflag:
+            logger.info(f"[ dataprep - del ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
         embedder = HuggingFaceHubEmbeddings(model=TEI_EMBEDDING_ENDPOINT)
     else:
         # create embeddings using local embedding model
-        print(f"[ dataprep - del ] Local TEI_EMBEDDING_MODEL:{TEI_EMBEDDING_MODEL}")
+        if logflag:
+            logger.info(f"[ dataprep - del ] Local TEI_EMBEDDING_MODEL:{TEI_EMBEDDING_MODEL}")
         embedder = HuggingFaceBgeEmbeddings(model_name=TEI_EMBEDDING_MODEL)
 
     # define Milvus obj
@@ -301,33 +341,45 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
 
     # delete all uploaded files
     if file_path == "all":
-        print("[ dataprep - del ] deleting all files")
+        if logflag:
+            logger.info("[ dataprep - del ] deleting all files")
         delete_all_data(my_milvus)
         remove_folder_with_ignore(upload_folder)
-        print("[ dataprep - del ] successfully delete all files.")
+        if logflag:
+            logger.info("[ dataprep - del ] successfully delete all files.")
         create_upload_folder(upload_folder)
+        if logflag:
+            logger.info({"status": True})
         return {"status": True}
 
     encode_file_name = encode_filename(file_path)
     delete_path = Path(upload_folder + "/" + encode_file_name)
-    print(f"[dataprep - del] delete_path: {delete_path}")
+    if logflag:
+        logger.info(f"[dataprep - del] delete_path: {delete_path}")
 
     # partially delete files
     if delete_path.exists():
         # file
         if delete_path.is_file():
-            print(f"[dataprep - del] deleting file {encode_file_name}")
+            if logflag:
+                logger.info(f"[dataprep - del] deleting file {encode_file_name}")
             try:
                 delete_by_partition_field(my_milvus, encode_file_name)
                 delete_path.unlink()
-                print(f"[dataprep - del] file {encode_file_name} deleted")
+                if logflag:
+                    logger.info(f"[dataprep - del] file {encode_file_name} deleted")
+                    logger.info({"status": True})
                 return {"status": True}
             except Exception as e:
-                print(f"[dataprep - del] fail to delete file {delete_path}: {e}")
+                if logflag:
+                    logger.info(f"[dataprep - del] fail to delete file {delete_path}: {e}")
+                    logger.info({"status": False})
                 return {"status": False}
         # folder
         else:
-            print("[dataprep - del] delete folder is not supported for now.")
+            if logflag:
+                logger.info("[dataprep - del] delete folder is not supported for now.")
+                logger.info({"status": False})
             return {"status": False}
     else:
         raise HTTPException(status_code=404, detail="File/folder not found. Please check del_path.")

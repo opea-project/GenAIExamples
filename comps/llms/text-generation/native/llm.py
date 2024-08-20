@@ -16,6 +16,7 @@ import sys
 sys.path.append("/test/GenAIComps/")
 
 import logging
+import os
 import threading
 import time
 
@@ -32,6 +33,8 @@ from comps import (
     register_microservice,
     register_statistics,
 )
+
+logflag = os.getenv("LOGFLAG", False)
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -140,7 +143,8 @@ def initialize():
 @register_statistics(names=["opea_service@llm_native"])
 def llm_generate(input: LLMParamsDoc):
     initialize()
-
+    if logflag:
+        logger.info(input)
     prompt = input.query
     prompt_template = None
     if input.chat_template:
@@ -158,7 +162,8 @@ def llm_generate(input: LLMParamsDoc):
             prompt = ChatTemplate.generate_rag_prompt(input.query, input.documents)
     res = generate([prompt])
 
-    logger.info(f"[llm - native] inference result: {res}")
+    if logflag:
+        logger.info(f"[llm - native] inference result: {res}")
     return GeneratedDoc(text=res[0], prompt=input.query)
 
 

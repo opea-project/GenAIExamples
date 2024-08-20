@@ -35,7 +35,7 @@ class CustomLogger:
                 self.__dict__[key.lower()] = functools.partial(self.log_message, level)
 
         # Set up log format and handler
-        self.format = logging.Formatter(fmt="[%(asctime)-15s] [%(levelname)8s] - %(message)s")
+        self.format = logging.Formatter(fmt="[%(asctime)-15s] [%(levelname)8s] - %(name)s - %(message)s")
         self.handler = logging.StreamHandler()
         self.handler.setFormatter(self.format)
 

@@ -8,6 +8,7 @@ from fastapi.responses import StreamingResponse
 from huggingface_hub import AsyncInferenceClient
 
 from comps import (
+    CustomLogger,
     LVMDoc,
     ServiceType,
     TextDoc,
@@ -16,6 +17,9 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+
+logger = CustomLogger("lvm_tgi")
+logflag = os.getenv("LOGFLAG", False)
 
 
 @register_microservice(
@@ -29,6 +33,8 @@ from comps import (
 )
 @register_statistics(names=["opea_service@lvm_tgi"])
 async def lvm(request: LVMDoc):
+    if logflag:
+        logger.info(request)
     start = time.time()
     stream_gen_time = []
     img_b64_str = request.image
@@ -60,9 +66,11 @@ async def lvm(request: LVMDoc):
                 stream_gen_time.append(time.time() - start)
                 chat_response += text
                 chunk_repr = repr(text.encode("utf-8"))
-                print(f"[llm - chat_stream] chunk:{chunk_repr}")
+                if logflag:
+                    logger.info(f"[llm - chat_stream] chunk:{chunk_repr}")
                 yield f"data: {chunk_repr}\n\n"
-            print(f"[llm - chat_stream] stream response: {chat_response}")
+            if logflag:
+                logger.info(f"[llm - chat_stream] stream response: {chat_response}")
             statistics_dict["opea_service@lvm_tgi"].append_latency(stream_gen_time[-1], stream_gen_time[0])
             yield "data: [DONE]\n\n"
 
@@ -77,11 +85,13 @@ async def lvm(request: LVMDoc):
             top_p=top_p,
         )
         statistics_dict["opea_service@lvm_tgi"].append_latency(time.time() - start, None)
+        if logflag:
+            logger.info(generated_str)
         return TextDoc(text=generated_str)
 
 
 if __name__ == "__main__":
     lvm_endpoint = os.getenv("LVM_ENDPOINT", "http://localhost:8399")
     lvm_client = AsyncInferenceClient(lvm_endpoint)
-    print("[LVM] LVM initialized.")
+    logger.info("[LVM] LVM initialized.")
     opea_microservices["opea_service@lvm_tgi"].start()

@@ -20,7 +20,7 @@ from langchain_text_splitters import HTMLHeaderTextSplitter
 from redis.commands.search.field import TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 
-from comps import DocPath, opea_microservices, register_microservice
+from comps import CustomLogger, DocPath, opea_microservices, register_microservice
 from comps.dataprep.utils import (
     create_upload_folder,
     document_loader,
@@ -33,63 +33,81 @@ from comps.dataprep.utils import (
     save_content_to_local_disk,
 )
 
+logger = CustomLogger("prepare_doc_redis")
+logflag = os.getenv("LOGFLAG", False)
+
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 upload_folder = "./uploaded_files/"
 redis_pool = redis.ConnectionPool.from_url(REDIS_URL)
 
 
 def check_index_existance(client):
-    print(f"[ check index existence ] checking {client}")
+    if logflag:
+        logger.info(f"[ check index existence ] checking {client}")
     try:
         results = client.search("*")
-        print(f"[ check index existence ] index of client exists: {client}")
+        if logflag:
+            logger.info(f"[ check index existence ] index of client exists: {client}")
         return results
     except Exception as e:
-        print(f"[ check index existence ] index does not exist: {e}")
+        if logflag:
+            logger.info(f"[ check index existence ] index does not exist: {e}")
         return None
 
 
 def create_index(client, index_name: str = KEY_INDEX_NAME):
-    print(f"[ create index ] creating index {index_name}")
+    if logflag:
+        logger.info(f"[ create index ] creating index {index_name}")
     try:
         definition = IndexDefinition(index_type=IndexType.HASH, prefix=["file:"])
         client.create_index((TextField("file_name"), TextField("key_ids")), definition=definition)
-        print(f"[ create index ] index {index_name} successfully created")
+        if logflag:
+            logger.info(f"[ create index ] index {index_name} successfully created")
     except Exception as e:
-        print(f"[ create index ] fail to create index {index_name}: {e}")
+        if logflag:
+            logger.info(f"[ create index ] fail to create index {index_name}: {e}")
         return False
     return True
 
 
 def store_by_id(client, key, value):
-    print(f"[ store by id ] storing ids of {key}")
+    if logflag:
+        logger.info(f"[ store by id ] storing ids of {key}")
     try:
         client.add_document(doc_id="file:" + key, file_name=key, key_ids=value)
-        print(f"[ store by id ] store document success. id: file:{key}")
+        if logflag:
+            logger.info(f"[ store by id ] store document success. id: file:{key}")
     except Exception as e:
-        print(f"[ store by id ] fail to store document file:{key}: {e}")
+        if logflag:
+            logger.info(f"[ store by id ] fail to store document file:{key}: {e}")
         return False
     return True
 
 
 def search_by_id(client, doc_id):
-    print(f"[ search by id ] searching docs of {doc_id}")
+    if logflag:
+        logger.info(f"[ search by id ] searching docs of {doc_id}")
     try:
         results = client.load_document(doc_id)
-        print(f"[ search by id ] search success of {doc_id}: {results}")
+        if logflag:
+            logger.info(f"[ search by id ] search success of {doc_id}: {results}")
         return results
     except Exception as e:
-        print(f"[ search by id ] fail to search docs of {doc_id}: {e}")
+        if logflag:
+            logger.info(f"[ search by id ] fail to search docs of {doc_id}: {e}")
         return None
 
 
 def drop_index(index_name, redis_url=REDIS_URL):
-    print(f"[ drop index ] dropping index {index_name}")
+    if logflag:
+        logger.info(f"[ drop index ] dropping index {index_name}")
     try:
         assert Redis.drop_index(index_name=index_name, delete_documents=True, redis_url=redis_url)
-        print(f"[ drop index ] index {index_name} deleted")
+        if logflag:
+            logger.info(f"[ drop index ] index {index_name} deleted")
     except Exception as e:
-        print(f"[ drop index ] index {index_name} delete failed: {e}")
+        if logflag:
+            logger.info(f"[ drop index ] index {index_name} delete failed: {e}")
         return False
     return True
 
@@ -97,15 +115,18 @@ def drop_index(index_name, redis_url=REDIS_URL):
 def delete_by_id(client, id):
     try:
         assert client.delete_document(id)
-        print(f"[ delete by id ] delete id success: {id}")
+        if logflag:
+            logger.info(f"[ delete by id ] delete id success: {id}")
     except Exception as e:
-        print(f"[ delete by id ] fail to delete ids {id}: {e}")
+        if logflag:
+            logger.info(f"[ delete by id ] fail to delete ids {id}: {e}")
         return False
     return True
 
 
 def ingest_chunks_to_redis(file_name: str, chunks: List):
-    print(f"[ ingest chunks ] file name: {file_name}")
+    if logflag:
+        logger.info(f"[ ingest chunks ] file name: {file_name}")
     # Create vectorstore
     if tei_embedding_endpoint:
         # create embeddings using TEI endpoint service
@@ -120,7 +141,8 @@ def ingest_chunks_to_redis(file_name: str, chunks: List):
 
     file_ids = []
     for i in range(0, num_chunks, batch_size):
-        print(f"[ ingest chunks ] Current batch: {i}")
+        if logflag:
+            logger.info(f"[ ingest chunks ] Current batch: {i}")
         batch_chunks = chunks[i : i + batch_size]
         batch_texts = batch_chunks
 
@@ -130,9 +152,11 @@ def ingest_chunks_to_redis(file_name: str, chunks: List):
             index_name=INDEX_NAME,
             redis_url=REDIS_URL,
         )
-        print(f"[ ingest chunks ] keys: {keys}")
+        if logflag:
+            logger.info(f"[ ingest chunks ] keys: {keys}")
         file_ids.extend(keys)
-        print(f"[ ingest chunks ] Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
+        if logflag:
+            logger.info(f"[ ingest chunks ] Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
 
     # store file_ids into index file-keys
     r = redis.Redis(connection_pool=redis_pool)
@@ -143,7 +167,8 @@ def ingest_chunks_to_redis(file_name: str, chunks: List):
     try:
         assert store_by_id(client, key=file_name, value="#".join(file_ids))
     except Exception as e:
-        print(f"[ ingest chunks ] {e}. Fail to store chunks of file {file_name}.")
+        if logflag:
+            logger.info(f"[ ingest chunks ] {e}. Fail to store chunks of file {file_name}.")
         raise HTTPException(status_code=500, detail=f"Fail to store chunks of file {file_name}.")
     return True
 
@@ -151,7 +176,8 @@ def ingest_chunks_to_redis(file_name: str, chunks: List):
 def ingest_data_to_redis(doc_path: DocPath):
     """Ingest document to Redis."""
     path = doc_path.path
-    print(f"Parsing document {path}.")
+    if logflag:
+        logger.info(f"Parsing document {path}.")
 
     if path.endswith(".html"):
         headers_to_split_on = [
@@ -174,7 +200,8 @@ def ingest_data_to_redis(doc_path: DocPath):
     if doc_path.process_table and path.endswith(".pdf"):
         table_chunks = get_tables_result(path, doc_path.table_strategy)
         chunks = chunks + table_chunks
-    print("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
+    if logflag:
+        logger.info("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
 
     file_name = doc_path.path.split("/")[-1]
     return ingest_chunks_to_redis(file_name, chunks)
@@ -189,8 +216,9 @@ async def ingest_documents(
     process_table: bool = Form(False),
     table_strategy: str = Form("fast"),
 ):
-    print(f"files:{files}")
-    print(f"link_list:{link_list}")
+    if logflag:
+        logger.info(f"files:{files}")
+        logger.info(f"link_list:{link_list}")
 
     r = redis.Redis(connection_pool=redis_pool)
     client = r.ft(KEY_INDEX_NAME)
@@ -208,9 +236,10 @@ async def ingest_documents(
             key_ids = None
             try:
                 key_ids = search_by_id(client, doc_id).key_ids
-                print(f"[ upload file ] File {file.filename} already exists.")
+                if logflag:
+                    logger.info(f"[ upload file ] File {file.filename} already exists.")
             except Exception as e:
-                print(f"[ upload file ] File {file.filename} does not exist.")
+                logger.info(f"[ upload file ] File {file.filename} does not exist.")
             if key_ids:
                 raise HTTPException(
                     status_code=400, detail=f"Uploaded file {file.filename} already exists. Please change file name."
@@ -228,7 +257,8 @@ async def ingest_documents(
                 )
             )
             uploaded_files.append(save_path)
-            print(f"Successfully saved file {save_path}")
+            if logflag:
+                logger.info(f"Successfully saved file {save_path}")
 
         # def process_files_wrapper(files):
         #     if not isinstance(files, list):
@@ -251,8 +281,10 @@ async def ingest_documents(
         # except:
         #     # Stop the SparkContext
         #     sc.stop()
-
-        return {"status": 200, "message": "Data preparation succeeded"}
+        result = {"status": 200, "message": "Data preparation succeeded"}
+        if logflag:
+            logger.info(result)
+        return result
 
     if link_list:
         link_list = json.loads(link_list)  # Parse JSON string to list
@@ -266,9 +298,10 @@ async def ingest_documents(
             key_ids = None
             try:
                 key_ids = search_by_id(client, doc_id).key_ids
-                print(f"[ upload file ] Link {link} already exists.")
+                if logflag:
+                    logger.info(f"[ upload file ] Link {link} already exists.")
             except Exception as e:
-                print(f"[ upload file ] Link {link} does not exist. Keep storing.")
+                logger.info(f"[ upload file ] Link {link} does not exist. Keep storing.")
             if key_ids:
                 raise HTTPException(
                     status_code=400, detail=f"Uploaded link {link} already exists. Please change another link."
@@ -286,7 +319,9 @@ async def ingest_documents(
                     table_strategy=table_strategy,
                 )
             )
-        print(f"Successfully saved link list {link_list}")
+        if logflag:
+            logger.info(f"Successfully saved link list {link_list}")
+            logger.info({"status": 200, "message": "Data preparation succeeded"})
         return {"status": 200, "message": "Data preparation succeeded"}
 
     raise HTTPException(status_code=400, detail="Must provide either a file or a string list.")
@@ -296,7 +331,8 @@ async def ingest_documents(
     name="opea_service@prepare_doc_redis", endpoint="/v1/dataprep/get_file", host="0.0.0.0", port=6007
 )
 async def rag_get_file_structure():
-    print("[ dataprep - get file ] start to get file structure")
+    if logflag:
+        logger.info("[ dataprep - get file ] start to get file structure")
 
     # define redis client
     r = redis.Redis(connection_pool=redis_pool)
@@ -312,6 +348,8 @@ async def rag_get_file_structure():
         # last batch
         if (len(response) - 1) // 2 < SEARCH_BATCH_SIZE:
             break
+    if logflag:
+        logger.info(file_list)
     return file_list
 
 
@@ -333,41 +371,50 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
 
     # delete all uploaded files
     if file_path == "all":
-        print("[dataprep - del] delete all files")
+        if logflag:
+            logger.info("[dataprep - del] delete all files")
 
         # drop index KEY_INDEX_NAME
         if check_index_existance(client):
             try:
                 assert drop_index(index_name=KEY_INDEX_NAME)
             except Exception as e:
-                print(f"[dataprep - del] {e}. Fail to drop index {KEY_INDEX_NAME}.")
+                if logflag:
+                    logger.info(f"[dataprep - del] {e}. Fail to drop index {KEY_INDEX_NAME}.")
                 raise HTTPException(status_code=500, detail=f"Fail to drop index {KEY_INDEX_NAME}.")
         else:
-            print(f"[dataprep - del] Index {KEY_INDEX_NAME} does not exits.")
+            logger.info(f"[dataprep - del] Index {KEY_INDEX_NAME} does not exits.")
 
         # drop index INDEX_NAME
         if check_index_existance(client2):
             try:
                 assert drop_index(index_name=INDEX_NAME)
             except Exception as e:
-                print(f"[dataprep - del] {e}. Fail to drop index {INDEX_NAME}.")
+                if logflag:
+                    logger.info(f"[dataprep - del] {e}. Fail to drop index {INDEX_NAME}.")
                 raise HTTPException(status_code=500, detail=f"Fail to drop index {INDEX_NAME}.")
         else:
-            print(f"[dataprep - del] Index {INDEX_NAME} does not exits.")
+            if logflag:
+                logger.info(f"[dataprep - del] Index {INDEX_NAME} does not exits.")
 
         # delete files on local disk
         try:
             remove_folder_with_ignore(upload_folder)
         except Exception as e:
-            print(f"[dataprep - del] {e}. Fail to delete {upload_folder}.")
+            if logflag:
+                logger.info(f"[dataprep - del] {e}. Fail to delete {upload_folder}.")
             raise HTTPException(status_code=500, detail=f"Fail to delete {upload_folder}.")
 
-        print("[dataprep - del] successfully delete all files.")
+        if logflag:
+            logger.info("[dataprep - del] successfully delete all files.")
         create_upload_folder(upload_folder)
+        if logflag:
+            logger.info({"status": True})
         return {"status": True}
 
     delete_path = Path(upload_folder + "/" + encode_filename(file_path))
-    print(f"[dataprep - del] delete_path: {delete_path}")
+    if logflag:
+        logger.info(f"[dataprep - del] delete_path: {delete_path}")
 
     # partially delete files
     if delete_path.exists():
@@ -377,7 +424,8 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
         try:
             key_ids = search_by_id(client, doc_id).key_ids
         except Exception as e:
-            print(f"[dataprep - del] {e}, File {file_path} does not exists.")
+            if logflag:
+                logger.info(f"[dataprep - del] {e}, File {file_path} does not exists.")
             raise HTTPException(
                 status_code=404, detail=f"File not found in db {KEY_INDEX_NAME}. Please check file_path."
             )
@@ -389,7 +437,8 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
             try:
                 assert delete_by_id(client, doc_id)
             except Exception as e:
-                print(f"[dataprep - del] {e}. File {file_path} delete failed for db {KEY_INDEX_NAME}.")
+                if logflag:
+                    logger.info(f"[dataprep - del] {e}. File {file_path} delete failed for db {KEY_INDEX_NAME}.")
                 raise HTTPException(status_code=500, detail=f"File {file_path} delete failed.")
 
             # delete file content in db INDEX_NAME
@@ -398,7 +447,8 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
                 try:
                     content = search_by_id(client2, file_id).content
                 except Exception as e:
-                    print(f"[dataprep - del] {e}. File {file_path} does not exists.")
+                    if logflag:
+                        logger.info(f"[dataprep - del] {e}. File {file_path} does not exists.")
                     raise HTTPException(
                         status_code=404, detail=f"File not found in db {INDEX_NAME}. Please check file_path."
                     )
@@ -407,17 +457,20 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
                 try:
                     assert delete_by_id(client2, file_id)
                 except Exception as e:
-                    print(f"[dataprep - del] {e}. File {file_path} delete failed for db {INDEX_NAME}")
+                    if logflag:
+                        logger.info(f"[dataprep - del] {e}. File {file_path} delete failed for db {INDEX_NAME}")
                     raise HTTPException(status_code=500, detail=f"File {file_path} delete failed.")
 
             # delete file on local disk
             delete_path.unlink()
-
+            if logflag:
+                logger.info({"status": True})
             return {"status": True}
 
         # delete folder
         else:
-            print(f"[dataprep - del] Delete folder {file_path} is not supported for now.")
+            if logflag:
+                logger.info(f"[dataprep - del] Delete folder {file_path} is not supported for now.")
             raise HTTPException(status_code=404, detail=f"Delete folder {file_path} is not supported for now.")
     else:
         raise HTTPException(status_code=404, detail=f"File {file_path} not found. Please check file_path.")

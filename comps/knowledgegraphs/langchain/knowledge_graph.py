@@ -23,7 +23,10 @@ from langchain_community.graphs import Neo4jGraph
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores.neo4j_vector import Neo4jVector
 
-from comps import GeneratedDoc, GraphDoc, ServiceType, opea_microservices, register_microservice
+from comps import CustomLogger, GeneratedDoc, GraphDoc, ServiceType, opea_microservices, register_microservice
+
+logger = CustomLogger("knowledge_graph")
+logflag = os.getenv("LOGFLAG", False)
 
 
 def get_retriever(input, neo4j_endpoint, neo4j_username, neo4j_password, llm):
@@ -105,7 +108,8 @@ def get_agent(vector_qa, cypher_chain, llm_repo_id):
     port=8060,
 )
 def graph_query(input: GraphDoc) -> GeneratedDoc:
-    print(input)
+    if logflag:
+        logger.info(input)
 
     ## Connect to Neo4j
     neo4j_endpoint = os.getenv("NEO4J_ENDPOINT", "neo4j://localhost:7687")
@@ -154,6 +158,8 @@ def graph_query(input: GraphDoc) -> GeneratedDoc:
         result = agent_executor.invoke({"input": input.text})["output"]
     else:
         result = "Please specify strtype as one of cypher, rag, query."
+    if logflag:
+        logger.info(result)
     return GeneratedDoc(text=result, prompt=input.text)
 
 

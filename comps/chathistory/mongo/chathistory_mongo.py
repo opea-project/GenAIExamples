@@ -1,13 +1,18 @@
 ﻿# Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+import os
 from typing import Optional
 
 from fastapi import HTTPException
 from mongo_store import DocumentStore
 from pydantic import BaseModel
 
+from comps import CustomLogger
 from comps.cores.mega.micro_service import opea_microservices, register_microservice
 from comps.cores.proto.api_protocol import ChatCompletionRequest
+
+logger = CustomLogger("chathistory_mongo")
+logflag = os.getenv("LOGFLAG", False)
 
 
 class ChatMessage(BaseModel):
@@ -50,7 +55,8 @@ async def create_documents(document: ChatMessage):
     Returns:
         The result of the operation if successful, None otherwise.
     """
-
+    if logflag:
+        logger.info(document)
     try:
         if document.data.user is None:
             raise HTTPException(status_code=500, detail="Please provide the user information")
@@ -62,10 +68,12 @@ async def create_documents(document: ChatMessage):
             res = await store.update_document(document.id, document.data, document.first_query)
         else:
             res = await store.save_document(document)
+        if logflag:
+            logger.info(res)
         return res
     except Exception as e:
         # Handle the exception here
-        print(f"An error occurred: {str(e)}")
+        logger.info(f"An error occurred: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -85,6 +93,8 @@ async def get_documents(document: ChatId):
     Returns:
         The retrieved documents if successful, None otherwise.
     """
+    if logflag:
+        logger.info(document)
     try:
         store = DocumentStore(document.user)
         store.initialize_storage()
@@ -92,10 +102,12 @@ async def get_documents(document: ChatId):
             res = await store.get_all_documents_of_user()
         else:
             res = await store.get_user_documents_by_id(document.id)
+        if logflag:
+            logger.info(res)
         return res
     except Exception as e:
         # Handle the exception here
-        print(f"An error occurred: {str(e)}")
+        logger.info(f"An error occurred: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -115,6 +127,8 @@ async def delete_documents(document: ChatId):
     Returns:
         The result of the deletion if successful, None otherwise.
     """
+    if logflag:
+        logger.info(document)
     try:
         store = DocumentStore(document.user)
         store.initialize_storage()
@@ -122,10 +136,12 @@ async def delete_documents(document: ChatId):
             raise Exception("Document id is required.")
         else:
             res = await store.delete_document(document.id)
+        if logflag:
+            logger.info(res)
         return res
     except Exception as e:
         # Handle the exception here
-        print(f"An error occurred: {str(e)}")
+        logger.info(f"An error occurred: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

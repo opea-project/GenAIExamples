@@ -9,6 +9,7 @@ import time
 import requests
 
 from comps import (
+    CustomLogger,
     LVMDoc,
     ServiceType,
     TextDoc,
@@ -17,6 +18,9 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+
+logger = CustomLogger("lvm")
+logflag = os.getenv("LOGFLAG", False)
 
 
 @register_microservice(
@@ -30,6 +34,8 @@ from comps import (
 )
 @register_statistics(names=["opea_service@lvm"])
 async def lvm(request: LVMDoc):
+    if logflag:
+        logger.info(request)
     start = time.time()
     img_b64_str = request.image
     prompt = request.prompt
@@ -41,11 +47,14 @@ async def lvm(request: LVMDoc):
     response = requests.post(url=f"{lvm_endpoint}/generate", data=json.dumps(inputs), proxies={"http": None})
 
     statistics_dict["opea_service@lvm"].append_latency(time.time() - start, None)
-    return TextDoc(text=response.json()["text"])
+    result = response.json()["text"]
+    if logflag:
+        logger.info(result)
+    return TextDoc(text=result)
 
 
 if __name__ == "__main__":
     lvm_endpoint = os.getenv("LVM_ENDPOINT", "http://localhost:8399")
 
-    print("[LVM] LVM initialized.")
+    logger.info("[LVM] LVM initialized.")
     opea_microservices["opea_service@lvm"].start()

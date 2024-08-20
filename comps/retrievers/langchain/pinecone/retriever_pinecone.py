@@ -10,6 +10,7 @@ from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone, ServerlessSpec
 
 from comps import (
+    CustomLogger,
     EmbedDoc,
     SearchedDoc,
     ServiceType,
@@ -19,6 +20,9 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+
+logger = CustomLogger("retriever_pinecone")
+logflag = os.getenv("LOGFLAG", False)
 
 tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
 
@@ -32,16 +36,21 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
 )
 @register_statistics(names=["opea_service@retriever_pinecone"])
 def retrieve(input: EmbedDoc) -> SearchedDoc:
+    if logflag:
+        logger.info(input)
     start = time.time()
 
     pc = Pinecone(api_key=PINECONE_API_KEY)
 
     index = pc.Index(PINECONE_INDEX_NAME)
-    print(index.describe_index_stats()["total_vector_count"])
+    if logflag:
+        logger.info(index.describe_index_stats()["total_vector_count"])
     # check if the Pinecone index has data
     if index.describe_index_stats()["total_vector_count"] == 0:
         result = SearchedDoc(retrieved_docs=[], initial_query=input.text)
         statistics_dict["opea_service@retriever_pinecone"].append_latency(time.time() - start, None)
+        if logflag:
+            logger.info(result)
         return result
 
     search_res = vector_db.max_marginal_relevance_search(query=input.text, k=input.k, fetch_k=input.fetch_k)
@@ -66,6 +75,8 @@ def retrieve(input: EmbedDoc) -> SearchedDoc:
         searched_docs.append(TextDoc(text=r.page_content))
     result = SearchedDoc(retrieved_docs=searched_docs, initial_query=input.text)
     statistics_dict["opea_service@retriever_pinecone"].append_latency(time.time() - start, None)
+    if logflag:
+        logger.info(result)
     return result
 
 

@@ -17,7 +17,10 @@ import os
 from fastapi.responses import StreamingResponse
 from langchain_openai import ChatOpenAI
 
-from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
+from comps import CustomLogger, GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
+
+logger = CustomLogger("llm_vllm_ray")
+logflag = os.getenv("LOGFLAG", False)
 
 
 @register_microservice(
@@ -28,6 +31,8 @@ from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, r
     port=9000,
 )
 def llm_generate(input: LLMParamsDoc):
+    if logflag:
+        logger.info(input)
     llm_endpoint = os.getenv("vLLM_RAY_ENDPOINT", "http://localhost:8006")
     llm_model = os.getenv("LLM_MODEL", "meta-llama/Llama-2-7b-chat-hf")
     llm = ChatOpenAI(
@@ -49,13 +54,16 @@ def llm_generate(input: LLMParamsDoc):
                 chat_response += text
                 chunk_repr = repr(text.encode("utf-8"))
                 yield f"data: {chunk_repr}\n\n"
-            print(f"[llm - chat_stream] stream response: {chat_response}")
+            if logflag:
+                logger.info(f"[llm - chat_stream] stream response: {chat_response}")
             yield "data: [DONE]\n\n"
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     else:
         response = llm.invoke(input.query)
         response = response.content
+        if logflag:
+            logger.info(response)
         return GeneratedDoc(text=response, prompt=input.query)
 
 

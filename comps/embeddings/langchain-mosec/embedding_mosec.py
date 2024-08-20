@@ -8,6 +8,7 @@ from typing import List, Optional
 from langchain_community.embeddings import OpenAIEmbeddings
 
 from comps import (
+    CustomLogger,
     EmbedDoc,
     ServiceType,
     TextDoc,
@@ -16,6 +17,9 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+
+logger = CustomLogger("embedding_mosec")
+logflag = os.getenv("LOGFLAG", False)
 
 
 class MosecEmbeddings(OpenAIEmbeddings):
@@ -54,10 +58,14 @@ class MosecEmbeddings(OpenAIEmbeddings):
 )
 @register_statistics(names=["opea_service@embedding_mosec"])
 def embedding(input: TextDoc) -> EmbedDoc:
+    if logflag:
+        logger.info(input)
     start = time.time()
     embed_vector = embeddings.embed_query(input.text)
     res = EmbedDoc(text=input.text, embedding=embed_vector)
     statistics_dict["opea_service@embedding_mosec"].append_latency(time.time() - start, None)
+    if logflag:
+        logger.info(res)
     return res
 
 
@@ -67,5 +75,5 @@ if __name__ == "__main__":
     os.environ["OPENAI_API_KEY"] = "Dummy key"
     MODEL_ID = "/home/user/bge-large-zh-v1.5"
     embeddings = MosecEmbeddings(model=MODEL_ID)
-    print("Mosec Embedding initialized.")
+    logger.info("Mosec Embedding initialized.")
     opea_microservices["opea_service@embedding_mosec"].start()

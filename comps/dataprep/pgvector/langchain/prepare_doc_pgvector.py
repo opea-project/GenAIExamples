@@ -14,7 +14,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores import PGVector
 
-from comps import DocPath, opea_microservices, register_microservice
+from comps import CustomLogger, DocPath, opea_microservices, register_microservice
 from comps.dataprep.utils import (
     create_upload_folder,
     document_loader,
@@ -25,6 +25,9 @@ from comps.dataprep.utils import (
     remove_folder_with_ignore,
     save_content_to_local_disk,
 )
+
+logger = CustomLogger("prepare_doc_pgvector")
+logflag = os.getenv("LOGFLAG", False)
 
 tei_embedding_endpoint = os.getenv("TEI_ENDPOINT")
 upload_folder = "./uploaded_files/"
@@ -37,7 +40,8 @@ async def save_file_to_local_disk(save_path: str, file):
             content = await file.read()
             fout.write(content)
         except Exception as e:
-            print(f"Write file failed. Exception: {e}")
+            if logflag:
+                logger.info(f"Write file failed. Exception: {e}")
             raise HTTPException(status_code=500, detail=f"Write file {save_path} failed. Exception: {e}")
 
 
@@ -54,7 +58,9 @@ def delete_embeddings(doc_name):
         connection = psycopg2.connect(database=database, user=username, password=password, host=hostname, port=port)
 
         # Create a cursor object to execute SQL queries
-        print(f"Deleting {doc_name} from vectorstore")
+
+        if logflag:
+            logger.info(f"Deleting {doc_name} from vectorstore")
 
         cur = connection.cursor()
         if doc_name == "all":
@@ -75,26 +81,30 @@ def delete_embeddings(doc_name):
         return True
 
     except psycopg2.Error as e:
-        print(f"Error deleting document from vectorstore: {e}")
+        if logflag:
+            logger.info(f"Error deleting document from vectorstore: {e}")
         return False
 
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        if logflag:
+            logger.info(f"An unexpected error occurred: {e}")
         return False
 
 
 def ingest_doc_to_pgvector(doc_path: DocPath):
     """Ingest document to PGVector."""
     doc_path = doc_path.path
-    print(f"Parsing document {doc_path}.")
+    if logflag:
+        logger.info(f"Parsing document {doc_path}.")
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP, add_start_index=True, separators=get_separators()
     )
     content = document_loader(doc_path)
     chunks = text_splitter.split_text(content)
-    print("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
-    print("PG Connection", PG_CONNECTION_STRING)
+    if logflag:
+        logger.info("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
+        logger.info("PG Connection", PG_CONNECTION_STRING)
     metadata = [dict({"doc_name": str(doc_path)})]
 
     # Create vectorstore
@@ -119,7 +129,8 @@ def ingest_doc_to_pgvector(doc_path: DocPath):
             collection_name=INDEX_NAME,
             connection_string=PG_CONNECTION_STRING,
         )
-        print(f"Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
+        if logflag:
+            logger.info(f"Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
     return True
 
 
@@ -139,11 +150,13 @@ async def ingest_link_to_pgvector(link_list: List[str]):
     for link in link_list:
         texts = []
         content = parse_html([link])[0][0]
-        print(f"[ ingest link ] link: {link} content: {content}")
+        if logflag:
+            logger.info(f"[ ingest link ] link: {link} content: {content}")
         encoded_link = encode_filename(link)
         save_path = upload_folder + encoded_link + ".txt"
         doc_path = upload_folder + link + ".txt"
-        print(f"[ ingest link ] save_path: {save_path}")
+        if logflag:
+            logger.info(f"[ ingest link ] save_path: {save_path}")
         await save_content_to_local_disk(save_path, content)
         metadata = [dict({"doc_name": str(doc_path)})]
 
@@ -162,7 +175,8 @@ async def ingest_link_to_pgvector(link_list: List[str]):
                 collection_name=INDEX_NAME,
                 connection_string=PG_CONNECTION_STRING,
             )
-            print(f"Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
+            if logflag:
+                logger.info(f"Processed batch {i//batch_size + 1}/{(num_chunks-1)//batch_size + 1}")
 
     return True
 
@@ -176,8 +190,9 @@ async def ingest_link_to_pgvector(link_list: List[str]):
 async def ingest_documents(
     files: Optional[Union[UploadFile, List[UploadFile]]] = File(None), link_list: Optional[str] = Form(None)
 ):
-    print(f"files:{files}")
-    print(f"link_list:{link_list}")
+    if logflag:
+        logger.info(f"files:{files}")
+        logger.info(f"link_list:{link_list}")
     if files and link_list:
         raise HTTPException(status_code=400, detail="Provide either a file or a string list, not both.")
 
@@ -192,8 +207,12 @@ async def ingest_documents(
             await save_file_to_local_disk(save_path, file)
 
             ingest_doc_to_pgvector(DocPath(path=save_path))
-            print(f"Successfully saved file {save_path}")
-        return {"status": 200, "message": "Data preparation succeeded"}
+            if logflag:
+                logger.info(f"Successfully saved file {save_path}")
+        result = {"status": 200, "message": "Data preparation succeeded"}
+        if logflag:
+            logger.info(result)
+        return result
 
     if link_list:
         try:
@@ -201,8 +220,12 @@ async def ingest_documents(
             if not isinstance(link_list, list):
                 raise HTTPException(status_code=400, detail="link_list should be a list.")
             await ingest_link_to_pgvector(link_list)
-            print(f"Successfully saved link list {link_list}")
-            return {"status": 200, "message": "Data preparation succeeded"}
+            if logflag:
+                logger.info(f"Successfully saved link list {link_list}")
+            result = {"status": 200, "message": "Data preparation succeeded"}
+            if logflag:
+                logger.info(result)
+            return result
         except json.JSONDecodeError:
             raise HTTPException(status_code=400, detail="Invalid JSON format for link_list.")
 
@@ -213,13 +236,17 @@ async def ingest_documents(
     name="opea_service@prepare_doc_pgvector", endpoint="/v1/dataprep/get_file", host="0.0.0.0", port=6007
 )
 async def rag_get_file_structure():
-    print("[ dataprep - get file ] start to get file structure")
+    if logflag:
+        logger.info("[ dataprep - get file ] start to get file structure")
 
     if not Path(upload_folder).exists():
-        print("No file uploaded, return empty list.")
+        if logflag:
+            logger.info("No file uploaded, return empty list.")
         return []
 
     file_content = get_file_structure(upload_folder)
+    if logflag:
+        logger.info(file_content)
     return file_content
 
 
@@ -235,16 +262,21 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
         - "all": delete all files uploaded
     """
     if file_path == "all":
-        print("[dataprep - del] delete all files")
+        if logflag:
+            logger.info("[dataprep - del] delete all files")
         remove_folder_with_ignore(upload_folder)
         assert delete_embeddings(file_path)
-        print("[dataprep - del] successfully delete all files.")
+        if logflag:
+            logger.info("[dataprep - del] successfully delete all files.")
         create_upload_folder(upload_folder)
+        if logflag:
+            logger.info({"status": True})
         return {"status": True}
 
     delete_path = Path(upload_folder + "/" + encode_filename(file_path))
     doc_path = upload_folder + file_path
-    print(f"[dataprep - del] delete_path: {delete_path}")
+    if logflag:
+        logger.info(f"[dataprep - del] delete_path: {delete_path}")
 
     # partially delete files/folders
     if delete_path.exists():
@@ -254,12 +286,18 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
                 assert delete_embeddings(doc_path)
                 delete_path.unlink()
             except Exception as e:
-                print(f"[dataprep - del] fail to delete file {delete_path}: {e}")
+                if logflag:
+                    logger.info(f"[dataprep - del] fail to delete file {delete_path}: {e}")
+                    logger.info({"status": False})
                 return {"status": False}
         # delete folder
         else:
-            print("[dataprep - del] delete folder is not supported for now.")
+            if logflag:
+                logger.info("[dataprep - del] delete folder is not supported for now.")
+                logger.info({"status": False})
             return {"status": False}
+        if logflag:
+            logger.info({"status": True})
         return {"status": True}
     else:
         raise HTTPException(status_code=404, detail="File/folder not found. Please check del_path.")
