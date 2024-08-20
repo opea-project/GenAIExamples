@@ -9,12 +9,18 @@ import { getCurrentTimeStamp, uuidv4 } from "../../common/util";
 import { createAsyncThunkWrapper } from "../thunkUtil";
 import client from "../../common/client";
 import { notifications } from "@mantine/notifications";
-import { CHAT_QNA_URL, DATA_PREP_URL } from "../../config";
+import {
+  CHAT_QNA_URL, 
+  DATA_PREP_URL,
+  DATA_PREP_GET_URL,
+  DATA_PREP_DELETE_URL,
+} from "../../config";
 
 const initialState: ConversationReducer = {
   conversations: [],
   selectedConversationId: "",
   onGoingResult: "",
+  filesInDataSource: [],
 };
 
 export const ConversationSlice = createSlice({
@@ -25,6 +31,7 @@ export const ConversationSlice = createSlice({
       state.conversations = [];
       state.selectedConversationId = "";
       state.onGoingResult = "";
+      state.filesInDataSource = [];
     },
     setOnGoingResult: (state, action: PayloadAction<string>) => {
       state.onGoingResult = action.payload;
@@ -75,30 +82,58 @@ export const ConversationSlice = createSlice({
         message: "Submit Failed",
       });
     });
+    builder.addCase(getAllFilesInDataSource.fulfilled, (state, action) => {
+      state.filesInDataSource = action.payload;
+    });
   },
 });
 
 export const submitDataSourceURL = createAsyncThunkWrapper(
   "conversation/submitDataSourceURL",
-  async ({ link_list }: { link_list: string[] }, {}) => {
+  async ({ link_list }: { link_list: string[] }, { dispatch }) => {
     const body = new FormData();
     body.append("link_list", JSON.stringify(link_list));
     const response = await client.post(DATA_PREP_URL, body);
+    dispatch(getAllFilesInDataSource({ knowledgeBaseId: "default" }));
     return response.data;
   },
 );
-export const uploadFile = createAsyncThunkWrapper("conversation/uploadFile", async ({ file }: { file: File }, {}) => {
-  const body = new FormData();
-  body.append("files", file);
+export const getAllFilesInDataSource = createAsyncThunkWrapper(
+  "conversation/getAllFilesInDataSource",
+  async ({ knowledgeBaseId }: { knowledgeBaseId: string }, {}) => {
+    const body = {
+      knowledge_base_id: knowledgeBaseId,
+    };
+    const response = await client.post(DATA_PREP_GET_URL, body);
+    return response.data;
+  },
+);
+export const deleteInDataSource = createAsyncThunkWrapper(
+  "conversation/deleteInDataSource",
+  async ({ file }: { file: any }, { dispatch }) => {
+    const response = await client.post(DATA_PREP_DELETE_URL, {
+      file_path: file,
+    });
+    dispatch(getAllFilesInDataSource({ knowledgeBaseId: "default" }));
+    return response.data;
+  },
+);
+export const uploadFile = createAsyncThunkWrapper(
+  "conversation/uploadFile",
+  async ({ file }: { file: File }, { dispatch }) => {
+    const body = new FormData();
+    body.append("files", file);
 
-  notifications.show({
-    id: "upload-file",
-    message: "uploading File",
-    loading: true,
-  });
-  const response = await client.post(DATA_PREP_URL, body);
-  return response.data;
-});
+    notifications.show({
+      id: "upload-file",
+      message: "uploading File",
+      loading: true,
+    });
+    const response = await client.post(DATA_PREP_URL, body);
+    dispatch(getAllFilesInDataSource({ knowledgeBaseId: "default" }));
+    return response.data;
+  },
+);
 export const {
   logout,
   setOnGoingResult,
@@ -159,8 +194,8 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
       onmessage(msg) {
         if (msg?.data != "[DONE]") {
           try {
-            const match = msg.data.match(/b'([^']*)'/);
-            if (match && match[1] != "</s>") {
+            /*const match = msg.data.match(/b'([^']*)'/);
+              if (match && match[1] != "</s>") {
               const extractedText = match[1];
 
               // Check for the presence of \x hexadecimal
@@ -179,6 +214,9 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
             if (result) {
               store.dispatch(setOnGoingResult(result));
             }
+            */
+            result += msg.data;
+            store.dispatch(setOnGoingResult(result));
           } catch (e) {
             console.log("something wrong in msg", e);
             throw e;

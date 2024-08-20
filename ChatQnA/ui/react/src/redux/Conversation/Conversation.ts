@@ -25,8 +25,13 @@ export interface Conversation {
   Messages: Message[];
 }
 
+type file = {
+  name: string;
+};
+
 export interface ConversationReducer {
   selectedConversationId: string;
   conversations: Conversation[];
   onGoingResult: string;
+  filesInDataSource: file[];
 }

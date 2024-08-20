@@ -58,7 +58,7 @@ const Conversation = ({ title }: ConversationProps) => {
       conversationId: selectedConversationId,
       userPrompt,
       messages,
-      model: "Intel/neural-chat-7b-v3-3",
+      model: "Qwen/Qwen2-7B",
     })
     setPrompt("")
   }
@@ -121,7 +121,7 @@ const Conversation = ({ title }: ConversationProps) => {
 
             {selectedConversation?.Messages.map((message) => {
               return (<ConversationMessage key={`_ai`} date={message.time * 1000} human={message.role == MessageRole.User} message={message.content} />)
-            })
+              })
             }
 
             {onGoingResult && (
