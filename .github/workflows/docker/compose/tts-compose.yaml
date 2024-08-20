@@ -4,10 +4,10 @@
 # this file should be run in the root of the repo
 # images used by GenAIExamples: reranking-tei
 services:
-  asr:
+  tts:
     build:
       dockerfile: comps/tts/Dockerfile
-    image: ${REGISTRY}opea/asr:${TAG:-latest}
+    image: ${REGISTRY}opea/tts:${TAG:-latest}
   speecht5:
     build:
       dockerfile: comps/tts/speecht5/Dockerfile
