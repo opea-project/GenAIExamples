@@ -272,7 +272,7 @@ spec:
             limits:
               habana.ai/gaudi: 1
               memory: 64Gi
-              hugepages-2Mi: 4400Mi
+              hugepages-2Mi: 500Mi
       volumes:
         - name: model-volume
           hostPath:
@@ -343,7 +343,7 @@ spec:
                 #            initialDelaySeconds: 5
                 #            periodSeconds: 5
                 #            failureThreshold: 120
-   CodeGen/kubernetes/manifests/gaudi/codegen.yaml             #          livenessProbe:
+                #          livenessProbe:
                 #            httpGet:
                 #              path: /
                 #              port: 7778
