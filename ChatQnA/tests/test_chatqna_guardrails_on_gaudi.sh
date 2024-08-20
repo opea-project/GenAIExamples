@@ -65,6 +65,17 @@ function start_services() {
         sleep 1s
         n=$((n+1))
     done
+
+    # Make sure tgi guardrails service is ready
+    n=0
+    until [[ "$n" -ge 400 ]]; do
+        docker logs tgi-guardrails-server > tgi_guardrails_service_start.log
+        if grep -q Connected tgi_guardrails_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
 }
 
 function validate_services() {
@@ -74,24 +85,27 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
 
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
-    else
+    # check response status
+    if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
+    # check response body
+    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
     sleep 1s
 }
 
@@ -101,7 +115,7 @@ function validate_microservices() {
     # tei for embedding service
     validate_services \
         "${ip_address}:8090/embed" \
-        "\[\[" \
+        "[[" \
         "tei-embedding" \
         "tei-embedding-gaudi-server" \
         '{"inputs":"What is Deep Learning?"}'
@@ -109,7 +123,7 @@ function validate_microservices() {
     # embedding microservice
     validate_services \
         "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":\[' \
+        '"text":"What is Deep Learning?","embedding":[' \
         "embedding" \
         "embedding-tei-server" \
         '{"text":"What is Deep Learning?"}'
@@ -120,7 +134,7 @@ function validate_microservices() {
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_services \
         "${ip_address}:7000/v1/retrieval" \
-        " " \
+        "retrieved_docs" \
         "retrieval" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
@@ -159,7 +173,7 @@ function validate_microservices() {
 
     # tgi for guardrails service
     validate_services \
-        "${ip_address}:8008/generate" \
+        "${ip_address}:8088/generate" \
         "generated_text" \
         "tgi-guardrails" \
         "tgi-guardrails-server" \
