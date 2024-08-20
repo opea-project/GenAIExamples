@@ -10,6 +10,11 @@ services:
         no_proxy: ${no_proxy}
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+  chatqna-guardrails:
+    build:
+      dockerfile: ./Dockerfile_guardrails
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna-guardrails:${TAG:-latest}
   chatqna-ui:
     build:
       context: ui
@@ -94,6 +99,12 @@ services:
       dockerfile: comps/dataprep/qdrant/docker/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
+  guardrails-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/guardrails/llama_guard/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/guardrails-tgi:${TAG:-latest}
   tei-gaudi:
     build:
       context: tei-gaudi
