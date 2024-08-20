@@ -45,6 +45,11 @@ on:
         description: 'Test examples with k8s'
         required: false
         type: boolean
+      test_gmc:
+        default: false
+        description: 'Test examples with gmc'
+        required: false
+        type: boolean
       opea_branch:
         default: "main"
         description: 'OPEA branch for image build'
@@ -70,6 +75,8 @@ jobs:
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
   build-deploy-gmc:
+    needs: [get-test-matrix]
+    if: ${{ fromJSON(inputs.deploy_gmc) }}
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
@@ -78,11 +85,12 @@ jobs:
     with:
       node: ${{ matrix.node }}
       tag: ${{ inputs.tag }}
-      deploy: ${{ fromJSON(inputs.deploy_gmc) }}
+      opea_branch: ${{ inputs.opea_branch }}
     secrets: inherit
 
   run-examples:
-    needs: [get-test-matrix]
+    needs: [get-test-matrix, build-deploy-gmc]
+    if: always()
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
@@ -97,5 +105,6 @@ jobs:
       scan: ${{ fromJSON(inputs.scan) }}
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_k8s: ${{ fromJSON(inputs.test_k8s) }}
+      test_gmc: ${{ fromJSON(inputs.test_gmc) }}
       opea_branch: ${{ inputs.opea_branch }}
     secrets: inherit
