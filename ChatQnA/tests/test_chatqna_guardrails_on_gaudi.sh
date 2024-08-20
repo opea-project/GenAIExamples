@@ -3,48 +3,33 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-echo "IMAGE_REPO=${IMAGE_REPO}"
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH
+    cd $WORKPATH/docker
     git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
+    git clone https://github.com/huggingface/tei-gaudi
 
-    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
-    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
-    docker build -t opea/guardrails-tgi:latest -f comps/guardrails/llama_guard/docker/Dockerfile .
-
-#    cd ..
-#    git clone https://github.com/huggingface/tei-gaudi
-#    cd tei-gaudi/
-#    docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="chatqna-guardrails chatqna-ui dataprep-redis embedding-tei retriever-redis reranking-tei llm-tgi tei-gaudi guardrails-tgi"
+    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-
-    cd $WORKPATH/docker
-    docker build --no-cache -t opea/chatqna-guardrails:latest -f Dockerfile_guardrails .
-
-    cd $WORKPATH/docker/ui
-    docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
 
     docker images
 }
 
 function start_services() {
-    # build tei-gaudi for each test instead of pull from local registry
-    cd $WORKPATH
-    git clone https://github.com/huggingface/tei-gaudi
-    cd tei-gaudi/
-    docker build --no-cache -q -f Dockerfile-hpu -t opea/tei-gaudi:latest .
-
     cd $WORKPATH/docker/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -69,24 +54,23 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    if [[ "$IMAGE_REPO" != "" ]]; then
-        # Replace the container name with a test-specific name
-        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna-guardrails:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_guardrails.yaml
-        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_guardrails.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_guardrails.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_guardrails.yaml
-        sed -i "s#image: ${IMAGE_REPO}opea/tei-gaudi:latest#image: opea/tei-gaudi:latest#g" compose_guardrails.yaml
-        echo "cat compose_guardrails.yaml"
-        cat compose_guardrails.yaml
-    fi
-
     # Start Docker Containers
     docker compose -f compose_guardrails.yaml up -d
     n=0
     until [[ "$n" -ge 400 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
+            break
+        fi
+        sleep 1s
+        n=$((n+1))
+    done
+
+    # Make sure tgi guardrails service is ready
+    n=0
+    until [[ "$n" -ge 400 ]]; do
+        docker logs tgi-guardrails-server > tgi_guardrails_service_start.log
+        if grep -q Connected tgi_guardrails_service_start.log; then
             break
         fi
         sleep 1s
@@ -101,24 +85,27 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
 
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
-    else
+    # check response status
+    if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
+    # check response body
+    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
     sleep 1s
 }
 
@@ -128,7 +115,7 @@ function validate_microservices() {
     # tei for embedding service
     validate_services \
         "${ip_address}:8090/embed" \
-        "\[\[" \
+        "[[" \
         "tei-embedding" \
         "tei-embedding-gaudi-server" \
         '{"inputs":"What is Deep Learning?"}'
@@ -136,7 +123,7 @@ function validate_microservices() {
     # embedding microservice
     validate_services \
         "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":\[' \
+        '"text":"What is Deep Learning?","embedding":[' \
         "embedding" \
         "embedding-tei-server" \
         '{"text":"What is Deep Learning?"}'
@@ -147,7 +134,7 @@ function validate_microservices() {
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_services \
         "${ip_address}:7000/v1/retrieval" \
-        " " \
+        "retrieved_docs" \
         "retrieval" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
@@ -186,7 +173,7 @@ function validate_microservices() {
 
     # tgi for guardrails service
     validate_services \
-        "${ip_address}:8008/generate" \
+        "${ip_address}:8088/generate" \
         "generated_text" \
         "tgi-guardrails" \
         "tgi-guardrails-server" \
@@ -217,13 +204,16 @@ function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-#    conda remove -n ${conda_env_name} --all -y
-#    conda create -n ${conda_env_name} python=3.12 -y
+    if conda info --envs | grep -q "$conda_env_name"; then
+        echo "$conda_env_name exist!"
+    else
+        conda create -n ${conda_env_name} python=3.12 -y
+    fi
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-#    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
@@ -246,7 +236,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
