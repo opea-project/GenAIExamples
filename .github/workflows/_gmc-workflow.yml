@@ -16,11 +16,11 @@ on:
         required: true
         type: string
         description: "Hardware to run test"
-      deploy:
-        default: true
-        required: true
-        type: boolean
-        description: 'Whether to deploy gmc'
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
+        description: 'OPEA branch for image build'
   workflow_call:
     inputs:
       tag:
@@ -33,11 +33,11 @@ on:
         required: true
         type: string
         description: "Hardware to run test"
-      deploy:
-        default: true
-        required: true
-        type: boolean
-        description: 'Whether to deploy gmc'
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
+        description: 'OPEA branch for image build'
 
 jobs:
 ####################################################################################################
@@ -50,7 +50,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: opea-project/GenAIInfra
-          ref: ${{ inputs.tag }}
+          ref: ${{ inputs.opea_branch }}
           path: GenAIInfra
 
       - name: Set variables
@@ -113,14 +113,13 @@ jobs:
 ####################################################################################################
   gmc-install:
     needs: image-build
-    if: ${{ fromJSON(inputs.deploy) }}
     runs-on: "k8s-${{ inputs.node }}"
     steps:
       - name: Checkout GenAIInfra repository
         uses: actions/checkout@v4
         with:
           repository: opea-project/GenAIInfra
-          ref: ${{ inputs.tag }}
+          ref: ${{ inputs.opea_branch }}
           path: GenAIInfra
 
       - name: Set variables
