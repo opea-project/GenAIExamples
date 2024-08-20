@@ -1,0 +1,45 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Comps CD workflow on manual event
+on:
+  workflow_dispatch:
+    inputs:
+      services:
+        default: "asr"
+        description: "List of services to test [agent_langchain,asr,chathistory_mongo,dataprep_milvus...]" #,embeddings,guardrails,knowledgegraphs,llms,lvms,prompt_registry,ragas,reranks,retrievers,tts,vectorstores,web_retrievers]"
+        required: true
+        type: string
+      build:
+        default: true
+        description: "Build test required images for Comps"
+        required: false
+        type: boolean
+
+permissions: read-all
+
+jobs:
+  get-test-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.get-matrix.outputs.services }}
+    steps:
+      - name: Create Matrix
+        id: get-matrix
+        run: |
+          services=($(echo ${{ inputs.services }} | tr ',' ' '))
+          services_json=$(printf '%s\n' "${services[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "services=$services_json" >> $GITHUB_OUTPUT
+
+  run-services:
+    needs: [get-test-matrix]
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.get-test-matrix.outputs.services) }}
+      fail-fast: false
+    uses: ./.github/workflows/_comps-workflow.yml
+    with:
+      service: ${{ matrix.service }}
+      tag: "comps"
+      node: gaudi
+    secrets: inherit
