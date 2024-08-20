@@ -7,7 +7,7 @@ metadata:
   name: embedding-dependency-deploy
   namespace: default
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: embedding-dependency-deploy
@@ -48,7 +48,7 @@ spec:
       volumes:
       - name: model-volume
         hostPath:
-          path: /home/sdp/cesg
+          path: /mnt/models
           type: Directory
       - name: shm
         emptyDir:
