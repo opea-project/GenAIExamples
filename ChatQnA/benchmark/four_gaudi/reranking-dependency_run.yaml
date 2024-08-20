@@ -31,7 +31,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: tei_gaudi:rerank
+        image: opea/tei-gaudi:latest
         name: reranking-dependency-deploy
         args:
         - --model-id
@@ -57,14 +57,14 @@ spec:
         - name: HABANA_VISIBLE_DEVICES
           value: all
         - name: HF_TOKEN
-          value: $(HF_TOKEN)
+          value: ${HF_TOKEN}
         - name: MAX_WARMUP_SEQUENCE_LENGTH
           value: '512'
       serviceAccountName: default
       volumes:
       - name: model-volume
         hostPath:
-          path: /home/sdp/cesg
+          path: /mnt/models
           type: Directory
       - name: shm
         emptyDir:
