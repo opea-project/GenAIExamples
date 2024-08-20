@@ -36,9 +36,11 @@ jobs:
       - name: Run script
         run: |
           find . -name "*.md" | xargs sed -i "s|^docker\ compose|TAG=${{ github.event.inputs.tag }}\ docker\ compose|g"
+          find . -type f -name "*.yaml" \( -path "*/benchmark/*" -o -path "*/kubernetes/*" \) | xargs sed -i -E 's/(opea\/[A-Za-z0-9\-]*:)latest/\1${{ github.event.inputs.tag }}/g'
+          find . -type f -name "*.md" \( -path "*/benchmark/*" -o -path "*/kubernetes/*" \) | xargs sed -i -E 's/(opea\/[A-Za-z0-9\-]*:)latest/\1${{ github.event.inputs.tag }}/g'
 
       - name: Commit changes
         run: |
           git add .
-          git commit -s -m "Freeze images tag"
+          git commit -s -m "Freeze OPEA images tag"
           git push
