@@ -14,4 +14,7 @@ ENV BACKEND_SERVICE_NAME=chatqna
 ENV BACKEND_SERVICE_IP=localhost
 ENV BACKEND_SERVICE_PORT=8888
 
-CMD /bin/sh -c "envsubst '${FRONTEND_SERVICE_IP} ${FRONTEND_SERVICE_PORT} ${BACKEND_SERVICE_NAME} ${BACKEND_SERVICE_IP} ${BACKEND_SERVICE_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+COPY start-nginx.sh /usr/local/bin/start-nginx.sh
+RUN chmod +x /usr/local/bin/start-nginx.sh
+
+CMD ["/usr/local/bin/start-nginx.sh"]
