@@ -67,7 +67,7 @@ spec:
       volumes:
       - name: model-volume
         hostPath:
-          path: /home/sdp/cesg
+          path: /mnt/models
           type: Directory
       - name: shm
         emptyDir:
