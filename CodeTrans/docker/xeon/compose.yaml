@@ -66,7 +66,7 @@ services:
       - codetrans-xeon-backend-server
       - codetrans-xeon-ui-server
     ports:
-      - "{NGINX_PORT:-80}:80"
+      - "${NGINX_PORT:-80}:80"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
