@@ -1,4 +1,0 @@
-eager
-fastapi
-optimum[habana]
-uvicorn

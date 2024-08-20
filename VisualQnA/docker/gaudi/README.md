@@ -24,9 +24,8 @@ docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_pr
 Since TGI Gaudi has not supported llava-next in main branch, we'll need to build it from a PR branch for now.
 
 ```bash
-git clone https://github.com/yuanwu2017/tgi-gaudi.git
+git clone https://github.com/huggingface/tgi-gaudi.git
 cd tgi-gaudi/
-git checkout v2.0.4
 docker build -t opea/llava-tgi:latest .
 cd ../
 ```
