@@ -11,7 +11,7 @@ metadata:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 data:
   TGI_LLM_ENDPOINT: "http://docsum-tgi"
@@ -41,10 +41,7 @@ metadata:
 data:
   MODEL_ID: "Intel/neural-chat-7b-v3-3"
   PORT: "2080"
-  HUGGING_FACE_HUB_TOKEN: "insert-your-huggingface-token-here"
   HF_TOKEN: "insert-your-huggingface-token-here"
-  MAX_INPUT_TOKENS: "1024"
-  MAX_TOTAL_TOKENS: "4096"
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
@@ -52,6 +49,8 @@ data:
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
+  MAX_INPUT_LENGTH: "1024"
+  MAX_TOTAL_TOKENS: "2048"
 ---
 # Source: docsum/charts/llm-uservice/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -65,7 +64,7 @@ metadata:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -115,7 +114,7 @@ metadata:
     helm.sh/chart: docsum-0.8.0
     app.kubernetes.io/name: docsum
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -140,7 +139,7 @@ metadata:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -180,14 +179,26 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
-          startupProbe:
-            exec:
-              command:
-              - curl
-              - http://docsum-tgi
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
             initialDelaySeconds: 5
             periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
             failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {}
       volumes:
@@ -240,6 +251,23 @@ spec:
             - name: http
               containerPort: 2080
               protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          startupProbe:
+            failureThreshold: 120
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
           resources:
             limits:
               habana.ai/gaudi: 1
@@ -263,7 +291,7 @@ metadata:
     helm.sh/chart: docsum-0.8.0
     app.kubernetes.io/name: docsum
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
