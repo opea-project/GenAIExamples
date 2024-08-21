@@ -111,8 +111,6 @@ services:
       - embedding
       - dataprep-redis-service
       - retriever
-      - tei-reranking-service
-      - reranking
       - tgi-service
       - llm
     ports:
@@ -124,7 +122,6 @@ services:
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
-      - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
