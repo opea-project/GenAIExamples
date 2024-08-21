@@ -1,0 +1,71 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-config
+data:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  labels:
+    helm.sh/chart: mongo-0.1.0
+    app.kubernetes.io/name: mongo
+    app.kubernetes.io/instance: mongo
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 27017
+      targetPort: 27017
+      protocol: TCP
+      name: mongo
+  selector:
+    app.kubernetes.io/name: mongo
+    app.kubernetes.io/instance: mongo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  labels:
+    helm.sh/chart: mongo-0.1.0
+    app.kubernetes.io/name: mongo
+    app.kubernetes.io/instance: mongo
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mongo
+      app.kubernetes.io/instance: mongo
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mongo
+        app.kubernetes.io/instance: mongo
+    spec:
+      securityContext: null
+      containers:
+        - name: mongo
+          envFrom:
+          - configMapRef:
+              name: mongo-config
+          securityContext: null
+          image: "mongo:7.0.11"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: mongo
+              containerPort: 27017
+              protocol: TCP
+          resources: null
+          command: ["mongod", "--bind_ip", "0.0.0.0", "--quiet", "--logpath", "/dev/null"]

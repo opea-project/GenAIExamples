@@ -1,0 +1,100 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  chatqna:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../../ChatQnA/docker/
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+  embedding-tei:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/langchain/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+  retriever-redis:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/langchain/redis/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+  reranking-tei:
+    build:
+      context: GenAIComps
+      dockerfile: comps/reranks/tei/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+  llm-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+  dataprep-redis:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/redis/langchain/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+  promptregistry-mongo:
+    build:
+      context: GenAIComps
+      dockerfile: comps/prompt_registry/mongo/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}
+  chathistory-mongo:
+    build:
+      context: GenAIComps
+      dockerfile: comps/chathistory/mongo/docker/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
+  productivity-suite-react-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile.react
+    extends: chatqna
+    image: ${REGISTRY:-opea}/productivity-suite-react-ui-server:${TAG:-latest}
+  codegen:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../../CodeGen/docker/
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
+  docsum:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../../DocSum/docker/
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+  faqgen:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../../FaqGen/docker/
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
+  llm_faqgen:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/faq-generation/tgi/Dockerfile
+    extends: faqgen
+    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+  llm_docsum_server:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/summarization/tgi/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
