@@ -1,0 +1,146 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build and deploy GMC system on call and manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        default: "latest"
+        required: true
+        type: string
+        description: "Tag to apply to images"
+      node:
+        default: "xeon"
+        required: true
+        type: string
+        description: "Hardware to run test"
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
+        description: 'OPEA branch for image build'
+  workflow_call:
+    inputs:
+      tag:
+        default: "latest"
+        required: true
+        type: string
+        description: "Tag to apply to images"
+      node:
+        default: "xeon"
+        required: true
+        type: string
+        description: "Hardware to run test"
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
+        description: 'OPEA branch for image build'
+
+jobs:
+####################################################################################################
+# Image Build and Scan
+####################################################################################################
+  image-build:
+    runs-on: "docker-build-${{ inputs.node }}"
+    steps:
+      - name: Checkout GenAIInfra repository
+        uses: actions/checkout@v4
+        with:
+          repository: opea-project/GenAIInfra
+          ref: ${{ inputs.opea_branch }}
+          path: GenAIInfra
+
+      - name: Set variables
+        id: set_variables
+        run: |
+          echo "DOCKER_REGISTRY=${OPEA_IMAGE_REPO}opea" >> $GITHUB_ENV
+          echo "IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_OUTPUT
+          echo "VERSION=${{ inputs.tag }}" >> $GITHUB_ENV
+          echo "VERSION=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+
+      - name: Build image and push
+        run: |
+          cd ${{github.workspace}}/GenAIInfra/microservices-connector
+          make docker.build
+          make docker.push
+
+      - name: Scan gmcmanager
+        if: ${{ inputs.node == 'gaudi' }}
+        uses: opea-project/validation/actions/trivy-scan@main
+        with:
+          image-ref: ${{ env.DOCKER_REGISTRY }}/gmcmanager:${{ env.VERSION }}
+          output: gmcmanager-scan.txt
+
+      - name: Upload gmcmanager scan result
+        if: ${{ inputs.node == 'gaudi' }}
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: gmcmanager-scan
+          path: gmcmanager-scan.txt
+          overwrite: true
+
+      - name: Scan gmcrouter
+        if: ${{ inputs.node == 'gaudi' }}
+        uses: opea-project/validation/actions/trivy-scan@main
+        with:
+          image-ref: ${{ env.DOCKER_REGISTRY }}/gmcrouter:${{ env.VERSION }}
+          output: gmcrouter-scan.txt
+
+      - name: Upload gmcrouter scan result
+        if: ${{ inputs.node == 'gaudi' }}
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: gmcrouter-scan
+          path: gmcrouter-scan.txt
+          overwrite: true
+
+      - name: Clean up images
+        if: always()
+        run: |
+          docker rmi ${{ env.DOCKER_REGISTRY }}/gmcrouter:${{ env.VERSION }}
+          docker rmi ${{ env.DOCKER_REGISTRY }}/gmcmanager:${{ env.VERSION }}
+
+      - name: Clean up GenAIInfra source codes
+        if: always()
+        run: |
+           rm -rf ${{github.workspace}}/GenAIInfra
+
+####################################################################################################
+# GMC Install
+####################################################################################################
+  gmc-install:
+    needs: image-build
+    runs-on: "k8s-${{ inputs.node }}"
+    steps:
+      - name: Checkout GenAIInfra repository
+        uses: actions/checkout@v4
+        with:
+          repository: opea-project/GenAIInfra
+          ref: ${{ inputs.opea_branch }}
+          path: GenAIInfra
+
+      - name: Set variables
+        run: |
+          echo "SYSTEM_NAMESPACE=opea-system" >> $GITHUB_ENV
+          echo "VERSION=${{ inputs.tag }}" >> $GITHUB_ENV
+          echo "SET_VERSION=true" >> $GITHUB_ENV # to change the tag of microservice images
+
+      - name: Cleanup existing GMC
+        run: |
+          cd GenAIInfra
+          .github/workflows/scripts/e2e/gmc_install.sh cleanup_gmc
+          cd ..
+
+      - name: Install GMC
+        run: |
+          cd GenAIInfra
+          .github/workflows/scripts/e2e/gmc_install.sh install_gmc
+          cd ..
+
+      - name: Clean up GenAIInfra source codes
+        if: always()
+        run: |
+           rm -rf ${{github.workspace}}/GenAIInfra
