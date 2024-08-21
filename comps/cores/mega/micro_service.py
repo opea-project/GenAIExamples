@@ -3,7 +3,7 @@
 
 import asyncio
 import multiprocessing
-from typing import Any, Optional, Type
+from typing import Any, List, Optional, Type
 
 from ..proto.docarray import TextDoc
 from .constants import ServiceRoleType, ServiceType
@@ -154,6 +154,7 @@ def register_microservice(
     output_datatype: Type[Any] = TextDoc,
     provider: Optional[str] = None,
     provider_endpoint: Optional[str] = None,
+    methods: List[str] = ["POST"],
 ):
     def decorator(func):
         if name not in opea_microservices:
@@ -173,7 +174,8 @@ def register_microservice(
                 provider_endpoint=provider_endpoint,
             )
             opea_microservices[name] = micro_service
-        opea_microservices[name].app.router.add_api_route(endpoint, func, methods=["POST"])
+        opea_microservices[name].app.router.add_api_route(endpoint, func, methods=methods)
+
         return func
 
     return decorator
