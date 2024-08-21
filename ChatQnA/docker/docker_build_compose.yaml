@@ -15,6 +15,11 @@ services:
       dockerfile: ./Dockerfile_guardrails
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-guardrails:${TAG:-latest}
+  chatqna-without-rerank:
+    build:
+      dockerfile: ./Dockerfile_without_rerank
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
   chatqna-ui:
     build:
       context: ui
