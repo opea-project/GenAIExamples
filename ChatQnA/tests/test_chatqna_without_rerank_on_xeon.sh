@@ -225,7 +225,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker/xeon
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_without_rerank.yaml stop && docker compose -f compose_without_rerank.yaml rm -f
 }
 
 function main() {
