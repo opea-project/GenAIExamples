@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 from docarray import BaseDoc, DocList
-from docarray.documents import AudioDoc
+from docarray.documents import AudioDoc, VideoDoc
 from docarray.typing import AudioUrl
 from pydantic import Field, conint, conlist, field_validator
 
@@ -170,3 +170,11 @@ class LVMDoc(BaseDoc):
     temperature: float = 0.01
     repetition_penalty: float = 1.03
     streaming: bool = False
+
+
+class LVMVideoDoc(BaseDoc):
+    video_url: str
+    chunk_start: float
+    chunk_duration: float
+    prompt: str
+    max_new_tokens: conint(ge=0, le=1024) = 512
