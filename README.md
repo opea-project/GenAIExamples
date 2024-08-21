@@ -25,26 +25,35 @@ GenAIComps-based Generative AI examples offer streamlined deployment, testing, a
 
 GenAIExamples offers flexible deployment options that cater to different user needs, enabling efficient use and deployment in various environments. Here’s a brief overview of the three primary methods: Python startup, Docker Compose, and Kubernetes.
 
-1. <b>Docker Compose</b>: Check the released docker images in [docker image list](./docker_images_list.md) for detailed information.
-2. <b>Kubernetes</b>: Follow the steps at [K8s Install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install) and [GMC Install](https://github.com/opea-project/docs/blob/main/guide/installation/gmc_install/gmc_install.md) to setup k8s and GenAI environment .
-
 Users can choose the most suitable approach based on ease of setup, scalability needs, and the environment in which they are operating.
 
-### Deployment
+### Deployment Guide
 
-| Use Case    | Docker Compose<br/>Deployment on Xeon                  | Docker Compose<br/>Deployment on Gaudi                   | Kubernetes Deployment                                     |
-| ----------- | ------------------------------------------------------ | -------------------------------------------------------- | --------------------------------------------------------- |
-| ChatQnA     | [Xeon Instructions](ChatQnA/docker/xeon/README.md)     | [Gaudi Instructions](ChatQnA/docker/gaudi/README.md)     | [K8s Instructions](ChatQnA/kubernetes/README.md)          |
-| CodeGen     | [Xeon Instructions](CodeGen/docker/xeon/README.md)     | [Gaudi Instructions](CodeGen/docker/gaudi/README.md)     | [K8s Instructions](Codegen/kubernetes/README.md)          |
-| CodeTrans   | [Xeon Instructions](CodeTrans/docker/xeon/README.md)   | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md)   | [K8s Instructions](CodeTrans/kubernetes/README.md)        |
-| DocSum      | [Xeon Instructions](CodeTrans/docker/xeon/README.md)   | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md)   | [K8s Instructions](CodeTrans/kubernetes/README.md)        |
-| SearchQnA   | [Xeon Instructions](SearchQnA/docker/xeon/README.md)   | [Gaudi Instructions](SearchQnA/docker/gaudi/README.md)   | [K8s Instructions](SearchQnA/kubernetes/README.md)        |
-| FaqGen      | [Xeon Instructions](FaqGen/docker/xeon/README.md)      | [Gaudi Instructions](FaqGen/docker/gaudi/README.md)      | [K8s Instructions](FaqGen/kubernetes/manifests/README.md) |
-| Translation | [Xeon Instructions](Translation/docker/xeon/README.md) | [Gaudi Instructions](Translation/docker/gaudi/README.md) | [K8s Instructions](Translation/kubernetes/README.md)      |
-| AudioQnA    | [Xeon Instructions](AudioQnA/docker/xeon/README.md)    | [Gaudi Instructions](AudioQnA/docker/gaudi/README.md)    | K8s Not Supported                                         |
-| VisualQnA   | [Xeon Instructions](VisualQnA/docker/xeon/README.md)   | [Gaudi Instructions](VisualQnA/docker/gaudi/README.md)   | K8s Not Supported                                         |
+Deployment are based on released docker images by default, check [docker image list](./docker_images_list.md) for detailed information. You can also build your own images following instructions.
 
-## Support Examples
+#### Prerequisite
+
+- For Docker Compose based deployment, you should have docker compose installed. Refer to [docker compose install](https://docs.docker.com/compose/install/).
+- For Kubernetes based deployment, we provide 3 ways from the easiest manifests to powerful [GMC](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector) based deployment.
+  - You should have a kubernetes cluster ready for use. If not, you can refer to [k8s install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install) to deploy one.
+  - (Optional) You should have GMC installed to your kubernetes cluster if you want to try with GMC. Refer to [GMC install](https://github.com/opea-project/docs/blob/main/guide/installation/gmc_install/gmc_install.md) for more information.
+  - (Optional) You should have Helm (version >= 3.15) installed if you want to deploy with Helm Charts. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
+
+#### Deploy Examples
+
+| Use Case    | Docker Compose<br/>Deployment on Xeon                  | Docker Compose<br/>Deployment on Gaudi                   | Kubernetes with GMC                                      | Kubernetes with Manifests                                            | Kubernetes with Helm Charts                                                                                        |
+| ----------- | ------------------------------------------------------ | -------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| ChatQnA     | [Xeon Instructions](ChatQnA/docker/xeon/README.md)     | [Gaudi Instructions](ChatQnA/docker/gaudi/README.md)     | [ChatQnA with GMC](ChatQnA/kubernetes/README.md)         | [ChatQnA with Manifests](ChatQnA/kubernetes/manifests/README.md)     | [ChatQnA with Helm Charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/chatqna/README.md)     |
+| CodeGen     | [Xeon Instructions](CodeGen/docker/xeon/README.md)     | [Gaudi Instructions](CodeGen/docker/gaudi/README.md)     | [CodeGen with GMC](CodeGen/kubernetes/README.md)         | [CodeGen with Manifests](CodeGen/kubernetes/manifests/README.md)     | [CodeGen with Helm Charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/codegen/README.md)     |
+| CodeTrans   | [Xeon Instructions](CodeTrans/docker/xeon/README.md)   | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md)   | [CodeTrans with GMC](CodeTrans/kubernetes/README.md)     | [CodeTrans with Manifests](CodeTrans/kubernetes/manifests/README.md) | [CodeTrans with Helm Charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/codetrans/README.md) |
+| DocSum      | [Xeon Instructions](DocSum/docker/xeon/README.md)      | [Gaudi Instructions](DocSum/docker/gaudi/README.md)      | [DocSum with GMC](DocSum/kubernetes/README.md)           | [DocSum with Manifests](DocSum/kubernetes/manifests/README.md)       | [DocSum with Helm Charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum/README.md)       |
+| SearchQnA   | [Xeon Instructions](SearchQnA/docker/xeon/README.md)   | [Gaudi Instructions](SearchQnA/docker/gaudi/README.md)   | [SearchQnA with GMC](SearchQnA/kubernetes/README.md)     | Not Supported                                                        | Not Supported                                                                                                      |
+| FaqGen      | [Xeon Instructions](FaqGen/docker/xeon/README.md)      | [Gaudi Instructions](FaqGen/docker/gaudi/README.md)      | [FaqGen with GMC](FaqGen/kubernetes/README.md)           | Not Supported                                                        | Not Supported                                                                                                      |
+| Translation | [Xeon Instructions](Translation/docker/xeon/README.md) | [Gaudi Instructions](Translation/docker/gaudi/README.md) | [Translation with GMC](Translation/kubernetes/README.md) | Not Supported                                                        | Not Supported                                                                                                      |
+| AudioQnA    | [Xeon Instructions](AudioQnA/docker/xeon/README.md)    | [Gaudi Instructions](AudioQnA/docker/gaudi/README.md)    | [AudioQnA with GMC](AudioQnA/kubernetes/README.md)       | Not Supported                                                        | Not Supported                                                                                                      |
+| VisualQnA   | [Xeon Instructions](VisualQnA/docker/xeon/README.md)   | [Gaudi Instructions](VisualQnA/docker/gaudi/README.md)   | [VisualQnA with GMC](VisualQnA/kubernetes/README.md)     | Not Supported                                                        | Not Supported                                                                                                      |
+
+## Supported Examples
 
 Check [here](./supported_examples.md) for detailed information of supported examples, models, hardwares, etc.
 
