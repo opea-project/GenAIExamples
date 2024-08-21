@@ -22,9 +22,9 @@ def split_jsonl_into_txts(jsonl_file):
         for line in f:
             data = json.loads(line)
             docs.append(data["doc"])
-            n+=1
-            if n>2:
-                break
+            # n+=1
+            # if n>2:
+            #     break
     return docs
 
 def write_docs_to_disk(docs, output_folder):

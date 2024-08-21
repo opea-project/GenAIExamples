@@ -1,0 +1,1 @@
+QUERY_SEPERATOR = "========THIS IS A NEW QUERY========"

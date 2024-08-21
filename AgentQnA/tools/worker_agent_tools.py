@@ -3,7 +3,6 @@ import os
 
 def search_knowledge_base(query: str) -> str:
     """Search the knowledge base for a specific query."""
-    # use worker agent (DocGrader) to search the knowledge base
     url = os.environ.get("RETRIEVAL_TOOL_URL")
     print(url)
     proxies = {"http": ""}
