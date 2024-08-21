@@ -77,6 +77,10 @@ function validate_megaservice() {
     echo $result
 
     if [[ $result == *"2024"* ]]; then
+        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
+        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
+        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
+        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
         echo "Result correct."
     else
         docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log

@@ -75,6 +75,8 @@ function validate_megaservice() {
     echo $result
 
     if [[ $result == *"2024"* ]]; then
+        docker logs web-retriever-chroma-server
+        docker logs searchqna-xeon-backend-server
         echo "Result correct."
     else
         docker logs web-retriever-chroma-server
