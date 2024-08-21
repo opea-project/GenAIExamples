@@ -90,6 +90,29 @@ Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](htt
 
 Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum) for instructions on deploying DocSum into Kubernetes on Xeon & Gaudi.
 
+### Workflow of the deployed Document Summarization Service
+
+The workflow of the Document Summarization Service, from user's input query to the application's output response, is as follows:
+
+```mermaid
+flowchart LR
+    subgraph DocSum
+        direction LR
+        A[User] <--> |Input query| B[DocSum Gateway]
+        B <--> |Post| Megaservice
+        subgraph Megaservice["Megaservice"]
+            direction TB
+            C([ Microservice : llm-docsum-tgi <br>9000]) -. Post .-> D{{TGI Service<br>8008}}
+        end
+        Megaservice --> |Output| E[Response]
+    end
+    subgraph Legend
+        X([Micsrservice])
+        Y{{Service from industry peers}}
+        Z[Gateway]
+    end
+```
+
 ## Consume Document Summarization Service
 
 Two ways of consuming Document Summarization Service:
