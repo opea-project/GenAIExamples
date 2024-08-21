@@ -13,7 +13,9 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
     libgl1-mesa-glx \
     libjemalloc-dev \
     vim \
-    libcairo2
+    libcairo2 \
+    poppler-utils \
+    tesseract-ocr
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
