@@ -125,6 +125,7 @@ data:
   LANGCHAIN_API_KEY: "insert-your-langchain-key-here"
   LANGCHAIN_PROJECT: "opea-retriever-service"
   HF_HOME: "/tmp/.cache/huggingface"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
 ---
 # Source: chatqna/charts/tei/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
