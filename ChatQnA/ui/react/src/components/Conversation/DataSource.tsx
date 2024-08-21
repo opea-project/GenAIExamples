@@ -55,7 +55,7 @@ export default function DataSource({ opened, onClose }: Props) {
         root: { paddingTop: '40px', display:'flex', flexDirection:'column', alignItems:'center' }
       }}>
         <Button.Group styles={{ group:{alignSelf:'center'}}} >
-          <Button variant={isFile ? 'filled' : 'default'} onClick={() => setIsFile(true)}>Upload FIle</Button>
+          <Button variant={isFile ? 'filled' : 'default'} onClick={() => setIsFile(true)}>Upload File</Button>
           <Button variant={!isFile ? 'filled' : 'default'} onClick={() => setIsFile(false)}>Use Link</Button>
         </Button.Group>
       </Container>
@@ -84,7 +84,7 @@ export default function DataSource({ opened, onClose }: Props) {
           return (
             <div className={classes.items}>
               <div className={classes.fileicon}><IconFile /></div>
-              <div className={classes.filename}><Text size="sm" >{file.name}</Text></div>
+              <div className={classes.filename}><Text size="sm" >{decodeURIComponent(file.name)}</Text></div>
               <div className={classes.icon}>
                 <ActionIcon onClick={()=>handleDelete(file.name)} size={32} variant="default">
                   <IconTrash />

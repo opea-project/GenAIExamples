@@ -4,7 +4,8 @@
 
 .filename {
     margin-left: 2px;
-    margin-right: auto;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .icon {
@@ -13,5 +14,7 @@
 
 .items {
     margin-top: 3px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 6% 88% 6%;
+    width: auto;
 }

@@ -10,7 +10,7 @@ import { createAsyncThunkWrapper } from "../thunkUtil";
 import client from "../../common/client";
 import { notifications } from "@mantine/notifications";
 import {
-  CHAT_QNA_URL, 
+  CHAT_QNA_URL,
   DATA_PREP_URL,
   DATA_PREP_GET_URL,
   DATA_PREP_DELETE_URL,
@@ -194,8 +194,8 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
       onmessage(msg) {
         if (msg?.data != "[DONE]") {
           try {
-            /*const match = msg.data.match(/b'([^']*)'/);
-              if (match && match[1] != "</s>") {
+            const match = msg.data.match(/b'([^']*)'/);
+            if (match && match[1] != "</s>") {
               const extractedText = match[1];
 
               // Check for the presence of \x hexadecimal
@@ -214,9 +214,6 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
             if (result) {
               store.dispatch(setOnGoingResult(result));
             }
-            */
-            result += msg.data;
-            store.dispatch(setOnGoingResult(result));
           } catch (e) {
             console.log("something wrong in msg", e);
             throw e;
