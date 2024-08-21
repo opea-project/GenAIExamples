@@ -1,0 +1,59 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+search_knowledge_base:
+  description: Search knowledge base for a given query. Returns text related to the query.
+  callable_api: tools.py:search_knowledge_base
+  args_schema:
+    query:
+      type: str
+      description: query
+  return_output: retrieved_data
+
+get_artist_birth_place:
+  description: Get the birth place of an artist.
+  callable_api: tools.py:get_artist_birth_place
+  args_schema:
+    artist_name:
+      type: str
+      description: artist name
+  return_output: birth_place
+
+get_billboard_rank_date:
+  description: Get Billboard ranking for a specific rank and date.
+  callable_api: tools.py:get_billboard_rank_date
+  args_schema:
+    rank:
+      type: int
+      description: song name
+    date:
+      type: str
+      description: date
+  return_output: billboard_info
+
+get_song_release_date:
+  description: Get the release date of a song.
+  callable_api: tools.py:get_song_release_date
+  args_schema:
+    song_name:
+      type: str
+      description: song name
+  return_output: release_date
+
+get_members:
+  description: Get the member list of a band.
+  callable_api: tools.py:get_members
+  args_schema:
+    band_name:
+      type: str
+      description: band name
+  return_output: members
+
+get_grammy_best_artist_by_year:
+  description: Get the Grammy Best New Artist for a specific year.
+  callable_api: tools.py:get_grammy_best_artist_by_year
+  args_schema:
+    year:
+      type: int
+      description: year
+  return_output: grammy_best_new_artist
