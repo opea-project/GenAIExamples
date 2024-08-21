@@ -100,10 +100,19 @@ def ingest_doc_to_pgvector(doc_path: DocPath):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP, add_start_index=True, separators=get_separators()
     )
+
     content = document_loader(doc_path)
-    chunks = text_splitter.split_text(content)
+
+    structured_types = [".xlsx", ".csv", ".json", "jsonl"]
+    _, ext = os.path.splitext(doc_path)
+
+    if ext in structured_types:
+        chunks = content
+    else:
+        chunks = text_splitter.split_text(content)
+
     if logflag:
-        logger.info("Done preprocessing. Created ", len(chunks), " chunks of the original pdf")
+        logger.info("Done preprocessing. Created ", len(chunks), " chunks of the original file.")
         logger.info("PG Connection", PG_CONNECTION_STRING)
     metadata = [dict({"doc_name": str(doc_path)})]
 

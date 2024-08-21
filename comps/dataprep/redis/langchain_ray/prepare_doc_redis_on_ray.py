@@ -177,7 +177,12 @@ def data_to_redis(data):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1500, chunk_overlap=100, add_start_index=True, separators=get_separators(), is_separator_regex=False
     )
-    chunks = text_splitter.split_text(data)
+    if isinstance(data, list):
+        chunks = data
+    elif isinstance(data, str):
+        chunks = text_splitter.split_text(data)
+    else:
+        raise TypeError("The content must be either a list or a string.")
 
     # Create vectorstore
     if tei_embedding_endpoint:
