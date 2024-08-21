@@ -10,5 +10,6 @@ sentencepiece
 shortuuid
 soundfile
 torch
+torchvision
 transformers
 uvicorn
