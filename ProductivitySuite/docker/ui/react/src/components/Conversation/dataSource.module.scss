@@ -1,0 +1,11 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+@import "../../styles/styles";
+
+.dataSourceWrapper {
+  //   @include flex(column, nowrap, flex-start, flex-start);
+  //   flex: 1 1 auto;
+  height: 100%;
+  padding: 20px;
+}
