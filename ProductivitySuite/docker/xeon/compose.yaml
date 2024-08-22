@@ -1,0 +1,370 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.3"
+
+services:
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  dataprep-redis-service:
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "6007:6007"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-embedding-server
+    ports:
+      - "6006:80"
+    volumes:
+      - "./data_embedding:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+  embedding:
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+    container_name: embedding-tei-server
+    depends_on:
+      - tei-embedding-service
+    ports:
+      - "6000:6000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-embedding-service"
+    restart: unless-stopped
+  retriever:
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    container_name: retriever-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-retriever-service"
+    restart: unless-stopped
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-reranking-server
+    ports:
+      - "8808:80"
+    volumes:
+      - "./data_tei:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
+  reranking:
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+    container_name: reranking-tei-xeon-server
+    depends_on:
+      - tei-reranking-service
+    ports:
+      - "8000:8000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-reranking-service"
+    restart: unless-stopped
+  tgi_service:
+    image: ghcr.io/huggingface/text-generation-inference:2.1.0
+    container_name: tgi-service
+    ports:
+      - "9009:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${LLM_MODEL_ID}
+  llm:
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    container_name: llm-tgi-server
+    depends_on:
+      - tgi_service
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CHATQNA}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
+    restart: unless-stopped
+  chatqna-xeon-backend-server:
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    container_name: chatqna-xeon-backend-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+      - embedding
+      - retriever
+      - tei-reranking-service
+      - reranking
+      - tgi_service
+      - llm
+    ports:
+      - "8888:8888"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      EMBEDDING_SERVICE_HOST_IP: ${EMBEDDING_SERVICE_HOST_IP}
+      RETRIEVER_SERVICE_HOST_IP: ${RETRIEVER_SERVICE_HOST_IP}
+      RERANK_SERVICE_HOST_IP: ${RERANK_SERVICE_HOST_IP}
+      LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP_CHATQNA}
+    ipc: host
+    restart: always
+  tgi_service_codegen:
+    image: ghcr.io/huggingface/text-generation-inference:2.1.0
+    container_name: tgi_service_codegen
+    ports:
+      - "8028:80"
+    volumes:
+      - "./data_codegen:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    command: --model-id ${LLM_MODEL_ID_CODEGEN}
+  llm_codegen:
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    container_name: llm-tgi-server-codegen
+    depends_on:
+      - tgi_service_codegen
+    ports:
+      - "9001:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CODEGEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
+    restart: unless-stopped
+  codegen-xeon-backend-server:
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
+    container_name: codegen-xeon-backend-server
+    depends_on:
+      - llm
+    ports:
+      - "7778:7778"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP_CODEGEN}
+      LLM_SERVICE_PORT: ${LLM_SERVICE_HOST_PORT_CODEGEN}
+    ipc: host
+    restart: always
+  llm_faqgen:
+    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+    container_name: llm-faqgen-server
+    depends_on:
+      - tgi_service
+    ports:
+      - "9002:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_FAQGEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
+    restart: unless-stopped
+  faqgen-xeon-backend-server:
+    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
+    container_name: faqgen-xeon-backend-server
+    depends_on:
+      - tgi_service
+      - llm_faqgen
+    ports:
+      - "8889:8888"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      LLM_SERVICE_PORT: ${LLM_SERVICE_HOST_PORT_FAQGEN}
+      LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP_FAQGEN}
+    ipc: host
+    restart: always
+  llm_docsum_server:
+    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    container_name: llm-docsum-server
+    depends_on:
+      - tgi_service
+    ports:
+      - "9003:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_DOCSUM}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
+    restart: unless-stopped
+  docsum-xeon-backend-server:
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+    container_name: docsum-xeon-backend-server
+    depends_on:
+      - tgi_service
+      - llm_docsum_server
+    ports:
+      - "8890:8888"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      LLM_SERVICE_PORT: ${LLM_SERVICE_HOST_PORT_DOCSUM}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP_DOCSUM}
+    ipc: host
+    restart: always
+  mongo:
+    image: mongo:7.0.11
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    command: mongod --quiet --logpath /dev/null
+
+  chathistory-mongo:
+    image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
+    container_name: chathistory-mongo-server
+    ports:
+      - "6012:6012"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      MONGO_HOST: ${MONGO_HOST}
+      MONGO_PORT: ${MONGO_PORT}
+      COLLECTION_NAME: ${COLLECTION_NAME}
+    restart: unless-stopped
+
+  promptregistry-mongo:
+    image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}
+    container_name: promptregistry-mongo-server
+    ports:
+      - "6015:6012"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+      MONGO_HOST: ${MONGO_HOST}
+      MONGO_PORT: ${MONGO_PORT}
+      COLLECTION_NAME: ${PROMPT_COLLECTION_NAME}
+    restart: unless-stopped
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.2
+    container_name: keycloak-server
+    ports:
+      - 8080:8080
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_PROXY=edge
+    ipc: host
+    command: start-dev
+    restart: always
+
+  productivity-suite-xeon-react-ui-server:
+    image: ${REGISTRY:-opea}/productivity-suite-react-ui-server:${TAG:-latest}
+    container_name: productivity-suite-xeon-react-ui-server
+    ports:
+      - "5174:80"
+    environment:
+      - APP_BACKEND_SERVICE_ENDPOINT_CHATQNA=${BACKEND_SERVICE_ENDPOINT_CHATQNA}
+      - APP_BACKEND_SERVICE_ENDPOINT_CODEGEN=${BACKEND_SERVICE_ENDPOINT_CODEGEN}
+      - APP_BACKEND_SERVICE_ENDPOINT_DOCSUM=${BACKEND_SERVICE_ENDPOINT_DOCSUM}
+      - APP_BACKEND_SERVICE_ENDPOINT_FAQGEN=${BACKEND_SERVICE_ENDPOINT_FAQGEN}
+      - APP_DATAPREP_SERVICE_ENDPOINT=${DATAPREP_SERVICE_ENDPOINT}
+      - APP_DATAPREP_GET_FILE_ENDPOINT=${DATAPREP_GET_FILE_ENDPOINT}
+      - APP_DATAPREP_DELETE_FILE_ENDPOINT=${DATAPREP_DELETE_FILE_ENDPOINT}
+      - APP_CHAT_HISTORY_CREATE_ENDPOINT=${CHAT_HISTORY_CREATE_ENDPOINT}
+      - APP_CHAT_HISTORY_DELETE_ENDPOINT=${CHAT_HISTORY_DELETE_ENDPOINT}
+      - APP_CHAT_HISTORY_GET_ENDPOINT=${CHAT_HISTORY_GET_ENDPOINT}
+      - APP_PROMPT_SERVICE_GET_ENDPOINT=${PROMPT_SERVICE_GET_ENDPOINT}
+      - APP_PROMPT_SERVICE_CREATE_ENDPOINT=${PROMPT_SERVICE_CREATE_ENDPOINT}
+      - APP_KEYCLOAK_SERVICE_ENDPOINT=${KEYCLOAK_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+networks:
+  default:
+    driver: bridge
