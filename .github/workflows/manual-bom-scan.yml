@@ -57,11 +57,23 @@ jobs:
           docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
           echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
 
-      - name: Scan Container
-        uses: opea-project/validation/actions/license-scan@main # TODO
+      - name: SBOM Scan Container
+        uses: anchore/sbom-action@v0.17.1
+        with:
+          image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
+          output-file: ${{ matrix.image }}-sbom-scan.txt
+          format: 'spdx-json'
+
+      - name: Security Scan Container
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
-          output: ${{ matrix.image }}-scan.txt
+          output: ${{ matrix.image }}-trivy-scan.txt
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
       - name: Cleanup
         if: always()
@@ -70,5 +82,5 @@ jobs:
       - uses: actions/upload-artifact@v4.3.4
         with:
           name: ${{ matrix.image }}-scan
-          path: ${{ matrix.image }}-scan.txt
+          path: ${{ matrix.image }}-*-scan.txt
           overwrite: true
