@@ -47,7 +47,7 @@ function start_services() {
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 10s
         n=$((n+1))
     done
 }
@@ -82,8 +82,7 @@ function validate_services() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
-    # TODO: Any results check required??
-    sleep 3m
+
     # tgi for llm service
     validate_services \
         "${ip_address}:8008/generate" \
