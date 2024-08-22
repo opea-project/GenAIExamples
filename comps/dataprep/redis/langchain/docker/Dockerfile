@@ -15,7 +15,8 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
     default-jre \
     vim \
     poppler-utils \
-    tesseract-ocr
+    tesseract-ocr \
+    libreoffice 
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
