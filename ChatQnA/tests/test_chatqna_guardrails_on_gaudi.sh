@@ -68,12 +68,12 @@ function start_services() {
 
     # Make sure tgi guardrails service is ready
     n=0
-    until [[ "$n" -ge 400 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs tgi-guardrails-server > tgi_guardrails_service_start.log
         if grep -q Connected tgi_guardrails_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 }

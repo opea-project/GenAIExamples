@@ -80,23 +80,23 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 500 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             echo "ChatQnA TGI Service Connected"
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
     n=0
-    until [[ "$n" -ge 500 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs tgi_service_codegen > ${LOG_PATH}/tgi_service_codegen_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_codegen_start.log; then
             echo "CodeGen TGI Service Connected"
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 }
