@@ -27,6 +27,7 @@ function validate() {
 function ingest_data_and_validate() {
     echo "Ingesting data"
     cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/
+    echo $PWD
     local CONTENT=$(bash run_ingest_data.sh)
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-server")
     echo "$EXIT_CODE"
@@ -61,3 +62,5 @@ function main(){
     validate_retrieval_tool
     echo "==================== Retrieval tool validated ===================="
 }
+
+main

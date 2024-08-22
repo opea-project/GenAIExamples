@@ -20,7 +20,7 @@ function stop_agent_and_api_server() {
 
 function stop_retrieval_tool() {
     echo "Stopping Retrieval tool"
-    docker compose -f $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/docker/docker_compose.yaml down
+    docker compose -f $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/docker/docker-compose-retrieval-tool.yaml down
 }
 
 echo "=================== #1 Building docker images===================="
@@ -43,8 +43,8 @@ echo "=================== #5 Stop agent and API server===================="
 stop_agent_and_api_server
 echo "=================== #5 Agent and API server stopped===================="
 
-# echo "=================== #6 Stop retrieval tool===================="
-# stop_retrieval_tool
-# echo "=================== #6 Retrieval tool stopped===================="
+echo "=================== #6 Stop retrieval tool===================="
+stop_retrieval_tool
+echo "=================== #6 Retrieval tool stopped===================="
 
 echo "ALL DONE!"
