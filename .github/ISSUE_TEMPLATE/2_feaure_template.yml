@@ -16,15 +16,6 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: Customer
-    attributes:
-      label: Customer info
-      description: Customer name, business impact, potential deal (Chip Number, Money) and other.
-      placeholder: Name, business impact, money.
-    validations:
-      required: true
-
   - type: checkboxes
     id: os
     attributes:
