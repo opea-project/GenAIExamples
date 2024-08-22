@@ -23,7 +23,7 @@ function build_docker_images() {
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:1.2.1
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {

@@ -22,7 +22,7 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui dataprep-qdrant embedding-tei retriever-qdrant reranking-tei llm-tgi"
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {
