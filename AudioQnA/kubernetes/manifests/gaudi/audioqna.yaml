@@ -10,7 +10,7 @@ data:
   ASR_ENDPOINT: http://whisper-svc.default.svc.cluster.local:7066
   TTS_ENDPOINT: http://speecht5-svc.default.svc.cluster.local:7055
   LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
-  HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:3006
   MEGA_SERVICE_HOST_IP: audioqna-backend-server-svc
   ASR_SERVICE_HOST_IP: asr-svc
