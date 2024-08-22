@@ -22,7 +22,7 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui dataprep-qdrant embedding-tei retriever-qdrant reranking-tei llm-tgi"
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -53,14 +53,14 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose_qdrant.yaml up -d
+    docker compose -f compose_qdrant.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 200 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs tgi-service > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 }

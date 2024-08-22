@@ -24,7 +24,7 @@ function build_docker_images() {
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -51,15 +51,15 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose_vllm_ray.yaml up -d
+    docker compose -f compose_vllm_ray.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 25 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         echo "n=$n"
         docker logs vllm-ray-gaudi-server > vllm_ray_service_start.log
         if grep -q "Warmup finished" vllm_ray_service_start.log; then
             break
         fi
-        sleep 20s
+        sleep 5s
         n=$((n+1))
     done
 }

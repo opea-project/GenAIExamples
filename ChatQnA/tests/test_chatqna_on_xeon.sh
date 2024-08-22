@@ -25,7 +25,7 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -54,7 +54,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 500 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
