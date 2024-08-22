@@ -21,7 +21,7 @@ services:
       context: ui
       dockerfile: ./docker/Dockerfile.react
     extends: codegen
-    image: ${REGISTRY:-opea}/codegen-conversation-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
   llm-tgi:
     build:
       context: GenAIComps
