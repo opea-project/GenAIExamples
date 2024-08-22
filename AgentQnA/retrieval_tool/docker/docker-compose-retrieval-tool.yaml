@@ -17,7 +17,7 @@ services:
     ports:
       - "6006:80"
     volumes:
-      - ${WORKDIR}/hf_cache:/data
+      - ${HF_CACHE_DIR}:/data
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -70,7 +70,7 @@ services:
     ports:
       - "8808:80"
     volumes:
-      - ${WORKDIR}/hf_cache:/data
+      - ${HF_CACHE_DIR}:/data
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
