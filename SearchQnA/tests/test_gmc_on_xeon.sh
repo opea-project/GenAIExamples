@@ -36,10 +36,10 @@ function validate_searchqa() {
     export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
     echo "$CLIENT_POD"
     accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='searchqa')].status.accessUrl}")
-    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"text":"What is the latest news? Give me also the source link."}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_searchqa.log
+    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"text":"How many gold medals does USA win in olympics 2024? Give me also the source link."}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_searchqa.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-        echo "chatqna failed, please check the logs in ${LOG_PATH}!"
+        echo "searchqna failed, please check the logs in ${LOG_PATH}!"
         exit 1
     fi
 
