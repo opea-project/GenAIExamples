@@ -32,7 +32,7 @@ export GOOGLE_CSE_ID=xxx
 ```
 
 ```bash
-docker run -d --name="web-retriever-chroma-server" -p 7078:7077 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT opea/web-retriever-chroma:latest
+docker run -d --name="web-retriever-chroma-server" -p 7077:7077 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e GOOGLE_API_KEY=$GOOGLE_API_KEY -e GOOGLE_CSE_ID=$GOOGLE_CSE_ID opea/web-retriever-chroma:latest
 ```
 
 ### Consume Web Retriever Service
@@ -43,8 +43,8 @@ To consume the Web Retriever Microservice, you can generate a mock embedding vec
 # Test
 your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 
-curl http://${your_ip}:7077/v1/web_retrieval \
+http_proxy= curl http://${your_ip}:7077/v1/web_retrieval \
   -X POST \
-  -d "{\"text\":\"What is OPEA?\",\"embedding\":${your_embedding}}" \
+  -d "{\"text\":\"What is black myth wukong?\",\"embedding\":${your_embedding}}" \
   -H 'Content-Type: application/json'
 ```
