@@ -1,0 +1,14 @@
+.promptContainer {
+  flex: 20;
+  border-left: 1px solid var(--mantine-color-gray-3);
+  height: 82vh;
+  padding: 8px;
+  .prompt {
+    // height: %;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    padding: 8px;
+    border: 1px solid var(--mantine-color-gray-3);
+  }
+}

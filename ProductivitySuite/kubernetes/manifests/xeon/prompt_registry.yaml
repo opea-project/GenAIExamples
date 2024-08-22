@@ -1,0 +1,75 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prompt-registry-config
+data:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  MONGO_HOST: "mongo"
+  MONGO_PORT: "27017"
+  DB_NAME: "OPEA"
+  COLLECTION_NAME: "Prompt"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prompt-registry
+  labels:
+    helm.sh/chart: prompt-registry-0.1.0
+    app.kubernetes.io/name: prompt-registry
+    app.kubernetes.io/instance: prompt-registry
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6012
+      targetPort: 6012
+      protocol: TCP
+      name: prompt-registry
+  selector:
+    app.kubernetes.io/name: prompt-registry
+    app.kubernetes.io/instance: prompt-registry
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prompt-registry
+  labels:
+    helm.sh/chart: prompt-registry-0.1.0
+    app.kubernetes.io/name: prompt-registry
+    app.kubernetes.io/instance: prompt-registry
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prompt-registry
+      app.kubernetes.io/instance: prompt-registry
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: prompt-registry
+        app.kubernetes.io/instance: prompt-registry
+    spec:
+      securityContext: null
+      containers:
+        - name: prompt-registry
+          envFrom:
+          - configMapRef:
+              name: prompt-registry-config
+          securityContext: null
+          image: "opea/promptregistry-mongo-server:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: prompt-registry
+              containerPort: 6012
+              protocol: TCP
+          resources: null
+---
