@@ -86,7 +86,7 @@ function validate_chatqna() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOGFILE ]] &&
-        [[ $(grep -c "billion" $LOGFILE) != 0 ]]; then
+        [[ $(grep -c "\[DONE\]" $LOGFILE) != 0 ]]; then
         status=true
     fi
     if [ $status == false ]; then

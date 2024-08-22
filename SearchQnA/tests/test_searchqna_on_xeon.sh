@@ -23,7 +23,7 @@ function build_docker_images() {
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
+    docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
     docker images
 }
 
@@ -71,10 +71,12 @@ function start_services() {
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the latest news? Give me also the source link", "stream": "False"}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "How many gold medals does USA win in olympics 2024? Give me also the source link.", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"news"* ]]; then
+    if [[ $result == *"2024"* ]]; then
+        docker logs web-retriever-chroma-server
+        docker logs searchqna-xeon-backend-server
         echo "Result correct."
     else
         docker logs web-retriever-chroma-server
