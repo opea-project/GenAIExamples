@@ -1,0 +1,157 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  dataprep-redis-service:
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+    ports:
+      - "6007:6007"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+  tei-embedding-service:
+    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}
+    container_name: tei-embedding-gaudi-server
+    ports:
+      - "8090:80"
+    volumes:
+      - "./data:/data"
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      MAX_WARMUP_SEQUENCE_LENGTH: 512
+      INIT_HCCL_ON_ACQUIRE: 0
+      ENABLE_EXPERIMENTAL_FLAGS: true
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+  embedding:
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+    container_name: embedding-tei-server
+    depends_on:
+      - tei-embedding-service
+    ports:
+      - "6000:6000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+    restart: unless-stopped
+  retriever:
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    container_name: retriever-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+    restart: unless-stopped
+  tgi-service:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+    container_name: tgi-gaudi-server
+    ports:
+      - "8005:80"
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
+  llm:
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    container_name: llm-tgi-gaudi-server
+    depends_on:
+      - tgi-service
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    restart: unless-stopped
+  chaqna-gaudi-backend-server:
+    image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
+    container_name: chatqna-gaudi-backend-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+      - embedding
+      - retriever
+      - tgi-service
+      - llm
+    ports:
+      - "8888:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
+      - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  chaqna-gaudi-ui-server:
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    container_name: chatqna-gaudi-ui-server
+    depends_on:
+      - chaqna-gaudi-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
+      - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
+      - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
