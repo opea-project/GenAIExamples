@@ -39,7 +39,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     until [[ "$n" -ge 500 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log

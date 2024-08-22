@@ -78,7 +78,7 @@ function start_services() {
     export PROMPT_COLLECTION_NAME="prompt"
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 500 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log

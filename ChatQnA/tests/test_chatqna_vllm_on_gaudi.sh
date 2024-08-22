@@ -50,15 +50,15 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose_vllm.yaml up -d
+    docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 25 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         echo "n=$n"
         docker logs vllm-gaudi-server > vllm_service_start.log
         if grep -q "Warmup finished" vllm_service_start.log; then
             break
         fi
-        sleep 20s
+        sleep 5s
         n=$((n+1))
     done
 }

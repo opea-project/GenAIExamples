@@ -55,14 +55,14 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose_guardrails.yaml up -d
+    docker compose -f compose_guardrails.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 400 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs tgi-gaudi-server > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 
