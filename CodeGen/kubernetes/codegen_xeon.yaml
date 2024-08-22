@@ -29,6 +29,5 @@ spec:
         internalService:
           serviceName: tgi-service
           config:
-            MODEL_ID: meta-llama/CodeLlama-7b-hf
             endpoint: /generate
           isDownstreamService: true
