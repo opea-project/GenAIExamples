@@ -5,7 +5,8 @@
 
 declare -A dict
 dict["langchain/langchain"]="docker://docker.io/langchain/langchain"
-dict["vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2"]="docker://vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2"
+# dict["vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2"]="docker://vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2"
+dict["opea/habanalabs:1.16.1-pytorch-installer-2.2.2"]="docker://docker.io/opea/habanalabs:1.16.1-pytorch-installer-2.2.2"
 
 function get_latest_version() {
     repo_image=$1
