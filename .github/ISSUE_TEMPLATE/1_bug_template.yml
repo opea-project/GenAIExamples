@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 name: Report Bug
 description: Used to report bug
 title: "[Bug]"
