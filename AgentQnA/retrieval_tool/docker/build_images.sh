@@ -2,7 +2,6 @@ cd ${WORKDIR}/GenAIComps/
 echo $PWD
 
 echo "==============Building dataprep image================="
-# cp ingest_data.py ${WORKDIR}/GenAIComps/comps/dataprep/redis/langchain/prepare_doc_redis.py
 docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/docker/Dockerfile .
 echo "==============Successfully built dataprep image================="
 
@@ -22,4 +21,4 @@ cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/docker/
 echo $PWD
 echo "==============Building retrieval-tool image================="
 docker build --no-cache -t opea/retrievaltool:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_retrievaltool .
-echo "==============Successfully built embedding-tei image================="
+echo "==============Successfully built retrieval-tool image================="

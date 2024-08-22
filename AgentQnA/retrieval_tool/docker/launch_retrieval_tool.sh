@@ -1,5 +1,5 @@
 host_ip=$(hostname -I | awk '{print $1}')
-export WORKDIR=/localdisk/minminho
+
 export no_proxy=${no_proxy}
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
