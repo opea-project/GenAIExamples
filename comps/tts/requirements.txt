@@ -4,12 +4,9 @@ fastapi
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
-optimum[habana]
 prometheus-fastapi-instrumentator
 sentencepiece
 shortuuid
 soundfile
-torch
-torchvision
 transformers
 uvicorn
