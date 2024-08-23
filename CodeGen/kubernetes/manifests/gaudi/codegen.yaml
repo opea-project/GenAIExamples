@@ -271,6 +271,8 @@ spec:
           resources:
             limits:
               habana.ai/gaudi: 1
+              memory: 64Gi
+              hugepages-2Mi: 500Mi
       volumes:
         - name: model-volume
           hostPath:
