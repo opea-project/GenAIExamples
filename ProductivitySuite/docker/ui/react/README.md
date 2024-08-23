@@ -16,20 +16,21 @@ Here're some of the project's features:
 
 #### DATA SOURCE
 
-  - The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
-  - Uploaded File would get listed and user would be able add or remove file/links
+- The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
+- Uploaded File would get listed and user would be able add or remove file/links
 
 ##### Screen Shot
 
-  ![project-screenshot](../../../assets/img/data_source.png)
+![project-screenshot](../../../assets/img/data_source.png)
 
 - Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
 - Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
 - Conversational Chat : The application maintains a history of the conversation, allowing users to review previous messages and the AI to refer back to earlier points in the dialogue when necessary.
 
 ##### Screen Shots
-  ![project-screenshot](../../../assets/img/chat_qna_init.png)
-  ![project-screenshot](../../../assets/img/chatqna_with_conversation.png)
+
+![project-screenshot](../../../assets/img/chat_qna_init.png)
+![project-screenshot](../../../assets/img/chatqna_with_conversation.png)
 
 ### CODEGEN
 
@@ -44,8 +45,9 @@ Here're some of the project's features:
 - Scroll to Bottom: The summarized content will automatically scroll to the bottom.
 
 #### Screen Shot
-  ![project-screenshot](../../../assets/img/doc_summary_paste.png)
-  ![project-screenshot](../../../assets/img/doc_summary_file.png)
+
+![project-screenshot](../../../assets/img/doc_summary_paste.png)
+![project-screenshot](../../../assets/img/doc_summary_file.png)
 
 ### FAQ Generator
 
@@ -54,7 +56,8 @@ Here're some of the project's features:
 - Generate FAQs from Text via txt file Upload: Upload the file in the Upload bar, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
 
 #### Screen Shot
-  ![project-screenshot](../../../assets/img/faq_generator.png)
+
+![project-screenshot](../../../assets/img/faq_generator.png)
 
 ## 🛠️ Get it Running:
 

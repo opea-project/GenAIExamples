@@ -265,7 +265,7 @@ Please refer to [keycloak_setup_guide](keycloak_setup_guide.md) for more detail 
      -H 'Content-Type: application/json'
    ```
 
-8. LLM backend Service (CodeGen)
+7. LLM backend Service (CodeGen)
 
    ```bash
    curl http://${host_ip}:8028/generate \
@@ -274,7 +274,7 @@ Please refer to [keycloak_setup_guide](keycloak_setup_guide.md) for more detail 
      -H 'Content-Type: application/json'
    ```
 
-9. ChatQnA LLM Microservice
+8. ChatQnA LLM Microservice
 
    ```bash
    curl http://${host_ip}:9000/v1/chat/completions\
@@ -283,204 +283,204 @@ Please refer to [keycloak_setup_guide](keycloak_setup_guide.md) for more detail 
      -H 'Content-Type: application/json'
    ```
 
-10. CodeGen LLM Microservice
+9. CodeGen LLM Microservice
 
-   ```bash
-   curl http://${host_ip}:9001/v1/chat/completions\
-     -X POST \
-     -d '{"query":"def print_hello_world():"}' \
-     -H 'Content-Type: application/json'
-   ```
+```bash
+curl http://${host_ip}:9001/v1/chat/completions\
+  -X POST \
+  -d '{"query":"def print_hello_world():"}' \
+  -H 'Content-Type: application/json'
+```
 
 11. DocSum LLM Microservice
 
-   ```bash
-   curl http://${host_ip}:9002/v1/chat/docsum\
-     -X POST \
-     -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
-     -H 'Content-Type: application/json'
-   ```
+```bash
+curl http://${host_ip}:9002/v1/chat/docsum\
+  -X POST \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
+  -H 'Content-Type: application/json'
+```
 
 12. FAQGen LLM Microservice
 
-   ```bash
-   curl http://${host_ip}:9003/v1/faqgen\
-     -X POST \
-     -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
-     -H 'Content-Type: application/json'
-   ```
+```bash
+curl http://${host_ip}:9003/v1/faqgen\
+  -X POST \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
+  -H 'Content-Type: application/json'
+```
 
 13. ChatQnA MegaService
 
-   ```bash
-   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "messages": "What is the revenue of Nike in 2023?"
-        }'
-   ```
+```bash
+curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+     "messages": "What is the revenue of Nike in 2023?"
+     }'
+```
 
 14. FAQGen MegaService
 
-   ```bash
-   curl http://${host_ip}:8889/v1/faqgen -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-        }'
-   ```
+```bash
+curl http://${host_ip}:8889/v1/faqgen -H "Content-Type: application/json" -d '{
+     "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+     }'
+```
 
 15. DocSum MegaService
 
-   ```bash
-   curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-        }'
-   ```
+```bash
+curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
+     "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+     }'
+```
 
 16. CodeGen MegaService
 
-   ```bash
-   curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
-        "messages": "def print_hello_world():"
-        }'
-   ```
+```bash
+curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
+     "messages": "def print_hello_world():"
+     }'
+```
 
 17. Dataprep Microservice
 
-   If you want to update the default knowledge base, you can use the following commands:
+If you want to update the default knowledge base, you can use the following commands:
 
-   Update Knowledge Base via Local File Upload:
+Update Knowledge Base via Local File Upload:
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F "files=@./nke-10k-2023.pdf"
-   ```
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
+```
 
-   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-   Add Knowledge Base via HTTP Links:
+Add Knowledge Base via HTTP Links:
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F 'link_list=["https://opea.dev"]'
-   ```
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
 
-   This command updates a knowledge base by submitting a list of HTTP links for processing.
+This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-   Also, you are able to get the file list that you uploaded:
+Also, you are able to get the file list that you uploaded:
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
-        -H "Content-Type: application/json"
-   ```
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+     -H "Content-Type: application/json"
+```
 
-   To delete the file/link you uploaded:
+To delete the file/link you uploaded:
 
-   ```bash
-   # delete link
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "https://opea.dev.txt"}' \
-        -H "Content-Type: application/json"
+```bash
+# delete link
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "https://opea.dev.txt"}' \
+     -H "Content-Type: application/json"
 
-   # delete file
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "nke-10k-2023.pdf"}' \
-        -H "Content-Type: application/json"
+# delete file
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "nke-10k-2023.pdf"}' \
+     -H "Content-Type: application/json"
 
-   # delete all uploaded files and links
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "all"}' \
-        -H "Content-Type: application/json"
-   ```
+# delete all uploaded files and links
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "all"}' \
+     -H "Content-Type: application/json"
+```
 
 18. Prompt Registry Microservice
 
-   If you want to update the default Prompts in the application for your user, you can use the following commands:
+If you want to update the default Prompts in the application for your user, you can use the following commands:
 
-   ```bash
-   curl -X 'POST' \
-     http://{host_ip}:6015/v1/prompt/create \
-     -H 'accept: application/json' \
-     -H 'Content-Type: application/json' \
-     -d '{
-       "prompt_text": "test prompt", "user": "test"
-   }'
-   ```
+```bash
+curl -X 'POST' \
+  http://{host_ip}:6015/v1/prompt/create \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "prompt_text": "test prompt", "user": "test"
+}'
+```
 
-   Retrieve prompt from database based on user or prompt_id
+Retrieve prompt from database based on user or prompt_id
 
-   ```bash
-   curl -X 'POST' \
-     http://{host_ip}:6015/v1/prompt/get \
-     -H 'accept: application/json' \
-     -H 'Content-Type: application/json' \
-     -d '{
-     "user": "test"}'
+```bash
+curl -X 'POST' \
+  http://{host_ip}:6015/v1/prompt/get \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test"}'
 
-   curl -X 'POST' \
-     http://{host_ip}:6015/v1/prompt/get \
-     -H 'accept: application/json' \
-     -H 'Content-Type: application/json' \
-     -d '{
-     "user": "test", "prompt_id":"{prompt_id returned from save prompt route above}"}'
-   ```
+curl -X 'POST' \
+  http://{host_ip}:6015/v1/prompt/get \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test", "prompt_id":"{prompt_id returned from save prompt route above}"}'
+```
 
-   Delete prompt from database based on prompt_id provided
+Delete prompt from database based on prompt_id provided
 
-   ```bash
-   curl -X 'POST' \
-     http://{host_ip}:6015/v1/prompt/delete \
-     -H 'accept: application/json' \
-     -H 'Content-Type: application/json' \
-     -d '{
-     "user": "test", "prompt_id":"{prompt_id to be deleted}"}'
-   ```
+```bash
+curl -X 'POST' \
+  http://{host_ip}:6015/v1/prompt/delete \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test", "prompt_id":"{prompt_id to be deleted}"}'
+```
 
 19. Chat History Microservice
 
-   To validate the chatHistory Microservice, you can use the following commands.
+To validate the chatHistory Microservice, you can use the following commands.
 
-   Create a sample conversation and get the message ID.
+Create a sample conversation and get the message ID.
 
-   ```bash
-   curl -X 'POST' \
-     http://${host_ip}:6012/v1/chathistory/create \
-     -H 'accept: application/json' \
-     -H 'Content-Type: application/json' \
-     -d '{
-     "data": {
-       "messages": "test Messages", "user": "test"
-     }
-   }'
-   ```
+```bash
+curl -X 'POST' \
+  http://${host_ip}:6012/v1/chathistory/create \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "data": {
+    "messages": "test Messages", "user": "test"
+  }
+}'
+```
 
-   Retrieve the conversation based on user or conversation id
+Retrieve the conversation based on user or conversation id
 
-   ```bash
-   curl -X 'POST' \
-     http://${host_ip}:6012/v1/chathistory/get \
-     -H 'accept: application/json' \
-     -H 'Content-Type: application/json' \
-     -d '{
-     "user": "test"}'
+```bash
+curl -X 'POST' \
+  http://${host_ip}:6012/v1/chathistory/get \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test"}'
 
-   curl -X 'POST' \
-     http://${host_ip}:6012/v1/chathistory/get \
-     -H 'accept: application/json' \
-     -H 'Content-Type: application/json' \
-     -d '{
-     "user": "test", "id":"{Conversation id to retrieve }"}'
-   ```
+curl -X 'POST' \
+  http://${host_ip}:6012/v1/chathistory/get \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test", "id":"{Conversation id to retrieve }"}'
+```
 
-   Delete Conversation from database based on conversation id provided.
+Delete Conversation from database based on conversation id provided.
 
-   ```bash
-   curl -X 'POST' \
-     http://${host_ip}:6012/v1/chathistory/delete \
-     -H 'accept: application/json' \
-     -H 'Content-Type: application/json' \
-     -d '{
-     "user": "test", "id":"{Conversation id to Delete}"}'
-   ```
+```bash
+curl -X 'POST' \
+  http://${host_ip}:6012/v1/chathistory/delete \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": "test", "id":"{Conversation id to Delete}"}'
+```
 
 ## 🚀 Launch the UI
 
@@ -509,20 +509,21 @@ Here're some of the project's features:
 
 ### DATA SOURCE
 
-  - The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
-  - Uploaded File would get listed and user would be able add or remove file/links
+- The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
+- Uploaded File would get listed and user would be able add or remove file/links
 
 #### Screen Shot
 
-  ![project-screenshot](../../assets/img/data_source.png)
+![project-screenshot](../../assets/img/data_source.png)
 
 - Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
 - Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
 - Conversational Chat : The application maintains a history of the conversation, allowing users to review previous messages and the AI to refer back to earlier points in the dialogue when necessary.
 
 #### Screen Shots
-  ![project-screenshot](../../assets/img/chat_qna_init.png)
-  ![project-screenshot](../../assets/img/chatqna_with_conversation.png)
+
+![project-screenshot](../../assets/img/chat_qna_init.png)
+![project-screenshot](../../assets/img/chatqna_with_conversation.png)
 
 ### CODEGEN
 
@@ -537,8 +538,9 @@ Here're some of the project's features:
 - Scroll to Bottom: The summarized content will automatically scroll to the bottom.
 
 #### Screen Shot
-  ![project-screenshot](../../assets/img/doc_summary_paste.png)
-  ![project-screenshot](../../assets/img/doc_summary_file.png)
+
+![project-screenshot](../../assets/img/doc_summary_paste.png)
+![project-screenshot](../../assets/img/doc_summary_file.png)
 
 ### FAQ Generator
 
@@ -547,4 +549,5 @@ Here're some of the project's features:
 - Generate FAQs from Text via txt file Upload: Upload the file in the Upload bar, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
 
 #### Screen Shot
-  ![project-screenshot](../../assets/img/faq_generator.png)
+
+![project-screenshot](../../assets/img/faq_generator.png)
