@@ -1,14 +1,14 @@
-# Toxicity Detection Microservice
-
-# ☣️💥🛡️<span style="color:royalblue"> Intel Toxicity Detection Model </span>
+# ☣️💥🛡️Toxicity Detection Microservice
 
 ## Introduction
 
-Intel also provides toxicity detection model, which is lightweight, runs efficiently on a CPU, and performs well on toxic_chat and jigsaws datasets. More datasets are being fine-tuned. If you're interested, please contact abolfazl.shahbazi@intel.com.
+Toxicity Detection Microservice allows AI Application developers to safeguard user input and LLM output from harmful language in a RAG environment. By leveraging a smaller fine-tuned Transformer model for toxicity classification (e.g. DistilledBERT, RoBERTa, etc.), we maintain a lightweight guardrails microservice without significantly sacrificing performance making it readily deployable on both Intel Gaudi and Xeon.
 
-## Training Customerizable Toxicity Model on Gaudi2
+Toxicity is defined as rude, disrespectful, or unreasonable language likely to make someone leave a conversation. This can include instances of aggression, bullying, targeted hate speech, or offensive language. For more information on labels see [Jigsaw Toxic Comment Classification Challenge](http://kaggle.com/c/jigsaw-toxic-comment-classification-challenge).
 
-Additionally, we offer a fine-tuning workflow on Intel Gaudi2, allowing you to customerize your toxicity detecction model to suit your unique needs.
+## Future Development
+
+- Add a RoBERTa (125M params) toxicity model fine-tuned on Gaudi2 with ToxicChat and Jigsaw dataset in an optimized serving framework.
 
 # 🚀1. Start Microservice with Python（Option 1）
 
@@ -24,7 +24,7 @@ pip install -r requirements.txt
 python toxicity_detection.py
 ```
 
-# 🚀2. Start Microservie with Docker (Option 2)
+# 🚀2. Start Microservice with Docker (Option 2)
 
 ## 2.1 Prepare toxicity detection model
 
@@ -58,7 +58,7 @@ Once microservice starts, users can use examples (bash or python) below to apply
 ```bash
 curl localhost:9091/v1/toxicity
     -X POST
-    -d '{"text":"How to poison your neighbor'\''s dog secretly"}'
+    -d '{"text":"How to poison my neighbor'\''s dog without being caught?"}'
     -H 'Content-Type: application/json'
 ```
 
@@ -76,7 +76,7 @@ import json
 
 proxies = {"http": ""}
 url = "http://localhost:9091/v1/toxicity"
-data = {"text": "How to poison your neighbor'''s dog without being caught?"}
+data = {"text": "How to poison my neighbor'''s dog without being caught?"}
 
 try:
     resp = requests.post(url=url, data=data, proxies=proxies)
