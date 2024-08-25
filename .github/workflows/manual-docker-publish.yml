@@ -15,6 +15,11 @@ on:
         description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
         required: true
         type: string
+      gmc:
+        default: false
+        description: 'Publish gmc images'
+        required: false
+        type: boolean
       tag:
         default: "v0.9"
         description: "Tag to publish"
@@ -49,24 +54,28 @@ jobs:
               images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
               image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
           done
+          
+          if [ "${{ inputs.gmc }}" == "true" ]; then
+              image_list=$(echo ${image_list} | jq -c '. + ["gmcmanager","gmcrouter"]')
+          fi
           echo $image_list
           echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
 
-  publish:
-    needs: [get-image-list]
-    strategy:
-      matrix:
-        image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
-    runs-on: "docker-build-${{ inputs.node }}"
-    steps:
-      - uses: docker/login-action@v3.2.0
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Image Publish
-        uses: opea-project/validation/actions/image-publish@main
-        with:
-          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
-          image_name: opea/${{ matrix.image }}
-          publish_tags: ${{ inputs.publish_tags }}
+#  publish:
+#    needs: [get-image-list]
+#    strategy:
+#      matrix:
+#        image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
+#    runs-on: "docker-build-${{ inputs.node }}"
+#    steps:
+#      - uses: docker/login-action@v3.2.0
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USER }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      - name: Image Publish
+#        uses: opea-project/validation/actions/image-publish@main
+#        with:
+#          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+#          image_name: opea/${{ matrix.image }}
+#          publish_tags: ${{ inputs.publish_tags }}
