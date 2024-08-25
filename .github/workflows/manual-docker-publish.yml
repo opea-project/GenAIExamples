@@ -53,7 +53,7 @@ jobs:
               images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
               image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
           done
-          
+
           if [ "${{ inputs.gmc }}" == "true" ]; then
               image_list=$(echo ${image_list} | jq -c '. + ["gmcmanager","gmcrouter"]')
           fi
