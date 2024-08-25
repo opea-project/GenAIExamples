@@ -205,7 +205,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/xeon/
-docker compose -f compose_qdrant.yaml up -d
+TAG=v0.9 docker compose -f compose_qdrant.yaml up -d
 ```
 
 ### Validate Microservices

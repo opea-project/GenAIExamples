@@ -63,7 +63,7 @@ Find the corresponding [compose.yaml](./docker/gaudi/compose.yaml).
 
 ```bash
 cd GenAIExamples/VisualQnA/docker/gaudi/
-docker compose up -d
+TAG=v0.9 docker compose up -d
 ```
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
@@ -76,5 +76,5 @@ Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
 
 ```bash
 cd GenAIExamples/VisualQnA/docker/xeon/
-docker compose up -d
+TAG=v0.9 docker compose up -d
 ```

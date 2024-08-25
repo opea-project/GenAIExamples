@@ -124,7 +124,7 @@ cd GenAIExamples/VisualQnA/docker/xeon/
 ```
 
 ```bash
-docker compose -f compose.yaml up -d
+TAG=v0.9 docker compose -f compose.yaml up -d
 ```
 
 ### Validate Microservices

@@ -226,13 +226,13 @@ cd GenAIExamples/ChatQnA/docker/xeon/
 If use TGI backend.
 
 ```bash
-docker compose -f compose.yaml up -d
+TAG=v0.9 docker compose -f compose.yaml up -d
 ```
 
 If use vLLM backend.
 
 ```bash
-docker compose -f compose_vllm.yaml up -d
+TAG=v0.9 docker compose -f compose_vllm.yaml up -d
 ```
 
 ### Validate Microservices

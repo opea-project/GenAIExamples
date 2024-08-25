@@ -121,7 +121,7 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gpu/
-docker compose up -d
+TAG=v0.9 docker compose up -d
 ```
 
 ### Validate MicroServices and MegaService

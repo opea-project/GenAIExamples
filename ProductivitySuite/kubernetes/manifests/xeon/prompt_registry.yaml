@@ -65,7 +65,7 @@ spec:
           - configMapRef:
               name: prompt-registry-config
           securityContext: null
-          image: "opea/promptregistry-mongo-server:latest"
+          image: "opea/promptregistry-mongo-server:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: prompt-registry

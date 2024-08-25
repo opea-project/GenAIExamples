@@ -82,7 +82,7 @@ spec:
             - name: APP_KEYCLOAK_SERVICE_ENDPOINT
               value: ""
           securityContext: null
-          image: "opea/productivity-suite-react-ui-server:latest"
+          image: "opea/productivity-suite-react-ui-server:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: react-ui

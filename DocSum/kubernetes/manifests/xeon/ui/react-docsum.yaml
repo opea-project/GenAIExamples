@@ -180,7 +180,7 @@ spec:
               value:
 
           securityContext: {}
-          image: "opea/llm-docsum-tgi:latest"
+          image: "opea/llm-docsum-tgi:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: llm-uservice
@@ -231,7 +231,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: null
-          image: "opea/docsum:latest"
+          image: "opea/docsum:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: docsum
@@ -274,7 +274,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: null
-          image: "opea/docsum-react-ui:latest"
+          image: "opea/docsum-react-ui:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: react-ui

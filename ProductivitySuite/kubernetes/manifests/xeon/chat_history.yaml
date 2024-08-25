@@ -65,7 +65,7 @@ spec:
           - configMapRef:
               name: chat-history-config
           securityContext: null
-          image: "opea/chathistory-mongo-server:latest"
+          image: "opea/chathistory-mongo-server:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: chat-history

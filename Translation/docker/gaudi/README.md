@@ -64,7 +64,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 ### Start Microservice Docker Containers
 
 ```bash
-docker compose up -d
+TAG=v0.9 docker compose up -d
 ```
 
 ### Validate Microservices

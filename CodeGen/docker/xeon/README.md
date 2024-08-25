@@ -106,7 +106,7 @@ Note: Please replace the `host_ip` with you external IP address, do not use `loc
 
 ```bash
 cd GenAIExamples/CodeGen/docker/xeon
-docker compose up -d
+TAG=v0.9 docker compose up -d
 ```
 
 ### Validate the MicroServices and MegaService

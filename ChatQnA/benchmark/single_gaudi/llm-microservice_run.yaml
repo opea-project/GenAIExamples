@@ -32,7 +32,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/llm-tgi:latest
+        image: opea/llm-tgi:v0.9
         imagePullPolicy: IfNotPresent
         name: llm-deploy
         args: null

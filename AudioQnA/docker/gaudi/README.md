@@ -81,7 +81,7 @@ export LLM_SERVICE_PORT=3007
 
 ```bash
 cd GenAIExamples/AudioQnA/docker/gaudi/
-docker compose up -d
+TAG=v0.9 docker compose up -d
 ```
 
 ## 🚀 Test MicroServices

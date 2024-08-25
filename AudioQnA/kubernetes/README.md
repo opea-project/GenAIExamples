@@ -15,19 +15,19 @@ The AudioQnA application is defined as a Custom Resource (CR) file that the abov
 The AudioQnA uses the below prebuilt images if you choose a Xeon deployment
 
 - tgi-service: ghcr.io/huggingface/text-generation-inference:1.4
-- llm: opea/llm-tgi:latest
-- asr: opea/asr:latest
-- whisper: opea/whisper:latest
-- tts: opea/tts:latest
-- speecht5: opea/speecht5:latest
+- llm: opea/llm-tgi:v0.9
+- asr: opea/asr:v0.9
+- whisper: opea/whisper:v0.9
+- tts: opea/tts:v0.9
+- speecht5: opea/speecht5:v0.9
 
 
 Should you desire to use the Gaudi accelerator, two alternate images are used for the embedding and llm services.
 For Gaudi:
 
 - tgi-service: ghcr.io/huggingface/tgi-gaudi:1.2.1
-- whisper-gaudi: opea/whisper-gaudi:latest
-- speecht5-gaudi: opea/speecht5-gaudi:latest
+- whisper-gaudi: opea/whisper-gaudi:v0.9
+- speecht5-gaudi: opea/speecht5-gaudi:v0.9
 
 > [NOTE]  
 > Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/xeon/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/gaudi/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.

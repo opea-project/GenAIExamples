@@ -85,7 +85,7 @@ cd GenAIExamples/VisualQnA/docker/gaudi/
 ```
 
 ```bash
-docker compose -f compose.yaml up -d
+TAG=v0.9 docker compose -f compose.yaml up -d
 ```
 
 > **_NOTE:_** Users need at least one Gaudi cards to run the VisualQnA successfully.

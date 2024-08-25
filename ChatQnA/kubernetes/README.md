@@ -16,18 +16,18 @@ The ChatQnA uses the below prebuilt images if you choose a Xeon deployment
 
 - redis-vector-db: redis/redis-stack:7.2.0-v9
 - tei_embedding_service: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-- embedding: opea/embedding-tei:latest
-- retriever: opea/retriever-redis:latest
+- embedding: opea/embedding-tei:v0.9
+- retriever: opea/retriever-redis:v0.9
 - tei_xeon_service: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-- reranking: opea/reranking-tei:latest
+- reranking: opea/reranking-tei:v0.9
 - tgi-service: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
-- llm: opea/llm-tgi:latest
-- chaqna-xeon-backend-server: opea/chatqna:latest
+- llm: opea/llm-tgi:v0.9
+- chaqna-xeon-backend-server: opea/chatqna:v0.9
 
 Should you desire to use the Gaudi accelerator, two alternate images are used for the embedding and llm services.
 For Gaudi:
 
-- tei-embedding-service: opea/tei-gaudi:latest
+- tei-embedding-service: opea/tei-gaudi:v0.9
 - tgi-service: ghcr.io/huggingface/tgi-gaudi:1.2.1
 
 > [NOTE]  

@@ -24,7 +24,7 @@ spec:
           env:
             - name: DOC_BASE_URL
               value: http://{insert_your_ip_here}:7779/v1/faqgen
-          image: opea/faqgen-ui:latest
+          image: opea/faqgen-ui:v0.9
           imagePullPolicy: IfNotPresent
           args: null
           ports:

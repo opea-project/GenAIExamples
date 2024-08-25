@@ -169,7 +169,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/llm-tgi:latest"
+          image: "opea/llm-tgi:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: llm-uservice
@@ -322,7 +322,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/codetrans:latest"
+          image: "opea/codetrans:v0.9"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /tmp

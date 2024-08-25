@@ -40,7 +40,7 @@ spec:
             configMapKeyRef:
               name: qna-config
               key: INDEX_NAME
-        image: opea/retriever-redis:latest
+        image: opea/retriever-redis:v0.9
         imagePullPolicy: IfNotPresent
         name: retriever-deploy
         args: null

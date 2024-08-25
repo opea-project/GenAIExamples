@@ -211,26 +211,26 @@ cd GenAIExamples/ChatQnA/docker/gaudi/
 If use tgi for llm backend.
 
 ```bash
-docker compose -f compose.yaml up -d
+TAG=v0.9 docker compose -f compose.yaml up -d
 ```
 
 If use vllm for llm backend.
 
 ```bash
-docker compose -f compose_vllm.yaml up -d
+TAG=v0.9 docker compose -f compose_vllm.yaml up -d
 ```
 
 If use vllm-on-ray for llm backend.
 
 ```bash
-docker compose -f compose_vllm_ray.yaml up -d
+TAG=v0.9 docker compose -f compose_vllm_ray.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/gaudi/
-docker compose -f compose_guardrails.yaml up -d
+TAG=v0.9 docker compose -f compose_guardrails.yaml up -d
 ```
 
 > **_NOTE:_** Users need at least two Gaudi cards to run the ChatQnA successfully.

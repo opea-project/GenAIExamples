@@ -93,7 +93,7 @@ Note: Please replace with `host_ip` with your external IP address, do not use lo
 
 ```bash
 cd GenAIExamples/DocSum/docker/xeon
-docker compose up -d
+TAG=v0.9 docker compose up -d
 ```
 
 ### Validate Microservices

@@ -500,7 +500,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/dataprep-redis:latest"
+          image: "opea/dataprep-redis:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: data-prep
@@ -578,7 +578,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/embedding-tei:latest"
+          image: "opea/embedding-tei:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: embedding-usvc
@@ -656,7 +656,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/llm-tgi:latest"
+          image: "opea/llm-tgi:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: llm-uservice
@@ -806,7 +806,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/reranking-tei:latest"
+          image: "opea/reranking-tei:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: reranking-usvc
@@ -884,7 +884,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/retriever-redis:latest"
+          image: "opea/retriever-redis:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: retriever-usvc
@@ -1209,7 +1209,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/chatqna:latest"
+          image: "opea/chatqna:v0.9"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /tmp

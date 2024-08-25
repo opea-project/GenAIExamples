@@ -70,7 +70,7 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7777/v1/codetrans"
 
 ```bash
 cd GenAIExamples/CodeTrans/docker/xeon
-docker compose up -d
+TAG=v0.9 docker compose up -d
 ```
 
 ### Validate Microservices

@@ -31,7 +31,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/tei-gaudi:latest
+        image: opea/tei-gaudi:v0.9
         name: reranking-dependency-deploy
         args:
         - --model-id

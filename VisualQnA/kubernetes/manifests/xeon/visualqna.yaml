@@ -166,7 +166,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/lvm-tgi:latest"
+          image: "opea/lvm-tgi:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: lvm-uservice
@@ -282,7 +282,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/visualqna:latest"
+          image: "opea/visualqna:v0.9"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /tmp

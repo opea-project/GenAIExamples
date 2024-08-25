@@ -183,7 +183,7 @@ spec:
             - configMapRef:
                 name: faqgen-llm-uservice-config
           securityContext: {}
-          image: "opea/llm-faqgen-tgi:latest"
+          image: "opea/llm-faqgen-tgi:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: llm-uservice
@@ -234,7 +234,7 @@ spec:
             - name: no_proxy
               value: ""
           securityContext: null
-          image: "opea/faqgen:latest"
+          image: "opea/faqgen:v0.9"
           imagePullPolicy: IfNotPresent
           ports:
             - name: faqgen

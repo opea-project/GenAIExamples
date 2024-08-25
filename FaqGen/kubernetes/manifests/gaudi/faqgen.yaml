@@ -117,7 +117,7 @@ spec:
               value: "http://faq-tgi-svc.default.svc.cluster.local:8010"
             - name: HUGGINGFACEHUB_API_TOKEN
               value: "insert-your-huggingface-token-here"
-          image: opea/llm-faqgen-tgi:latest
+          image: opea/llm-faqgen-tgi:v0.9
           imagePullPolicy: IfNotPresent
           args: null
           ports:
@@ -166,7 +166,7 @@ spec:
               value: faq-mega-server-svc
             - name: MEGA_SERVICE_PORT
               value: "7777"
-          image: opea/faqgen:latest
+          image: opea/faqgen:v0.9
           imagePullPolicy: IfNotPresent
           args: null
           ports:

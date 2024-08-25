@@ -59,7 +59,7 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 export llm_hardware='xeon' #xeon, xpu, gaudi
 cd GenAIExamples/DocIndexRetriever/docker/${llm_hardware}/
-docker compose -f docker-compose.yaml up -d
+TAG=v0.9 docker compose -f docker-compose.yaml up -d
 ```
 
 ### 3. Validation

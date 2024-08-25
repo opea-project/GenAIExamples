@@ -17,7 +17,7 @@ start the docker containers
 
 ```
 cd ./GenAIExamples/ChatQnA/docker/gaudi
-docker compose up -d
+TAG=v0.9 docker compose up -d
 ```
 
 Check the start up log by `docker compose -f ./docker/gaudi/compose.yaml logs`.
@@ -149,7 +149,7 @@ Set the LLM_MODEL_ID then restart the containers.
 Also you can check overall logs with the following command, where the compose.yaml is the mega service docker-compose configuration file.
 
 ```
-docker compose -f ./docker-composer/gaudi/compose.yaml logs
+TAG=v0.9 docker compose -f ./docker-composer/gaudi/compose.yaml logs
 ```
 
 ## 4. Check each micro service used by the Mega Service

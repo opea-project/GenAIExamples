@@ -160,7 +160,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/aipc/
-docker compose up -d
+TAG=v0.9 docker compose up -d
 
 # let ollama service runs
 # e.g. ollama run llama3
