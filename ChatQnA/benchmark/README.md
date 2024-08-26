@@ -1,5 +1,5 @@
 # ChatQnA Inference Throughput Benchmarks
-This repository contains a collection of Kubernetes manifest files for deploying the ChatQnA service across scalable nodes. It includes a comprehensive [benchmarking tool](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/README.md) that enables throughput analysis to assess inference performance.
+This folder contains a collection of Kubernetes manifest files for deploying the ChatQnA service across scalable nodes. It includes a comprehensive [benchmarking tool](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/README.md) that enables throughput analysis to assess inference performance.
 
 By following this guide, you can run benchmarks on your deployment and share the results with the OPEA community.
 
@@ -146,7 +146,7 @@ We copy the configuration file [benchmark.yaml](https://github.com/opea-project/
 ```bash
 export USER_QUERIES="4, 8, 16, 640"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_1"
-envsubst < Validation/.github/scripts/benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
+envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
 
 And then run the benchmark tool by:
@@ -196,7 +196,7 @@ We copy the configuration file [benchmark.yaml](https://github.com/opea-project/
 ```bash
 export USER_QUERIES="4, 8, 16, 1280"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_2"
-envsubst < Validation/.github/scripts/benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
+envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
 
 And then run the benchmark tool by:
@@ -246,7 +246,7 @@ We copy the configuration file [benchmark.yaml](https://github.com/opea-project/
 ```bash
 export USER_QUERIES="4, 8, 16, 2560"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_4"
-envsubst < Validation/.github/scripts/benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
+envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
 
 And then run the benchmark tool by:
