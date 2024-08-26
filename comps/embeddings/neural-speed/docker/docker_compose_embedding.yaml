@@ -1,0 +1,22 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  embedding:
+    image: opea/embedding-langchain-mosec:neuralspeed
+    container_name: embedding-langchain-mosec-server
+    ports:
+      - "6000:6000"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MOSEC_EMBEDDING_ENDPOINT: ${MOSEC_EMBEDDING_ENDPOINT}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
