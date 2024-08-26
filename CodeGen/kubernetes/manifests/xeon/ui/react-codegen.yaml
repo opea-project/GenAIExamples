@@ -117,6 +117,8 @@ spec:
               value: ise-uiuc/Magicoder-S-DS-6.7B
             - name: PORT
               value: "80"
+            - name: CUDA_GRAPHS
+              value: "0"
             - name: http_proxy
               value:
             - name: https_proxy
@@ -124,7 +126,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: {}
-          image: "ghcr.io/huggingface/text-generation-inference:1.4"
+          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data

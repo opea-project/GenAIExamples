@@ -7,7 +7,7 @@ metadata:
   name: chatqna-backend-server-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: chatqna-backend-server-deploy
@@ -18,6 +18,8 @@ spec:
       labels:
         app: chatqna-backend-server-deploy
     spec:
+      nodeSelector:
+        node-type: chatqna-opea
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -48,7 +50,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: chaqna-backend-server-svc
+  name: chatqna-backend-server-svc
 spec:
   type: NodePort
   selector:

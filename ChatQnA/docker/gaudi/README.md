@@ -124,9 +124,7 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 
 ```bash
 cd GenAIExamples/ChatQnA/docker/ui/
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
 
@@ -175,9 +173,9 @@ export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export LLM_MODEL_ID_NAME="neural-chat-7b-v3-3"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
-export vLLM_LLM_ENDPOINT="http://${host_ip}:8008"
-export vLLM_RAY_LLM_ENDPOINT="http://${host_ip}:8008"
+export TGI_LLM_ENDPOINT="http://${host_ip}:8005"
+export vLLM_LLM_ENDPOINT="http://${host_ip}:8007"
+export vLLM_RAY_LLM_ENDPOINT="http://${host_ip}:8006"
 export LLM_SERVICE_PORT=9000
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
@@ -298,7 +296,7 @@ curl http://${host_ip}:8000/v1/reranking \
 
 ```bash
 #TGI Service
-curl http://${host_ip}:8008/generate \
+curl http://${host_ip}:8005/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
   -H 'Content-Type: application/json'
@@ -306,7 +304,7 @@ curl http://${host_ip}:8008/generate \
 
 ```bash
 #vLLM Service
-curl http://${host_ip}:8008/v1/completions \
+curl http://${host_ip}:8007/v1/completions \
   -H "Content-Type: application/json" \
   -d '{
   "model": "${LLM_MODEL_ID}",
@@ -318,7 +316,7 @@ curl http://${host_ip}:8008/v1/completions \
 
 ```bash
 #vLLM-on-Ray Service
-curl http://${host_ip}:8008/v1/chat/completions \
+curl http://${host_ip}:8006/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "${LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 ```
@@ -426,9 +424,8 @@ chaqna-gaudi-conversation-ui-server:
   image: opea/chatqna-conversation-ui:latest
   container_name: chatqna-gaudi-conversation-ui-server
   environment:
-    - no_proxy=${no_proxy}
-    - https_proxy=${https_proxy}
-    - http_proxy=${http_proxy}
+    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
   ports:
     - "5174:80"
   depends_on:

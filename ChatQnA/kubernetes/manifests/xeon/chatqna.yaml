@@ -11,17 +11,18 @@ metadata:
     helm.sh/chart: data-prep-0.8.0
     app.kubernetes.io/name: data-prep
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_ENDPOINT: "http://chatqna-tei"
+  EMBED_MODEL: ""
   REDIS_URL: "redis://chatqna-redis-vector-db:6379"
   INDEX_NAME: "rag-redis"
   HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   HF_HOME: "/tmp/.cache/huggingface"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   LANGCHAIN_TRACING_V2: "false"
   LANGCHAIN_API_KEY: "insert-your-langchain-key-here"
   LANGCHAIN_PROJECT: "opea-dataprep-service"
@@ -38,13 +39,13 @@ metadata:
     helm.sh/chart: embedding-usvc-0.8.0
     app.kubernetes.io/name: embedding-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_EMBEDDING_ENDPOINT: "http://chatqna-tei"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   LANGCHAIN_TRACING_V2: "false"
   LANGCHAIN_API_KEY: insert-your-langchain-key-here
   LANGCHAIN_PROJECT: "opea-embedding-service"
@@ -61,15 +62,15 @@ metadata:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 data:
   TGI_LLM_ENDPOINT: "http://chatqna-tgi"
   HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   HF_HOME: "/tmp/.cache/huggingface"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   LANGCHAIN_TRACING_V2: "false"
   LANGCHAIN_API_KEY: insert-your-langchain-key-here
   LANGCHAIN_PROJECT: "opea-llm-uservice"
@@ -86,13 +87,13 @@ metadata:
     helm.sh/chart: reranking-usvc-0.8.0
     app.kubernetes.io/name: reranking-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_RERANKING_ENDPOINT: "http://chatqna-teirerank"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   LANGCHAIN_TRACING_V2: "false"
   LANGCHAIN_API_KEY: "insert-your-langchain-key-here"
   LANGCHAIN_PROJECT: "opea-reranking-service"
@@ -109,20 +110,22 @@ metadata:
     helm.sh/chart: retriever-usvc-0.8.0
     app.kubernetes.io/name: retriever-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_EMBEDDING_ENDPOINT: "http://chatqna-tei"
+  EMBED_MODEL: ""
   REDIS_URL: "redis://chatqna-redis-vector-db:6379"
   INDEX_NAME: "rag-redis"
   EASYOCR_MODULE_PATH: "/tmp/.EasyOCR"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   LANGCHAIN_TRACING_V2: "false"
   LANGCHAIN_API_KEY: "insert-your-langchain-key-here"
   LANGCHAIN_PROJECT: "opea-retriever-service"
   HF_HOME: "/tmp/.cache/huggingface"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
 ---
 # Source: chatqna/charts/tei/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -136,14 +139,14 @@ metadata:
     helm.sh/chart: tei-0.8.0
     app.kubernetes.io/name: tei
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/version: "cpu-1.5"
     app.kubernetes.io/managed-by: Helm
 data:
   MODEL_ID: "BAAI/bge-base-en-v1.5"
   PORT: "2081"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
@@ -161,14 +164,14 @@ metadata:
     helm.sh/chart: teirerank-0.8.0
     app.kubernetes.io/name: teirerank
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/version: "cpu-1.5"
     app.kubernetes.io/managed-by: Helm
 data:
   MODEL_ID: "BAAI/bge-reranker-base"
   PORT: "2082"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
@@ -190,17 +193,15 @@ metadata:
 data:
   MODEL_ID: "Intel/neural-chat-7b-v3-3"
   PORT: "2080"
-  HUGGING_FACE_HUB_TOKEN: "insert-your-huggingface-token-here"
   HF_TOKEN: "insert-your-huggingface-token-here"
-  MAX_INPUT_TOKENS: "1024"
-  MAX_TOTAL_TOKENS: "4096"
-  http_proxy:
-  https_proxy:
-  no_proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
   HABANA_LOGS: "/tmp/habana_logs"
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
+  CUDA_GRAPHS: "0"
 ---
 # Source: chatqna/charts/data-prep/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -214,7 +215,7 @@ metadata:
     helm.sh/chart: data-prep-0.8.0
     app.kubernetes.io/name: data-prep
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -239,7 +240,7 @@ metadata:
     helm.sh/chart: embedding-usvc-0.8.0
     app.kubernetes.io/name: embedding-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -264,7 +265,7 @@ metadata:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -318,7 +319,7 @@ metadata:
     helm.sh/chart: reranking-usvc-0.8.0
     app.kubernetes.io/name: reranking-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -343,7 +344,7 @@ metadata:
     helm.sh/chart: retriever-usvc-0.8.0
     app.kubernetes.io/name: retriever-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -368,7 +369,7 @@ metadata:
     helm.sh/chart: tei-0.8.0
     app.kubernetes.io/name: tei
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/version: "cpu-1.5"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -393,7 +394,7 @@ metadata:
     helm.sh/chart: teirerank-0.8.0
     app.kubernetes.io/name: teirerank
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/version: "cpu-1.5"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -443,7 +444,7 @@ metadata:
     helm.sh/chart: chatqna-0.8.0
     app.kubernetes.io/name: chatqna
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -468,7 +469,7 @@ metadata:
     helm.sh/chart: data-prep-0.8.0
     app.kubernetes.io/name: data-prep
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -508,6 +509,26 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: data-prep
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: data-prep
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: data-prep
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {}
       volumes:
@@ -526,7 +547,7 @@ metadata:
     helm.sh/chart: embedding-usvc-0.8.0
     app.kubernetes.io/name: embedding-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -566,6 +587,26 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: embedding-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: embedding-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: embedding-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {}
       volumes:
@@ -584,7 +625,7 @@ metadata:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -624,14 +665,26 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
-          startupProbe:
-            exec:
-              command:
-              - curl
-              - http://chatqna-tgi
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
             initialDelaySeconds: 5
             periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
             failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {}
       volumes:
@@ -722,7 +775,7 @@ metadata:
     helm.sh/chart: reranking-usvc-0.8.0
     app.kubernetes.io/name: reranking-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -762,6 +815,26 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: reranking-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: reranking-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: reranking-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {}
       volumes:
@@ -780,7 +853,7 @@ metadata:
     helm.sh/chart: retriever-usvc-0.8.0
     app.kubernetes.io/name: retriever-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -820,14 +893,26 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
-          startupProbe:
-            exec:
-              command:
-              - curl
-              - http://chatqna-tei
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: retriever-usvc
             initialDelaySeconds: 5
             periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: retriever-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
             failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: retriever-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {}
       volumes:
@@ -846,7 +931,7 @@ metadata:
     helm.sh/chart: tei-0.8.0
     app.kubernetes.io/name: tei
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/version: "cpu-1.5"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -869,8 +954,10 @@ spec:
                 name: chatqna-tei-config
           securityContext:
             {}
-          image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.2"
+          image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
           imagePullPolicy: IfNotPresent
+          args:
+            - "--auto-truncate"
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -882,6 +969,26 @@ spec:
             - name: http
               containerPort: 2081
               protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {}
       volumes:
@@ -908,7 +1015,7 @@ metadata:
     helm.sh/chart: teirerank-0.8.0
     app.kubernetes.io/name: teirerank
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/version: "cpu-1.5"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -931,8 +1038,10 @@ spec:
                 name: chatqna-teirerank-config
           securityContext:
             {}
-          image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.2"
+          image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
           imagePullPolicy: IfNotPresent
+          args:
+            - "--auto-truncate"
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -944,6 +1053,26 @@ spec:
             - name: http
               containerPort: 2082
               protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {}
       volumes:
@@ -993,7 +1122,7 @@ spec:
                 name: chatqna-tgi-config
           securityContext:
             {}
-          image: "ghcr.io/huggingface/text-generation-inference:2.1.0"
+          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
@@ -1004,6 +1133,23 @@ spec:
             - name: http
               containerPort: 2080
               protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          startupProbe:
+            failureThreshold: 120
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
           resources:
             {}
       volumes:
@@ -1026,7 +1172,7 @@ metadata:
     helm.sh/chart: chatqna-0.8.0
     app.kubernetes.io/name: chatqna
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
