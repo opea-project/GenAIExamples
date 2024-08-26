@@ -117,7 +117,7 @@ Number of test requests for different scheduled node number:
 | 2 | 5 | 1280 |
 | 4 | 5 | 2560 |
 
-More detailed configuration can be found in configuration file [benchmark.yaml](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/benchmark.yaml).
+More detailed configuration can be found in configuration file [benchmark.yaml](./benchmark.yaml).
 
 ## Test Steps
 
@@ -143,7 +143,7 @@ kubectl apply -f .
 
 #### 3. Run tests
 
-We copy the configuration file [benchmark.yaml](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
 ```bash
 export USER_QUERIES="4, 8, 16, 640"
@@ -193,7 +193,7 @@ kubectl apply -f .
 
 #### 3. Run tests
 
-We copy the configuration file [benchmark.yaml](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
 ```bash
 export USER_QUERIES="4, 8, 16, 1280"
@@ -242,7 +242,7 @@ kubectl apply -f .
 
 #### 3. Run tests
 
-We copy the configuration file [benchmark.yaml](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
 ```bash
 export USER_QUERIES="4, 8, 16, 2560"
