@@ -4,7 +4,7 @@
 test_suite_config: # Overall configuration settings for the test suite
   examples: ["chatqna"]  # The specific test cases being tested, e.g., chatqna, codegen, codetrans, faqgen, audioqna, visualqna
   concurrent_level: 5  # The concurrency level, adjustable based on requirements
-  user_queries: [${USER_QUERIES}]  # Number of test requests at each concurrency level
+  user_queries: ${USER_QUERIES}  # Number of test requests at each concurrency level
   random_prompt: false  # Use random prompts if true, fixed prompts if false
   run_time: 60m  # The max total run time for the test suite
   collect_service_metric: false  # Collect service metrics if true, do not collect service metrics if false

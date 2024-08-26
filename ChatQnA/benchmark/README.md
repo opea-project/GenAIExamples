@@ -14,18 +14,18 @@ We aim to run these benchmarks and share them with the OPEA community for three 
 
 # Metrics
 
-The benchmark will report both end-to-end and per-microservice metrics, including:
+The benchmark will report the below metrics, including:
 
 - Number of Concurrent Requests
 - End-to-End Latency: P50, P90, P99 (in milliseconds)
-- First Token Latency: P50, P90, P99 (in milliseconds)
+- End-to-End First Token Latency: P50, P90, P99 (in milliseconds)
 - Average Next Token Latency (in milliseconds)
 - Average Token Latency (in milliseconds)
 - Requests Per Second (RPS)
 - Output Tokens Per Second
 - Input Tokens Per Second
 
-Results will be displayed in the terminal and saved as CSV files for easy export to spreadsheets.
+Results will be displayed in the terminal and saved as CSV file named `1_stats.csv` for easy export to spreadsheets.
 
 # Getting Started
 
@@ -111,11 +111,11 @@ Benchmark parameters
 | LLM output tokens | 128 |
 
 Number of test requests for different scheduled node number:
-| Node account | Concurrent | Query number |
+| Node count | Concurrency | Query number |
 | ----- | -------- | -------- |
-| 1 | 5 | 640 |
-| 2 | 5 | 1280 |
-| 4 | 5 | 2560 |
+| 1 | 128 | 640 |
+| 2 | 256 | 1280 |
+| 4 | 512 | 2560 |
 
 More detailed configuration can be found in configuration file [benchmark.yaml](./benchmark.yaml).
 
@@ -146,7 +146,7 @@ kubectl apply -f .
 We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
 ```bash
-export USER_QUERIES="4, 8, 16, 640"
+export USER_QUERIES="[4, 8, 16, 640]"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_1"
 envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
@@ -196,7 +196,7 @@ kubectl apply -f .
 We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
 ```bash
-export USER_QUERIES="4, 8, 16, 1280"
+export USER_QUERIES="[4, 8, 16, 1280]"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_2"
 envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
@@ -245,7 +245,7 @@ kubectl apply -f .
 We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
 ```bash
-export USER_QUERIES="4, 8, 16, 2560"
+export USER_QUERIES="[4, 8, 16, 2560]"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_4"
 envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
@@ -268,4 +268,279 @@ All the test results will come to this folder `/home/sdp/benchmark_output/node_4
 cd GenAIExamples/ChatQnA/benchmark/single_gaudi
 kubectl delete -f .
 kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type-
+```
+
+### Example Result
+
+The following is a summary of the test result, with files saved at `TEST_OUTPUT_DIR`.
+
+```statistics
+Concurrency       : 512
+Max request count : 2560
+Http timeout      : 60000
+
+Benchmark target  : chatqnafixed
+
+=================Total statistics=====================
+Succeed Response:  2560 (Total 2560, 100.0% Success), Duration: 26.44s, Input Tokens: 61440, Output Tokens: 255985, RPS: 96.82, Input Tokens per Second: 2323.71, Output Tokens per Second: 9681.57
+End to End latency(ms),    P50: 3576.34,   P90: 4242.19,   P99: 5252.23,   Avg: 3581.55
+First token latency(ms),   P50: 726.64,   P90: 1128.27,   P99: 1796.09,   Avg: 769.58
+Average Next token latency(ms): 28.41
+Average token latency(ms)     : 35.85
+======================================================
+```
+
+```test spec
+benchmarkresult:
+  Average_Next_token_latency: '28.41'
+  Average_token_latency: '35.85'
+  Duration: '26.44'
+  End_to_End_latency_Avg: '3581.55'
+  End_to_End_latency_P50: '3576.34'
+  End_to_End_latency_P90: '4242.19'
+  End_to_End_latency_P99: '5252.23'
+  First_token_latency_Avg: '769.58'
+  First_token_latency_P50: '726.64'
+  First_token_latency_P90: '1128.27'
+  First_token_latency_P99: '1796.09'
+  Input_Tokens: '61440'
+  Input_Tokens_per_Second: '2323.71'
+  Onput_Tokens: '255985'
+  Output_Tokens_per_Second: '9681.57'
+  RPS: '96.82'
+  Succeed_Response: '2560'
+  locust_P50: '160'
+  locust_P99: '810'
+  locust_num_failures: '0'
+  locust_num_requests: '2560'
+benchmarkspec:
+  bench-target: chatqnafixed
+  endtest_time: '2024-08-25T14:19:25.955973'
+  host: http://10.110.105.197:8888
+  llm-model: Intel/neural-chat-7b-v3-3
+  locustfile: /home/sdp/lvl/GenAIEval/evals/benchmark/stresscli/locust/aistress.py
+  max_requests: 2560
+  namespace: default
+  processes: 2
+  run_name: benchmark
+  runtime: 60m
+  starttest_time: '2024-08-25T14:18:50.366514'
+  stop_timeout: 120
+  tool: locust
+  users: 512
+hardwarespec:
+  aise-gaudi-00:
+    architecture: amd64
+    containerRuntimeVersion: containerd://1.7.18
+    cpu: '160'
+    habana.ai/gaudi: '8'
+    kernelVersion: 5.15.0-92-generic
+    kubeProxyVersion: v1.29.7
+    kubeletVersion: v1.29.7
+    memory: 1056375272Ki
+    operatingSystem: linux
+    osImage: Ubuntu 22.04.3 LTS
+  aise-gaudi-01:
+    architecture: amd64
+    containerRuntimeVersion: containerd://1.7.18
+    cpu: '160'
+    habana.ai/gaudi: '8'
+    kernelVersion: 5.15.0-92-generic
+    kubeProxyVersion: v1.29.7
+    kubeletVersion: v1.29.7
+    memory: 1056375256Ki
+    operatingSystem: linux
+    osImage: Ubuntu 22.04.3 LTS
+  aise-gaudi-02:
+    architecture: amd64
+    containerRuntimeVersion: containerd://1.7.18
+    cpu: '160'
+    habana.ai/gaudi: '8'
+    kernelVersion: 5.15.0-92-generic
+    kubeProxyVersion: v1.29.7
+    kubeletVersion: v1.29.7
+    memory: 1056375260Ki
+    operatingSystem: linux
+    osImage: Ubuntu 22.04.3 LTS
+  aise-gaudi-03:
+    architecture: amd64
+    containerRuntimeVersion: containerd://1.6.8
+    cpu: '160'
+    habana.ai/gaudi: '8'
+    kernelVersion: 5.15.0-112-generic
+    kubeProxyVersion: v1.29.7
+    kubeletVersion: v1.29.7
+    memory: 1056374404Ki
+    operatingSystem: linux
+    osImage: Ubuntu 22.04.4 LTS
+workloadspec:
+  aise-gaudi-00:
+    chatqna-backend-server-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 4000Mi
+        requests:
+          cpu: '8'
+          memory: 4000Mi
+    embedding-dependency-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '80'
+          memory: 20000Mi
+        requests:
+          cpu: '80'
+          memory: 20000Mi
+    embedding-deploy:
+      replica: 1
+    llm-dependency-deploy:
+      replica: 8
+      resources:
+        limits:
+          habana.ai/gaudi: '1'
+        requests:
+          habana.ai/gaudi: '1'
+    llm-deploy:
+      replica: 1
+    retriever-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 2500Mi
+        requests:
+          cpu: '8'
+          memory: 2500Mi
+  aise-gaudi-01:
+    chatqna-backend-server-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 4000Mi
+        requests:
+          cpu: '8'
+          memory: 4000Mi
+    embedding-dependency-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '80'
+          memory: 20000Mi
+        requests:
+          cpu: '80'
+          memory: 20000Mi
+    embedding-deploy:
+      replica: 1
+    llm-dependency-deploy:
+      replica: 8
+      resources:
+        limits:
+          habana.ai/gaudi: '1'
+        requests:
+          habana.ai/gaudi: '1'
+    llm-deploy:
+      replica: 1
+    prometheus-operator:
+      replica: 1
+      resources:
+        limits:
+          cpu: 200m
+          memory: 200Mi
+        requests:
+          cpu: 100m
+          memory: 100Mi
+    retriever-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 2500Mi
+        requests:
+          cpu: '8'
+          memory: 2500Mi
+  aise-gaudi-02:
+    chatqna-backend-server-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 4000Mi
+        requests:
+          cpu: '8'
+          memory: 4000Mi
+    embedding-dependency-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '80'
+          memory: 20000Mi
+        requests:
+          cpu: '80'
+          memory: 20000Mi
+    embedding-deploy:
+      replica: 1
+    llm-dependency-deploy:
+      replica: 8
+      resources:
+        limits:
+          habana.ai/gaudi: '1'
+        requests:
+          habana.ai/gaudi: '1'
+    llm-deploy:
+      replica: 1
+    retriever-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 2500Mi
+        requests:
+          cpu: '8'
+          memory: 2500Mi
+  aise-gaudi-03:
+    chatqna-backend-server-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 4000Mi
+        requests:
+          cpu: '8'
+          memory: 4000Mi
+    dataprep-deploy:
+      replica: 1
+    embedding-dependency-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '80'
+          memory: 20000Mi
+        requests:
+          cpu: '80'
+          memory: 20000Mi
+    embedding-deploy:
+      replica: 1
+    llm-dependency-deploy:
+      replica: 8
+      resources:
+        limits:
+          habana.ai/gaudi: '1'
+        requests:
+          habana.ai/gaudi: '1'
+    llm-deploy:
+      replica: 1
+    retriever-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 2500Mi
+        requests:
+          cpu: '8'
+          memory: 2500Mi
+    vector-db:
+      replica: 1
 ```
