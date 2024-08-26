@@ -1,4 +1,5 @@
 # ChatQnA Inference Throughput Benchmarks
+
 This folder contains a collection of Kubernetes manifest files for deploying the ChatQnA service across scalable nodes. It includes a comprehensive [benchmarking tool](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/README.md) that enables throughput analysis to assess inference performance.
 
 By following this guide, you can run benchmarks on your deployment and share the results with the OPEA community.
