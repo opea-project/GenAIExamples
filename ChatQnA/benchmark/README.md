@@ -4,40 +4,41 @@ This folder contains a collection of Kubernetes manifest files for deploying the
 By following this guide, you can run benchmarks on your deployment and share the results with the OPEA community.
 
 # Purpose
+
 We aim to run these benchmarks and share them with the OPEA community for three primary reasons:
 
-* To offer insights on inference throughput in real-world scenarios, helping you choose the best service or deployment for your needs.
-* To establish a baseline for validating optimization solutions across different implementations, providing clear guidance on which methods are most effective for your use case.
-* To inspire the community to build upon our benchmarks, allowing us to better quantify new solutions in conjunction with current leading llms, serving frameworks etc.
-
+- To offer insights on inference throughput in real-world scenarios, helping you choose the best service or deployment for your needs.
+- To establish a baseline for validating optimization solutions across different implementations, providing clear guidance on which methods are most effective for your use case.
+- To inspire the community to build upon our benchmarks, allowing us to better quantify new solutions in conjunction with current leading llms, serving frameworks etc.
 
 # Metrics
+
 The benchmark will report both end-to-end and per-microservice metrics, including:
 
-* Number of Concurrent Requests
-* End-to-End Latency: P50, P90, P99 (in milliseconds)
-* First Token Latency: P50, P90, P99 (in milliseconds)
-* Average Next Token Latency (in milliseconds)
-* Average Token Latency (in milliseconds)
-* Requests Per Second (RPS)
-* Output Tokens Per Second
-* Input Tokens Per Second
+- Number of Concurrent Requests
+- End-to-End Latency: P50, P90, P99 (in milliseconds)
+- First Token Latency: P50, P90, P99 (in milliseconds)
+- Average Next Token Latency (in milliseconds)
+- Average Token Latency (in milliseconds)
+- Requests Per Second (RPS)
+- Output Tokens Per Second
+- Input Tokens Per Second
 
 Results will be displayed in the terminal and saved as CSV files for easy export to spreadsheets.
-
 
 # Getting Started
 
 ## Prerequisites
 
-* Install Kubernetes by following [this guide](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md).
+- Install Kubernetes by following [this guide](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md).
 
-* Every node has direct internet access
-* Set up kubectl on the master node with access to the Kubernetes cluster.
-* Install Python 3.8+ on the master node for running the stress tool.
-* Ensure all nodes have a local /mnt/models folder, which will be mounted by the pods.
+- Every node has direct internet access
+- Set up kubectl on the master node with access to the Kubernetes cluster.
+- Install Python 3.8+ on the master node for running the stress tool.
+- Ensure all nodes have a local /mnt/models folder, which will be mounted by the pods.
 
 ## Kubernetes Cluster Example
+
 ```bash
 $ kubectl get nodes
 NAME                STATUS   ROLES           AGE   VERSION
@@ -90,11 +91,10 @@ pip install -r requirements.txt
 
 Workload configuration:
 
-
-| Key | Value |
-| ---------- | ------------------ |
-| Workload | ChatQnA  |
-| Tag | V0.9  |
+| Key      | Value   |
+| -------- | ------- |
+| Workload | ChatQnA |
+| Tag      | V0.9    |
 
 Models configuration
 | Key | Value |
@@ -139,6 +139,7 @@ Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/Cha
 cd GenAIExamples/ChatQnA/benchmark/single_gaudi
 kubectl apply -f .
 ```
+
 #### 3. Run tests
 
 We copy the configuration file [benchmark.yaml](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
@@ -155,6 +156,7 @@ And then run the benchmark tool by:
 cd GenAIEval/evals/benchmark
 python benchmark.py
 ```
+
 #### 4. Data collection
 
 All the test results will come to this folder `/home/sdp/benchmark_output/node_1` configured by the environment variable `TEST_OUTPUT_DIR` in previous steps.
@@ -167,7 +169,6 @@ cd GenAIExamples/ChatQnA/benchmark/single_gaudi
 kubectl delete -f .
 kubectl label nodes k8s-worker1 node-type-
 ```
-
 
 ### Two node test
 
@@ -218,7 +219,6 @@ kubectl delete -f .
 kubectl label nodes k8s-worker1 k8s-worker2 node-type-
 ```
 
-
 ### Four node test
 
 #### 1. Preparation
@@ -250,6 +250,7 @@ envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
 
 And then run the benchmark tool by:
+
 ```bash
 cd GenAIEval/evals/benchmark
 python benchmark.py
