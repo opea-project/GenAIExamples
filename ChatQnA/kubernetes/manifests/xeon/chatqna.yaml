@@ -978,7 +978,7 @@ spec:
     spec:
       securityContext:
         {}
-      hostIPC: true        
+      hostIPC: true
       containers:
         - name: chatqna-ui
           envFrom:
