@@ -66,7 +66,7 @@ This involves deploying the AudioQnA custom resource. You can use audioQnA_xeon.
    ```sh
    export CLIENT_POD=$(kubectl get pod -n audioqa -l app=client-test -o jsonpath={.items..metadata.name})
    export accessUrl=$(kubectl get gmc -n audioqa -o jsonpath="{.items[?(@.metadata.name=='audioqa')].status.accessUrl}")
-   kubectl exec "$CLIENT_POD" -n audioqa -- curl $accessUrl  -X POST  -d '{"byte_str": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "parameters":{"max_new_tokens":64, "do_sample": true, "streaming":false}}' -H 'Content-Type: application/json'
+   kubectl exec "$CLIENT_POD" -n audioqa -- curl -s --no-buffer $accessUrl  -X POST  -d '{"byte_str": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "parameters":{"max_new_tokens":64, "do_sample": true, "streaming":false}}' -H 'Content-Type: application/json'
    ```
 
 > [NOTE]
