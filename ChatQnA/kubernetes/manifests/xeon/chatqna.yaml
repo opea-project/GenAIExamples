@@ -203,6 +203,20 @@ data:
   HF_HOME: "/tmp/.cache/huggingface"
   CUDA_GRAPHS: "0"
 ---
+# Source: chatqna/charts/tgi/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chatqna-ui-config
+data:
+  CHAT_BASE_URL: 'http://backend_address:8888/v1/chatqna'
+  UPLOAD_FILE_BASE_URL: 'http://backend_address:6007/v1/dataprep'
+  GET_FILE: 'http://backend_address:6007/v1/dataprep/get_file'
+  DELETE_FILE: 'http://backend_address:6007/v1/dataprep/delete_file'
+---
 # Source: chatqna/charts/data-prep/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -456,6 +470,25 @@ spec:
   selector:
     app.kubernetes.io/name: chatqna
     app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-ui
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5173
+      targetPort: 5173
+      protocol: TCP
+      name: chatqna-ui
+  selector:
+    app.kubernetes.io/name: chatqna-ui
+    app.kubernetes.io/instance: chatqna-ui
 ---
 # Source: chatqna/charts/data-prep/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -918,6 +951,67 @@ spec:
       volumes:
         - name: tmp
           emptyDir: {}
+---
+# Source: chatqna/charts/tei/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chatqna-ui
+      app.kubernetes.io/instance: chatqna-ui
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app.kubernetes.io/name: chatqna-ui
+        app.kubernetes.io/instance: chatqna-ui
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: chatqna-ui
+          envFrom:
+            - configMapRef:
+                name: chatqna-ui-config
+          securityContext:
+            {}
+          image: "opea/chatqna-ui:latest"
+          imagePullPolicy: IfNotPresent
+          args: null
+          ports:
+            - name: http
+              containerPort: 5173
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {}
 ---
 # Source: chatqna/charts/tei/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
