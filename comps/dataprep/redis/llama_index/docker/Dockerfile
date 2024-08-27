@@ -1,4 +1,3 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -10,10 +9,9 @@ ARG ARCH="cpu"
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     build-essential \
+    libcairo2 \
     libgl1-mesa-glx \
     libjemalloc-dev \
-    vim \
-    libcairo2 \
     poppler-utils \
     tesseract-ocr
 
@@ -40,4 +38,3 @@ USER user
 WORKDIR /home/user/comps/dataprep/redis/llama_index
 
 ENTRYPOINT ["python", "prepare_doc_redis.py"]
-

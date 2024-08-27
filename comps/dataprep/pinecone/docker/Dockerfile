@@ -1,4 +1,3 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -10,12 +9,10 @@ ARG ARCH="cpu"
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     build-essential \
-    libgl1-mesa-glx \
-    libjemalloc-dev \
     default-jre \
-    vim \
-    libcairo2
-
+    libcairo2 \
+    libgl1-mesa-glx \
+    libjemalloc-dev
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
@@ -43,4 +40,3 @@ USER user
 WORKDIR /home/user/comps/dataprep/pinecone
 
 ENTRYPOINT ["python", "prepare_doc_pinecone.py"]
-

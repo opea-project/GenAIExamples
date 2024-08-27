@@ -1,4 +1,3 @@
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -7,10 +6,9 @@ FROM python:3.10-slim
 ENV LANG=C.UTF-8
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    git \
     libgl1-mesa-glx \
-    libjemalloc-dev \
-    vim \
-    git
+    libjemalloc-dev
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
@@ -33,4 +31,3 @@ ENV PYTHONPATH=$PYTHONPH:/home/user
 WORKDIR /home/user/comps/reranks/fastrag
 
 ENTRYPOINT ["python", "local_reranking.py"]
-

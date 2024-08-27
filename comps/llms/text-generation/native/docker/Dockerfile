@@ -1,5 +1,3 @@
-
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -11,19 +9,18 @@ ENV LANG=en_US.UTF-8
 ARG REPO=https://github.com/huggingface/optimum-habana.git
 ARG REPO_VER=v1.12.1
 
-RUN apt-get update && \
-    apt-get install git-lfs && \
-    git-lfs install && \
-    apt-get install -y --no-install-recommends --fix-missing \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
+    git-lfs \
     libgl1-mesa-glx \
-    libjemalloc-dev \
-    vim
+    libjemalloc-dev
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/
 
 USER user
+
+RUN git lfs install
 
 COPY comps /home/user/comps
 
