@@ -212,10 +212,10 @@ kind: ConfigMap
 metadata:
   name: chatqna-ui-config
 data:
-  CHAT_BASE_URL: 'http://backend_address:8888/v1/chatqna'
-  UPLOAD_FILE_BASE_URL: 'http://backend_address:6007/v1/dataprep'
-  GET_FILE: 'http://backend_address:6007/v1/dataprep/get_file'
-  DELETE_FILE: 'http://backend_address:6007/v1/dataprep/delete_file'
+  CHAT_BASE_URL: 'http://backend_address:30888/v1/chatqna'
+  # UPLOAD_FILE_BASE_URL: 'http://backend_address:6007/v1/dataprep'
+  # GET_FILE: 'http://backend_address:6007/v1/dataprep/get_file'
+  # DELETE_FILE: 'http://backend_address:6007/v1/dataprep/delete_file'
 ---
 # Source: chatqna/charts/data-prep/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -461,10 +461,11 @@ metadata:
     app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - port: 8888
       targetPort: 8888
+      nodePort: 30888
       protocol: TCP
       name: chatqna
   selector:
@@ -480,10 +481,11 @@ kind: Service
 metadata:
   name: chatqna-ui
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - port: 5173
       targetPort: 5173
+      nodePort: 30889
       protocol: TCP
       name: chatqna-ui
   selector:
@@ -976,6 +978,7 @@ spec:
     spec:
       securityContext:
         {}
+      hostIPC: true        
       containers:
         - name: chatqna-ui
           envFrom:
@@ -990,28 +993,6 @@ spec:
             - name: http
               containerPort: 5173
               protocol: TCP
-          livenessProbe:
-            failureThreshold: 24
-            httpGet:
-              path: /health
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          startupProbe:
-            failureThreshold: 120
-            httpGet:
-              path: /health
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          resources:
-            {}
 ---
 # Source: chatqna/charts/tei/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
