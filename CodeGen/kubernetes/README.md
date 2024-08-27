@@ -36,5 +36,5 @@ In the below example we illustrate on Xeon.
    ```bash
    export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
    export accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='codegen')].status.accessUrl}")
-   kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl -X POST -d '{"query": "def print_hello_world():"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codegen.log
+   kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl -s --no-buffer $accessUrl -X POST -d '{"query": "def print_hello_world():"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codegen.log
    ```
