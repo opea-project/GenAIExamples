@@ -19,42 +19,42 @@ body:
     validations:
       required: true
 
-  - type: checkboxes
+  - type: dropdown
     id: os
     attributes:
       label: OS type
       options:
-        - label: Ubuntu
-        - label: RedHat
-        - label: SUSE
-        - label: Windows
-        - label: Mac
-        - label: BSD
-        - label: Other (Please let us know in description)
+        - Ubuntu
+        - RedHat
+        - SUSE
+        - Windows
+        - Mac
+        - BSD
+        - Other (Please let us know in description)
     validations:
       required: true
 
-  - type: checkboxes
+  - type: dropdown
     id: hardware
     attributes:
       label: Hardware type
       options:
-        - label: Xeon-GNR
-        - label: Xeon-EMR
-        - label: Xeon-SPR
-        - label: Xeon-ICX
-        - label: Xeon-other (Please let us know in description)
-        - label: Gaudi3
-        - label: Gaudi2
-        - label: GPU-PVC
-        - label: GPU-Flex
-        - label: GPU-Arc
-        - label: GPU-Arc-MTL
-        - label: GPU-Nvidia
-        - label: GPU-AMD
-        - label: GPU-other (Please let us know in description)
-        - label: AI-PC (Please let us know in description)
-        - label: CPU-other (Please let us know in description)
+        - Xeon-GNR
+        - Xeon-EMR
+        - Xeon-SPR
+        - Xeon-ICX
+        - Xeon-other (Please let us know in description)
+        - Gaudi3
+        - Gaudi2
+        - AI-PC (Please let us know in description)
+        - CPU-other (Please let us know in description)
+        - GPU-PVC
+        - GPU-Flex
+        - GPU-Arc
+        - GPU-Arc-MTL
+        - GPU-Nvidia
+        - GPU-AMD
+        - GPU-other (Please let us know in description)
     validations:
       required: true
 
@@ -72,7 +72,7 @@ body:
   - type: textarea
     id: problem
     attributes:
-      label: Problem
+      label: Description
       description: Describe your problem and expectation, avoid to ask solution (we would provide better solution).
       placeholder: As cloud/AI PC user, I want xxxx, so that I/customer can xxx.
     validations:
