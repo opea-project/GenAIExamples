@@ -188,18 +188,20 @@ class ServiceOrchestrator(DAG):
         if chunk_str == "data: [DONE]\n\n":
             return ""
         prefix = "data: b'"
+        prefix_2 = 'data: b"'
         suffix = "'\n\n"
-        if chunk_str.startswith(prefix):
+        suffix_2 = '"\n\n'
+        if chunk_str.startswith(prefix) or chunk_str.startswith(prefix_2):
             chunk_str = chunk_str[len(prefix) :]
-        if chunk_str.endswith(suffix):
+        if chunk_str.endswith(suffix) or chunk_str.endswith(suffix_2):
             chunk_str = chunk_str[: -len(suffix)]
         return chunk_str
 
     def token_generator(self, sentence, is_last=False):
         prefix = "data: "
         suffix = "\n\n"
-        tokens = re.findall(r"\S+\s?", sentence, re.UNICODE)
+        tokens = re.findall(r"\s?\S+\s?", sentence, re.UNICODE)
         for token in tokens:
-            yield prefix + repr(token.encode("utf-8")) + suffix
+            yield prefix + repr(token.replace("\\n", "\n").encode("utf-8")) + suffix
         if is_last:
             yield "data: [DONE]\n\n"
