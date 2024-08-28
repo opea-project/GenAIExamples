@@ -7,6 +7,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: chatqna-nginx-config
+  labels:
+    helm.sh/chart: chatqna-nginx-0.8.0
+    app.kubernetes.io/name: chatqna-nginx
+    app.kubernetes.io/instance: chatqna-nginx
+    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/managed-by: Helm 
 data:
   default.conf: |
     server {
@@ -525,6 +531,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: chatqna-ui
+  labels:
+    helm.sh/chart: chatqna-ui-0.8.0
+    app.kubernetes.io/name: chatqna-ui
+    app.kubernetes.io/instance: chatqna-ui
+    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/managed-by: Helm    
 spec:
   type: ClusterIP
   ports:
@@ -1006,6 +1018,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: chatqna-ui
+  labels:
+    helm.sh/chart: chatqna-ui-0.8.0
+    app.kubernetes.io/name: chatqna-ui
+    app.kubernetes.io/instance: chatqna-ui
+    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/managed-by: Helm  
 spec:
   replicas: 1
   selector:
@@ -1363,6 +1381,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: chatqna-nginx-deployment
+  labels:
+    helm.sh/chart: chatqna-nginx-0.8.0
+    app.kubernetes.io/name: chatqna-nginx
+    app.kubernetes.io/instance: chatqna-nginx
+    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
@@ -1391,6 +1415,12 @@ kind: Service
 apiVersion: v1
 metadata:
   name: chatqna-nginx-svc
+  labels:
+    helm.sh/chart: chatqna-nginx-0.8.0
+    app.kubernetes.io/name: chatqna-nginx
+    app.kubernetes.io/instance: chatqna-nginx
+    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/managed-by: Helm  
 spec:
   selector:
     app: chatqna-nginx
