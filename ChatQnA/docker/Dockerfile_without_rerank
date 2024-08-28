@@ -5,7 +5,6 @@
 
 FROM python:3.11-slim
 
-
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
     libjemalloc-dev \
@@ -22,7 +21,7 @@ WORKDIR /home/user/GenAIComps
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
 
-COPY ./faqgen.py /home/user/faqgen.py
+COPY ./chatqna_without_rerank.py /home/user/chatqna_without_rerank.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
@@ -30,4 +29,4 @@ USER user
 
 WORKDIR /home/user
 
-ENTRYPOINT ["python", "faqgen.py"]
+ENTRYPOINT ["python", "chatqna_without_rerank.py"]

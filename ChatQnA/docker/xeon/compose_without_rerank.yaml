@@ -21,11 +21,12 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${REDIS_HOST}
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
     ports:
       - "6006:80"
@@ -50,9 +51,6 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-embedding-service"
     restart: unless-stopped
   retriever:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
@@ -69,16 +67,13 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-retriever-service"
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
-  tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
-    container_name: tei-reranking-server
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    container_name: tgi-service
     ports:
-      - "8808:80"
+      - "9009:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -86,50 +81,15 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
-  reranking:
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
-    container_name: reranking-tei-xeon-server
-    depends_on:
-      - tei-reranking-service
-    ports:
-      - "8000:8000"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-reranking-service"
-    restart: unless-stopped
-  vllm_service:
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
-    container_name: vllm-service
-    ports:
-      - "9009:80"
-    volumes:
-      - "./data:/data"
-    shm_size: 128g
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      LLM_MODEL_ID: ${LLM_MODEL_ID}
-    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
-    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
-    container_name: llm-vllm-server
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    container_name: llm-tgi-server
     depends_on:
-      - vllm_service
+      - tgi-service
     ports:
       - "9000:9000"
     ipc: host
@@ -137,26 +97,21 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      vLLM_ENDPOINT: ${vLLM_LLM_ENDPOINT}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      LLM_MODEL: ${LLM_MODEL_ID}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
   chaqna-xeon-backend-server:
-    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
       - tei-embedding-service
       - embedding
+      - dataprep-redis-service
       - retriever
-      - tei-reranking-service
-      - reranking
-      - vllm_service
+      - tgi-service
       - llm
     ports:
       - "8888:8888"
@@ -167,7 +122,6 @@ services:
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
-      - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always

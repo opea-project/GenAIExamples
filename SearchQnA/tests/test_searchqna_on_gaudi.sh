@@ -25,7 +25,7 @@ function build_docker_images() {
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -59,24 +59,28 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 500 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
         if grep -q Connected $LOG_PATH/tgi_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 }
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the latest news? Give me also the source link", "stream": "False"}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "How many gold medals does USA win in olympics 2024? Give me also the source link.", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"news"* ]]; then
+    if [[ $result == *"2024"* ]]; then
+        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
+        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
+        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
+        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
         echo "Result correct."
     else
         docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
