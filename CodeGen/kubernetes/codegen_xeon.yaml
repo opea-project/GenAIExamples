@@ -29,6 +29,6 @@ spec:
         internalService:
           serviceName: tgi-service
           config:
-            MODEL_ID: HuggingFaceH4/mistral-7b-grok
+            MODEL_ID: ise-uiuc/Magicoder-S-DS-6.7B
             endpoint: /generate
           isDownstreamService: true
