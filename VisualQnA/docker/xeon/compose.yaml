@@ -6,7 +6,7 @@ services:
     image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
     container_name: tgi-llava-xeon-server
     ports:
-      - "9399:80"
+      - "8399:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
