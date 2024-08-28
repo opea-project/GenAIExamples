@@ -7,7 +7,9 @@ import glob
 import importlib
 import os
 
-from .logging import logger
+from comps import CustomLogger
+
+logger = CustomLogger("llm_on_ray")
 
 
 def import_all_modules(basedir, prefix=None):

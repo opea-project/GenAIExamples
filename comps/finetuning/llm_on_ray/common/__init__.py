@@ -3,5 +3,4 @@
 #
 # Copyright 2023 The LLM-on-Ray Authors.
 
-from .logging import logger
 from .torch_config import TorchConfig
