@@ -164,7 +164,7 @@ docker compose up -d
 
 # let ollama service runs
 # e.g. ollama run llama3
-ollama run $OLLAMA_MODEL
+OLLAMA_HOST=${host_ip}:11434 ollama run $OLLAMA_MODEL
 # for windows
 # ollama run %OLLAMA_MODEL%
 ```
