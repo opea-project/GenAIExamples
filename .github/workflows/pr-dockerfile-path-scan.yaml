@@ -27,7 +27,7 @@ jobs:
 
       - name: Check for changed Dockerfile paths in yaml
         run: |
-          set -xe
+          set -e
           shopt -s globstar
           cd ${{github.workspace}}
           is_use="FALSE"
@@ -52,7 +52,7 @@ jobs:
 
       - name: Check for changed Dockerfile paths in readme
         run: |
-          set -xe
+          set -e
           shopt -s globstar
           cd ${{github.workspace}}
           is_use="FALSE"
@@ -93,7 +93,7 @@ jobs:
 
       - name: Check for changed Dockerfile paths
         run: |
-          set -xe
+          set -e
           shopt -s globstar
           cd ${{github.workspace}}
           is_use="FALSE"
@@ -102,9 +102,12 @@ jobs:
           changed_files="$(git diff --name-status --diff-filter=DR ${{ github.event.pull_request.base.sha }} ${merged_commit} -- '**/Dockerfile' | cut -f2)"
           if [ -n "$changed_files" ]; then
             for file in $changed_files; do
-              if grep -q "$file" ../GenAIExamples/**/*.md; then
+              matching_files=$(grep -rl "$file" ../GenAIExamples/**/*.md)
+              if [ -n "$matching_files" ]; then
                 is_use="TRUE"
                 used_files+="$file "
+                echo "Modified Dockerfile '$file' is referenced in:"
+                echo "$matching_files"
               fi
             done
           fi
