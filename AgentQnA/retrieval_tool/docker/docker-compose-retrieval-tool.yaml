@@ -102,7 +102,7 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
-  
+
   dataprep-redis-service:
     image: opea/dataprep-redis:latest
     container_name: dataprep-redis-server
@@ -121,11 +121,11 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-  
+
   retrievaltool-xeon-backend-server:
     image: opea/retrievaltool:latest
     container_name: retrievaltool-xeon-backend-server
-    # volumes: 
+    # volumes:
     #   - ${WORKDIR}/GenAIComps/comps/:/home/user/GenAIComps/comps/
     #   - ${WORKDIR}/GenAIExamples/AgentQnA/retrieval_tool/docker/:/home/user/script/
     depends_on:

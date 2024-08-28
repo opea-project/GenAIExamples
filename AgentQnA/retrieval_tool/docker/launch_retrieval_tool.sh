@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 host_ip=$(hostname -I | awk '{print $1}')
 export HF_CACHE_DIR=${HF_CACHE_DIR}
 export no_proxy=${no_proxy}
