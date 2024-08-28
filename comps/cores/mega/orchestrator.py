@@ -72,6 +72,18 @@ class ServiceOrchestrator(DAG):
                                         downstreams.remove(downstream)
                                 except re.error as e:
                                     print("Pattern invalid! Operation cancelled.")
+                            if len(downstreams) == 0 and llm_parameters.streaming:
+                                # turn the response to a StreamingResponse
+                                # to make the response uniform to UI
+                                def fake_stream(text):
+                                    yield "data: b'" + text + "'\n\n"
+                                    yield "data: [DONE]\n\n"
+
+                                self.dump_outputs(
+                                    node,
+                                    StreamingResponse(fake_stream(response["text"]), media_type="text/event-stream"),
+                                    result_dict,
+                                )
 
                     for d_node in downstreams:
                         if all(i in result_dict for i in runtime_graph.predecessors(d_node)):
