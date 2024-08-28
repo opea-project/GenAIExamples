@@ -54,12 +54,12 @@ flowchart LR
         Z1([UI]):::orchid
     end
 
-    TEI_RER{{Reranking service<br>'TEI'<br>}}
-    TEI_EM{{Embedding service <br>'TEI LangChain'<br>}}
-    VDB{{Vector DB<br>'Redis'<br>}}
-    R_RET{{Retriever service <br>'LangChain Redis'<br>}}
-    DP([Data Preparation<br>'LangChain Redis'<br>]):::blue
-    LLM_gen{{LLM Service <br>'TGI'<br>}}
+    TEI_RER{{Reranking service<br>}}
+    TEI_EM{{Embedding service <br>}}
+    VDB{{Vector DB<br><br>}}
+    R_RET{{Retriever service <br>}}
+    DP([Data Preparation<br>]):::blue
+    LLM_gen{{LLM Service <br>}}
 
     %% Data Preparation flow
     %% Ingest data flow
