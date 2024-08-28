@@ -8,6 +8,8 @@ WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
+export host_ip=$ip_address
+echo "ip_address=${ip_address}"
 
 
 function validate() {

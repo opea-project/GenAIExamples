@@ -4,12 +4,11 @@
 
 set -e
 
-echo "OPENAI_API_KEY=${OPENAI_API_KEY}"
 WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
-export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
 function stop_agent_and_api_server() {
     echo "Stopping CRAG server"

@@ -16,8 +16,9 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-      HABANA_VISIBLE_DEVICES: all
+      HABANA_VISIBLE_DEVICES: all #0,1,4,5
       OMPI_MCA_btl_vader_single_copy_mechanism: none
+      PT_HPU_ENABLE_LAZY_COLLECTIVES: true
     runtime: habana
     cap_add:
       - SYS_NICE
@@ -39,6 +40,7 @@ services:
       strategy: rag_agent
       recursion_limit: ${recursion_limit_worker}
       llm_engine: tgi
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
       model: ${LLM_MODEL_ID}
       temperature: ${temperature}
@@ -73,6 +75,7 @@ services:
       strategy: react_langgraph
       recursion_limit: ${recursion_limit_supervisor}
       llm_engine: tgi
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
       model: ${LLM_MODEL_ID}
       temperature: ${temperature}

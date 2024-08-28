@@ -8,7 +8,7 @@ export HF_CACHE_DIR=${HF_CACHE_DIR}
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-70B-Instruct"
 export LLM_ENDPOINT_URL="http://${ip_address}:8085"
-export temperature=0
+export temperature=0.01
 export max_new_tokens=512
 
 # agent related environment variables

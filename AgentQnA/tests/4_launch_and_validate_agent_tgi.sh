@@ -3,13 +3,20 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-echo "OPENAI_API_KEY=${OPENAI_API_KEY}"
 
 WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+
+export HF_CACHE_DIR=$WORKDIR/hf_cache
+if [ ! -d "$HF_CACHE_DIR" ]; then
+    mkdir -p "$HF_CACHE_DIR"
+fi
+ls $HF_CACHE_DIR
+
 
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
@@ -36,6 +43,15 @@ function validate() {
 
 function validate_agent_service() {
     echo "----------------Test agent ----------------"
+    local CONTENT=$(http_proxy="" curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+     "query": "Tell me about Michael Jackson song thriller"
+    }')
+    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
+    docker logs docgrader-agent-endpoint
+    if [ "$EXIT_CODE" == "1" ]; then
+        exit 1
+    fi
+
     local CONTENT=$(http_proxy="" curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "Tell me about Michael Jackson song thriller"
     }')
@@ -50,6 +66,8 @@ function validate_agent_service() {
 function main() {
     echo "==================== Start agent ===================="
     start_agent_and_api_server
+    echo "Waiting for LLM endpoint to be ready"
+    sleep 300
     echo "==================== Agent started ===================="
 
     echo "==================== Validate agent service ===================="
