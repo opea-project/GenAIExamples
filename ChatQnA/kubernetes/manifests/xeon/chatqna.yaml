@@ -1025,9 +1025,6 @@ spec:
       hostIPC: true
       containers:
         - name: chatqna-ui
-          envFrom:
-            - configMapRef:
-                name: chatqna-ui-config
           securityContext:
             {}
           image: "opea/chatqna-ui:latest"
