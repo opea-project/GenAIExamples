@@ -36,7 +36,7 @@ bash 3_ingest_data_and_validate_retrieval.sh
 echo "=================== #3 Data ingestion and validation completed===================="
 
 echo "=================== #4 Start agent and API server===================="
-bash 4_launch_and_validate_agent_openai.sh
+bash 4_launch_and_validate_agent_tgi.sh
 echo "=================== #4 Agent test passed ===================="
 
 echo "=================== #5 Stop agent and API server===================="
