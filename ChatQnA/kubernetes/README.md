@@ -67,7 +67,7 @@ This involves deploying the ChatQnA custom resource. You can use chatQnA_xeon.ya
    ```sh
    export CLIENT_POD=$(kubectl get pod -n chatqa -l app=client-test -o jsonpath={.items..metadata.name})
    export accessUrl=$(kubectl get gmc -n chatqa -o jsonpath="{.items[?(@.metadata.name=='chatqa')].status.accessUrl}")
-   kubectl exec "$CLIENT_POD" -n chatqa -- curl $accessUrl  -X POST  -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
+   kubectl exec "$CLIENT_POD" -n chatqa -- curl -s --no-buffer $accessUrl  -X POST  -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
    ```
 
 6. Perhaps you want to try another LLM model? Just modify the application custom resource to use another LLM model
@@ -98,7 +98,7 @@ This involves deploying the ChatQnA custom resource. You can use chatQnA_xeon.ya
 9. Access the updated pipeline using the same URL from above using the client pod
 
    ```sh
-   kubectl exec "$CLIENT_POD" -n chatqa -- curl $accessUrl -X POST -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
+   kubectl exec "$CLIENT_POD" -n chatqa -- curl -s --no-buffer $accessUrl -X POST -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
    ```
 
 > [NOTE]
