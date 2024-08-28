@@ -1,0 +1,87 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# This workflow will only test GMC pipeline and will not install GMC any more
+name: Single GMC E2e Test For CD Workflow Call
+
+on:
+  workflow_call:
+    inputs:
+      example:
+        default: "ChatQnA"
+        description: "The example to test on K8s"
+        required: true
+        type: string
+      hardware:
+        default: "xeon"
+        description: "Nodes to run the test, xeon or gaudi"
+        required: true
+        type: string
+
+jobs:
+  gmc-test:
+    runs-on: "k8s-${{ inputs.hardware }}"
+    continue-on-error: true
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Get checkout ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+          echo "checkout ref ${{ env.CHECKOUT_REF }}"
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
+          fetch-depth: 0
+
+      - name: Set variables
+        run: |
+          echo "IMAGE_REPO=$OPEA_IMAGE_REPO" >> $GITHUB_ENV
+          lower_example=$(echo "${{ inputs.example }}" | tr '[:upper:]' '[:lower:]')
+          echo "APP_NAMESPACE=$lower_example-$(tr -dc a-z0-9 </dev/urandom | head -c 16)" >> $GITHUB_ENV
+          echo "ROLLOUT_TIMEOUT_SECONDS=1800s" >> $GITHUB_ENV
+          echo "KUBECTL_TIMEOUT_SECONDS=60s" >> $GITHUB_ENV
+          echo "continue_test=true" >> $GITHUB_ENV
+          echo "should_cleanup=false" >> $GITHUB_ENV
+          echo "APP_NAMESPACE=$APP_NAMESPACE"
+
+      - name: Run tests
+        id: run-test
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: |
+          if [[ ! -f ${{ github.workspace }}/${{ inputs.example }}/tests/test_gmc_on_${{ inputs.hardware }}.sh ]]; then
+            echo "No test script found, exist test!"
+            exit 0
+          else
+            echo "should_cleanup=true" >> $GITHUB_ENV
+            ${{ github.workspace }}/${{ inputs.example }}/tests/test_gmc_on_${{ inputs.hardware }}.sh install_${{ inputs.example }}
+            echo "Testing ${{ inputs.example }}, waiting for pod ready..."
+            if kubectl rollout status deployment --namespace "$APP_NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
+              echo "Testing gmc ${{ inputs.example }}, running validation test..."
+              ${{ github.workspace }}/${{ inputs.example }}/tests/test_gmc_on_${{ inputs.hardware }}.sh validate_${{ inputs.example }}
+            else
+              echo "Timeout waiting for pods in namespace $APP_NAMESPACE to be ready!"
+              exit 1
+            fi
+            sleep 60
+          fi
+
+      - name: Kubectl uninstall
+        if: always()
+        run: |
+          if $should_cleanup; then
+            if ! kubectl delete ns $APP_NAMESPACE --timeout=$KUBECTL_TIMEOUT_SECONDS; then
+              kubectl delete pods --namespace $APP_NAMESPACE --force --grace-period=0 --all
+              kubectl delete ns $APP_NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
+            fi
+          fi

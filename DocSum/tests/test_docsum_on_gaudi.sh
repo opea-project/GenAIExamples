@@ -23,7 +23,7 @@ function build_docker_images() {
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -39,15 +39,15 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 400 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 }
