@@ -237,56 +237,57 @@ docker compose -f compose_vllm.yaml up -d
 
 ### Validate Microservices
 
+Users could test all microservices at once by below command.
+
+```bash
+python Request.py ChatQnA -v
+```
+
+Example output
+
+```bash
+test_embed (__main__.ChatQnA) ... ok
+test_embeddings (__main__.ChatQnA) ... ok
+test_rerank (__main__.ChatQnA) ... ok
+test_reranking (__main__.ChatQnA) ... ok
+test_retrival (__main__.ChatQnA) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.114s
+
+OK
+```
+
+Users could also test each service by below instructions.
+
 1. TEI Embedding Service
 
 ```bash
-curl ${host_ip}:6006/embed \
-    -X POST \
-    -d '{"inputs":"What is Deep Learning?"}' \
-    -H 'Content-Type: application/json'
+python Request.py ChatQnA.test_embed -v
 ```
 
 2. Embedding Microservice
 
 ```bash
-curl http://${host_ip}:6000/v1/embeddings\
-  -X POST \
-  -d '{"text":"hello"}' \
-  -H 'Content-Type: application/json'
+python Request.py ChatQnA.test_embedding -v
 ```
 
 3. Retriever Microservice
 
-To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
-is determined by the embedding model.
-Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
-
-Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
-
 ```bash
-export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-curl http://${host_ip}:7000/v1/retrieval \
-  -X POST \
-  -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
-  -H 'Content-Type: application/json'
+python Request.py ChatQnA.test_retrieval -v
 ```
 
 4. TEI Reranking Service
 
 ```bash
-curl http://${host_ip}:8808/rerank \
-    -X POST \
-    -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-    -H 'Content-Type: application/json'
+python Request.py ChatQnA.test_rerank -v
 ```
 
 5. Reranking Microservice
 
 ```bash
-curl http://${host_ip}:8000/v1/reranking\
-  -X POST \
-  -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-  -H 'Content-Type: application/json'
+python Request.py ChatQnA.test_reranking -v
 ```
 
 6. LLM backend Service
@@ -296,11 +297,7 @@ In first startup, this service will take more time to download the LLM file. Aft
 Use `docker logs CONTAINER_ID` to check if the download is finished.
 
 ```bash
-# TGI service
-curl http://${host_ip}:9009/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
+python Request.py ChatQnA.test_llm_backend -v
 ```
 
 ```bash
@@ -315,10 +312,7 @@ curl http://${host_ip}:9009/v1/completions \
 This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
 ```bash
-curl http://${host_ip}:9000/v1/chat/completions\
-  -X POST \
-  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-  -H 'Content-Type: application/json'
+python UnitTests.py ChatQnA.test_llm -v
 ```
 
 8. MegaService
