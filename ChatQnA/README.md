@@ -95,7 +95,124 @@ flowchart LR
 
 ```
 
-This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
+This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.  
+
+For a full list of different framework and servings available for each of the microservice components in the ChatQnA architecture, please refer to the below table:  
+<table>
+    <tbody>
+        <tr>
+            <th>Microservice</th>
+            <th>Port</th>
+            <th>Endpoint</th>
+            <th>Framework</th>
+            <th>Model</th>
+            <th>Serving</th>
+            <th>Hardware</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td rowspan="2"><a href="https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings">Embedding</a></td>
+            <td rowspan="2">6000</td>
+            <td rowspan="2">/v1/embeddings</td>
+            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
+			<td rowspan="2"><a href="https://huggingface.co/BAAI/bge-large-en-v1.5">BAAI/bge-large-en-v1.5</a></td>
+            <td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
+            <td>Gaudi2</td>
+            <td>Embedding on Gaudi2</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
+            <td>Xeon</td>
+            <td>Embedding on Xeon CPU</td>
+        </tr>
+        <tr>
+			<td><a href="https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers">Retriever</a></td>
+            <td>7000</td>
+            <td>/v1/retrieval</td>
+			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
+			<td><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">BAAI/bge-base-en-v1.5</a></td>
+			<td><a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
+			<td>Xeon</td>
+			<td>Retriever on Xeon CPU</td>
+		</tr>
+        <tr>
+			<td rowspan="2"><a href="https://github.com/opea-project/GenAIComps/tree/main/comps/reranks">Reranking</a></td>
+            <td rowspan="2">8000</td>
+            <td rowspan="2">/v1/reranking</td>
+            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
+			<td ><a href="https://huggingface.co/BAAI/bge-reranker-large">BAAI/bge-reranker-large</a></td>
+			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
+			<td>Gaudi2</td>
+			<td>Reranking on Gaudi2</td>
+		</tr>
+		<tr>
+			<td><a href="https://huggingface.co/BAAI/bge-reranker-base">BBAAI/bge-reranker-base</a></td>
+			<td><a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
+			<td>Xeon</td>
+			<td>Reranking on Xeon CPU</td>
+		</tr>
+        <tr>
+			<td rowspan="6"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/llms">LLM</a></td>
+            <td rowspan="6">9000</td>
+            <td rowspan="6">/v1/chat/completions</td>
+            <td rowspan="6"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
+			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
+			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI Gaudi</a></td>
+			<td>Gaudi2</td>
+			<td>LLM on Gaudi2</td>
+		</tr>
+		<tr>
+			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+			<td>Xeon</td>
+			<td>LLM on Xeon CPU</td>
+		</tr>
+		<tr>
+			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
+			<td rowspan="2"><a href="https://github.com/ray-project/ray">Ray Serve</a></td>
+			<td>Gaudi2</td>
+			<td>LLM on Gaudi2</td>
+		</tr>
+		<tr>
+			<td>Xeon</td>
+			<td>LLM on Xeon CPU</td>
+		</tr>
+		<tr>
+			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
+			<td rowspan="2"><a href="https://github.com/vllm-project/vllm/">vLLM</a></td>
+			<td>Gaudi2</td>
+			<td>LLM on Gaudi2</td>
+		</tr>
+		<tr>
+			<td>Xeon</td>
+			<td>LLM on Xeon CPU</td>
+		</tr>
+        <tr>
+			<td rowspan="4"><a href="https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep">Dataprep</a></td>
+            <td rowspan="4">6007</td>
+            <td rowspan="4">/v1/dataprep</td>
+            <td rowspan="2"><a href="https://qdrant.tech/">Qdrant</td>
+			<td rowspan="2"><a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">sentence-transformers/all-MiniLM-L6-v2</a></td>
+			<td rowspan="4">NA</td>
+			<td>Gaudi2</td>
+			<td>Dataprep on Gaudi2</td>
+		</tr>
+		<tr>
+			<td>Xeon</td>
+			<td>Dataprep on Xeon CPU</td>
+		</tr>
+		<tr>
+			<td rowspan="2"><a href="https://redis.io/">Redis</td>
+			<td rowspan="2"><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">BAAI/bge-base-en-v1.5</a></td>
+			<td>Gaudi2</td>
+			<td>Dataprep on Gaudi2</td>
+		</tr>
+		<tr>
+			<td>Xeon</td>
+			<td>Dataprep on Xeon CPU</td>
+		</tr>    
+    </tbody>
+</table>
+
 
 ## Deploy ChatQnA Service
 
