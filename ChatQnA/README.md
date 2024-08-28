@@ -97,7 +97,7 @@ flowchart LR
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.  
 
-For a full list of different framework and servings available for each of the microservice components in the ChatQnA architecture, please refer to the below table:  
+For a full list of framework, model, serving, and hardware choices available for each of the microservice components in the ChatQnA architecture, please refer to the below table:  
 <table>
     <tbody>
         <tr>
