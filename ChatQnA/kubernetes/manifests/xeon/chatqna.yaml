@@ -41,7 +41,7 @@ data:
         }
 
          location /v1/dataprep {
-            proxy_pass http://chatqna.default.svc.cluster.local:6007;
+            proxy_pass http://chatqna-data-prep.default.svc.cluster.local:6007;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -49,7 +49,7 @@ data:
         }
 
          location /v1/dataprep/get_file {
-            proxy_pass http://chatqna.default.svc.cluster.local:6007;
+            proxy_pass http://chatqna-data-prep.default.svc.cluster.local:6007;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -57,7 +57,7 @@ data:
         }
 
          location /v1/dataprep/delete_file {
-            proxy_pass http://chatqna.default.svc.cluster.local:6007;
+            proxy_pass http://chatqna-data-prep.default.svc.cluster.local:6007;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
