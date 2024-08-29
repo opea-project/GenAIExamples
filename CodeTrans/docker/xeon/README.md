@@ -50,9 +50,17 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 ## 🚀 Start Microservices
 
-### Setup Environment Variables
+### Required Models
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below. Notice that the `LLM_MODEL_ID` indicates the LLM model used for TGI service.
+By default, the LLM model is set to a default value as listed below:
+
+| Service | Model                         |
+| ------- | ----------------------------- |
+| LLM     | HuggingFaceH4/mistral-7b-grok |
+
+Change the `LLM_MODEL_ID` below for your needs.
+
+### Setup Environment Variables
 
 ```bash
 export no_proxy=${your_no_proxy}
