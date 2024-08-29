@@ -1420,7 +1420,7 @@ spec:
         app: chatqna-nginx
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: visualqna
       containers:
       - name: chatqna-nginx
         image: nginx:latest
