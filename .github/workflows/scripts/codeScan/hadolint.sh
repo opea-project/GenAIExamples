@@ -6,7 +6,7 @@
 source /GenAIExamples/.github/workflows/scripts/change_color
 log_dir=/GenAIExamples/.github/workflows/scripts/codeScan
 
-find . -type f \( -name "Dockerfile*" \) -print -exec hadolint --ignore DL3006 --ignore DL3007 --ignore DL3008 --ignore DL3013 {} \; 2>&1 | tee ${log_dir}/hadolint.log
+find . -type f \( -name "Dockerfile*" \) -print -exec hadolint --ignore DL3006 --ignore DL3007 {} \; 2>&1 | tee ${log_dir}/hadolint.log
 
 if [[ $(grep -c "error" ${log_dir}/hadolint.log) != 0 ]]; then
     $BOLD_RED && echo "Error!! Please Click on the artifact button to download and check error details." && $RESET
@@ -14,7 +14,8 @@ if [[ $(grep -c "error" ${log_dir}/hadolint.log) != 0 ]]; then
 fi
 
 if [[ $(grep -c "warning" ${log_dir}/hadolint.log) != 0 ]]; then
-    $BOLD_RED && echo "Warning!! Please Click on the artifact button to download and check warning details." $(grep "warning" ${log_dir}/hadolint.log) && $RESET
+    $BOLD_RED && echo "Warning!! Please Click on the artifact button to download and check warning details." && $RESET
+    $BOLD_RED && echo $(grep "warning" ${log_dir}/hadolint.log) && $RESET
 fi
 $BOLD_PURPLE && echo "Congratulations, Hadolint check passed!" && $LIGHT_PURPLE && echo " You can click on the artifact button to see the log details." && $RESET
 exit 0
