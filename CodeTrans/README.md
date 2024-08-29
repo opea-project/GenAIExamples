@@ -45,7 +45,7 @@ To set up environment variables for deploying Code Translation services, follow 
 
 3. Set up other environment variables:
 
-    Notice that the LLM in CodeTrans example is set to `HuggingFaceH4/mistral-7b-grok` by default. Change the `LLM_MODEL_ID` in `docker/set_env.sh` for your needs.
+   Notice that the LLM in CodeTrans example is set to `HuggingFaceH4/mistral-7b-grok` by default. Change the `LLM_MODEL_ID` in `docker/set_env.sh` for your needs.
 
    ```bash
    source ./docker/set_env.sh
