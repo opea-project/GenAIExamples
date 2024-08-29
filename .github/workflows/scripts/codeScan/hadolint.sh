@@ -22,6 +22,7 @@ if [[ $(grep -c "warning" ${log_dir}/hadolint.log) != 0 ]]; then
 fi
 
 if [[ $ERROR_WARN ]]; then
+    echo $ERROR_WARN
     exit 1
 fi
 $BOLD_PURPLE && echo "Congratulations, Hadolint check passed!" && $LIGHT_PURPLE && echo " You can click on the artifact button to see the log details." && $RESET
