@@ -54,9 +54,9 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 By default, the LLM model is set to a default value as listed below:
 
-|Service  |Model                    |
-|---------|-------------------------|
-|LLM      |HuggingFaceH4/mistral-7b-grok|
+| Service | Model                         |
+| ------- | ----------------------------- |
+| LLM     | HuggingFaceH4/mistral-7b-grok |
 
 Change the `LLM_MODEL_ID` below for your needs.
 

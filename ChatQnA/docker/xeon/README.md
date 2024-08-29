@@ -165,11 +165,11 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
 
-|Service  |Model                    |
-|---------|-------------------------|
-|Embedding|BAAI/bge-base-en-v1.5    |
-|Reranking|BAAI/bge-reranker-base   |
-|LLM      |Intel/neural-chat-7b-v3-3|
+| Service   | Model                     |
+| --------- | ------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5     |
+| Reranking | BAAI/bge-reranker-base    |
+| LLM       | Intel/neural-chat-7b-v3-3 |
 
 Change the `xxx_MODEL_ID` below for your needs.
 
