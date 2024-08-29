@@ -1,0 +1,25 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+FROM pathwaycom/pathway:0.13.2-slim
+
+ENV DOCKER_BUILDKIT=1
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y \
+    poppler-utils \
+    libreoffice \
+    libmagic-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt /app/
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY vectorstore_pathway.py /app/
+
+
+CMD ["python", "vectorstore_pathway.py"]
+
