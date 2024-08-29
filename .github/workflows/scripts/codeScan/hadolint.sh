@@ -7,7 +7,7 @@ source /GenAIExamples/.github/workflows/scripts/change_color
 log_dir=/GenAIExamples/.github/workflows/scripts/codeScan
 
 # find . -type f \( -name "Dockerfile*" \) -print -exec hadolint --ignore DL3006 --ignore DL3007 --ignore DL3008 --ignore DL3013 {} \; 2>&1 | tee ${log_dir}/hadolint.log
-find . -type f \( -name "Dockerfile*" \) -print -exec sh -c 'hadolint --ignore DL3006 --ignore DL3007 --ignore DL3008 --ignore DL3013 "$1" | grep -E "^(error|warning):"' _ {} \; 2>&1 | tee "${log_dir}/hadolint.log"
+find . -type f \( -name "Dockerfile*" \) -print -exec sh -c 'hadolint --ignore DL3006 --ignore DL3007 --ignore DL3008 {} \; | grep -E "^(error|warning):"' _  2>&1 | tee "${log_dir}/hadolint.log"
 
 
 if [[ $(grep -c "error" ${log_dir}/hadolint.log) != 0 ]]; then
