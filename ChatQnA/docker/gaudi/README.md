@@ -159,11 +159,21 @@ If Guardrails docker image is built, you will find one more image:
 
 ## 🚀 Start MicroServices and MegaService
 
+### Required Models
+
+By default, the embedding, reranking and LLM models are set to a default value as listed below:
+
+|Service  |Model                    |
+|---------|-------------------------|
+|Embedding|BAAI/bge-base-en-v1.5    |
+|Reranking|BAAI/bge-reranker-base   |
+|LLM      |Intel/neural-chat-7b-v3-3|
+
+Change the `xxx_MODEL_ID` below for your needs.
+
 ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
-
-> Notice that the LLM in ChatQnA example is set to `Intel/neural-chat-7b-v3-3` by default. Change the `LLM_MODEL_ID` below for your needs.
 
 ```bash
 export no_proxy=${your_no_proxy}
