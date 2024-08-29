@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/name: chatqna-nginx
     app.kubernetes.io/instance: chatqna-nginx
     app.kubernetes.io/version: "v0.8"
-    app.kubernetes.io/managed-by: Helm 
+    app.kubernetes.io/managed-by: Helm
 data:
   default.conf: |
     server {
@@ -536,7 +536,7 @@ metadata:
     app.kubernetes.io/name: chatqna-ui
     app.kubernetes.io/instance: chatqna-ui
     app.kubernetes.io/version: "v0.8"
-    app.kubernetes.io/managed-by: Helm    
+    app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
   ports:
@@ -1035,7 +1035,7 @@ metadata:
     app.kubernetes.io/name: chatqna-ui
     app.kubernetes.io/instance: chatqna-ui
     app.kubernetes.io/version: "v0.8"
-    app.kubernetes.io/managed-by: Helm  
+    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
@@ -1444,7 +1444,7 @@ metadata:
     app.kubernetes.io/name: chatqna-nginx
     app.kubernetes.io/instance: chatqna-nginx
     app.kubernetes.io/version: "v0.8"
-    app.kubernetes.io/managed-by: Helm  
+    app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     app: chatqna-nginx
