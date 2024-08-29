@@ -56,8 +56,9 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 3. Set up other environment variables:
 
    > Note: By default, the [`docker/set_env.sh`](docker/set_env.sh) file will configure your environment
-   > variables to use [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf). This
-   > is a gated model that requires submitting an access request through Hugging Face.
+   > variable `LLM_MODEL_ID` to use [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf). This
+   > is a gated model that requires submitting an access request through Hugging Face. You can replace it with another model,
+   > such as: [Qwen/CodeQwen1.5-7B-Chat](https://huggingface.co/Qwen/CodeQwen1.5-7B-Chat), [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
 
    ```bash
    source ./docker/set_env.sh
