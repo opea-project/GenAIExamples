@@ -51,4 +51,4 @@ jobs:
       - name: create pull request
         run: gh pr create -B main -H ${{ env.BRANCH_NAME }} --title 'Update ghcr.io/huggingface/text-generation-inference image tag' --body 'Created by Github action'
         env:
-          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
+          GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
