@@ -22,8 +22,8 @@ function build_docker_images() {
     service_list="codetrans codetrans-ui llm-tgi nginx"
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:latest-intel-cpu
-    docker images
+    docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -46,15 +46,15 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 400 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs codetrans-tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 }
