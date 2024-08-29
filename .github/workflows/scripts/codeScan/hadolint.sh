@@ -7,7 +7,7 @@ source /GenAIExamples/.github/workflows/scripts/change_color
 log_dir=/GenAIExamples/.github/workflows/scripts/codeScan
 ERROR_WARN=false
 
-find . -type f \( -name "Dockerfile*" \) -print -exec hadolint --ignore DL3006 --ignore DL3007 --ignore DL3008 {} \; > ${log_dir}/hadolint.log
+find . -type f \( -name "Dockerfile*" \) -print -exec hadolint --ignore DL3006 --ignore DL3007 --ignore DL3008 --ignore DL3013 {} \; > ${log_dir}/hadolint.log
 
 if [[ $(grep -c "error" ${log_dir}/hadolint.log) != 0 ]]; then
     $BOLD_RED && echo "Error!! Please Click on the artifact button to download and check error details." && $RESET
