@@ -42,11 +42,19 @@ cd GenAIExamples/CodeTrans/docker/ui
 docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
+### 5. Build Nginx Docker Image
+
+```bash
+cd GenAIComps/comps/nginx/docker
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile .
+```
+
 Then run the command `docker images`, you will have the following Docker Images:
 
 - `opea/llm-tgi:latest`
 - `opea/codetrans:latest`
 - `opea/codetrans-ui:latest`
+- `opea/nginx:latest`
 
 ## 🚀 Start Microservices
 
@@ -62,17 +70,30 @@ Change the `LLM_MODEL_ID` below for your needs.
 
 ### Setup Environment Variables
 
-```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export LLM_MODEL_ID="HuggingFaceH4/mistral-7b-grok"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7777/v1/codetrans"
-```
+1. Set the required environment variables:
+
+   ```bash
+   # Example: host_ip="192.168.1.1"
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   # Example: NGINX_PORT=80
+   export NGINX_PORT=${your_nginx_port}
+   ```
+
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   ```
+
+3. Set up other environment variables:
+
+   ```bash
+   source ../set_env.sh
+   ```
 
 ### Start Microservice Docker Containers
 
@@ -108,3 +129,27 @@ curl http://${host_ip}:7777/v1/codetrans \
     -H "Content-Type: application/json" \
     -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 ```
+
+4. Nginx Service
+
+```bash
+curl http://${host_ip}:${NGINX_PORT}/v1/codetrans \
+    -H "Content-Type: application/json" \
+    -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+```
+
+## 🚀 Launch the UI
+
+### Launch with origin port
+
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+
+### Launch with Nginx
+
+If you want to launch the UI using Nginx, open this URL: `http://{host_ip}:{NGINX_PORT}` in your browser to access the frontend.
+
+![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/71214938-819c-4979-89cb-c03d937cd7b5)
+
+Here is an example for summarizing a article.
+
+![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/be543e96-ddcd-4ee0-9f2c-4e99fee77e37)

@@ -22,3 +22,9 @@ services:
       dockerfile: comps/llms/text-generation/tgi/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+  nginx:
+    build:
+      context: GenAIComps/comps/nginx/docker
+      dockerfile: ./Dockerfile
+    extends: codetrans
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
