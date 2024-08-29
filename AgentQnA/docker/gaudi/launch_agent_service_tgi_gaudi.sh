@@ -19,4 +19,4 @@ export WORKER_AGENT_URL="http://${ip_address}:9095/v1/chat/completions"
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
 export CRAG_SERVER=http://${ip_address}:8080
 
-docker compose -f docker-compose-agent-tgi-gaudi.yaml up -d
+docker compose -f compose.yaml up -d
