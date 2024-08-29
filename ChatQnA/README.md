@@ -121,6 +121,18 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 
 2. Start services using the docker images `built from source`: [Guide](./docker)
 
+### Required Models
+
+By default, the embedding, reranking and LLM models are set to a default value as listed below:
+
+| Service   | Model                     |
+| --------- | ------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5     |
+| Reranking | BAAI/bge-reranker-base    |
+| LLM       | Intel/neural-chat-7b-v3-3 |
+
+Change the `xxx_MODEL_ID` in `docker/xxx/set_env.sh` for your needs.
+
 ### Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:

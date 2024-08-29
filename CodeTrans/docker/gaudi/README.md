@@ -50,9 +50,17 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 ## 🚀 Start Microservices
 
-### Setup Environment Variables
+### Required Models
 
-To set up environment variables for deploying Code Translation services, follow these steps:
+By default, the LLM model is set to a default value as listed below:
+
+| Service | Model                         |
+| ------- | ----------------------------- |
+| LLM     | HuggingFaceH4/mistral-7b-grok |
+
+Change the `LLM_MODEL_ID` below for your needs.
+
+### Setup Environment Variables
 
 1. Set the required environment variables:
 
