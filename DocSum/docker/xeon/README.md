@@ -74,6 +74,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 ## 🚀 Start Microservices and MegaService
 
 ### Required Models
+
 We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
 
 ### Setup Environment Variables

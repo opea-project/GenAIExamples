@@ -24,6 +24,7 @@ Currently we support two ways of deploying Document Summarization services with 
 2. Start services using the docker images `built from source`: [Guide](./docker)
 
 ### Required Models
+
 We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "set_env.sh" if you want to use other models.
 
 ```
