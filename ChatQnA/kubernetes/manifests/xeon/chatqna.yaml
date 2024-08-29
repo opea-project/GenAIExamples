@@ -573,7 +573,7 @@ spec:
       labels:
         app.kubernetes.io/name: data-prep
         app.kubernetes.io/instance: chatqna
-    spec:      
+    spec:
       securityContext:
         {}
       containers:
@@ -651,7 +651,7 @@ spec:
       labels:
         app.kubernetes.io/name: embedding-usvc
         app.kubernetes.io/instance: chatqna
-    spec:      
+    spec:
       securityContext:
         {}
       containers:
@@ -729,7 +729,7 @@ spec:
       labels:
         app.kubernetes.io/name: llm-uservice
         app.kubernetes.io/instance: chatqna
-    spec:     
+    spec:
       securityContext:
         {}
       containers:
@@ -807,7 +807,7 @@ spec:
       labels:
         app.kubernetes.io/name: redis-vector-db
         app.kubernetes.io/instance: chatqna
-    spec:     
+    spec:
       securityContext:
         {}
       containers:
@@ -879,7 +879,7 @@ spec:
       labels:
         app.kubernetes.io/name: reranking-usvc
         app.kubernetes.io/instance: chatqna
-    spec:     
+    spec:
       securityContext:
         {}
       containers:
@@ -957,7 +957,7 @@ spec:
       labels:
         app.kubernetes.io/name: retriever-usvc
         app.kubernetes.io/instance: chatqna
-    spec:     
+    spec:
       securityContext:
         {}
       containers:
@@ -1037,7 +1037,7 @@ spec:
       labels:
         app.kubernetes.io/name: chatqna-ui
         app.kubernetes.io/instance: chatqna-ui
-    spec:     
+    spec:
       securityContext:
         {}
       hostIPC: true
@@ -1078,7 +1078,7 @@ spec:
       labels:
         app.kubernetes.io/name: tei
         app.kubernetes.io/instance: chatqna
-    spec:     
+    spec:
       securityContext:
         {}
       containers:
@@ -1162,7 +1162,7 @@ spec:
       labels:
         app.kubernetes.io/name: teirerank
         app.kubernetes.io/instance: chatqna
-    spec:      
+    spec:
       securityContext:
         {}
       containers:
@@ -1246,7 +1246,7 @@ spec:
       labels:
         app.kubernetes.io/name: tgi
         app.kubernetes.io/instance: chatqna
-    spec:      
+    spec:
       securityContext:
         {}
       containers:
@@ -1319,7 +1319,7 @@ spec:
       labels:
         app.kubernetes.io/name: chatqna
         app.kubernetes.io/instance: chatqna
-    spec:      
+    spec:
       securityContext:
         null
       containers:
