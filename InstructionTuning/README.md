@@ -42,7 +42,7 @@ curl http://${your_ip}:8005/v1/fine_tuning/jobs \
 
 Below commands show how to list finetuning jobs, retrieve a finetuning job, cancel a finetuning job and list checkpoints of a finetuning job.
 
-``` bash
+```bash
 # list finetuning jobs
 curl http://${your_ip}:8005/v1/fine_tuning/jobs   -X GET
 
