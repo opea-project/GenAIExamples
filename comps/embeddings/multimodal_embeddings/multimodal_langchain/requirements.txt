@@ -1,0 +1,14 @@
+docarray[full]
+fastapi
+huggingface_hub
+langchain
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+prometheus-fastapi-instrumentator
+pydantic==2.8.2
+shortuuid
+torch
+torchvision
+transformers
+uvicorn

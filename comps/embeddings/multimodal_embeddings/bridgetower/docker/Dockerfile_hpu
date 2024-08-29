@@ -1,0 +1,29 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# HABANA environment
+FROM vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest AS hpu
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
+
+RUN rm -rf /etc/ssh/ssh_host*
+USER user
+# Set environment variables
+ENV LANG=en_US.UTF-8
+ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/optimum-habana
+
+COPY --chown=user comps /home/user/comps
+
+# Install requirements and optimum habana
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /home/user/comps/embeddings/multimodal_embeddings/multimodal_langchain/requirements.txt && \
+    pip install optimum[habana]
+
+ENV PYTHONPATH=$PYTHONPATH:/home/user
+
+ARG EMBEDDER_PORT=8080
+ENV PORT=$EMBEDDER_PORT
+
+WORKDIR /home/user/comps/embeddings/multimodal_embeddings/bridgetower
+ENTRYPOINT ["python", "bridgetower_server.py", "--device", "hpu"]

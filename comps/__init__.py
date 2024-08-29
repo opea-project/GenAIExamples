@@ -19,6 +19,10 @@ from comps.cores.proto.docarray import (
     GraphDoc,
     LVMDoc,
     LVMVideoDoc,
+    ImageDoc,
+    TextImageDoc,
+    MultimodalDoc,
+    EmbedMultimodalDoc,
 )
 
 # Constants
