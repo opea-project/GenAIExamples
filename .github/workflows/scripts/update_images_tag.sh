@@ -34,7 +34,6 @@ function replace_image_version() {
 }
 
 function main() {
-    check_branch_name
     for repo_image in "${!dict[@]}"; do
         echo "::group::check $repo_image"
         get_latest_version $repo_image
