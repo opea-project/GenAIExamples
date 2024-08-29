@@ -144,6 +144,8 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 3. Set up other environment variables:
 
+   > Notice that the LLM in ChatQnA example is set to `Intel/neural-chat-7b-v3-3` by default. Change the `LLM_MODEL_ID` in `docker/xxx/set_env.sh` for your needs.
+
    > Notice that you can only choose **one** command below to set up envs according to your hardware. Other that the port numbers may be set incorrectly.
 
    ```bash

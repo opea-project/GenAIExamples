@@ -183,9 +183,11 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 
 **Append the value of the public IP address to the no_proxy list**
 
-```
+```bash
 export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
+
+> Notice that the LLM in ChatQnA example is set to `Intel/neural-chat-7b-v3-3` by default. Change the `LLM_MODEL_ID` below for your needs.
 
 ```bash
 export no_proxy=${your_no_proxy}

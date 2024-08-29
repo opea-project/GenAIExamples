@@ -91,6 +91,8 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
+> Notice that the LLM in ChatQnA example is set to `Intel/neural-chat-7b-v3-3` by default. Change the `LLM_MODEL_ID` below for your needs.
+
 ```bash
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
