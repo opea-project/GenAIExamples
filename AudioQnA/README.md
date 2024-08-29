@@ -14,7 +14,6 @@ Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deployi
 
 Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying AudioQnA on Xeon.
 
-
 ## Supported Models
 
 ### ASR
