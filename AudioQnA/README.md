@@ -31,4 +31,4 @@ services:
 
 ### TTS
 
-The default model is [microsoft/SpeechT5](https://huggingface.co/microsoft/speecht5_tts). More models under the commercial license will be added in the future.
+The default model is [microsoft/SpeechT5](https://huggingface.co/microsoft/speecht5_tts). We currently do not support replacing the model. More models under the commercial license will be added in the future.
