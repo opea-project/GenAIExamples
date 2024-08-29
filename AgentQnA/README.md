@@ -26,50 +26,50 @@ This example showcases a hierarchical multi-agent system for question-answering 
 1. Build agent docker image </br>
    First, clone the opea GenAIComps repo
 
-```
-export WORKDIR=<your-work-directory>
-cd $WORKDIR
-git clone https://github.com/opea-project/GenAIComps.git
-```
+   ```
+   export WORKDIR=<your-work-directory>
+   cd $WORKDIR
+   git clone https://github.com/opea-project/GenAIComps.git
+   ```
 
-Then build the agent docker image. Both the supervisor agent and the worker agent will use the same docker image, but when we launch the two agents we will specify different strategies and register different tools.
+   Then build the agent docker image. Both the supervisor agent and the worker agent will use the same docker image, but when we launch the two agents we will specify different strategies and register different tools.
 
-```
-cd GenAIComps
-docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/docker/Dockerfile .
-```
+   ```
+   cd GenAIComps
+   docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/docker/Dockerfile .
+   ```
 
 2. Launch tool services </br>
    In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
 
-```
-docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
-```
+   ```
+   docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+   ```
 
 3. Set up environment for this example </br>
    First, clone this repo
 
-```
-cd $WORKDIR
-git clone https://github.com/opea-project/GenAIExamples.git
-```
+   ```
+   cd $WORKDIR
+   git clone https://github.com/opea-project/GenAIExamples.git
+   ```
 
-Second, set up env vars
+   Second, set up env vars
 
-```
-export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
-# optional: OPANAI_API_KEY
-export OPENAI_API_KEY=<your-openai-key>
-```
+   ```
+   export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+   # optional: OPANAI_API_KEY
+   export OPENAI_API_KEY=<your-openai-key>
+   ```
 
 4. Launch agent services</br>
    The configurations of the supervisor agent and the worker agent are defined in the docker-compose yaml file. We currently use openAI GPT-4o-mini as LLM, and we plan to add support for llama3.1-70B-instruct (served by TGI-Gaudi) in a subsequent release.
    To use openai llm, run command below.
 
-```
-cd docker/openai/
-bash launch_agent_service_openai.sh
-```
+   ```
+   cd docker/openai/
+   bash launch_agent_service_openai.sh
+   ```
 
 ## Validate services
 
