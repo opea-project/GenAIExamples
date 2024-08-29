@@ -52,10 +52,9 @@ jobs:
           cat test_chatqna_on_gaudi.sh
 
           echo "Run test..."
+          echo "LOG_DIR=$(pwd)" >> $GITHUB_ENV
           export IMAGE_TAG="comps"
           timeout 50m bash test_chatqna_on_gaudi.sh
-
-          echo "LOG_PATH=$(pwd)/*.log" >> $GITHUB_ENV
 
       - name: Clean up container
         if: cancelled() || failure()
@@ -69,4 +68,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "Examples-Test-Logs"
-          path: ${{ env.LOG_PATH }}
+          path: ${{ env.LOG_DIR }}/*.log

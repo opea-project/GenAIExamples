@@ -25,7 +25,6 @@ jobs:
           else
             echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
           fi
-          echo "checkout ref ${{ env.CHECKOUT_REF }}"
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
@@ -39,7 +38,7 @@ jobs:
           set -xe
           if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             LATEST_COMMIT_SHA=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/opea-project/GenAIComps/commits?sha=main" | jq -r '.[0].sha')
+            "https://api.github.com/repos/opea-project/GenAIComps/commits?sha=${{ github.event.pull_request.base.ref }}" | jq -r '.[0].sha')
             echo "Latest commit SHA is $LATEST_COMMIT_SHA"
             base_commit=$LATEST_COMMIT_SHA
           else
