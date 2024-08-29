@@ -59,6 +59,7 @@ jobs:
 
       - name: SBOM Scan Container
         uses: anchore/sbom-action@v0.17.1
+        if: always()
         with:
           image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output-file: ${{ matrix.image }}-sbom-scan.txt
@@ -66,6 +67,7 @@ jobs:
 
       - name: Security Scan Container
         uses: aquasecurity/trivy-action@0.24.0
+        if: always()
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output: ${{ matrix.image }}-trivy-scan.txt
@@ -80,6 +82,7 @@ jobs:
         run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
 
       - uses: actions/upload-artifact@v4.3.4
+        if: always()
         with:
           name: ${{ matrix.image }}-scan
           path: ${{ matrix.image }}-*-scan.txt
