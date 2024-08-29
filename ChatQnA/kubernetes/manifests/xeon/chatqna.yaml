@@ -574,6 +574,8 @@ spec:
         app.kubernetes.io/name: data-prep
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna
       securityContext:
         {}
       containers:
@@ -652,6 +654,8 @@ spec:
         app.kubernetes.io/name: embedding-usvc
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna
       securityContext:
         {}
       containers:
@@ -730,6 +734,8 @@ spec:
         app.kubernetes.io/name: llm-uservice
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna
       securityContext:
         {}
       containers:
@@ -808,6 +814,8 @@ spec:
         app.kubernetes.io/name: redis-vector-db
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna
       securityContext:
         {}
       containers:
@@ -880,6 +888,8 @@ spec:
         app.kubernetes.io/name: reranking-usvc
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna
       securityContext:
         {}
       containers:
@@ -938,7 +948,7 @@ spec:
 
 apiVersion: apps/v1
 kind: Deployment
-metadata:
+metadata: 
   name: chatqna-retriever-usvc
   labels:
     helm.sh/chart: retriever-usvc-0.8.0
@@ -958,6 +968,8 @@ spec:
         app.kubernetes.io/name: retriever-usvc
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna
       securityContext:
         {}
       containers:
@@ -1038,6 +1050,8 @@ spec:
         app.kubernetes.io/name: chatqna-ui
         app.kubernetes.io/instance: chatqna-ui
     spec:
+      nodeSelector:
+        node-type: visualqna
       securityContext:
         {}
       hostIPC: true
@@ -1079,6 +1093,8 @@ spec:
         app.kubernetes.io/name: tei
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna
       securityContext:
         {}
       containers:
@@ -1163,6 +1179,8 @@ spec:
         app.kubernetes.io/name: teirerank
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna    
       securityContext:
         {}
       containers:
@@ -1247,6 +1265,8 @@ spec:
         app.kubernetes.io/name: tgi
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna    
       securityContext:
         {}
       containers:
@@ -1320,6 +1340,8 @@ spec:
         app.kubernetes.io/name: chatqna
         app.kubernetes.io/instance: chatqna
     spec:
+      nodeSelector:
+        node-type: visualqna    
       securityContext:
         null
       containers:
@@ -1397,6 +1419,8 @@ spec:
       labels:
         app: chatqna-nginx
     spec:
+      nodeSelector:
+        task: visualqna
       containers:
       - name: chatqna-nginx
         image: nginx:latest
