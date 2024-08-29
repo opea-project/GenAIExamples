@@ -948,7 +948,7 @@ spec:
 
 apiVersion: apps/v1
 kind: Deployment
-metadata: 
+metadata:
   name: chatqna-retriever-usvc
   labels:
     helm.sh/chart: retriever-usvc-0.8.0
@@ -1180,7 +1180,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: visualqna    
+        node-type: visualqna
       securityContext:
         {}
       containers:
@@ -1266,7 +1266,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: visualqna    
+        node-type: visualqna
       securityContext:
         {}
       containers:
@@ -1341,7 +1341,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: visualqna    
+        node-type: visualqna
       securityContext:
         null
       containers:
