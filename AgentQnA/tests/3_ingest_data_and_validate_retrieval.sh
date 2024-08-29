@@ -47,7 +47,7 @@ function validate_retrieval_tool() {
      "text": "Who sang Thriller"
     }')
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "retrieval-tool")
-    
+
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs retrievaltool-xeon-backend-server
         exit 1

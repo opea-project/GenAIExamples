@@ -9,4 +9,3 @@ search_knowledge_base:
       type: str
       description: query
   return_output: retrieved_data
-

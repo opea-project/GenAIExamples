@@ -56,7 +56,7 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-worker-agent-service"
       port: 9095
-      
+
 
   supervisor-react-agent:
     image: opea/comps-agent-langchain:latest

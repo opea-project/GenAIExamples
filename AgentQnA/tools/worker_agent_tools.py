@@ -1,5 +1,10 @@
-import requests
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import os
+
+import requests
+
 
 def search_knowledge_base(query: str) -> str:
     """Search the knowledge base for a specific query."""

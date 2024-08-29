@@ -15,6 +15,7 @@ RETRIEVER_SERVICE_PORT = os.getenv("RETRIEVER_SERVICE_PORT", 7000)
 RERANK_SERVICE_HOST_IP = os.getenv("RERANK_SERVICE_HOST_IP", "0.0.0.0")
 RERANK_SERVICE_PORT = os.getenv("RERANK_SERVICE_PORT", 8000)
 
+
 class RetrievalToolService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
@@ -46,7 +47,7 @@ class RetrievalToolService:
             use_remote_service=True,
             service_type=ServiceType.RERANK,
         )
-        
+
         self.megaservice.add(embedding).add(retriever).add(rerank)
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, rerank)
