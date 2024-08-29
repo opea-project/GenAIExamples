@@ -8,6 +8,8 @@
 
 > You need to make sure you have created the directory `/mnt/opea-models` to save the cached model on the node where the CodeTrans workload is running. Otherwise, you need to modify the `codetrans.yaml` file to change the `model-volume` to a directory that exists on the node.
 
+> Notice that the LLM in CodeTrans example is set to `HuggingFaceH4/mistral-7b-grok` by default. Change the `MODEL_ID` in `codetrans.yaml` for your needs.
+
 ## Deploy On Xeon
 
 ```

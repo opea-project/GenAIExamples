@@ -10,6 +10,9 @@ In the below example we illustrate on Xeon.
 ## Deploy the RAG application
 
 1. Create the desired namespace if it does not already exist and deploy the application
+    
+    Notice that the LLM in CodeTrans example is set to `HuggingFaceH4/mistral-7b-grok` by default. Change the `MODEL_ID` in `codetrans_xeon.yaml`/`codetrans_gaudi.yaml` for your needs.
+
    ```bash
    export APP_NAMESPACE=CT
    kubectl create ns $APP_NAMESPACE

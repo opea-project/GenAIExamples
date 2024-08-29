@@ -52,7 +52,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 ### Setup Environment Variables
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below. Notice that the `LLM_MODEL_ID` indicates the LLM model used for TGI service.
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below. Notice that the `LLM_MODEL_ID` indicates the LLM model used for TGI service, and it is set to `HuggingFaceH4/mistral-7b-grok` by default. Change the `LLM_MODEL_ID` below for your needs.
 
 ```bash
 export no_proxy=${your_no_proxy}
