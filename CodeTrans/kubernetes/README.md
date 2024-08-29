@@ -7,9 +7,20 @@ Please install GMC in your Kubernetes cluster, if you have not already done so, 
 If you have only Intel Xeon machines you could use the codetrans_xeon.yaml file or if you have a Gaudi cluster you could use codetrans_gaudi.yaml
 In the below example we illustrate on Xeon.
 
+## Required Models
+
+By default, the LLM model is set to a default value as listed below:
+
+|Service  |Model                    |
+|---------|-------------------------|
+|LLM      |HuggingFaceH4/mistral-7b-grok|
+
+Change the `MODEL_ID` in `codetrans_xeon.yaml` for your needs.
+
 ## Deploy the RAG application
 
 1. Create the desired namespace if it does not already exist and deploy the application
+
    ```bash
    export APP_NAMESPACE=CT
    kubectl create ns $APP_NAMESPACE

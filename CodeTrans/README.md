@@ -22,6 +22,16 @@ Currently we support two ways of deploying Code Translation services on docker:
 
 2. Start services using the docker images `built from source`: [Guide](./docker)
 
+### Required Models
+
+By default, the LLM model is set to a default value as listed below:
+
+| Service | Model                         |
+| ------- | ----------------------------- |
+| LLM     | HuggingFaceH4/mistral-7b-grok |
+
+Change the `LLM_MODEL_ID` in `docker/set_env.sh` for your needs.
+
 ### Setup Environment Variable
 
 To set up environment variables for deploying Code Translation services, follow these steps:
