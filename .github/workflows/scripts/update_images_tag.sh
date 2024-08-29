@@ -33,17 +33,7 @@ function replace_image_version() {
     fi
 }
 
-function check_branch_name() {
-    if [[ "$GITHUB_REF_NAME" == "main" ]]; then
-        echo "$GITHUB_REF_NAME is protected branch"
-        exit 0
-    else
-        echo "branch name is $GITHUB_REF_NAME"
-    fi
-}
-
 function main() {
-    check_branch_name
     for repo_image in "${!dict[@]}"; do
         echo "::group::check $repo_image"
         get_latest_version $repo_image
