@@ -11,9 +11,8 @@ In the below example we illustrate on Xeon.
 
 1. Create the desired namespace if it does not already exist and deploy the application
    ```bash
-   export APP_NAMESPACE=CT
+   export APP_NAMESPACE=visualqna
    kubectl create ns $APP_NAMESPACE
-   sed -i "s|namespace: visualqna|namespace: $APP_NAMESPACE|g"  ./visualqna_xeon.yaml
    kubectl apply -f ./visualqna_xeon.yaml
    ```
 

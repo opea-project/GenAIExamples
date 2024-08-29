@@ -8,7 +8,6 @@ COPY GenAIComps /home/user/GenAIComps
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
     libjemalloc-dev \
-    vim \
     git
 
 RUN useradd -m -s /bin/bash user && \
