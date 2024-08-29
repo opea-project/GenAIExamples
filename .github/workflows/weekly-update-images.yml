@@ -1,0 +1,54 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Weekly update base images and 3rd party images
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  freeze-images:
+    runs-on: ubuntu-latest
+    env:
+      USER_NAME: "NeuralChatBot"
+      USER_EMAIL: "grp_neural_chat_bot@intel.com"
+      BRANCH_NAME: "update_images_tag"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: "main"
+
+      - name: Install skopeo
+        run: |
+          sudo apt update
+          sudo apt -y install skopeo
+
+      - name: Set up Git
+        run: |
+          git config --global user.name ${{ env.USER_NAME }}
+          git config --global user.email ${{ env.USER_EMAIL }}
+          git remote set-url origin https://${{ env.USER_NAME }}:"${{ secrets.ACTION_TOKEN }}"@github.com/opea-project/GenAIExamples.git
+          git checkout -b ${{ env.BRANCH_NAME }}
+
+      - name: Run script
+        run: |
+          bash .github/workflows/scripts/update_images_tag.sh
+
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -s -m "Update third party images tag"
+          git push --set-upstream origin update_images_tag
+
+      - name: create pull request
+        run: gh pr create -B main -H ${{ env.BRANCH_NAME }} --title 'Update ghcr.io/huggingface/text-generation-inference image tag' --body 'Created by Github action'
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
