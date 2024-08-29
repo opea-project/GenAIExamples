@@ -575,7 +575,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -655,7 +655,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -735,7 +735,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -815,7 +815,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -889,7 +889,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -969,7 +969,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -1051,7 +1051,7 @@ spec:
         app.kubernetes.io/instance: chatqna-ui
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       hostIPC: true
@@ -1094,7 +1094,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -1180,7 +1180,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -1266,7 +1266,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -1341,7 +1341,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       securityContext:
         null
       containers:
@@ -1420,7 +1420,7 @@ spec:
         app: chatqna-nginx
     spec:
       nodeSelector:
-        task: visualqna
+        node-type: chatqna-ui
       containers:
       - name: chatqna-nginx
         image: nginx:latest
