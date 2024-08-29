@@ -33,16 +33,14 @@ function start_service() {
     # start milvus vector db
     mkdir $WORKPATH/milvus
     cd $WORKPATH/milvus
-    wget https://raw.githubusercontent.com/milvus-io/milvus/v2.4.6/configs/milvus.yaml
-    wget https://github.com/milvus-io/milvus/releases/download/v2.4.6/milvus-standalone-docker-compose.yml -O docker-compose.yml
+    wget https://raw.githubusercontent.com/milvus-io/milvus/v2.4.9/configs/milvus.yaml
+    wget https://github.com/milvus-io/milvus/releases/download/v2.4.9/milvus-standalone-docker-compose.yml -O docker-compose.yml
     sed '/- \${DOCKER_VOLUME_DIRECTORY:-\.}\/volumes\/milvus:\/var\/lib\/milvus/a \ \ \ \ \ \ - \${DOCKER_VOLUME_DIRECTORY:-\.}\/milvus.yaml:\/milvus\/configs\/milvus.yaml' -i docker-compose.yml
     docker compose up -d
 
     # set service ports
     mosec_embedding_port=5021
     dataprep_service_port=5022
-    dataprep_file_service_port=5023
-    dataprep_del_service_port=5024
 
     # start mosec embedding service
     docker run -d --name="test-comps-dataprep-milvus-mosec-server" -p $mosec_embedding_port:8000 -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/langchain-mosec:comps
@@ -50,69 +48,89 @@ function start_service() {
     # start dataprep service
     MOSEC_EMBEDDING_ENDPOINT="http://${ip_address}:${mosec_embedding_port}"
     MILVUS=${ip_address}
-    docker run -d --name="test-comps-dataprep-milvus-server" -p ${dataprep_service_port}:6010 -p ${dataprep_file_service_port}:6011 -p ${dataprep_del_service_port}:6012 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MOSEC_EMBEDDING_ENDPOINT=${MOSEC_EMBEDDING_ENDPOINT} -e MILVUS=${MILVUS} --ipc=host opea/dataprep-milvus:comps
+    docker run -d --name="test-comps-dataprep-milvus-server" -p ${dataprep_service_port}:6010 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MOSEC_EMBEDDING_ENDPOINT=${MOSEC_EMBEDDING_ENDPOINT} -e MILVUS=${MILVUS} -e LOGFLAG=true --ipc=host opea/dataprep-milvus:comps
     sleep 1m
+}
+
+function validate_service() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local INPUT_DATA="$5"
+
+    if [[ $SERVICE_NAME == *"dataprep_upload_file"* ]]; then
+        cd $LOG_PATH
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep_upload_link"* ]]; then
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'link_list=["https://www.ces.tech/"]' -F "chunk_size=500" "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "all"}' -H 'Content-Type: application/json' "$URL")
+    else
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    fi
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+
+    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+
+    # check response status
+    if [ "$HTTP_STATUS" -ne "200" ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        #####################
+        if [[ $SERVICE_NAME == *"dataprep_upload_link"* ]]; then
+            docker logs test-comps-dataprep-milvus-mosec-server >> ${LOG_PATH}/mosec-embedding.log
+        fi
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    fi
+    # check response body
+    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
+    sleep 5s
 }
 
 function validate_microservice() {
     cd $LOG_PATH
-
-    # test /v1/dataprep
     dataprep_service_port=5022
-    URL="http://${ip_address}:$dataprep_service_port/v1/dataprep"
-    echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ dataprep ] HTTP status is 200. Checking content..."
-        cp ./dataprep_file.txt ./dataprep_file2.txt
-        local CONTENT=$(curl -s -X POST -F 'files=@./dataprep_file2.txt' -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/dataprep.log)
-
-        if echo "$CONTENT" | grep -q "Data preparation succeeded"; then
-            echo "[ dataprep ] Content is as expected."
-        else
-            echo "[ dataprep ] Content does not match the expected result: $CONTENT"
-            docker logs test-comps-dataprep-milvus-server >> ${LOG_PATH}/dataprep.log
-            exit 1
-        fi
-    else
-        echo "[ dataprep ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs test-comps-dataprep-milvus-server >> ${LOG_PATH}/dataprep.log
-        exit 1
-    fi
-
-    # test /v1/dataprep/get_file
-    dataprep_file_service_port=5023
-    URL="http://${ip_address}:$dataprep_file_service_port/v1/dataprep/get_file"
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ dataprep - file ] HTTP status is 200. Checking content..."
-        local CONTENT=$(curl -s -X POST -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/dataprep_file.log)
-
-        if echo "$CONTENT" | grep -q '{"name":'; then
-            echo "[ dataprep - file ] Content is as expected."
-        else
-            echo "[ dataprep - file ] Content does not match the expected result: $CONTENT"
-            docker logs test-comps-dataprep-milvus-server >> ${LOG_PATH}/dataprep_file.log
-            exit 1
-        fi
-    else
-        echo "[ dataprep - file ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs test-comps-dataprep-milvus-server >> ${LOG_PATH}/dataprep_file.log
-        exit 1
-    fi
 
     # test /v1/dataprep/delete_file
-    dataprep_del_service_port=5024
-    URL="http://${ip_address}:$dataprep_del_service_port/v1/dataprep/delete_file"
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d '{"file_path": "dataprep_file.txt"}' -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ dataprep - del ] HTTP status is 200."
-        docker logs test-comps-dataprep-milvus-server >> ${LOG_PATH}/dataprep_del.log
-    else
-        echo "[ dataprep - del ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs test-comps-dataprep-milvus-server >> ${LOG_PATH}/dataprep_del.log
-        exit 1
-    fi
+    validate_service \
+        "http://${ip_address}:${dataprep_service_port}/v1/dataprep/delete_file" \
+        '{"status":true}' \
+        "dataprep_del" \
+        "test-comps-dataprep-milvus-server"
+
+    # test /v1/dataprep upload file
+    echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
+    validate_service \
+        "http://${ip_address}:${dataprep_service_port}/v1/dataprep" \
+        "Data preparation succeeded" \
+        "dataprep_upload_file" \
+        "test-comps-dataprep-milvus-server"
+
+    # test /v1/dataprep upload link
+    validate_service \
+        "http://${ip_address}:${dataprep_service_port}/v1/dataprep" \
+        "Data preparation succeeded" \
+        "dataprep_upload_link" \
+        "test-comps-dataprep-milvus-server"
+
+    # test /v1/dataprep/get_file
+    validate_service \
+        "http://${ip_address}:${dataprep_service_port}/v1/dataprep/get_file" \
+        '{"name":' \
+        "dataprep_get" \
+        "test-comps-dataprep-milvus-server"
+
 }
 
 function stop_docker() {
