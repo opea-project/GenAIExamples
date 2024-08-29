@@ -20,7 +20,7 @@ Currently we support two ways of deploying Code Translation services on docker:
    docker pull opea/codetrans:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker)
+2. Start services using the docker images `built from source`: [Guide](./docker/xeon/README.md)
 
 ### Required Models
 
@@ -44,6 +44,8 @@ To set up environment variables for deploying Code Translation services, follow 
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
    export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   # Example: NGINX_PORT=80
+   export NGINX_PORT=${your_nginx_port}
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
