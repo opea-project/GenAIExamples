@@ -21,7 +21,7 @@ if [[ $(grep -c "warning" ${log_dir}/hadolint.log) != 0 ]]; then
     ERROR_WARN=true
 fi
 
-if [[ $ERROR_WARN ]]; then
+if [ "$ERROR_WARN" = true ]; then
     echo $ERROR_WARN
     exit 1
 fi
