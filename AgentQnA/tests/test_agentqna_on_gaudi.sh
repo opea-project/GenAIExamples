@@ -14,13 +14,17 @@ function stop_agent_and_api_server() {
     echo "Stopping CRAG server"
     docker stop $(docker ps -q --filter ancestor=docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0)
     echo "Stopping Agent services"
-    docker stop $(docker ps -q --filter ancestor=opea/comps-agent-langchain:latest)
+    docker compose -f $WORKDIR/GenAIExamples/AgentQnA/docker/gaudi/compose.yaml down
 }
 
 function stop_retrieval_tool() {
     echo "Stopping Retrieval tool"
     docker compose -f $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/docker/docker-compose-retrieval-tool.yaml down
 }
+
+echo "=================== Stop containers ===================="
+stop_agent_and_api_server
+stop_retrieval_tool
 
 echo "=================== #1 Building docker images===================="
 bash 1_build_images.sh
