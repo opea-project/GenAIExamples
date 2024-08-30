@@ -70,7 +70,6 @@ jobs:
 
   scan-docker:
     needs: get-image-list
-    if: ${{ fromJSON(inputs.sbom_scan) }} || ${{ fromJSON(inputs.trivy_scan) }}
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
@@ -107,14 +106,14 @@ jobs:
         run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }} || true
 
       - uses: actions/upload-artifact@v4.3.4
-        if: ${{ inputs.sbom_scan }}
+        if: always() && ${{ inputs.sbom_scan }}
         with:
           name: sbom-scan
           path: ${{ matrix.image }}-*-sbom-scan.txt
           overwrite: true
 
       - uses: actions/upload-artifact@v4.3.4
-        if: ${{ inputs.trivy_scan }}
+        if: always() && ${{ inputs.trivy_scan }}
         with:
           name: trivy-scan
           path: ${{ matrix.image }}-*-trivy-scan.txt
