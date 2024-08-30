@@ -122,7 +122,7 @@ jobs:
   upload-artifacts:
     needs: scan-docker
     runs-on: "docker-build-${{ inputs.node }}"
-    continue-on-error: true
+    if: always()
     steps:
       - uses: actions/upload-artifact@v4.3.4
         with:
