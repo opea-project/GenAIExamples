@@ -70,6 +70,7 @@ jobs:
 
   scan-docker:
     needs: get-image-list
+    if: ${{ fromJSON(inputs.sbom_scan) }} || ${{ fromJSON(inputs.trivy_scan) }}
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
