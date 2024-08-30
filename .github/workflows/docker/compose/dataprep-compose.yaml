@@ -13,11 +13,3 @@ services:
     build:
       dockerfile: comps/dataprep/qdrant/docker/Dockerfile
     image: ${REGISTRY}opea/dataprep-qdrant:${TAG:-latest}
-  dataprep-redis-llama-index:
-    build:
-      dockerfile: comps/dataprep/redis/llama_index/docker/Dockerfile
-    image: ${REGISTRY}opea/dataprep-redis-llama-index:${TAG:-latest}
-  dataprep-on-ray-redis:
-    build:
-      dockerfile: comps/dataprep/redis/langchain_ray/docker/Dockerfile
-    image: ${REGISTRY}opea/dataprep-on-ray-redis:${TAG:-latest}

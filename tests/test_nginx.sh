@@ -9,8 +9,8 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/comps/nginx/docker
-    docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t opea/nginx:comps -f ./Dockerfile .
+    cd $WORKPATH
+    docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t opea/nginx:comps -f comps/nginx/docker/Dockerfile .
     if [ $? -ne 0 ]; then
         echo "opea/nginx built fail"
         exit 1

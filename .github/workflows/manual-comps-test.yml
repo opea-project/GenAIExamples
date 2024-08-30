@@ -7,7 +7,7 @@ on:
     inputs:
       services:
         default: "asr"
-        description: "List of services to test [agent_langchain,asr,chathistory_mongo,dataprep_milvus...]" #,embeddings,guardrails,knowledgegraphs,llms,lvms,prompt_registry,ragas,reranks,retrievers,tts,vectorstores,web_retrievers]"
+        description: "List of services to test [agent,asr,chathistory,dataprep,embeddings,guardrails,llms,lvms,nginx,prompt_registry,reranks,retrievers,tts,web_retrievers]"
         required: true
         type: string
       build:
@@ -15,6 +15,21 @@ on:
         description: "Build test required images for Comps"
         required: false
         type: boolean
+      test:
+        default: true
+        description: "Test comps with docker compose"
+        required: false
+        type: boolean
+      tag:
+        default: "comps"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+      mode:
+        default: "CD"
+        description: "Whether the test range is CI or CD"
+        required: false
+        type: string
 
 permissions: read-all
 
@@ -40,6 +55,8 @@ jobs:
     uses: ./.github/workflows/_comps-workflow.yml
     with:
       service: ${{ matrix.service }}
-      tag: "comps"
+      tag: ${{ inputs.tag }}
       node: gaudi
+      mode: ${{ inputs.mode }}
+      test: ${{ inputs.test }}
     secrets: inherit

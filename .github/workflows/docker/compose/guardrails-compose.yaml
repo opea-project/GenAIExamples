@@ -9,7 +9,3 @@ services:
     build:
       dockerfile: comps/guardrails/llama_guard/docker/Dockerfile
     image: ${REGISTRY}opea/guardrails-tgi:${TAG:-latest}
-  guardrails-pii-detection:
-    build:
-      dockerfile: comps/guardrails/pii_detection/docker/Dockerfile
-    image: ${REGISTRY}opea/guardrails-pii-detection:${TAG:-latest}

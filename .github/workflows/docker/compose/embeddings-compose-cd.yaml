@@ -1,0 +1,16 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  embedding-langchain-mosec-endpoint:
+    build:
+      dockerfile: comps/embeddings/langchain-mosec/mosec-docker/Dockerfile
+    image: ${REGISTRY}opea/embedding-langchain-mosec-endpoint:${TAG:-latest}
+  embedding-langchain-mosec:
+    build:
+      dockerfile: comps/embeddings/langchain-mosec/docker/Dockerfile
+    image: ${REGISTRY}opea/embedding-langchain-mosec:${TAG:-latest}
+  embedding-tei-llama-index:
+    build:
+      dockerfile: comps/embeddings/llama_index/docker/Dockerfile
+    image: ${REGISTRY}opea/embedding-tei-llama-index:${TAG:-latest}

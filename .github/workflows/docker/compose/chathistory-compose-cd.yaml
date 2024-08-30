@@ -1,0 +1,9 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+services:
+  chathistory-mongo-server:
+    build:
+      dockerfile: comps/chathistory/mongo/docker/Dockerfile
+    image: ${REGISTRY}opea/chathistory-mongo-server:${TAG:-latest}
