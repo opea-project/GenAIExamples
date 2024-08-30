@@ -68,13 +68,13 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
         docs = [doc["text"] for doc in data["retrieved_docs"]]
 
-        with_rerank = runtime_graph.downstream(cur_node)[0].startswith('rerank')
+        with_rerank = runtime_graph.downstream(cur_node)[0].startswith("rerank")
         if with_rerank and docs:
             # forward to rerank
             # prepare inputs for rerank
             # TODO add top_n
             next_data["query"] = data["initial_query"]
-            next_data["texts"] = [doc['text'] for doc in data["retrieved_docs"]]
+            next_data["texts"] = [doc["text"] for doc in data["retrieved_docs"]]
         else:
             # forward to llm
             if not docs:
