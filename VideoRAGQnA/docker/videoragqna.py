@@ -4,7 +4,7 @@
 import os
 
 from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
-# TODO: update the port since not in the env script
+
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 EMBEDDING_SERVICE_HOST_IP = os.getenv("EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")

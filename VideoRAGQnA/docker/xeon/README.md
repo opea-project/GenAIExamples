@@ -2,6 +2,8 @@
 
 This document outlines the deployment process for a videoragqna application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `lvm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
+Video RAG QnA is a framework that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search. 
+
 ## 🚀 Port used for the microservices
 
 ```
@@ -78,7 +80,7 @@ docker build --no-cache -t opea/lvm-video-llama:latest --build-arg https_proxy=$
 ### 5. Build Dataprep Image
 
 ```bash
-# docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/docker/Dockerfile .
+# docker build --no-cache -t opea/dataprep-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/langchain/docker/Dockerfile .
 cd ..
 ```
 
@@ -169,7 +171,7 @@ export USECLIP=1
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-### Start all the services Docker Containers
+### Start all the services with Docker Containers
 
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
@@ -184,14 +186,19 @@ docker compose -f compose.yaml up -d
 ### Validate Microservices 
 TODO: test all the command
 
-
-2. Embedding Microservice
+1. Dataprep Microservice
 TODO
 ```bash
-# curl http://${host_ip}:6000/v1/embeddings\
-#   -X POST \
-#   -d '{"text":"hello"}' \
-#   -H 'Content-Type: application/json'
+
+```
+
+2. Embedding Microservice
+
+```bash
+curl http://${host_ip}:6000/v1/embeddings \
+    -X POST \
+    -d '{"text":"Sample text"}' \
+    -H 'Content-Type: application/json'
 ```
 
 3. Retriever Microservice
@@ -210,16 +217,24 @@ curl http://${host_ip}:7000/v1/retrieval \
   -H 'Content-Type: application/json'
 ```
 
-5. Reranking Microservice
-TODO
+4. Reranking Microservice
+
 ```bash
-# curl http://${host_ip}:8000/v1/reranking\
-#   -X POST \
-#   -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-#   -H 'Content-Type: application/json'
+curl http://${host_ip}:8000/v1/reranking \
+  -X 'POST' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "retrieved_docs": [{"doc": [{"text": "this is the retrieved text"}]}],
+    "initial_query": "this is the query",
+    "top_n": 1,
+    "metadata": [
+        {"other_key": "value", "video":"top_video_name", "timestamp":"20"}
+    ]
+  }'
 ```
 
-6. LVM backend Service
+5. LVM backend Service
 
 In first startup, this service will take times to download the LLM file. After it's finished, the service will be ready.
 
@@ -232,7 +247,7 @@ curl -X POST \
   -d ''
 ```
 
-7. LVM Microservice
+6. LVM Microservice
 
 This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
@@ -245,7 +260,7 @@ curl http://${host_ip}:9000/v1/lvm\
 
 > Please note that the local video will be deleted after completion to conserve disk space.
 
-8. MegaService
+7. MegaService
 TODO
 ```bash
 # curl http://${host_ip}:8888/v1/videoragqna -H "Content-Type: application/json" -d '{
@@ -253,11 +268,6 @@ TODO
 #     #  }'
 ```
 
-9. Dataprep Microservice
-TODO
-```bash
-
-```
 
 ## 🚀 Launch the UI
 
