@@ -12,6 +12,8 @@ We set "meta-llama/Meta-Llama-3-8B-Instruct" as default model, if you want to us
 - 'meta-llama/Meta-Llama-3-8B-Instruct'
 ```
 
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+
 ## Deploy On Xeon
 
 ```
