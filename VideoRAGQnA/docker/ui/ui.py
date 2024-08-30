@@ -1,19 +1,17 @@
 from io import BytesIO
+import json
 import os
 import requests
 import time
 import streamlit as st
 
 
-MEGA_SERVICE_URL = "http://localhost:5031/v1/lvm"
-MEGA_SERVICE_HEALTH_CHECK_URL = 'http://localhost:5031/v1/health_check'
-VIDEO_DIR = "./data"
+BACKEND_SERVICE_ENDPOINT = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:5031/v1/lvm")
+BACKEND_HEALTH_CHECK_ENDPOINT = os.getenv("BACKEND_HEALTH_CHECK_ENDPOINT", "http://localhost:5031/v1/health_check")
 
-if not os.path.exists(VIDEO_DIR):
-    os.makedirs(VIDEO_DIR)
 
 def perform_health_check():
-    url = MEGA_SERVICE_HEALTH_CHECK_URL
+    url = BACKEND_HEALTH_CHECK_ENDPOINT
     response = requests.get(url, headers={'accept': 'application/json'})
     return response
   
@@ -39,10 +37,11 @@ def clear_chat_history():
 
 def handle_selectbox_change():
     prompt = st.session_state.example_video
-
-    st.session_state['prompt'] = prompt
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    st.session_state.example_video = None
+    
+    if prompt is not None:
+        st.session_state['prompt'] = prompt
+        st.session_state.messages.append({"role": "user", "content": prompt})
+    
 
 def handle_chat_input():
     print("st.session_state.custom_prompt update", st.session_state.custom_prompt)
@@ -51,7 +50,7 @@ def handle_chat_input():
     st.session_state['prompt'] = prompt
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-def handle_message():
+def handle_message(col):
     params = None
     full_response = ""
 
@@ -65,58 +64,56 @@ def handle_message():
                     
             # TODO: request the megaservice, get the answer: request(prompt)
             try:
-                # response = requests.post(MEGA_SERVICE_URL,
-                #     json={
-                #         "video_url": "https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4",
-                #         "chunk_start": 0,
-                #         "chunk_duration": 7,
-                #         "prompt": "what is the girl doing",
-                #         "max_new_tokens": 100
-                #     },
-                #     proxies={"http": None},
-                #     stream=True
-                # )
-                # response.raise_for_status()
-                # for chunk in response.iter_content(chunk_size=8192):
-                #     if chunk:
-                #         if params is None:
-                #             try:
-                #                 chunk_str = chunk.decode('utf-8').replace("'", '"')
-                #                 params = json.loads(chunk_str)
+                response = requests.post(BACKEND_SERVICE_ENDPOINT,
+                    json={
+                        "video_url": "https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4",
+                        "chunk_start": 0,
+                        "chunk_duration": 7,
+                        "prompt": "what is the girl doing",
+                        "max_new_tokens": 100
+                    },
+                    proxies={"http": None},
+                    stream=True
+                )
+                response.raise_for_status()
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        if params is None:
+                            try:
+                                chunk_str = chunk.decode('utf-8').replace("'", '"')
+                                params = json.loads(chunk_str)
                                 
-                #                 video_url = params['video_url']
-                #                 chunk_start = params['chunk_start']
-                #                 print("VIDEO NAME USED IN PLAYBACK: ", video_url) 
+                                video_url = params['video_url']
+                                chunk_start = params['chunk_start']
+                                print("VIDEO NAME USED IN PLAYBACK: ", video_url) 
                                 
-                #                 video_name = video_url.split('/')[-1]
-                #                 full_response += f"Most relevant retrived video is **{video_name}** \n\n"
-                #                 placeholder.markdown(full_response)
+                                video_name = video_url.split('/')[-1]
+                                full_response += f"Most relevant retrived video is **{video_name}** \n\n"
+                                placeholder.markdown(full_response)
                                 
-                #                 with col2:
-                #                     play_video(video_url, chunk_start)
+                                with col:
+                                    play_video(video_url, chunk_start)
                                 
-                #             except json.JSONDecodeError:
-                #                 print("In the param decode error branch")
-                #                 print(chunk.decode('utf-8'))
-                #         else:
-                #             new_text = chunk.decode('utf-8')
-                #             print(new_text, end=" ", flush=True)
-                #             full_response += new_text
-                #             placeholder.markdown(full_response)
+                            except json.JSONDecodeError:
+                                print("In the param decode error branch")
+                                print(chunk.decode('utf-8'))
+                        else:
+                            new_text = chunk.decode('utf-8')
+                            # print(new_text, end=" ", flush=True) 
+                            full_response += new_text
+                            placeholder.markdown(full_response)
                 # Fake response
-                video_url = "https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4"
-                chunk_start=0
-                video_name = video_url.split('/')[-1]
-                full_response += f"Most relevant retrived video is **{video_name}** \n\n"
-                placeholder.markdown(full_response)
-                
-                
-                with col2:
-                    play_video(video_url, chunk_start)
-                for i in range(10):
-                    full_response += f"new_text {i} "
-                    time.sleep(1)
-                    placeholder.markdown(full_response)
+                # video_url = "https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4"
+                # chunk_start=0
+                # video_name = video_url.split('/')[-1]
+                # full_response += f"Most relevant retrived video is **{video_name}** \n\n"
+                # placeholder.markdown(full_response)
+                # with col:
+                #     play_video(video_url, chunk_start)
+                # for i in range(10):
+                #     full_response += f"new_text {i} "
+                #     time.sleep(1)
+                #     placeholder.markdown(full_response)
                     
                     
             except requests.HTTPError as http_err:
@@ -140,70 +137,74 @@ def display_messages():
         with st.chat_message(message["role"]):
             st.write(message["content"])
 
+def main():
+    st.set_page_config(initial_sidebar_state='collapsed', layout='wide')
+    st.title("Video RAG QnA")
+    title_alignment="""
+    <style>
+    h1 {
+    text-align: center
+    }
 
-st.set_page_config(initial_sidebar_state='collapsed', layout='wide')
-st.title("Video RAG")
-title_alignment="""
-<style>
-h1 {
-  text-align: center
-}
+    video.stVideo {
+        width: 200px;
+        height: 500px;      
+    }
+    </style>
+    """
+    st.markdown(title_alignment, unsafe_allow_html=True)
+    st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
-video.stVideo {
-    width: 200px;
-    height: 500px;      
-}
-</style>
-"""
-st.markdown(title_alignment, unsafe_allow_html=True)
-st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
+    placeholder = st.empty()
 
-placeholder = st.empty()
-# check server health
-if "health_check" not in st.session_state.keys():
-    with st.spinner('Checking health of the server...'):
-        time.sleep(1)
-        response = perform_health_check()
-    if response.status_code == 200:
-        placeholder.success('Server is healthy!', icon='✅')
-        time.sleep(1.5) 
-        placeholder.empty()  # Remove the message 
-        st.session_state['health_check'] = True
-    else:
-        st.error(f'Server health check failed with status code {response.status_code}')
-        st.stop()
-
-
-# Initialize conversation state
-if "messages" not in st.session_state.keys():
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
-if 'prompt' not in st.session_state.keys():
-    st.session_state['prompt'] = ''
+    # check server health
+    if "health_check" not in st.session_state.keys():
+        with st.spinner('Checking health of the server...'):
+            time.sleep(1)
+            response = perform_health_check()
+        if response.status_code == 200:
+            placeholder.success('Server is healthy!', icon='✅')
+            time.sleep(1) 
+            placeholder.empty()  # Remove the message 
+            st.session_state['health_check'] = True
+        else:
+            st.error(f'Server health check failed with status code {response.status_code}')
+            st.stop()
 
 
-col1, col2 = st.columns([2, 1])
-    
-with col1:
-    select_prompt = st.selectbox(
-        'Example Prompts',
-        (
-            'Man wearing glasses', 
-            'People reading item description',
-            'Man holding red shopping basket',
-            'Was there any person wearing a blue shirt seen today?',
-            'Was there any person wearing a blue shirt seen in the last 6 hours?',
-            'Was there any person wearing a blue shirt seen last Sunday?',
-            'Was a person wearing glasses seen in the last 30 minutes?',
-            'Was a person wearing glasses seen in the last 72 hours?',
-        ),
-        key='example_video',
-        index=None,
-        placeholder="--- Prompt Options ---",
-        on_change=handle_selectbox_change
-    )
-    
-custom_prompt = st.chat_input(disabled=False, key='custom_prompt', on_submit=handle_chat_input)
+    # Initialize conversation state
+    if "messages" not in st.session_state.keys():
+        st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+    if 'prompt' not in st.session_state.keys():
+        st.session_state['prompt'] = ''
 
-with col1:
-    display_messages()
-    handle_message()
+
+    col1, col2 = st.columns([2, 1])
+        
+    with col1:
+        st.selectbox(
+            'Example Prompts',
+            (
+                'Man wearing glasses', 
+                'People reading item description',
+                'Man holding red shopping basket',
+                'Was there any person wearing a blue shirt seen today?',
+                'Was there any person wearing a blue shirt seen in the last 6 hours?',
+                'Was there any person wearing a blue shirt seen last Sunday?',
+                'Was a person wearing glasses seen in the last 30 minutes?',
+                'Was a person wearing glasses seen in the last 72 hours?',
+            ),
+            key='example_video',
+            index=None,
+            placeholder="--- Options ---",
+            on_change=handle_selectbox_change
+        )
+        
+    st.chat_input(disabled=False, key='custom_prompt', on_submit=handle_chat_input)
+
+    with col1:
+        display_messages()
+        handle_message(col2)
+
+if __name__ == "__main__":
+    main()

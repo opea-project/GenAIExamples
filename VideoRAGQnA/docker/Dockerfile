@@ -16,7 +16,9 @@ RUN useradd -m -s /bin/bash user && \
     chown -R user /home/user/
 
 WORKDIR /home/user/
-# RUN git clone https://github.com/opea-project/GenAIComps.git # TODO: 挂载代码
+
+RUN git clone https://github.com/opea-project/GenAIComps.git
+
 WORKDIR /home/user/GenAIComps
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
