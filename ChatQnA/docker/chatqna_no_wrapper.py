@@ -120,7 +120,6 @@ def align_generator(self, gen):
     # TGI format
     # {"index":20,"token":{"id":368,"text":" you","logprob":0.0,"special":false},"generated_text":null,"details":null}
     for line in gen:
-        print(line.decode("utf-8"))
         line = line.decode("utf-8")
         start = line.find("{")
         end = line.rfind("}") + 1
