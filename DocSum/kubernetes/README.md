@@ -20,7 +20,9 @@ These will be available on Docker Hub soon, simplifying installation.
 This involves deploying the application pipeline custom resource. You can use docsum_xeon.yaml if you have just a Xeon cluster or docsum_gaudi.yaml if you have a Gaudi cluster.
 
 1. Setup Environment variables. These are specific to the user. Skip the proxy settings if you are not operating behind one.
-
+   
+   We use "Intel/neural-chat-7b-v3-3" as an example. If you want to use other models, change "LLM_MODEL_ID" in following setting and change "MODEL_ID" in manifests yaml file.
+   
    ```bash
    export no_proxy=${your_no_proxy}
    export http_proxy=${your_http_proxy}

@@ -3,7 +3,16 @@
 > [NOTE]
 > The following values must be set before you can deploy:
 > HUGGINGFACEHUB_API_TOKEN
-> You can also customize the "MODEL_ID" and "model-volume"
+> You can also customize the "MODEL_ID" and "model-volume". 
+
+## Required Models
+We set "meta-llama/Meta-Llama-3-8B-Instruct" as default model, if you want to use other models, change arguments "--model-id" in `xeon/faqgen.yaml` or `gaudi/faqgen.yaml`.
+```
+- --model-id
+- 'meta-llama/Meta-Llama-3-8B-Instruct'
+```
+
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
 ## Deploy On Xeon
 
