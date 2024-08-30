@@ -32,6 +32,17 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 
 2. Start services using the docker images built from source. See the [Gaudi Guide](./docker/gaudi/README.md) or [Xeon Guide](./docker/xeon/README.md) for more information.
 
+### Required Models
+
+By default, the LLM model is set to a default value as listed below:
+
+| Service      | Model                                                                           |
+| ------------ | ------------------------------------------------------------------------------- |
+| LLM_MODEL_ID | [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) |
+
+[meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) is a gated model that requires submitting an access request through Hugging Face. You can replace it with another model.
+Change the `LLM_MODEL_ID` below for your needs, such as: [Qwen/CodeQwen1.5-7B-Chat](https://huggingface.co/Qwen/CodeQwen1.5-7B-Chat), [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
+
 ### Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
@@ -54,10 +65,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```
 
 3. Set up other environment variables:
-
-   > Note: By default, the [`docker/set_env.sh`](docker/set_env.sh) file will configure your environment
-   > variables to use [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf). This
-   > is a gated model that requires submitting an access request through Hugging Face.
 
    ```bash
    source ./docker/set_env.sh
