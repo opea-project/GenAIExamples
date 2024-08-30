@@ -1,0 +1,128 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Report Bug
+description: Used to report bug
+title: "[Bug]"
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Undecided
+        - P1-Stopper
+        - P2-High
+        - P3-Medium
+        - P4-Low
+      default: 0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS type
+      options:
+        - Ubuntu
+        - RedHat
+        - SUSE
+        - Windows
+        - Mac
+        - BSD
+        - Other (Please let us know in description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: hardware
+    attributes:
+      label: Hardware type
+      options:
+        - Xeon-GNR
+        - Xeon-EMR
+        - Xeon-SPR
+        - Xeon-ICX
+        - Xeon-other (Please let us know in description)
+        - Gaudi3
+        - Gaudi2
+        - AI-PC (Please let us know in description)
+        - CPU-other (Please let us know in description)
+        - GPU-PVC
+        - GPU-Flex
+        - GPU-Arc
+        - GPU-Arc-MTL
+        - GPU-Nvidia
+        - GPU-AMD
+        - GPU-other (Please let us know in description)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: install
+    attributes:
+      label: Installation method
+      options:
+        - label: Pull docker images from hub.docker.com
+        - label: Build docker images from source
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: deploy
+    attributes:
+      label: Deploy method
+      options:
+        - label: Docker compose
+        - label: Docker
+        - label: Kubernetes
+        - label: Helm
+    validations:
+      required: true
+
+  - type: dropdown
+    id: node
+    attributes:
+      label: Running nodes
+      options:
+        - Single Node
+        - Multiple Nodes
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: version
+    attributes:
+      label: What's the version?
+      description: Docker ID in hub.docker.com or commit ID of Dockerfile.
+      placeholder:
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Description
+      description: What is the problem, question, or error?
+    validations:
+      required: true
+
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduce steps
+      description:
+    validations:
+      required: true
+
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Raw log
+      description: Provide the log of RESTFul API or docker for micro-service by `docker logs CONTAINER`
+      render: shell
+    validations:
+      required: false
