@@ -126,8 +126,12 @@ def align_generator(self, gen):
         end = line.rfind('}') + 1
         
         json_str = line[start:end]
-        json_data = json.loads(json_str)
-        yield f"data: {json_data["token"]['text']}\n\n"
+        try:
+            # sometimes yield empty chunk, do a fallback here
+            json_data = json.loads(json_str)
+            yield f"data: {repr(json_data["token"]['text'].encode('utf-8'))}\n\n"
+        except Exception as e:
+            yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
     yield "data: [DONE]\n\n"
 
 
