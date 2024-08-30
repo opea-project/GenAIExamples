@@ -115,6 +115,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
     return next_data
 
+
 def align_generator(self, gen):
     # TGI format
     # {"index":20,"token":{"id":368,"text":" you","logprob":0.0,"special":false},"generated_text":null,"details":null}
@@ -128,7 +129,6 @@ def align_generator(self, gen):
         json_data = json.loads(json_str)
         yield f"data: {json_data["token"]['text']}\n\n"
     yield "data: [DONE]\n\n"
-
 
 
 class ChatQnAService:
