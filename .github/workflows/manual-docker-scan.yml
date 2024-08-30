@@ -16,8 +16,8 @@ on:
         required: false
         type: string
       images:
-        default: ""
-        description: 'List of images to scan'
+        default: "gmcmanager,gmcrouter"
+        description: 'List of images to scan [gmcmanager,gmcrouter, ...]'
         required: false
         type: string
       tag:
@@ -49,20 +49,23 @@ jobs:
       - name: Set Matrix
         id: scan-matrix
         run: |
-          if [[ ! -z "${{ inputs.images }}" ]]; then
-              images=($(echo ${{ inputs.images }} | tr ',' ' '))
-              image_list=$(printf '%s\n' "${images[@]}" | sort -u | jq -R '.' | jq -sc '.')
-          else
+          image_list=[]
+          if [[ ! -z "${{ inputs.examples }}" ]]; then
               pip install yq
               examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
-              image_list=[]
               for example in ${examples[@]}
               do
                   images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
                   image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
               done
           fi
-
+          
+          if [[ ! -z "${{ inputs.images }}" ]]; then
+              images=($(echo ${{ inputs.images }} | tr ',' ' '))
+              input_image_list=$(printf '%s\n' "${images[@]}" | sort -u | jq -R '.' | jq -sc '.')
+              image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${input_image_list}))
+          fi
+          
           echo "print image list..."
           echo "$image_list" | jq . | jq -r '.[]'
           echo "end of image list..."
@@ -106,14 +109,14 @@ jobs:
         run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }} || true
 
       - uses: actions/upload-artifact@v4.3.4
-        if: always() && ${{ inputs.sbom_scan }}
+        if: always()
         with:
           name: sbom-scan
           path: ${{ matrix.image }}-sbom-scan.txt
           overwrite: true
 
       - uses: actions/upload-artifact@v4.3.4
-        if: always() && ${{ inputs.trivy_scan }}
+        if: always()
         with:
           name: trivy-scan
           path: ${{ matrix.image }}-trivy-scan.txt
