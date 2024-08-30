@@ -116,8 +116,8 @@ jobs:
       - name: Collect Logs
         if: always()
         run: |
-          mkdir -p /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
-          mv ${{ matrix.image }}-*-scan.txt /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
+          mkdir -p /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
+          mv ${{ matrix.image }}-*-scan.txt /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
 
   upload-artifacts:
     needs: scan-docker
@@ -126,15 +126,15 @@ jobs:
     steps:
       - uses: actions/upload-artifact@v4.3.4
         with:
-          name: sbom-scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
-          path: /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}/*-sbom-scan.txt
+          name: sbom-scan-${{ inputs.tag }}-${{ github.run_number }}
+          path: /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}/*-sbom-scan.txt
           overwrite: true
 
       - uses: actions/upload-artifact@v4.3.4
         with:
-          name: trivy-scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
-          path: /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}/*-trivy-scan.txt
+          name: trivy-scan-${{ inputs.tag }}-${{ github.run_number }}
+          path: /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}/*-trivy-scan.txt
           overwrite: true
 
       - name: Remove Logs
-        run: rm -rf /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER} && rm -rf /tmp/sbom-action-*
+        run: rm -rf /tmp/scan-${{ inputs.tag }}-${{ github.run_number }} && rm -rf /tmp/sbom-action-*
