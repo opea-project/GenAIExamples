@@ -74,7 +74,7 @@ docker build --no-cache -t opea/reranking-videoragqna:latest --build-arg https_p
 docker build --no-cache -t opea/video-llama-lvm-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/server/docker/Dockerfile .
 
 # LVM Service Image
-docker build --no-cache -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/lvms/video-llama/Dockerfile .
+docker build --no-cache -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
@@ -92,7 +92,7 @@ Build MegaService Docker image via below command:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/VideoRAGQnA/docker
+cd GenAIExamples/MultiModalRAGQnA/VideoRAGQnA/docker
 docker build --no-cache -t opea/videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
@@ -176,7 +176,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/videoragqna/docker/xeon/
+cd GenAIExamples/MultiModalRAGQnA/VideoRAGQnA/docker/xeon/
 ```
 
 ```bash
