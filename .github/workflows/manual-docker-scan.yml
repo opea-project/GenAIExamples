@@ -13,7 +13,7 @@ on:
       examples:
         default: "ChatQnA"
         description: 'List of examples to scan [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
-        required: true
+        required: false
         type: string
       images:
         default: ""
@@ -109,12 +109,12 @@ jobs:
         if: always() && ${{ inputs.sbom_scan }}
         with:
           name: sbom-scan
-          path: ${{ matrix.image }}-*-sbom-scan.txt
+          path: ${{ matrix.image }}-sbom-scan.txt
           overwrite: true
 
       - uses: actions/upload-artifact@v4.3.4
         if: always() && ${{ inputs.trivy_scan }}
         with:
           name: trivy-scan
-          path: ${{ matrix.image }}-*-trivy-scan.txt
+          path: ${{ matrix.image }}-trivy-scan.txt
           overwrite: true
