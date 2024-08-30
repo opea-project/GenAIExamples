@@ -116,13 +116,13 @@ jobs:
       - uses: actions/upload-artifact@v4.3.4
         if: always()
         with:
-          name: sbom-scan
+          name: sbom-scan-${GITHUB_RUN_ID}
           path: ${{ matrix.image }}-sbom-scan.txt
           overwrite: false
 
       - uses: actions/upload-artifact@v4.3.4
         if: always()
         with:
-          name: trivy-scan
+          name: trivy-scan-${GITHUB_RUN_ID}
           path: ${{ matrix.image }}-trivy-scan.txt
           overwrite: false
