@@ -1,11 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 from docarray import BaseDoc, DocList
-from docarray.documents import AudioDoc, VideoDoc
+from docarray.documents import AudioDoc
 from docarray.typing import AudioUrl, ImageUrl
 from pydantic import Field, conint, conlist, field_validator
 
@@ -41,14 +41,6 @@ MultimodalDoc = Union[
     ImageDoc,
     TextImageDoc,
 ]
-
-
-class ImageDoc(BaseDoc):
-    image_path: str
-
-
-class TextImageDoc(BaseDoc):
-    doc: Tuple[Union[TextDoc, ImageDoc]]
 
 
 class Base64ByteStrDoc(BaseDoc):
@@ -110,14 +102,8 @@ class SearchedDoc(BaseDoc):
         json_encoders = {np.ndarray: lambda x: x.tolist()}
 
 
-class SearchedMultimodalDoc(BaseDoc):
-    retrieved_docs: List[TextImageDoc]
-    initial_query: str
-    top_n: int = 1
-    metadata: Optional[List[Dict]] = None
-
-    class Config:
-        json_encoders = {np.ndarray: lambda x: x.tolist()}
+class SearchedMultimodalDoc(SearchedDoc):
+    metadata: List[Dict[str, Any]]
 
 
 class GeneratedDoc(BaseDoc):
