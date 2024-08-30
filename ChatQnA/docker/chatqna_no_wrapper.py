@@ -50,68 +50,65 @@ LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 9009))
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict):
-    if self.services[cur_node].no_wrapper:
-        if self.services[cur_node].service_type == ServiceType.EMBEDDING:
-            inputs["inputs"] = inputs["text"]
-            del inputs["text"]
+    if self.services[cur_node].service_type == ServiceType.EMBEDDING:
+        inputs["inputs"] = inputs["text"]
+        del inputs["text"]
     return inputs
 
 def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict):
-    if self.services[cur_node].no_wrapper:
-        next_data = {}
-        if self.services[cur_node].service_type == ServiceType.EMBEDDING:
-            assert isinstance(data, list)
-            next_data = {"text": inputs["inputs"], "embedding": data[0]}
-        elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
+    next_data = {}
+    if self.services[cur_node].service_type == ServiceType.EMBEDDING:
+        assert isinstance(data, list)
+        next_data = {"text": inputs["inputs"], "embedding": data[0]}
+    elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
 
-            docs = [doc["text"] for doc in data["retrieved_docs"]]
+        docs = [doc["text"] for doc in data["retrieved_docs"]]
 
-            with_rerank = runtime_graph.downstream(cur_node)[0].startswith('rerank')
-            if with_rerank and docs:
-                # forward to rerank
-                # prepare inputs for rerank
-                # TODO add top_n
-                next_data["query"] = data["initial_query"]
-                next_data["texts"] = [doc['text'] for doc in data["retrieved_docs"]]
-            else:
-                # forward to llm
-                if not docs:
-                    # delete the rerank from retriever -> rerank -> llm
-                    for ds in reversed(runtime_graph.downstream(cur_node)):
-                        for nds in runtime_graph.downstream(ds):
-                            runtime_graph.add_edge(cur_node, nds)
-                        runtime_graph.delete_node_if_exists(ds)
+        with_rerank = runtime_graph.downstream(cur_node)[0].startswith('rerank')
+        if with_rerank and docs:
+            # forward to rerank
+            # prepare inputs for rerank
+            # TODO add top_n
+            next_data["query"] = data["initial_query"]
+            next_data["texts"] = [doc['text'] for doc in data["retrieved_docs"]]
+        else:
+            # forward to llm
+            if not docs:
+                # delete the rerank from retriever -> rerank -> llm
+                for ds in reversed(runtime_graph.downstream(cur_node)):
+                    for nds in runtime_graph.downstream(ds):
+                        runtime_graph.add_edge(cur_node, nds)
+                    runtime_graph.delete_node_if_exists(ds)
 
-                # prepare inputs for LLM
-                next_data["parameters"] = {}
-                next_data["parameters"].update(llm_parameters_dict)
-                del next_data["parameters"]["id"]
-                del next_data["parameters"]["chat_template"]
-                del next_data["parameters"]["streaming"]
-                prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
-                next_data["inputs"] = prompt
-
-        elif self.services[cur_node].service_type == ServiceType.RERANK:
             # prepare inputs for LLM
             next_data["parameters"] = {}
             next_data["parameters"].update(llm_parameters_dict)
             del next_data["parameters"]["id"]
             del next_data["parameters"]["chat_template"]
             del next_data["parameters"]["streaming"]
-
-            # rerank the inputs with the scores
-            # TODO add top_n
-            top_n = 1
-            docs = inputs["texts"]
-            reranked_docs = []
-            for best_response in data[:top_n]:
-                reranked_docs.append(docs[best_response["index"]])
-
-            prompt = ChatTemplate.generate_rag_prompt(inputs["query"], reranked_docs)
+            prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
             next_data["inputs"] = prompt
 
-        data = next_data
-    return data
+    elif self.services[cur_node].service_type == ServiceType.RERANK:
+        # prepare inputs for LLM
+        next_data["parameters"] = {}
+        next_data["parameters"].update(llm_parameters_dict)
+        del next_data["parameters"]["id"]
+        del next_data["parameters"]["chat_template"]
+        del next_data["parameters"]["streaming"]
+
+        # rerank the inputs with the scores
+        # TODO add top_n
+        top_n = 1
+        docs = inputs["texts"]
+        reranked_docs = []
+        for best_response in data[:top_n]:
+            reranked_docs.append(docs[best_response["index"]])
+
+        prompt = ChatTemplate.generate_rag_prompt(inputs["query"], reranked_docs)
+        next_data["inputs"] = prompt
+
+    return next_data
 
 class ChatQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
@@ -130,7 +127,6 @@ class ChatQnAService:
             endpoint="/embed",
             use_remote_service=True,
             service_type=ServiceType.EMBEDDING,
-            no_wrapper=True,
         )
 
         retriever = MicroService(
@@ -140,7 +136,6 @@ class ChatQnAService:
             endpoint="/v1/retrieval",
             use_remote_service=True,
             service_type=ServiceType.RETRIEVER,
-            no_wrapper=True,
         )
 
         rerank = MicroService(
@@ -150,7 +145,6 @@ class ChatQnAService:
             endpoint="/rerank",
             use_remote_service=True,
             service_type=ServiceType.RERANK,
-            no_wrapper=True,
         )
 
         llm = MicroService(
@@ -160,7 +154,6 @@ class ChatQnAService:
             endpoint="/generate_stream",    # FIXME non-stream case
             use_remote_service=True,
             service_type=ServiceType.LLM,
-            no_wrapper=True,
         )
         self.megaservice.add(embedding).add(retriever).add(rerank).add(llm)
         self.megaservice.flow_to(embedding, retriever)
@@ -178,7 +171,6 @@ class ChatQnAService:
             endpoint="/embed",
             use_remote_service=True,
             service_type=ServiceType.EMBEDDING,
-            no_wrapper=True,
         )
 
         retriever = MicroService(
@@ -188,7 +180,6 @@ class ChatQnAService:
             endpoint="/v1/retrieval",
             use_remote_service=True,
             service_type=ServiceType.RETRIEVER,
-            no_wrapper=True,
         )
 
         llm = MicroService(
@@ -198,7 +189,6 @@ class ChatQnAService:
             endpoint="/generate_stream",  # FIXME non-stream case
             use_remote_service=True,
             service_type=ServiceType.LLM,
-            no_wrapper=True,
         )
         self.megaservice.add(embedding).add(retriever).add(llm)
         self.megaservice.flow_to(embedding, retriever)

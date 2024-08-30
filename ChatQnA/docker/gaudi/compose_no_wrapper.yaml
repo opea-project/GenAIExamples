@@ -74,6 +74,39 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-reranking-gaudi-server
+    ports:
+      - "8808:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
+  # reranking:
+  #   image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+  #   container_name: reranking-tei-gaudi-server
+  #   depends_on:
+  #     - tei-reranking-service
+  #   ports:
+  #     - "8000:8000"
+  #   ipc: host
+  #   environment:
+  #     no_proxy: ${no_proxy}
+  #     http_proxy: ${http_proxy}
+  #     https_proxy: ${https_proxy}
+  #     TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
+  #     HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+  #     HF_HUB_DISABLE_PROGRESS_BARS: 1
+  #     HF_HUB_ENABLE_HF_TRANSFER: 0
+  #   restart: unless-stopped
   tgi-service:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.1
     container_name: tgi-gaudi-server
@@ -112,45 +145,48 @@ services:
   #     HF_HUB_DISABLE_PROGRESS_BARS: 1
   #     HF_HUB_ENABLE_HF_TRANSFER: 0
   #   restart: unless-stopped
-  # chaqna-gaudi-backend-server:
-  #   image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
-  #   container_name: chatqna-gaudi-backend-server
-  #   depends_on:
-  #     - redis-vector-db
-  #     - tei-embedding-service
-  #     - embedding
-  #     - retriever
-  #     - tgi-service
-  #     - llm
-  #   ports:
-  #     - "8888:8888"
-  #   environment:
-  #     - no_proxy=${no_proxy}
-  #     - https_proxy=${https_proxy}
-  #     - http_proxy=${http_proxy}
-  #     - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
-  #     - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
-  #     - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
-  #     - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
-  #   ipc: host
-  #   restart: always
-  # chaqna-gaudi-ui-server:
-  #   image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
-  #   container_name: chatqna-gaudi-ui-server
-  #   depends_on:
-  #     - chaqna-gaudi-backend-server
-  #   ports:
-  #     - "5173:5173"
-  #   environment:
-  #     - no_proxy=${no_proxy}
-  #     - https_proxy=${https_proxy}
-  #     - http_proxy=${http_proxy}
-  #     - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
-  #     - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
-  #     - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
-  #     - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
-  #   ipc: host
-  #   restart: always
+  chaqna-gaudi-backend-server:
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    container_name: chatqna-gaudi-backend-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+      # - embedding
+      - retriever
+      - tei-reranking-service
+      # - reranking
+      - tgi-service
+      # - llm
+    ports:
+      - "8888:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
+      - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
+      - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  chaqna-gaudi-ui-server:
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    container_name: chatqna-gaudi-ui-server
+    depends_on:
+      - chaqna-gaudi-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
+      - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
+      - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
+    ipc: host
+    restart: always
 
 networks:
   default:
