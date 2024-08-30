@@ -5,7 +5,7 @@
 set -xe
 USER_ID=$(whoami)
 LOG_PATH=/home/$(whoami)/logs
-MOUNT_DIR=/home/$USER_ID/charts-mnt
+MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 IMAGE_TAG=${IMAGE_TAG:-latest}
 
