@@ -12,14 +12,14 @@ on:
         type: string
       examples:
         default: "Translation"
-        description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
-        required: true
-        type: string
-      gmc:
-        default: false
-        description: 'Publish gmc images'
+        description: 'List of examples to publish [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
         required: false
-        type: boolean
+        type: string
+      images:
+        default: "gmcmanager,gmcrouter"
+        description: 'List of images to publish [gmcmanager,gmcrouter, ...]'
+        required: false
+        type: string
       tag:
         default: "v0.9"
         description: "Tag to publish"
@@ -34,31 +34,10 @@ on:
 permissions: read-all
 jobs:
   get-image-list:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.scan-matrix.outputs.matrix }}
-    steps:
-      - name: Checkout out Repo
-        uses: actions/checkout@v4
-
-      - name: Set Matrix
-        id: scan-matrix
-        run: |
-          pip install yq
-          examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
-          image_list=[]
-          for example in ${examples[@]}
-          do
-              echo ${example}
-              images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
-              image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
-          done
-
-          if [ "${{ inputs.gmc }}" == "true" ]; then
-              image_list=$(echo ${image_list} | jq -c '. + ["gmcmanager","gmcrouter"]')
-          fi
-          echo $image_list
-          echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
+    uses: ./.github/workflows/_get-image-list.yml
+    with:
+      examples: ${{ inputs.examples }}
+      images: ${{ inputs.images }}
 
   publish:
     needs: [get-image-list]
