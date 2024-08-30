@@ -68,6 +68,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in following setting if you want to use other models.
 If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+
 ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
