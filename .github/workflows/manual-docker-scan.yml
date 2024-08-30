@@ -122,21 +122,19 @@ jobs:
   upload-artifacts:
     needs: scan-docker
     runs-on: "docker-build-${{ inputs.node }}"
+    continue-on-error: true
     steps:
       - uses: actions/upload-artifact@v4.3.4
-        if: always()
         with:
           name: sbom-scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
           path: /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}/*-sbom-scan.txt
           overwrite: true
 
       - uses: actions/upload-artifact@v4.3.4
-        if: always()
         with:
           name: trivy-scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
           path: /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}/*-trivy-scan.txt
           overwrite: true
 
       - name: Remove Logs
-        if: always()
         run: rm -rf /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER} && rm -rf /tmp/sbom-action-*
