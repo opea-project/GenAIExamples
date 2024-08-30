@@ -139,4 +139,4 @@ jobs:
 
       - name: Remove Logs
         if: always()
-        run: rm -rf /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
+        run: rm -rf /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER} && rm -rf /tmp/sbom-action-*
