@@ -113,16 +113,30 @@ jobs:
         if: always()
         run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }} || true
 
+      - name: Collect Logs
+        if: always()
+        run: |
+          mkdir -p /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
+          mv ${{ matrix.image }}-*-scan.txt /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
+
+  upload-artifacts:
+    needs: scan-docker
+    runs-on: "docker-build-${{ inputs.node }}"
+    steps:
       - uses: actions/upload-artifact@v4.3.4
         if: always()
         with:
-          name: sbom-scan-${GITHUB_RUN_ID}
-          path: ${{ matrix.image }}-sbom-scan.txt
-          overwrite: false
+          name: sbom-scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
+          path: /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}/*-sbom-scan.txt
+          overwrite: true
 
       - uses: actions/upload-artifact@v4.3.4
         if: always()
         with:
-          name: trivy-scan-${GITHUB_RUN_ID}
-          path: ${{ matrix.image }}-trivy-scan.txt
-          overwrite: false
+          name: trivy-scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
+          path: /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}/*-trivy-scan.txt
+          overwrite: true
+
+      - name: Remove Logs
+        if: always()
+        run: rm -rf /tmp/scan-${{ inputs.tag }}-${GITHUB_RUN_NUMBER}
