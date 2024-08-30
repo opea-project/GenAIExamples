@@ -79,6 +79,11 @@ jobs:
         image: ${{ fromJson(needs.get-image-list.outputs.matrix) }}
       fail-fast: false
     steps:
+      - name: Clean up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/* || true
+          docker system prune -f
+
       - name: Pull Image
         run: |
           docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
@@ -113,11 +118,11 @@ jobs:
         with:
           name: sbom-scan
           path: ${{ matrix.image }}-sbom-scan.txt
-          overwrite: true
+          overwrite: false
 
       - uses: actions/upload-artifact@v4.3.4
         if: always()
         with:
           name: trivy-scan
           path: ${{ matrix.image }}-trivy-scan.txt
-          overwrite: true
+          overwrite: false
