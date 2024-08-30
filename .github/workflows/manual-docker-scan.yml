@@ -62,7 +62,7 @@ jobs:
                   image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
               done
           fi
-          
+
           echo "print image list..."
           echo "$image_list" | jq . | jq -r '.[]'
           echo "end of image list..."
