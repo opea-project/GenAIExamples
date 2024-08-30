@@ -3,7 +3,9 @@
 
 import os
 import re
+
 from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
+
 
 class ChatTemplate:
     @staticmethod
@@ -49,11 +51,13 @@ RERANK_SERVER_PORT = int(os.getenv("RERANK_SERVER_PORT", 8808))
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 9009))
 
+
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict):
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         inputs["inputs"] = inputs["text"]
         del inputs["text"]
     return inputs
+
 
 def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict):
     next_data = {}
@@ -110,6 +114,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
     return next_data
 
+
 class ChatQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
@@ -151,7 +156,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
-            endpoint="/generate_stream",    # FIXME non-stream case
+            endpoint="/generate_stream",  # FIXME non-stream case
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )
@@ -160,7 +165,6 @@ class ChatQnAService:
         self.megaservice.flow_to(retriever, rerank)
         self.megaservice.flow_to(rerank, llm)
         self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
-
 
     def add_remote_service_without_rerank(self):
 
