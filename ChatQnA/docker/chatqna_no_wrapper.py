@@ -1,9 +1,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import os
 import re
-import json
 
 from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
 
@@ -120,11 +120,11 @@ def align_generator(self, gen):
     # TGI format
     # {"index":20,"token":{"id":368,"text":" you","logprob":0.0,"special":false},"generated_text":null,"details":null}
     for line in gen:
-        print(line.decode('utf-8'))
-        line = line.decode('utf-8')
-        start = line.find('{')
-        end = line.rfind('}') + 1
-        
+        print(line.decode("utf-8"))
+        line = line.decode("utf-8")
+        start = line.find("{")
+        end = line.rfind("}") + 1
+
         json_str = line[start:end]
         try:
             # sometimes yield empty chunk, do a fallback here
