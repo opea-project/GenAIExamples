@@ -31,6 +31,8 @@ We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "s
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 ```
 
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+
 ### Setup Environment Variable
 
 To set up environment variables for deploying Document Summarization services, follow these steps:
