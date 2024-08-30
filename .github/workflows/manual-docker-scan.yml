@@ -68,9 +68,8 @@ jobs:
           echo "end of image list..."
           echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
 
-  scan-license:
+  scan-docker:
     needs: get-image-list
-    if: ${{ fromJSON(inputs.sbom_scan) }} || ${{ fromJSON(inputs.trivy_scan) }}
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
@@ -84,7 +83,7 @@ jobs:
 
       - name: SBOM Scan Container
         uses: anchore/sbom-action@v0.17.1
-        if: always() && ${{ inputs.sbom_scan }}
+        if: ${{ inputs.sbom_scan }}
         with:
           image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output-file: ${{ matrix.image }}-sbom-scan.txt
@@ -92,7 +91,7 @@ jobs:
 
       - name: Security Scan Container
         uses: aquasecurity/trivy-action@0.24.0
-        if: always() && ${{ inputs.trivy_scan }}
+        if: ${{ inputs.trivy_scan }}
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output: ${{ matrix.image }}-trivy-scan.txt
@@ -104,17 +103,17 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+        run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }} || true
 
       - uses: actions/upload-artifact@v4.3.4
-        if: always() && (${{ inputs.sbom_scan }}
+        if: ${{ inputs.sbom_scan }}
         with:
           name: sbom-scan
           path: ${{ matrix.image }}-*-sbom-scan.txt
           overwrite: true
 
       - uses: actions/upload-artifact@v4.3.4
-        if: always() && (${{ inputs.trivy_scan }}
+        if: ${{ inputs.trivy_scan }}
         with:
           name: trivy-scan
           path: ${{ matrix.image }}-*-trivy-scan.txt
