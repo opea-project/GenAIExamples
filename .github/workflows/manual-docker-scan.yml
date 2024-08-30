@@ -1,25 +1,40 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Examples docker images BoM scan on manual event
+name: Examples docker images BoM/CVE scan on manual event
 on:
   workflow_dispatch:
     inputs:
       node:
         default: "gaudi"
-        description: "Hardware to run test"
+        description: "Hardware to run scan"
         required: true
         type: string
       examples:
         default: "ChatQnA"
-        description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        description: 'List of examples to scan [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
         required: true
+        type: string
+      images:
+        default: ""
+        description: 'List of images to scan'
+        required: false
         type: string
       tag:
         default: "latest"
-        description: "Tag to apply to images"
+        description: "Tag for images to scan"
         required: true
         type: string
+      sbom_scan:
+        default: true
+        description: 'Scan images for BoM'
+        required: false
+        type: boolean
+      trivy_scan:
+        default: true
+        description: 'Scan images for CVE'
+        required: false
+        type: boolean
 
 permissions: read-all
 jobs:
@@ -34,18 +49,28 @@ jobs:
       - name: Set Matrix
         id: scan-matrix
         run: |
-          pip install yq
-          examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
-          image_list=[]
-          for example in ${examples[@]}
-          do
-              images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
-              image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
-          done
+          if [[ ! -z "${{ inputs.images }}" ]]; then
+              images=($(echo ${{ inputs.images }} | tr ',' ' '))
+              image_list=$(printf '%s\n' "${images[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          else
+              pip install yq
+              examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
+              image_list=[]
+              for example in ${examples[@]}
+              do
+                  images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
+                  image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
+              done
+          fi
+
+          echo "print image list..."
+          echo "$image_list" | jq . | jq -r '.[]'
+          echo "end of image list..."
           echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
 
   scan-license:
     needs: get-image-list
+    if: ${{ fromJSON(inputs.sbom_scan) }} || ${{ fromJSON(inputs.trivy_scan) }}
     runs-on: "docker-build-${{ inputs.node }}"
     strategy:
       matrix:
@@ -59,7 +84,7 @@ jobs:
 
       - name: SBOM Scan Container
         uses: anchore/sbom-action@v0.17.1
-        if: always()
+        if: always() && ${{ inputs.sbom_scan }}
         with:
           image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output-file: ${{ matrix.image }}-sbom-scan.txt
@@ -67,7 +92,7 @@ jobs:
 
       - name: Security Scan Container
         uses: aquasecurity/trivy-action@0.24.0
-        if: always()
+        if: always() && ${{ inputs.trivy_scan }}
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output: ${{ matrix.image }}-trivy-scan.txt
@@ -82,8 +107,15 @@ jobs:
         run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
 
       - uses: actions/upload-artifact@v4.3.4
-        if: always()
+        if: always() && (${{ inputs.sbom_scan }}
         with:
-          name: ${{ matrix.image }}-scan
-          path: ${{ matrix.image }}-*-scan.txt
+          name: sbom-scan
+          path: ${{ matrix.image }}-*-sbom-scan.txt
+          overwrite: true
+
+      - uses: actions/upload-artifact@v4.3.4
+        if: always() && (${{ inputs.trivy_scan }}
+        with:
+          name: trivy-scan
+          path: ${{ matrix.image }}-*-trivy-scan.txt
           overwrite: true

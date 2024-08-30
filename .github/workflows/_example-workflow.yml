@@ -20,10 +20,6 @@ on:
         default: true
         required: false
         type: boolean
-      scan:
-        default: true
-        required: false
-        type: boolean
       test_compose:
         default: false
         required: false
@@ -74,56 +70,6 @@ jobs:
           docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
           registry: ${OPEA_IMAGE_REPO}opea
           tag: ${{ inputs.tag }}
-
-####################################################################################################
-# Trivy Scan
-####################################################################################################
-  get-image-list:
-    needs: [build-images]
-    if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi' }}
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.scan-matrix.outputs.matrix }}
-    steps:
-      - name: Checkout out Repo
-        uses: actions/checkout@v4
-
-      - name: Set Matrix
-        id: scan-matrix
-        run: |
-          pip install yq
-          compose_path=${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
-          echo "matrix=$(cat ${compose_path} | yq -r '.[]' | jq 'keys' | jq -c '.')" >> $GITHUB_OUTPUT
-
-  scan-images:
-    needs: [get-image-list, build-images]
-    if: ${{ fromJSON(inputs.scan) && inputs.node == 'gaudi'}}
-    runs-on: "docker-build-${{ inputs.node }}"
-    strategy:
-      matrix:
-        image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
-      fail-fast: false
-    steps:
-      - name: Pull Image
-        run: |
-          docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
-          echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
-
-      - name: Scan Container
-        uses: opea-project/validation/actions/trivy-scan@main
-        with:
-          image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
-          output: ${{ matrix.image }}-scan.txt
-
-      - name: Cleanup
-        if: always()
-        run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
-
-      - uses: actions/upload-artifact@v4.3.4
-        with:
-          name: ${{ matrix.image }}-scan
-          path: ${{ matrix.image }}-scan.txt
-          overwrite: true
 
 ####################################################################################################
 # Docker Compose Test
