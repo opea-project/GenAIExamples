@@ -67,7 +67,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
-            endpoint="/generate_stream",    # FIXME non-stream case
+            endpoint="/generate_stream",  # FIXME non-stream case
             use_remote_service=True,
             service_type=ServiceType.LLM,
             no_wrapper=True,
