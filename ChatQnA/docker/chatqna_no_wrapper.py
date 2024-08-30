@@ -128,7 +128,7 @@ def align_generator(self, gen):
         try:
             # sometimes yield empty chunk, do a fallback here
             json_data = json.loads(json_str)
-            yield f"data: {repr(json_data["token"]['text'].encode('utf-8'))}\n\n"
+            yield f"data: {repr(json_data['token']['text'].encode('utf-8'))}\n\n"
         except Exception as e:
             yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
     yield "data: [DONE]\n\n"
