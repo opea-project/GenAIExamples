@@ -28,7 +28,6 @@ export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
 
 You can choose other llava-next models, such as `llava-hf/llava-v1.6-vicuna-13b-hf`, as needed.
 
-
 # Deploy VisualQnA Service
 
 The VisualQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
