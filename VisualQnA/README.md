@@ -20,7 +20,7 @@ This example guides you through how to deploy a [LLaVA-NeXT](https://github.com/
 
 # Required Models
 
-By default, the model is set to llava-hf/llava-v1.6-mistral-7b-hf. To use a different model, update the LVM_MODEL_ID variable in the [`set_env.sh`](./docker/gaudi/set_env.sh) file.
+By default, the model is set to `llava-hf/llava-v1.6-mistral-7b-hf`. To use a different model, update the LVM_MODEL_ID variable in the [`set_env.sh`](./docker/gaudi/set_env.sh) file.
 
 ```
 export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
