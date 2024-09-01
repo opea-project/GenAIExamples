@@ -1,0 +1,32 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  tgi_service:
+    image: ghcr.io/huggingface/text-generation-inference:1.4
+    container_name: tgi-service
+    ports:
+      - "8008:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    command: --model-id ${LLM_MODEL_ID}
+  llm:
+    image: opea/llm-tgi:latest
+    container_name: intent-tgi-server
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
