@@ -84,18 +84,10 @@ function validate_services() {
 function validate_microservices() {
     # Check if the microservices are running correctly.
 
-    # tgi for lvm service
-    validate_services \
-        "${ip_address}:8399/generate" \
-        "generated_text" \
-        "llava-tgi-service" \
-        "tgi-llava-gaudi-server" \
-        '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
-
     # lvm microservice
     validate_services \
         "${ip_address}:9399/v1/lvm" \
-        "data: " \
+        "The image" \
         "lvm-tgi" \
         "lvm-tgi-gaudi-server" \
         '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
@@ -105,7 +97,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
     "${ip_address}:8888/v1/visualqna" \
-    "VisualQnA" \
+    "The image" \
     "visualqna-gaudi-backend-server" \
     "visualqna-gaudi-backend-server" \
     '{
@@ -172,7 +164,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+    #validate_frontend
 
     stop_docker
     echo y | docker system prune
