@@ -15,6 +15,16 @@ on:
         description: "Tag to apply to images"
         required: true
         type: string
+      sbom-scan:
+        default: true
+        description: "Enable sbom-scan"
+        required: false
+        type: boolean
+      trivy-scan:
+        default: true
+        description: "Enable trivy-scan"
+        required: false
+        type: boolean
 
 permissions: read-all
 jobs:
@@ -55,7 +65,7 @@ jobs:
 
       - name: SBOM Scan Container
         uses: anchore/sbom-action@v0.17.1
-        if: always()
+        if: ${{ fromJSON(inputs.sbom-scan) }}
         with:
           image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output-file: ${{ matrix.image }}-sbom-scan.txt
@@ -63,7 +73,7 @@ jobs:
 
       - name: Security Scan Container
         uses: aquasecurity/trivy-action@0.24.0
-        if: always()
+        if: ${{ fromJSON(inputs.trivy-scan) }}
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output: ${{ matrix.image }}-trivy-scan.txt
