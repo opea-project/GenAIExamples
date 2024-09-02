@@ -213,6 +213,9 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
 // decode \x hexadecimal encoding
 function decodeEscapedBytes(str: string): string {
   // Convert the byte portion separated by \x into a byte array and decode it into a UTF-8 string
-  const byteArray: number[] = str.split("\\x").slice(1).map((byte: string) => parseInt(byte, 16));
+  const byteArray: number[] = str
+    .split("\\x")
+    .slice(1)
+    .map((byte: string) => parseInt(byte, 16));
   return new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
 }
