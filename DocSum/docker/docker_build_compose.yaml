@@ -1,0 +1,30 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  docsum:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+  docsum-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+  docsum-react-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile.react
+    extends: docsum
+    image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
+  llm-docsum-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/summarization/tgi/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}

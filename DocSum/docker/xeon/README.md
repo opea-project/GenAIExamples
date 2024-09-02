@@ -60,6 +60,8 @@ Build the frontend Docker image via below command:
 cd GenAIExamples/DocSum/docker/ui/
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f ./docker/Dockerfile.react .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
@@ -71,6 +73,11 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 ## 🚀 Start Microservices and MegaService
 
+### Required Models
+
+We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+
 ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
@@ -80,7 +87,7 @@ export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
+export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
@@ -135,6 +142,24 @@ Open this URL `http://{host_ip}:5174` in your browser to access the React based 
 
 ![project-screenshot](../../assets/img/docSum_ui_text.png)
 
-### React UI
+### React UI (Optional)
+
+To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `docsum-xeon-ui-server` service with the `docsum-xeon-react-ui-server` service as per the config below:
+
+```yaml
+docsum-xeon-react-ui-server:
+  image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
+  container_name: docsum-xeon-react-ui-server
+  depends_on:
+    - docsum-xeon-backend-server
+  ports:
+    - "5174:80"
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+  ipc: host
+  restart: always
+```
 
 ![preject-react-screenshot](../../assets/img/docsum-ui-react.png)

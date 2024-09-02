@@ -1,0 +1,59 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Examples publish docker image on manual event
+on:
+  workflow_dispatch:
+    inputs:
+      node:
+        default: "gaudi"
+        description: "Hardware to run test"
+        required: true
+        type: string
+      examples:
+        default: "Translation"
+        description: 'List of examples to publish [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        required: false
+        type: string
+      images:
+        default: "gmcmanager,gmcrouter"
+        description: 'List of images to publish [gmcmanager,gmcrouter, ...]'
+        required: false
+        type: string
+      tag:
+        default: "v0.9"
+        description: "Tag to publish"
+        required: true
+        type: string
+      publish_tags:
+        default: "latest,v0.9"
+        description: 'Tag list apply to publish images'
+        required: false
+        type: string
+
+permissions: read-all
+jobs:
+  get-image-list:
+    uses: ./.github/workflows/_get-image-list.yml
+    with:
+      examples: ${{ inputs.examples }}
+      images: ${{ inputs.images }}
+
+  publish:
+    needs: [get-image-list]
+    strategy:
+      matrix:
+        image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
+    runs-on: "docker-build-${{ inputs.node }}"
+    steps:
+      - uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Image Publish
+        uses: opea-project/validation/actions/image-publish@main
+        with:
+          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          image_name: opea/${{ matrix.image }}
+          publish_tags: ${{ inputs.publish_tags }}

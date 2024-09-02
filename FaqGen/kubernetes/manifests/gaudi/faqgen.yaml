@@ -1,216 +1,188 @@
 ---
-# Source: codegen/charts/llm-uservice/charts/tgi/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-apiVersion: v1
-kind: Service
-metadata:
-  name: faqgen-tgi
-  labels:
-    helm.sh/chart: tgi-0.1.0
-    app.kubernetes.io/name: tgi
-    app.kubernetes.io/instance: faqgen
-    app.kubernetes.io/version: "1.4"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
-      name: tgi
-  selector:
-    app.kubernetes.io/name: tgi
-    app.kubernetes.io/instance: faqgen
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: faqgen-llm-uservice
-  labels:
-    helm.sh/chart: llm-uservice-0.1.0
-    app.kubernetes.io/name: llm-uservice
-    app.kubernetes.io/instance: faqgen
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 9000
-      targetPort: 9000
-      protocol: TCP
-      name: llm-uservice
-  selector:
-    app.kubernetes.io/name: llm-uservice
-    app.kubernetes.io/instance: faqgen
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: faqgen
-  labels:
-    helm.sh/chart: faqgen-0.1.0
-    app.kubernetes.io/name: faqgen
-    app.kubernetes.io/instance: faqgen
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8888
-      targetPort: 8888
-      protocol: TCP
-      name: faqgen
-  selector:
-    app.kubernetes.io/name: faqgen
-    app.kubernetes.io/instance: faqgen
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: faqgen-tgi
-  labels:
-    helm.sh/chart: tgi-0.1.0
-    app.kubernetes.io/name: tgi
-    app.kubernetes.io/instance: faqgen
-    app.kubernetes.io/version: "1.4"
-    app.kubernetes.io/managed-by: Helm
+  name: faq-tgi-deploy
+  namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: tgi
-      app.kubernetes.io/instance: faqgen
+      app: faq-tgi-deploy
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
       labels:
-        app.kubernetes.io/name: tgi
-        app.kubernetes.io/instance: faqgen
+        app: faq-tgi-deploy
     spec:
-      securityContext: {}
+      hostIPC: true
       containers:
-        - name: tgi
-          env:
-            - name: MODEL_ID
-              value: Intel/neural-chat-7b-v3-3
-            - name: PORT
-              value: "80"
-            - name: http_proxy
-              value:
-            - name: https_proxy
-              value:
-            - name: no_proxy
-              value:
-          securityContext: {}
-          image: "ghcr.io/huggingface/text-generation-inference:1.4"
-          imagePullPolicy: IfNotPresent
-          volumeMounts:
-            - mountPath: /data
-              name: model-volume
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          resources: {}
+      - name: faq-tgi-deploy-demo
+        env:
+          - name: HUGGING_FACE_HUB_TOKEN
+            value: "insert-your-huggingface-token-here"
+          - name: OMPI_MCA_btl_vader_single_copy_mechanism
+            value: none
+          - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+            value: 'true'
+          - name: runtime
+            value: habana
+          - name: HABANA_VISIBLE_DEVICES
+            value: all
+          - name: PREFILL_BATCH_BUCKET_SIZE
+            value: "1"
+          - name: BATCH_BUCKET_SIZE
+            value: "8"
+          - name: PORT
+            value: "80"
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          capabilities:
+            add:
+            - SYS_NICE
+        args:
+        - --model-id
+        - 'meta-llama/Meta-Llama-3-8B-Instruct'
+        - --cuda_graphs
+        - '0'
+        - --max-input-length
+        - '3096'
+        - --max-total-tokens
+        - '4096'
+        - --max-batch-total-tokens
+        - '65536'
+        - --max-batch-prefill-tokens
+        - '4096'
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            habana.ai/gaudi: 1
+      serviceAccountName: default
       volumes:
-        - name: model-volume
-          hostPath:
-            path: /mnt
-            type: Directory
+      - name: model-volume
+        hostPath:
+          path: /home/sdp/cesg
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: faq-tgi-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: faq-tgi-deploy
+  ports:
+  - name: service
+    port: 8010
+    targetPort: 80
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: faqgen-llm-uservice
-  labels:
-    helm.sh/chart: llm-uservice-0.1.0
-    app.kubernetes.io/name: llm-uservice
-    app.kubernetes.io/instance: faqgen
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
+  name: faq-micro-deploy
+  namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: llm-uservice
-      app.kubernetes.io/instance: faqgen
+      app: faq-micro-deploy
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
       labels:
-        app.kubernetes.io/name: llm-uservice
-        app.kubernetes.io/instance: faqgen
+        app: faq-micro-deploy
     spec:
-      securityContext: {}
+      hostIPC: true
       containers:
-        - name: faqgen
+        - name: faq-micro-deploy
           env:
             - name: TGI_LLM_ENDPOINT
-              value: "http://faqgen-tgi:80"
+              value: "http://faq-tgi-svc.default.svc.cluster.local:8010"
             - name: HUGGINGFACEHUB_API_TOKEN
               value: "insert-your-huggingface-token-here"
-            - name: http_proxy
-              value:
-            - name: https_proxy
-              value:
-            - name: no_proxy
-              value:
-          securityContext: {}
-          image: "opea/llm-faqgen-tgi:latest"
+          image: opea/llm-faqgen-tgi:latest
           imagePullPolicy: IfNotPresent
+          args: null
           ports:
-            - name: llm-uservice
-              containerPort: 9000
-              protocol: TCP
-          startupProbe:
-            exec:
-              command:
-                - curl
-                - http://faqgen-tgi:80
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            failureThreshold: 120
-          resources: {}
+          - containerPort: 9000
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: faq-micro-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: faq-micro-deploy
+  ports:
+  - name: service
+    port: 9003
+    targetPort: 9000
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: faqgen
-  labels:
-    helm.sh/chart: faqgen-0.1.0
-    app.kubernetes.io/name: faqgen
-    app.kubernetes.io/instance: faqgen
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
+  name: faq-mega-server-deploy
+  namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: faqgen
-      app.kubernetes.io/instance: faqgen
+      app: faq-mega-server-deploy
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
       labels:
-        app.kubernetes.io/name: faqgen
-        app.kubernetes.io/instance: faqgen
+        app: faq-mega-server-deploy
     spec:
-      securityContext: null
+      hostIPC: true
       containers:
-        - name: faqgen
+        - name: faq-mega-server-deploy
           env:
             - name: LLM_SERVICE_HOST_IP
-              value: faqgen-llm-uservice
-            - name: http_proxy
-              value:
-            - name: https_proxy
-              value:
-            - name: no_proxy
-              value:
-          securityContext: null
-          image: "opea/faqgen:latest"
+              value: faq-micro-svc
+            - name: LLM_SERVICE_PORT
+              value: "9003"
+            - name: MEGA_SERVICE_HOST_IP
+              value: faq-mega-server-svc
+            - name: MEGA_SERVICE_PORT
+              value: "7777"
+          image: opea/faqgen:latest
           imagePullPolicy: IfNotPresent
+          args: null
           ports:
-            - name: faqgen
-              containerPort: 8888
-              protocol: TCP
-          resources: null
+          - containerPort: 7777
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: faq-mega-server-svc
+spec:
+  type: NodePort
+  selector:
+    app: faq-mega-server-deploy
+  ports:
+  - name: service
+    port: 7779
+    targetPort: 7777
+    nodePort: 30779

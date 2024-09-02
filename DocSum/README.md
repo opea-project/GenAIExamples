@@ -1,8 +1,6 @@
 # Document Summarization Application
 
-In a world where data, information, and legal complexities are prevalent, the volume of legal documents is growing rapidly. Law firms, legal professionals, and businesses are dealing with an ever-increasing number of legal texts, including contracts, court rulings, statutes, and regulations. These documents contain important insights, but understanding them can be overwhelming. This is where the demand for legal document summarization comes in.
-
-Large Language Models (LLMs) have revolutionized the way we interact with text. These models can be used to create summaries of news articles, research papers, technical documents, and other types of text. Suppose you have a set of documents (PDFs, Notion pages, customer questions, etc.) and you want to summarize the content. In this example use case, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.
+Large Language Models (LLMs) have revolutionized the way we interact with text. These models can be used to create summaries of news articles, research papers, technical documents, legal documents and other types of text. Suppose you have a set of documents (PDFs, Notion pages, customer questions, etc.) and you want to summarize the content. In this example use case, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference.
 
 The architecture for document summarization will be illustrated/described below:
 
@@ -24,6 +22,16 @@ Currently we support two ways of deploying Document Summarization services with 
    ```
 
 2. Start services using the docker images `built from source`: [Guide](./docker)
+
+### Required Models
+
+We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "set_env.sh" if you want to use other models.
+
+```
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+```
+
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
 ### Setup Environment Variable
 
@@ -91,6 +99,29 @@ Refer to [Kubernetes deployment](./kubernetes/manifests/README.md)
 Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
 
 Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum) for instructions on deploying DocSum into Kubernetes on Xeon & Gaudi.
+
+### Workflow of the deployed Document Summarization Service
+
+The workflow of the Document Summarization Service, from user's input query to the application's output response, is as follows:
+
+```mermaid
+flowchart LR
+    subgraph DocSum
+        direction LR
+        A[User] <--> |Input query| B[DocSum Gateway]
+        B <--> |Post| Megaservice
+        subgraph Megaservice["Megaservice"]
+            direction TB
+            C([ Microservice : llm-docsum-tgi <br>9000]) -. Post .-> D{{TGI Service<br>8008}}
+        end
+        Megaservice --> |Output| E[Response]
+    end
+    subgraph Legend
+        X([Micsrservice])
+        Y{{Service from industry peers}}
+        Z[Gateway]
+    end
+```
 
 ## Consume Document Summarization Service
 

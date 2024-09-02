@@ -11,7 +11,7 @@ metadata:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 data:
   TGI_LLM_ENDPOINT: "http://codetrans-tgi"
@@ -20,9 +20,6 @@ data:
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
-  LANGCHAIN_TRACING_V2: "false"
-  LANGCHAIN_API_KEY: insert-your-langchain-key-here
-  LANGCHAIN_PROJECT: "opea-llm-uservice"
 ---
 # Source: codetrans/charts/tgi/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -41,10 +38,7 @@ metadata:
 data:
   MODEL_ID: "HuggingFaceH4/mistral-7b-grok"
   PORT: "2080"
-  HUGGING_FACE_HUB_TOKEN: "insert-your-huggingface-token-here"
   HF_TOKEN: "insert-your-huggingface-token-here"
-  MAX_INPUT_TOKENS: "1024"
-  MAX_TOTAL_TOKENS: "4096"
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
@@ -52,6 +46,8 @@ data:
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
+  MAX_INPUT_LENGTH: "1024"
+  MAX_TOTAL_TOKENS: "2048"
 ---
 # Source: codetrans/charts/llm-uservice/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -65,7 +61,7 @@ metadata:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -115,7 +111,7 @@ metadata:
     helm.sh/chart: codetrans-0.8.0
     app.kubernetes.io/name: codetrans
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -140,7 +136,7 @@ metadata:
     helm.sh/chart: llm-uservice-0.8.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -180,14 +176,26 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
-          startupProbe:
-            exec:
-              command:
-              - curl
-              - http://codetrans-tgi
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
             initialDelaySeconds: 5
             periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
             failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {}
       volumes:
@@ -240,6 +248,23 @@ spec:
             - name: http
               containerPort: 2080
               protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          startupProbe:
+            failureThreshold: 120
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
           resources:
             limits:
               habana.ai/gaudi: 1
@@ -263,7 +288,7 @@ metadata:
     helm.sh/chart: codetrans-0.8.0
     app.kubernetes.io/name: codetrans
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/version: "v0.8"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -310,3 +335,75 @@ spec:
       volumes:
         - name: tmp
           emptyDir: {}
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: codetrans-nginx-config
+data:
+  default.conf: |
+    server {
+        listen       80;
+        listen  [::]:80;
+
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+
+        location /v1/codetrans {
+            proxy_pass http://codetrans:7777;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codetrans-nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+      volumes:
+      - name: nginx-config-volume
+        configMap:
+          name: codetrans-nginx-config
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-svc
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30789
+  type: NodePort

@@ -20,7 +20,7 @@ The ChatQnA uses the below prebuilt images if you choose a Xeon deployment
 - retriever: opea/retriever-redis:latest
 - tei_xeon_service: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 - reranking: opea/reranking-tei:latest
-- tgi-service: ghcr.io/huggingface/text-generation-inference:1.4
+- tgi-service: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
 - llm: opea/llm-tgi:latest
 - chaqna-xeon-backend-server: opea/chatqna:latest
 
@@ -67,7 +67,7 @@ This involves deploying the ChatQnA custom resource. You can use chatQnA_xeon.ya
    ```sh
    export CLIENT_POD=$(kubectl get pod -n chatqa -l app=client-test -o jsonpath={.items..metadata.name})
    export accessUrl=$(kubectl get gmc -n chatqa -o jsonpath="{.items[?(@.metadata.name=='chatqa')].status.accessUrl}")
-   kubectl exec "$CLIENT_POD" -n chatqa -- curl $accessUrl  -X POST  -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
+   kubectl exec "$CLIENT_POD" -n chatqa -- curl -s --no-buffer $accessUrl  -X POST  -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
    ```
 
 6. Perhaps you want to try another LLM model? Just modify the application custom resource to use another LLM model
@@ -98,7 +98,7 @@ This involves deploying the ChatQnA custom resource. You can use chatQnA_xeon.ya
 9. Access the updated pipeline using the same URL from above using the client pod
 
    ```sh
-   kubectl exec "$CLIENT_POD" -n chatqa -- curl $accessUrl -X POST -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
+   kubectl exec "$CLIENT_POD" -n chatqa -- curl -s --no-buffer $accessUrl -X POST -d '{"text":"What is the revenue of Nike in 2023?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
    ```
 
 > [NOTE]

@@ -1,0 +1,104 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Examples CD workflow on manual event
+on:
+  workflow_dispatch:
+    inputs:
+      nodes:
+        default: "gaudi,xeon"
+        description: "Hardware to run test"
+        required: true
+        type: string
+      examples:
+        default: "ChatQnA"
+        description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+      deploy_gmc:
+        default: false
+        description: 'Whether to deploy gmc'
+        required: true
+        type: boolean
+      build:
+        default: true
+        description: 'Build test required images for Examples'
+        required: false
+        type: boolean
+      test_compose:
+        default: true
+        description: 'Test examples with docker compose'
+        required: false
+        type: boolean
+      test_k8s:
+        default: false
+        description: 'Test examples with k8s'
+        required: false
+        type: boolean
+      test_gmc:
+        default: false
+        description: 'Test examples with gmc'
+        required: false
+        type: boolean
+      opea_branch:
+        default: "main"
+        description: 'OPEA branch for image build'
+        required: false
+        type: string
+
+permissions: read-all
+jobs:
+  get-test-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      examples: ${{ steps.get-matrix.outputs.examples }}
+      nodes: ${{ steps.get-matrix.outputs.nodes }}
+    steps:
+    - name: Create Matrix
+      id: get-matrix
+      run: |
+        examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
+        examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "examples=$examples_json" >> $GITHUB_OUTPUT
+        nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
+        nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+
+  build-deploy-gmc:
+    needs: [get-test-matrix]
+    if: ${{ fromJSON(inputs.deploy_gmc) }}
+    strategy:
+      matrix:
+        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+      fail-fast: false
+    uses: ./.github/workflows/_gmc-workflow.yml
+    with:
+      node: ${{ matrix.node }}
+      tag: ${{ inputs.tag }}
+      opea_branch: ${{ inputs.opea_branch }}
+    secrets: inherit
+
+  run-examples:
+    needs: [get-test-matrix, build-deploy-gmc]
+    if: always()
+    strategy:
+      matrix:
+        example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
+        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+      fail-fast: false
+    uses: ./.github/workflows/_example-workflow.yml
+    with:
+      node: ${{ matrix.node }}
+      example: ${{ matrix.example }}
+      tag: ${{ inputs.tag }}
+      build: ${{ fromJSON(inputs.build) }}
+      test_compose: ${{ fromJSON(inputs.test_compose) }}
+      test_k8s: ${{ fromJSON(inputs.test_k8s) }}
+      test_gmc: ${{ fromJSON(inputs.test_gmc) }}
+      opea_branch: ${{ inputs.opea_branch }}
+    secrets: inherit

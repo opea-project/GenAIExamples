@@ -1,0 +1,55 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+test_suite_config: # Overall configuration settings for the test suite
+  examples: ["chatqna"]  # The specific test cases being tested, e.g., chatqna, codegen, codetrans, faqgen, audioqna, visualqna
+  concurrent_level: 5  # The concurrency level, adjustable based on requirements
+  user_queries: ${USER_QUERIES}  # Number of test requests at each concurrency level
+  random_prompt: false  # Use random prompts if true, fixed prompts if false
+  run_time: 60m  # The max total run time for the test suite
+  collect_service_metric: false  # Collect service metrics if true, do not collect service metrics if false
+  data_visualization: false # Generate data visualization if true, do not generate data visualization if false
+  llm_model: "Intel/neural-chat-7b-v3-3"  # The LLM model used for the test
+  test_output_dir: "${TEST_OUTPUT_DIR}"  # The directory to store the test output
+
+test_cases:
+  chatqna:
+    embedding:
+      run_test: false
+      service_name: "embedding-svc"  # Replace with your service name
+    embedserve:
+      run_test: false
+      service_name: "embedding-dependency-svc"  # Replace with your service name
+    retriever:
+      run_test: false
+      service_name: "retriever-svc"  # Replace with your service name
+      parameters:
+        search_type: "similarity"
+        k: 4
+        fetch_k: 20
+        lambda_mult: 0.5
+        score_threshold: 0.2
+    reranking:
+      run_test: false
+      service_name: "reranking-svc"  # Replace with your service name
+      parameters:
+        top_n: 1
+    rerankserve:
+      run_test: false
+      service_name: "reranking-dependency-svc"  # Replace with your service name
+    llm:
+      run_test: false
+      service_name: "llm-svc"  # Replace with your service name
+      parameters:
+        max_new_tokens: 128
+        temperature: 0.01
+        top_k: 10
+        top_p: 0.95
+        repetition_penalty: 1.03
+        streaming: true
+    llmserve:
+      run_test: false
+      service_name: "llm-dependency-svc"  # Replace with your service name
+    e2e:
+      run_test: true
+      service_name: "chatqna-backend-server-svc"  # Replace with your service name

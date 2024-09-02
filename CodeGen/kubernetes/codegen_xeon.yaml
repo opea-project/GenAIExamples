@@ -29,6 +29,6 @@ spec:
         internalService:
           serviceName: tgi-service
           config:
-            MODEL_ID: ise-uiuc/Magicoder-S-DS-6.7B
+            MODEL_ID: meta-llama/CodeLlama-7b-hf
             endpoint: /generate
           isDownstreamService: true

@@ -3,25 +3,27 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH
-    git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
-
-    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-
     cd $WORKPATH/docker
-    docker build --no-cache -t opea/codetrans:latest -f Dockerfile .
+    git clone https://github.com/opea-project/GenAIComps.git
 
-    cd $WORKPATH/docker/ui
-    docker build --no-cache -t opea/codetrans-ui:latest -f docker/Dockerfile .
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="codetrans codetrans-ui llm-tgi nginx"
+    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker images
+    docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -34,29 +36,25 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"
+    export FRONTEND_SERVICE_IP=${ip_address}
+    export FRONTEND_SERVICE_PORT=5173
+    export BACKEND_SERVICE_NAME=codetrans
+    export BACKEND_SERVICE_IP=${ip_address}
+    export BACKEND_SERVICE_PORT=7777
+    export NGINX_PORT=80
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    if [[ "$IMAGE_REPO" != "" ]]; then
-        # Replace the container name with a test-specific name
-        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/codetrans:latest#image: opea/codetrans:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/codetrans-ui:latest#image: opea/codetrans-ui:${IMAGE_TAG}#g" compose.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose.yaml
-        echo "cat compose.yaml"
-        cat compose.yaml
-    fi
-
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 400 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs codetrans-tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 }
@@ -117,19 +115,30 @@ function validate_megaservice() {
         "codetrans-xeon-backend-server" \
         '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 
+    # test the megeservice via nginx
+    validate_services \
+        "${ip_address}:80/v1/codetrans" \
+        "print" \
+        "mega-codetrans-nginx" \
+        "codetrans-xeon-nginx-server" \
+        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+
 }
 
 function validate_frontend() {
     cd $WORKPATH/docker/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-#    conda remove -n ${conda_env_name} --all -y
-#    conda create -n ${conda_env_name} python=3.12 -y
+    if conda info --envs | grep -q "$conda_env_name"; then
+        echo "$conda_env_name exist!"
+    else
+        conda create -n ${conda_env_name} python=3.12 -y
+    fi
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-#    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
@@ -153,7 +162,7 @@ function main() {
 
     stop_docker
 
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices

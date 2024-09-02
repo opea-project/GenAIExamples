@@ -5,7 +5,7 @@
 set -xe
 USER_ID=$(whoami)
 LOG_PATH=/home/$(whoami)/logs
-MOUNT_DIR=/home/$USER_ID/charts-mnt
+MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 IMAGE_TAG=${IMAGE_TAG:-latest}
 
@@ -13,8 +13,13 @@ function init_docsum() {
     # executed under path manifest/docsum/xeon
     # replace the mount dir "path: /mnt/model" with "path: $CHART_MOUNT"
     find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/opea-models#path: $MOUNT_DIR#g" {} \;
-    # replace megaservice image tag
-    find . -name '*.yaml' -type f -exec sed -i "s#image: opea/docsum:latest#image: opea/docsum:${IMAGE_TAG}#g" {} \;
+    if [ $CONTEXT == "CI" ]; then
+        # replace megaservice image tag
+        find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/docsum:latest#image: \"opea/docsum:${IMAGE_TAG}#g" {} \;
+    else
+        # replace microservice image tag
+        find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/\(.*\):latest#image: \"opea/\1:${IMAGE_TAG}#g" {} \;
+    fi
     # replace the repository "image: opea/*" with "image: $IMAGE_REPO/opea/"
     find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}opea/#g" {} \;
     # set huggingface token

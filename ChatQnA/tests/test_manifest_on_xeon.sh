@@ -5,15 +5,20 @@
 set -xe
 USER_ID=$(whoami)
 LOG_PATH=/home/$(whoami)/logs
-MOUNT_DIR=/home/$USER_ID/charts-mnt
+MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 IMAGE_TAG=${IMAGE_TAG:-latest}
 
 function init_chatqna() {
     # replace the mount dir "path: /mnt/opea-models" with "path: $CHART_MOUNT"
     find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/opea-models#path: $MOUNT_DIR#g" {} \;
-    # replace megaservice image tag
-    find . -name '*.yaml' -type f -exec sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" {} \;
+    if [ $CONTEXT == "CI" ]; then
+        # replace megaservice image tag
+        find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/chatqna:latest#image: \"opea/chatqna:${IMAGE_TAG}#g" {} \;
+    else
+        # replace microservice image tag
+        find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/\(.*\):latest#image: \"opea/\1:${IMAGE_TAG}#g" {} \;
+    fi
     # replace the repository "image: opea/*" with "image: $IMAGE_REPO/opea/"
     find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}opea/#g" {} \;
     # set huggingface token
@@ -71,7 +76,7 @@ function validate_chatqna() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOGFILE ]] &&
-        [[ $(grep -c "billion" $LOGFILE) != 0 ]]; then
+        [[ $(grep -c "\[DONE\]" $LOGFILE) != 0 ]]; then
         status=true
     fi
     if [ $status == false ]; then
