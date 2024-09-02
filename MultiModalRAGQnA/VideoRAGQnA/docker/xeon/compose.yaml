@@ -10,21 +10,24 @@ services:
     container_name: vdms-vector-db
     ports:
       - "8001:55555"
-  dataprep-vdms-service: # TODO
+  dataprep: # TODO
     image: opea/dataprep-vdms:latest
     container_name: dataprep-vdms-server
     depends_on:
       - vdms-vector-db
     ports:
       - "6007:6007"
+      - "6005:6005"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      VDMS_URL: ${VDMS_URL}
       VDMS_HOST: ${VDMS_HOST}
+      VDMS_PORT: ${VDMS_PORT}
       INDEX_NAME: ${INDEX_NAME}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    volumes:
+      - /home/$USER/.cache/clip:/home/user/.cache/clip
   embedding:
     image: opea/embedding-multimodal:latest
     container_name: embedding-multimodal-server
@@ -35,6 +38,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+    volumes:
+      - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
     restart: unless-stopped
   retriever:
     image: opea/retriever-vdms:latest
@@ -53,6 +58,8 @@ services:
       VDMS_PORT: ${VDMS_PORT}
       USECLIP: ${USECLIP}
     restart: unless-stopped
+    volumes:
+      - /home/raspadmin/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   reranking:
     image: opea/reranking-videoragqna:latest
     container_name: reranking-videoragqna-server
@@ -100,7 +107,7 @@ services:
     container_name: videoragqna-xeon-backend-server
     depends_on:
       - vdms-vector-db
-      - dataprep-vdms-service # FIXME
+      - dataprep
       - embedding
       - retriever
       - reranking
@@ -116,7 +123,7 @@ services:
       EMBEDDING_SERVICE_HOST_IP: ${EMBEDDING_SERVICE_HOST_IP}
       RETRIEVER_SERVICE_HOST_IP: ${RETRIEVER_SERVICE_HOST_IP}
       RERANK_SERVICE_HOST_IP: ${RERANK_SERVICE_HOST_IP}
-      LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP}
+      LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
     ipc: host
     restart: always
   videoragqna-xeon-ui-server:

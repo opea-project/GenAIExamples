@@ -184,7 +184,6 @@ docker compose -f compose.yaml up -d
 ```
 
 ### Validate Microservices 
-TODO: test all the command
 
 1. Dataprep Microservice
 TODO
@@ -208,6 +207,7 @@ is determined by the embedding model.
 Here we use the model `openai/clip-vit-base-patch32`, which vector size is 512.
 
 Check the vector dimension of your embedding model, set `your_embedding` dimension equals to it.
+TODO: test
 
 ```bash
 export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
@@ -218,6 +218,7 @@ curl http://${host_ip}:7000/v1/retrieval \
 ```
 
 4. Reranking Microservice
+TODO: test
 
 ```bash
 curl http://${host_ip}:8000/v1/reranking \
@@ -235,6 +236,7 @@ curl http://${host_ip}:8000/v1/reranking \
 ```
 
 5. LVM backend Service
+TODO: test
 
 In first startup, this service will take times to download the LLM file. After it's finished, the service will be ready.
 
@@ -248,6 +250,7 @@ curl -X POST \
 ```
 
 6. LVM Microservice
+TODO: test
 
 This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 

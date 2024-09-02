@@ -19,7 +19,8 @@ export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:8888/v1/health_check"
 export VDMS_HOST=${host_ip}
 export VDMS_PORT=8001
 export INDEX_NAME="video-test"
-export LLM_DOWNLOAD="False" # Optional
+export USECLIP=1
+# export LLM_DOWNLOAD="False" # Optional
 
 
 

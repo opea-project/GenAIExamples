@@ -3,18 +3,18 @@
 
 import os
 
-from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
+from comps import VideoRAGQnAGateway, MicroService, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 EMBEDDING_SERVICE_HOST_IP = os.getenv("EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
-EMBEDDING_SERVICE_PORT = int(os.getenv("EMBEDDING_SERVICE_PORT", 5038))
+EMBEDDING_SERVICE_PORT = int(os.getenv("EMBEDDING_SERVICE_PORT", 6000))
 RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
 RETRIEVER_SERVICE_PORT = int(os.getenv("RETRIEVER_SERVICE_PORT", 7000))
 RERANK_SERVICE_HOST_IP = os.getenv("RERANK_SERVICE_HOST_IP", "0.0.0.0")
-RERANK_SERVICE_PORT = int(os.getenv("RERANK_SERVICE_PORT", 5037)) 
+RERANK_SERVICE_PORT = int(os.getenv("RERANK_SERVICE_PORT", 8000)) 
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
-LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 5051))
+LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9000))
 
 
 class VideoRAGQnAService:
@@ -60,9 +60,9 @@ class VideoRAGQnAService:
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, rerank)
         self.megaservice.flow_to(rerank, lvm)
-        self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+        self.gateway = VideoRAGQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
 
 if __name__ == "__main__":
-    chatqna = VideoRAGQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
-    chatqna.add_remote_service()
+    videoragqna = VideoRAGQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    videoragqna.add_remote_service()
