@@ -274,7 +274,7 @@ kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type-
 
 The following is a summary of the test result, with files saved at `TEST_OUTPUT_DIR`.
 
-```statistics
+```none
 Concurrency       : 512
 Max request count : 2560
 Http timeout      : 60000
@@ -290,7 +290,7 @@ Average token latency(ms)     : 35.85
 ======================================================
 ```
 
-```test spec
+```none
 benchmarkresult:
   Average_Next_token_latency: '28.41'
   Average_token_latency: '35.85'
