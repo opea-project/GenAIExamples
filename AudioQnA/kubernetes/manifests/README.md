@@ -1,4 +1,4 @@
-# Deploy VisualQnA in a Kubernetes Cluster
+# Deploy AudioQnA in a Kubernetes Cluster
 
 > [NOTE]
 > The following values must be set before you can deploy:
