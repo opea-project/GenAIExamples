@@ -161,6 +161,18 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 ## 🚀 Start Microservices
 
+### Required Models
+
+By default, the embedding, reranking and LLM models are set to a default value as listed below:
+
+| Service   | Model                     |
+| --------- | ------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5     |
+| Reranking | BAAI/bge-reranker-base    |
+| LLM       | Intel/neural-chat-7b-v3-3 |
+
+Change the `xxx_MODEL_ID` below for your needs.
+
 ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
@@ -183,7 +195,7 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 
 **Append the value of the public IP address to the no_proxy list**
 
-```
+```bash
 export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
@@ -291,9 +303,21 @@ curl http://${host_ip}:8000/v1/reranking\
 
 6. LLM backend Service
 
-In first startup, this service will take more time to download the LLM file. After it's finished, the service will be ready.
+In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
 
-Use `docker logs CONTAINER_ID` to check if the download is finished.
+Try the command below to check whether the LLM serving is ready.
+
+```bash
+docker logs ${CONTAINER_ID} | grep Connected
+```
+
+If the service is ready, you will get the response like below.
+
+```log
+2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+```
+
+Then try the `cURL` command below to validate services.
 
 ```bash
 # TGI service
