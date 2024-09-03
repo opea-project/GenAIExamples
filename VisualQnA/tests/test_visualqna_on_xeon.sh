@@ -27,7 +27,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/gaudi
+    cd $WORKPATH/docker/xeon
 
     export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
     export LVM_ENDPOINT="http://${ip_address}:8399"
@@ -44,7 +44,7 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs lvm-tgi-gaudi-server > ${LOG_PATH}/lvm_tgi_service_start.log
+        docker logs lvm-tgi-xeon-server > ${LOG_PATH}/lvm_tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
             break
         fi
@@ -89,7 +89,7 @@ function validate_microservices() {
         "${ip_address}:9399/v1/lvm" \
         "The image" \
         "lvm-tgi" \
-        "lvm-tgi-gaudi-server" \
+        "lvm-tgi-xeon-server" \
         '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }
 
@@ -98,8 +98,8 @@ function validate_megaservice() {
     validate_services \
     "${ip_address}:8888/v1/visualqna" \
     "The image" \
-    "visualqna-gaudi-backend-server" \
-    "visualqna-gaudi-backend-server" \
+    "visualqna-xeon-backend-server" \
+    "visualqna-xeon-backend-server" \
     '{
         "messages": [
         {
@@ -151,7 +151,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/gaudi
+    cd $WORKPATH/docker/xeon
     docker compose stop && docker compose rm -f
 }
 
