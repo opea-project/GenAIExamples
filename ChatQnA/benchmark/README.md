@@ -143,6 +143,34 @@ kubectl apply -f .
 
 #### 3. Run tests
 
+##### 3.1 Upload Retrieval File
+
+Before running tests, upload a specified file to make sure the llm input have the token length of 1k.
+
+Run the following command to check the cluster ip of dataprep.
+
+```bash
+kubectl get svc
+```
+
+Substitute the `${cluster_ip}` into the real cluster ip of dataprep microservice as below.
+
+```log
+dataprep-svc   ClusterIP   xx.xx.xx.xx    <none>   6007/TCP   5m   app=dataprep-deploy
+```
+
+Run the cURL command to upload file:
+
+```bash
+cd GenAIEval/evals/benchmark/data
+curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./upload_file.txt" \
+     -F "chunk_size=3800"
+```
+
+##### 3.2 Run Benchmark Test
+
 We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
 ```bash
