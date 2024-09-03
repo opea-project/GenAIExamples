@@ -23,7 +23,7 @@ function build_docker_images() {
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -39,7 +39,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -47,7 +47,7 @@ function start_services() {
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 10s
         n=$((n+1))
     done
 }
@@ -84,8 +84,7 @@ function validate_services() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
-    # TODO: Any results check required??
-    sleep 3m
+
     # tgi gaudi service
     validate_services \
         "${ip_address}:8008/generate" \

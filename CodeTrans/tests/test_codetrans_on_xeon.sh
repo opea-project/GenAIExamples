@@ -19,11 +19,11 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codetrans codetrans-ui llm-tgi"
+    service_list="codetrans codetrans-ui llm-tgi nginx"
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:1.4
-    docker images
+    docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -36,19 +36,25 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"
+    export FRONTEND_SERVICE_IP=${ip_address}
+    export FRONTEND_SERVICE_PORT=5173
+    export BACKEND_SERVICE_NAME=codetrans
+    export BACKEND_SERVICE_IP=${ip_address}
+    export BACKEND_SERVICE_PORT=7777
+    export NGINX_PORT=80
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 400 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs codetrans-tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 }
@@ -107,6 +113,14 @@ function validate_megaservice() {
         "print" \
         "mega-codetrans" \
         "codetrans-xeon-backend-server" \
+        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+
+    # test the megeservice via nginx
+    validate_services \
+        "${ip_address}:80/v1/codetrans" \
+        "print" \
+        "mega-codetrans-nginx" \
+        "codetrans-xeon-nginx-server" \
         '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 
 }

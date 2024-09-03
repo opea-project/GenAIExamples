@@ -24,7 +24,7 @@ function build_docker_images() {
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -57,7 +57,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs tgi-service > $LOG_PATH/tgi_service_start.log
@@ -71,10 +71,12 @@ function start_services() {
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the latest news? Give me also the source link", "stream": "False"}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "How many gold medals does USA win in olympics 2024? Give me also the source link.", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"news"* ]]; then
+    if [[ $result == *"2024"* ]]; then
+        docker logs web-retriever-chroma-server
+        docker logs searchqna-xeon-backend-server
         echo "Result correct."
     else
         docker logs web-retriever-chroma-server
