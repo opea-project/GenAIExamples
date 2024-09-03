@@ -162,7 +162,21 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
             const match = msg.data.match(/b'([^']*)'/);
             if (match && match[1] != "</s>") {
               const extractedText = match[1];
-              result += extractedText;
+
+              // Check for the presence of \x hexadecimal
+              if (extractedText.includes("\\x")) {
+                // Decode Chinese (or other non-ASCII characters)
+                const decodedText = decodeEscapedBytes(extractedText);
+                result += decodedText;
+              } else {
+                result += extractedText;
+              }
+            } else if (!match) {
+              // Return data without pattern
+              result += msg?.data;
+            }
+            // Store back result if it is not null
+            if (result) {
               store.dispatch(setOnGoingResult(result));
             }
           } catch (e) {
@@ -195,3 +209,13 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
     console.log(err);
   }
 };
+
+// decode \x hexadecimal encoding
+function decodeEscapedBytes(str: string): string {
+  // Convert the byte portion separated by \x into a byte array and decode it into a UTF-8 string
+  const byteArray: number[] = str
+    .split("\\x")
+    .slice(1)
+    .map((byte: string) => parseInt(byte, 16));
+  return new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
+}
