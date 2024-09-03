@@ -17,9 +17,8 @@ config:
     nodeSpacing: 100
     rankSpacing: 100
     curve: linear
-  theme: base
   themeVariables:
-    fontSize: 42px
+    fontSize: 60px
 ---
 flowchart LR
     %% Colors %%
@@ -29,30 +28,29 @@ flowchart LR
     classDef invisible fill:transparent,stroke:transparent;
     style ChatQnA-MegaService stroke:#000000
     %% Subgraphs %%
-    subgraph ChatQnA-MegaService["ChatQnA-MegaService"]
+
+    subgraph ChatQnA-MegaService["<div style="margin:1ex 52ex 0 0;"> ChatQnA MegaService <br></div>"]
         direction LR
-        EM([Embedding <br>]):::blue
-        RET([Retrieval <br>]):::blue
-        RER([Rerank <br>]):::blue
-        LLM([LLM <br>]):::blue
+        EM([Embedding]):::blue
+        RET([Retrieval ]):::blue
+        RER([Rerank ]):::blue
+        LLM([LLM ]):::blue
     end
-    subgraph User Interface
-        direction TB
+    subgraph UserInterface["<div style="margin:1ex 52ex 0 0;"> User Interface </div>"]
+        direction LR
         a([User Input Query]):::orchid
         Ingest([Ingest data]):::orchid
         UI([UI server<br>]):::orchid
     end
-    subgraph ChatQnA GateWay
-        direction LR
-        invisible1[ ]:::invisible
-        GW([ChatQnA GateWay<br>]):::orange
-    end
     subgraph .
-        X([OPEA Micsrservice]):::blue
+        direction TB
+        invisible1[ ]:::invisible
+        X([OPEA Microservice]):::blue
         Y{{Open Source Service}}
         Z([OPEA Gateway]):::orange
         Z1([UI]):::orchid
     end
+
 
     TEI_RER{{Reranking service<br>}}
     TEI_EM{{Embedding service <br>}}
@@ -60,35 +58,36 @@ flowchart LR
     R_RET{{Retriever service <br>}}
     DP([Data Preparation<br>]):::blue
     LLM_gen{{LLM Service <br>}}
+    GW([ChatQnA GateWay<br>]):::orange
 
     %% Data Preparation flow
     %% Ingest data flow
     direction LR
-    Ingest[Ingest data] -->|a| UI
-    UI -->|b| DP
-    DP <-.->|c| TEI_EM
+    Ingest[Ingest data] --> UI
+    UI --> DP
+    DP <-.-> TEI_EM
 
     %% Questions interaction
     direction LR
-    a[User Input Query] -->|1| UI
-    UI -->|2| GW
-    GW <==>|3| ChatQnA-MegaService
-    EM ==>|4| RET
-    RET ==>|5| RER
-    RER ==>|6| LLM
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> ChatQnA-MegaService
+    EM ==> RET
+    RET ==> RER
+    RER ==> LLM
 
 
     %% Embedding service flow
-    direction TB
-    EM <-.->|3'| TEI_EM
-    RET <-.->|4'| R_RET
-    RER <-.->|5'| TEI_RER
-    LLM <-.->|6'| LLM_gen
+    direction LR
+    EM <-.-> TEI_EM
+    RET <-.-> R_RET
+    RER <-.-> TEI_RER
+    LLM <-.-> LLM_gen
 
     direction TB
     %% Vector DB interaction
-    R_RET <-.->|d|VDB
-    DP <-.->|d|VDB
+    R_RET <-.->VDB
+    DP <-.->VDB
 
 
 
