@@ -22,7 +22,7 @@ The default model is [openai/whisper-small](https://huggingface.co/openai/whispe
 
 To replace the model, please edit the `compose.yaml` and add the `command` line to pass the name of the model you want to use:
 
-```yml
+```yaml
 services:
   whisper-service:
     ...

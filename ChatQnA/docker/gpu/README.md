@@ -192,6 +192,22 @@ curl http://${host_ip}:8000/v1/reranking \
 
 6. TGI Service
 
+In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
+
+Try the command below to check whether the TGI service is ready.
+
+```bash
+docker logs ${CONTAINER_ID} | grep Connected
+```
+
+If the service is ready, you will get the response like below.
+
+```log
+2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+```
+
+Then try the `cURL` command below to validate TGI.
+
 ```bash
 curl http://${host_ip}:8008/generate \
   -X POST \

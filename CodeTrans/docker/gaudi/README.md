@@ -37,8 +37,8 @@ docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --
 ### 5. Build Nginx Docker Image
 
 ```bash
-cd GenAIComps/comps/nginx/docker
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile .
+cd GenAIComps
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:

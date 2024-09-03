@@ -54,12 +54,12 @@ flowchart LR
         Z1([UI]):::orchid
     end
 
-    TEI_RER{{Reranking service<br>'TEI'<br>}}
-    TEI_EM{{Embedding service <br>'TEI LangChain'<br>}}
-    VDB{{Vector DB<br>'Redis'<br>}}
-    R_RET{{Retriever service <br>'LangChain Redis'<br>}}
-    DP([Data Preparation<br>'LangChain Redis'<br>]):::blue
-    LLM_gen{{LLM Service <br>'TGI'<br>}}
+    TEI_RER{{Reranking service<br>}}
+    TEI_EM{{Embedding service <br>}}
+    VDB{{Vector DB<br><br>}}
+    R_RET{{Retriever service <br>}}
+    DP([Data Preparation<br>]):::blue
+    LLM_gen{{LLM Service <br>}}
 
     %% Data Preparation flow
     %% Ingest data flow
@@ -223,6 +223,19 @@ Refer to the [AI PC Guide](./docker/aipc/README.md) for instructions on deployin
 Refer to the [Intel Technology enabling for Openshift readme](https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/workloads/opea/chatqna/README.md) for instructions to deploy ChatQnA prototype on RHOCP with [Red Hat OpenShift AI (RHOAI)](https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai).
 
 ## Consume ChatQnA Service
+
+Before consuming ChatQnA Service, make sure the TGI/vLLM service is ready (which takes up to 2 minutes to start).
+
+```bash
+# TGI example
+docker logs tgi-service | grep Connected
+```
+
+Consume ChatQnA service until you get the TGI response like below.
+
+```log
+2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+```
 
 Two ways of consuming ChatQnA Service:
 
