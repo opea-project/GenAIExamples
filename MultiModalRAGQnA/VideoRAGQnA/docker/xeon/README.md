@@ -2,11 +2,16 @@
 
 This document outlines the deployment process for a videoragqna application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `lvm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
-Video RAG QnA is a framework that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search. 
+VideoRAGQnA is a pipeline that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search. 
 
 ## 🚀 Port used for the microservices
 
 ```
+dataprep #FIXME
+========
+Port 6005 - Open to 0.0.0.0/0
+Port 6007 - Open to 0.0.0.0/0
+
 vdms-vector-db
 ===============
 Port 8001 - Open to 0.0.0.0/0
@@ -52,35 +57,34 @@ cd GenAIComps
 ### 1. Build Embedding Image
 
 ```bash
-docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain_multimodal/docker/Dockerfile .
+docker build -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain_multimodal/docker/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg huggingfacehub_api_token=$hf_token -f comps/retrievers/langchain/vdms/docker/Dockerfile .
-# FIXME: OK to rm the token?
+docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/vdms/docker/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/docker/Dockerfile .
+docker build -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/docker/Dockerfile .
 ```
 
 ### 4. Build LVM Image (Xeon)
 
 ```bash
-docker build --no-cache -t opea/video-llama-lvm-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/server/docker/Dockerfile .
+docker build -t opea/video-llama-lvm-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/server/docker/Dockerfile .
 
 # LVM Service Image
-docker build --no-cache -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/Dockerfile .
+docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
 
-```bash
-# docker build --no-cache -t opea/dataprep-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/langchain/docker/Dockerfile .
+```bash #TODO
+# docker build -t opea/dataprep-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/langchain/docker/Dockerfile .
 cd ..
 ```
 
@@ -93,7 +97,7 @@ Build MegaService Docker image via below command:
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/MultiModalRAGQnA/VideoRAGQnA/docker
-docker build --no-cache -t opea/videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+docker build -t opea/videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 ### 7. Build UI Docker Image
@@ -102,7 +106,7 @@ Build frontend Docker image via below command:
 
 ```bash
 cd ui
-docker build --no-cache -t opea/videoragqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+docker build -t opea/videoragqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
@@ -144,6 +148,8 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
+Then you can run below commands or `source set_env.sh` to set all the variables
+
 ```bash
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
@@ -153,17 +159,19 @@ export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
+
 export LVM_ENDPOINT="http://${host_ip}:9009"
 export FILE_SERVER_ENDPOINT="http://${host_ip}:8080" # FIXME
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:8888/v1/health_check"
+
 export VDMS_HOST=${host_ip}
 export VDMS_PORT=8001
 export INDEX_NAME="video-test"
 export LLM_DOWNLOAD="True"
 export USECLIP=1
 
-# export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 # export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 # export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
 # export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
@@ -173,13 +181,12 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ### Start all the services with Docker Containers
 
-> Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
+Before running the docker compose command, you need to be in the folder that has the docker compose yaml file. To avoid model re-download, we manage the volume seperately using [external volume](https://docs.docker.com/reference/compose-file/volumes/#external).
 
 ```bash
 cd GenAIExamples/MultiModalRAGQnA/VideoRAGQnA/docker/xeon/
-```
 
-```bash
+docker volume create video-llama-model
 docker compose -f compose.yaml up -d
 ```
 
@@ -207,7 +214,6 @@ is determined by the embedding model.
 Here we use the model `openai/clip-vit-base-patch32`, which vector size is 512.
 
 Check the vector dimension of your embedding model, set `your_embedding` dimension equals to it.
-TODO: test
 
 ```bash
 export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
@@ -218,7 +224,6 @@ curl http://${host_ip}:7000/v1/retrieval \
 ```
 
 4. Reranking Microservice
-TODO: test
 
 ```bash
 curl http://${host_ip}:8000/v1/reranking \
@@ -236,7 +241,6 @@ curl http://${host_ip}:8000/v1/reranking \
 ```
 
 5. LVM backend Service
-TODO: test
 
 In first startup, this service will take times to download the LLM file. After it's finished, the service will be ready.
 
@@ -245,12 +249,13 @@ Use `docker logs video-llama-lvm-server` to check if the download is finished.
 ```bash
 curl -X POST \
   "http://${host_ip}:9009/generate?video_url=silence_girl.mp4&start=0.0&duration=9&prompt=What%20is%20the%20person%20doing%3F&max_new_tokens=150" \
-  -H "accept: */*"
+  -H "accept: */*" \
   -d ''
 ```
 
+> To avoid re-download for the model in case of restart, please see [here](#clean-microservices)
+
 6. LVM Microservice
-TODO: test
 
 This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
@@ -261,16 +266,18 @@ curl http://${host_ip}:9000/v1/lvm\
   -H 'Content-Type: application/json'
 ```
 
-> Please note that the local video will be deleted after completion to conserve disk space.
+> Please note that the local video file will be deleted after completion to conserve disk space.
 
 7. MegaService
-TODO
+
 ```bash
-# curl http://${host_ip}:8888/v1/videoragqna -H "Content-Type: application/json" -d '{
-#     #  "messages": "What is the revenue of Nike in 2023?"
-#     #  }'
+curl http://${host_ip}:8888/v1/videoragqna -H "Content-Type: application/json" -d '{
+      "messages": "What is the man doing?",
+      "stream": "True"
+      }'
 ```
 
+> Please note that the megaservice support only stream output.
 
 ## 🚀 Launch the UI
 
@@ -287,3 +294,19 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 Here is an example of running videoragqna:
 
 ![project-screenshot](../../assets/img/videoragqna.png)
+
+## Clean Microservices
+
+All the allocated resources could be easily removed by:
+
+```bash
+docker compose -f compose.yaml down
+```
+
+If you plan to restart the service in the future, the above command is enough. The model file is saved in docker volume `video-llama-model` and will be reserved on your server. Next time when you restart the service, set `export LLM_DOWNLOAD="False"` before start to reuse the volume.
+
+To clean the volume:
+
+``` bash
+docker volume rm video-llama-model
+```

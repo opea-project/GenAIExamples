@@ -71,7 +71,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       CHUNK_DURATION: ${CHUNK_DURATION}
-      FILE_SERVER_ENDPOINT: ${FILE_SERVER_URL}
+      FILE_SERVER_ENDPOINT: ${FILE_SERVER_ENDPOINT}
     restart: unless-stopped
   lvm-video-llama:
     image: opea/video-llama-lvm-server:latest
@@ -143,6 +143,7 @@ services:
     restart: always
 volumes:
   video-llama-model:
+    external: true
 networks:
   default:
     driver: bridge

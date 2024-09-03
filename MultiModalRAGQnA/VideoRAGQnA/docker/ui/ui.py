@@ -6,8 +6,8 @@ import time
 import streamlit as st
 
 
-BACKEND_SERVICE_ENDPOINT = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:5031/v1/lvm")
-BACKEND_HEALTH_CHECK_ENDPOINT = os.getenv("BACKEND_HEALTH_CHECK_ENDPOINT", "http://localhost:5031/v1/health_check")
+BACKEND_SERVICE_ENDPOINT = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/videoragqna")
+BACKEND_HEALTH_CHECK_ENDPOINT = os.getenv("BACKEND_HEALTH_CHECK_ENDPOINT", "http://localhost:8888/v1/health_check")
 
 
 def perform_health_check():
@@ -61,18 +61,10 @@ def handle_message(col):
             placeholder = st.empty()
             start = time.time()
             prompt = st.session_state['prompt']
-                    
-            # TODO: request the megaservice, get the answer: request(prompt)
+            request_data = {"messages": prompt, "stream": "True"}
             try:
                 response = requests.post(BACKEND_SERVICE_ENDPOINT,
-                    json={
-                        "video_url": "https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4",
-                        "chunk_start": 0,
-                        "chunk_duration": 7,
-                        "prompt": "what is the girl doing",
-                        "max_new_tokens": 100
-                    },
-                    proxies={"http": None},
+                    data=json.dumps(request_data),
                     stream=True
                 )
                 response.raise_for_status()
