@@ -53,24 +53,18 @@ jobs:
           cd ${{ github.workspace }}/.github/workflows/docker/compose
           # service=$(echo ${{ inputs.service }} | cut -d'_' -f1)
           if [[ "${{ inputs.mode }}" == "CD" ]]; then
-            if [ -f "${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.service }}-compose-cd.yaml" ]; then
-              docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.service }}-compose-cd.yaml
-              echo "file_exists=true" >> $GITHUB_OUTPUT
-            else
-              echo "There is no CD part of ${{ inputs.service }} that needs to be executed."
-              echo "file_exists=false" >> $GITHUB_OUTPUT
-            fi
+            docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.service }}-compose-cd.yaml
           else
-            if [ -f "${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.service }}-compose.yaml" ]; then
-              docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.service }}-compose.yaml
-              echo "file_exists=true" >> $GITHUB_OUTPUT
-            else
-              echo "There is no CI part of ${{ inputs.service }} that needs to be executed."
-              echo "file_exists=false" >> $GITHUB_OUTPUT
-            fi
+            docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.service }}-compose.yaml
+          fi
+          echo "docker_compose_path=${docker_compose_yml}" >> $GITHUB_OUTPUT
+          if [ -f "$docker_compose_yml" ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "There is no ${{ inputs.mode }} part of ${{ inputs.service }} that needs to be executed."
+            echo "file_exists=false" >> $GITHUB_OUTPUT
           fi
 
-          echo "docker_compose_path=${docker_compose_yml}" >> $GITHUB_OUTPUT
           if [[ $(grep -c "llava-tgi:" ${docker_compose_yml}) != 0 ]]; then
               git clone https://github.com/yuanwu2017/tgi-gaudi.git && cd tgi-gaudi && git checkout v2.0.4
           fi
