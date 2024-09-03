@@ -12,12 +12,12 @@ on:
         type: string
       examples:
         default: "ChatQnA"
-        description: 'List of examples to scan [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        description: "List of examples to scan [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]"
         required: false
         type: string
       images:
         default: "gmcmanager,gmcrouter"
-        description: 'List of images to scan [gmcmanager,gmcrouter, ...]'
+        description: "List of images to scan [gmcmanager,gmcrouter, ...]"
         required: false
         type: string
       tag:
@@ -27,12 +27,12 @@ on:
         type: string
       sbom_scan:
         default: true
-        description: 'Scan images for BoM'
+        description: "Scan images for BoM"
         required: false
         type: boolean
       trivy_scan:
         default: true
-        description: 'Scan images for CVE'
+        description: "Scan images for CVE"
         required: false
         type: boolean
 
@@ -68,7 +68,7 @@ jobs:
         with:
           image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output-file: ${{ matrix.image }}-sbom-scan.txt
-          format: 'spdx-json'
+          format: "spdx-json"
 
       - name: Security Scan Container
         uses: aquasecurity/trivy-action@0.24.0
@@ -76,11 +76,11 @@ jobs:
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output: ${{ matrix.image }}-trivy-scan.txt
-          format: 'table'
-          exit-code: '1'
+          format: "table"
+          exit-code: "1"
           ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
 
       - name: Cleanup
         if: always()

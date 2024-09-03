@@ -5,7 +5,7 @@ name: Build latest images on push event
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: ["main"]
     paths:
       - "**/docker/*.py"
       - "**/docker/Dockerfile"
@@ -25,7 +25,7 @@ jobs:
     strategy:
       matrix:
         workload: ${{ fromJSON(needs.job1.outputs.run_matrix).include.*.example }}
-        hardware: ["gaudi","xeon"]
+        hardware: ["gaudi", "xeon"]
     runs-on: docker-build-${{ matrix.hardware }}
     steps:
       - name: Clean up Working Directory

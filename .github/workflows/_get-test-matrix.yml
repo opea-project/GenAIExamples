@@ -10,15 +10,15 @@ on:
       diff_excluded_files:
         required: false
         type: string
-        default: '.github|README.md|*.txt'
+        default: ".github|README.md|*.txt"
       xeon_server_label:
         required: false
         type: string
-        default: 'xeon'
+        default: "xeon"
       gaudi_server_label:
         required: false
         type: string
-        default: 'gaudi'
+        default: "gaudi"
     outputs:
       run_matrix:
         description: "The matrix string"

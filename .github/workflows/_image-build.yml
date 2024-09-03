@@ -18,7 +18,7 @@ on:
       runner_label:
         required: false
         type: string
-        default: 'docker-build-xeon'
+        default: "docker-build-xeon"
     outputs:
       image_repo:
         description: "The image repository used for the image build"

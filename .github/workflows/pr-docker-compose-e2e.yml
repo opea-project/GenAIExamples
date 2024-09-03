@@ -24,7 +24,7 @@ jobs:
   get-test-matrix:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|gmc|assets'
+      diff_excluded_files: ".github|README.md|*.txt|deprecate|kubernetes|manifest|gmc|assets"
 
   example-test:
     needs: [get-test-matrix]

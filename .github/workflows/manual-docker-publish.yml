@@ -12,12 +12,12 @@ on:
         type: string
       examples:
         default: "Translation"
-        description: 'List of examples to publish [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        description: "List of examples to publish [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]"
         required: false
         type: string
       images:
         default: "gmcmanager,gmcrouter"
-        description: 'List of images to publish [gmcmanager,gmcrouter, ...]'
+        description: "List of images to publish [gmcmanager,gmcrouter, ...]"
         required: false
         type: string
       tag:
@@ -27,7 +27,7 @@ on:
         type: string
       publish_tags:
         default: "latest,v0.9"
-        description: 'Tag list apply to publish images'
+        description: "Tag list apply to publish images"
         required: false
         type: string
 
