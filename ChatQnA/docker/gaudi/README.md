@@ -316,7 +316,7 @@ docker logs ${CONTAINER_ID} | grep Connected
 
 If the service is ready, you will get the response like below.
 
-```bash
+```log
 2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
 ```
 
