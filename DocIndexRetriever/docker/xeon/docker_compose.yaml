@@ -18,17 +18,20 @@ services:
       - redis-vector-db
     ports:
       - "6007:6007"
+      - "6008:6008"
+      - "6009:6009"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
     container_name: tei-embedding-server
     ports:
-      - "8090:80"
+      - "6006:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -36,6 +39,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${EMBEDDING_MODEL_ID}
   embedding:
     image: opea/embedding-tei:latest
@@ -49,6 +53,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
@@ -68,17 +73,38 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-retriever-service"
     restart: unless-stopped
+    
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    container_name: tei-reranking-server
+    ports:
+      - "8808:80"
+    volumes:
+      - ${HF_CACHE_DIR}:/data
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${RERANK_MODEL_ID}
+
   reranking:
     image: opea/reranking-tei:latest
-    container_name: reranking-tei-server
+    container_name: reranking-tei-xeon-server
+    depends_on:
+      - tei-reranking-service
     ports:
       - "8000:8000"
     ipc: host
-    entrypoint: python local_reranking.py
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
