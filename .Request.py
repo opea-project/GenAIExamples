@@ -14,7 +14,9 @@ class ChatQnA_Xeon(unittest.TestCase):
         # ip_address = 0.0.0.0#os.environ.get("ip_address")
         endpoint = "http://0.0.0.0:6006/embed"
 
-        data = {"inputs": "What is Deep Learning?"}
+        with open("ChatQnA/tests/data.json", "r") as file:
+            data = json.load(file)
+        # data = {"inputs": "What is Deep Learning?"}
         response = requests.post(
             url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None}
         )
