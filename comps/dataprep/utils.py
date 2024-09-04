@@ -41,6 +41,11 @@ from langchain_community.document_loaders import (
 from langchain_community.llms import HuggingFaceEndpoint
 from PIL import Image
 
+from comps import CustomLogger
+
+logger = CustomLogger("prepare_doc_util")
+logflag = os.getenv("LOGFLAG", False)
+
 
 class TimeoutError(Exception):
     pass
@@ -428,14 +433,51 @@ class Crawler:
         if not headers:
             headers = self.headers
         while max_times:
-            if not url.startswith("http") or not url.startswith("https"):
+            parsed_url = urlparse(url)
+            if not parsed_url.scheme:
                 url = "http://" + url
-            print("start fetch %s...", url)
+            if logflag:
+                logger.info("start fetch %s..." % url)
             try:
                 response = requests.get(url, headers=headers, verify=True)
                 if response.status_code != 200:
                     print("fail to fetch %s, response status code: %s", url, response.status_code)
                 else:
+                    # Extract charset from the Content-Type header
+                    content_type = response.headers.get("Content-Type", "").lower()
+                    if "charset=" in content_type:
+                        # Extract charset value from the content-type header
+                        charset = content_type.split("charset=")[-1].strip()
+                        response.encoding = charset
+                        if logflag:
+                            logger.info(f"Charset detected and set: {response.encoding}")
+                    else:
+                        import re
+
+                        # Extract charset from the response HTML content
+                        charset_from_meta = None
+                        # Check for <meta charset="...">
+                        match = re.search(r'<meta\s+charset=["\']?([^"\'>]+)["\']?', response.text, re.IGNORECASE)
+                        if match:
+                            charset_from_meta = match.group(1)
+                        # Check for <meta http-equiv="Content-Type" content="...; charset=...">
+                        if not charset_from_meta:
+                            match = re.search(
+                                r'<meta\s+http-equiv=["\']?content-type["\']?\s+content=["\']?[^"\']*charset=([^"\'>]+)["\']?',
+                                response.text,
+                                re.IGNORECASE,
+                            )
+                            if match:
+                                charset_from_meta = match.group(1)
+                        if charset_from_meta:
+                            response.encoding = charset_from_meta
+                            if logflag:
+                                logger.info(f"Charset detected and set from meta tag: {response.encoding}")
+                        else:
+                            # Fallback to default encoding
+                            response.encoding = "utf-8"
+                            if logflag:
+                                logger.info("Charset not specified, using default utf-8")
                     return response
             except Exception as e:
                 print("fail to fetch %s, caused by %s", url, e)
@@ -540,8 +582,9 @@ def load_html_data(url):
     main_content = all_text if main_content == "" else main_content
     main_content = main_content.replace("\n", "")
     main_content = main_content.replace("\n\n", "")
-    main_content = uni_pro(main_content)
     main_content = re.sub(r"\s+", " ", main_content)
+    if logflag:
+        logger.info("main_content=[%s]" % main_content)
 
     return main_content
 
