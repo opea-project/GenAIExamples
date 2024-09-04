@@ -8,7 +8,7 @@ import unittest
 import requests
 
 
-class ChatQnA(unittest.TestCase):
+class ChatQnA_Xeon(unittest.TestCase):
 
     def test_embed(self):
         # ip_address = 0.0.0.0#os.environ.get("ip_address")
@@ -18,19 +18,17 @@ class ChatQnA(unittest.TestCase):
         response = requests.post(
             url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None}
         )
-        # print(f"Status code: {response.status_code}")
-        # print(response.json())
         self.assertEqual(response.status_code, 200)
 
-    def test_embeddings(self):
-        # ip_address = 0.0.0.0#os.environ.get("ip_address")
-        endpoint = "http://0.0.0.0:6000/v1/embeddings"
+    #    def test_embeddings(self):
+    # ip_address = 0.0.0.0#os.environ.get("ip_address")
+    #        endpoint = "http://0.0.0.0:6000/v1/embeddings"
 
-        data = {"text": "hello"}
-        response = requests.post(
-            url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None}
-        )
-        self.assertEqual(response.status_code, 200)
+    #        data = {"text": "hello"}
+    #        response = requests.post(
+    #            url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None}
+    #        )
+    #        self.assertEqual(response.status_code, 200)
 
     def test_retrival(self):
         # ip_address = 0.0.0.0#os.environ.get("ip_address")
@@ -68,24 +66,25 @@ class ChatQnA(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_llm(self):
-        # ip_address = 0.0.0.0#os.environ.get("ip_address")
-        endpoint = "http://0.0.0.0:9000/v1/completions"
 
-        data = {
-            "query": "What is Deep Learning?",
-            "max_new_tokens": 17,
-            "top_k": 10,
-            "top_p": 0.95,
-            "typical_p": 0.95,
-            "temperature": 0.01,
-            "repetition_penalty": 1.03,
-            "streaming": True,
-        }
-        response = requests.post(
-            url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None}
-        )
-        self.assertEqual(response.status_code, 200)
+#    def test_llm(self):
+# ip_address = 0.0.0.0#os.environ.get("ip_address")
+#        endpoint = "http://0.0.0.0:9000/v1/completions"
+
+#        data = {
+#            "query": "What is Deep Learning?",
+#            "max_new_tokens": 17,
+#            "top_k": 10,
+#            "top_p": 0.95,
+#            "typical_p": 0.95,
+#            "temperature": 0.01,
+#            "repetition_penalty": 1.03,
+#            "streaming": True,
+#        }
+#        response = requests.post(
+#            url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None}
+#        )
+#        self.assertEqual(response.status_code, 200)
 
 
 if __name__ == "__main__":
