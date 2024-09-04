@@ -1,0 +1,35 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3"
+services:
+  mongo:
+    image: mongo:7.0.11
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    command: mongod --quiet --logpath /dev/null
+
+  feedbackmanagement-mongo:
+    image: opea/feedbackmanagement-mongo:latest
+    container_name: feedbackmanagement-mongo-server
+    ports:
+      - "6016:6016"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+      MONGO_HOST: ${MONGO_HOST}
+      MONGO_PORT: ${MONGO_PORT}
+      DB_NAME: ${DB_NAME}
+      COLLECTION_NAME: ${COLLECTION_NAME}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
