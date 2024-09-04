@@ -83,8 +83,8 @@ docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy
 
 ### 5. Build Dataprep Image
 
-```bash #TODO
-# docker build -t opea/dataprep-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/langchain/docker/Dockerfile .
+```bash
+docker build -t opea/dataprep-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/docker/Dockerfile .
 cd ..
 ```
 
@@ -161,9 +161,11 @@ export RERANK_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 
 export LVM_ENDPOINT="http://${host_ip}:9009"
-export FILE_SERVER_ENDPOINT="http://${host_ip}:8080" # FIXME
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:8888/v1/health_check"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+export FILE_SERVER_ENDPOINT="http://${host_ip}:6005" # FIXME
+# export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
 
 export VDMS_HOST=${host_ip}
 export VDMS_PORT=8001
@@ -172,9 +174,6 @@ export LLM_DOWNLOAD="True"
 export USECLIP=1
 
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-# export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-# export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
-# export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -193,9 +192,20 @@ docker compose -f compose.yaml up -d
 ### Validate Microservices 
 
 1. Dataprep Microservice
-TODO
-```bash
 
+Once the microservice is up, please ingest the videos files into vector store using dataprep microservice. Both single and multiple file(s) upload are supported.
+
+```bash
+# Single file upload
+curl -X POST ${DATAPREP_SERVICE_ENDPOINT} \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./file1.mp4"
+# Multiple file upload
+curl -X POST ${DATAPREP_SERVICE_ENDPOINT} \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./file1.mp4" \
+    -F "files=@./file2.mp4" \
+    -F "files=@./file3.mp4"
 ```
 
 2. Embedding Microservice

@@ -10,8 +10,7 @@ services:
     container_name: vdms-vector-db
     ports:
       - "8001:55555"
-  dataprep: # TODO
-    image: opea/dataprep-vdms:latest
+  dataprep:
     container_name: dataprep-vdms-server
     depends_on:
       - vdms-vector-db
@@ -25,7 +24,6 @@ services:
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
       INDEX_NAME: ${INDEX_NAME}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
       - /home/$USER/.cache/clip:/home/user/.cache/clip
   embedding:

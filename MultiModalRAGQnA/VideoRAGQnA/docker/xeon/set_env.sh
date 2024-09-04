@@ -15,6 +15,7 @@ export LVM_ENDPOINT="http://${host_ip}:9009"
 export FILE_SERVER_ENDPOINT="http://${host_ip}:8080" # FIXME
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/videoragqna"
 export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:8888/v1/health_check"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 
 export VDMS_HOST=${host_ip}
 export VDMS_PORT=8001
