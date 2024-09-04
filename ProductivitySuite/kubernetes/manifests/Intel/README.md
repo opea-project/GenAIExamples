@@ -20,7 +20,7 @@ In ProductivitySuite, it consists of following pipelines/examples and components
 To begin with, ensure that you have following prerequisites in place:
 
 1. Kubernetes installation: Make sure that you have Kubernetes installed.
-2. Images: Make sure you have all the images ready for the examples and components stated above. You may refer to [README](../../docker/xeon/README.md) for steps to build the images.
+2. Images: Make sure you have all the images ready for the examples and components stated above. You may refer to [README](../../docker_compose/Intel/CPU/README.md) for steps to build the images.
 3. Configuration Values: Set the following values in all the yaml files before proceeding with the deployment:
 
    a. HUGGINGFACEHUB_API_TOKEN (Your HuggingFace token to download your desired model from HuggingFace):
@@ -53,7 +53,7 @@ kubectl apply -f *.yaml
 ```
 
 ## User Management via Keycloak Configuration
-Please refer to [keycloak_setup_guide](../../docker/xeon/keycloak_setup_guide.md) for more detail related to Keycloak configuration setup.
+Please refer to [keycloak_setup_guide](../../docker_compose/Intel/CPU/keycloak_setup_guide.md) for more detail related to Keycloak configuration setup.
 
 ## Verify Services
 To verify the installation, run command 'kubectl get pod' to make sure all pods are running.

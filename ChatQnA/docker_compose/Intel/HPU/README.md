@@ -111,7 +111,7 @@ cd ../../..
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/ui/
+cd GenAIExamples/ChatQnA/
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 cd ../../../..
 ```
@@ -123,8 +123,8 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 **Export the value of the public IP address of your Gaudi node to the `host_ip` environment variable**
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/ui/
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
+cd GenAIExamples/ChatQnA/
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile_ui.react .
 cd ../../../..
 ```
 
@@ -217,7 +217,7 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 ### Start all the services Docker Containers
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/gaudi/
+cd GenAIExamples/ChatQnA/docker_compose/Intel/HPU/
 ```
 
 If use tgi for llm backend.
@@ -241,7 +241,7 @@ docker compose -f compose_vllm_ray.yaml up -d
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/gaudi/
+cd GenAIExamples/ChatQnA/docker_compose/Intel/HPU/
 docker compose -f compose_guardrails.yaml up -d
 ```
 
@@ -437,11 +437,11 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
-![project-screenshot](../../assets/img/chat_ui_init.png)
+![project-screenshot](../../../assets/img/chat_ui_init.png)
 
 Here is an example of running ChatQnA:
 
-![project-screenshot](../../assets/img/chat_ui_response.png)
+![project-screenshot](../../../assets/img/chat_ui_response.png)
 
 ## 🚀 Launch the Conversational UI (Optional)
 
@@ -474,4 +474,4 @@ Once the services are up, open the following URL in your browser: http://{host_i
 
 Here is an example of running ChatQnA with Conversational UI (React):
 
-![project-screenshot](../../assets/img/conversation_ui_response.png)
+![project-screenshot](../../../assets/img/conversation_ui_response.png)

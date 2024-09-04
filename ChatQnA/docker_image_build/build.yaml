@@ -8,28 +8,28 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      dockerfile: ./Dockerfile
+      dockerfile: ../Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
   chatqna-guardrails:
     build:
-      dockerfile: ./Dockerfile_guardrails
+      dockerfile: ../Dockerfile_guardrails
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-guardrails:${TAG:-latest}
   chatqna-without-rerank:
     build:
-      dockerfile: ./Dockerfile_without_rerank
+      dockerfile: ../Dockerfile_without_rerank
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
   chatqna-ui:
     build:
-      context: ui
-      dockerfile: ./Dockerfile_ui
+      context:
+      dockerfile: ../Dockerfile_ui
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
   chatqna-conversation-ui:
     build:
-      context: ui
-      dockerfile: ./Dockerfile_ui.react
+      context:
+      dockerfile: ../Dockerfile_ui.react
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}
   embedding-tei:

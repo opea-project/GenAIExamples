@@ -53,13 +53,13 @@ for MEGA_SVC in $1; do
             cd ui
             docker_build ${IMAGE_NAME}-ui docker/Dockerfile
             if [ "$MEGA_SVC" == "ChatQnA" ];then
-                docker_build ${IMAGE_NAME}-conversation-ui docker/Dockerfile.react
+                docker_build ${IMAGE_NAME}-conversation-ui Dockerfile_ui.react
             fi
             if [ "$MEGA_SVC" == "DocSum" ];then
-                docker_build ${IMAGE_NAME}-react-ui docker/Dockerfile.react
+                docker_build ${IMAGE_NAME}-react-ui Dockerfile_ui.react
             fi
             if [ "$MEGA_SVC" == "CodeGen" ];then
-                docker_build ${IMAGE_NAME}-react-ui docker/Dockerfile.react
+                docker_build ${IMAGE_NAME}-react-ui Dockerfile_ui.react
             fi
             ;;
         "VisualQnA")

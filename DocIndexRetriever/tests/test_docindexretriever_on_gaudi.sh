@@ -31,7 +31,7 @@ function build_docker_images() {
 
 function start_services() {
     # build tei-gaudi for each test instead of pull from local registry
-    cd $WORKPATH/docker/gaudi
+    cd $WORKPATH/docker_compose/Intel/HPU
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
@@ -99,7 +99,7 @@ function validate_megaservice() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/gaudi
+    cd $WORKPATH/docker_compose/Intel/HPU
     container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")

@@ -30,7 +30,7 @@ For Gaudi:
 - speecht5-gaudi: opea/speecht5-gaudi:latest
 
 > [NOTE]  
-> Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/xeon/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker/gaudi/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.
+> Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker_compose/Intel/CPU/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker_compose/Intel/HPU/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.
 
 ## Deploy AudioQnA pipeline
 This involves deploying the AudioQnA custom resource. You can use audioQnA_xeon.yaml or if you have a Gaudi cluster, you could use audioQnA_gaudi.yaml. 

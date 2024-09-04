@@ -10,6 +10,6 @@ services:
     image: ${REGISTRY:-opea}/translation:${TAG:-latest}
   translation-ui:
     build:
-      context: docker/ui
-      dockerfile: ./docker/Dockerfile
+      context: 
+      dockerfile: Dockerfile_ui
     image: ${REGISTRY:-opea}/translation-ui:${TAG:-latest}

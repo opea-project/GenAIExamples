@@ -16,16 +16,16 @@ Make sure environment variables are set
 start the docker containers
 
 ```
-cd ./GenAIExamples/ChatQnA/docker/gaudi
+cd ./GenAIExamples/ChatQnA/docker_compose/Intel/HPU
 docker compose up -d
 ```
 
-Check the start up log by `docker compose -f ./docker/gaudi/compose.yaml logs`.
+Check the start up log by `docker compose -f ./docker_compose/Intel/HPU/compose.yaml logs`.
 Where the compose.yaml file is the mega service docker-compose configuration.
 The warning messages point out the veriabls are **NOT** set.
 
 ```
-ubuntu@gaudi-vm:~/GenAIExamples/ChatQnA/docker/gaudi$ docker compose -f ./compose.yaml up -d
+ubuntu@gaudi-vm:~/GenAIExamples/ChatQnA/docker_compose/Intel/HPU$ docker compose -f ./compose.yaml up -d
 WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
 WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
 WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
@@ -34,7 +34,7 @@ WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank st
 WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
 WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
 WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
-WARN[0000] /home/ubuntu/GenAIExamples/ChatQnA/docker/gaudi/compose.yaml: `version` is obsolete
+WARN[0000] /home/ubuntu/GenAIExamples/ChatQnA/docker_compose/Intel/HPU/compose.yaml: `version` is obsolete
 ```
 
 ## 2. Check the docker container status
@@ -118,7 +118,7 @@ Check the log by `docker logs f7a08f9867f9 -t`.
 
 The log indicates the MODLE_ID is not set.
 
-View the docker input parameters in `./ChatQnA/docker/gaudi/compose.yaml`
+View the docker input parameters in `./ChatQnA/docker_compose/Intel/HPU/compose.yaml`
 
 ```
   tgi-service:

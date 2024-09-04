@@ -60,7 +60,7 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/ui/
+cd GenAIExamples/ChatQnA//
 docker build --no-cache -t opea/chatqna-ui:latest -f ./docker/Dockerfile .
 cd ../../../..
 ```

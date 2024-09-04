@@ -8,8 +8,8 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      context: ../../ChatQnA/docker/
-      dockerfile: ./Dockerfile
+      context: ../../ChatQnA/
+      dockerfile: ../Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
   embedding-tei:
     build:
@@ -55,8 +55,8 @@ services:
     image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
   productivity-suite-react-ui:
     build:
-      context: ui
-      dockerfile: ./docker/Dockerfile.react
+      context:
+      dockerfile: ../Dockerfile_ui.react
     extends: chatqna
     image: ${REGISTRY:-opea}/productivity-suite-react-ui-server:${TAG:-latest}
   codegen:
@@ -65,8 +65,8 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      context: ../../CodeGen/docker/
-      dockerfile: ./Dockerfile
+      context: ../../CodeGen/
+      dockerfile: ../Dockerfile
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
   docsum:
     build:
@@ -74,8 +74,8 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      context: ../../DocSum/docker/
-      dockerfile: ./Dockerfile
+      context: ../../DocSum/
+      dockerfile: ../Dockerfile
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
   faqgen:
     build:
@@ -83,8 +83,8 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      context: ../../FaqGen/docker/
-      dockerfile: ./Dockerfile
+      context: ../../FaqGen/
+      dockerfile: ../Dockerfile
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
   llm_faqgen:
     build:

@@ -40,7 +40,7 @@ docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/DocSum/docker/ui/
+cd GenAIExamples/DocSum/
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -49,9 +49,9 @@ docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --bui
 Build the frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/DocSum/docker/ui/
+cd GenAIExamples/DocSum/
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./Dockerfile_ui.react .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
@@ -90,7 +90,7 @@ Note: Please replace with `host_ip` with your external IP address, do not use lo
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/DocSum/docker/gaudi
+cd GenAIExamples/DocSum/docker_compose/Intel/HPU
 docker compose up -d
 ```
 
@@ -153,4 +153,4 @@ docsum-gaudi-react-ui-server:
 
 Open this URL `http://{host_ip}:5175` in your browser to access the frontend.
 
-![project-screenshot](../../assets/img/docsum-ui-react.png)
+![project-screenshot](../../../assets/img/docsum-ui-react.png)

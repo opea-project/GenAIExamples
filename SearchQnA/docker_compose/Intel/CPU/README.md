@@ -41,7 +41,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/SearchQnA/docker
+cd GenAIExamples/SearchQnA
 docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 cd ../../..
 ```
@@ -87,7 +87,7 @@ export LLM_SERVICE_PORT=3007
 ## 🚀 Start the MegaService
 
 ```bash
-cd GenAIExamples/SearchQnA/docker/xeon/
+cd GenAIExamples/SearchQnA/docker_compose/Intel/CPU
 docker compose up -d
 ```
 
