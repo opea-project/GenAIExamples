@@ -13,7 +13,7 @@ services:
       dockerfile: comps/lvms/llava/Dockerfile
     image: ${REGISTRY:-opea}/llava:${TAG:-latest}
   # Gaudi2 HPU
-  llava_hpu:
+  llava-hpu:
     build:
       dockerfile: comps/lvms/llava/Dockerfile_hpu
     image: ${REGISTRY:-opea}/llava-hpu:${TAG:-latest}

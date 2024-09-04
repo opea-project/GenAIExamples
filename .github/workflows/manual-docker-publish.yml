@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       services:
-        default: "asr"
-        description: "List of services to test [agent_langchain,asr,chathistory_mongo,dataprep_milvus,embeddings,guardrails,knowledgegraphs,llms,lvms,prompt_registry,ragas,reranks,retrievers,tts,vectorstores,web_retrievers]"
+        default: ""
+        description: "List of services to test [agent,asr,chathistory,dataprep,embeddings,guardrails,knowledgegraphs,llms,lvms,nginx,prompt_registry,ragas,reranks,retrievers,tts,vectorstores,web_retrievers]"
         required: false
         type: string
       images:
