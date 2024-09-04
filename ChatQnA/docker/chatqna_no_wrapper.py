@@ -53,14 +53,20 @@ LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 9009))
 
 
-def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict):
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         inputs["inputs"] = inputs["text"]
         del inputs["text"]
+    elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
+        # prepare the retriever params
+        retriever_parameters = kwargs.get("retriever_parameters", None)
+        if retriever_parameters:
+            inputs.update(retriever_parameters.dict())
+
     return inputs
 
 
-def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict):
+def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
     next_data = {}
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         assert isinstance(data, list)
@@ -103,8 +109,8 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         del next_data["parameters"]["streaming"]
 
         # rerank the inputs with the scores
-        # TODO add top_n
-        top_n = 1
+        reranker_parameters = kwargs.get("reranker_parameters", None)
+        top_n = reranker_parameters.top_n if reranker_parameters else 1
         docs = inputs["texts"]
         reranked_docs = []
         for best_response in data[:top_n]:
@@ -116,7 +122,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
     return next_data
 
 
-def align_generator(self, gen):
+def align_generator(self, gen, **kwargs):
     # TGI format
     # {"index":20,"token":{"id":368,"text":" you","logprob":0.0,"special":false},"generated_text":null,"details":null}
     for line in gen:
