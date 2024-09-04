@@ -237,10 +237,10 @@ docker compose -f compose_vllm.yaml up -d
 
 ### Validate Microservices
 
-Users could test all microservices at once by below command.
+Users could test all microservices at once by below command with .Request.py under the top folder.
 
 ```bash
-python Request.py ChatQnA -v
+python .Request.py ChatQnA -v
 ```
 
 Example output
@@ -263,31 +263,31 @@ Users could also test each service by below instructions.
 1. TEI Embedding Service
 
 ```bash
-python Request.py ChatQnA.test_embed -v
+python .Request.py ChatQnA.test_embed -v
 ```
 
 2. Embedding Microservice
 
 ```bash
-python Request.py ChatQnA.test_embedding -v
+python .Request.py ChatQnA.test_embedding -v
 ```
 
 3. Retriever Microservice
 
 ```bash
-python Request.py ChatQnA.test_retrieval -v
+python .Request.py ChatQnA.test_retrieval -v
 ```
 
 4. TEI Reranking Service
 
 ```bash
-python Request.py ChatQnA.test_rerank -v
+python .Request.py ChatQnA.test_rerank -v
 ```
 
 5. Reranking Microservice
 
 ```bash
-python Request.py ChatQnA.test_reranking -v
+python .Request.py ChatQnA.test_reranking -v
 ```
 
 6. LLM backend Service
@@ -297,7 +297,7 @@ In first startup, this service will take more time to download the LLM file. Aft
 Use `docker logs CONTAINER_ID` to check if the download is finished.
 
 ```bash
-python Request.py ChatQnA.test_llm_backend -v
+python .Request.py ChatQnA.test_llm_backend -v
 ```
 
 ```bash
@@ -312,7 +312,7 @@ curl http://${host_ip}:9009/v1/completions \
 This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
 ```bash
-python UnitTests.py ChatQnA.test_llm -v
+python .Request.py ChatQnA.test_llm -v
 ```
 
 8. MegaService
