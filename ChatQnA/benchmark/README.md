@@ -163,10 +163,15 @@ Run the cURL command to upload file:
 
 ```bash
 cd GenAIEval/evals/benchmark/data
+# RAG with Rerank
 curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
      -F "files=@./upload_file.txt" \
      -F "chunk_size=3800"
+# RAG without Rerank
+curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./upload_file_no_rerank.txt"
 ```
 
 ##### 3.2 Run Benchmark Test
