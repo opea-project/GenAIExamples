@@ -13,28 +13,21 @@ from pydantic_yaml import parse_yaml_raw_as, to_yaml_file
 from ray.job_submission import JobSubmissionClient
 
 from comps import CustomLogger
-from comps.cores.proto.api_protocol import (
-    FineTuningJob,
-    FineTuningJobIDRequest,
-    FineTuningJobList,
-    FineTuningJobsRequest,
-)
-from comps.finetuning.llm_on_ray.finetune.finetune_config import FinetuneConfig
+from comps.cores.proto.api_protocol import FineTuningJob, FineTuningJobIDRequest, FineTuningJobList
+from comps.finetuning.finetune_config import FinetuneConfig, FineTuningParams
 
 logger = CustomLogger("finetuning_handlers")
 
-MODEL_CONFIG_FILE_MAP = {
-    "meta-llama/Llama-2-7b-chat-hf": "./models/llama-2-7b-chat-hf.yaml",
-    "mistralai/Mistral-7B-v0.1": "./models/mistral-7b-v0.1.yaml",
-}
-
 DATASET_BASE_PATH = "datasets"
 JOBS_PATH = "jobs"
+OUTPUT_DIR = "output"
+
 if not os.path.exists(DATASET_BASE_PATH):
     os.mkdir(DATASET_BASE_PATH)
-
 if not os.path.exists(JOBS_PATH):
     os.mkdir(JOBS_PATH)
+if not os.path.exists(OUTPUT_DIR):
+    os.mkdir(OUTPUT_DIR)
 
 FineTuningJobID = str
 CHECK_JOB_STATUS_INTERVAL = 5  # Check every 5 secs
@@ -62,23 +55,17 @@ def update_job_status(job_id: FineTuningJobID):
         time.sleep(CHECK_JOB_STATUS_INTERVAL)
 
 
-def handle_create_finetuning_jobs(request: FineTuningJobsRequest, background_tasks: BackgroundTasks):
+def handle_create_finetuning_jobs(request: FineTuningParams, background_tasks: BackgroundTasks):
     base_model = request.model
     train_file = request.training_file
     train_file_path = os.path.join(DATASET_BASE_PATH, train_file)
 
-    model_config_file = MODEL_CONFIG_FILE_MAP.get(base_model)
-    if not model_config_file:
-        raise HTTPException(status_code=404, detail=f"Base model '{base_model}' not supported!")
-
     if not os.path.exists(train_file_path):
         raise HTTPException(status_code=404, detail=f"Training file '{train_file}' not found!")
 
-    with open(model_config_file) as f:
-        finetune_config = parse_yaml_raw_as(FinetuneConfig, f)
-
+    finetune_config = FinetuneConfig(General=request.General, Dataset=request.Dataset, Training=request.Training)
+    finetune_config.General.base_model = base_model
     finetune_config.Dataset.train_file = train_file_path
-
     if request.hyperparameters is not None:
         if request.hyperparameters.epochs != "auto":
             finetune_config.Training.epochs = request.hyperparameters.epochs
@@ -90,7 +77,7 @@ def handle_create_finetuning_jobs(request: FineTuningJobsRequest, background_tas
             finetune_config.Training.learning_rate = request.hyperparameters.learning_rate_multiplier
 
     if os.getenv("HF_TOKEN", None):
-        finetune_config.General.config.use_auth_token = os.getenv("HF_TOKEN", None)
+        finetune_config.General.config.token = os.getenv("HF_TOKEN", None)
 
     job = FineTuningJob(
         id=f"ft-job-{uuid.uuid4()}",
@@ -105,12 +92,16 @@ def handle_create_finetuning_jobs(request: FineTuningJobsRequest, background_tas
         status="running",
         seed=random.randint(0, 1000) if request.seed is None else request.seed,
     )
-    finetune_config.General.output_dir = os.path.join(JOBS_PATH, job.id)
+    finetune_config.General.output_dir = os.path.join(OUTPUT_DIR, job.id)
     if os.getenv("DEVICE", ""):
 
         logger.info(f"specific device: {os.getenv('DEVICE')}")
 
         finetune_config.Training.device = os.getenv("DEVICE")
+        if finetune_config.Training.device == "hpu":
+            if finetune_config.Training.resources_per_worker.HPU == 0:
+                # set 1
+                finetune_config.Training.resources_per_worker.HPU = 1
 
     finetune_config_file = f"{JOBS_PATH}/{job.id}.yaml"
     to_yaml_file(finetune_config_file, finetune_config)
@@ -122,7 +113,7 @@ def handle_create_finetuning_jobs(request: FineTuningJobsRequest, background_tas
         # Entrypoint shell command to execute
         entrypoint=f"python finetune_runner.py --config_file {finetune_config_file}",
         # Path to the local directory that contains the script.py file
-        runtime_env={"working_dir": "./"},
+        runtime_env={"working_dir": "./", "excludes": [f"{OUTPUT_DIR}"]},
     )
 
     logger.info(f"Submitted Ray job: {ray_job_id} ...")

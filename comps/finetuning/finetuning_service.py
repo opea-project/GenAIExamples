@@ -8,7 +8,8 @@ from typing import List, Optional, Union
 from fastapi import BackgroundTasks, File, UploadFile
 
 from comps import opea_microservices, register_microservice
-from comps.cores.proto.api_protocol import FineTuningJobIDRequest, FineTuningJobsRequest
+from comps.cores.proto.api_protocol import FineTuningJobIDRequest
+from comps.finetuning.finetune_config import FineTuningParams
 from comps.finetuning.handlers import (
     DATASET_BASE_PATH,
     handle_cancel_finetuning_job,
@@ -21,7 +22,7 @@ from comps.finetuning.handlers import (
 
 
 @register_microservice(name="opea_service@finetuning", endpoint="/v1/fine_tuning/jobs", host="0.0.0.0", port=8015)
-def create_finetuning_jobs(request: FineTuningJobsRequest, background_tasks: BackgroundTasks):
+def create_finetuning_jobs(request: FineTuningParams, background_tasks: BackgroundTasks):
     return handle_create_finetuning_jobs(request, background_tasks)
 
 

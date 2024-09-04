@@ -32,7 +32,8 @@ WORKDIR /home/user/comps/finetuning
 RUN echo PKGPATH=$(python3 -c "import pkg_resources; print(pkg_resources.get_distribution('oneccl-bind-pt').location)") >> run.sh && \
     echo 'export LD_LIBRARY_PATH=$PKGPATH/oneccl_bindings_for_pytorch/opt/mpi/lib/:$LD_LIBRARY_PATH' >> run.sh && \
     echo 'source $PKGPATH/oneccl_bindings_for_pytorch/env/setvars.sh' >> run.sh && \
-    echo ray start --head >> run.sh && \
+    echo ray start --head --dashboard-host=0.0.0.0 >> run.sh && \
+    echo export RAY_ADDRESS=http://localhost:8265 >> run.sh && \
     echo python finetuning_service.py >> run.sh
 
 CMD bash run.sh
