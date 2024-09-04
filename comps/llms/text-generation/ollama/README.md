@@ -48,7 +48,7 @@ All of your local models are automatically served on localhost:11434. Run ollama
 Send an application/json request to the API endpoint of Ollama to interact.
 
 ```bash
-curl http://localhost:11434/api/generate -d '{
+curl --noproxy "*" http://localhost:11434/api/generate -d '{
   "model": "llama3",
   "prompt":"Why is the sky blue?"
 }'
