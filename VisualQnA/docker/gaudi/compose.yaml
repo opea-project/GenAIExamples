@@ -3,7 +3,7 @@
 
 services:
   llava-tgi-service:
-    image: ${REGISTRY:-opea}/llava-tgi:${TAG:-latest}
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.4
     container_name: tgi-llava-gaudi-server
     ports:
       - "8399:80"
