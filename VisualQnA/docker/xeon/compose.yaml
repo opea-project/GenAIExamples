@@ -19,7 +19,7 @@ services:
     command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192 --cuda-graphs 0
   lvm-tgi:
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-    container_name: lvm-tgi-server
+    container_name: lvm-tgi-xeon-server
     depends_on:
       - llava-tgi-service
     ports:

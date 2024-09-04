@@ -1,0 +1,24 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  visualqna:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/visualqna:${TAG:-latest}
+  visualqna-ui:
+    build:
+      context: ui
+      dockerfile: ./docker/Dockerfile
+    extends: visualqna
+    image: ${REGISTRY:-opea}/visualqna-ui:${TAG:-latest}
+  llm-visualqna-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/lvms/Dockerfile_tgi
+    extends: visualqna
+    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
