@@ -32,8 +32,6 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_ENDPOINT}

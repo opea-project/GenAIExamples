@@ -12,6 +12,7 @@ import re
 import shutil
 import signal
 import subprocess
+import tempfile
 import timeit
 import unicodedata
 import urllib.parse
@@ -192,8 +193,7 @@ def load_docx(docx_path):
         if isinstance(r._target, docx.parts.image.ImagePart):
             rid2img[r.rId] = os.path.basename(r._target.partname)
     if rid2img:
-        save_path = "./imgs/"
-        os.makedirs(save_path, exist_ok=True)
+        save_path = tempfile.mkdtemp()
         docx2txt.process(docx_path, save_path)
     for paragraph in doc.paragraphs:
         if hasattr(paragraph, "text"):

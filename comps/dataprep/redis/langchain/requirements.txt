@@ -25,5 +25,5 @@ python-pptx
 redis
 sentence_transformers
 shortuuid
-unstructured[all-docs]==0.11.5
+unstructured[all-docs]==0.15.7
 uvicorn
