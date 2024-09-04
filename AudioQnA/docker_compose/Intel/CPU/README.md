@@ -1,6 +1,6 @@
-# Build Mega Service of AudioQnA on Gaudi
+# Build Mega Service of AudioQnA on Xeon
 
-This document outlines the deployment process for a AudioQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server.
+This document outlines the deployment process for a AudioQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server.
 
 ## 🚀 Build Docker images
 
@@ -14,7 +14,7 @@ cd GenAIComps
 ### 2. Build ASR Image
 
 ```bash
-docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile_hpu .
+docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile .
 
 
 docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/Dockerfile .
@@ -29,7 +29,7 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 ### 4. Build TTS Image
 
 ```bash
-docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile_hpu .
+docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile .
 
 docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/Dockerfile .
 ```
@@ -40,16 +40,16 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/AudioQnA/docker
+cd GenAIExamples/AudioQnA/
 docker build --no-cache -t opea/audioqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 Then run the command `docker images`, you will have following images ready:
 
-1. `opea/whisper-gaudi:latest`
+1. `opea/whisper:latest`
 2. `opea/asr:latest`
 3. `opea/llm-tgi:latest`
-4. `opea/speecht5-gaudi:latest`
+4. `opea/speecht5:latest`
 5. `opea/tts:latest`
 6. `opea/audioqna:latest`
 
@@ -80,7 +80,7 @@ export LLM_SERVICE_PORT=3007
 ## 🚀 Start the MegaService
 
 ```bash
-cd GenAIExamples/AudioQnA/docker/gaudi/
+cd GenAIExamples/AudioQnA/docker/xeon/
 docker compose up -d
 ```
 
