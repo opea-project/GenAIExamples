@@ -15,13 +15,13 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/docker
+    cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git
     git clone https://github.com/vllm-project/vllm.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep-redis embedding-tei retriever-redis reranking-tei llm-vllm vllm"
-    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -30,7 +30,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/xeon
+    cd cd $WORKPATH/docker_compose/Intel/CPU/xeon
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -50,7 +50,7 @@ function start_services() {
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -169,7 +169,7 @@ function validate_megaservice() {
 }
 
 function validate_frontend() {
-    cd $WORKPATH/docker/ui/svelte
+    cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
@@ -198,7 +198,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/xeon
+    cd cd $WORKPATH/docker_compose/Intel/CPU/xeon
     docker compose -f compose_vllm.yaml down
 }
 

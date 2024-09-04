@@ -23,13 +23,13 @@ services:
   chatqna-ui:
     build:
       context: ui
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./Dockerfile_ui
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
   chatqna-conversation-ui:
     build:
       context: ui
-      dockerfile: ./docker/Dockerfile.react
+      dockerfile: ./Dockerfile_ui.react
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}
   embedding-tei:
