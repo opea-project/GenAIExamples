@@ -65,6 +65,7 @@ jobs:
             echo "file_exists=false" >> $GITHUB_OUTPUT
           fi
 
+          cd ${{ github.workspace }}
           if [[ $(grep -c "llava-tgi:" ${docker_compose_yml}) != 0 ]]; then
               git clone https://github.com/yuanwu2017/tgi-gaudi.git && cd tgi-gaudi && git checkout v2.0.4
           fi

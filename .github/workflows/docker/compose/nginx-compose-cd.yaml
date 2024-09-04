@@ -6,4 +6,4 @@ services:
   nginx:
     build:
       dockerfile: comps/nginx/docker/Dockerfile
-    image: ${REGISTRY}opea/nginx:${TAG:-latest}
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

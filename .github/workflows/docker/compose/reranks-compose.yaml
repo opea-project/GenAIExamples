@@ -7,4 +7,4 @@ services:
   reranking-tei:
     build:
       dockerfile: comps/reranks/tei/docker/Dockerfile
-    image: ${REGISTRY}opea/reranking-tei:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}

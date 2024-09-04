@@ -5,4 +5,8 @@ services:
   llm-native:
     build:
       dockerfile: comps/llms/text-generation/native/docker/Dockerfile
-    image: ${REGISTRY}opea/llm-native:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-native:${TAG:-latest}
+  vllm-openvino:
+    build:
+      dockerfile: vllm-openvino/Dockerfile.openvino
+    image: ${REGISTRY:-opea}/vllm-openvino:${TAG:-latest}

@@ -8,4 +8,4 @@ services:
   guardrails-tgi:
     build:
       dockerfile: comps/guardrails/llama_guard/docker/Dockerfile
-    image: ${REGISTRY}opea/guardrails-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/guardrails-tgi:${TAG:-latest}

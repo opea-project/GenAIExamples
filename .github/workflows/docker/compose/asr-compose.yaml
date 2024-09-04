@@ -7,12 +7,12 @@ services:
   asr:
     build:
       dockerfile: comps/asr/Dockerfile
-    image: ${REGISTRY}opea/asr:${TAG:-latest}
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
   whisper:
     build:
       dockerfile: comps/asr/whisper/Dockerfile
-    image: ${REGISTRY}opea/whisper:${TAG:-latest}
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
   whisper-gaudi:
     build:
       dockerfile: comps/asr/whisper/Dockerfile_hpu
-    image: ${REGISTRY}opea/whisper-gaudi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/whisper-gaudi:${TAG:-latest}

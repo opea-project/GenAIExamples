@@ -5,12 +5,12 @@ services:
   reranking-fastrag:
     build:
       dockerfile: comps/reranks/fastrag/docker/Dockerfile
-    image: ${REGISTRY}opea/reranking-fastrag:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking-fastrag:${TAG:-latest}
   reranking-langchain-mosec-endpoint:
     build:
       dockerfile: comps/reranks/langchain-mosec/mosec-docker/Dockerfile
-    image: ${REGISTRY}opea/reranking-langchain-mosec-endpoint:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking-langchain-mosec-endpoint:${TAG:-latest}
   reranking-langchain-mosec:
     build:
       dockerfile: comps/reranks/langchain-mosec/docker/Dockerfile
-    image: ${REGISTRY}opea/reranking-langchain-mosec:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking-langchain-mosec:${TAG:-latest}

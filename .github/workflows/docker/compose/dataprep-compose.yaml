@@ -8,8 +8,8 @@ services:
   dataprep-redis:
     build:
       dockerfile: comps/dataprep/redis/langchain/docker/Dockerfile
-    image: ${REGISTRY}opea/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
   dataprep-qdrant:
     build:
       dockerfile: comps/dataprep/qdrant/docker/Dockerfile
-    image: ${REGISTRY}opea/dataprep-qdrant:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
