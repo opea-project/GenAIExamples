@@ -3,8 +3,6 @@
 
 FROM python:3.11-slim
 
-COPY GenAIComps /home/user/GenAIComps
-
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
     libjemalloc-dev \
@@ -13,6 +11,11 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/
+
+
+RUN cd /home/user/ && \
+    git clone https://github.com/opea-project/GenAIComps.git
+
 
 WORKDIR /home/user/GenAIComps
 RUN pip install --no-cache-dir --upgrade pip && \

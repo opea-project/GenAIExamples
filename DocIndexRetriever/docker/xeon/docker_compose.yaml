@@ -9,10 +9,10 @@ services:
     image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
     ports:
-      - "16379:6379"
+      - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: opea/dataprep-on-ray-redis:latest
+    image: opea/dataprep-redis:latest
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
@@ -76,7 +76,7 @@ services:
     image: opea/reranking-tei:latest
     container_name: reranking-tei-server
     ports:
-      - "18000:8000"
+      - "8000:8000"
     ipc: host
     entrypoint: python local_reranking.py
     environment:
@@ -103,9 +103,9 @@ services:
     ports:
       - "8889:8889"
     environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
+      # - no_proxy=${no_proxy}
+      # - https_proxy=${https_proxy}
+      # - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
