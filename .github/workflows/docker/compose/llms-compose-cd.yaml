@@ -8,5 +8,6 @@ services:
     image: ${REGISTRY:-opea}/llm-native:${TAG:-latest}
   vllm-openvino:
     build:
-      dockerfile: vllm-openvino/Dockerfile.openvino
+      context: vllm-openvino
+      dockerfile: Dockerfile.openvino
     image: ${REGISTRY:-opea}/vllm-openvino:${TAG:-latest}
