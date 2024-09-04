@@ -1,0 +1,10 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3"
+services:
+  vdms-vector-db:
+    image: intellabs/vdms:latest
+    container_name: vdms-vector-db
+    ports:
+      - "55555:55555"

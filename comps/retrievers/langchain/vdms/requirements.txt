@@ -1,0 +1,16 @@
+docarray[full]
+easyocr
+einops
+fastapi
+langchain-community
+langchain-core
+langchain-huggingface
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+prometheus-fastapi-instrumentator
+pymupdf
+sentence_transformers
+shortuuid
+uvicorn
+vdms
