@@ -35,7 +35,7 @@ spec:
             configMapKeyRef:
               name: qna-config
               key: REDIS_URL
-        - name: TEI_EMBEDDING_ENDPOINT
+        - name: TEI_ENDPOINT
           valueFrom:
             configMapKeyRef:
               name: qna-config
