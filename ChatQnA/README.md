@@ -97,17 +97,18 @@ flowchart LR
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
 
-In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.  
+In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
+
 <details>
 <summary> Gaudi default compose.yaml </summary>
 
-| MicroService | Open Source Project | HW   | Port | Endpoint            |
-|--------------|---------------------|------|------|---------------------|
-| Embedding    | Langchain           | Gaudi| 6000 | /v1/embaddings       |
-| Retriever    | Langchain           | Xeon | 7000 | /v1/retrieval        |
-| Reranking    | Langchain           | Xeon | 8000 | /v1/reranking        |
-| LLM          | Langchain           | Gaudi| 9000 | /v1/chat/completions |
-| Dataprep     | Redis               | Xeon | 6007 | /v1/dataprep         |
+| MicroService | Open Source Project | HW    | Port | Endpoint             |
+| ------------ | ------------------- | ----- | ---- | -------------------- |
+| Embedding    | Langchain           | Gaudi | 6000 | /v1/embaddings       |
+| Retriever    | Langchain           | Xeon  | 7000 | /v1/retrieval        |
+| Reranking    | Langchain           | Xeon  | 8000 | /v1/reranking        |
+| LLM          | Langchain           | Gaudi | 9000 | /v1/chat/completions |
+| Dataprep     | Redis               | Xeon  | 6007 | /v1/dataprep         |
 
 </details>
 
