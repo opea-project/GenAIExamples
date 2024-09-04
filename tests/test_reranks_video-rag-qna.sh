@@ -49,9 +49,30 @@ function validate_microservice() {
         ]
         }')
     if [[ $result == *"this is the query"* ]]; then
-        echo "Result correct."
+        echo "Result correct for the positive case."
     else
-        echo "Result wrong."
+        echo "Result wrong for the positive case. Received was $result"
+        exit 1
+    fi
+
+    # Add test for negative case
+    result=$(\
+    http_proxy="" \
+    curl -X 'POST' \
+        "http://${ip_address}:5037/v1/reranking" \
+        -H 'accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d '{
+        "retrieved_docs": [
+            {"doc": [{"text": "this is the retrieved text"}]}
+        ],
+        "initial_query": "this is the query",
+        "top_n": 1,
+        "metadata": [{"other_key": "value", "video":"top_video_name_bad_format.avi", "timestamp":"20"}]}')
+    if [[ $result == *"Invalid file extension"* ]]; then
+        echo "Result correct for the negative case."
+    else
+        echo "Result wrong for the negative case. Received was $result"
         exit 1
     fi
 }

@@ -28,7 +28,7 @@ use_clip = int(os.getenv("USECLIP"))
 if use_clip:
     import sys
 
-    sys.path.append("../../../embeddings/langchain_multimodal/")
+    sys.path.append("../../../embeddings/multimodal_clip/")
     from embeddings_clip import vCLIP
 
 # Debugging
