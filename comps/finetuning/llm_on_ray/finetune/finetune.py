@@ -405,6 +405,7 @@ def main(external_config=None):
             ray.init(runtime_env=runtime_env)
 
     logger.info(f"ray available resources = {ray.available_resources()}")
+
     use_gpu = True if device == "gpu" else False
     scaling_config = ScalingConfig(
         num_workers=num_training_workers,

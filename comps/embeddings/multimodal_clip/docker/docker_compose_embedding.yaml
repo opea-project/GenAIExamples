@@ -1,0 +1,22 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  embedding:
+    image: opea/embedding-multimodal:latest
+    container_name: embedding-multimodal-server
+    ports:
+      - "6000:6000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

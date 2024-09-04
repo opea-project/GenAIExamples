@@ -133,6 +133,7 @@ def ingest_data_to_milvus(doc_path: DocPath, embedder):
         )
 
     content = document_loader(path)
+
     if logflag:
         logger.info("[ ingest data ] file content loaded")
 

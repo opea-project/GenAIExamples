@@ -36,7 +36,9 @@ logging.basicConfig(level=logging.INFO)
 context_db = None
 streamer = None
 chat = None
+
 VIDEO_DIR = "/home/user/comps/lvms/video-llama/server/data"
+
 CFG_PATH = "video_llama_config/video_llama_eval_only_vl.yaml"
 MODEL_TYPE = "llama_v2"
 
@@ -263,6 +265,8 @@ async def generate(
 
     # format context and instruction
     instruction = f"{get_context(prompt,context_db)[0]}: {prompt}"
+
+    # logging.info("instruction:",instruction)
 
     return StreamingResponse(stream_res(video_info, instruction, max_new_tokens))
 

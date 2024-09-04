@@ -62,7 +62,9 @@ function start_service() {
 }
 
 function validate_microservice() {
+
     result=$(http_proxy="" curl http://localhost:5031/v1/lvm -X POST -d '{"video_url":"silence_girl.mp4","chunk_start": 0,"chunk_duration": 7,"prompt":"What is the person doing?","max_new_tokens": 50}' -H 'Content-Type: application/json')
+
     if [[ $result == *"silence"* ]]; then
         echo "Result correct."
     else

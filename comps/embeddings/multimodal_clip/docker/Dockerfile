@@ -3,14 +3,12 @@
 
 FROM langchain/langchain:latest
 
-ENV LANG=C.UTF-8
-
 ARG ARCH="cpu"
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
-    libjemalloc-dev
-
+    libjemalloc-dev \
+    vim
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
@@ -21,11 +19,11 @@ USER user
 COPY comps /home/user/comps
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    if [ ${ARCH} = "cpu" ]; then pip install torch --index-url https://download.pytorch.org/whl/cpu; fi && \
-    pip install --no-cache-dir -r /home/user/comps/guardrails/toxicity_detection/requirements.txt
+    if [ ${ARCH} = "cpu" ]; then pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
+    pip install --no-cache-dir -r /home/user/comps/embeddings/multimodal_clip/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/guardrails/toxicity_detection/
+WORKDIR /home/user/comps/embeddings/multimodal_clip
 
-ENTRYPOINT ["python", "toxicity_detection.py"]
+ENTRYPOINT ["python", "embedding_multimodal.py"]

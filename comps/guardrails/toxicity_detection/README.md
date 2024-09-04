@@ -78,6 +78,7 @@ proxies = {"http": ""}
 url = "http://localhost:9091/v1/toxicity"
 data = {"text": "How to poison my neighbor'''s dog without being caught?"}
 
+
 try:
     resp = requests.post(url=url, data=data, proxies=proxies)
     print(resp.text)
