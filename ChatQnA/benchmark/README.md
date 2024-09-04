@@ -310,54 +310,58 @@ The following is a summary of the test result, with files saved at `TEST_OUTPUT_
 ```none
 Concurrency       : 512
 Max request count : 2560
-Http timeout      : 60000
+Http timeout      : 120000
 
 Benchmark target  : chatqnafixed
 
 =================Total statistics=====================
-Succeed Response:  2560 (Total 2560, 100.0% Success), Duration: 26.44s, Input Tokens: 61440, Output Tokens: 255985, RPS: 96.82, Input Tokens per Second: 2323.71, Output Tokens per Second: 9681.57
-End to End latency(ms),    P50: 3576.34,   P90: 4242.19,   P99: 5252.23,   Avg: 3581.55
-First token latency(ms),   P50: 726.64,   P90: 1128.27,   P99: 1796.09,   Avg: 769.58
-Average Next token latency(ms): 28.41
-Average token latency(ms)     : 35.85
+Succeed Response:  2563 (Total 2563, 100.0% Success), Duration: 38.80s, Input Tokens: 325501, Output Tokens: 283991, RPS: 66.06, Input Tokens per Second: 8389.88, Output Tokens per Second: 7319.95
+End to End latency(ms),    P50: 4810.01,   P90: 8378.85,   P99: 10720.44,   Avg: 5186.22
+First token latency(ms),   P50: 1816.57,   P90: 5025.61,   P99: 6633.57,   Avg: 2289.94
+Next token latency(ms),   P50: 25.25,   P90: 44.89,   P99: 57.18,   Avg: 26.38
+Average token latency(ms)     : 46.88
 ======================================================
 ```
 
 ```none
 benchmarkresult:
-  Average_Next_token_latency: '28.41'
-  Average_token_latency: '35.85'
-  Duration: '26.44'
-  End_to_End_latency_Avg: '3581.55'
-  End_to_End_latency_P50: '3576.34'
-  End_to_End_latency_P90: '4242.19'
-  End_to_End_latency_P99: '5252.23'
-  First_token_latency_Avg: '769.58'
-  First_token_latency_P50: '726.64'
-  First_token_latency_P90: '1128.27'
-  First_token_latency_P99: '1796.09'
-  Input_Tokens: '61440'
-  Input_Tokens_per_Second: '2323.71'
-  Onput_Tokens: '255985'
-  Output_Tokens_per_Second: '9681.57'
-  RPS: '96.82'
-  Succeed_Response: '2560'
-  locust_P50: '160'
-  locust_P99: '810'
+  Average_token_latency: '46.88'
+  Duration: '38.80'
+  End_to_End_latency_Avg: '5186.22'
+  End_to_End_latency_P50: '4810.01'
+  End_to_End_latency_P90: '8378.85'
+  End_to_End_latency_P99: '10720.44'
+  First_token_latency_Avg: '2289.94'
+  First_token_latency_P50: '1816.57'
+  First_token_latency_P90: '5025.61'
+  First_token_latency_P99: '6633.57'
+  Input_Tokens: '325501'
+  Input_Tokens_per_Second: '8389.88'
+  Next_token_latency_Avg: '26.38'
+  Next_token_latency_P50: '25.25'
+  Next_token_latency_P90: '44.89'
+  Next_token_latency_P99: '57.18'
+  Onput_Tokens: '283991'
+  Output_Tokens_per_Second: '7319.95'
+  RPS: '66.06'
+  Succeed_Response: '2563'
+  locust_P50: '1500'
+  locust_P99: '6300'
   locust_num_failures: '0'
-  locust_num_requests: '2560'
+  locust_num_requests: '2563'
 benchmarkspec:
   bench-target: chatqnafixed
-  endtest_time: '2024-08-25T14:19:25.955973'
-  host: http://10.110.105.197:8888
+  deployment-type: k8s
+  endtest_time: '2024-09-04T11:09:51.602725'
+  host: http://10.110.107.109:8888
   llm-model: Intel/neural-chat-7b-v3-3
-  locustfile: /home/sdp/lvl/GenAIEval/evals/benchmark/stresscli/locust/aistress.py
+  locustfile: /home/sdp/validation-action-runner/_work/Validation/Validation/GenAIEval/evals/benchmark/stresscli/locust/aistress.py
   max_requests: 2560
   namespace: default
   processes: 2
   run_name: benchmark
   runtime: 60m
-  starttest_time: '2024-08-25T14:18:50.366514'
+  starttest_time: '2024-09-04T11:09:02.786727'
   stop_timeout: 120
   tool: locust
   users: 512
@@ -428,8 +432,13 @@ workloadspec:
           memory: 20000Mi
     embedding-deploy:
       replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
     llm-dependency-deploy:
-      replica: 8
+      replica: 7
       resources:
         limits:
           habana.ai/gaudi: '1'
@@ -437,6 +446,34 @@ workloadspec:
           habana.ai/gaudi: '1'
     llm-deploy:
       replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
+    prometheus-operator:
+      replica: 1
+      resources:
+        limits:
+          cpu: 200m
+          memory: 200Mi
+        requests:
+          cpu: 100m
+          memory: 100Mi
+    reranking-dependency-deploy:
+      replica: 1
+      resources:
+        limits:
+          habana.ai/gaudi: '1'
+        requests:
+          habana.ai/gaudi: '1'
+    reranking-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
     retriever-deploy:
       replica: 1
       resources:
@@ -467,6 +504,11 @@ workloadspec:
           memory: 20000Mi
     embedding-deploy:
       replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
     llm-dependency-deploy:
       replica: 8
       resources:
@@ -476,15 +518,18 @@ workloadspec:
           habana.ai/gaudi: '1'
     llm-deploy:
       replica: 1
-    prometheus-operator:
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
+    reranking-deploy:
       replica: 1
       resources:
         limits:
-          cpu: 200m
-          memory: 200Mi
+          cpu: '4'
         requests:
-          cpu: 100m
-          memory: 100Mi
+          cpu: '4'
     retriever-deploy:
       replica: 1
       resources:
@@ -495,45 +540,6 @@ workloadspec:
           cpu: '8'
           memory: 2500Mi
   aise-gaudi-02:
-    chatqna-backend-server-deploy:
-      replica: 1
-      resources:
-        limits:
-          cpu: '8'
-          memory: 4000Mi
-        requests:
-          cpu: '8'
-          memory: 4000Mi
-    embedding-dependency-deploy:
-      replica: 1
-      resources:
-        limits:
-          cpu: '80'
-          memory: 20000Mi
-        requests:
-          cpu: '80'
-          memory: 20000Mi
-    embedding-deploy:
-      replica: 1
-    llm-dependency-deploy:
-      replica: 8
-      resources:
-        limits:
-          habana.ai/gaudi: '1'
-        requests:
-          habana.ai/gaudi: '1'
-    llm-deploy:
-      replica: 1
-    retriever-deploy:
-      replica: 1
-      resources:
-        limits:
-          cpu: '8'
-          memory: 2500Mi
-        requests:
-          cpu: '8'
-          memory: 2500Mi
-  aise-gaudi-03:
     chatqna-backend-server-deploy:
       replica: 1
       resources:
@@ -556,6 +562,11 @@ workloadspec:
           memory: 20000Mi
     embedding-deploy:
       replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
     llm-dependency-deploy:
       replica: 8
       resources:
@@ -565,6 +576,18 @@ workloadspec:
           habana.ai/gaudi: '1'
     llm-deploy:
       replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
+    reranking-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
     retriever-deploy:
       replica: 1
       resources:
@@ -576,4 +599,60 @@ workloadspec:
           memory: 2500Mi
     vector-db:
       replica: 1
+  aise-gaudi-03:
+    chatqna-backend-server-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 4000Mi
+        requests:
+          cpu: '8'
+          memory: 4000Mi
+    embedding-dependency-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '80'
+          memory: 20000Mi
+        requests:
+          cpu: '80'
+          memory: 20000Mi
+    embedding-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
+    llm-dependency-deploy:
+      replica: 8
+      resources:
+        limits:
+          habana.ai/gaudi: '1'
+        requests:
+          habana.ai/gaudi: '1'
+    llm-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
+    reranking-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '4'
+        requests:
+          cpu: '4'
+    retriever-deploy:
+      replica: 1
+      resources:
+        limits:
+          cpu: '8'
+          memory: 2500Mi
+        requests:
+          cpu: '8'
+          memory: 2500Mi
 ```
