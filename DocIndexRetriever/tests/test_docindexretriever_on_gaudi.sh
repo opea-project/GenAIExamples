@@ -25,8 +25,8 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/tgi-gaudi:latest
     docker pull redis/redis-stack:7.2.0-v9
 
-    cd $WORKPATH/../../
-    docker build -t opea/doc-index-retriever:latest -f GenAIExamples/DocIndexRetriever/docker/Dockerfile .
+    cd $WORKPATH/docker
+    docker build -t opea/doc-index-retriever:latest -f ./Dockerfile .
 }
 
 function start_services() {
