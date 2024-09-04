@@ -96,12 +96,12 @@ fi
 
 case "$1" in
     install_AudioQnA)
-        pushd AudioQnA/kubernetes
+        pushd AudioQnA/kubernetes/Intel
         install_audioqa
         popd
         ;;
     validate_AudioQnA)
-        pushd AudioQnA/kubernetes
+        pushd AudioQnA/kubernetes/Intel
         validate_audioqa
         popd
         ;;
