@@ -72,7 +72,7 @@ function start_services() {
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_new_tokens":64}' -H 'Content-Type: application/json')
     echo "result is === $result"
     if [[ $result == *"AAA"* ]]; then
         echo "Result correct."

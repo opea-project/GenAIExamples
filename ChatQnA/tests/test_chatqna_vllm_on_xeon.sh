@@ -145,7 +145,7 @@ function validate_microservices() {
         "text" \
         "vllm-llm" \
         "vllm-service" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+        '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_new_tokens": 32, "temperature": 0}'
 
     # llm microservice
     validate_services \

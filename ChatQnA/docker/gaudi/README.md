@@ -337,7 +337,7 @@ curl http://${host_ip}:8007/v1/completions \
   -d '{
   "model": "${LLM_MODEL_ID}",
   "prompt": "What is Deep Learning?",
-  "max_tokens": 32,
+  "max_new_tokens": 32,
   "temperature": 0
   }'
 ```

@@ -130,6 +130,6 @@ curl http://${host_ip}:3002/v1/audio/speech \
 ```bash
 curl http://${host_ip}:3008/v1/audioqna \
   -X POST \
-  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' \
+  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_new_tokens":64}' \
   -H 'Content-Type: application/json'
 ```

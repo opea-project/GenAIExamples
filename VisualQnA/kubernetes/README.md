@@ -52,5 +52,5 @@ In the below example we illustrate on Xeon.
         ]
       }
     ],
-    "max_tokens": 128}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_visualqna.log
+    "max_new_tokens": 128}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_visualqna.log
    ```
