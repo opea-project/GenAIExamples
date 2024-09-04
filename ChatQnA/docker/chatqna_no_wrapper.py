@@ -6,6 +6,7 @@ import os
 import re
 
 from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
+from langchain_core.prompts import PromptTemplate
 
 
 class ChatTemplate:
@@ -95,9 +96,26 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             next_data["parameters"] = {}
             next_data["parameters"].update(llm_parameters_dict)
             del next_data["parameters"]["id"]
-            del next_data["parameters"]["chat_template"]
             del next_data["parameters"]["streaming"]
-            prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
+
+            # handle template
+            # if user provides template, then format the prompt with it
+            # otherwise, use the default template
+            prompt = data["initial_query"]
+            chat_template = next_data["parameters"]["chat_template"]
+            if chat_template:
+                prompt_template = PromptTemplate.from_template(chat_template)
+                input_variables = prompt_template.input_variables
+                if sorted(input_variables) == ["context", "question"]:
+                    prompt = prompt_template.format(question=data["initial_query"], context="\n".join(docs))
+                elif input_variables == ["question"]:
+                    prompt = prompt_template.format(question=data["initial_query"])
+                else:
+                    print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
+                    prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
+            else:
+                prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
+
             next_data["inputs"] = prompt
 
     elif self.services[cur_node].service_type == ServiceType.RERANK:
@@ -105,7 +123,6 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         next_data["parameters"] = {}
         next_data["parameters"].update(llm_parameters_dict)
         del next_data["parameters"]["id"]
-        del next_data["parameters"]["chat_template"]
         del next_data["parameters"]["streaming"]
 
         # rerank the inputs with the scores
@@ -116,7 +133,24 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         for best_response in data[:top_n]:
             reranked_docs.append(docs[best_response["index"]])
 
-        prompt = ChatTemplate.generate_rag_prompt(inputs["query"], reranked_docs)
+        # handle template
+        # if user provides template, then format the prompt with it
+        # otherwise, use the default template
+        prompt = inputs["query"]
+        chat_template = next_data["parameters"]["chat_template"]
+        if chat_template:
+            prompt_template = PromptTemplate.from_template(chat_template)
+            input_variables = prompt_template.input_variables
+            if sorted(input_variables) == ["context", "question"]:
+                prompt = prompt_template.format(question=prompt, context="\n".join(docs))
+            elif input_variables == ["question"]:
+                prompt = prompt_template.format(question=prompt)
+            else:
+                print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
+                prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
+        else:
+            prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
+
         next_data["inputs"] = prompt
 
     return next_data
