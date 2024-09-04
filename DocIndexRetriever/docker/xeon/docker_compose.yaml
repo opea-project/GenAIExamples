@@ -40,7 +40,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    command: --model-id ${EMBEDDING_MODEL_ID}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
     image: opea/embedding-tei:latest
     container_name: embedding-tei-server
@@ -86,7 +86,7 @@ services:
     ports:
       - "8808:80"
     volumes:
-      - ${HF_CACHE_DIR}:/data
+      - "./data:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -95,11 +95,13 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-    command: --model-id ${RERANK_MODEL_ID}
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
 
   reranking:
     image: opea/reranking-tei:latest
     container_name: reranking-tei-xeon-server
+    volumes:
+      - ${WORKDIR}/GenAIComps/comps/:/home/user/comps
     depends_on:
       - tei-reranking-service
     ports:
@@ -125,13 +127,14 @@ services:
       - tei-embedding-service
       - embedding
       - retriever
+      - tei-reranking-service
       - reranking
     ports:
       - "8889:8889"
     environment:
-      # - no_proxy=${no_proxy}
-      # - https_proxy=${https_proxy}
-      # - http_proxy=${http_proxy}
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
