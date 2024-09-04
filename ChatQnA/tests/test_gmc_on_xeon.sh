@@ -199,12 +199,12 @@ fi
 
 case "$1" in
     install_ChatQnA)
-        pushd ChatQnA/kubernetes
+        pushd ChatQnA/kubernetes/Intel
         install_chatqna
         popd
         ;;
     validate_ChatQnA)
-        pushd ChatQnA/kubernetes
+        pushd ChatQnA/kubernetes/Intel
         validate_chatqna
         validate_chatqna_dataprep
         popd

@@ -94,12 +94,12 @@ fi
 
 case "$1" in
     init_ChatQnA)
-        pushd ChatQnA/kubernetes/manifests/xeon
+        pushd ChatQnA/kubernetes/manifests/Intel/CPU
         init_chatqna
         popd
         ;;
     install_ChatQnA)
-        pushd ChatQnA/kubernetes/manifests/xeon
+        pushd ChatQnA/kubernetes/manifests/Intel/CPU
         NAMESPACE=$2
         install_chatqna
         popd
