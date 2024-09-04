@@ -26,7 +26,7 @@ function start_services() {
     echo "Starting CRAG server"
     docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
     echo "Starting Agent services"
-    cd $WORKDIR/GenAIExamples/AgentQnA/docker/openai
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/Intel/CPU/openai
     bash launch_agent_service_openai.sh
 }
 
