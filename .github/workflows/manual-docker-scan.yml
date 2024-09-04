@@ -1,14 +1,19 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Comps docker images BoM scan on manual event
+name: Services docker images BoM/CVE scan on manual event
 on:
   workflow_dispatch:
     inputs:
       services:
         default: "asr"
         description: "List of services to test [agent_langchain,asr,chathistory_mongo,dataprep_milvus...]" #,embeddings,guardrails,knowledgegraphs,llms,lvms,prompt_registry,ragas,reranks,retrievers,tts,vectorstores,web_retrievers]"
-        required: true
+        required: false
+        type: string
+      images:
+        default: ""
+        description: "List of images to scan [dataprep-pgvector,dataprep-pinecone...]"
+        required: false
         type: string
       tag:
         default: "comps"
@@ -25,31 +30,22 @@ on:
         description: "Enable trivy-scan"
         required: false
         type: boolean
+      mode:
+        default: "CD"
+        description: "Whether the test range is CI or CD"
+        required: false
+        type: string
 
 permissions: read-all
 jobs:
   get-image-list:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.scan-matrix.outputs.matrix }}
-    steps:
-      - name: Checkout out Repo
-        uses: actions/checkout@v4
+    uses: ./.github/workflows/_get-image-list.yml
+    with:
+      services: ${{ inputs.services }}
+      images: ${{ inputs.images }}
+      mode: ${{ inputs.mode }}
 
-      - name: Set Matrix
-        id: scan-matrix
-        run: |
-          pip install yq
-          services=($(echo ${{ inputs.services }} | tr ',' ' '))
-          image_list=[]
-          for service in ${services[@]}
-          do
-              images=$(cat ${{ github.workspace }}/.github/workflows/docker/compose/${service}-compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
-              image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
-          done
-          echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
-
-  scan-license:
+  scan-docker:
     needs: get-image-list
     runs-on: "docker-build-gaudi"
     strategy:
@@ -59,8 +55,7 @@ jobs:
     steps:
       - name: Pull Image
         run: |
-          docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:latest
-          # ${{ inputs.tag }}
+          docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
           echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
 
       - name: SBOM Scan Container
@@ -87,16 +82,28 @@ jobs:
         if: always()
         run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
 
-      - uses: actions/upload-artifact@v4.3.4
+      - name: Collect Logs
         if: always()
+        run: |
+          mkdir -p /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
+          mv ${{ matrix.image }}-*-scan.txt /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
+
+  upload-artifacts:
+    needs: scan-docker
+    runs-on: "docker-build-gaudi"
+    if: always()
+    steps:
+      - uses: actions/upload-artifact@v4.3.4
         with:
-          name: sbom-scan
-          path: ${{ matrix.image }}-sbom-scan.txt
+          name: sbom-scan-${{ inputs.tag }}-${{ github.run_number }}
+          path: /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}/*-sbom-scan.txt
           overwrite: true
 
       - uses: actions/upload-artifact@v4.3.4
-        if: always()
         with:
-          name: trivy-scan
-          path: ${{ matrix.image }}-trivy-scan.txt
+          name: trivy-scan-${{ inputs.tag }}-${{ github.run_number }}
+          path: /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}/*-trivy-scan.txt
           overwrite: true
+
+      - name: Remove Logs
+        run: rm -rf /tmp/scan-${{ inputs.tag }}-${{ github.run_number }} && rm -rf /tmp/sbom-action-*
