@@ -761,3 +761,39 @@ class FineTuningJobList(BaseModel):
 
     If true, additional requests can be made to retrieve more jobs.
     """
+
+
+class UploadFileRequest(BaseModel):
+    purpose: str
+    """The intended purpose of the uploaded file.
+
+    Use "assistants" for Assistants and Message files, "vision" for Assistants image file inputs, "batch" for Batch API, and "fine-tune" for Fine-tuning.
+    """
+
+    file: UploadFile
+    """The File object (not file name) to be uploaded."""
+
+
+class FileObject(BaseModel):
+    # Ordered by official OpenAI API documentation
+    # https://platform.openai.com/docs/api-reference/files/object
+    id: str
+    """The file identifier, which can be referenced in the API endpoints."""
+
+    bytes: int
+    """The size of the file, in bytes."""
+
+    created_at: int
+    """The Unix timestamp (in seconds) for when the file was created."""
+
+    filename: str
+    """The name of the file."""
+
+    object: str = "file"
+    """The object type, which is always file."""
+
+    purpose: str
+    """The intended purpose of the file.
+
+    Supported values are assistants, assistants_output, batch, batch_output, fine-tune, fine-tune-results and vision.
+    """
