@@ -21,7 +21,7 @@ WORKDIR /home/user/GenAIComps
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
 
-COPY GenAIExamples/DocIndexRetriever/docker/retrieval_tool.py /home/user/retrieval_tool.py
+COPY ./retrieval_tool.py /home/user/retrieval_tool.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
