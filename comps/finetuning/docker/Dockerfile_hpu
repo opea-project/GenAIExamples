@@ -1,9 +1,11 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Use the same python version with ray
-FROM vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest
+# FROM vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest as hpu
+FROM opea/habanalabs:1.16.1-pytorch-installer-2.2.2 as hpu
 
 ENV DEVICE="hpu"
-
-RUN apt-get update -y && apt-get install -y vim htop net-tools dnsutils
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
@@ -17,15 +19,12 @@ USER user
 
 ENV PATH=$PATH:/home/user/.local/bin
 
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/user/comps/finetuning/requirements.txt && \
-    pip install --no-cache-dir optimum-habana
+RUN python -m pip install --no-cache-dir --upgrade pip && \
+    python -m pip install --no-cache-dir -r /home/user/comps/finetuning/requirements.txt && \
+    python -m pip install --no-cache-dir optimum-habana
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 WORKDIR /home/user/comps/finetuning
 
 ENTRYPOINT ["/bin/bash", "launch.sh"]
-
-# CMD ["/bin/bash"]
-
