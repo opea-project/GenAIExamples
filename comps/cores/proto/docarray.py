@@ -173,6 +173,19 @@ class LLMParams(BaseDoc):
     )
 
 
+class RetrieverParms(BaseDoc):
+    search_type: str = "similarity"
+    k: int = 4
+    distance_threshold: Optional[float] = None
+    fetch_k: int = 20
+    lambda_mult: float = 0.5
+    score_threshold: float = 0.2
+
+
+class RerankerParms(BaseDoc):
+    top_n: int = 1
+
+
 class RAGASParams(BaseDoc):
     questions: DocList[TextDoc]
     answers: DocList[TextDoc]
