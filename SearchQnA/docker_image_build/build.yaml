@@ -8,12 +8,12 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      dockerfile: ./Dockerfile
+      dockerfile: ../Dockerfile
     image: ${REGISTRY:-opea}/searchqna:${TAG:-latest}
   searchqna-ui:
     build:
-      context: ui
-      dockerfile: ./docker/Dockerfile
+      context:
+      dockerfile: ../Dockerfile_ui
     extends: searchqna
     image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
   embedding-tei:

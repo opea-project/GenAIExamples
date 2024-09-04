@@ -15,12 +15,12 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/docker
+    cd cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna dataprep-redis embedding-tei promptregistry-mongo llm_docsum_server llm_faqgen chathistory-mongo retriever-redis reranking-tei llm-tgi productivity-suite-react-ui codegen docsum faqgen"
-    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/text-generation-inference:2.1.0
@@ -28,7 +28,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/Intel/CPU
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -333,7 +333,7 @@ function validate_megaservice() {
 
 function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
-    cd $WORKPATH/docker/ui/react
+    cd $WORKPATH/react
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
 #    conda remove -n ${conda_env_name} --all -y
@@ -357,7 +357,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/Intel/CPU
     docker compose stop && docker compose rm -f
 }
 

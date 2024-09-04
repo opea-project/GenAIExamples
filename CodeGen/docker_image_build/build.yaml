@@ -8,18 +8,18 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      dockerfile: ./Dockerfile
+      dockerfile: ../Dockerfile
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
   codegen-ui:
     build:
-      context: ui
-      dockerfile: ./Dockerfile_ui
+      context:
+      dockerfile: ../Dockerfile_ui
     extends: codegen
     image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
   codegen-react-ui:
     build:
-      context: ui
-      dockerfile: ./Dockerfile_ui.react
+      context:
+      dockerfile: ../Dockerfile_ui.react
     extends: codegen
     image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
   llm-tgi:

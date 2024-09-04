@@ -23,15 +23,15 @@ docker build -t opea/llm-tgi:latest --no-cache --build-arg https_proxy=$https_pr
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/CodeTrans/docker
+cd GenAIExamples/CodeTrans
 docker build -t opea/codetrans:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 ### 4. Build UI Docker Image
 
 ```bash
-cd GenAIExamples/CodeTrans/docker/ui
-docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/CodeTrans
+docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_ui .
 ```
 
 ### 5. Build Nginx Docker Image
@@ -90,7 +90,7 @@ Change the `LLM_MODEL_ID` below for your needs.
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/CodeTrans/docker/gaudi
+cd GenAIExamples/CodeTrans/docker_compose/Intel/HPU
 docker compose up -d
 ```
 

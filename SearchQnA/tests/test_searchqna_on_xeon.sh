@@ -15,12 +15,12 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/docker
+    cd cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="searchqna searchqna-ui embedding-tei web-retriever-chroma reranking-tei llm-tgi"
-    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
@@ -28,7 +28,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/Intel/CPU
     export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
     export GOOGLE_API_KEY=$GOOGLE_API_KEY
     export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
@@ -54,7 +54,7 @@ function start_services() {
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
 
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/svelte/.env
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -88,7 +88,7 @@ function validate_megaservice() {
 }
 
 function validate_frontend() {
-    cd $WORKPATH/docker/ui/svelte
+    cd $WORKPATH/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
@@ -116,7 +116,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/Intel/CPU
     docker compose stop && docker compose rm -f
 }
 

@@ -6,11 +6,11 @@ Instruction tuning is the process of further training LLMs on a dataset consisti
 
 ### Deploy Instruction Tuning Service on Xeon
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for detail.
+Refer to the [Xeon Guide](./docker_compose/Intel/CPU/README.md) for detail.
 
 ### Deploy Instruction Tuning Service on Gaudi
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) for detail.
+Refer to the [Gaudi Guide](./docker_compose/Intel/HPU/README.md) for detail.
 
 ## Consume Instruction Tuning Service
 

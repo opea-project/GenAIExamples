@@ -67,7 +67,7 @@ The Productivity Suite is composed of multiple GenAIExample reference solutions 
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA/docker
+cd GenAIExamples/ChatQnA/
 docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 cd ../../..
 ```
@@ -75,7 +75,7 @@ cd ../../..
 #### 8.2 Build DocSum Megaservice Docker Images
 
 ```bash
-cd GenAIExamples/DocSum/docker
+cd GenAIExamples/DocSum
 docker build --no-cache -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 cd ../../..
 ```
@@ -83,7 +83,7 @@ cd ../../..
 #### 8.3 Build CodeGen Megaservice Docker Images
 
 ```bash
-cd GenAIExamples/CodeGen/docker
+cd GenAIExamples/CodeGen
 docker build --no-cache -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 cd ../../..
 ```
@@ -91,7 +91,7 @@ cd ../../..
 #### 8.4 Build FAQGen Megaservice Docker Images
 
 ```bash
-cd GenAIExamples/FaqGen/docker
+cd GenAIExamples/FaqGen
 docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 cd ../../..
 ```
@@ -103,8 +103,8 @@ Build frontend Docker image that enables via below command:
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
 ```bash
-cd GenAIExamples/ProductivitySuite/docker/ui/
-docker build --no-cache -t ProductivitySuite/docker/xeon/compose.yaml ./docker/Dockerfile.react .
+cd GenAIExamples/ProductivitySuite/
+docker build --no-cache -t ProductivitySuite/docker_compose/Intel/CPU/compose.yaml Dockerfile_ui.react .
 cd ../../../..
 ```
 
@@ -191,7 +191,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ProductivitySuite/docker/xeon/
+cd GenAIExamples/ProductivitySuite/docker_compose/Intel/CPU
 ```
 
 ```bash
@@ -495,8 +495,8 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 ```
 
 Here is an example of running Productivity Suite
-![project-screenshot](../../assets/img/chat_qna_init.png)
-![project-screenshot](../../assets/img/Login_page.png)
+![project-screenshot](../../../assets/img/chat_qna_init.png)
+![project-screenshot](../../../assets/img/Login_page.png)
 
 ## 🧐 Features
 
@@ -514,7 +514,7 @@ Here're some of the project's features:
 
 #### Screen Shot
 
-![project-screenshot](../../assets/img/data_source.png)
+![project-screenshot](../../../assets/img/data_source.png)
 
 - Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
 - Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
@@ -522,14 +522,14 @@ Here're some of the project's features:
 
 #### Screen Shots
 
-![project-screenshot](../../assets/img/chat_qna_init.png)
-![project-screenshot](../../assets/img/chatqna_with_conversation.png)
+![project-screenshot](../../../assets/img/chat_qna_init.png)
+![project-screenshot](../../../assets/img/chatqna_with_conversation.png)
 
 ### CODEGEN
 
 - Generate code: generate the corresponding code based on the current user's input.
   ###### Screen Shot
-  ![project-screenshot](../../assets/img/codegen.png)
+  ![project-screenshot](../../../assets/img/codegen.png)
 
 ### DOC SUMMARY
 
@@ -539,8 +539,8 @@ Here're some of the project's features:
 
 #### Screen Shot
 
-![project-screenshot](../../assets/img/doc_summary_paste.png)
-![project-screenshot](../../assets/img/doc_summary_file.png)
+![project-screenshot](../../../assets/img/doc_summary_paste.png)
+![project-screenshot](../../../assets/img/doc_summary_file.png)
 
 ### FAQ Generator
 
@@ -550,4 +550,4 @@ Here're some of the project's features:
 
 #### Screen Shot
 
-![project-screenshot](../../assets/img/faq_generator.png)
+![project-screenshot](../../../assets/img/faq_generator.png)

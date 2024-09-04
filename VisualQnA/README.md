@@ -20,7 +20,7 @@ This example guides you through how to deploy a [LLaVA-NeXT](https://github.com/
 
 # Required Models
 
-By default, the model is set to `llava-hf/llava-v1.6-mistral-7b-hf`. To use a different model, update the `LVM_MODEL_ID` variable in the [`set_env.sh`](./docker/gaudi/set_env.sh) file.
+By default, the model is set to `llava-hf/llava-v1.6-mistral-7b-hf`. To use a different model, update the `LVM_MODEL_ID` variable in the [`set_env.sh`](./docker_compose/Intel/HPU/set_env.sh) file.
 
 ```
 export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
@@ -60,19 +60,19 @@ To set up environment variables for deploying VisualQnA services, follow these s
 
    ```bash
    # on Gaudi
-   source ./docker/gaudi/set_env.sh
+   source ./docker_compose/Intel/HPU/set_env.sh
    # on Xeon
-   source ./docker/xeon/set_env.sh
+   source ./docker_compose/Intel/CPU/set_env.sh
    ```
 
 ## Deploy VisualQnA on Gaudi
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Refer to the [Gaudi Guide](./docker_compose/Intel/HPU/README.md) to build docker images from source.
 
-Find the corresponding [compose.yaml](./docker/gaudi/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/Intel/HPU/compose.yaml).
 
 ```bash
-cd GenAIExamples/VisualQnA/docker/gaudi/
+cd GenAIExamples/VisualQnA/docker_compose/Intel/HPU/
 docker compose up -d
 ```
 
@@ -80,11 +80,11 @@ docker compose up -d
 
 ## Deploy VisualQnA on Xeon
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
+Refer to the [Xeon Guide](./docker_compose/Intel/CPU/README.md) for more instructions on building docker images from source.
 
-Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/Intel/CPU/compose.yaml).
 
 ```bash
-cd GenAIExamples/VisualQnA/docker/xeon/
+cd GenAIExamples/VisualQnA/docker_compose/Intel/CPU/
 docker compose up -d
 ```

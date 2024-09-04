@@ -33,7 +33,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/DocSum/docker
+cd GenAIExamples/DocSum/
 docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
@@ -42,8 +42,8 @@ docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-
 Build the frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/DocSum/docker/ui/
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/DocSum/
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_ui .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
@@ -57,11 +57,11 @@ Then run the command `docker images`, you will have the following Docker Images:
 Build the frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/DocSum/docker/ui/
+cd GenAIExamples/DocSum/
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./Dockerfile_ui.react .
 
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f ./docker/Dockerfile.react .
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f ./Dockerfile_ui.react .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
@@ -99,7 +99,7 @@ Note: Please replace with `host_ip` with your external IP address, do not use lo
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/DocSum/docker/xeon
+cd GenAIExamples/DocSum/docker_compose/Intel/CPU
 docker compose up -d
 ```
 
@@ -140,7 +140,7 @@ Open this URL `http://{host_ip}:5174` in your browser to access the React based 
 
 ### Svelte UI
 
-![project-screenshot](../../assets/img/docSum_ui_text.png)
+![project-screenshot](../../../assets/img/docSum_ui_text.png)
 
 ### React UI (Optional)
 
@@ -162,4 +162,4 @@ docsum-xeon-react-ui-server:
   restart: always
 ```
 
-![preject-react-screenshot](../../assets/img/docsum-ui-react.png)
+![preject-react-screenshot](../../../assets/img/docsum-ui-react.png)

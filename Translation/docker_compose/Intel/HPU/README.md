@@ -32,7 +32,7 @@ docker build -t opea/translation:latest --build-arg https_proxy=$https_proxy --b
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/Translation/docker/ui/
+cd GenAIExamples/Translation//
 docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -99,5 +99,5 @@ Following the validation of all aforementioned microservices, we are now prepare
 ## 🚀 Launch the UI
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
-![project-screenshot](../../assets/img/trans_ui_init.png)
-![project-screenshot](../../assets/img/trans_ui_select.png)
+![project-screenshot](../../../assets/img/trans_ui_init.png)
+![project-screenshot](../../../assets/img/trans_ui_select.png)

@@ -64,27 +64,27 @@ To set up environment variables for deploying Document Summarization services, f
 
 #### Deploy on Gaudi
 
-Find the corresponding [compose.yaml](./docker/gaudi/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/Intel/HPU/compose.yaml).
 
 ```bash
-cd GenAIExamples/DocSum/docker/gaudi/
+cd GenAIExamples/DocSum/docker_compose/Intel/HPU/
 docker compose -f compose.yaml up -d
 ```
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Refer to the [Gaudi Guide](./docker_compose/Intel/HPU/README.md) to build docker images from source.
 
 #### Deploy on Xeon
 
-Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/Intel/CPU/compose.yaml).
 
 ```bash
-cd GenAIExamples/DocSum/docker/xeon/
+cd GenAIExamples/DocSum/docker_compose/Intel/CPU/
 docker compose up -d
 ```
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
+Refer to the [Xeon Guide](./docker_compose/Intel/CPU/README.md) for more instructions on building docker images from source.
 
 ### Deploy using Kubernetes with GMC
 
@@ -143,7 +143,7 @@ Two ways of consuming Document Summarization Service:
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker/xeon#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose/Intel/CPU#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy=""

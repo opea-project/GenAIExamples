@@ -115,7 +115,7 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 
    Two type of UI are supported now, choose one you like and pull the referred docker image.
 
-   If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/gaudi#-launch-the-conversational-ui-optional) and modify the [compose.yaml](./docker/xeon/compose.yaml).
+   If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/Intel/HPU#-launch-the-conversational-ui-optional) and modify the [compose.yaml](./docker_compose/Intel/CPU/compose.yaml).
 
    ```bash
    docker pull opea/chatqna-ui:latest
@@ -166,36 +166,36 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
    ```bash
    # on Gaudi
-   source ./docker/gaudi/set_env.sh
+   source ./docker_compose/Intel/HPU/set_env.sh
    # on Xeon
-   source ./docker/xeon/set_env.sh
+   source ./docker_compose/Intel/CPU/set_env.sh
    # on Nvidia GPU
    source ./docker/gpu/set_env.sh
    ```
 
 ### Deploy ChatQnA on Gaudi
 
-Find the corresponding [compose.yaml](./docker/gaudi/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/Intel/HPU/compose.yaml).
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/gaudi/
+cd GenAIExamples/ChatQnA/docker_compose/Intel/HPU/
 docker compose up -d
 ```
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Refer to the [Gaudi Guide](./docker_compose/Intel/HPU/README.md) to build docker images from source.
 
 ### Deploy ChatQnA on Xeon
 
-Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/Intel/CPU/compose.yaml).
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/xeon/
+cd GenAIExamples/ChatQnA/docker_compose/Intel/CPU/
 docker compose up -d
 ```
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
+Refer to the [Xeon Guide](./docker_compose/Intel/CPU/README.md) for more instructions on building docker images from source.
 
 ### Deploy ChatQnA on NVIDIA GPU
 
@@ -265,7 +265,7 @@ Two ways of consuming ChatQnA Service:
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/xeon#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/Intel/CPU#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'

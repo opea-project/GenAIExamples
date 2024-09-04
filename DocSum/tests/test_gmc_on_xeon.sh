@@ -112,12 +112,12 @@ fi
 
 case "$1" in
     install_DocSum)
-        pushd DocSum/kubernetes
+        pushd DocSum/kubernetes/Intel
         install_docsum
         popd
         ;;
     validate_DocSum)
-        pushd DocSum/kubernetes
+        pushd DocSum/kubernetes/Intel
         validate_docsum
         popd
         ;;

@@ -33,7 +33,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/CodeGen/docker
+cd GenAIExamples/CodeGen
 docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
@@ -42,8 +42,8 @@ docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build
 Build the frontend Docker image via the command below:
 
 ```bash
-cd GenAIExamples/CodeGen/docker/ui/
-docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/CodeGen/
+docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile_ui .
 ```
 
 Then run the command `docker images`, you will have the following 3 Docker Images:
@@ -105,7 +105,7 @@ Note: Please replace the `host_ip` with you external IP address, do not use `loc
 ### Start the Docker Containers for All Services
 
 ```bash
-cd GenAIExamples/CodeGen/docker/xeon
+cd GenAIExamples/CodeGen/docker_compose/Intel/CPU
 docker compose up -d
 ```
 
@@ -149,11 +149,11 @@ To access the frontend, open the following URL in your browser: `http://{host_ip
       - "80:5173"
 ```
 
-![project-screenshot](../../assets/img/codeGen_ui_init.jpg)
+![project-screenshot](../../../assets/img/codeGen_ui_init.jpg)
 
 Here is an example of running CodeGen in the UI:
 
-![project-screenshot](../../assets/img/codeGen_ui_response.png)
+![project-screenshot](../../../assets/img/codeGen_ui_response.png)
 
 ## 🚀 Launch the React Based UI (Optional)
 
@@ -175,7 +175,7 @@ codegen-xeon-react-ui-server:
   restart: always
 ```
 
-![project-screenshot](../../assets/img/codegen_react.png)
+![project-screenshot](../../../assets/img/codegen_react.png)
 
 ## Install Copilot VSCode extension from Plugin Marketplace as the frontend
 
@@ -183,7 +183,7 @@ In addition to the Svelte UI, users can also install the Copilot VSCode extensio
 
 Install `Neural Copilot` in VSCode as below.
 
-![Install-screenshot](../../assets/img/codegen_copilot.png)
+![Install-screenshot](../../../assets/img/codegen_copilot.png)
 
 ### How to Use
 
@@ -191,46 +191,46 @@ Install `Neural Copilot` in VSCode as below.
 
 Please adjust the service URL in the extension settings based on the endpoint of the code generation backend service.
 
-![Setting-screenshot](../../assets/img/codegen_settings.png)
-![Setting-screenshot](../../assets/img/codegen_endpoint.png)
+![Setting-screenshot](../../../assets/img/codegen_settings.png)
+![Setting-screenshot](../../../assets/img/codegen_endpoint.png)
 
 #### Customize
 
 The Copilot enables users to input their corresponding sensitive information and tokens in the user settings according to their own needs. This customization enhances the accuracy and output content to better meet individual requirements.
 
-![Customize](../../assets/img/codegen_customize.png)
+![Customize](../../../assets/img/codegen_customize.png)
 
 #### Code Suggestion
 
 To trigger inline completion, you'll need to type `# {your keyword} (start with your programming language's comment keyword, like // in C++ and # in python)`. Make sure the `Inline Suggest` is enabled from the VS Code Settings.
 For example:
 
-![code suggestion](../../assets/img/codegen_suggestion.png)
+![code suggestion](../../../assets/img/codegen_suggestion.png)
 
 To provide programmers with a smooth experience, the Copilot supports multiple ways to trigger inline code suggestions. If you are interested in the details, they are summarized as follows:
 
 - Generate code from single-line comments: The simplest way introduced before.
 - Generate code from consecutive single-line comments:
 
-![codegen from single-line comments](../../assets/img/codegen_single_line.png)
+![codegen from single-line comments](../../../assets/img/codegen_single_line.png)
 
 - Generate code from multi-line comments, which will not be triggered until there is at least one `space` outside the multi-line comment):
 
-![codegen from multi-line comments](../../assets/img/codegen_multi_line.png)
+![codegen from multi-line comments](../../../assets/img/codegen_multi_line.png)
 
 - Automatically complete multi-line comments:
 
-![auto complete](../../assets/img/codegen_auto_complete.jpg)
+![auto complete](../../../assets/img/codegen_auto_complete.jpg)
 
 ### Chat with AI assistant
 
 You can start a conversation with the AI programming assistant by clicking on the robot icon in the plugin bar on the left:
 
-![icon](../../assets/img/codegen_icon.png)
+![icon](../../../assets/img/codegen_icon.png)
 
 Then you can see the conversation window on the left, where you can chat with AI assistant:
 
-![dialog](../../assets/img/codegen_dialog.png)
+![dialog](../../../assets/img/codegen_dialog.png)
 
 There are 4 areas worth noting as shown in the screenshot above:
 
@@ -244,8 +244,8 @@ For example:
 
 - Select code
 
-![select code](../../assets/img/codegen_select_code.png)
+![select code](../../../assets/img/codegen_select_code.png)
 
 - Ask question and get answer
 
-![qna](../../assets/img/codegen_qna.png)
+![qna](../../../assets/img/codegen_qna.png)

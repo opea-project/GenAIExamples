@@ -41,7 +41,7 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/VisualQnA/docker/ui/
+cd GenAIExamples/VisualQnA//
 docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 cd ../../../..
 ```
@@ -76,7 +76,7 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 ### Start all the services Docker Containers
 
 ```bash
-cd GenAIExamples/VisualQnA/docker/gaudi/
+cd GenAIExamples/VisualQnA/docker_compose/Intel/HPU/
 ```
 
 ```bash

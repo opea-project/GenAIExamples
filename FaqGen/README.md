@@ -10,8 +10,8 @@ The FAQ Generation service can be deployed on either Intel Gaudi2 or Intel XEON 
 
 ### Deploy FAQ Generation on Gaudi
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying FAQ Generation on Gaudi.
+Refer to the [Gaudi Guide](./docker_compose/Intel/HPU/README.md) for instructions on deploying FAQ Generation on Gaudi.
 
 ### Deploy FAQ Generation on Xeon
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying FAQ Generation on Xeon.
+Refer to the [Xeon Guide](./docker_compose/Intel/CPU/README.md) for instructions on deploying FAQ Generation on Xeon.

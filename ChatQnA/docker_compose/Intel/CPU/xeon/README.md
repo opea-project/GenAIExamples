@@ -147,7 +147,7 @@ cd ..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/ui/
+cd GenAIExamples/ChatQnA/
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 cd ../../../..
 ```
@@ -159,8 +159,8 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/ui/
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
+cd GenAIExamples/ChatQnA/
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile_ui.react .
 cd ../../../..
 ```
 
@@ -247,7 +247,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/xeon/
+cd GenAIExamples/ChatQnA/docker_compose/Intel/CPU/
 ```
 
 If use TGI backend.
@@ -487,12 +487,12 @@ Once the services are up, open the following URL in your browser: http://{host_i
       - "80:80"
 ```
 
-![project-screenshot](../../assets/img/chat_ui_init.png)
+![project-screenshot](../../../assets/img/chat_ui_init.png)
 
 Here is an example of running ChatQnA:
 
-![project-screenshot](../../assets/img/chat_ui_response.png)
+![project-screenshot](../../../assets/img/chat_ui_response.png)
 
 Here is an example of running ChatQnA with Conversational UI (React):
 
-![project-screenshot](../../assets/img/conversation_ui_response.png)
+![project-screenshot](../../../assets/img/conversation_ui_response.png)

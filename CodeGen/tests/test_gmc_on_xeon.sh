@@ -112,12 +112,12 @@ fi
 
 case "$1" in
     install_CodeGen)
-        pushd CodeGen/kubernetes
+        pushd CodeGen/kubernetes/Intel
         install_codegen
         popd
         ;;
     validate_CodeGen)
-        pushd CodeGen/kubernetes
+        pushd CodeGen/kubernetes/Intel
         validate_codegen
         popd
         ;;
