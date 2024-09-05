@@ -5,7 +5,7 @@ on:
   push:
     branches: [ 'main','issue' ]
     paths:
-      - "**/docker/*/compose.yaml"
+      - "**/docker/*/compose*.yaml"
 
 name: Create an issue to GenAIInfra on push
 jobs:
@@ -25,7 +25,7 @@ jobs:
           base_commit=$(git rev-parse HEAD~1)
           merged_commit=$(git log -1 --format='%H')
           changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
-          grep -E '.*/docker/.*/compose.yaml')" || true
+          grep -E '.*/docker/.*/compose.*.yaml')" || true
 
           examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
           format_examples=$(echo "$examples" | tr '\n' ',')
