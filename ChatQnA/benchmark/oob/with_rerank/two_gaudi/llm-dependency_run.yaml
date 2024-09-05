@@ -34,6 +34,10 @@ spec:
         args:
         - --model-id
         - $(LLM_MODEL_ID)
+        - --max-input-length
+        - '2048'
+        - --max-total-tokens
+        - '4096'
         volumeMounts:
         - mountPath: /data
           name: model-volume
