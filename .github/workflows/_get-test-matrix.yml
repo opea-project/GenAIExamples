@@ -14,11 +14,11 @@ on:
       xeon_server_label:
         required: false
         type: string
-        default: 'xeon'
+        default: 'CPU'
       gaudi_server_label:
         required: false
         type: string
-        default: 'gaudi'
+        default: 'HPU'
     outputs:
       run_matrix:
         description: "The matrix string"
@@ -65,11 +65,11 @@ jobs:
           run_matrix="{\"include\":["
           for example in ${examples}; do
               run_hardware=""
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
-              if [ "$run_hardware" == "" ]; then run_hardware="gaudi"; fi
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c HPU) != 0 ]; then run_hardware="HPU"; fi
+              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c CPU) != 0 ]; then run_hardware="CPU ${run_hardware}"; fi
+              if [ "$run_hardware" == "" ]; then run_hardware="HPU"; fi
               for hw in ${run_hardware}; do
-                  if [ "$hw" == "gaudi" ] && [ "${{ inputs.gaudi_server_label }}" != "" ]; then
+                  if [ "$hw" == "HPU" ] && [ "${{ inputs.gaudi_server_label }}" != "" ]; then
                     run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.gaudi_server_label }}\"},"
                   elif [ "${{ inputs.xeon_server_label }}" != "" ]; then
                     run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.xeon_server_label }}\"},"

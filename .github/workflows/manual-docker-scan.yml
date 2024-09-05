@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       node:
-        default: "gaudi"
+        default: "HPU"
         description: "Hardware to run scan"
         required: true
         type: string

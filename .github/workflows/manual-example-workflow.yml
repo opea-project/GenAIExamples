@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       nodes:
-        default: "gaudi,xeon"
+        default: "HPU,CPU"
         description: "Hardware to run test"
         required: true
         type: string
