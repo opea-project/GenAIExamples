@@ -127,7 +127,7 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096
   # llm:
   #   image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
   #   container_name: llm-tgi-gaudi-server
@@ -146,7 +146,7 @@ services:
   #     HF_HUB_ENABLE_HF_TRANSFER: 0
   #   restart: unless-stopped
   chaqna-gaudi-backend-server:
-    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chatqna_no_wrapper:${TAG:-latest}
     container_name: chatqna-gaudi-backend-server
     depends_on:
       - redis-vector-db

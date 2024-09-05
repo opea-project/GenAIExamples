@@ -63,6 +63,19 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         retriever_parameters = kwargs.get("retriever_parameters", None)
         if retriever_parameters:
             inputs.update(retriever_parameters.dict())
+    elif self.services[cur_node].service_type == ServiceType.LLM:
+        # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
+        next_inputs = {}
+        next_inputs["model"] = "tgi"            # specifically clarify the fake model to make the format unified
+        next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
+        next_inputs["max_tokens"] = llm_parameters_dict["max_new_tokens"]
+        next_inputs["top_p"] = llm_parameters_dict["top_p"]
+        next_inputs["stream"] = inputs["streaming"]
+        next_inputs["frequency_penalty"] = inputs["repetition_penalty"]
+        next_inputs["temperature"] = inputs["temperature"]
+        inputs = next_inputs
+
+
 
     return inputs
 
@@ -80,7 +93,6 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         if with_rerank and docs:
             # forward to rerank
             # prepare inputs for rerank
-            # TODO add top_n
             next_data["query"] = data["initial_query"]
             next_data["texts"] = [doc["text"] for doc in data["retrieved_docs"]]
         else:
@@ -92,17 +104,11 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
                         runtime_graph.add_edge(cur_node, nds)
                     runtime_graph.delete_node_if_exists(ds)
 
-            # prepare inputs for LLM
-            next_data["parameters"] = {}
-            next_data["parameters"].update(llm_parameters_dict)
-            del next_data["parameters"]["id"]
-            del next_data["parameters"]["streaming"]
-
             # handle template
             # if user provides template, then format the prompt with it
             # otherwise, use the default template
             prompt = data["initial_query"]
-            chat_template = next_data["parameters"]["chat_template"]
+            chat_template = llm_parameters_dict["chat_template"]
             if chat_template:
                 prompt_template = PromptTemplate.from_template(chat_template)
                 input_variables = prompt_template.input_variables
@@ -119,12 +125,6 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             next_data["inputs"] = prompt
 
     elif self.services[cur_node].service_type == ServiceType.RERANK:
-        # prepare inputs for LLM
-        next_data["parameters"] = {}
-        next_data["parameters"].update(llm_parameters_dict)
-        del next_data["parameters"]["id"]
-        del next_data["parameters"]["streaming"]
-
         # rerank the inputs with the scores
         reranker_parameters = kwargs.get("reranker_parameters", None)
         top_n = reranker_parameters.top_n if reranker_parameters else 1
@@ -137,7 +137,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         # if user provides template, then format the prompt with it
         # otherwise, use the default template
         prompt = inputs["query"]
-        chat_template = next_data["parameters"]["chat_template"]
+        chat_template = llm_parameters_dict["chat_template"]
         if chat_template:
             prompt_template = PromptTemplate.from_template(chat_template)
             input_variables = prompt_template.input_variables
@@ -157,8 +157,8 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
 
 def align_generator(self, gen, **kwargs):
-    # TGI format
-    # {"index":20,"token":{"id":368,"text":" you","logprob":0.0,"special":false},"generated_text":null,"details":null}
+    # openai reaponse format
+    #b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
     for line in gen:
         line = line.decode("utf-8")
         start = line.find("{")
@@ -168,7 +168,8 @@ def align_generator(self, gen, **kwargs):
         try:
             # sometimes yield empty chunk, do a fallback here
             json_data = json.loads(json_str)
-            yield f"data: {repr(json_data['token']['text'].encode('utf-8'))}\n\n"
+            if json_data["choices"][0]["finish_reason"] != "eos_token":
+                yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
         except Exception as e:
             yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
     yield "data: [DONE]\n\n"
@@ -216,7 +217,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
-            endpoint="/generate_stream",  # FIXME non-stream case
+            endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )
@@ -250,7 +251,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
-            endpoint="/generate_stream",  # FIXME non-stream case
+            endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )
