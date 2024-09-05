@@ -2,12 +2,8 @@
 @import "../components/content.scss";
 
 .contextWrapper {
-  background-color: light-dark(
-    var(--mantine-color-gray-0),
-    var(--mantine-color-dark-6)
-  );
-  border-right: 1px solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+  border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
   width: 13vw;
   overflow-y: hidden;
   overflow-x: hidden;
@@ -24,15 +20,16 @@
   .contextTitle {
     grid-area: title;
     top: 0;
-    font-family: Greycliff CF, var(--mantine-font-family);
+    font-family:
+      Greycliff CF,
+      var(--mantine-font-family);
     margin-bottom: var(--mantine-spacing-sm);
     background-color: var(--mantine-color-body);
     padding: var(--mantine-spacing-md);
     padding-top: 18px;
     width: 100%;
     height: 60px;
-    border-bottom: 1px solid
-      light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-7));
+    border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-7));
   }
 
   .contextList {
@@ -48,10 +45,7 @@
       text-decoration: none;
       border-top-right-radius: var(--mantine-radius-md);
       border-bottom-right-radius: var(--mantine-radius-md);
-      color: light-dark(
-        var(--mantine-color-gray-7),
-        var(--mantine-color-dark-0)
-      );
+      color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
       padding: 0 var(--mantine-spacing-md);
       font-size: var(--mantine-font-size-sm);
       margin-right: var(--mantine-spacing-md);
@@ -68,14 +62,8 @@
       }
 
       &:hover {
-        background-color: light-dark(
-          var(--mantine-color-gray-1),
-          var(--mantine-color-dark-5)
-        );
-        color: light-dark(
-          var(--mantine-color-dark),
-          var(--mantine-color-light)
-        );
+        background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+        color: light-dark(var(--mantine-color-dark), var(--mantine-color-light));
       }
 
       &[data-active] {

@@ -4,13 +4,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState, store } from "../store";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import {
-  Message,
-  MessageRole,
-  ConversationReducer,
-  ConversationRequest,
-  Conversation,
-} from "./Conversation";
+import { Message, MessageRole, ConversationReducer, ConversationRequest, Conversation } from "./Conversation";
 import { getCurrentTimeStamp } from "../../common/util";
 import { createAsyncThunkWrapper } from "../thunkUtil";
 import client from "../../common/client";
@@ -60,9 +54,7 @@ export const ConversationSlice = createSlice({
       state.selectedConversationHistory.push(action.payload);
     },
     newConversation: (state) => {
-      (state.selectedConversationId = ""),
-        (state.onGoingResult = ""),
-        (state.selectedConversationHistory = []);
+      (state.selectedConversationId = ""), (state.onGoingResult = ""), (state.selectedConversationHistory = []);
     },
     setSelectedConversationId: (state, action: PayloadAction<string>) => {
       state.selectedConversationId = action.payload;
@@ -143,7 +135,7 @@ export const submitDataSourceURL = createAsyncThunkWrapper(
     const response = await client.post(DATA_PREP_URL, body);
     dispatch(getAllFilesInDataSource({ knowledgeBaseId: "default" }));
     return response.data;
-  }
+  },
 );
 
 export const getAllFilesInDataSource = createAsyncThunkWrapper(
@@ -154,7 +146,7 @@ export const getAllFilesInDataSource = createAsyncThunkWrapper(
     };
     const response = await client.post(DATA_PREP_GET_URL, body);
     return response.data;
-  }
+  },
 );
 export const uploadFile = createAsyncThunkWrapper(
   "conversation/uploadFile",
@@ -170,7 +162,7 @@ export const uploadFile = createAsyncThunkWrapper(
     const response = await client.post(DATA_PREP_URL, body);
     dispatch(getAllFilesInDataSource({ knowledgeBaseId: "default" }));
     return response.data;
-  }
+  },
 );
 
 export const deleteInDataSource = createAsyncThunkWrapper(
@@ -181,7 +173,7 @@ export const deleteInDataSource = createAsyncThunkWrapper(
     });
     dispatch(getAllFilesInDataSource({ knowledgeBaseId: "default" }));
     return response.data;
-  }
+  },
 );
 
 export const saveConversationtoDatabase = createAsyncThunkWrapper(
@@ -189,8 +181,7 @@ export const saveConversationtoDatabase = createAsyncThunkWrapper(
   async ({ conversation }: { conversation: Conversation }, { getState }) => {
     // @ts-ignore
     const state: RootState = getState();
-    const selectedConversationHistory =
-      state.conversationReducer.selectedConversationHistory;
+    const selectedConversationHistory = state.conversationReducer.selectedConversationHistory;
     const response = await client.post(CHAT_HISTORY_CREATE, {
       data: {
         user: state.userReducer.name,
@@ -200,7 +191,7 @@ export const saveConversationtoDatabase = createAsyncThunkWrapper(
       first_query: selectedConversationHistory[1].content,
     });
     return response.data;
-  }
+  },
 );
 
 export const getAllConversations = createAsyncThunkWrapper(
@@ -210,29 +201,23 @@ export const getAllConversations = createAsyncThunkWrapper(
       user,
     });
     return response.data;
-  }
+  },
 );
 
 export const getConversationHistory = createAsyncThunkWrapper(
   "conversation/getConversationHistory",
-  async (
-    { user, conversationId }: { user: string; conversationId: string },
-    {}
-  ) => {
+  async ({ user, conversationId }: { user: string; conversationId: string }, {}) => {
     const response = await client.post(CHAT_HISTORY_GET, {
       user,
       id: conversationId,
     });
     return response.data.messages;
-  }
+  },
 );
 
 export const deleteConversation = createAsyncThunkWrapper(
   "conversation/delete",
-  async (
-    { user, conversationId }: { user: string; conversationId: string },
-    { dispatch }
-  ) => {
+  async ({ user, conversationId }: { user: string; conversationId: string }, { dispatch }) => {
     const response = await client.post(CHAT_HISTORY_DELETE, {
       user,
       id: conversationId,
@@ -241,7 +226,7 @@ export const deleteConversation = createAsyncThunkWrapper(
     dispatch(newConversation());
     dispatch(getAllConversations({ user }));
     return response.data;
-  }
+  },
 );
 
 export const doConversation = (conversationRequest: ConversationRequest) => {
@@ -256,7 +241,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
     messages: [...messages, userPromptWithoutTime],
     model,
     max_new_tokens: token,
-    temperature: temperature
+    temperature: temperature,
   };
 
   //   let conversation: Conversation;
@@ -272,11 +257,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
       async onopen(response) {
         if (response.ok) {
           return;
-        } else if (
-          response.status >= 400 &&
-          response.status < 500 &&
-          response.status !== 429
-        ) {
+        } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
           const e = await response.json();
           console.log(e);
           throw Error(e.error.message);
@@ -322,7 +303,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
             conversation: {
               id: conversationId,
             },
-          })
+          }),
         );
       },
     });
@@ -339,8 +320,7 @@ export const {
   setSelectedConversationId,
   setTemperature,
   setToken,
-  setSystemPrompt
+  setSystemPrompt,
 } = ConversationSlice.actions;
-export const conversationSelector = (state: RootState) =>
-  state.conversationReducer;
+export const conversationSelector = (state: RootState) => state.conversationReducer;
 export default ConversationSlice.reducer;

@@ -6,8 +6,8 @@ export type ConversationRequest = {
   userPrompt: Message;
   messages: Message[];
   model: string;
-  temperature: number,
-  token: number
+  temperature: number;
+  token: number;
 };
 export enum MessageRole {
   Assistant = "assistant",
