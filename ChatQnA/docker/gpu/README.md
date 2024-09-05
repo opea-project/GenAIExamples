@@ -87,6 +87,18 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 
 ## 🚀 Start MicroServices and MegaService
 
+### Required Models
+
+By default, the embedding, reranking and LLM models are set to a default value as listed below:
+
+| Service   | Model                     |
+| --------- | ------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5     |
+| Reranking | BAAI/bge-reranker-base    |
+| LLM       | Intel/neural-chat-7b-v3-3 |
+
+Change the `xxx_MODEL_ID` below for your needs.
+
 ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
@@ -180,6 +192,22 @@ curl http://${host_ip}:8000/v1/reranking \
 
 6. TGI Service
 
+In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
+
+Try the command below to check whether the TGI service is ready.
+
+```bash
+docker logs ${CONTAINER_ID} | grep Connected
+```
+
+If the service is ready, you will get the response like below.
+
+```log
+2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+```
+
+Then try the `cURL` command below to validate TGI.
+
 ```bash
 curl http://${host_ip}:8008/generate \
   -X POST \
@@ -268,19 +296,19 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 ## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-ui-server` service with the `chatqna-react-ui-server` service as per the config below:
 
 ```yaml
-chaqna-xeon-conversation-ui-server:
-  image: opea/chatqna-conversation-ui:latest
-  container_name: chatqna-xeon-conversation-ui-server
+chatqna-react-ui-server:
+  image: opea/chatqna-react-ui:latest
+  container_name: chatqna-react-ui-server
   environment:
     - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
     - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
   ports:
     - "5174:80"
   depends_on:
-    - chaqna-xeon-backend-server
+    - chaqna-backend-server
   ipc: host
   restart: always
 ```
@@ -288,8 +316,8 @@ chaqna-xeon-conversation-ui-server:
 Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  chaqna-xeon-conversation-ui-server:
-    image: opea/chatqna-conversation-ui:latest
+  chaqna-react-ui-server:
+    image: opea/chatqna-react-ui:latest
     ...
     ports:
       - "80:80"

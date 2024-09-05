@@ -1,0 +1,113 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Examples docker images BoM/CVE scan on manual event
+on:
+  workflow_dispatch:
+    inputs:
+      node:
+        default: "gaudi"
+        description: "Hardware to run scan"
+        required: true
+        type: string
+      examples:
+        default: "ChatQnA"
+        description: 'List of examples to scan [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        required: false
+        type: string
+      images:
+        default: "gmcmanager,gmcrouter"
+        description: 'List of images to scan [gmcmanager,gmcrouter, ...]'
+        required: false
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag for images to scan"
+        required: true
+        type: string
+      sbom_scan:
+        default: true
+        description: 'Scan images for BoM'
+        required: false
+        type: boolean
+      trivy_scan:
+        default: true
+        description: 'Scan images for CVE'
+        required: false
+        type: boolean
+
+permissions: read-all
+jobs:
+  get-image-list:
+    uses: ./.github/workflows/_get-image-list.yml
+    with:
+      examples: ${{ inputs.examples }}
+      images: ${{ inputs.images }}
+
+  scan-docker:
+    needs: get-image-list
+    runs-on: "docker-build-${{ inputs.node }}"
+    strategy:
+      matrix:
+        image: ${{ fromJson(needs.get-image-list.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - name: Clean up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/* || true
+          docker system prune -f
+
+      - name: Pull Image
+        run: |
+          docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
+
+      - name: SBOM Scan Container
+        uses: anchore/sbom-action@v0.17.1
+        if: ${{ inputs.sbom_scan }}
+        with:
+          image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
+          output-file: ${{ matrix.image }}-sbom-scan.txt
+          format: 'spdx-json'
+
+      - name: Security Scan Container
+        uses: aquasecurity/trivy-action@0.24.0
+        if: ${{ inputs.trivy_scan }}
+        with:
+          image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
+          output: ${{ matrix.image }}-trivy-scan.txt
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Cleanup
+        if: always()
+        run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }} || true
+
+      - name: Collect Logs
+        if: always()
+        run: |
+          mkdir -p /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
+          mv ${{ matrix.image }}-*-scan.txt /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
+
+  upload-artifacts:
+    needs: scan-docker
+    runs-on: "docker-build-${{ inputs.node }}"
+    if: always()
+    steps:
+      - uses: actions/upload-artifact@v4.3.4
+        with:
+          name: sbom-scan-${{ inputs.tag }}-${{ github.run_number }}
+          path: /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}/*-sbom-scan.txt
+          overwrite: true
+
+      - uses: actions/upload-artifact@v4.3.4
+        with:
+          name: trivy-scan-${{ inputs.tag }}-${{ github.run_number }}
+          path: /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}/*-trivy-scan.txt
+          overwrite: true
+
+      - name: Remove Logs
+        run: rm -rf /tmp/scan-${{ inputs.tag }}-${{ github.run_number }} && rm -rf /tmp/sbom-action-*

@@ -80,6 +80,8 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 
 ### 3. Build Rerank Image
 
+> Skip for ChatQnA without Rerank pipeline
+
 ```bash
 docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
 ```
@@ -118,14 +120,27 @@ cd ..
 
 ### 6. Build MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+1. MegaService with Rerank
 
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA/docker
-docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
-```
+   To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+   cd ../../..
+   ```
+
+2. MegaService without Rerank
+
+   To construct the Mega Service without Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna_without_rerank.py` Python script. Build MegaService Docker image via below command:
+
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_without_rerank .
+   cd ../../..
+   ```
 
 ### 7. Build UI Docker Image
 
@@ -156,10 +171,22 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 3. `opea/retriever-redis:latest`
 4. `opea/reranking-tei:latest`
 5. `opea/llm-tgi:latest` or `opea/llm-vllm:latest`
-6. `opea/chatqna:latest`
+6. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest`
 7. `opea/chatqna-ui:latest`
 
 ## 🚀 Start Microservices
+
+### Required Models
+
+By default, the embedding, reranking and LLM models are set to a default value as listed below:
+
+| Service   | Model                     |
+| --------- | ------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5     |
+| Reranking | BAAI/bge-reranker-base    |
+| LLM       | Intel/neural-chat-7b-v3-3 |
+
+Change the `xxx_MODEL_ID` below for your needs.
 
 ### Setup Environment Variables
 
@@ -183,7 +210,7 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 
 **Append the value of the public IP address to the no_proxy list**
 
-```
+```bash
 export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
@@ -226,7 +253,10 @@ cd GenAIExamples/ChatQnA/docker/xeon/
 If use TGI backend.
 
 ```bash
+# Start ChatQnA with Rerank Pipeline
 docker compose -f compose.yaml up -d
+# Start ChatQnA without Rerank Pipeline
+docker compose -f compose_without_rerank.yaml up -d
 ```
 
 If use vLLM backend.
@@ -273,6 +303,8 @@ curl http://${host_ip}:7000/v1/retrieval \
 
 4. TEI Reranking Service
 
+> Skip for ChatQnA without Rerank pipeline
+
 ```bash
 curl http://${host_ip}:8808/rerank \
     -X POST \
@@ -281,6 +313,8 @@ curl http://${host_ip}:8808/rerank \
 ```
 
 5. Reranking Microservice
+
+> Skip for ChatQnA without Rerank pipeline
 
 ```bash
 curl http://${host_ip}:8000/v1/reranking\
@@ -291,9 +325,21 @@ curl http://${host_ip}:8000/v1/reranking\
 
 6. LLM backend Service
 
-In first startup, this service will take more time to download the LLM file. After it's finished, the service will be ready.
+In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
 
-Use `docker logs CONTAINER_ID` to check if the download is finished.
+Try the command below to check whether the LLM serving is ready.
+
+```bash
+docker logs ${CONTAINER_ID} | grep Connected
+```
+
+If the service is ready, you will get the response like below.
+
+```log
+2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+```
+
+Then try the `cURL` command below to validate services.
 
 ```bash
 # TGI service
@@ -360,12 +406,33 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
      -H "Content-Type: application/json"
 ```
 
+Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
+
+```json
+[
+  {
+    "name": "nke-10k-2023.pdf",
+    "id": "nke-10k-2023.pdf",
+    "type": "File",
+    "parent": ""
+  },
+  {
+    "name": "https://opea.dev.txt",
+    "id": "https://opea.dev.txt",
+    "type": "File",
+    "parent": ""
+  }
+]
+```
+
 To delete the file/link you uploaded:
+
+The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
 
 ```bash
 # delete link
 curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "https://opea.dev"}' \
+     -d '{"file_path": "https://opea.dev.txt"}' \
      -H "Content-Type: application/json"
 
 # delete file
