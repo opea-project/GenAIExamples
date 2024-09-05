@@ -101,9 +101,13 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 
 The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
+Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
+
+### Prepare Docker Image
+
 Currently we support two ways of deploying ChatQnA services with docker compose:
 
-1. Start services using the docker image on `docker hub`:
+1. Using the docker image on `docker hub`:
 
    ```bash
    docker pull opea/chatqna:latest
@@ -119,7 +123,9 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
    docker pull opea/chatqna-conversation-ui:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker)
+2. Using the docker images `built from source`: [Guide](docker/xeon/README.md)
+
+   > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
 
 ### Required Models
 

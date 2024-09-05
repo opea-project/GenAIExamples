@@ -27,6 +27,8 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 
 ### 4. Build Rerank Image
 
+> Skip for ChatQnA without Rerank pipeline
+
 ```bash
 docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
 ```
@@ -88,23 +90,38 @@ cd ../..
 
 ### 8. Build MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
+1. MegaService with Rerank
 
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA/docker
-docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
-```
+   To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
 
-If you want to enable guardrails microservice in the pipeline, please use the below command instead:
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+   cd ../../..
+   ```
 
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA/docker
-docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_guardrails .
-cd ../../..
-```
+2. MegaService with Guardrails
+
+   If you want to enable guardrails microservice in the pipeline, please use the below command instead:
+
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_guardrails .
+   cd ../../..
+   ```
+
+3. MegaService without Rerank
+
+   To construct the Mega Service without Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna_without_rerank.py` Python script. Build MegaService Docker image via below command:
+
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_without_rerank .
+   cd ../../..
+   ```
 
 ### 9. Build UI Docker Image
 
@@ -146,7 +163,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 4. `opea/llm-tgi:latest` or `opea/llm-vllm:latest` or `opea/llm-vllm-ray:latest`
 5. `opea/tei-gaudi:latest`
 6. `opea/dataprep-redis:latest`
-7. `opea/chatqna:latest` or `opea/chatqna-guardrails:latest`
+7. `opea/chatqna:latest` or `opea/chatqna-guardrails:latest` or `opea/chatqna-without-rerank:latest`
 8. `opea/chatqna-ui:latest`
 
 If Conversation React UI is built, you will find one more image:
@@ -223,7 +240,10 @@ cd GenAIExamples/ChatQnA/docker/gaudi/
 If use tgi for llm backend.
 
 ```bash
+# Start ChatQnA with Rerank Pipeline
 docker compose -f compose.yaml up -d
+# Start ChatQnA without Rerank Pipeline
+docker compose -f compose_without_rerank.yaml up -d
 ```
 
 If use vllm for llm backend.
@@ -288,6 +308,8 @@ curl http://${host_ip}:7000/v1/retrieval \
 
 4. TEI Reranking Service
 
+> Skip for ChatQnA without Rerank pipeline
+
 ```bash
 curl http://${host_ip}:8808/rerank \
     -X POST \
@@ -296,6 +318,8 @@ curl http://${host_ip}:8808/rerank \
 ```
 
 5. Reranking Microservice
+
+> Skip for ChatQnA without Rerank pipeline
 
 ```bash
 curl http://${host_ip}:8000/v1/reranking \
@@ -397,12 +421,31 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
      -H "Content-Type: application/json"
 ```
 
+Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
+
+```json
+[
+  {
+    "name": "nke-10k-2023.pdf",
+    "id": "nke-10k-2023.pdf",
+    "type": "File",
+    "parent": ""
+  },
+  {
+    "name": "https://opea.dev.txt",
+    "id": "https://opea.dev.txt",
+    "type": "File",
+    "parent": ""
+  }
+]
+```
+
 To delete the file/link you uploaded:
 
 ```bash
 # delete link
 curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "https://opea.dev"}' \
+     -d '{"file_path": "https://opea.dev.txt"}' \
      -H "Content-Type: application/json"
 
 # delete file
