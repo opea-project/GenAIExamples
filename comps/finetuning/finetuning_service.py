@@ -60,7 +60,7 @@ async def upload_training_files(request: UploadFileRequest = Depends(upload_file
 )
 def list_checkpoints(request: FineTuningJobIDRequest):
     checkpoints = handle_list_finetuning_checkpoints(request)
-    return {"status": 200, "checkpoints": str(checkpoints)}
+    return checkpoints
 
 
 if __name__ == "__main__":
