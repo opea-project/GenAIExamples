@@ -1,0 +1,62 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-backend-server-deploy
+  namespace: default
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: chatqna-backend-server-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: chatqna-backend-server-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: chatqna-backend-server-deploy
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: opea/chatqna-without-rerank:latest
+        imagePullPolicy: IfNotPresent
+        name: chatqna-backend-server-deploy
+        args: null
+        ports:
+        - containerPort: 8888
+        resources:
+          limits:
+            cpu: 8
+            memory: 4000Mi
+          requests:
+            cpu: 8
+            memory: 4000Mi
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: chatqna-backend-server-svc
+spec:
+  type: NodePort
+  selector:
+    app: chatqna-backend-server-deploy
+  ports:
+  - name: service
+    port: 8888
+    targetPort: 8888
+    nodePort: 30888
