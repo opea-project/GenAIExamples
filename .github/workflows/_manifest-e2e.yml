@@ -80,6 +80,7 @@ jobs:
               echo "skip_validate=false" >> $GITHUB_ENV
             else
               echo "Timeout waiting for pods in namespace $NAMESPACE to be ready!"
+              .github/workflows/scripts/k8s-utils.sh dump_pods_status $NAMESPACE
               exit 1
             fi
             sleep 60
@@ -91,7 +92,12 @@ jobs:
           if $skip_validate; then
             echo "Skip validate"
           else
-            ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh validate_${{ inputs.example }} $NAMESPACE
+            if ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh validate_${{ inputs.example }} $NAMESPACE ; then
+              echo "Validate ${{ inputs.example }} successful!"
+            else
+              echo "Validate ${{ inputs.example }} failure!!!"
+              .github/workflows/scripts/k8s-utils.sh dump_all_pod_logs $NAMESPACE
+            fi
           fi
 
       - name: Kubectl uninstall

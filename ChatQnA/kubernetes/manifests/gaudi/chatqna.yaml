@@ -8,24 +8,24 @@ kind: ConfigMap
 metadata:
   name: chatqna-data-prep-config
   labels:
-    helm.sh/chart: data-prep-0.8.0
+    helm.sh/chart: data-prep-1.0.0
     app.kubernetes.io/name: data-prep
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_ENDPOINT: "http://chatqna-tei"
   EMBED_MODEL: ""
   REDIS_URL: "redis://chatqna-redis-vector-db:6379"
   INDEX_NAME: "rag-redis"
+  KEY_INDEX_NAME: "file-keys"
+  SEARCH_BATCH_SIZE: "10"
   HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   HF_HOME: "/tmp/.cache/huggingface"
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
-  LANGCHAIN_TRACING_V2: "false"
-  LANGCHAIN_API_KEY: "insert-your-langchain-key-here"
-  LANGCHAIN_PROJECT: "opea-dataprep-service"
+  LOGFLAG: ""
 ---
 # Source: chatqna/charts/embedding-usvc/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -36,19 +36,17 @@ kind: ConfigMap
 metadata:
   name: chatqna-embedding-usvc-config
   labels:
-    helm.sh/chart: embedding-usvc-0.8.0
+    helm.sh/chart: embedding-usvc-1.0.0
     app.kubernetes.io/name: embedding-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_EMBEDDING_ENDPOINT: "http://chatqna-tei"
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
-  LANGCHAIN_TRACING_V2: "false"
-  LANGCHAIN_API_KEY: insert-your-langchain-key-here
-  LANGCHAIN_PROJECT: "opea-embedding-service"
+  LOGFLAG: ""
 ---
 # Source: chatqna/charts/llm-uservice/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -59,10 +57,10 @@ kind: ConfigMap
 metadata:
   name: chatqna-llm-uservice-config
   labels:
-    helm.sh/chart: llm-uservice-0.8.0
+    helm.sh/chart: llm-uservice-1.0.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 data:
   TGI_LLM_ENDPOINT: "http://chatqna-tgi"
@@ -71,9 +69,7 @@ data:
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
-  LANGCHAIN_TRACING_V2: "false"
-  LANGCHAIN_API_KEY: insert-your-langchain-key-here
-  LANGCHAIN_PROJECT: "opea-llm-uservice"
+  LOGFLAG: ""
 ---
 # Source: chatqna/charts/reranking-usvc/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -84,19 +80,17 @@ kind: ConfigMap
 metadata:
   name: chatqna-reranking-usvc-config
   labels:
-    helm.sh/chart: reranking-usvc-0.8.0
+    helm.sh/chart: reranking-usvc-1.0.0
     app.kubernetes.io/name: reranking-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_RERANKING_ENDPOINT: "http://chatqna-teirerank"
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
-  LANGCHAIN_TRACING_V2: "false"
-  LANGCHAIN_API_KEY: "insert-your-langchain-key-here"
-  LANGCHAIN_PROJECT: "opea-reranking-service"
+  LOGFLAG: ""
 ---
 # Source: chatqna/charts/retriever-usvc/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -107,10 +101,10 @@ kind: ConfigMap
 metadata:
   name: chatqna-retriever-usvc-config
   labels:
-    helm.sh/chart: retriever-usvc-0.8.0
+    helm.sh/chart: retriever-usvc-1.0.0
     app.kubernetes.io/name: retriever-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_EMBEDDING_ENDPOINT: "http://chatqna-tei"
@@ -121,11 +115,9 @@ data:
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
-  LANGCHAIN_TRACING_V2: "false"
-  LANGCHAIN_API_KEY: "insert-your-langchain-key-here"
-  LANGCHAIN_PROJECT: "opea-retriever-service"
   HF_HOME: "/tmp/.cache/huggingface"
   HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  LOGFLAG: ""
 ---
 # Source: chatqna/charts/tei/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -136,7 +128,7 @@ kind: ConfigMap
 metadata:
   name: chatqna-tei-config
   labels:
-    helm.sh/chart: tei-0.8.0
+    helm.sh/chart: tei-1.0.0
     app.kubernetes.io/name: tei
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "cpu-1.5"
@@ -161,7 +153,7 @@ kind: ConfigMap
 metadata:
   name: chatqna-teirerank-config
   labels:
-    helm.sh/chart: teirerank-0.8.0
+    helm.sh/chart: teirerank-1.0.0
     app.kubernetes.io/name: teirerank
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "cpu-1.5"
@@ -185,7 +177,7 @@ kind: ConfigMap
 metadata:
   name: chatqna-tgi-config
   labels:
-    helm.sh/chart: tgi-0.8.0
+    helm.sh/chart: tgi-1.0.0
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "2.1.0"
@@ -199,7 +191,6 @@ data:
   no_proxy: ""
   HABANA_LOGS: "/tmp/habana_logs"
   NUMBA_CACHE_DIR: "/tmp"
-  TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
   MAX_INPUT_LENGTH: "1024"
   MAX_TOTAL_TOKENS: "2048"
@@ -213,10 +204,10 @@ kind: Service
 metadata:
   name: chatqna-data-prep
   labels:
-    helm.sh/chart: data-prep-0.8.0
+    helm.sh/chart: data-prep-1.0.0
     app.kubernetes.io/name: data-prep
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -238,10 +229,10 @@ kind: Service
 metadata:
   name: chatqna-embedding-usvc
   labels:
-    helm.sh/chart: embedding-usvc-0.8.0
+    helm.sh/chart: embedding-usvc-1.0.0
     app.kubernetes.io/name: embedding-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -263,10 +254,10 @@ kind: Service
 metadata:
   name: chatqna-llm-uservice
   labels:
-    helm.sh/chart: llm-uservice-0.8.0
+    helm.sh/chart: llm-uservice-1.0.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -288,7 +279,7 @@ kind: Service
 metadata:
   name: chatqna-redis-vector-db
   labels:
-    helm.sh/chart: redis-vector-db-0.8.0
+    helm.sh/chart: redis-vector-db-1.0.0
     app.kubernetes.io/name: redis-vector-db
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "7.2.0-v9"
@@ -317,10 +308,10 @@ kind: Service
 metadata:
   name: chatqna-reranking-usvc
   labels:
-    helm.sh/chart: reranking-usvc-0.8.0
+    helm.sh/chart: reranking-usvc-1.0.0
     app.kubernetes.io/name: reranking-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -342,10 +333,10 @@ kind: Service
 metadata:
   name: chatqna-retriever-usvc
   labels:
-    helm.sh/chart: retriever-usvc-0.8.0
+    helm.sh/chart: retriever-usvc-1.0.0
     app.kubernetes.io/name: retriever-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -367,7 +358,7 @@ kind: Service
 metadata:
   name: chatqna-tei
   labels:
-    helm.sh/chart: tei-0.8.0
+    helm.sh/chart: tei-1.0.0
     app.kubernetes.io/name: tei
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "cpu-1.5"
@@ -392,7 +383,7 @@ kind: Service
 metadata:
   name: chatqna-teirerank
   labels:
-    helm.sh/chart: teirerank-0.8.0
+    helm.sh/chart: teirerank-1.0.0
     app.kubernetes.io/name: teirerank
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "cpu-1.5"
@@ -417,7 +408,7 @@ kind: Service
 metadata:
   name: chatqna-tgi
   labels:
-    helm.sh/chart: tgi-0.8.0
+    helm.sh/chart: tgi-1.0.0
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "2.1.0"
@@ -442,10 +433,10 @@ kind: Service
 metadata:
   name: chatqna
   labels:
-    helm.sh/chart: chatqna-0.8.0
+    helm.sh/chart: chatqna-1.0.0
     app.kubernetes.io/name: chatqna
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -467,10 +458,10 @@ kind: Deployment
 metadata:
   name: chatqna-data-prep
   labels:
-    helm.sh/chart: data-prep-0.8.0
+    helm.sh/chart: data-prep-1.0.0
     app.kubernetes.io/name: data-prep
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -545,10 +536,10 @@ kind: Deployment
 metadata:
   name: chatqna-embedding-usvc
   labels:
-    helm.sh/chart: embedding-usvc-0.8.0
+    helm.sh/chart: embedding-usvc-1.0.0
     app.kubernetes.io/name: embedding-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -623,10 +614,10 @@ kind: Deployment
 metadata:
   name: chatqna-llm-uservice
   labels:
-    helm.sh/chart: llm-uservice-0.8.0
+    helm.sh/chart: llm-uservice-1.0.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -701,7 +692,7 @@ kind: Deployment
 metadata:
   name: chatqna-redis-vector-db
   labels:
-    helm.sh/chart: redis-vector-db-0.8.0
+    helm.sh/chart: redis-vector-db-1.0.0
     app.kubernetes.io/name: redis-vector-db
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "7.2.0-v9"
@@ -773,10 +764,10 @@ kind: Deployment
 metadata:
   name: chatqna-reranking-usvc
   labels:
-    helm.sh/chart: reranking-usvc-0.8.0
+    helm.sh/chart: reranking-usvc-1.0.0
     app.kubernetes.io/name: reranking-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -851,10 +842,10 @@ kind: Deployment
 metadata:
   name: chatqna-retriever-usvc
   labels:
-    helm.sh/chart: retriever-usvc-0.8.0
+    helm.sh/chart: retriever-usvc-1.0.0
     app.kubernetes.io/name: retriever-usvc
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -929,12 +920,13 @@ kind: Deployment
 metadata:
   name: chatqna-tei
   labels:
-    helm.sh/chart: tei-0.8.0
+    helm.sh/chart: tei-1.0.0
     app.kubernetes.io/name: tei
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "cpu-1.5"
     app.kubernetes.io/managed-by: Helm
 spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
   replicas: 1
   selector:
     matchLabels:
@@ -954,7 +946,15 @@ spec:
             - configMapRef:
                 name: chatqna-tei-config
           securityContext:
-            {}
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           image: "ghcr.io/huggingface/tei-gaudi:synapse_1.16"
           imagePullPolicy: IfNotPresent
           args:
@@ -995,9 +995,7 @@ spec:
               habana.ai/gaudi: 1
       volumes:
         - name: model-volume
-          hostPath:
-            path: /mnt/opea-models
-            type: Directory
+          emptyDir: {}
         - name: shm
           emptyDir:
             medium: Memory
@@ -1014,12 +1012,13 @@ kind: Deployment
 metadata:
   name: chatqna-teirerank
   labels:
-    helm.sh/chart: teirerank-0.8.0
+    helm.sh/chart: teirerank-1.0.0
     app.kubernetes.io/name: teirerank
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "cpu-1.5"
     app.kubernetes.io/managed-by: Helm
 spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
   replicas: 1
   selector:
     matchLabels:
@@ -1039,7 +1038,15 @@ spec:
             - configMapRef:
                 name: chatqna-teirerank-config
           securityContext:
-            {}
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
           imagePullPolicy: IfNotPresent
           args:
@@ -1079,9 +1086,7 @@ spec:
             {}
       volumes:
         - name: model-volume
-          hostPath:
-            path: /mnt/opea-models
-            type: Directory
+          emptyDir: {}
         - name: shm
           emptyDir:
             medium: Memory
@@ -1098,12 +1103,13 @@ kind: Deployment
 metadata:
   name: chatqna-tgi
   labels:
-    helm.sh/chart: tgi-0.8.0
+    helm.sh/chart: tgi-1.0.0
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
   replicas: 1
   selector:
     matchLabels:
@@ -1123,7 +1129,15 @@ spec:
             - configMapRef:
                 name: chatqna-tgi-config
           securityContext:
-            {}
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           image: "ghcr.io/huggingface/tgi-gaudi:2.0.1"
           imagePullPolicy: IfNotPresent
           volumeMounts:
@@ -1157,9 +1171,7 @@ spec:
               habana.ai/gaudi: 1
       volumes:
         - name: model-volume
-          hostPath:
-            path: /mnt/opea-models
-            type: Directory
+          emptyDir: {}
         - name: tmp
           emptyDir: {}
 ---
@@ -1172,10 +1184,10 @@ kind: Deployment
 metadata:
   name: chatqna
   labels:
-    helm.sh/chart: chatqna-0.8.0
+    helm.sh/chart: chatqna-1.0.0
     app.kubernetes.io/name: chatqna
     app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -1202,6 +1214,8 @@ spec:
               value: chatqna-retriever-usvc
             - name: EMBEDDING_SERVICE_HOST_IP
               value: chatqna-embedding-usvc
+            - name: GUARDRAIL_SERVICE_HOST_IP
+              value: chatqna-guardrails-usvc
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

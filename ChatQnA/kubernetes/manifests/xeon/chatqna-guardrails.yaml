@@ -6,72 +6,6 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: chatqna-nginx-config
-  labels:
-    helm.sh/chart: chatqna-nginx-0.8.0
-    app.kubernetes.io/name: chatqna-nginx
-    app.kubernetes.io/instance: chatqna-nginx
-    app.kubernetes.io/version: "v0.8"
-    app.kubernetes.io/managed-by: Helm
-data:
-  default.conf: |
-    server {
-        listen       80;
-        listen  [::]:80;
-
-        location /home {
-            root   /usr/share/nginx/html;
-            index  index.html index.htm;
-        }
-
-        location / {
-            proxy_pass http://chatqna-ui:5173;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-
-        location /v1/chatqna {
-            proxy_pass http://chatqna:8888;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-
-         location /v1/dataprep {
-            proxy_pass http://chatqna-data-prep:6007;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-
-         location /v1/dataprep/get_file {
-            proxy_pass http://chatqna-data-prep:6007;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-
-         location /v1/dataprep/delete_file {
-            proxy_pass http://chatqna-data-prep:6007;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-    }
----
-# Source: chatqna/charts/data-prep/templates/configmap.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
   name: chatqna-data-prep-config
   labels:
     helm.sh/chart: data-prep-1.0.0
@@ -113,6 +47,30 @@ data:
   https_proxy: ""
   no_proxy: ""
   LOGFLAG: ""
+---
+# Source: chatqna/charts/guardrails-usvc/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chatqna-guardrails-usvc-config
+  labels:
+    helm.sh/chart: guardrails-usvc-1.0.0
+    app.kubernetes.io/name: guardrails-usvc
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  SAFETY_GUARD_ENDPOINT: "http://chatqna-tgi-guardrails"
+  SAFETY_GUARD_MODEL_ID: "meta-llama/Meta-Llama-Guard-2-8B"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  HF_HOME: "/tmp/.cache/huggingface"
+  LOGFLAG: ""
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
 ---
 # Source: chatqna/charts/llm-uservice/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -234,6 +192,32 @@ data:
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
 ---
+# Source: chatqna/charts/tgi-guardrails/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chatqna-tgi-guardrails-config
+  labels:
+    helm.sh/chart: tgi-guardrails-1.0.0
+    app.kubernetes.io/name: tgi-guardrails
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  MODEL_ID: "meta-llama/Meta-Llama-Guard-2-8B"
+  PORT: "2080"
+  HF_TOKEN: "insert-your-huggingface-token-here"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  HABANA_LOGS: "/tmp/habana_logs"
+  NUMBA_CACHE_DIR: "/tmp"
+  HF_HOME: "/tmp/.cache/huggingface"
+  CUDA_GRAPHS: "0"
+---
 # Source: chatqna/charts/tgi/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -308,6 +292,31 @@ spec:
       name: embedding-usvc
   selector:
     app.kubernetes.io/name: embedding-usvc
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/guardrails-usvc/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-guardrails-usvc
+  labels:
+    helm.sh/chart: guardrails-usvc-1.0.0
+    app.kubernetes.io/name: guardrails-usvc
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+      name: guardrails-usvc
+  selector:
+    app.kubernetes.io/name: guardrails-usvc
     app.kubernetes.io/instance: chatqna
 ---
 # Source: chatqna/charts/llm-uservice/templates/service.yaml
@@ -464,6 +473,31 @@ spec:
     app.kubernetes.io/name: teirerank
     app.kubernetes.io/instance: chatqna
 ---
+# Source: chatqna/charts/tgi-guardrails/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-tgi-guardrails
+  labels:
+    helm.sh/chart: tgi-guardrails-1.0.0
+    app.kubernetes.io/name: tgi-guardrails
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 2080
+      protocol: TCP
+      name: tgi
+  selector:
+    app.kubernetes.io/name: tgi-guardrails
+    app.kubernetes.io/instance: chatqna
+---
 # Source: chatqna/charts/tgi/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -513,31 +547,6 @@ spec:
   selector:
     app.kubernetes.io/name: chatqna
     app.kubernetes.io/instance: chatqna
----
-# Source: chatqna/templates/service.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: chatqna-ui
-  labels:
-    helm.sh/chart: chatqna-ui-0.8.0
-    app.kubernetes.io/name: chatqna-ui
-    app.kubernetes.io/instance: chatqna-ui
-    app.kubernetes.io/version: "v0.8"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 5173
-      targetPort: 5173
-      protocol: TCP
-      name: chatqna-ui
-  selector:
-    app.kubernetes.io/name: chatqna-ui
-    app.kubernetes.io/instance: chatqna-ui
 ---
 # Source: chatqna/charts/data-prep/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -687,6 +696,84 @@ spec:
             httpGet:
               path: v1/health_check
               port: embedding-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/charts/guardrails-usvc/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-guardrails-usvc
+  labels:
+    helm.sh/chart: guardrails-usvc-1.0.0
+    app.kubernetes.io/name: guardrails-usvc
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: guardrails-usvc
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: guardrails-usvc
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: chatqna
+          envFrom:
+            - configMapRef:
+                name: chatqna-guardrails-usvc-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/guardrails-tgi:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: guardrails-usvc
+              containerPort: 9090
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: guardrails-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: guardrails-usvc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: guardrails-usvc
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
@@ -1008,49 +1095,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatqna-ui
-  labels:
-    helm.sh/chart: chatqna-ui-0.8.0
-    app.kubernetes.io/name: chatqna-ui
-    app.kubernetes.io/instance: chatqna-ui
-    app.kubernetes.io/version: "v0.8"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: chatqna-ui
-      app.kubernetes.io/instance: chatqna-ui
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
-      labels:
-        app.kubernetes.io/name: chatqna-ui
-        app.kubernetes.io/instance: chatqna-ui
-    spec:
-      securityContext:
-        {}
-      hostIPC: true
-      containers:
-        - name: chatqna-ui
-          securityContext:
-            {}
-          image: "opea/chatqna-ui:latest"
-          imagePullPolicy: IfNotPresent
-          args: null
-          ports:
-            - name: http
-              containerPort: 5173
-              protocol: TCP
----
-# Source: chatqna/charts/tei/templates/deployment.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: chatqna-tei
   labels:
     helm.sh/chart: tei-1.0.0
@@ -1226,6 +1270,86 @@ spec:
         - name: tmp
           emptyDir: {}
 ---
+# Source: chatqna/charts/tgi-guardrails/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-tgi-guardrails
+  labels:
+    helm.sh/chart: tgi-guardrails-1.0.0
+    app.kubernetes.io/name: tgi-guardrails
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tgi-guardrails
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tgi-guardrails
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: tgi-guardrails
+          envFrom:
+            - configMapRef:
+                name: chatqna-tgi-guardrails-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "ghcr.io/huggingface/text-generation-inference:2.2.0"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: http
+              containerPort: 2080
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          startupProbe:
+            failureThreshold: 120
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          resources:
+            {}
+      volumes:
+        - name: model-volume
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
 # Source: chatqna/charts/tgi/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -1270,7 +1394,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
+          image: "ghcr.io/huggingface/text-generation-inference:2.2.0"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
@@ -1357,7 +1481,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/chatqna:latest"
+          image: "opea/chatqna-guardrails:latest"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /tmp
@@ -1387,60 +1511,3 @@ spec:
       volumes:
         - name: tmp
           emptyDir: {}
----
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: chatqna-nginx-deployment
-  labels:
-    helm.sh/chart: chatqna-nginx-0.8.0
-    app.kubernetes.io/name: chatqna-nginx
-    app.kubernetes.io/instance: chatqna-nginx
-    app.kubernetes.io/version: "v0.8"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: chatqna-nginx
-  template:
-    metadata:
-      labels:
-        app: chatqna-nginx
-    spec:
-      containers:
-      - name: chatqna-nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - name: nginx-config-volume
-          mountPath: /etc/nginx/conf.d/default.conf
-          subPath: default.conf
-      volumes:
-      - name: nginx-config-volume
-        configMap:
-          name: chatqna-nginx-config
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: chatqna-nginx-svc
-  labels:
-    helm.sh/chart: chatqna-nginx-0.8.0
-    app.kubernetes.io/name: chatqna-nginx
-    app.kubernetes.io/instance: chatqna-nginx
-    app.kubernetes.io/version: "v0.8"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  selector:
-    app: chatqna-nginx
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-      nodePort: 30789
-  type: NodePort

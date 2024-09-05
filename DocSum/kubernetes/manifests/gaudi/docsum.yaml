@@ -8,10 +8,10 @@ kind: ConfigMap
 metadata:
   name: docsum-llm-uservice-config
   labels:
-    helm.sh/chart: llm-uservice-0.8.0
+    helm.sh/chart: llm-uservice-1.0.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 data:
   TGI_LLM_ENDPOINT: "http://docsum-tgi"
@@ -20,9 +20,7 @@ data:
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
-  LANGCHAIN_TRACING_V2: "false"
-  LANGCHAIN_API_KEY: insert-your-langchain-key-here
-  LANGCHAIN_PROJECT: "opea-llm-uservice"
+  LOGFLAG: ""
 ---
 # Source: docsum/charts/tgi/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -33,7 +31,7 @@ kind: ConfigMap
 metadata:
   name: docsum-tgi-config
   labels:
-    helm.sh/chart: tgi-0.8.0
+    helm.sh/chart: tgi-1.0.0
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: docsum
     app.kubernetes.io/version: "2.1.0"
@@ -47,7 +45,6 @@ data:
   no_proxy: ""
   HABANA_LOGS: "/tmp/habana_logs"
   NUMBA_CACHE_DIR: "/tmp"
-  TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
   MAX_INPUT_LENGTH: "1024"
   MAX_TOTAL_TOKENS: "2048"
@@ -61,10 +58,10 @@ kind: Service
 metadata:
   name: docsum-llm-uservice
   labels:
-    helm.sh/chart: llm-uservice-0.8.0
+    helm.sh/chart: llm-uservice-1.0.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -86,7 +83,7 @@ kind: Service
 metadata:
   name: docsum-tgi
   labels:
-    helm.sh/chart: tgi-0.8.0
+    helm.sh/chart: tgi-1.0.0
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: docsum
     app.kubernetes.io/version: "2.1.0"
@@ -111,10 +108,10 @@ kind: Service
 metadata:
   name: docsum
   labels:
-    helm.sh/chart: docsum-0.8.0
+    helm.sh/chart: docsum-1.0.0
     app.kubernetes.io/name: docsum
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -136,10 +133,10 @@ kind: Deployment
 metadata:
   name: docsum-llm-uservice
   labels:
-    helm.sh/chart: llm-uservice-0.8.0
+    helm.sh/chart: llm-uservice-1.0.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -214,12 +211,13 @@ kind: Deployment
 metadata:
   name: docsum-tgi
   labels:
-    helm.sh/chart: tgi-0.8.0
+    helm.sh/chart: tgi-1.0.0
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: docsum
     app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
   replicas: 1
   selector:
     matchLabels:
@@ -239,7 +237,15 @@ spec:
             - configMapRef:
                 name: docsum-tgi-config
           securityContext:
-            {}
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           image: "ghcr.io/huggingface/tgi-gaudi:2.0.1"
           imagePullPolicy: IfNotPresent
           volumeMounts:
@@ -273,9 +279,7 @@ spec:
               habana.ai/gaudi: 1
       volumes:
         - name: model-volume
-          hostPath:
-            path: /mnt/opea-models
-            type: Directory
+          emptyDir: {}
         - name: tmp
           emptyDir: {}
 ---
@@ -288,10 +292,10 @@ kind: Deployment
 metadata:
   name: docsum
   labels:
-    helm.sh/chart: docsum-0.8.0
+    helm.sh/chart: docsum-1.0.0
     app.kubernetes.io/name: docsum
     app.kubernetes.io/instance: docsum
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1

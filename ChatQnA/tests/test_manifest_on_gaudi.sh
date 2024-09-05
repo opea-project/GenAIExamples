@@ -9,6 +9,9 @@ MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 IMAGE_TAG=${IMAGE_TAG:-latest}
 
+ROLLOUT_TIMEOUT_SECONDS="1800s"
+KUBECTL_TIMEOUT_SECONDS="60s"
+
 function init_chatqna() {
     # replace the mount dir "path: /mnt/opea-models" with "path: $CHART_MOUNT"
     find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/opea-models#path: $MOUNT_DIR#g" {} \;
@@ -27,7 +30,7 @@ function init_chatqna() {
 
 function install_chatqna {
     echo "namespace is $NAMESPACE"
-    kubectl apply -f . -n $NAMESPACE
+    kubectl apply -f chatqna.yaml -n $NAMESPACE
     # Sleep enough time for retreiver-usvc to be ready
     sleep 60
 }
@@ -40,13 +43,15 @@ function get_end_point() {
 }
 
 function validate_chatqna() {
+    local ns=$1
+    local log=$2
     max_retry=20
     # make sure microservice retriever-usvc is ready
     # try to curl retriever-svc for max_retry times
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     for ((i=1; i<=max_retry; i++))
     do
-        endpoint_url=$(get_end_point "chatqna-retriever-usvc" $NAMESPACE)
+        endpoint_url=$(get_end_point "chatqna-retriever-usvc" $ns)
         curl http://$endpoint_url/v1/retrieval -X POST \
             -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}" \
             -H 'Content-Type: application/json' && break
@@ -55,32 +60,32 @@ function validate_chatqna() {
     # if i is bigger than max_retry, then exit with error
     if [ $i -gt $max_retry ]; then
         echo "Microservice retriever failed, exit with error."
-        exit 1
+        return 1
     fi
     # make sure microservice tgi-svc is ready
     for ((i=1; i<=max_retry; i++))
     do
-        endpoint_url=$(get_end_point "chatqna-tgi" $NAMESPACE)
+        endpoint_url=$(get_end_point "chatqna-tgi" $ns)
         curl http://$endpoint_url/generate -X POST \
             -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
             -H 'Content-Type: application/json' && break
-        sleep 10
+        sleep 30
     done
     # if i is bigger than max_retry, then exit with error
     if [ $i -gt $max_retry ]; then
         echo "Microservice tgi failed, exit with error."
-        exit 1
+        return 1
     fi
 
     # check megaservice works
     # generate a random logfile name to avoid conflict among multiple runners
-    LOGFILE=$LOG_PATH/curlmega_$NAMESPACE.log
-    endpoint_url=$(get_end_point "chatqna" $NAMESPACE)
+    LOGFILE=$LOG_PATH/curlmega_$log.log
+    endpoint_url=$(get_end_point "chatqna" $ns)
     curl http://$endpoint_url/v1/chatqna -H "Content-Type: application/json" -d '{"messages": "What is the revenue of Nike in 2023?"}' > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Megaservice failed, please check the logs in $LOGFILE!"
-        exit 1
+        return ${exit_code}
     fi
 
     echo "Checking response results, make sure the output is reasonable. "
@@ -91,10 +96,49 @@ function validate_chatqna() {
     fi
     if [ $status == false ]; then
         echo "Response check failed, please check the logs in artifacts!"
-        exit 1
+        return 1
     else
         echo "Response check succeed!"
     fi
+    return 0
+}
+
+
+function _cleanup_ns() {
+    local ns=$1
+    if kubectl get ns $ns; then
+      if ! kubectl delete ns $ns --timeout=$KUBECTL_TIMEOUT_SECONDS; then
+        kubectl delete pods --namespace $ns --force --grace-period=0 --all
+        kubectl delete ns $ns --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
+      fi
+    fi
+}
+
+function install_and_validate_chatqna_guardrail() {
+    echo "Testing manifests chatqna_guardrils"
+    local ns=${NAMESPACE}-gaurdrails
+    _cleanup_ns $ns
+    kubectl create namespace $ns
+    # install guardrail
+    kubectl apply -f chatqna-guardrails.yaml -n $ns
+    # Sleep enough time for chatqna_guardrail to be ready
+    sleep 60
+    if kubectl rollout status deployment -n "$ns" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
+        echo "Waiting for cahtqna_guardrail pod ready done!"
+    else
+        echo "Timeout waiting for chatqna_guardrail pod ready!"
+        _cleanup_ns $ns
+        exit 1
+    fi
+
+    # validate guardrail
+    validate_chatqna $ns chatqna-guardrails
+    local ret=$?
+    if [ $ret -ne 0 ]; then
+        _cleanup_ns $ns
+        exit 1
+    fi
+    _cleanup_ns $ns
 }
 
 if [ $# -eq 0 ]; then
@@ -117,7 +161,15 @@ case "$1" in
     validate_ChatQnA)
         NAMESPACE=$2
         SERVICE_NAME=chatqna
-        validate_chatqna
+        validate_chatqna $NAMESPACE chatqna
+        ret=$?
+        if [ $ret -ne 0 ]; then
+            exit $ret
+        fi
+        pushd ChatQnA/kubernetes/manifests/gaudi
+        set +e
+        install_and_validate_chatqna_guardrail
+        popd
         ;;
     *)
         echo "Unknown function: $1"
