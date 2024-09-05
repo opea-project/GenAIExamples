@@ -2,7 +2,7 @@
 
 This document outlines the deployment process for a videoragqna application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `lvm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
-VideoRAGQnA is a pipeline that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search. 
+VideoRAGQnA is a pipeline that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search.
 
 ## 🚀 Port used for the microservices
 
@@ -89,7 +89,7 @@ cd ..
 
 ### 6. Build MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `videoragqna.py` Python script. 
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `videoragqna.py` Python script.
 
 Build MegaService Docker image via below command:
 
@@ -179,7 +179,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ### Start all the services with Docker Containers
 
-Before running the docker compose command, you need to be in the folder that has the docker compose yaml file. To avoid model re-download, we manage the volume seperately using [external volume](https://docs.docker.com/reference/compose-file/volumes/#external).
+Before running the docker compose command, you need to be in the folder that has the docker compose yaml file. To avoid model re-download, we manage the volume separately using [external volume](https://docs.docker.com/reference/compose-file/volumes/#external).
 
 ```bash
 cd GenAIExamples/MultiModalRAGQnA/VideoRAGQnA/docker/xeon/
@@ -188,7 +188,7 @@ docker volume create video-llama-model
 docker compose -f compose.yaml up -d
 ```
 
-### Validate Microservices 
+### Validate Microservices
 
 1. Dataprep Microservice
 
@@ -325,6 +325,6 @@ If you plan to restart the service in the future, the above command is enough. T
 
 To clean the volume:
 
-``` bash
+```bash
 docker volume rm video-llama-model
 ```

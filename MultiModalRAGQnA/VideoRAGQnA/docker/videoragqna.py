@@ -3,7 +3,7 @@
 
 import os
 
-from comps import VideoRAGQnAGateway, MicroService, ServiceOrchestrator, ServiceType
+from comps import MicroService, ServiceOrchestrator, ServiceType, VideoRAGQnAGateway
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
@@ -12,7 +12,7 @@ EMBEDDING_SERVICE_PORT = int(os.getenv("EMBEDDING_SERVICE_PORT", 6000))
 RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
 RETRIEVER_SERVICE_PORT = int(os.getenv("RETRIEVER_SERVICE_PORT", 7000))
 RERANK_SERVICE_HOST_IP = os.getenv("RERANK_SERVICE_HOST_IP", "0.0.0.0")
-RERANK_SERVICE_PORT = int(os.getenv("RERANK_SERVICE_PORT", 8000)) 
+RERANK_SERVICE_PORT = int(os.getenv("RERANK_SERVICE_PORT", 8000))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9000))
 
