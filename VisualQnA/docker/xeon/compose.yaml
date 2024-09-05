@@ -6,7 +6,7 @@ services:
     image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
     container_name: tgi-llava-xeon-server
     ports:
-      - "9399:80"
+      - "8399:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -19,7 +19,7 @@ services:
     command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192 --cuda-graphs 0
   lvm-tgi:
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-    container_name: lvm-tgi-server
+    container_name: lvm-tgi-xeon-server
     depends_on:
       - llava-tgi-service
     ports:
@@ -60,7 +60,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - BACKEND_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 

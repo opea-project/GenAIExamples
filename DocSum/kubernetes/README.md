@@ -20,7 +20,9 @@ These will be available on Docker Hub soon, simplifying installation.
 This involves deploying the application pipeline custom resource. You can use docsum_xeon.yaml if you have just a Xeon cluster or docsum_gaudi.yaml if you have a Gaudi cluster.
 
 1. Setup Environment variables. These are specific to the user. Skip the proxy settings if you are not operating behind one.
-
+   
+   We use "Intel/neural-chat-7b-v3-3" as an example. If you want to use other models, change "LLM_MODEL_ID" in following setting and change "MODEL_ID" in manifests yaml file.
+   
    ```bash
    export no_proxy=${your_no_proxy}
    export http_proxy=${your_http_proxy}
@@ -60,7 +62,7 @@ This involves deploying the application pipeline custom resource. You can use do
    ```bash
    export CLIENT_POD=$(kubectl get pod -n ${ns} -l app=client-test -o jsonpath={.items..metadata.name})
    export accessUrl=$(kubectl get gmc -n $ns -o jsonpath="{.items[?(@.metadata.name=='docsum')].status.accessUrl}")
-   kubectl exec "$CLIENT_POD" -n $ns -- curl $accessUrl -X POST -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'  -H 'Content-Type: application/json'
+   kubectl exec "$CLIENT_POD" -n $ns -- curl -s --no-buffer $accessUrl -X POST -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'  -H 'Content-Type: application/json'
    ```
 
 7. Clean up. Use standard Kubernetes custom resource remove commands. Confirm cleaned by retrieving pods in application namespace.

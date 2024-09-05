@@ -23,6 +23,16 @@ Currently we support two ways of deploying Document Summarization services with 
 
 2. Start services using the docker images `built from source`: [Guide](./docker)
 
+### Required Models
+
+We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "set_env.sh" if you want to use other models.
+
+```
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+```
+
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+
 ### Setup Environment Variable
 
 To set up environment variables for deploying Document Summarization services, follow these steps:

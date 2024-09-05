@@ -1,0 +1,54 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Get Image List
+permissions: read-all
+on:
+  workflow_call:
+    inputs:
+      examples:
+        default: ""
+        required: false
+        type: string
+      images:
+        default: ""
+        required: false
+        type: string
+    outputs:
+      matrix:
+        description: "Image List"
+        value: ${{ jobs.get-image-list.outputs.matrix }}
+
+jobs:
+  get-image-list:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.get-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: Set Matrix
+        id: get-matrix
+        run: |
+          image_list=[]
+          if [[ ! -z "${{ inputs.examples }}" ]]; then
+              pip install yq
+              examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
+              for example in ${examples[@]}
+              do
+                  images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
+                  image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
+              done
+          fi
+
+          if [[ ! -z "${{ inputs.images }}" ]]; then
+              images=($(echo ${{ inputs.images }} | tr ',' ' '))
+              input_image_list=$(printf '%s\n' "${images[@]}" | sort -u | jq -R '.' | jq -sc '.')
+              image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${input_image_list}))
+          fi
+
+          echo "print image list..."
+          echo "$image_list" | jq . | jq -r '.[]'
+          echo "end of image list..."
+          echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
