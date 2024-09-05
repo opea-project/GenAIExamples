@@ -12,7 +12,7 @@ on:
         type: string
         description: "Tag to apply to images"
       node:
-        default: "xeon"
+        default: "CPU"
         required: true
         type: string
         description: "Hardware to run test"
@@ -29,7 +29,7 @@ on:
         type: string
         description: "Tag to apply to images"
       node:
-        default: "xeon"
+        default: "CPU"
         required: true
         type: string
         description: "Hardware to run test"
@@ -68,14 +68,14 @@ jobs:
           make docker.push
 
       - name: Scan gmcmanager
-        if: ${{ inputs.node == 'gaudi' }}
+        if: ${{ inputs.node == 'HPU' }}
         uses: opea-project/validation/actions/trivy-scan@main
         with:
           image-ref: ${{ env.DOCKER_REGISTRY }}/gmcmanager:${{ env.VERSION }}
           output: gmcmanager-scan.txt
 
       - name: Upload gmcmanager scan result
-        if: ${{ inputs.node == 'gaudi' }}
+        if: ${{ inputs.node == 'HPU' }}
         uses: actions/upload-artifact@v4.3.4
         with:
           name: gmcmanager-scan
@@ -83,14 +83,14 @@ jobs:
           overwrite: true
 
       - name: Scan gmcrouter
-        if: ${{ inputs.node == 'gaudi' }}
+        if: ${{ inputs.node == 'HPU' }}
         uses: opea-project/validation/actions/trivy-scan@main
         with:
           image-ref: ${{ env.DOCKER_REGISTRY }}/gmcrouter:${{ env.VERSION }}
           output: gmcrouter-scan.txt
 
       - name: Upload gmcrouter scan result
-        if: ${{ inputs.node == 'gaudi' }}
+        if: ${{ inputs.node == 'HPU' }}
         uses: actions/upload-artifact@v4.3.4
         with:
           name: gmcrouter-scan

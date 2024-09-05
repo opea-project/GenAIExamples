@@ -101,7 +101,7 @@ jobs:
         shell: bash
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}/docker/${{ inputs.hardware }}
+          cd ${{ github.workspace }}/${{ inputs.example }}/docker_compose/Intel/${{ inputs.hardware }}
           yaml_files=$(find . -type f -name "*compose*yaml")
           for file in $yaml_files; do
               docker compose -f ${file} stop && docker compose -f ${file} rm -f || true

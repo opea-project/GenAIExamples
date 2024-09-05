@@ -25,7 +25,7 @@ jobs:
     strategy:
       matrix:
         workload: ${{ fromJSON(needs.job1.outputs.run_matrix).include.*.example }}
-        hardware: ["gaudi","xeon"]
+        hardware: ["HPU","CPU"]
     runs-on: docker-build-${{ matrix.hardware }}
     steps:
       - name: Clean up Working Directory

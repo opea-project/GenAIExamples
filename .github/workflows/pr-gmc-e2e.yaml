@@ -24,8 +24,8 @@ jobs:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
       diff_excluded_files: '.github|deprecated|docker|assets|*.md|*.txt'
-      xeon_server_label: 'xeon'
-      gaudi_server_label: 'gaudi'
+      xeon_server_label: 'CPU'
+      gaudi_server_label: 'HPU'
 
   gmc-test:
     needs: [job1]
