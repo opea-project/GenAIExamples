@@ -9,7 +9,7 @@ def detect_phones(text):
     try:
         import phonenumbers
     except ImportError:
-        os.system("pip install phonenumbers")
+        os.system("pip install --no-cache-dir phonenumbers")
         import phonenumbers
 
     matches = []

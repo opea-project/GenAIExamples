@@ -11,11 +11,10 @@ WORKDIR /home/user/vllm-ray
 # copy the source code to the package directory
 COPY comps/llms/text-generation/vllm-ray /home/user/vllm-ray
 
-RUN pip install --upgrade-strategy eager optimum[habana] && \
-    pip install git+https://github.com/HabanaAI/DeepSpeed.git@1.15.1
-# RUN pip install -v git+https://github.com/HabanaAI/vllm-fork.git@ae3d6121
-RUN pip install -v git+https://github.com/HabanaAI/vllm-fork.git@cf6952d
-RUN pip install "ray>=2.10" "ray[serve,tune]>=2.10"
+RUN pip install --no-cache-dir --upgrade-strategy eager optimum[habana] && \
+    pip install --no-cache-dir git+https://github.com/HabanaAI/DeepSpeed.git@1.15.1
+RUN pip install --no-cache-dir -v git+https://github.com/HabanaAI/vllm-fork.git@cf6952d
+RUN pip install --no-cache-dir "ray>=2.10" "ray[serve,tune]>=2.10"
 
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     service ssh restart

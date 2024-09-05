@@ -24,14 +24,14 @@ RUN git lfs install
 
 COPY comps /home/user/comps
 
-RUN pip install --upgrade-strategy eager optimum[habana] && \
-    pip install git+https://github.com/HabanaAI/DeepSpeed.git@1.17.0
+RUN pip install --no-cache-dir --upgrade-strategy eager optimum[habana] && \
+    pip install --no-cache-dir git+https://github.com/HabanaAI/DeepSpeed.git@1.17.0
 
 RUN git clone ${REPO} /home/user/optimum-habana && \
     cd /home/user/optimum-habana && git checkout ${REPO_VER} && \
-    cd examples/text-generation && pip install -r requirements.txt && \
-    cd /home/user/comps/llms/text-generation/native && pip install -r requirements.txt && \
-    pip install --upgrade --force-reinstall pydantic
+    cd examples/text-generation && pip install --no-cache-dir -r requirements.txt && \
+    cd /home/user/comps/llms/text-generation/native && pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir --upgrade --force-reinstall pydantic
 
 ENV PYTHONPATH=/root:/home/user
 

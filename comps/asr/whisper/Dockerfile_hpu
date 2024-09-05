@@ -25,7 +25,7 @@ USER user
 # Install requirements and optimum habana
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/comps/asr/requirements.txt && \
-    pip install optimum[habana]
+    pip install --no-cache-dir optimum[habana]
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
