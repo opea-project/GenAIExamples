@@ -461,12 +461,12 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
 
 10. Guardrails (Optional)
 
-   ```bash
-   curl http://${host_ip}:9090/v1/guardrails\
-     -X POST \
-     -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
-     -H 'Content-Type: application/json'
-   ```
+```bash
+curl http://${host_ip}:9090/v1/guardrails\
+  -X POST \
+  -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
+  -H 'Content-Type: application/json'
+```
 
 ## 🚀 Launch the UI
 
