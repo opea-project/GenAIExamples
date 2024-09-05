@@ -125,7 +125,7 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 
 2. Using the docker images `built from source`: [Guide](docker/xeon/README.md)
 
-    > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
+   > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
 
 ### Required Models
 

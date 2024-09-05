@@ -92,36 +92,36 @@ cd ../..
 
 1. MegaService with Rerank
 
-    To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
+   To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
 
-    ```bash
-    git clone https://github.com/opea-project/GenAIExamples.git
-    cd GenAIExamples/ChatQnA/docker
-    docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-    cd ../../..
-    ```
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+   cd ../../..
+   ```
 
 2. MegaService with Guardrails
 
-    If you want to enable guardrails microservice in the pipeline, please use the below command instead:
+   If you want to enable guardrails microservice in the pipeline, please use the below command instead:
 
-    ```bash
-    git clone https://github.com/opea-project/GenAIExamples.git
-    cd GenAIExamples/ChatQnA/docker
-    docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_guardrails .
-    cd ../../..
-    ```
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_guardrails .
+   cd ../../..
+   ```
 
 3. MegaService without Rerank
 
-    To construct the Mega Service without Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna_without_rerank.py` Python script. Build MegaService Docker image via below command:
+   To construct the Mega Service without Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna_without_rerank.py` Python script. Build MegaService Docker image via below command:
 
-    ```bash
-    git clone https://github.com/opea-project/GenAIExamples.git
-    cd GenAIExamples/ChatQnA/docker
-    docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_without_rerank .
-    cd ../../..
-    ```
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_without_rerank .
+   cd ../../..
+   ```
 
 ### 9. Build UI Docker Image
 
@@ -308,7 +308,7 @@ curl http://${host_ip}:7000/v1/retrieval \
 
 4. TEI Reranking Service
 
-> Skip for ChatQnA withou Rerank pipeline
+> Skip for ChatQnA without Rerank pipeline
 
 ```bash
 curl http://${host_ip}:8808/rerank \
@@ -319,7 +319,7 @@ curl http://${host_ip}:8808/rerank \
 
 5. Reranking Microservice
 
-> Skip for ChatQnA withou Rerank pipeline
+> Skip for ChatQnA without Rerank pipeline
 
 ```bash
 curl http://${host_ip}:8000/v1/reranking \
