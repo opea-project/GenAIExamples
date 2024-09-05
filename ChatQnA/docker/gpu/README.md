@@ -296,19 +296,19 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 ## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-ui-server` service with the `chatqna-react-ui-server` service as per the config below:
 
 ```yaml
-chaqna-xeon-conversation-ui-server:
-  image: opea/chatqna-conversation-ui:latest
-  container_name: chatqna-xeon-conversation-ui-server
+chatqna-react-ui-server:
+  image: opea/chatqna-react-ui:latest
+  container_name: chatqna-react-ui-server
   environment:
     - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
     - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
   ports:
     - "5174:80"
   depends_on:
-    - chaqna-xeon-backend-server
+    - chaqna-backend-server
   ipc: host
   restart: always
 ```
@@ -316,8 +316,8 @@ chaqna-xeon-conversation-ui-server:
 Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  chaqna-xeon-conversation-ui-server:
-    image: opea/chatqna-conversation-ui:latest
+  chaqna-react-ui-server:
+    image: opea/chatqna-react-ui:latest
     ...
     ports:
       - "80:80"
