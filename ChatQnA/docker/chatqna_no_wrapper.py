@@ -66,7 +66,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
     elif self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
-        next_inputs["model"] = "tgi"            # specifically clarify the fake model to make the format unified
+        next_inputs["model"] = "tgi"  # specifically clarify the fake model to make the format unified
         next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_new_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
@@ -74,8 +74,6 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs["frequency_penalty"] = inputs["repetition_penalty"]
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
-
-
 
     return inputs
 
@@ -158,7 +156,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
 def align_generator(self, gen, **kwargs):
     # openai reaponse format
-    #b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
+    # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
     for line in gen:
         line = line.decode("utf-8")
         start = line.find("{")
