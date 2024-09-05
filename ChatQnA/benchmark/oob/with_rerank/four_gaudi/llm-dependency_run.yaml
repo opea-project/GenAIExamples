@@ -1,0 +1,88 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-dependency-deploy
+  namespace: default
+spec:
+  replicas: 31
+  selector:
+    matchLabels:
+      app: llm-dependency-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: llm-dependency-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+        name: llm-dependency-deploy-demo
+        securityContext:
+          capabilities:
+            add:
+            - SYS_NICE
+        args:
+        - --model-id
+        - $(LLM_MODEL_ID)
+        - --max-input-length
+        - '2048'
+        - --max-total-tokens
+        - '4096'
+        - --max-batch-total-tokens
+        - '65536'
+        - --max-batch-prefill-tokens
+        - '4096'
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            habana.ai/gaudi: 1
+        env:
+        - name: OMPI_MCA_btl_vader_single_copy_mechanism
+          value: none
+        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+          value: 'true'
+        - name: runtime
+          value: habana
+        - name: HABANA_VISIBLE_DEVICES
+          value: all
+        - name: HF_TOKEN
+          value: ${HF_TOKEN}
+      serviceAccountName: default
+      volumes:
+      - name: model-volume
+        hostPath:
+          path: /mnt/models
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: llm-dependency-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: llm-dependency-deploy
+  ports:
+  - name: service
+    port: 9009
+    targetPort: 80

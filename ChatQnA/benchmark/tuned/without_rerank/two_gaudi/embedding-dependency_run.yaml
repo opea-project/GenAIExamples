@@ -1,0 +1,69 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embedding-dependency-deploy
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: embedding-dependency-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: embedding-dependency-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+        name: embedding-dependency-deploy
+        args:
+        - --model-id
+        - $(EMBEDDING_MODEL_ID)
+        - --auto-truncate
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 80
+            memory: 20000Mi
+          requests:
+            cpu: 80
+            memory: 20000Mi
+      serviceAccountName: default
+      volumes:
+      - name: model-volume
+        hostPath:
+          path: /mnt/models
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: embedding-dependency-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: embedding-dependency-deploy
+  ports:
+  - name: service
+    port: 6006
+    targetPort: 80

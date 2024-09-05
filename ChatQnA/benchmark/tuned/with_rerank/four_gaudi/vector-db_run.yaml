@@ -1,0 +1,48 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vector-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vector-db
+  template:
+    metadata:
+      labels:
+        app: vector-db
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: vector-db
+      containers:
+      - name: vector-db
+        image: redis/redis-stack:7.2.0-v9
+        ports:
+        - containerPort: 6379
+        - containerPort: 8001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vector-db
+spec:
+  type: ClusterIP
+  selector:
+    app: vector-db
+  ports:
+  - name: vector-db-service
+    port: 6379
+    targetPort: 6379
+  - name: vector-db-insight
+    port: 8001
+    targetPort: 8001
