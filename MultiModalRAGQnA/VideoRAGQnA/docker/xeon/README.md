@@ -7,9 +7,8 @@ VideoRAGQnA is a pipeline that retrieves video based on provided user prompt. It
 ## 🚀 Port used for the microservices
 
 ```
-dataprep #FIXME
+dataprep
 ========
-Port 6005 - Open to 0.0.0.0/0
 Port 6007 - Open to 0.0.0.0/0
 
 vdms-vector-db
@@ -164,8 +163,8 @@ export LVM_ENDPOINT="http://${host_ip}:9009"
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:8888/v1/health_check"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export FILE_SERVER_ENDPOINT="http://${host_ip}:6005" # FIXME
-# export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
 
 export VDMS_HOST=${host_ip}
 export VDMS_PORT=8001
@@ -206,6 +205,15 @@ curl -X POST ${DATAPREP_SERVICE_ENDPOINT} \
     -F "files=@./file1.mp4" \
     -F "files=@./file2.mp4" \
     -F "files=@./file3.mp4"
+```
+
+Use below method to check and download available videos the microservice. The download endpoint is also used for LVM and UI.
+
+```bash
+# List available videos
+curl -X 'GET' ${DATAPREP_GET_VIDEO_LIST_ENDPOINT} -H 'accept: application/json'
+# Download available video
+curl -X 'GET' ${DATAPREP_GET_FILE_ENDPOINT}/video_name.mp4' -H 'accept: application/json'
 ```
 
 2. Embedding Microservice

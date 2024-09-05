@@ -11,12 +11,12 @@ services:
     ports:
       - "8001:55555"
   dataprep:
+    image: opea/dataprep-vdms:latest
     container_name: dataprep-vdms-server
     depends_on:
       - vdms-vector-db
     ports:
       - "6007:6007"
-      - "6005:6005"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -26,6 +26,7 @@ services:
       INDEX_NAME: ${INDEX_NAME}
     volumes:
       - /home/$USER/.cache/clip:/home/user/.cache/clip
+      - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   embedding:
     image: opea/embedding-multimodal:latest
     container_name: embedding-multimodal-server
@@ -57,7 +58,7 @@ services:
       USECLIP: ${USECLIP}
     restart: unless-stopped
     volumes:
-      - /home/raspadmin/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
+      - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   reranking:
     image: opea/reranking-videoragqna:latest
     container_name: reranking-videoragqna-server
@@ -69,7 +70,8 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       CHUNK_DURATION: ${CHUNK_DURATION}
-      FILE_SERVER_ENDPOINT: ${FILE_SERVER_ENDPOINT}
+      FILE_SERVER_ENDPOINT: ${DATAPREP_GET_FILE_ENDPOINT}
+      DATAPREP_GET_VIDEO_LIST_ENDPOINT: ${DATAPREP_GET_VIDEO_LIST_ENDPOINT}
     restart: unless-stopped
   lvm-video-llama:
     image: opea/video-llama-lvm-server:latest
