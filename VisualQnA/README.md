@@ -13,10 +13,20 @@ General architecture of VQA shows below:
 
 ![VQA](./assets/img/vqa.png)
 
-This example guides you through how to deploy a [LLaVA](https://llava-vl.github.io/) (Large Language and Vision Assistant) model on Intel Gaudi2 to do visual question and answering task. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products/) for more details.
+This example guides you through how to deploy a [LLaVA-NeXT](https://github.com/LLaVA-VL/LLaVA-NeXT) (Open Large Multimodal Models) model on Intel Gaudi2 to do visual question and answering task. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products/) for more details.
 
 ![llava screenshot](./assets/img/llava_screenshot1.png)
 ![llava-screenshot](./assets/img/llava_screenshot2.png)
+
+# Required Models
+
+By default, the model is set to `llava-hf/llava-v1.6-mistral-7b-hf`. To use a different model, update the `LVM_MODEL_ID` variable in the [`set_env.sh`](./docker/gaudi/set_env.sh) file.
+
+```
+export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
+```
+
+You can choose other llava-next models, such as `llava-hf/llava-v1.6-vicuna-13b-hf`, as needed.
 
 # Deploy VisualQnA Service
 

@@ -19,15 +19,10 @@ cd GenAIComps
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/Dockerfile_tgi .
 ```
 
-### 3. Build TGI Gaudi Image
-
-Since TGI Gaudi has not supported llava-next in main branch, we'll need to build it from a PR branch for now.
+### 3. Pull TGI Gaudi Image
 
 ```bash
-git clone https://github.com/huggingface/tgi-gaudi.git
-cd tgi-gaudi/
-docker build -t opea/llava-tgi:latest .
-cd ../
+docker pull ghcr.io/huggingface/tgi-gaudi:2.0.4
 ```
 
 ### 4. Build MegaService Docker Image
