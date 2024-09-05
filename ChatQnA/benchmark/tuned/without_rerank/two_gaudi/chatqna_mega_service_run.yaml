@@ -7,7 +7,7 @@ metadata:
   name: chatqna-backend-server-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: chatqna-backend-server-deploy
