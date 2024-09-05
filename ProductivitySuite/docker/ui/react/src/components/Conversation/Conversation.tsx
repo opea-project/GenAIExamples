@@ -154,7 +154,7 @@ const Conversation = ({ title }: ConversationProps) => {
               style={{
                 display: updateSystemPrompt ? 'block' : 'none',
                 marginBottom: '10px',
-                marginLeft:'30px'
+                marginLeft:'35px'
               }}
               radius="lg"
               size="md"
