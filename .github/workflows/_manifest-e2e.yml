@@ -75,7 +75,6 @@ jobs:
             kubectl create ns $NAMESPACE
             ${{ github.workspace }}/${{ inputs.example }}/tests/test_manifest_on_${{ inputs.hardware }}.sh install_${{ inputs.example }} $NAMESPACE
             echo "Testing ${{ inputs.example }}, waiting for pod ready..."
-            
             if kubectl rollout status deployment --namespace "$NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
               echo "Testing manifests ${{ inputs.example }}, waiting for pod ready done!"
               echo "skip_validate=false" >> $GITHUB_ENV
