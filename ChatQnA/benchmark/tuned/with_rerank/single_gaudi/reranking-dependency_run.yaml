@@ -1,0 +1,85 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reranking-dependency-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reranking-dependency-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: reranking-dependency-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: reranking-dependency-deploy
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: opea/tei-gaudi:latest
+        name: reranking-dependency-deploy
+        args:
+        - --model-id
+        - $(RERANK_MODEL_ID)
+        - --auto-truncate
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            habana.ai/gaudi: 1
+        env:
+        - name: OMPI_MCA_btl_vader_single_copy_mechanism
+          value: none
+        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+          value: 'true'
+        - name: runtime
+          value: habana
+        - name: HABANA_VISIBLE_DEVICES
+          value: all
+        - name: HF_TOKEN
+          value: ${HF_TOKEN}
+        - name: MAX_WARMUP_SEQUENCE_LENGTH
+          value: '512'
+      serviceAccountName: default
+      volumes:
+      - name: model-volume
+        hostPath:
+          path: /mnt/models
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: reranking-dependency-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: reranking-dependency-deploy
+  ports:
+  - name: service
+    port: 8808
+    targetPort: 80

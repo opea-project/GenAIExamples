@@ -133,11 +133,11 @@ kubectl label nodes k8s-worker1 node-type=chatqna-opea
 
 #### 2. Install ChatQnA
 
-Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/single_gaudi) and apply to K8s.
+Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/tuned/with_rerank/single_gaudi) and apply to K8s.
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/single_gaudi
+cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/single_gaudi
 kubectl apply -f .
 ```
 
@@ -199,7 +199,7 @@ All the test results will come to this folder `/home/sdp/benchmark_output/node_1
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/single_gaudi
+cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/single_gaudi
 kubectl delete -f .
 kubectl label nodes k8s-worker1 node-type-
 ```
@@ -216,11 +216,11 @@ kubectl label nodes k8s-worker1 k8s-worker2 node-type=chatqna-opea
 
 #### 2. Install ChatQnA
 
-Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/two_gaudi) and apply to K8s.
+Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/tuned/with_rerank/two_gaudi) and apply to K8s.
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/two_gaudi
+cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/two_gaudi
 kubectl apply -f .
 ```
 
@@ -265,11 +265,11 @@ kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type=cha
 
 #### 2. Install ChatQnA
 
-Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/four_gaudi) and apply to K8s.
+Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/tuned/with_rerank/four_gaudi) and apply to K8s.
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/four_gaudi
+cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/four_gaudi
 kubectl apply -f .
 ```
 
@@ -298,7 +298,11 @@ All the test results will come to this folder `/home/sdp/benchmark_output/node_4
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/single_gaudi
+cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/single_gaudi
 kubectl delete -f .
 kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type-
 ```
+
+#### 6. Results
+
+Check OOB performance data [here](/opea_release_data.md#chatqna), tuned performance data will be released soon.

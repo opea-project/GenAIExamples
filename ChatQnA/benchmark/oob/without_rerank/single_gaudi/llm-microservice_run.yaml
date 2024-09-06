@@ -1,0 +1,54 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: llm-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: llm-deploy
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: opea/llm-tgi:latest
+        imagePullPolicy: IfNotPresent
+        name: llm-deploy
+        args: null
+        ports:
+        - containerPort: 9000
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: llm-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: llm-deploy
+  ports:
+  - name: service
+    port: 9000
+    targetPort: 9000
