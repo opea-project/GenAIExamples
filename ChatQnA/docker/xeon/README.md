@@ -57,6 +57,32 @@ chaqna-xeon-ui-server
 Port 5173 - Open to 0.0.0.0/0
 ```
 
+You can pull ChatQnA and components docker images form docker hub or build images from source code.
+
+## 🚀 Pull docker images
+
+```bash
+docker pull opea/dataprep-redis:latest
+docker pull opea/embedding-tei:latest
+docker pull opea/retriever-redis:latest
+docker pull opea/reranking-tei:latest
+docker pull opea/chatqna:latest
+docker pull opea/chatqna-ui:latest
+```
+
+
+### Use TGI as backend
+```
+docker pull opea/llm-tgi:latest
+```
+### Use vLLM as backend
+```
+docker pull opea/vllm:latest
+docker pull opea/llm-vllm:latest
+```
+
+Go to [Section Check Docker Images)](#Check-Docker-Images)
+
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
@@ -163,6 +189,8 @@ cd GenAIExamples/ChatQnA/docker/ui/
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
+
+## Check Docker Images
 
 Then run the command `docker images`, you will have the following 7 Docker Images:
 
