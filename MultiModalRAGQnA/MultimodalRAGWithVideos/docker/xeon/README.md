@@ -162,3 +162,14 @@ cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/ui
 docker build --no-cache -t opea/multimodalragwithvideos-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 cd ../../../../..
 ```
+
+Then run the command `docker images`, you will have the following 8 Docker Images:
+
+1. `opea/multimodal-dataprep-redis:latest`
+2. `opea/lvm:latest`
+3. `opea/llava:latest`
+4. `opea/multimodal-retriever-redis:latest`
+5. `opea/multimodal-embedding:latest`
+6. `opea/bridgetower-embedder:latest`
+7. `opea/multimodalragwithvideos:latest`
+8. `opea/multimodalragwithvideos-ui:latest`
