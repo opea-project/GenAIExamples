@@ -25,6 +25,14 @@ const initialState: ConversationReducer = {
   selectedConversationHistory: [],
   onGoingResult: "",
   filesInDataSource: [],
+  model: "Intel/neural-chat-7b-v3-3",
+  systemPrompt: "You are helpful assistant",
+  minToken: 100,
+  maxToken: 1000,
+  token: 100,
+  minTemperature: 0,
+  maxTemperature: 1,
+  temperature: 0.4,
 };
 
 export const ConversationSlice = createSlice({
@@ -50,6 +58,15 @@ export const ConversationSlice = createSlice({
     },
     setSelectedConversationId: (state, action: PayloadAction<string>) => {
       state.selectedConversationId = action.payload;
+    },
+    setTemperature: (state, action: PayloadAction<number>) => {
+      state.temperature = action.payload;
+    },
+    setToken: (state, action: PayloadAction<number>) => {
+      state.token = action.payload;
+    },
+    setSystemPrompt: (state, action: PayloadAction<string>) => {
+      state.systemPrompt = action.payload;
     },
   },
   extraReducers(builder) {
@@ -213,7 +230,7 @@ export const deleteConversation = createAsyncThunkWrapper(
 );
 
 export const doConversation = (conversationRequest: ConversationRequest) => {
-  const { conversationId, userPrompt, messages, model } = conversationRequest;
+  const { conversationId, userPrompt, messages, model, token, temperature } = conversationRequest;
   store.dispatch(addMessageToMessages(messages[0]));
   store.dispatch(addMessageToMessages(userPrompt));
   const userPromptWithoutTime = {
@@ -223,6 +240,8 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
   const body = {
     messages: [...messages, userPromptWithoutTime],
     model,
+    max_new_tokens: token,
+    temperature: temperature,
   };
 
   //   let conversation: Conversation;
@@ -293,7 +312,15 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
   }
 };
 
-export const { logout, setOnGoingResult, newConversation, addMessageToMessages, setSelectedConversationId } =
-  ConversationSlice.actions;
+export const {
+  logout,
+  setOnGoingResult,
+  newConversation,
+  addMessageToMessages,
+  setSelectedConversationId,
+  setTemperature,
+  setToken,
+  setSystemPrompt,
+} = ConversationSlice.actions;
 export const conversationSelector = (state: RootState) => state.conversationReducer;
 export default ConversationSlice.reducer;

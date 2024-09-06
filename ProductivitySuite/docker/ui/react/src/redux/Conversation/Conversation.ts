@@ -6,6 +6,8 @@ export type ConversationRequest = {
   userPrompt: Message;
   messages: Message[];
   model: string;
+  temperature: number;
+  token: number;
 };
 export enum MessageRole {
   Assistant = "assistant",
@@ -34,4 +36,12 @@ export interface ConversationReducer {
   selectedConversationHistory: Message[];
   onGoingResult: string;
   filesInDataSource: file[];
+  systemPrompt: string;
+  model: string;
+  minToken: number;
+  maxToken: number;
+  token: number;
+  minTemperature: number;
+  maxTemperature: number;
+  temperature: number;
 }

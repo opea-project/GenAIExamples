@@ -4,18 +4,26 @@
 .contextWrapper {
   background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
   border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
-  width: 180px;
+  width: 13vw;
   overflow-y: hidden;
   overflow-x: hidden;
-  // overflow-y: auto;
+  display: grid;
+  height: 100vh;
+  grid-template-areas:
+    "title"
+    "history"
+    "settings";
+
+  grid-template-columns: auto;
+  grid-template-rows: 70px 1fr 175px;
 
   .contextTitle {
-    position: sticky;
+    grid-area: title;
     top: 0;
     font-family:
       Greycliff CF,
       var(--mantine-font-family);
-    margin-bottom: var(--mantine-spacing-xl);
+    margin-bottom: var(--mantine-spacing-sm);
     background-color: var(--mantine-color-body);
     padding: var(--mantine-spacing-md);
     padding-top: 18px;
@@ -25,8 +33,9 @@
   }
 
   .contextList {
-    height: 90vh;
-    // display: flex();
+    grid-area: history;
+    // overflow-x: none;
+    // overflow-y: auto;
 
     .contextListItem {
       display: flex;
@@ -65,6 +74,15 @@
           color: var(--mantine-color-white);
         }
       }
+    }
+  }
+
+  .settings {
+    grid-area: settings;
+    border: black;
+    padding: var(--mantine-spacing-sm);
+    > * {
+      padding: 5px 0;
     }
   }
 }
