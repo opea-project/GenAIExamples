@@ -13,6 +13,7 @@ from comps.cores.proto.docarray import (
     LLMParamsDoc,
     SearchedDoc,
     SearchedMultimodalDoc,
+    LVMSearchedMultimodalDoc,
     RerankedDoc,
     TextDoc,
     RAGASParams,

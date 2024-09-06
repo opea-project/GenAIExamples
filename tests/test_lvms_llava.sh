@@ -45,6 +45,26 @@ function validate_microservice() {
         exit 1
     fi
 
+    result=$(http_proxy="" curl http://localhost:5028/v1/lvm -XPOST -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image"}]}' -H 'Content-Type: application/json')
+    if [[ $result == *"yellow"* ]]; then
+        echo "Result correct."
+    else
+        echo "Result wrong."
+        docker logs test-comps-lvm-llava
+        docker logs test-comps-lvm
+        exit 1
+    fi
+
+    result=$(http_proxy="" curl http://localhost:5028/v1/lvm -XPOST -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}' -H 'Content-Type: application/json')
+    if [[ $result == *"yellow"* ]]; then
+        echo "Result correct."
+    else
+        echo "Result wrong."
+        docker logs test-comps-lvm-llava
+        docker logs test-comps-lvm
+        exit 1
+    fi
+
 }
 
 function stop_docker() {

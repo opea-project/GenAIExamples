@@ -1,14 +1,11 @@
-datasets
 docarray[full]
 fastapi
-huggingface_hub
-langchain-core
+langchain_community
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
-optimum[habana]
 prometheus-fastapi-instrumentator
-pydantic==2.7.2
-pydub
+redis
 shortuuid
+transformers
 uvicorn

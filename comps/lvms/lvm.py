@@ -5,12 +5,16 @@
 import json
 import os
 import time
+from typing import Union
 
 import requests
+from langchain_core.prompts import PromptTemplate
+from template import ChatTemplate
 
 from comps import (
     CustomLogger,
     LVMDoc,
+    LVMSearchedMultimodalDoc,
     ServiceType,
     TextDoc,
     opea_microservices,
@@ -29,20 +33,41 @@ logflag = os.getenv("LOGFLAG", False)
     endpoint="/v1/lvm",
     host="0.0.0.0",
     port=9399,
-    input_datatype=LVMDoc,
-    output_datatype=TextDoc,
 )
 @register_statistics(names=["opea_service@lvm"])
-async def lvm(request: LVMDoc):
+async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> TextDoc:
     if logflag:
         logger.info(request)
     start = time.time()
-    img_b64_str = request.image
-    prompt = request.prompt
-    max_new_tokens = request.max_new_tokens
+    if isinstance(request, LVMSearchedMultimodalDoc):
+        if logflag:
+            logger.info("[LVMSearchedMultimodalDoc ] input from retriever microservice")
+        retrieved_metadatas = request.metadata
+        img_b64_str = retrieved_metadatas[0]["b64_img_str"]
+        initial_query = request.initial_query
+        context = retrieved_metadatas[0]["transcript_for_inference"]
+        prompt = initial_query
+        if request.chat_template is None:
+            prompt = ChatTemplate.generate_multimodal_rag_on_videos_prompt(initial_query, context)
+        else:
+            prompt_template = PromptTemplate.from_template(request.chat_template)
+            input_variables = prompt_template.input_variables
+            if sorted(input_variables) == ["context", "question"]:
+                prompt = prompt_template.format(question=initial_query, context=context)
+            else:
+                logger.info(
+                    f"[ LVMSearchedMultimodalDoc ] {prompt_template} not used, we only support 2 input variables ['question', 'context']"
+                )
+        max_new_tokens = request.max_new_tokens
+        if logflag:
+            logger.info(f"prompt generated for [LVMSearchedMultimodalDoc ] input from retriever microservice: {prompt}")
+
+    else:
+        img_b64_str = request.image
+        prompt = request.prompt
+        max_new_tokens = request.max_new_tokens
 
     inputs = {"img_b64_str": img_b64_str, "prompt": prompt, "max_new_tokens": max_new_tokens}
-
     # forward to the LLaVA server
     response = requests.post(url=f"{lvm_endpoint}/generate", data=json.dumps(inputs), proxies={"http": None})
 

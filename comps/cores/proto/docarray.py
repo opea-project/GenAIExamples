@@ -107,6 +107,24 @@ class SearchedMultimodalDoc(SearchedDoc):
     metadata: List[Dict[str, Any]]
 
 
+class LVMSearchedMultimodalDoc(SearchedMultimodalDoc):
+    max_new_tokens: conint(ge=0, le=1024) = 512
+    top_k: int = 10
+    top_p: float = 0.95
+    typical_p: float = 0.95
+    temperature: float = 0.01
+    streaming: bool = False
+    repetition_penalty: float = 1.03
+    chat_template: Optional[str] = Field(
+        default=None,
+        description=(
+            "A template to use for this conversion. "
+            "If this is not passed, the model's default chat template will be "
+            "used instead. We recommend that the template contains {context} and {question} for multimodal-rag on videos."
+        ),
+    )
+
+
 class GeneratedDoc(BaseDoc):
     text: str
     prompt: str
