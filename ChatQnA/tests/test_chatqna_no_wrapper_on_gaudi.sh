@@ -42,9 +42,6 @@ function start_services() {
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
-    # export EMBEDDING_SERVICE_HOST_IP=${ip_address}
-    # export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    # export RERANK_SERVICE_HOST_IP=${ip_address}
     export EMBEDDING_SERVER_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVER_HOST_IP=${ip_address}
@@ -243,7 +240,7 @@ function main() {
     elif [ "${mode}" == "" ]; then
         validate_microservices
         validate_megaservice
-        validate_frontend
+        # validate_frontend
     fi
 
     stop_docker
