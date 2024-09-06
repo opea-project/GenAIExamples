@@ -136,7 +136,7 @@ services:
   #     HF_HUB_ENABLE_HF_TRANSFER: 0
   #   restart: unless-stopped
   chaqna-xeon-backend-server:
-    image: ${REGISTRY:-opea}/chatqna_no_wrapper:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chatqna-no-wrapper:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
