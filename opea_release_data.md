@@ -17,7 +17,7 @@ This page shows the benchmark data of GenAIExamples. More data for different exa
 | opea/chatqna:v0.9                                     |
 
 System Summary:   
-4-nodes, 2x Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz, 40 cores, 270W TDP, HT On, Turbo On, NUMA 2, Integrated Accelerators Available [used]: DLB 0 [0], DSA 0 [0], IAA 0 [0], QAT 0 [0], Total Memory 1024GB (32x32GB DDR4 3200 MT/s [3200 MT/s]), BIOS ETM02, microcode 0xd0003b9, 8x Habana Labs Ltd., 4x MT28800 Family [ConnectX-5 Ex], 4x 7T INTEL SSDPF2KX076TZ, 2x 894.3G SAMSUNG MZ1L2960HCJR-00A07, Ubuntu 22.04.3 LTS, 5.15.0-92-generic. Software: WORKLOAD+VERSION, COMPILER, LIBRARIES, OTHER_SW. Test by Intel as of 08/20/24.
+1-node, 2x Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz, 40 cores, 270W TDP, HT On, Turbo On, NUMA 2, Integrated Accelerators Available [used]: DLB 0 [0], DSA 0 [0], IAA 0 [0], QAT 0 [0], Total Memory 1024GB (32x32GB DDR4 3200 MT/s [3200 MT/s]), BIOS ETM02, microcode 0xd0003b9, 8x Habana Labs Ltd., 4x MT28800 Family [ConnectX-5 Ex], 4x 7T INTEL SSDPF2KX076TZ, 2x 894.3G SAMSUNG MZ1L2960HCJR-00A07, Ubuntu 22.04.3 LTS, 5.15.0-92-generic. Software: WORKLOAD+VERSION, COMPILER, LIBRARIES, OTHER_SW. Test by Intel as of 08/20/24.
 
 ### Performance Data
 | 1Node E2E Performance (Sec) | Gaudi nodes | Concurrency | Input | Output | Average Latency | P90 Total latency |
