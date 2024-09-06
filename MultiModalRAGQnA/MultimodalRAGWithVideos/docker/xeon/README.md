@@ -242,3 +242,12 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
     -H "Content-Type: application/json" \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
+
+4. LLaVA Server
+
+```bash
+curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
+     -X POST \
+     -H "Content-Type:application/json" \
+     -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+```
