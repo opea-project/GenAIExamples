@@ -82,7 +82,7 @@ export REDIS_URL="redis://${host_ip}:6379"
 export REDIS_HOST=${host_ip}
 export INDEX_NAME="mm-rag-redis"
 export LLAVA_SERVER_PORT=8399
-export LVM_ENDPOINT="http://${host_ip}:8399/v1/lvm"
+export LVM_ENDPOINT="http://${host_ip}:8399"
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
 export WHISPER_MODEL="base"
 
@@ -250,4 +250,13 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
      -X POST \
      -H "Content-Type:application/json" \
      -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+```
+
+5. LVM Microservice
+
+```bash
+curl http://${host_ip}:9399/v1/lvm \
+    -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}' 
 ```
