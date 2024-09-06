@@ -21,8 +21,3 @@ services:
     build:
       dockerfile: comps/lvms/Dockerfile_tgi
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-  llava-tgi:
-    build:
-      context: tgi-gaudi
-      dockerfile: Dockerfile
-    image: ${REGISTRY:-opea}/llava-tgi:${TAG:-latest}

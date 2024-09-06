@@ -10,16 +10,6 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    git clone https://github.com/yuanwu2017/tgi-gaudi.git && cd tgi-gaudi && git checkout v2.0.4
-    docker build --no-cache -t opea/llava-tgi:comps .
-    if [ $? -ne 0 ]; then
-        echo "opea/llava-tgi built fail"
-        exit 1
-    else
-        echo "opea/llava-tgi built successful"
-    fi
-
-    cd ..
     docker build --no-cache -t opea/lvm-tgi:comps -f comps/lvms/Dockerfile_tgi .
     if [ $? -ne 0 ]; then
         echo "opea/lvm-tgi built fail"
@@ -32,7 +22,7 @@ function build_docker_images() {
 function start_service() {
     unset http_proxy
     model="llava-hf/llava-v1.6-mistral-7b-hf"
-    docker run -d --name="test-comps-lvm-llava-tgi" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 5027:80 --runtime=habana -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e SKIP_TOKENIZER_IN_TGI=true -e HABANA_VISIBLE_DEVICES=all  -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host opea/llava-tgi:comps --model-id $model --max-input-tokens 4096 --max-total-tokens 8192
+    docker run -d --name="test-comps-lvm-llava-tgi" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 5027:80 --runtime=habana -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e SKIP_TOKENIZER_IN_TGI=true -e HABANA_VISIBLE_DEVICES=all  -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.4 --model-id $model --max-input-tokens 4096 --max-total-tokens 8192
     docker run -d --name="test-comps-lvm-tgi" -e LVM_ENDPOINT=http://$ip_address:5027 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 5028:9399 --ipc=host opea/lvm-tgi:comps
     sleep 3m
 }
