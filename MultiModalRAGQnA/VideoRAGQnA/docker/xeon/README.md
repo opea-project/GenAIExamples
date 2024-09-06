@@ -56,7 +56,7 @@ cd GenAIComps
 ### 1. Build Embedding Image
 
 ```bash
-docker build -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain_multimodal/docker/Dockerfile .
+docker build -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/docker/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
@@ -168,7 +168,7 @@ export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_
 
 export VDMS_HOST=${host_ip}
 export VDMS_PORT=8001
-export INDEX_NAME="video-test"
+export INDEX_NAME="mega-videoragqna"
 export LLM_DOWNLOAD="True"
 export USECLIP=1
 

@@ -2,7 +2,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3.8"
 
 services:
   vdms-vector-db:
@@ -24,6 +23,7 @@ services:
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
       INDEX_NAME: ${INDEX_NAME}
+    entrypoint: sh -c 'sleep 10 && python ingest_videos.py'
     volumes:
       - /home/$USER/.cache/clip:/home/user/.cache/clip
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
@@ -56,6 +56,7 @@ services:
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
       USECLIP: ${USECLIP}
+    entrypoint: sh -c 'sleep 16 && python retriever_vdms.py'
     restart: unless-stopped
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
