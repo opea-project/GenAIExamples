@@ -40,11 +40,11 @@ lvm
 ===
 Port 9399 - Open to 0.0.0.0/0
 
-chaqna-xeon-backend-server
+multimodalragwithvideos-xeon-backend-server
 ==========================
 Port 8888 - Open to 0.0.0.0/0
 
-chaqna-xeon-ui-server
+multimodalragwithvideos-xeon-ui-server
 =====================
 Port 5173 - Open to 0.0.0.0/0
 ```
@@ -81,7 +81,7 @@ export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
 export WHISPER_MODEL="base"
 
 
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalragwithvideos"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
 export DATAPREP_VIDEO_WITH_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/videos_with_transcripts"
 export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
@@ -151,4 +151,14 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker
 docker build --no-cache -t opea/multimodalragwithvideos:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 cd ../../../..
+```
+
+### 6. Build UI Docker Image
+
+Build frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/ui
+docker build --no-cache -t opea/multimodalragwithvideos-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd ../../../../..
 ```
