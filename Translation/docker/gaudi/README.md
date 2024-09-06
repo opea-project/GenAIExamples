@@ -71,28 +71,28 @@ docker compose up -d
 
 1. TGI Service
 
-```bash
-curl http://${host_ip}:8008/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:8008/generate \
+     -X POST \
+     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
+     -H 'Content-Type: application/json'
+   ```
 
 2. LLM Microservice
 
-```bash
-curl http://${host_ip}:9000/v1/chat/completions \
-  -X POST \
-  -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:9000/v1/chat/completions \
+     -X POST \
+     -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
+     -H 'Content-Type: application/json'
+   ```
 
 3. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/translation -H "Content-Type: application/json" -d '{
-     "language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/translation -H "Content-Type: application/json" -d '{
+        "language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+   ```
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 

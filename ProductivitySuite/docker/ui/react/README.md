@@ -35,7 +35,8 @@ Here're some of the project's features:
 ### CODEGEN
 
 - Generate code: generate the corresponding code based on the current user's input.
-  ###### Screen Shot
+
+  Screen Shot
   ![project-screenshot](../../../assets/img/codegen.png)
 
 ### DOC SUMMARY
@@ -59,7 +60,7 @@ Here're some of the project's features:
 
 ![project-screenshot](../../../assets/img/faq_generator.png)
 
-## 🛠️ Get it Running:
+## 🛠️ Get it Running
 
 1. Clone the repo.
 
