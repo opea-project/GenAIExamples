@@ -259,5 +259,5 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
 curl http://${host_ip}:9399/v1/lvm \
     -X POST \
     -H 'Content-Type: application/json' \
-    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}' 
+    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
