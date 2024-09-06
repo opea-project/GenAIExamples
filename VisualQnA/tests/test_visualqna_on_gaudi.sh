@@ -131,8 +131,8 @@ function validate_megaservice() {
     validate_services \
     "${ip_address}:80/v1/visualqna" \
     "The image" \
-    "visualqna-gaudi-backend-server" \
-    "visualqna-gaudi-backend-server" \
+    "visualqna-gaudi-nginx-server" \
+    "visualqna-gaudi-nginx-server" \
     '{
         "messages": [
         {
