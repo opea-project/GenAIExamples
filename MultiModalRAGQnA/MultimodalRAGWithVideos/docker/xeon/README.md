@@ -294,7 +294,6 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
 ```bash
 curl http://${host_ip}:8888/v1/mmragvideoqna \
     -H "Content-Type: application/json" \
-    -d '{
-     "messages": "What is the revenue of Nike in 2023?"
-     }'
+    -X POST \
+    -d '{"messages": "What is the revenue of Nike in 2023?"}'
 ```
