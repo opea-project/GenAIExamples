@@ -1,4 +1,4 @@
-# ☣️💥🛡️Toxicity Detection Microservice
+# Toxicity Detection Microservice
 
 ## Introduction
 
@@ -10,46 +10,46 @@ Toxicity is defined as rude, disrespectful, or unreasonable language likely to m
 
 - Add a RoBERTa (125M params) toxicity model fine-tuned on Gaudi2 with ToxicChat and Jigsaw dataset in an optimized serving framework.
 
-# 🚀1. Start Microservice with Python（Option 1）
+## 🚀1. Start Microservice with Python（Option 1）
 
-## 1.1 Install Requirements
+### 1.1 Install Requirements
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 1.2 Start Toxicity Detection Microservice with Python Script
+### 1.2 Start Toxicity Detection Microservice with Python Script
 
 ```bash
 python toxicity_detection.py
 ```
 
-# 🚀2. Start Microservice with Docker (Option 2)
+## 🚀2. Start Microservice with Docker (Option 2)
 
-## 2.1 Prepare toxicity detection model
+### 2.1 Prepare toxicity detection model
 
 export HUGGINGFACEHUB_API_TOKEN=${HP_TOKEN}
 
-## 2.2 Build Docker Image
+### 2.2 Build Docker Image
 
 ```bash
 cd ../../../ # back to GenAIComps/ folder
 docker build -t opea/guardrails-toxicity-detection:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/toxicity_detection/docker/Dockerfile .
 ```
 
-## 2.3 Run Docker Container with Microservice
+### 2.3 Run Docker Container with Microservice
 
 ```bash
 docker run -d --rm --runtime=runc --name="guardrails-toxicity-detection-endpoint" -p 9091:9091 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} opea/guardrails-toxicity-detection:latest
 ```
 
-# 🚀3. Get Status of Microservice
+## 🚀3. Get Status of Microservice
 
 ```bash
 docker container logs -f guardrails-toxicity-detection-endpoint
 ```
 
-# 🚀4. Consume Microservice Pre-LLM/Post-LLM
+## 🚀4. Consume Microservice Pre-LLM/Post-LLM
 
 Once microservice starts, users can use examples (bash or python) below to apply toxicity detection for both user's query (Pre-LLM) or LLM's response (Post-LLM)
 

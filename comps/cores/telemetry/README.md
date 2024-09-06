@@ -8,7 +8,7 @@ OPEA Comps currently provides telemetry functionalities for metrics and tracing 
 
 OPEA microservice metrics are exported in Prometheus format and are divided into two categories: general metrics and specific metrics.
 
-General metrics, such as `http_requests_total `, `http_request_size_bytes`, are exposed by every microservice endpoint using the [prometheus-fastapi-instrumentator](https://github.com/trallnag/prometheus-fastapi-instrumentator).
+General metrics, such as `http_requests_total`, `http_request_size_bytes`, are exposed by every microservice endpoint using the [prometheus-fastapi-instrumentator](https://github.com/trallnag/prometheus-fastapi-instrumentator).
 
 Specific metrics are the built-in metrics exposed under `/metrics` by each specific microservices such as TGI, vLLM, TEI and others. Both types of the metrics adhere to the Prometheus format.
 

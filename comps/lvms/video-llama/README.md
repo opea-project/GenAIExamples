@@ -2,9 +2,9 @@
 
 This is a Docker-based microservice that runs Video-Llama as a Large Vision Model (LVM). It utilizes Llama-2-7b-chat-hf for conversations based on video dialogues. It support Intel Xeon CPU.
 
-# 🚀1. Start Microservice with Docker
+## 🚀1. Start Microservice with Docker
 
-## 1.1 Build Images
+### 1.1 Build Images
 
 ```bash
 cd GenAIComps
@@ -14,7 +14,7 @@ docker build --no-cache -t opea/video-llama-lvm-server:latest --build-arg https_
 docker build --no-cache -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/lvms/video-llama/Dockerfile .
 ```
 
-## 1.2 Start Video-Llama and LVM Services
+### 1.2 Start Video-Llama and LVM Services
 
 For the very first run, please follow below steps:
 
@@ -42,7 +42,7 @@ services:
       llm_download: "False" # avoid download
 ```
 
-# ✅ 2. Test
+## ✅ 2. Test
 
 ```bash
 # use curl
@@ -58,7 +58,7 @@ export ip_address=$(hostname -I | awk '{print $1}')
 python comps/lvms/video-llama/check_lvm.py
 ```
 
-# ♻️ 3. Clean
+## ♻️ 3. Clean
 
 ```bash
 # remove the container

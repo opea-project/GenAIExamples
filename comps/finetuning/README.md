@@ -2,9 +2,9 @@
 
 LLM Fine-tuning microservice involves adapting a base model to a specific task or dataset to improve its performance on that task.
 
-# 🚀1. Start Microservice with Python (Optional 1)
+## 🚀1. Start Microservice with Python (Optional 1)
 
-## 1.1 Install Requirements
+### 1.1 Install Requirements
 
 ```bash
 python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
@@ -13,9 +13,9 @@ python -m pip install oneccl_bind_pt --extra-index-url https://pytorch-extension
 pip install -r requirements.txt
 ```
 
-## 1.2 Start Finetuning Service with Python Script
+### 1.2 Start Finetuning Service with Python Script
 
-### 1.2.1 Start Ray Cluster
+#### 1.2.1 Start Ray Cluster
 
 OneCCL and Intel MPI libraries should be dynamically linked in every node before Ray starts:
 
@@ -35,18 +35,18 @@ For a multi-node cluster, start additional Ray worker nodes with below command.
 ray start --address='${head_node_ip}:6379'
 ```
 
-### 1.2.2 Start Finetuning Service
+#### 1.2.2 Start Finetuning Service
 
 ```bash
 export HF_TOKEN=${your_huggingface_token}
 python finetuning_service.py
 ```
 
-# 🚀2. Start Microservice with Docker (Optional 2)
+## 🚀2. Start Microservice with Docker (Optional 2)
 
-## 2.1 Setup on CPU
+### 2.1 Setup on CPU
 
-### 2.1.1 Build Docker Image
+#### 2.1.1 Build Docker Image
 
 Build docker image with below command:
 
@@ -56,7 +56,7 @@ cd ../../
 docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg HF_TOKEN=$HF_TOKEN -f comps/finetuning/docker/Dockerfile_cpu .
 ```
 
-### 2.1.2 Run Docker with CLI
+#### 2.1.2 Run Docker with CLI
 
 Start docker container with below command:
 
@@ -64,9 +64,9 @@ Start docker container with below command:
 docker run -d --name="finetuning-server" -p 8015:8015 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/finetuning:latest
 ```
 
-## 2.2 Setup on Gaudi2
+### 2.2 Setup on Gaudi2
 
-### 2.2.1 Build Docker Image
+#### 2.2.1 Build Docker Image
 
 Build docker image with below command:
 
@@ -75,7 +75,7 @@ cd ../../
 docker build -t opea/finetuning-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/finetuning/docker/Dockerfile_hpu .
 ```
 
-### 2.2.2 Run Docker with CLI
+#### 2.2.2 Run Docker with CLI
 
 Start docker container with below command:
 
@@ -84,9 +84,9 @@ export HF_TOKEN=${your_huggingface_token}
 docker run --runtime=habana -e HABANA_VISIBLE_DEVICES=all -p 8015:8015 -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --net=host --ipc=host -e https_proxy=$https_proxy -e http_proxy=$http_proxy -e no_proxy=$no_proxy -e HF_TOKEN=$HF_TOKEN opea/finetuning-gaudi:latest
 ```
 
-# 🚀3. Consume Finetuning Service
+## 🚀3. Consume Finetuning Service
 
-## 3.1 Create fine-tuning job
+### 3.1 Create fine-tuning job
 
 Assuming a training file `alpaca_data.json` is uploaded, it can be downloaded in [here](https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json), the following script launches a finetuning job using `meta-llama/Llama-2-7b-chat-hf` as base model:
 
@@ -120,6 +120,6 @@ curl http://${your_ip}:8015/v1/finetune/list_checkpoints -X POST -H "Content-Typ
 
 ```
 
-# 🚀4. Descriptions for Finetuning parameters
+## 🚀4. Descriptions for Finetuning parameters
 
 We utilize [OpenAI finetuning parameters](https://platform.openai.com/docs/api-reference/fine-tuning) and extend it with more customizable parameters.

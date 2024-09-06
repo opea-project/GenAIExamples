@@ -17,7 +17,7 @@ Once it successfully builds, you will have the `vllm:openvino` image. It can be 
 
 ## Use vLLM serving with OpenAI API
 
-### Start The Server:
+### Start The Server
 
 For gated models, such as `LLAMA-2`, you will have to pass -e HUGGING_FACE_HUB_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
 
@@ -33,7 +33,7 @@ To start the model server:
 bash launch_model_server.sh
 ```
 
-### Request Completion With Curl:
+### Request Completion With Curl
 
 ```bash
 curl http://localhost:8000/v1/completions \
@@ -55,7 +55,7 @@ The `launch_model_server.sh` script accepts two parameters:
 
 You have the flexibility to customize the two parameters according to your specific needs. Below is a sample reference, if you wish to specify a different model and port number
 
-` bash launch_model_server.sh -m meta-llama/Llama-2-7b-chat-hf -p 8123`
+`bash launch_model_server.sh -m meta-llama/Llama-2-7b-chat-hf -p 8123`
 
 Additionally, you can set the vLLM CPU endpoint by exporting the environment variable `vLLM_LLM_ENDPOINT`:
 
@@ -78,5 +78,9 @@ To enable better TPOT / TTFT latency, you can use vLLM's chunked prefill feature
 
 OpenVINO best known configuration is:
 
-    $ VLLM_OPENVINO_KVCACHE_SPACE=100 VLLM_OPENVINO_CPU_KV_CACHE_PRECISION=u8 VLLM_OPENVINO_ENABLE_QUANTIZED_WEIGHTS=ON \
-        python3 vllm/benchmarks/benchmark_throughput.py --model meta-llama/Llama-2-7b-chat-hf --dataset vllm/benchmarks/ShareGPT_V3_unfiltered_cleaned_split.json --enable-chunked-prefill --max-num-batched-tokens 256
+```bash
+$ VLLM_OPENVINO_KVCACHE_SPACE=100 VLLM_OPENVINO_CPU_KV_CACHE_PRECISION=u8 VLLM_OPENVINO_ENABLE_QUANTIZED_WEIGHTS=ON \
+     python3 vllm/benchmarks/benchmark_throughput.py --model meta-llama/Llama-2-7b-chat-hf \
+     --dataset vllm/benchmarks/ShareGPT_V3_unfiltered_cleaned_split.json --enable-chunked-prefill \
+     --max-num-batched-tokens 256
+```

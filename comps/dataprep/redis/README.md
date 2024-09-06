@@ -105,7 +105,7 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 
 - Build docker image with langchain
 
-* option 1: Start single-process version (for 1-10 files processing)
+- option 1: Start single-process version (for 1-10 files processing)
 
 ```bash
 cd ../../../../

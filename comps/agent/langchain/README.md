@@ -33,34 +33,34 @@ The tools are registered with a yaml file. We support the following types of too
 
 Currently we have implemented OpenAI chat completion compatible API for agents. We are working to support OpenAI assistants APIs.
 
-# 🚀2. Start Agent Microservice
+## 🚀2. Start Agent Microservice
 
-## 2.1 Option 1: with Python
+### 2.1 Option 1: with Python
 
-### 2.1.1 Install Requirements
+#### 2.1.1 Install Requirements
 
 ```bash
 cd comps/agent/langchain/
 pip install -r requirements.txt
 ```
 
-### 2.1.2 Start Microservice with Python Script
+#### 2.1.2 Start Microservice with Python Script
 
 ```bash
 cd comps/agent/langchain/
 python agent.py
 ```
 
-## 2.2 Option 2. Start Microservice with Docker
+### 2.2 Option 2. Start Microservice with Docker
 
-### 2.2.1 Build Microservices
+#### 2.2.1 Build Microservices
 
 ```bash
 cd GenAIComps/ # back to GenAIComps/ folder
 docker build -t opea/comps-agent-langchain:latest -f comps/agent/langchain/docker/Dockerfile .
 ```
 
-### 2.2.2 Start microservices
+#### 2.2.2 Start microservices
 
 ```bash
 export ip_address=$(hostname -I | awk '{print $1}')
@@ -87,7 +87,7 @@ docker logs comps-langchain-agent-endpoint
 > docker run --rm --runtime=runc --name="comps-langchain-agent-endpoint" -v ./comps/agent/langchain/:/home/user/comps/agent/langchain/ -p 9090:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e ip_address=${ip_address} -e strategy=react -e llm_endpoint_url=http://${ip_address}:8080 -e llm_engine=tgi -e recursion_limit=5 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/comps-agent-langchain:latest
 > ```
 
-# 🚀 3. Validate Microservice
+## 🚀 3. Validate Microservice
 
 Once microservice starts, user can use below script to invoke.
 
@@ -104,7 +104,7 @@ data: [DONE]
 
 ```
 
-# 🚀 4. Provide your own tools
+## 🚀 4. Provide your own tools
 
 - Define tools
 
@@ -180,7 +180,7 @@ data: 'The weather information in Austin is not available from the Open Platform
 data: [DONE]
 ```
 
-# 5. Customize agent strategy
+## 5. Customize agent strategy
 
 For advanced developers who want to implement their own agent strategies, you can add a separate folder in `src\strategy`, implement your agent by inherit the `BaseAgent` class, and add your strategy into the `src\agent.py`. The architecture of this agent microservice is shown in the diagram below as a reference.
 ![Architecture Overview](agent_arch.jpg)

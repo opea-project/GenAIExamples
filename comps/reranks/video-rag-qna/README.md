@@ -4,16 +4,16 @@ This is a Docker-based microservice that do result rerank for VideoRAGQnA use ca
 
 For the `VideoRAGQnA` usecase, during the data preparation phase, frames are extracted from videos and stored in a vector database. To identify the most relevant video, we count the occurrences of each video source among the retrieved data with rerank function `get_top_doc`. This sorts the video as a descending list of names, ranked by their degree of match with the query. Then we could send the `top_n` videos to the downstream LVM.
 
-# 🚀1. Start Microservice with Docker
+## 🚀1. Start Microservice with Docker
 
-## 1.1 Build Images
+### 1.1 Build Images
 
 ```bash
 cd GenAIComps
 docker build --no-cache -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/docker/Dockerfile .
 ```
 
-## 1.2 Start Rerank Service
+### 1.2 Start Rerank Service
 
 ```bash
 docker compose -f comps/reranks/video-rag-qna/docker/docker_compose_reranking.yaml up -d
@@ -27,7 +27,7 @@ Available configuration by environment variable:
 
 - CHUNK_DURATION: target chunk duration, should be aligned with VideoRAGQnA dataprep. Default 10s.
 
-# ✅ 2. Test
+## ✅ 2. Test
 
 ```bash
 export ip_address=$(hostname -I | awk '{print $1}')
@@ -53,7 +53,7 @@ The result should be:
 {"id":"random number","video_url":"http://0.0.0.0:6005/top_video_name","chunk_start":20.0,"chunk_duration":10.0,"prompt":"this is the query","max_new_tokens":512}
 ```
 
-# ♻️ 3. Clean
+## ♻️ 3. Clean
 
 ```bash
 # remove the container
