@@ -22,11 +22,13 @@ from pydantic_yaml import parse_yaml_raw_as
 from ray.air import FailureConfig, RunConfig
 from ray.air.config import ScalingConfig
 from ray.train.torch import TorchTrainer
+from transformers import Trainer, TrainingArguments
 
 from comps import CustomLogger
 from comps.finetuning.finetune_config import FinetuneConfig
 from comps.finetuning.llm_on_ray import common
-from comps.finetuning.llm_on_ray.finetune.data_process import DataProcessor
+from comps.finetuning.llm_on_ray.finetune.data_process import DataProcessor, GroupCollator, TrainDatasetForCE
+from comps.finetuning.llm_on_ray.finetune.modeling import CrossEncoder
 
 logger = CustomLogger("llm_on_ray/finetune")
 
@@ -186,74 +188,106 @@ def load_dataset(config: Dict):
 
 
 def tokenize_dataset(config: Dict, tokenizer, dataset):
-    group = config["Dataset"].get("group", True)
-    block_size = config["Dataset"].get("block_size", 512)
-    tokenizer.pad_token = tokenizer.eos_token
+    task = config["General"].get("task", "instruction_tuning")
+    if task == "instruction_tuning":
+        group = config["Dataset"].get("group", True)
+        block_size = config["Dataset"].get("block_size", 512)
+        tokenizer.pad_token = tokenizer.eos_token
 
-    processor = DataProcessor(config, tokenizer)
+        processor = DataProcessor(config, tokenizer)
 
-    for key in dataset:
-        prompts = processor.make_prompt(dataset[key])
-        dataset[key] = datasets.Dataset.from_dict(prompts)
+        for key in dataset:
+            prompts = processor.make_prompt(dataset[key])
+            dataset[key] = datasets.Dataset.from_dict(prompts)
 
-    column_names = list(dataset["train"].features)
-    tokenize_fn = (
-        processor.tokenize_by_neural_chat
-        if config["Dataset"].get("data_preprocess_type", "") == "neural_chat"
-        else processor.tokenize
-    )
-
-    tokenized_dataset = dataset.map(
-        tokenize_fn,
-        remove_columns=column_names,
-        batched=True,
-        load_from_cache_file=False,
-        desc="Tokenize dataset",
-    )
-
-    if group:
-
-        def group_texts(examples):
-            # Concatenate all texts.
-            concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
-            total_length = len(concatenated_examples[list(examples.keys())[0]])
-            # We drop the small remainder, we could add padding if the model supported it instead of this drop, you can
-            # customize this part to your needs.
-            if total_length >= block_size:
-                total_length = (total_length // block_size) * block_size
-            # Split by chunks of max_len.
-            result = {
-                k: [t[i : i + block_size] for i in range(0, total_length, block_size)]
-                for k, t in concatenated_examples.items()
-            }
-            return result
-
-        tokenized_dataset = tokenized_dataset.map(
-            group_texts,
-            batched=True,
-            load_from_cache_file=False,
-            desc=f"Grouping texts in chunks of {block_size}",
+        column_names = list(dataset["train"].features)
+        tokenize_fn = (
+            processor.tokenize_by_neural_chat
+            if config["Dataset"].get("data_preprocess_type", "") == "neural_chat"
+            else processor.tokenize
         )
 
-    return tokenized_dataset
+        tokenized_dataset = dataset.map(
+            tokenize_fn,
+            remove_columns=column_names,
+            batched=True,
+            load_from_cache_file=False,
+            desc="Tokenize dataset",
+        )
+
+        if group:
+
+            def group_texts(examples):
+                # Concatenate all texts.
+                concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
+                total_length = len(concatenated_examples[list(examples.keys())[0]])
+                # We drop the small remainder, we could add padding if the model supported it instead of this drop, you can
+                # customize this part to your needs.
+                if total_length >= block_size:
+                    total_length = (total_length // block_size) * block_size
+                # Split by chunks of max_len.
+                result = {
+                    k: [t[i : i + block_size] for i in range(0, total_length, block_size)]
+                    for k, t in concatenated_examples.items()
+                }
+                return result
+
+            tokenized_dataset = tokenized_dataset.map(
+                group_texts,
+                batched=True,
+                load_from_cache_file=False,
+                desc=f"Grouping texts in chunks of {block_size}",
+            )
+
+        return tokenized_dataset
+    elif task == "rerank":
+        dataset["train"] = TrainDatasetForCE(dataset["train"], config["Dataset"], tokenizer)
+        return dataset
+    elif task == "embedding":
+        pass
+    else:
+        raise NotImplementedError(f"Unsupported task {task}, only support instruction_tuning, rerank, embedding now.")
 
 
 def prepare_data_collator(config: Dict, tokenizer):
-    return transformers.DataCollatorForLanguageModeling(
-        tokenizer=tokenizer, mlm=False, return_tensors="pt", pad_to_multiple_of=8
-    )
+    task = config["General"].get("task", "instruction_tuning")
+    if task == "instruction_tuning":
+        return transformers.DataCollatorForLanguageModeling(
+            tokenizer=tokenizer, mlm=False, return_tensors="pt", pad_to_multiple_of=8
+        )
+    elif task == "rerank":
+        return GroupCollator(tokenizer)
+    elif task == "embedding":
+        pass
+    else:
+        raise NotImplementedError(f"Unsupported task {task}, only support instruction_tuning, rerank, embedding now.")
 
 
 def load_model(config: Dict):
     model_name = config["General"]["base_model"]
     model_dtype = convert_dtype(config["Training"].get("mixed_precision", "no"))
     model_config = config["General"].get("config", {})
-    model = transformers.AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=model_dtype, **model_config)
+    task = config["General"].get("task", "instruction_tuning")
+    training_args = convert_to_training_args(TrainingArguments, config)
+    if task == "instruction_tuning":
+        model = transformers.AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=model_dtype, **model_config)
 
-    lora_config = config["General"].get("lora_config", None)
-    if lora_config:
-        peft_config = LoraConfig(**lora_config)
-        model = get_peft_model(model, peft_config)
+        lora_config = config["General"].get("lora_config", None)
+        if lora_config:
+            peft_config = LoraConfig(**lora_config)
+            model = get_peft_model(model, peft_config)
+    elif task == "rerank":
+        model = CrossEncoder.from_pretrained(
+            config["Dataset"],
+            training_args,
+            model_name,
+            from_tf=bool(".ckpt" in model_name),
+            config=model_config,
+        )
+    elif task == "embedding":
+        pass
+    else:
+        raise NotImplementedError(f"Unsupported task {task}, only support instruction_tuning, rerank, embedding now.")
 
     egc = config["General"].get("enable_gradient_checkpointing", False)
     if egc:
@@ -269,8 +303,6 @@ def load_model(config: Dict):
 def get_trainer(config: Dict, model, tokenizer, tokenized_dataset, data_collator):
     device = config["Training"]["device"]
     if device in ["cpu", "gpu"]:
-        from transformers import Trainer, TrainingArguments
-
         training_args = convert_to_training_args(TrainingArguments, config)
         trainer = Trainer(
             model=model,

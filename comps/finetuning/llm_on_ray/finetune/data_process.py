@@ -4,10 +4,16 @@
 # Copyright 2023 The LLM-on-Ray Authors.
 
 import copy
+import math
+import random
 import re
+from dataclasses import dataclass
 from itertools import chain
+from typing import Dict, List, Tuple
 
 import torch
+from torch.utils.data import Dataset
+from transformers import BatchEncoding, DataCollatorWithPadding
 
 IGNORE_INDEX = -100
 
@@ -194,3 +200,49 @@ class DataProcessor:
             examples["labels"].append(labels)
             examples["attention_mask"].append(results["attention_mask"])
         return examples
+
+
+class TrainDatasetForCE(Dataset):
+    def __init__(self, dataset, args, tokenizer):
+        self.dataset = dataset
+        self.tokenizer = tokenizer
+        self.args = args
+        self.total_len = len(self.dataset)
+
+    def create_one_example(self, qry_encoding: str, doc_encoding: str):
+        item = self.tokenizer.encode_plus(
+            qry_encoding,
+            doc_encoding,
+            truncation=True,
+            max_length=self.args.get("max_length", 512),
+            padding=False,
+        )
+        return item
+
+    def __len__(self):
+        return self.total_len
+
+    def __getitem__(self, item) -> List[BatchEncoding]:
+        query = self.dataset[item]["query"]
+        pos = random.choice(self.dataset[item]["pos"])
+        train_group_size = self.args.get("train_group_size", 8)
+        if len(self.dataset[item]["neg"]) < train_group_size - 1:
+            num = math.ceil((train_group_size - 1) / len(self.dataset[item]["neg"]))
+            negs = random.sample(self.dataset[item]["neg"] * num, train_group_size - 1)
+        else:
+            negs = random.sample(self.dataset[item]["neg"], train_group_size - 1)
+
+        batch_data = []
+        batch_data.append(self.create_one_example(query, pos))
+        for neg in negs:
+            batch_data.append(self.create_one_example(query, neg))
+
+        return batch_data
+
+
+@dataclass
+class GroupCollator(DataCollatorWithPadding):
+    def __call__(self, features) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
+        if isinstance(features[0], list):
+            features = sum(features, [])
+        return super().__call__(features)

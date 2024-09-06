@@ -1,6 +1,6 @@
-# LLM Fine-tuning Microservice
+# Fine-tuning Microservice
 
-LLM Fine-tuning microservice involves adapting a base model to a specific task or dataset to improve its performance on that task.
+Fine-tuning microservice involves adapting a model to a specific task or dataset to improve its performance on that task, we currently supported instruction tuning for LLMs, finetuning for reranking and embedding models.
 
 ## 🚀1. Start Microservice with Python (Optional 1)
 
@@ -86,14 +86,22 @@ docker run --runtime=habana -e HABANA_VISIBLE_DEVICES=all -p 8015:8015 -e OMPI_M
 
 ## 🚀3. Consume Finetuning Service
 
-### 3.1 Create fine-tuning job
+## 3.1 Upload a training file
 
-Assuming a training file `alpaca_data.json` is uploaded, it can be downloaded in [here](https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json), the following script launches a finetuning job using `meta-llama/Llama-2-7b-chat-hf` as base model:
+Download a training file, such as `alpaca_data.json` for instruction tuning and upload it to the server with below command, this file can be downloaded in [here](https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json):
 
 ```bash
 # upload a training file
 curl http://${your_ip}:8015/v1/files -X POST -H "Content-Type: multipart/form-data" -F "file=@./alpaca_data.json" -F purpose="fine-tune"
+```
 
+For reranking and embedding models finetuning, the training file [toy_finetune_data.jsonl](https://github.com/FlagOpen/FlagEmbedding/blob/master/examples/finetune/toy_finetune_data.jsonl) is an toy example.
+
+## 3.2 Create fine-tuning job
+
+After a training file like `alpaca_data.json` is uploaded, use the following command to launch a finetuning job using `meta-llama/Llama-2-7b-chat-hf` as base model:
+
+```bash
 # create a finetuning job
 curl http://${your_ip}:8015/v1/fine_tuning/jobs \
   -X POST \
@@ -102,22 +110,41 @@ curl http://${your_ip}:8015/v1/fine_tuning/jobs \
     "training_file": "alpaca_data.json",
     "model": "meta-llama/Llama-2-7b-chat-hf"
   }'
+```
 
+Use the following command to launch a finetuning job for reranking model finetuning, such as `BAAI/bge-reranker-large`:
+
+```bash
+# create a finetuning job
+curl http://${your_ip}:8015/v1/fine_tuning/jobs \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "training_file": "toy_finetune_data.jsonl",
+    "model": "BAAI/bge-reranker-large",
+    "General":{
+      "task":"rerank",
+      "lora_config":null
+    }
+  }'
+```
+
+## 3.3 Manage fine-tuning job
+
+Below commands show how to list finetuning jobs, retrieve a finetuning job, cancel a finetuning job and list checkpoints of a finetuning job.
+
+```bash
 # list finetuning jobs
-curl http://${your_ip}:8015/v1/fine_tuning/jobs   -X GET
+curl http://${your_ip}:8015/v1/fine_tuning/jobs -X GET
 
 # retrieve one finetuning job
-curl http://localhost:8015/v1/fine_tuning/jobs/retrieve   -X POST   -H "Content-Type: application/json"   -d '{
-    "fine_tuning_job_id": ${fine_tuning_job_id}}'
+curl http://localhost:8015/v1/fine_tuning/jobs/retrieve -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
 
 # cancel one finetuning job
-curl http://localhost:8015/v1/fine_tuning/jobs/cancel   -X POST   -H "Content-Type: application/json"   -d '{
-    "fine_tuning_job_id": ${fine_tuning_job_id}}'
+curl http://localhost:8015/v1/fine_tuning/jobs/cancel -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
 
 # list checkpoints of a finetuning job
 curl http://${your_ip}:8015/v1/finetune/list_checkpoints -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
-
-
 ```
 
 ## 🚀4. Descriptions for Finetuning parameters
