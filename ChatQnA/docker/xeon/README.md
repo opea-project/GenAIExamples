@@ -70,12 +70,14 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-
 ### Use TGI as backend
+
 ```
 docker pull opea/llm-tgi:latest
 ```
+
 ### Use vLLM as backend
+
 ```
 docker pull opea/vllm:latest
 docker pull opea/llm-vllm:latest
