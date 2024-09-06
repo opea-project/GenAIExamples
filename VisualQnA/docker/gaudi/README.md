@@ -91,34 +91,34 @@ Follow the instructions to validate MicroServices.
 
 1. LLM Microservice
 
-```bash
-http_proxy="" curl http://${host_ip}:9399/v1/lvm -XPOST -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}' -H 'Content-Type: application/json'
-```
+   ```bash
+   http_proxy="" curl http://${host_ip}:9399/v1/lvm -XPOST -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}' -H 'Content-Type: application/json'
+   ```
 
 2. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
-     "messages": [
-      {
-        "role": "user",
-        "content": [
-          {
-            "type": "text",
-            "text": "What'\''s in this image?"
-          },
-          {
-            "type": "image_url",
-            "image_url": {
-              "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
-            }
-          }
-        ]
-      }
-    ],
-    "max_tokens": 300
-    }'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
+        "messages": [
+         {
+           "role": "user",
+           "content": [
+             {
+               "type": "text",
+               "text": "What'\''s in this image?"
+             },
+             {
+               "type": "image_url",
+               "image_url": {
+                 "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+               }
+             }
+           ]
+         }
+       ],
+       "max_tokens": 300
+       }'
+   ```
 
 ## 🚀 Launch the UI
 

@@ -36,12 +36,15 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LVM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/visualqna"
+<<<<<<< HEAD
     export FRONTEND_SERVICE_IP=${ip_address}
     export FRONTEND_SERVICE_PORT=5173
     export BACKEND_SERVICE_NAME=codetrans
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
     export NGINX_PORT=80
+=======
+>>>>>>> 1d1e1f90b60f0116c0219923e0c1dcbea7f4f86d
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
