@@ -199,6 +199,7 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/xeon/
 docker compose -f compose.yaml up -d
 ```
+
 ### Validate Microservices
 
 1. Bridgetower Embedding Server
