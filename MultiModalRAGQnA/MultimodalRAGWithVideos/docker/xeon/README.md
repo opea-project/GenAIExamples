@@ -297,3 +297,9 @@ curl http://${host_ip}:8888/v1/mmragvideoqna \
     -X POST \
     -d '{"messages": "What is the revenue of Nike in 2023?"}'
 ```
+
+```bash
+curl http://${host_ip}:8888/v1/mmragvideoqna \
+	-H "Content-Type: application/json" \
+	-d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+```
