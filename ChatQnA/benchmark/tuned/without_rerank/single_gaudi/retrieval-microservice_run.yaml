@@ -1,0 +1,79 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: retriever-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: retriever-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: retriever-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: retriever-deploy
+      hostIPC: true
+      containers:
+      - env:
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: REDIS_URL
+        - name: TEI_EMBEDDING_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: TEI_EMBEDDING_ENDPOINT
+        - name: HUGGINGFACEHUB_API_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: HUGGINGFACEHUB_API_TOKEN
+        - name: INDEX_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: INDEX_NAME
+        image: opea/retriever-redis:latest
+        imagePullPolicy: IfNotPresent
+        name: retriever-deploy
+        args: null
+        ports:
+        - containerPort: 7000
+        resources:
+          limits:
+            cpu: 8
+            memory: 2500Mi
+          requests:
+            cpu: 8
+            memory: 2500Mi
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: retriever-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: retriever-deploy
+  ports:
+  - name: service
+    port: 7000
+    targetPort: 7000
