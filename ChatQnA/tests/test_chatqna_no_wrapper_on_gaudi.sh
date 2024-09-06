@@ -45,9 +45,9 @@ function start_services() {
     # export EMBEDDING_SERVICE_HOST_IP=${ip_address}
     # export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     # export RERANK_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVER_HOST_IP=${host_ip}
-    export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-    export RERANK_SERVER_HOST_IP=${host_ip}
+    export EMBEDDING_SERVER_HOST_IP=${ip_address}
+    export RETRIEVER_SERVICE_HOST_IP=${ip_address}
+    export RERANK_SERVER_HOST_IP=${ip_address}
     export EMBEDDING_SERVER_PORT=8090
     export RERANK_SERVER_PORT=8808
     export LLM_SERVER_PORT=8005
