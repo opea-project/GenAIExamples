@@ -243,7 +243,12 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
+
+export llm_service_devices=all
+export tei_embedding_devices=all
 ```
+
+To specify the device ids, "llm_service_devices" and "tei_embedding_devices"` can be set as "0,1,2,3" alike. More info in [gaudi docs](https://docs.habana.ai/en/latest/Orchestration/Multiple_Tenants_on_HPU/Multiple_Dockers_each_with_Single_Workload.html).    
 
 If guardrails microservice is enabled in the pipeline, the below environment variables are necessary to be set.
 
@@ -254,7 +259,7 @@ export SAFETY_GUARD_ENDPOINT="http://${host_ip}:8088"
 export GUARDRAIL_SERVICE_HOST_IP=${host_ip}
 ```
 
-Note: Please replace with `host_ip` with you external IP address, do **NOT** use localhost.
+Note: Please replace `host_ip` with your external IP address, do **NOT** use localhost.    
 
 ### Start all the services Docker Containers
 
