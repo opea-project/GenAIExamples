@@ -42,16 +42,13 @@ function start_services() {
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
-    # export EMBEDDING_SERVICE_HOST_IP=${ip_address}
-    # export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    # export RERANK_SERVICE_HOST_IP=${ip_address}
     export EMBEDDING_SERVER_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVER_HOST_IP=${ip_address}
+    export LLM_SERVER_HOST_IP=${ip_address}
     export EMBEDDING_SERVER_PORT=6006
     export RERANK_SERVER_PORT=8808
     export LLM_SERVER_PORT=9009
-    export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get_file"
