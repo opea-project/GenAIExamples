@@ -20,6 +20,11 @@ services:
       dockerfile: ./Dockerfile_without_rerank
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
+  chatqna-no-wrapper:
+    build:
+      dockerfile: ./Dockerfile_no_wrapper
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna-no-wrapper:${TAG:-latest}
   chatqna-ui:
     build:
       context: ui
