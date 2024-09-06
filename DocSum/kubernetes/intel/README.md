@@ -3,9 +3,9 @@
 > [NOTE]
 > The following values must be set before you can deploy:
 > HUGGINGFACEHUB_API_TOKEN
-
+>
 > You can also customize the "MODEL_ID" and "model-volume"
-
+>
 > You need to make sure you have created the directory `/mnt/opea-models` to save the cached model on the node where the DocSum workload is running. Otherwise, you need to modify the `docsum.yaml` file to change the `model-volume` to a directory that exists on the node.
 
 ## Deploy On Xeon

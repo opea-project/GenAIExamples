@@ -98,29 +98,29 @@ docker compose up -d
 
 1. TGI Service
 
-```bash
-curl http://${your_ip}:8008/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${your_ip}:8008/generate \
+     -X POST \
+     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
+     -H 'Content-Type: application/json'
+   ```
 
 2. LLM Microservice
 
-```bash
-curl http://${your_ip}:9000/v1/chat/docsum \
-  -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${your_ip}:9000/v1/chat/docsum \
+     -X POST \
+     -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+     -H 'Content-Type: application/json'
+   ```
 
 3. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
-     "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-     }'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
+        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+        }'
+   ```
 
 ## 🚀 Launch the Svelte UI
 

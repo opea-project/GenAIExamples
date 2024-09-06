@@ -173,97 +173,97 @@ OLLAMA_HOST=${host_ip}:11434 ollama run $OLLAMA_MODEL
 
 1. TEI Embedding Service
 
-```bash
-curl ${host_ip}:6006/embed \
-    -X POST \
-    -d '{"inputs":"What is Deep Learning?"}' \
-    -H 'Content-Type: application/json'
-```
+   ```bash
+   curl ${host_ip}:6006/embed \
+       -X POST \
+       -d '{"inputs":"What is Deep Learning?"}' \
+       -H 'Content-Type: application/json'
+   ```
 
 2. Embedding Microservice
 
-```bash
-curl http://${host_ip}:6000/v1/embeddings\
-  -X POST \
-  -d '{"text":"hello"}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:6000/v1/embeddings\
+     -X POST \
+     -d '{"text":"hello"}' \
+     -H 'Content-Type: application/json'
+   ```
 
 3. Retriever Microservice  
    To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
 
-```bash
-export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-curl http://${host_ip}:7000/v1/retrieval \
-  -X POST \
-  -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+   curl http://${host_ip}:7000/v1/retrieval \
+     -X POST \
+     -d '{"text":"What is the revenue of Nike in 2023?","embedding":"'"${your_embedding}"'"}' \
+     -H 'Content-Type: application/json'
+   ```
 
 4. TEI Reranking Service
 
-```bash
-curl http://${host_ip}:8808/rerank \
-    -X POST \
-    -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-    -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:8808/rerank \
+       -X POST \
+       -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
+       -H 'Content-Type: application/json'
+   ```
 
 5. Reranking Microservice
 
-```bash
-curl http://${host_ip}:8000/v1/reranking\
-  -X POST \
-  -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:8000/v1/reranking\
+     -X POST \
+     -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
+     -H 'Content-Type: application/json'
+   ```
 
 6. Ollama Service
 
-```bash
-curl http://${host_ip}:11434/api/generate -d '{"model": "llama3", "prompt":"What is Deep Learning?"}'
-```
+   ```bash
+   curl http://${host_ip}:11434/api/generate -d '{"model": "llama3", "prompt":"What is Deep Learning?"}'
+   ```
 
 7. LLM Microservice
 
-```bash
-curl http://${host_ip}:9000/v1/chat/completions\
-  -X POST \
-  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:9000/v1/chat/completions\
+     -X POST \
+     -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -H 'Content-Type: application/json'
+   ```
 
 8. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-     "messages": "What is the revenue of Nike in 2023?", "model": "'"${OLLAMA_MODEL}"'"
-     }'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+        "messages": "What is the revenue of Nike in 2023?", "model": "'"${OLLAMA_MODEL}"'"
+        }'
+   ```
 
 9. Dataprep Microservice（Optional）
 
-If you want to update the default knowledge base, you can use the following commands:
+   If you want to update the default knowledge base, you can use the following commands:
 
-Update Knowledge Base via Local File Upload:
+   Update Knowledge Base via Local File Upload:
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F "files=@./nke-10k-2023.pdf"
-```
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+        -H "Content-Type: multipart/form-data" \
+        -F "files=@./nke-10k-2023.pdf"
+   ```
 
-This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-Add Knowledge Base via HTTP Links:
+   Add Knowledge Base via HTTP Links:
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F 'link_list=["https://opea.dev"]'
-```
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+        -H "Content-Type: multipart/form-data" \
+        -F 'link_list=["https://opea.dev"]'
+   ```
 
-This command updates a knowledge base by submitting a list of HTTP links for processing.
+   This command updates a knowledge base by submitting a list of HTTP links for processing.
 
 ## 🚀 Launch the UI
 

@@ -78,7 +78,7 @@ Check the log of container by:
 
 View the logs of `ghcr.io/huggingface/tgi-gaudi:1.2.1`
 
-#docker logs 05c40b636239 -t
+`docker logs 05c40b636239 -t`
 
 ```
 ...

@@ -106,37 +106,37 @@ docker compose up -d
 
 1. TGI Service
 
-```bash
-curl http://${host_ip}:8008/generate \
-  -X POST \
-  -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:8008/generate \
+     -X POST \
+     -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -H 'Content-Type: application/json'
+   ```
 
 2. LLM Microservice
 
-```bash
-curl http://${host_ip}:9000/v1/chat/completions\
-  -X POST \
-  -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:9000/v1/chat/completions\
+     -X POST \
+     -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' \
+     -H 'Content-Type: application/json'
+   ```
 
 3. MegaService
 
-```bash
-curl http://${host_ip}:7777/v1/codetrans \
-    -H "Content-Type: application/json" \
-    -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
-```
+   ```bash
+   curl http://${host_ip}:7777/v1/codetrans \
+       -H "Content-Type: application/json" \
+       -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+   ```
 
 4. Nginx Service
 
-```bash
-curl http://${host_ip}:${NGINX_PORT}/v1/codetrans \
-    -H "Content-Type: application/json" \
-    -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
-```
+   ```bash
+   curl http://${host_ip}:${NGINX_PORT}/v1/codetrans \
+       -H "Content-Type: application/json" \
+       -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+   ```
 
 ## 🚀 Launch the UI
 
