@@ -131,7 +131,7 @@ services:
     depends_on:
       - vllm-ray-service
     ports:
-      - "9000:9000"
+      - "9005:9000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}

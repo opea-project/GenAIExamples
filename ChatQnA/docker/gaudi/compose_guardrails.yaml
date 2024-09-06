@@ -167,7 +167,7 @@ services:
     depends_on:
       - tgi-service
     ports:
-      - "9000:9000"
+      - "9004:9000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
