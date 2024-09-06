@@ -33,10 +33,10 @@ function start_services() {
     source set_env.sh
     docker volume create video-llama-model
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 3m
+    sleep 2m
 
     # List of containers running uvicorn
-    list=("dataprep-vdms-server" "embedding-multimodal-server" "retriever-vdms-server" "reranking-videoragqna-server" "video-llama-lvm-server" "lvm-video-llama")
+    list=("dataprep-vdms-server" "embedding-multimodal-server" "retriever-vdms-server" "reranking-videoragqna-server" "video-llama-lvm-server" "lvm-video-llama" "videoragqna-xeon-backend-server")
 
     # Define the maximum time limit in seconds
     TIME_LIMIT=5400
@@ -85,6 +85,12 @@ function start_services() {
         fi
         sleep 5m
     done
+
+    if docker logs videoragqna-xeon-ui-server 2>&1 | grep -q "Streamlit app"; then
+        return 0
+    else
+        return 1
+    fi
 
 }
 
@@ -184,7 +190,6 @@ function validate_megaservice() {
 }
 
 function validate_frontend() {
-    http://localhost:
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET http://${ip_address}:5173/_stcore/health)
 
     if [ "$HTTP_STATUS" -eq 200 ]; then
@@ -207,14 +212,14 @@ function validate_frontend() {
 function stop_docker() {
     cd $WORKPATH/VideoRAGQnA/docker/xeon
     docker compose stop && docker compose rm -f
-    # docker volume rm video-llama-model
+    docker volume rm video-llama-model
 }
 
 function main() {
 
     stop_docker
 
-    # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices
