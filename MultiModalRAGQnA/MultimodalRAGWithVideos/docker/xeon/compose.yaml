@@ -103,14 +103,14 @@ services:
     ports:
       - "8888:8888"
     environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
-      - MM_EMBEDDING_SERVICE_HOST_IP=${MM_EMBEDDING_SERVICE_HOST_IP}
-      - MM_EMBEDDING_PORT_MICROSERVICE=${MM_EMBEDDING_PORT_MICROSERVICE}
-      - MM_RETRIEVER_SERVICE_HOST_IP=${MM_RETRIEVER_SERVICE_HOST_IP}
-      - LVM_SERVICE_HOST_IP=${LVM_SERVICE_HOST_IP}
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      MM_EMBEDDING_SERVICE_HOST_IP: ${MM_EMBEDDING_SERVICE_HOST_IP}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
+      LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
     ipc: host
     restart: always
   # multimodalragwithvideos-xeon-ui-server:

@@ -28,3 +28,4 @@ USER user
 WORKDIR /home/user
 
 ENTRYPOINT ["python", "multimodalragwithvideos.py"]
+# ENTRYPOINT ["/usr/bin/sleep", "infinity"]

@@ -89,7 +89,6 @@ export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
-
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalragwithvideos"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
 export DATAPREP_VIDEO_WITH_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/videos_with_transcripts"
@@ -291,3 +290,11 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
 ```
 
 7. MegaService
+
+```bash
+curl http://${host_ip}:8888/v1/mmragvideoqna \
+    -H "Content-Type: application/json" \
+    -d '{
+     "messages": "What is the revenue of Nike in 2023?"
+     }'
+```

@@ -60,7 +60,7 @@ class MultimodalRAGWithVideosService:
         self.gateway = MultimodalRAGWithVideosGateway(
             multimodal_rag_megaservice=self.mmrag_megaservice,
             lvm_megaservice=self.lvm_megaservice,
-            host=self.host,
+            host="0.0.0.0",
             port=self.port,
         )
 
