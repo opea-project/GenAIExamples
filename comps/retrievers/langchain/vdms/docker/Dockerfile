@@ -18,8 +18,6 @@ RUN useradd -m -s /bin/bash user && \
 
 COPY comps /home/user/comps
 
-# RUN chmod +x /home/user/comps/retrievers/langchain/vdms/run.sh
-
 USER user
 RUN pip install --no-cache-dir --upgrade pip && \
     if [ ${ARCH} = "cpu" ]; then pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
@@ -42,8 +40,5 @@ ENV http_proxy=""
 ENV https_proxy=""
 
 WORKDIR /home/user/comps/retrievers/langchain/vdms
-
-#ENTRYPOINT ["/home/user/comps/retrievers/langchain/vdms/run.sh"]
-#ENTRYPOINT ["/bin/bash"]
 
 ENTRYPOINT ["python", "retriever_vdms.py"]
