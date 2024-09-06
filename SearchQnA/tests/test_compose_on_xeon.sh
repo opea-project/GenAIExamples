@@ -28,7 +28,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/Intel/CPU
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
     export GOOGLE_API_KEY=$GOOGLE_API_KEY
     export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
@@ -116,7 +116,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/Intel/CPU
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose stop && docker compose rm -f
 }
 

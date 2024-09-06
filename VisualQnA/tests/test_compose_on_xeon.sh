@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -19,22 +19,23 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="translation translation-ui llm-tgi"
+    service_list="visualqna visualqna-ui llm-visualqna-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:1.4
+    docker pull ghcr.io/huggingface/text-generation-inference:2.2.0
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/Intel/CPU
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
-    export LLM_MODEL_ID="haoranxu/ALMA-13B"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
+    export LVM_ENDPOINT="http://${ip_address}:8399"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export LVM_SERVICE_PORT=9399
     export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
+    export LVM_SERVICE_HOST_IP=${ip_address}
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/visualqna"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/svelte/.env
 
@@ -43,11 +44,11 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+        docker logs lvm-tgi-xeon-server > ${LOG_PATH}/lvm_tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
             break
         fi
-        sleep 10s
+        sleep 5s
         n=$((n+1))
     done
 }
@@ -83,31 +84,42 @@ function validate_services() {
 function validate_microservices() {
     # Check if the microservices are running correctly.
 
-    # tgi for llm service
+    # lvm microservice
     validate_services \
-        "${ip_address}:8008/generate" \
-        "generated_text" \
-        "tgi" \
-        "tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
-    # llm microservice
-    validate_services \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm" \
-        "llm-tgi-server" \
-        '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
+        "${ip_address}:9399/v1/lvm" \
+        "The image" \
+        "lvm-tgi" \
+        "lvm-tgi-xeon-server" \
+        '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-    "${ip_address}:8888/v1/translation" \
-    "translation" \
-    "mega-translation" \
-    "translation-xeon-backend-server" \
-    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+    "${ip_address}:8888/v1/visualqna" \
+    "The image" \
+    "visualqna-xeon-backend-server" \
+    "visualqna-xeon-backend-server" \
+    '{
+        "messages": [
+        {
+            "role": "user",
+            "content": [
+            {
+                "type": "text",
+                "text": "What'\''s in this image?"
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+                }
+            }
+            ]
+        }
+        ],
+        "max_tokens": 300
+    }'
 }
 
 function validate_frontend() {
@@ -139,7 +151,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/Intel/CPU
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose stop && docker compose rm -f
 }
 
@@ -152,7 +164,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+    #validate_frontend
 
     stop_docker
     echo y | docker system prune

@@ -69,12 +69,12 @@ fi
 
 case "$1" in
     init_DocSum)
-        pushd DocSum/kubernetes/manifests/xeon
+        pushd DocSum/kubernetes/intel/cpu/xeon/manifest
         init_docsum
         popd
         ;;
     install_DocSum)
-        pushd DocSum/kubernetes/manifests/xeon
+        pushd DocSum/kubernetes/intel/cpu/xeon/manifest
         NAMESPACE=$2
         install_docsum
         popd

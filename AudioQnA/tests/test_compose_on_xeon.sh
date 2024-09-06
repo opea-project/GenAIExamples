@@ -27,7 +27,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/Intel/CPU
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export TGI_LLM_ENDPOINT=http://$ip_address:3006
     export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
@@ -106,7 +106,7 @@ function validate_megaservice() {
 #}
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/Intel/CPU
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose stop && docker compose rm -f
 }
 

@@ -8,19 +8,19 @@ LOG_PATH=/home/$(whoami)/logs
 MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
 IMAGE_REPO=${IMAGE_REPO:-}
 
-function install_codetrans() {
+function install_translation() {
     kubectl create ns $APP_NAMESPACE
-    sed -i "s|namespace: codetrans|namespace: $APP_NAMESPACE|g"  ./codetrans_xeon.yaml
-    kubectl apply -f ./codetrans_xeon.yaml
+    sed -i "s|namespace: translation|namespace: $APP_NAMESPACE|g"  ./translation_xeon.yaml
+    kubectl apply -f ./translation_xeon.yaml
 
     # Wait until the router service is ready
-    echo "Waiting for the codetrans router service to be ready..."
-    wait_until_pod_ready "codetrans router" $APP_NAMESPACE "router-service"
+    echo "Waiting for the translation router service to be ready..."
+    wait_until_pod_ready "translation router" $APP_NAMESPACE "router-service"
     output=$(kubectl get pods -n $APP_NAMESPACE)
     echo $output
 }
 
-function validate_codetrans() {
+function validate_translation() {
     # deploy client pod for testing
     kubectl create deployment client-test -n $APP_NAMESPACE --image=python:3.8.13 -- sleep infinity
 
@@ -30,28 +30,29 @@ function validate_codetrans() {
     sleep 60
 
     kubectl get pods -n $APP_NAMESPACE
-    # send request to codetrans
+    # send request to translation
     export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
     echo "$CLIENT_POD"
-    accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='codetrans')].status.accessUrl}")
-    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codetrans.log
+    accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='translation')].status.accessUrl}")
+    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_translation.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-        echo "codetrans failed, please check the logs in ${LOG_PATH}!"
+        echo "chatqna failed, please check the logs in ${LOG_PATH}!"
         exit 1
     fi
 
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
-    if [[ -f $LOG_PATH/gmc_codetrans.log ]] && \
-    [[ $(grep -c "[DONE]" $LOG_PATH/gmc_codetrans.log) != 0 ]]; then
+    if [[ -f $LOG_PATH/gmc_translation.log ]] && \
+    [[ $(grep -c "[DONE]" $LOG_PATH/gmc_translation.log) != 0 ]]; then
         status=true
     fi
     if [ $status == false ]; then
-        if [[ -f $LOG_PATH/gmc_codetrans.log ]]; then
-            cat $LOG_PATH/gmc_codetrans.log
+        if [[ -f $LOG_PATH/gmc_translation.log ]]; then
+            cat $LOG_PATH/gmc_translation.log
         fi
         echo "Response check failed, please check the logs in artifacts!"
+        cat $LOG_PATH/gmc_translation.log
         exit 1
     else
         echo "Response check succeed!"
@@ -110,14 +111,14 @@ if [ $# -eq 0 ]; then
 fi
 
 case "$1" in
-    install_CodeTrans)
-        pushd CodeTrans/kubernetes/intel/cpu/xeon/gmc
-        install_codetrans
+    install_Translation)
+        pushd Translation/kubernetes/intel/cpu/xeon/gmc
+        install_translation
         popd
         ;;
-    validate_CodeTrans)
-        pushd CodeTrans/kubernetes/intel/cpu/xeon/gmc
-        validate_codetrans
+    validate_Translation)
+        pushd Translation/kubernetes/intel/cpu/xeon/gmc
+        validate_translation
         popd
         ;;
     *)

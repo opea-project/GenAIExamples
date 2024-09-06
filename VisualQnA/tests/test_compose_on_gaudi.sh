@@ -27,7 +27,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/Intel/HPU
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
     export LVM_ENDPOINT="http://${ip_address}:8399"
@@ -151,7 +151,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/Intel/HPU
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose stop && docker compose rm -f
 }
 

@@ -29,7 +29,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd cd $WORKPATH/docker_compose/Intel/CPU/xeon
+    cd cd $WORKPATH/docker_compose/intel/cpu/xeon//xeon
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
@@ -224,7 +224,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd cd $WORKPATH/docker_compose/Intel/CPU/xeon
+    cd cd $WORKPATH/docker_compose/intel/cpu/xeon//xeon
     docker compose -f compose_without_rerank.yaml stop && docker compose -f compose_without_rerank.yaml rm -f
 }
 

@@ -111,12 +111,12 @@ fi
 
 case "$1" in
     install_CodeTrans)
-        pushd CodeTrans/kubernetes/Intel
+        pushd CodeTrans/kubernetes/intel/hpu/gaudi/gmc
         install_codetrans
         popd
         ;;
     validate_CodeTrans)
-        pushd CodeTrans/kubernetes/Intel
+        pushd CodeTrans/kubernetes/intel/hpu/gaudi/gmc
         validate_codetrans
         popd
         ;;

@@ -26,7 +26,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/Intel/CPU/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/xeon//xeon
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -214,7 +214,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/Intel/CPU/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/xeon//xeon
     docker compose -f compose_qdrant.yaml stop && docker compose -f compose_qdrant.yaml rm -f
 }
 

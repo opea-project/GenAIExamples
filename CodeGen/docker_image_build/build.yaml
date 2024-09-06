@@ -13,13 +13,13 @@ services:
   codegen-ui:
     build:
       context:
-      dockerfile: ../Dockerfile_ui
+      dockerfile: ../ui/docker/Dockerfile
     extends: codegen
     image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
   codegen-react-ui:
     build:
       context:
-      dockerfile: ../Dockerfile_ui.react
+      dockerfile: ../ui/docker/Dockerfile.react
     extends: codegen
     image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
   llm-tgi:

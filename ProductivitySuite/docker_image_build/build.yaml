@@ -56,7 +56,7 @@ services:
   productivity-suite-react-ui:
     build:
       context:
-      dockerfile: ../Dockerfile_ui.react
+      dockerfile: ../ui/docker/Dockerfile.react
     extends: chatqna
     image: ${REGISTRY:-opea}/productivity-suite-react-ui-server:${TAG:-latest}
   codegen:

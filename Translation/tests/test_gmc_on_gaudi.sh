@@ -112,12 +112,12 @@ fi
 
 case "$1" in
     install_Translation)
-        pushd Translation/kubernetes/Intel
+        pushd Translation/kubernetes/intel/hpu/gaudi/gmc
         install_translation
         popd
         ;;
     validate_Translation)
-        pushd Translation/kubernetes/Intel
+        pushd Translation/kubernetes/intel/hpu/gaudi/gmc
         validate_translation
         popd
         ;;

@@ -30,7 +30,7 @@ function build_docker_images() {
 
 function start_services() {
 
-    cd $WORKPATH/docker_compose/Intel/HPU
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
     export GOOGLE_API_KEY=$GOOGLE_API_KEY
     export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
@@ -123,7 +123,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/Intel/HPU
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose stop && docker compose rm -f
 }
 

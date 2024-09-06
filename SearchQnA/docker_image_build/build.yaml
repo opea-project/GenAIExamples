@@ -13,7 +13,7 @@ services:
   searchqna-ui:
     build:
       context:
-      dockerfile: ../Dockerfile_ui
+      dockerfile: ../ui/docker/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
   embedding-tei:

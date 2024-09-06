@@ -197,12 +197,12 @@ fi
 
 case "$1" in
     install_ChatQnA)
-        pushd ChatQnA/kubernetes/Intel
+        pushd ChatQnA/kubernetes/intel/hpu/gaudi/gmc
         install_chatqna
         popd
         ;;
     validate_ChatQnA)
-        pushd ChatQnA/kubernetes/Intel
+        pushd ChatQnA/kubernetes/intel/hpu/gaudi/gmc
         validate_chatqna
         validate_chatqna_dataprep
         popd

@@ -3,125 +3,160 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
-USER_ID=$(whoami)
-LOG_PATH=/home/$(whoami)/logs
-MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
-IMAGE_REPO=${IMAGE_REPO:-}
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
-function install_translation() {
-    kubectl create ns $APP_NAMESPACE
-    sed -i "s|namespace: translation|namespace: $APP_NAMESPACE|g"  ./translation_xeon.yaml
-    kubectl apply -f ./translation_xeon.yaml
+WORKPATH=$(dirname "$PWD")
+LOG_PATH="$WORKPATH/tests"
+ip_address=$(hostname -I | awk '{print $1}')
 
-    # Wait until the router service is ready
-    echo "Waiting for the translation router service to be ready..."
-    wait_until_pod_ready "translation router" $APP_NAMESPACE "router-service"
-    output=$(kubectl get pods -n $APP_NAMESPACE)
-    echo $output
+function build_docker_images() {
+    cd cd $WORKPATH/docker_image_build
+    git clone https://github.com/opea-project/GenAIComps.git
+
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="translation translation-ui llm-tgi"
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+
+    docker pull ghcr.io/huggingface/text-generation-inference:1.4
+    docker images && sleep 1s
 }
 
-function validate_translation() {
-    # deploy client pod for testing
-    kubectl create deployment client-test -n $APP_NAMESPACE --image=python:3.8.13 -- sleep infinity
+function start_services() {
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
-    # wait for client pod ready
-    wait_until_pod_ready "client-test" $APP_NAMESPACE "client-test"
-    # giving time to populating data
-    sleep 60
+    export LLM_MODEL_ID="haoranxu/ALMA-13B"
+    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export MEGA_SERVICE_HOST_IP=${ip_address}
+    export LLM_SERVICE_HOST_IP=${ip_address}
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
 
-    kubectl get pods -n $APP_NAMESPACE
-    # send request to translation
-    export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
-    echo "$CLIENT_POD"
-    accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='translation')].status.accessUrl}")
-    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_translation.log
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-        echo "chatqna failed, please check the logs in ${LOG_PATH}!"
-        exit 1
-    fi
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/svelte/.env
 
-    echo "Checking response results, make sure the output is reasonable. "
-    local status=false
-    if [[ -f $LOG_PATH/gmc_translation.log ]] && \
-    [[ $(grep -c "[DONE]" $LOG_PATH/gmc_translation.log) != 0 ]]; then
-        status=true
-    fi
-    if [ $status == false ]; then
-        if [[ -f $LOG_PATH/gmc_translation.log ]]; then
-            cat $LOG_PATH/gmc_translation.log
+    # Start Docker Containers
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+
+    n=0
+    until [[ "$n" -ge 100 ]]; do
+        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+            break
         fi
-        echo "Response check failed, please check the logs in artifacts!"
-        cat $LOG_PATH/gmc_translation.log
-        exit 1
-    else
-        echo "Response check succeed!"
-    fi
-}
-
-function wait_until_pod_ready() {
-    echo "Waiting for the $1 to be ready..."
-    max_retries=30
-    retry_count=0
-    while ! is_pod_ready $2 $3; do
-        if [ $retry_count -ge $max_retries ]; then
-            echo "$1 is not ready after waiting for a significant amount of time"
-            get_gmc_controller_logs
-            exit 1
-        fi
-        echo "$1 is not ready yet. Retrying in 10 seconds..."
-        sleep 10
-        output=$(kubectl get pods -n $2)
-        echo $output
-        retry_count=$((retry_count + 1))
+        sleep 10s
+        n=$((n+1))
     done
 }
 
-function is_pod_ready() {
-    if [ "$2" == "gmc-controller" ]; then
-      pod_status=$(kubectl get pods -n $1 -o jsonpath='{.items[].status.conditions[?(@.type=="Ready")].status}')
+function validate_services() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local INPUT_DATA="$5"
+
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
     else
-      pod_status=$(kubectl get pods -n $1 -l app=$2 -o jsonpath='{.items[].status.conditions[?(@.type=="Ready")].status}')
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
     fi
-    if [ "$pod_status" == "True" ]; then
-        return 0
+    sleep 1s
+}
+
+function validate_microservices() {
+    # Check if the microservices are running correctly.
+
+    # tgi for llm service
+    validate_services \
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi" \
+        "tgi-service" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
+    # llm microservice
+    validate_services \
+        "${ip_address}:9000/v1/chat/completions" \
+        "data: " \
+        "llm" \
+        "llm-tgi-server" \
+        '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
+}
+
+function validate_megaservice() {
+    # Curl the Mega Service
+    validate_services \
+    "${ip_address}:8888/v1/translation" \
+    "translation" \
+    "mega-translation" \
+    "translation-xeon-backend-server" \
+    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+}
+
+function validate_frontend() {
+    cd $WORKPATH/svelte
+    local conda_env_name="OPEA_e2e"
+    export PATH=${HOME}/miniforge3/bin/:$PATH
+    if conda info --envs | grep -q "$conda_env_name"; then
+        echo "$conda_env_name exist!"
     else
-        return 1
+        conda create -n ${conda_env_name} python=3.12 -y
+    fi
+    source activate ${conda_env_name}
+
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+    conda install -c conda-forge nodejs -y
+    npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
+
+    exit_status=0
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------frontend test failed---------"
+        exit $exit_status
+    else
+        echo "[TEST INFO]: ---------frontend test passed---------"
     fi
 }
 
-function get_gmc_controller_logs() {
-    # Fetch the name of the pod with the app-name gmc-controller in the specified namespace
-    pod_name=$(kubectl get pods -n $SYSTEM_NAMESPACE -l control-plane=gmc-controller -o jsonpath='{.items[0].metadata.name}')
-
-    # Check if the pod name was found
-    if [ -z "$pod_name" ]; then
-        echo "No pod found with app-name gmc-controller in namespace $SYSTEM_NAMESPACE"
-        return 1
-    fi
-
-    # Get the logs of the found pod
-    echo "Fetching logs for pod $pod_name in namespace $SYSTEM_NAMESPACE..."
-    kubectl logs $pod_name -n $SYSTEM_NAMESPACE
+function stop_docker() {
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    docker compose stop && docker compose rm -f
 }
 
-if [ $# -eq 0 ]; then
-    echo "Usage: $0 <function_name>"
-    exit 1
-fi
+function main() {
 
-case "$1" in
-    install_Translation)
-        pushd Translation/kubernetes/Intel
-        install_translation
-        popd
-        ;;
-    validate_Translation)
-        pushd Translation/kubernetes/Intel
-        validate_translation
-        popd
-        ;;
-    *)
-        echo "Unknown function: $1"
-        ;;
-esac
+    stop_docker
+
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    start_services
+
+    validate_microservices
+    validate_megaservice
+    validate_frontend
+
+    stop_docker
+    echo y | docker system prune
+
+}
+
+main

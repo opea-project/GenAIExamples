@@ -27,7 +27,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/Intel/CPU
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
     export LLM_MODEL_ID="HuggingFaceH4/mistral-7b-grok"
@@ -154,7 +154,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/Intel/CPU
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose stop && docker compose rm -f
 }
 

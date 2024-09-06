@@ -27,7 +27,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/Intel/HPU
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
@@ -155,7 +155,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/Intel/HPU
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose stop && docker compose rm -f
 }
 

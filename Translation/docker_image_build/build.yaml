@@ -13,7 +13,7 @@ services:
   translation-ui:
     build:
       context: 
-      dockerfile: ../Dockerfile_ui
+      dockerfile: ../ui/docker/Dockerfile
     extends: translation
     image: ${REGISTRY:-opea}/translation-ui:${TAG:-latest}
   llm-tgi:

@@ -10,4 +10,4 @@ export OPENAI_API_KEY=${OPENAI_API_KEY}
 export WORKER_AGENT_URL="http://${ip_address}:9095/v1/chat/completions"
 export CRAG_SERVER=http://${ip_address}:8080
 
-docker compose -f docker-compose-agent-openai.yaml up -d
+docker compose -f compose_openai.yaml up -d
