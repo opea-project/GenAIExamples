@@ -100,11 +100,11 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
 <details>
-<summary> **Gaudi default compose.yaml** </summary>
+<summary><b>Gaudi default compose.yaml</b></summary>
 
 | MicroService | Open Source Project | HW    | Port | Endpoint             |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding    | Langchain           | Gaudi | 6000 | /v1/embaddings       |
+| Embedding    | Langchain           | Xeon  | 6000 | /v1/embaddings       |
 | Retriever    | Langchain, Redis    | Xeon  | 7000 | /v1/retrieval        |
 | Reranking    | Langchain, TEI      | Gaudi | 8000 | /v1/reranking        |
 | LLM          | Langchain, TGI      | Gaudi | 9000 | /v1/chat/completions |
