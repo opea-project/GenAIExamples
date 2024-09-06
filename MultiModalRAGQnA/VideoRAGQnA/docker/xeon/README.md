@@ -311,7 +311,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 Here is an example of running videoragqna:
 
-![project-screenshot](../../assets/img/videoragqna.png)
+![project-screenshot](../../assets/img/video-rag-qna.gif)
 
 ## Clean Microservices
 
