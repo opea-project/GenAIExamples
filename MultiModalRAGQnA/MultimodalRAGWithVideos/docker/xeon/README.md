@@ -197,5 +197,49 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/xeon/
+cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/xeon/
+docker compose -f compose.yaml up -d
+```
+### Validate Microservices
+
+1. Bridgetower Embedding Server
+
+```bash
+curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
+     -X POST \
+     -H "Content-Type:application/json" \
+     -d '{"text":"This is example"}'
+```
+
+```bash
+curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
+     -X POST \
+     -H "Content-Type:application/json" \
+     -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+```
+
+2. Multimodal-Embedding Microservice
+
+```bash
+curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"text" : "This is some sample text."}'
+```
+
+```bash
+curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
+```
+
+3. Multimodal-Retriever Microservice
+
+```bash
+export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+curl http://${host_ip}:7000/v1/multimodal_retrieval \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```

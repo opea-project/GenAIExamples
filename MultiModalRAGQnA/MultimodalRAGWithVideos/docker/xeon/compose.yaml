@@ -13,7 +13,7 @@ services:
     container_name: multimodaldataprep-redis-service
     depends_on:
       - redis-vector-db
-      - llava-service
+      - llava-server
     ports:
       - "6007:6007"
     environment:
@@ -54,7 +54,7 @@ services:
     restart: unless-stopped
   multimodal-retriever:
     image: ${REGISTRY:-opea}/multimodal-retriever-redis:${TAG:-latest}
-    container_name: multimoda-retriever-redis-service
+    container_name: multimodal-retriever-redis-service
     depends_on:
       - redis-vector-db
     ports:
@@ -91,7 +91,7 @@ services:
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
     restart: unless-stopped
-    
+
   # multimodalragwithvideos-xeon-backend-server:
   #   image: ${REGISTRY:-opea}/multimodalragwithvideos:${TAG:-latest}
   #   container_name: multimodalragwithvideos-xeon-backend-server
