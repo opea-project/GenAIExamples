@@ -24,7 +24,7 @@ services:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
   nginx:
     build:
-      context: GenAIComps/comps/nginx/docker
-      dockerfile: ./Dockerfile
+      context: GenAIComps
+      dockerfile: comps/nginx/docker/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

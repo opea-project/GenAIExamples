@@ -2,7 +2,7 @@
 
 # Generative AI Examples
 
-[![version](https://img.shields.io/badge/release-0.8-green)](https://github.com/opea-project/GenAIExamples/releases)
+[![version](https://img.shields.io/badge/release-0.9-green)](https://github.com/opea-project/GenAIExamples/releases)
 [![license](https://img.shields.io/badge/license-Apache%202-blue)](https://github.com/intel/neural-compressor/blob/master/LICENSE)
 
 ---
@@ -48,10 +48,10 @@ Deployment are based on released docker images by default, check [docker image l
 | CodeTrans   | [Xeon Instructions](CodeTrans/docker/xeon/README.md)   | [Gaudi Instructions](CodeTrans/docker/gaudi/README.md)   | [CodeTrans with GMC](CodeTrans/kubernetes/README.md)     | [CodeTrans with Manifests](CodeTrans/kubernetes/manifests/README.md) | [CodeTrans with Helm Charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/codetrans/README.md) |
 | DocSum      | [Xeon Instructions](DocSum/docker/xeon/README.md)      | [Gaudi Instructions](DocSum/docker/gaudi/README.md)      | [DocSum with GMC](DocSum/kubernetes/README.md)           | [DocSum with Manifests](DocSum/kubernetes/manifests/README.md)       | [DocSum with Helm Charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum/README.md)       |
 | SearchQnA   | [Xeon Instructions](SearchQnA/docker/xeon/README.md)   | [Gaudi Instructions](SearchQnA/docker/gaudi/README.md)   | [SearchQnA with GMC](SearchQnA/kubernetes/README.md)     | Not Supported                                                        | Not Supported                                                                                                      |
-| FaqGen      | [Xeon Instructions](FaqGen/docker/xeon/README.md)      | [Gaudi Instructions](FaqGen/docker/gaudi/README.md)      | [FaqGen with GMC](FaqGen/kubernetes/README.md)           | Not Supported                                                        | Not Supported                                                                                                      |
+| FaqGen      | [Xeon Instructions](FaqGen/docker/xeon/README.md)      | [Gaudi Instructions](FaqGen/docker/gaudi/README.md)      | [FaqGen with GMC](FaqGen/kubernetes/README.md)           | [FaqGen with Manifests](FaqGen/kubernetes/manifests/README.md)       | Not Supported                                                                                                      |
 | Translation | [Xeon Instructions](Translation/docker/xeon/README.md) | [Gaudi Instructions](Translation/docker/gaudi/README.md) | [Translation with GMC](Translation/kubernetes/README.md) | Not Supported                                                        | Not Supported                                                                                                      |
-| AudioQnA    | [Xeon Instructions](AudioQnA/docker/xeon/README.md)    | [Gaudi Instructions](AudioQnA/docker/gaudi/README.md)    | [AudioQnA with GMC](AudioQnA/kubernetes/README.md)       | Not Supported                                                        | Not Supported                                                                                                      |
-| VisualQnA   | [Xeon Instructions](VisualQnA/docker/xeon/README.md)   | [Gaudi Instructions](VisualQnA/docker/gaudi/README.md)   | [VisualQnA with GMC](VisualQnA/kubernetes/README.md)     | Not Supported                                                        | Not Supported                                                                                                      |
+| AudioQnA    | [Xeon Instructions](AudioQnA/docker/xeon/README.md)    | [Gaudi Instructions](AudioQnA/docker/gaudi/README.md)    | [AudioQnA with GMC](AudioQnA/kubernetes/README.md)       | [AudioQnA with Manifests](AudioQnA/kubernetes/manifests/README.md)   | Not Supported                                                                                                      |
+| VisualQnA   | [Xeon Instructions](VisualQnA/docker/xeon/README.md)   | [Gaudi Instructions](VisualQnA/docker/gaudi/README.md)   | [VisualQnA with GMC](VisualQnA/kubernetes/README.md)     | [VisualQnA with Manifests](VisualQnA/kubernetes/manifests/README.md) | Not Supported                                                                                                      |
 
 ## Supported Examples
 
