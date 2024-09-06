@@ -106,7 +106,7 @@ In the below, we provide a table that describes for each microservice component 
 | ------------ | ------------------- | ----- | ---- | -------------------- |
 | Embedding    | Langchain           | Gaudi | 6000 | /v1/embaddings       |
 | Retriever    | Langchain           | Xeon  | 7000 | /v1/retrieval        |
-| Reranking    | Langchain           | Xeon  | 8000 | /v1/reranking        |
+| Reranking    | Langchain           | Gaudi | 8000 | /v1/reranking        |
 | LLM          | Langchain           | Gaudi | 9000 | /v1/chat/completions |
 | Dataprep     | Redis               | Xeon  | 6007 | /v1/dataprep         |
 
