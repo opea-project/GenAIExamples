@@ -280,13 +280,38 @@ export video_fn="WeAreGoingOnBullrun.mp4"
 wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
 ```
 
-Test dataprep microservice
+Test dataprep microservice. This command updates a knowledge base by uploading a local video .mp4.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
     -X POST -F "files=@./${video_fn}"
+```
+
+Also, you are able to get the list of all videos that you uploaded:
+
+```bash
+curl -X POST \
+    -H "Content-Type: application/json" \
+    ${DATAPREP_GET_VIDEO_ENDPOINT}
+```
+
+Then you will get the response python-style LIST like this. Notice the name of each uploaded video e.g., `videoname.mp4` will become `videoname_uuid.mp4` where `uuid` is a unique ID for each uploaded video. The same video that are uploaded twice will have different `uuid`. 
+
+```bash
+[
+    "WeAreGoingOnBullrun_7ac553a1-116c-40a2-9fc5-deccbb89b507.mp4",
+    "WeAreGoingOnBullrun_6d13cf26-8ba2-4026-a3a9-ab2e5eb73a29.mp4"
+]
+```
+
+To delete all uploaded videos along with data indexed with `$INDEX_NAME` in REDIS.
+
+```bash
+curl -X POST \
+    -H "Content-Type: application/json" \
+    ${DATAPREP_DELETE_VIDEO_ENDPOINT}
 ```
 
 7. MegaService
