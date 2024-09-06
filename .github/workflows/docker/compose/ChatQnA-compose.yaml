@@ -5,16 +5,16 @@
 services:
   chatqna:
     build:
-      context:  
+      context:
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
   chatqna-ui:
     build:
-      context: 
+      context:
       dockerfile: Dockerfile_ui
     image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
   chatqna-conversation-ui:
     build:
-      context: 
+      context:
       dockerfile: Dockerfile_ui.react
     image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}

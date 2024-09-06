@@ -10,11 +10,11 @@ services:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
   docsum-ui:
     build:
-      context: 
+      context:
       dockerfile: Dockerfile_ui
     image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
   docsum-react-ui:
     build:
-      context: 
+      context:
       dockerfile: Dockerfile_ui.react
     image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}

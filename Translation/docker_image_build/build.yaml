@@ -12,7 +12,7 @@ services:
     image: ${REGISTRY:-opea}/translation:${TAG:-latest}
   translation-ui:
     build:
-      context: 
+      context:
       dockerfile: ../ui/docker/Dockerfile
     extends: translation
     image: ${REGISTRY:-opea}/translation-ui:${TAG:-latest}

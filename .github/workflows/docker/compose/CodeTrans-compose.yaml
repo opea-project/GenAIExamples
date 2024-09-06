@@ -10,6 +10,6 @@ services:
     image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}
   codetrans-ui:
     build:
-      context: 
+      context:
       dockerfile: Dockerfile_ui
     image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}

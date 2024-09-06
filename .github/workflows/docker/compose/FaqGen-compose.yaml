@@ -10,11 +10,11 @@ services:
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
   faqgen-ui:
     build:
-      context: 
+      context:
       dockerfile: Dockerfile_ui
     image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
   faqgen-react-ui:
     build:
-      context: 
+      context:
       dockerfile: Dockerfile_ui.react
     image: ${REGISTRY:-opea}/faqgen-react-ui:${TAG:-latest}

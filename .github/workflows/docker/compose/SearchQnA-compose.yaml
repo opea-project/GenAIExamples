@@ -10,6 +10,6 @@ services:
     image: ${REGISTRY:-opea}/searchqna:${TAG:-latest}
   searchqna-ui:
     build:
-      context: 
+      context:
       dockerfile: Dockerfile_ui
     image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
