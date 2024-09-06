@@ -38,7 +38,7 @@ function start_services() {
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/visualqna"
     export FRONTEND_SERVICE_IP=${ip_address}
     export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_NAME=codetrans
+    export BACKEND_SERVICE_NAME=visualqna
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
     export NGINX_PORT=80
