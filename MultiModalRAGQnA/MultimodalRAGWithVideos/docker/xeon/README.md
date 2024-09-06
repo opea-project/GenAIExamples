@@ -143,7 +143,7 @@ docker build --no-cache -t opea/multimodal-dataprep-redis:latest --build-arg htt
 ```
 
 ### 5. Build MegaService Docker Image
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `[multimodalragwithvideos.py](../multimodalragwithvideos.py)` Python script. Build MegaService Docker image via below command:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalragwithvideos.py](../multimodalragwithvideos.py) Python script. Build MegaService Docker image via below command:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
