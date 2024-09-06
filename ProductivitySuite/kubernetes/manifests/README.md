@@ -16,7 +16,7 @@ In ProductivitySuite, it consists of following pipelines/examples and components
 - keycloak
 ```
 
-## Prerequisites for Deploying ProductivitySuite with ReactUI:
+## Prerequisites for Deploying ProductivitySuite with ReactUI
 To begin with, ensure that you have following prerequisites in place:
 
 1. Kubernetes installation: Make sure that you have Kubernetes installed.
