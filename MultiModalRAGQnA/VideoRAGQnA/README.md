@@ -1,7 +1,6 @@
 # VideoRAGQnA Application
 
-Video RAG QnA is a framework that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search. 
-
+Video RAG QnA is a framework that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search.
 
 VideoRAGQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), with the architecture flow chart shows below:
 
@@ -96,13 +95,13 @@ The VideoRAGQnA service can be effortlessly deployed on Intel XEON Scalable Proc
 
 By default, the embedding and LVM models are set to a default value as listed below:
 
-| Service   | Model                     |
-| --------- | ------------------------- |
+| Service   | Model                        |
+| --------- | ---------------------------- |
 | Embedding | openai/clip-vit-base-patch32 |
-| LVM       | DAMO-NLP-SG/Video-LLaMA |
+| LVM       | DAMO-NLP-SG/Video-LLaMA      |
 
 ### Deploy VideoRAGQnA on Xeon
 
-For full instruction of depolyment, please check [Guide](docker/xeon/README.md)
+For full instruction of deployment, please check [Guide](docker/xeon/README.md)
 
-Currently we support deploying VideoRAGQnA services with docker compose, using the docker images `built from source`. Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).  
+Currently we support deploying VideoRAGQnA services with docker compose, using the docker images `built from source`. Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
