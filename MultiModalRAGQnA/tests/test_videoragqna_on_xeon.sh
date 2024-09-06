@@ -15,7 +15,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/docker
+    cd $WORKPATH/VideoRAGQnA/docker
     git clone https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
@@ -28,12 +28,12 @@ function build_docker_images() {
 
 
 function start_services() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/VideoRAGQnA/docker/xeon
 
     source set_env.sh
     docker volume create video-llama-model
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 60
+    sleep 3m
 
     # List of containers running uvicorn
     list=("dataprep-vdms-server" "embedding-multimodal-server" "retriever-vdms-server" "reranking-videoragqna-server" "video-llama-lvm-server" "lvm-video-llama")
@@ -118,7 +118,7 @@ function validate_services() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
-    cd $WORKPATH/docker/xeon/data
+    cd $WORKPATH/VideoRAGQnA/docker/xeon/data
 
     # dataprep microservice
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep \
@@ -205,16 +205,16 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/VideoRAGQnA/docker/xeon
     docker compose stop && docker compose rm -f
-    docker volume rm video-llama-model
+    # docker volume rm video-llama-model
 }
 
 function main() {
 
     stop_docker
 
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices
