@@ -261,3 +261,31 @@ curl http://${host_ip}:9399/v1/lvm \
     -H 'Content-Type: application/json' \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}' 
 ```
+
+```bash
+curl http://${host_ip}:9399/v1/lvm  \
+    -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}' 
+```
+
+6. Multimodal Dataprep Microservice
+
+Download a sample video
+
+```bash
+export video_fn="WeAreGoingOnBullrun.mp4"
+wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
+```
+
+Test dataprep microservice
+
+```bash
+curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+    ${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT} \
+    -H 'Content-Type: multipart/form-data' \
+    -X POST -F "files=@./${video_fn}" 
+```
+
+7. MegaService
+
