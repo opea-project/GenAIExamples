@@ -1,7 +1,7 @@
 // Copyright (C) 2024 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ActionIcon, ScrollAreaAutosize, Title } from "@mantine/core"
+import { ActionIcon, Title } from "@mantine/core"
 
 import contextStyles from "../../styles/components/context.module.scss"
 import { useAppDispatch, useAppSelector } from "../../redux/store"
@@ -9,6 +9,7 @@ import { conversationSelector, deleteConversation, getConversationHistory, setSe
 import { useEffect } from "react"
 import { userSelector } from "../../redux/User/userSlice"
 import { IconTrash } from "@tabler/icons-react"
+import Settings from "./settings"
 // import { userSelector } from "../../redux/User/userSlice"
 
 export interface ConversationContextProps {
@@ -27,7 +28,7 @@ export function ConversationSideBar({ title }: ConversationContextProps) {
         }
     }, [selectedConversationId])
 
-    const handleDeleteConversation = (id : string) => {
+    const handleDeleteConversation = (id: string) => {
         dispatch(deleteConversation({ user: name, conversationId: id }))
     }
 
@@ -56,9 +57,10 @@ export function ConversationSideBar({ title }: ConversationContextProps) {
             <Title order={3} className={contextStyles.contextTitle}>
                 {title}
             </Title>
-            <ScrollAreaAutosize type="hover" scrollHideDelay={0}>
-                <div className={contextStyles.contextList}>{conversationList}</div>
-            </ScrollAreaAutosize>
+            <div className={contextStyles.contextList}>{conversationList}</div>
+            <div className={contextStyles.settings}>
+                <Settings />
+            </div>
         </div>
     )
 }

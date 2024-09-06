@@ -269,182 +269,182 @@ docker compose -f compose_vllm.yaml up -d
 
 1. TEI Embedding Service
 
-```bash
-curl ${host_ip}:6006/embed \
-    -X POST \
-    -d '{"inputs":"What is Deep Learning?"}' \
-    -H 'Content-Type: application/json'
-```
+   ```bash
+   curl ${host_ip}:6006/embed \
+       -X POST \
+       -d '{"inputs":"What is Deep Learning?"}' \
+       -H 'Content-Type: application/json'
+   ```
 
 2. Embedding Microservice
 
-```bash
-curl http://${host_ip}:6000/v1/embeddings\
-  -X POST \
-  -d '{"text":"hello"}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:6000/v1/embeddings\
+     -X POST \
+     -d '{"text":"hello"}' \
+     -H 'Content-Type: application/json'
+   ```
 
 3. Retriever Microservice
 
-To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
-is determined by the embedding model.
-Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
+   To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
+   is determined by the embedding model.
+   Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
 
-Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
+   Check the vector dimension of your embedding model, set `your_embedding` dimension equals to it.
 
-```bash
-export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-curl http://${host_ip}:7000/v1/retrieval \
-  -X POST \
-  -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+   curl http://${host_ip}:7000/v1/retrieval \
+     -X POST \
+     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
+     -H 'Content-Type: application/json'
+   ```
 
 4. TEI Reranking Service
 
-> Skip for ChatQnA without Rerank pipeline
+   > Skip for ChatQnA without Rerank pipeline
 
-```bash
-curl http://${host_ip}:8808/rerank \
-    -X POST \
-    -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-    -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:8808/rerank \
+       -X POST \
+       -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
+       -H 'Content-Type: application/json'
+   ```
 
 5. Reranking Microservice
 
-> Skip for ChatQnA without Rerank pipeline
+   > Skip for ChatQnA without Rerank pipeline
 
-```bash
-curl http://${host_ip}:8000/v1/reranking\
-  -X POST \
-  -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:8000/v1/reranking\
+     -X POST \
+     -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
+     -H 'Content-Type: application/json'
+   ```
 
 6. LLM backend Service
 
-In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
+   In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
 
-Try the command below to check whether the LLM serving is ready.
+   Try the command below to check whether the LLM serving is ready.
 
-```bash
-docker logs ${CONTAINER_ID} | grep Connected
-```
+   ```bash
+   docker logs ${CONTAINER_ID} | grep Connected
+   ```
 
-If the service is ready, you will get the response like below.
+   If the service is ready, you will get the response like below.
 
-```log
-2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
-```
+   ```
+   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   ```
 
-Then try the `cURL` command below to validate services.
+   Then try the `cURL` command below to validate services.
 
-```bash
-# TGI service
-curl http://${host_ip}:9009/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   # TGI service
+   curl http://${host_ip}:9009/generate \
+     -X POST \
+     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -H 'Content-Type: application/json'
+   ```
 
-```bash
-# vLLM Service
-curl http://${host_ip}:9009/v1/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
-```
+   ```bash
+   # vLLM Service
+   curl http://${host_ip}:9009/v1/completions \
+     -H "Content-Type: application/json" \
+     -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+   ```
 
 7. LLM Microservice
 
-This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
+   This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
-```bash
-curl http://${host_ip}:9000/v1/chat/completions\
-  -X POST \
-  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:9000/v1/chat/completions\
+     -X POST \
+     -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -H 'Content-Type: application/json'
+   ```
 
 8. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-     "messages": "What is the revenue of Nike in 2023?"
-     }'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+        }'
+   ```
 
 9. Dataprep Microservice（Optional）
 
-If you want to update the default knowledge base, you can use the following commands:
+   If you want to update the default knowledge base, you can use the following commands:
 
-Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) Upload:
+   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) Upload:
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F "files=@./nke-10k-2023.pdf"
-```
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+        -H "Content-Type: multipart/form-data" \
+        -F "files=@./nke-10k-2023.pdf"
+   ```
 
-This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-Add Knowledge Base via HTTP Links:
+   Add Knowledge Base via HTTP Links:
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F 'link_list=["https://opea.dev"]'
-```
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+        -H "Content-Type: multipart/form-data" \
+        -F 'link_list=["https://opea.dev"]'
+   ```
 
-This command updates a knowledge base by submitting a list of HTTP links for processing.
+   This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-Also, you are able to get the file list that you uploaded:
+   Also, you are able to get the file list that you uploaded:
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
-     -H "Content-Type: application/json"
-```
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+        -H "Content-Type: application/json"
+   ```
 
-Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
+   Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
 
-```json
-[
-  {
-    "name": "nke-10k-2023.pdf",
-    "id": "nke-10k-2023.pdf",
-    "type": "File",
-    "parent": ""
-  },
-  {
-    "name": "https://opea.dev.txt",
-    "id": "https://opea.dev.txt",
-    "type": "File",
-    "parent": ""
-  }
-]
-```
+   ```json
+   [
+     {
+       "name": "nke-10k-2023.pdf",
+       "id": "nke-10k-2023.pdf",
+       "type": "File",
+       "parent": ""
+     },
+     {
+       "name": "https://opea.dev.txt",
+       "id": "https://opea.dev.txt",
+       "type": "File",
+       "parent": ""
+     }
+   ]
+   ```
 
-To delete the file/link you uploaded:
+   To delete the file/link you uploaded:
 
-The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
+   The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
 
-```bash
-# delete link
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "https://opea.dev.txt"}' \
-     -H "Content-Type: application/json"
+   ```bash
+   # delete link
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+        -d '{"file_path": "https://opea.dev.txt"}' \
+        -H "Content-Type: application/json"
 
-# delete file
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "nke-10k-2023.pdf"}' \
-     -H "Content-Type: application/json"
+   # delete file
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+        -d '{"file_path": "nke-10k-2023.pdf"}' \
+        -H "Content-Type: application/json"
 
-# delete all uploaded files and links
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "all"}' \
-     -H "Content-Type: application/json"
-```
+   # delete all uploaded files and links
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+        -d '{"file_path": "all"}' \
+        -H "Content-Type: application/json"
+   ```
 
 ## 🚀 Launch the UI
 
