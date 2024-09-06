@@ -9,8 +9,8 @@ MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 MM_EMBEDDING_SERVICE_HOST_IP = os.getenv("MM_EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
 MM_EMBEDDING_PORT_MICROSERVICE = int(os.getenv("MM_EMBEDDING_PORT_MICROSERVICE", 6000))
-RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
-RETRIEVER_SERVICE_PORT = int(os.getenv("RETRIEVER_SERVICE_PORT", 7000))
+MM_RETRIEVER_SERVICE_HOST_IP = os.getenv("MM_RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
+MM_RETRIEVER_SERVICE_PORT = int(os.getenv("MM_RETRIEVER_SERVICE_PORT", 7000))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9399))
 
@@ -33,8 +33,8 @@ class MultimodalRAGWithVideosService:
 
         mm_retriever = MicroService(
             name="retriever",
-            host=RETRIEVER_SERVICE_HOST_IP,
-            port=RETRIEVER_SERVICE_PORT,
+            host=MM_RETRIEVER_SERVICE_HOST_IP,
+            port=MM_RETRIEVER_SERVICE_PORT,
             endpoint="/v1/multimodal_retrieval",
             use_remote_service=True,
             service_type=ServiceType.RETRIEVER,

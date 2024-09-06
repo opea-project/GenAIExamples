@@ -91,28 +91,28 @@ services:
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
     restart: unless-stopped
-
-  # multimodalragwithvideos-xeon-backend-server:
-  #   image: ${REGISTRY:-opea}/multimodalragwithvideos:${TAG:-latest}
-  #   container_name: multimodalragwithvideos-xeon-backend-server
-  #   depends_on:
-  #     - redis-vector-db
-  #     - multimodal-data-prep-service
-  #     - multimodal-embedding
-  #     - multimodal-retriever
-  #     - lvm
-  #   ports:
-  #     - "8888:8888"
-  #   environment:
-  #     - no_proxy=${no_proxy}
-  #     - https_proxy=${https_proxy}
-  #     - http_proxy=${http_proxy}
-  #     - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
-  #     - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
-  #     - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
-  #     - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
-  #   ipc: host
-  #   restart: always
+  multimodalragwithvideos-xeon-backend-server:
+    image: ${REGISTRY:-opea}/multimodalragwithvideos:${TAG:-latest}
+    container_name: multimodalragwithvideos-xeon-backend-server
+    depends_on:
+      - redis-vector-db
+      - multimodal-data-prep-service
+      - multimodal-embedding
+      - multimodal-retriever
+      - lvm
+    ports:
+      - "8888:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - MM_EMBEDDING_SERVICE_HOST_IP=${MM_EMBEDDING_SERVICE_HOST_IP}
+      - MM_EMBEDDING_PORT_MICROSERVICE=${MM_EMBEDDING_PORT_MICROSERVICE}
+      - MM_RETRIEVER_SERVICE_HOST_IP=${MM_RETRIEVER_SERVICE_HOST_IP}
+      - LVM_SERVICE_HOST_IP=${LVM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
   # multimodalragwithvideos-xeon-ui-server:
   #   image: ${REGISTRY:-opea}/multimodalragwithvideos-ui:${TAG:-latest}
   #   container_name: multimodalragwithvideos-xeon-ui-server

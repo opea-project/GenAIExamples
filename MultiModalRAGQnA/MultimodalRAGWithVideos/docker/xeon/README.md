@@ -86,7 +86,7 @@ export LVM_ENDPOINT="http://${host_ip}:8399"
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
 export WHISPER_MODEL="base"
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
+export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 
