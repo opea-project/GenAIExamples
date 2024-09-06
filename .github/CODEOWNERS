@@ -1,3 +1,6 @@
+# Code owners will review PRs within their respective folders. 
+# Typically, ownership is organized at the second-level subdirectory under the homepage
+/*/ liang1.lv@intel.com
 /comps/agent/ xuhui.ren@intel.com
 /comps/finetuning/ xinyu.ye@intel.com
 /comps/guardrails/ liang1.lv@intel.com
