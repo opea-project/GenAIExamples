@@ -1,0 +1,136 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  multimodal-data-prep-service:
+    image: ${REGISTRY:-opea}/multimodal-dataprep-redis:${TAG:-latest}
+    container_name: multimodaldataprep-redis-service
+    depends_on:
+      - redis-vector-db
+      - llava-service
+    ports:
+      - "6007:6007"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      INDEX_NAME: ${INDEX_NAME}
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  bridgetower-embedding-server:
+    image: ${REGISTRY:-opea}/bridgetower-embedder:${TAG:-latest}
+    container_name: bridgetower-embedding-server
+    ports:
+      - ${EMBEDDER_PORT}:${EMBEDDER_PORT}
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PORT: ${EMBEDDER_PORT}
+    restart: unless-stopped
+  multimodal-embedding:
+    image: ${REGISTRY:-opea}/multimodal-embedding:${TAG:-latest}
+    container_name: multimodal-embedding-service
+    depends_on:
+      - bridgetower-embedding-server
+    ports:
+      - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+    restart: unless-stopped
+  multimodal-retriever:
+    image: ${REGISTRY:-opea}/multimodal-retriever-redis:${TAG:-latest}
+    container_name: multimoda-retriever-redis-service
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+    restart: unless-stopped
+  llava-server:
+    image: ${REGISTRY:-opea}/llava:${TAG:-latest}
+    container_name: llava-server
+    ports:
+      - "8399:8399"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm-service
+    depends_on:
+      - llava-server
+    ports:
+      - "9399:9399"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
+    restart: unless-stopped
+    
+  # multimodalragwithvideos-xeon-backend-server:
+  #   image: ${REGISTRY:-opea}/multimodalragwithvideos:${TAG:-latest}
+  #   container_name: multimodalragwithvideos-xeon-backend-server
+  #   depends_on:
+  #     - redis-vector-db
+  #     - multimodal-data-prep-service
+  #     - multimodal-embedding
+  #     - multimodal-retriever
+  #     - lvm
+  #   ports:
+  #     - "8888:8888"
+  #   environment:
+  #     - no_proxy=${no_proxy}
+  #     - https_proxy=${https_proxy}
+  #     - http_proxy=${http_proxy}
+  #     - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+  #     - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
+  #     - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
+  #     - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+  #   ipc: host
+  #   restart: always
+  # multimodalragwithvideos-xeon-ui-server:
+  #   image: ${REGISTRY:-opea}/multimodalragwithvideos-ui:${TAG:-latest}
+  #   container_name: multimodalragwithvideos-xeon-ui-server
+  #   depends_on:
+  #     - multimodalragwithvideos-xeon-backend-server
+  #   ports:
+  #     - "5173:5173"
+  #   environment:
+  #     - no_proxy=${no_proxy}
+  #     - https_proxy=${https_proxy}
+  #     - http_proxy=${http_proxy}
+  #     - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+  #     - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
+  #     - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
+  #     - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
+  #   ipc: host
+  #   restart: always
+
+networks:
+  default:
+    driver: bridge

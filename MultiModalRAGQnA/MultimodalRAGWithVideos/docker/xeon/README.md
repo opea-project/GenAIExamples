@@ -40,6 +40,10 @@ lvm
 ===
 Port 9399 - Open to 0.0.0.0/0
 
+multimodal-data-prep-service
+===
+Port 6007 - Open to 0.0.0.0/0
+
 multimodalragwithvideos-xeon-backend-server
 ==========================
 Port 8888 - Open to 0.0.0.0/0
@@ -73,7 +77,9 @@ export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDER_PORT=6006
 export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
+export MM_EMBEDDING_PORT_MICROSERVICE=6000
 export REDIS_URL="redis://${host_ip}:6379"
+export REDIS_HOST=${host_ip}
 export INDEX_NAME="mm-rag-redis"
 export LLAVA_SERVER_PORT=8399
 export LVM_ENDPOINT="http://${host_ip}:8399/v1/lvm"
@@ -173,3 +179,23 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 6. `opea/bridgetower-embedder:latest`
 7. `opea/multimodalragwithvideos:latest`
 8. `opea/multimodalragwithvideos-ui:latest`
+
+## 🚀 Start Microservices
+
+### Required Models
+
+By default, the multimodal-embedding and LVM models are set to a default value as listed below:
+
+| Service              | Model                                       |
+| ---------            | -------------------------                   |
+| Multimodal-Embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
+| LVM                  | llava-hf/llava-1.5-7b-hf                    |
+
+
+### Start all the services Docker Containers
+
+> Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
+
+```bash
+cd GenAIExamples/ChatQnA/docker/xeon/
+```
