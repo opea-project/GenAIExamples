@@ -3,7 +3,7 @@
 
 import os
 
-from comps import MultimodalRAGWithVideosGateway, MicroService, ServiceOrchestrator, ServiceType
+from comps import MicroService, MultimodalRAGWithVideosGateway, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
@@ -13,6 +13,7 @@ RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
 RETRIEVER_SERVICE_PORT = int(os.getenv("RETRIEVER_SERVICE_PORT", 7000))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9399))
+
 
 class MultimodalRAGWithVideosService:
     def __init__(self, host="0.0.0.0", port=8000):
@@ -57,10 +58,12 @@ class MultimodalRAGWithVideosService:
         self.lvm_megaservice.add(lvm)
 
         self.gateway = MultimodalRAGWithVideosGateway(
-                            multimodal_rag_megaservice=self.mmrag_megaservice,
-                            lvm_megaservice=self.lvm_megaservice,
-                            host=self.host, port=self.port
-                    )
+            multimodal_rag_megaservice=self.mmrag_megaservice,
+            lvm_megaservice=self.lvm_megaservice,
+            host=self.host,
+            port=self.port,
+        )
+
 
 if __name__ == "__main__":
     mmragwithvideos = MultimodalRAGWithVideosService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
