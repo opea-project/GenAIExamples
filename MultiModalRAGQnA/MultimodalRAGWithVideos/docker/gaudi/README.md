@@ -247,7 +247,7 @@ curl -X POST \
     ${DATAPREP_GET_VIDEO_ENDPOINT}
 ```
 
-Then you will get the response python-style LIST like this. Notice the name of each uploaded video e.g., `videoname.mp4` will become `videoname_uuid.mp4` where `uuid` is a unique ID for each uploaded video. The same video that are uploaded twice will have different `uuid`. 
+Then you will get the response python-style LIST like this. Notice the name of each uploaded video e.g., `videoname.mp4` will become `videoname_uuid.mp4` where `uuid` is a unique ID for each uploaded video. The same video that are uploaded twice will have different `uuid`.
 
 ```bash
 [
