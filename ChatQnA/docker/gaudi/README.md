@@ -2,6 +2,76 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as embedding, retriever, rerank, and llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
+## Quickstart
+
+Clone the repo
+```bash
+> git clone https://github.com/opea-project/GenAIExamples.git
+```
+
+Navigate to this directory
+```bash
+> cd GenAIExamples/ChatQnA/docker/gaudi
+```
+
+Generate a default `.env` file.
+```bash
+> bash gen_env.sh
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    14  100    14    0     0    313      0 --:--:-- --:--:-- --:--:--   311
+Entry your huggingface API token (hf_****): # Model info
+EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+RERANK_MODEL_ID="BAAI/bge-reranker-base"
+LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+
+# Huggingface token used to download the model if needed
+HUGGINGFACEHUB_API_TOKEN=
+
+# The internal docker endpoints addresses
+# If you were running components on different nodes you may need to specify the internal IP addresses
+TEI_EMBEDDING_ENDPOINT="http://tei-embedding-service:80"
+TEI_RERANKING_ENDPOINT="http://tei-reranking-service:80"
+TGI_LLM_ENDPOINT="http://tgi-service:80"
+REDIS_URL="redis://redis-vector-db:6379"
+INDEX_NAME="rag-redis"
+MEGA_SERVICE_HOST_IP=localhost
+EMBEDDING_SERVICE_HOST_IP=embedding
+RETRIEVER_SERVICE_HOST_IP=retriever
+RERANK_SERVICE_HOST_IP=reranking
+LLM_SERVICE_HOST_IP=llm
+
+# Used by the client UI to access backend services
+...
+```
+NOTES:
+- If you don't plan to use any gated huggingface models you can just hit <enter> when prompted for a token.
+- Make note of the public IP used in the client UI section.
+
+Now we can bring up the docker compose stack.
+Models will need to be downloaded from huggingface the first time you run this, so just give it a couple minutes.
+```bash
+> docker compose up
+WARN[0000] The "no_proxy" variable is not set. Defaulting to a blank string.
+WARN[0000] The "http_proxy" variable is not set. Defaulting to a blank string.
+...
+[+] Running 12/12
+ ✔ Network gaudi_default                   Created                                                                              0.2s
+ ✔ Container redis-vector-db               Created                                                                              0.1s
+ ✔ Container tei-embedding-gaudi-server    Created                                                                              0.1s
+ ✔ Container tei-reranking-gaudi-server    Created                                                                              0.1s
+ ✔ Container tgi-gaudi-server              Created                                                                              0.1s
+ ✔ Container reranking-tei-gaudi-server    Created                                                                              0.1s
+ ✔ Container retriever-redis-server        Created                                                                              0.1s
+ ✔ Container dataprep-redis-server         Created                                                                              0.1s
+ ✔ Container embedding-tei-server          Created                                                                              0.1s
+ ✔ Container llm-tgi-gaudi-server          Created                                                                              0.1s
+ ✔ Container chatqna-gaudi-backend-server  Created                                                                              0.1s
+ ✔ Container chatqna-gaudi-ui-server       Created                                                                              0.1s
+...
+```
+Once all services are online, open a browser and navigate to `http://<public_ip>:5173`
+
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
