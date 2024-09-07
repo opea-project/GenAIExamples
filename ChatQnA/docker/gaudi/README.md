@@ -5,16 +5,19 @@ This document outlines the deployment process for a ChatQnA application utilizin
 ## Quickstart
 
 Clone the repo
+
 ```bash
 > git clone https://github.com/opea-project/GenAIExamples.git
 ```
 
 Navigate to this directory
+
 ```bash
 > cd GenAIExamples/ChatQnA/docker/gaudi
 ```
 
 Generate a default `.env` file.
+
 ```bash
 > bash gen_env.sh
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -44,12 +47,15 @@ LLM_SERVICE_HOST_IP=llm
 # Used by the client UI to access backend services
 ...
 ```
+
 NOTES:
+
 - If you don't plan to use any gated huggingface models you can just hit <enter> when prompted for a token.
 - Make note of the public IP used in the client UI section.
 
 Now we can bring up the docker compose stack.
 Models will need to be downloaded from huggingface the first time you run this, so just give it a couple minutes.
+
 ```bash
 > docker compose up
 WARN[0000] The "no_proxy" variable is not set. Defaulting to a blank string.
@@ -70,6 +76,7 @@ WARN[0000] The "http_proxy" variable is not set. Defaulting to a blank string.
  ✔ Container chatqna-gaudi-ui-server       Created                                                                              0.1s
 ...
 ```
+
 Once all services are online, open a browser and navigate to `http://<public_ip>:5173`
 
 ## 🚀 Build Docker Images
