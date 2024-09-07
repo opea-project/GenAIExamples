@@ -116,6 +116,7 @@ services:
       - lvm
     ports:
       - "8888:8888"
+    entrypoint: sh -c 'sleep 45 && python videoragqna.py'
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}

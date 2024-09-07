@@ -181,11 +181,27 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 Before running the docker compose command, you need to be in the folder that has the docker compose yaml file. To avoid model re-download, we manage the volume separately using [external volume](https://docs.docker.com/reference/compose-file/volumes/#external).
 
+There are 2 parts of the pipeline:
+- The first is the data preparation, with which you could add your videos into the database.
+- The second is the megaservice, serves as the main service, takes the user query, consumes the microservices to give the response. Including embedding, retrieving, reranking and LVM.
+
+In the deploy steps, you need to start the VDMS DB and dataprep firstly, then insert some sample data into it. After that you could get the megaservice up.
+
 ```bash
 cd GenAIExamples/MultiModalRAGQnA/VideoRAGQnA/docker/xeon/
 
 docker volume create video-llama-model
-docker compose -f compose.yaml up -d
+docker compose up vdms-vector-db dataprep -d
+sleep 1m # wait for the services ready
+
+# Insert some sample data to the DB
+curl -X POST http://${host_ip}:6007/v1/dataprep \
+      -H "Content-Type: multipart/form-data" \
+      -F "files=@./data/op_1_0320241830.mp4"
+
+# Bring all the others
+docker compose up -d 
+# wait until all the services is up. The LVM server will download models, so it take ~1.5hr to get ready.
 ```
 
 ### Validate Microservices

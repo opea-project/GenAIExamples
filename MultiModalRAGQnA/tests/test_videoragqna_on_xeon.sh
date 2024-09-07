@@ -32,8 +32,24 @@ function start_services() {
 
     source set_env.sh
     docker volume create video-llama-model
+    docker compose up vdms-vector-db dataprep -d
+    sleep 1m
+
+    # Insert some sample data to the DB
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./data/op_1_0320241830.mp4")
+
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "Inserted some data at the beginning."
+    else
+        echo "Inserted failed at the beginning. Received status was $HTTP_STATUS"
+        docker logs dataprep-vdms-server >> ${LOG_PATH}/dataprep.log
+        exit 1
+    fi
+    # Bring all the others
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 2m
+    sleep 1m
 
     # List of containers running uvicorn
     list=("dataprep-vdms-server" "embedding-multimodal-server" "retriever-vdms-server" "reranking-videoragqna-server" "video-llama-lvm-server" "lvm-video-llama" "videoragqna-xeon-backend-server")
@@ -178,6 +194,8 @@ function validate_microservices() {
         "lvm" \
         "lvm-video-llama" \
         '{"video_url":"https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4","chunk_start": 0,"chunk_duration": 7,"prompt":"What is the person doing?","max_new_tokens": 50}'
+    
+    sleep 10
 }
 
 function validate_megaservice() {
