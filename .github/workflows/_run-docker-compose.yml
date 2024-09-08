@@ -71,7 +71,7 @@ jobs:
               merged_commit=$(git log -1 --format='%H')
               changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | grep -vE '${{ inputs.diff_excluded_files }}')" || true
           fi
-          
+
           for test_case in $other_test_cases; do
               if [ "${{ inputs.tag }}" == "ci" ]; then
                   flag=${test_case%_on_*}
