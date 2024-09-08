@@ -5,7 +5,7 @@
 # example: 'ChatQnA', 'CodeGen', ...
 # hardware: 'xeon', 'gaudi', ...
 
-set -xe
+set -e
 changed_files=$changed_files
 run_matrix="{\"include\":["
 hardware_list="xeon gaudi" # current support hardware list
