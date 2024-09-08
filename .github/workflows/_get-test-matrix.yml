@@ -17,7 +17,7 @@ on:
         value: ${{ jobs.job1.outputs.run_matrix }}
       changed_files:
         description: "The changed files"
-        value: ${{ steps.job1.outputs.changed_files }}
+        value: ${{ jobs.job1.outputs.changed_files }}
 
 jobs:
   job1:
