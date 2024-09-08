@@ -11,7 +11,7 @@ on:
         required: true
         type: string
       hardware:
-        default: "CPU"
+        default: "xeon"
         description: "Nodes to run the test, xeon or gaudi"
         required: true
         type: string
