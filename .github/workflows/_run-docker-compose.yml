@@ -64,6 +64,7 @@ jobs:
           if [ "$default_test_case" ]; then run_test_cases+="$default_test_cases "; fi
           other_test_cases=$(find . -type f -name "test_compose_*_on_${{ inputs.hardware }}.sh")
           echo "other_test_cases=$other_test_cases"
+          echo "run_test_cases---111---=$run_test_cases"
 
           if [ "${{ inputs.tag }}" == "ci" ]; then
               base_commit=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -76,13 +77,14 @@ jobs:
               if [ "${{ inputs.tag }}" == "ci" ]; then
                   flag=${test_case%_on_*}
                   flag=${flag#test_compose_}
-                  if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep ${flag} ) ]]; then
+                  if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep ${flag}) ]]; then
                       run_test_cases+="$test_case "
                   fi
               else
                   run_test_cases+="$test_case "
               fi
           done
+          echo "run_test_cases---222---=$run_test_cases"
 
           test_cases=$(echo $run_test_cases | tr ' ' '\n' | sort -u | jq -R '.' | jq -sc '.')
           echo "test_cases=$test_cases"
