@@ -246,3 +246,74 @@ class GroupCollator(DataCollatorWithPadding):
         if isinstance(features[0], list):
             features = sum(features, [])
         return super().__call__(features)
+
+
+class TrainDatasetForEmbedding(Dataset):
+    def __init__(self, dataset, args, tokenizer):
+        self.dataset = dataset
+        self.tokenizer = tokenizer
+        self.args = args
+        self.total_len = len(self.dataset)
+
+    def __len__(self):
+        return self.total_len
+
+    def __getitem__(self, item) -> Tuple[str, List[str]]:
+        query = self.dataset[item]["query"]
+        if self.args["query_instruction_for_retrieval"] is not None:
+            query = self.args["query_instruction_for_retrieval"] + query
+
+        passages = []
+
+        assert isinstance(self.dataset[item]["pos"], list)
+        pos = random.choice(self.dataset[item]["pos"])
+        passages.append(pos)
+
+        train_group_size = self.args.get("train_group_size", 8)
+        if len(self.dataset[item]["neg"]) < train_group_size - 1:
+            num = math.ceil((train_group_size - 1) / len(self.dataset[item]["neg"]))
+            negs = random.sample(self.dataset[item]["neg"] * num, train_group_size - 1)
+        else:
+            negs = random.sample(self.dataset[item]["neg"], train_group_size - 1)
+        passages.extend(negs)
+
+        if self.args["passage_instruction_for_retrieval"] is not None:
+            passages = [self.args["passage_instruction_for_retrieval"] + p for p in passages]
+        return query, passages
+
+
+@dataclass
+class EmbedCollator(DataCollatorWithPadding):
+    """Wrapper that does conversion from List[Tuple[encode_qry, encode_psg]] to List[qry], List[psg]
+    and pass batch separately to the actual collator.
+
+    Abstract out data detail for the model.
+    """
+
+    query_max_len: int = 32
+    passage_max_len: int = 128
+
+    def __call__(self, features):
+        query = [f[0] for f in features]
+        passage = [f[1] for f in features]
+
+        if isinstance(query[0], list):
+            query = sum(query, [])
+        if isinstance(passage[0], list):
+            passage = sum(passage, [])
+
+        q_collated = self.tokenizer(
+            query,
+            padding=self.padding,
+            truncation=True,
+            max_length=self.query_max_len,
+            return_tensors="pt",
+        )
+        d_collated = self.tokenizer(
+            passage,
+            padding=self.padding,
+            truncation=True,
+            max_length=self.passage_max_len,
+            return_tensors="pt",
+        )
+        return {"query": q_collated, "passage": d_collated}
