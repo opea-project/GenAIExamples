@@ -79,7 +79,7 @@ jobs:
               if [ "${{ inputs.tag }}" == "ci" ]; then
                   flag=${test_case%_on_*}
                   flag=${flag#test_compose_}
-                  if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep ${flag}) ]]; then
+                  if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep ${flag}) ]]; then
                       run_test_cases="$run_test_cases $test_case"
                   fi
               else
@@ -149,5 +149,5 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.test_case }}
+          name: ${{ inputs.example }}_${{ matrix.test_case }}
           path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log
