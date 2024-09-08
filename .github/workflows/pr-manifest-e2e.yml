@@ -32,7 +32,7 @@ jobs:
       fail-fast: false
     uses: ./.github/workflows/_example-workflow.yml
     with:
-      node: ${{ matrix.node }}
+      node: ${{ matrix.hardware }}
       example: ${{ matrix.example }}
       tag: ${{ github.event.pull_request.head.sha }}
       test_k8s: true
