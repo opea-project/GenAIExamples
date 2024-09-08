@@ -13,12 +13,12 @@ hardware_list="xeon gaudi" # current support hardware list
 examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
 for example in ${examples}; do
     run_hardware=""
-    if [ $(printf '%s\n' "${changed_files[@]}" | grep -c ${example} | cut -d'/' -f2 | grep -E '*.py|Dockerfile*|ui' ) != 0 ]; then
+    if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '*.py|Dockerfile*|ui|docker_image_build' ) ]]; then
         # run test on all hardware if megaservice or ui code change
         run_hardware=$hardware_list
     else
         for hardware in ${hardware_list}; do
-            if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c ${hardware}) != 0 ]; then
+            if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c ${hardware}) != 0 ]]; then
                 run_hardware="${hardware} ${run_hardware}"
             fi
         done
