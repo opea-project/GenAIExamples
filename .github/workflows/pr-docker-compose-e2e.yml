@@ -42,5 +42,5 @@ jobs:
       tag: "ci"
       example: ${{ matrix.example }}
       hardware: ${{ matrix.hardware }}
-      changed_files: ${{ needs.get-test-matrix.outputs.changed_files }}
+      diff_excluded_files: '.github|*.md|*.txt|kubernetes|manifest|gmc|assets|benchmark'
     secrets: inherit
