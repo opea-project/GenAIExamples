@@ -125,11 +125,13 @@ jobs:
         shell: bash
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}/docker_compose/Intel/${{ inputs.hardware }}
-          yaml_files=$(find . -type f -name "*compose*yaml")
-          for file in $yaml_files; do
-              docker compose -f ${file} stop && docker compose -f ${file} rm -f || true
-          done
+          cd ${{ github.workspace }}/${{ inputs.example }}/docker_compose
+          test_case=${{ matrix.test_case }}
+          flag=${test_case%_on_*}
+          flag=${flag#test_}
+          yaml_file=$(find . -type f -wholename "*${{ inputs.hardware }}/${flag}.yaml")
+          echo $yaml_file
+          docker compose -f $yaml_file stop && docker compose -f $yaml_file rm -f || true
           docker system prune -f
           docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
 
