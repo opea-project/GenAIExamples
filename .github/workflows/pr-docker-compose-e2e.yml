@@ -4,12 +4,15 @@
 name: E2E test with docker compose
 
 on:
-  pull_request_target:
-    branches: [main]
+  pull_request:
+    branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - "**/docker/**"
-      - "**/tests/**"
+      - "**/Dockerfile**"
+      - "**.py"
+      - "**/docker_compose/**"
+      - "**/docker_image_build/**"
+      - "**/tests/test_compose**"
       - "**/ui/**"
       - "!**.md"
       - "!**.txt"
@@ -22,15 +25,17 @@ concurrency:
 
 jobs:
   get-test-matrix:
+    if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '.github|README.md|*.txt|deprecate|kubernetes|manifest|gmc|assets'
+      diff_excluded_files: '.github|*.md|*.txt|kubernetes|manifest|gmc|assets|benchmark'
 
   example-test:
     needs: [get-test-matrix]
     strategy:
       matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false
+    if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       registry: "opea"
