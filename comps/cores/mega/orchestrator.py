@@ -136,7 +136,10 @@ class ServiceOrchestrator(DAG):
         # send the cur_node request/reply
         endpoint = self.services[cur_node].endpoint_path
         llm_parameters_dict = llm_parameters.dict()
-        if self.services[cur_node].service_type == ServiceType.LLM:
+        if (
+            self.services[cur_node].service_type == ServiceType.LLM
+            or self.services[cur_node].service_type == ServiceType.LVM
+        ):
             for field, value in llm_parameters_dict.items():
                 if inputs.get(field) != value:
                     inputs[field] = value
