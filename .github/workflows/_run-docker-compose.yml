@@ -24,6 +24,10 @@ on:
         description: Hardware to run the test on
         required: true
         type: string
+      changed_files:
+        description: "The changed files for pr test"
+        required: false
+        type: string
 jobs:
   get-test-case:
     runs-on: ubuntu-latest
@@ -52,10 +56,30 @@ jobs:
         shell: bash
         id: test-case-matrix
         run: |
-          set -x
           example_l=$(echo ${{ inputs.example }} | tr '[:upper:]' '[:lower:]')
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
-          test_cases=$(find . -type f -name "test_${example_l}*on_${{ inputs.hardware }}.sh" -print | cut -d/ -f2 | jq -R '.' | jq -sc '.')
+          run_test_cases=""
+          
+          default_test_case=$(find . -type f -name "test_compose_on_${{ inputs.hardware }}.sh")
+          if [ "$default_test_case" ]; then run_test_cases+="$default_test_cases "; fi
+          other_test_cases=$(find . -type f -name "test_compose_*_on_${{ inputs.hardware }}.sh")
+          echo "other_test_cases=$other_test_cases"
+          echo "changed_files=$changed_files"
+          
+          for test_case in $other_test_cases; do
+              if [ "$changed_files" ]; then
+                  flag=${test_case%_on_*}
+                  flag=${flag#test_compose_}
+                  if [[ $(printf '%s\n' "${{ inputs.changed_files[@] }}" | grep ${example} | grep ${flag} ) ]]; then
+                      run_test_cases+="$test_case "
+                  fi
+              else
+                  run_test_cases+="$test_case "
+              fi
+          done
+          
+          test_cases=$(echo $run_test_cases | tr ' ' '\n' | sort -u | jq -R '.' | jq -sc '.')
+          echo "test_cases=$test_cases"
           echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
 
   run-test:

@@ -46,8 +46,20 @@ jobs:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
 
+      - name: Get checkout ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+          echo "checkout ref ${{ env.CHECKOUT_REF }}"
+
       - name: Checkout out Repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
+          fetch-depth: 0
 
       - name: Clone required Repo
         run: |
