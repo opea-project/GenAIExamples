@@ -63,7 +63,7 @@ jobs:
 
       - name: Clone required Repo
         run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}
+          cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           if [[ $(grep -c "tei-gaudi:" ${docker_compose_path}) != 0 ]]; then
               git clone https://github.com/huggingface/tei-gaudi.git
