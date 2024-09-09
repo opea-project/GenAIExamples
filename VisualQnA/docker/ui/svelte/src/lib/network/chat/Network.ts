@@ -17,14 +17,36 @@ import { SSE } from "sse.js";
 
 const BACKEND_BASE_URL = env.BACKEND_BASE_URL;
 
-export async function fetchTextStream(query: string, knowledge_base_id: string, isCheckedStore: boolean) {
+export async function fetchTextStream(
+	query: string,
+	stepValueStore: number,
+	base64ImageStore: string
+) {
 	let payload = {};
 	let url = "";
+	base64ImageStore = base64ImageStore.replace(/^data:[a-zA-Z]+\/[a-zA-Z]+;base64,/, '');
 
 	payload = {
-		messages: query,
-		stream: "True",
+		messages: [
+			{
+				role: "user",
+				content: [
+					{
+						type: "text",
+						text: query,
+					},
+					{
+						type: "image_url",
+						image_url: { url: base64ImageStore },
+					},
+				],
+			},
+		],
+		max_tokens: stepValueStore,
+		stream: true
 	};
+	console.log('payload', payload);
+	
 	url = `${BACKEND_BASE_URL}`;
 
 	return new SSE(url, {
