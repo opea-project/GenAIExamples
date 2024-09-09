@@ -13,8 +13,8 @@ RUN useradd -m -s /bin/bash user && \
     chown -R user /home/user/
 
 
-RUN cd /home/user/ && \
-    git clone https://github.com/opea-project/GenAIComps.git
+WORKDIR /home/user/
+RUN git clone https://github.com/opea-project/GenAIComps.git
 
 
 WORKDIR /home/user/GenAIComps
