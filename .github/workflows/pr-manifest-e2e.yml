@@ -36,4 +36,5 @@ jobs:
       example: ${{ matrix.example }}
       tag: ${{ github.event.pull_request.head.sha }}
       test_k8s: true
+      opea_branch: "reorg" # for re-org test only
     secrets: inherit

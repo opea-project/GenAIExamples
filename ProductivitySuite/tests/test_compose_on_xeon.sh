@@ -16,7 +16,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git
+    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps &&  git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna dataprep-redis embedding-tei promptregistry-mongo llm_docsum_server llm_faqgen chathistory-mongo retriever-redis reranking-tei llm-tgi productivity-suite-react-ui codegen docsum faqgen"

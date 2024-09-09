@@ -123,6 +123,7 @@ jobs:
           example: ${{ inputs.example }}
           hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}
+          opea_branch: "reorg" # for re-org test only
         run: |
           cd ${{ github.workspace }}/$example/tests
           if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
