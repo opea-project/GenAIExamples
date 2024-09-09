@@ -63,6 +63,12 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 ## 🚀 Start Microservices and MegaService
 
+### Required Models
+
+We set default model as "meta-llama/Meta-Llama-3-8B-Instruct", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
+
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+
 ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
@@ -71,7 +77,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
@@ -92,31 +98,31 @@ docker compose up -d
 
 1. TGI Service
 
-```bash
-curl http://${host_ip}:8008/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:8008/generate \
+     -X POST \
+     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -H 'Content-Type: application/json'
+   ```
 
 2. LLM Microservice
 
-```bash
-curl http://${host_ip}:9000/v1/faqgen \
-  -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:9000/v1/faqgen \
+     -X POST \
+     -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+     -H 'Content-Type: application/json'
+   ```
 
 3. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/faqgen -H "Content-Type: application/json" -d '{
-     "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-     }'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/faqgen -H "Content-Type: application/json" -d '{
+        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+        }'
+   ```
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
+   Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
 ## 🚀 Launch the UI
 

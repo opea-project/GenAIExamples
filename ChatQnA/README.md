@@ -54,12 +54,12 @@ flowchart LR
         Z1([UI]):::orchid
     end
 
-    TEI_RER{{Reranking service<br>'TEI'<br>}}
-    TEI_EM{{Embedding service <br>'TEI LangChain'<br>}}
-    VDB{{Vector DB<br>'Redis'<br>}}
-    R_RET{{Retriever service <br>'LangChain Redis'<br>}}
-    DP([Data Preparation<br>'LangChain Redis'<br>]):::blue
-    LLM_gen{{LLM Service <br>'TGI'<br>}}
+    TEI_RER{{Reranking service<br>}}
+    TEI_EM{{Embedding service <br>}}
+    VDB{{Vector DB<br><br>}}
+    R_RET{{Retriever service <br>}}
+    DP([Data Preparation<br>]):::blue
+    LLM_gen{{LLM Service <br>}}
 
     %% Data Preparation flow
     %% Ingest data flow
@@ -101,9 +101,13 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 
 The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
+Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
+
+### Prepare Docker Image
+
 Currently we support two ways of deploying ChatQnA services with docker compose:
 
-1. Start services using the docker image on `docker hub`:
+1. Using the docker image on `docker hub`:
 
    ```bash
    docker pull opea/chatqna:latest
@@ -119,7 +123,21 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
    docker pull opea/chatqna-conversation-ui:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker)
+2. Using the docker images `built from source`: [Guide](docker/xeon/README.md)
+
+   > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
+
+### Required Models
+
+By default, the embedding, reranking and LLM models are set to a default value as listed below:
+
+| Service   | Model                     |
+| --------- | ------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5     |
+| Reranking | BAAI/bge-reranker-base    |
+| LLM       | Intel/neural-chat-7b-v3-3 |
+
+Change the `xxx_MODEL_ID` in `docker/xxx/set_env.sh` for your needs.
 
 ### Setup Environment Variable
 
@@ -211,6 +229,19 @@ Refer to the [AI PC Guide](./docker/aipc/README.md) for instructions on deployin
 Refer to the [Intel Technology enabling for Openshift readme](https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/workloads/opea/chatqna/README.md) for instructions to deploy ChatQnA prototype on RHOCP with [Red Hat OpenShift AI (RHOAI)](https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai).
 
 ## Consume ChatQnA Service
+
+Before consuming ChatQnA Service, make sure the TGI/vLLM service is ready (which takes up to 2 minutes to start).
+
+```bash
+# TGI example
+docker logs tgi-service | grep Connected
+```
+
+Consume ChatQnA service until you get the TGI response like below.
+
+```log
+2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+```
 
 Two ways of consuming ChatQnA Service:
 

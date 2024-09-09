@@ -3,7 +3,7 @@
 
 services:
   llava-tgi-service:
-    image: ${REGISTRY:-opea}/llava-tgi:${TAG:-latest}
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.4
     container_name: tgi-llava-gaudi-server
     ports:
       - "8399:80"
@@ -65,7 +65,26 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - BACKEND_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+  visualqna-gaudi-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: visualqna-gaudi-nginx-server
+    depends_on:
+      - visualqna-gaudi-backend-server
+      - visualqna-gaudi-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=${FRONTEND_SERVICE_IP}
+      - FRONTEND_SERVICE_PORT=${FRONTEND_SERVICE_PORT}
+      - BACKEND_SERVICE_NAME=${BACKEND_SERVICE_NAME}
+      - BACKEND_SERVICE_IP=${BACKEND_SERVICE_IP}
+      - BACKEND_SERVICE_PORT=${BACKEND_SERVICE_PORT}
     ipc: host
     restart: always
 

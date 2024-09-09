@@ -19,15 +19,10 @@ cd GenAIComps
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/Dockerfile_tgi .
 ```
 
-### 3. Build TGI Gaudi Image
-
-Since TGI Gaudi has not supported llava-next in main branch, we'll need to build it from a PR branch for now.
+### 3. Pull TGI Gaudi Image
 
 ```bash
-git clone https://github.com/huggingface/tgi-gaudi.git
-cd tgi-gaudi/
-docker build -t opea/llava-tgi:latest .
-cd ../
+docker pull ghcr.io/huggingface/tgi-gaudi:2.0.4
 ```
 
 ### 4. Build MegaService Docker Image
@@ -96,34 +91,34 @@ Follow the instructions to validate MicroServices.
 
 1. LLM Microservice
 
-```bash
-http_proxy="" curl http://${host_ip}:9399/v1/lvm -XPOST -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}' -H 'Content-Type: application/json'
-```
+   ```bash
+   http_proxy="" curl http://${host_ip}:9399/v1/lvm -XPOST -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}' -H 'Content-Type: application/json'
+   ```
 
 2. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
-     "messages": [
-      {
-        "role": "user",
-        "content": [
-          {
-            "type": "text",
-            "text": "What'\''s in this image?"
-          },
-          {
-            "type": "image_url",
-            "image_url": {
-              "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
-            }
-          }
-        ]
-      }
-    ],
-    "max_tokens": 300
-    }'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
+        "messages": [
+         {
+           "role": "user",
+           "content": [
+             {
+               "type": "text",
+               "text": "What'\''s in this image?"
+             },
+             {
+               "type": "image_url",
+               "image_url": {
+                 "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+               }
+             }
+           ]
+         }
+       ],
+       "max_tokens": 300
+       }'
+   ```
 
 ## 🚀 Launch the UI
 

@@ -30,11 +30,6 @@ on:
         description: 'Build test required images for Examples'
         required: false
         type: boolean
-      scan:
-        default: true
-        description: 'Scan all images with Trivy'
-        required: false
-        type: boolean
       test_compose:
         default: true
         description: 'Test examples with docker compose'
@@ -102,7 +97,6 @@ jobs:
       example: ${{ matrix.example }}
       tag: ${{ inputs.tag }}
       build: ${{ fromJSON(inputs.build) }}
-      scan: ${{ fromJSON(inputs.scan) }}
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_k8s: ${{ fromJSON(inputs.test_k8s) }}
       test_gmc: ${{ fromJSON(inputs.test_gmc) }}

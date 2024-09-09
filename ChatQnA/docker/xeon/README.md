@@ -80,6 +80,8 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 
 ### 3. Build Rerank Image
 
+> Skip for ChatQnA without Rerank pipeline
+
 ```bash
 docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
 ```
@@ -118,14 +120,27 @@ cd ..
 
 ### 6. Build MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+1. MegaService with Rerank
 
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA/docker
-docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
-```
+   To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+   cd ../../..
+   ```
+
+2. MegaService without Rerank
+
+   To construct the Mega Service without Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna_without_rerank.py` Python script. Build MegaService Docker image via below command:
+
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA/docker
+   docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_without_rerank .
+   cd ../../..
+   ```
 
 ### 7. Build UI Docker Image
 
@@ -156,10 +171,22 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 3. `opea/retriever-redis:latest`
 4. `opea/reranking-tei:latest`
 5. `opea/llm-tgi:latest` or `opea/llm-vllm:latest`
-6. `opea/chatqna:latest`
+6. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest`
 7. `opea/chatqna-ui:latest`
 
 ## 🚀 Start Microservices
+
+### Required Models
+
+By default, the embedding, reranking and LLM models are set to a default value as listed below:
+
+| Service   | Model                     |
+| --------- | ------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5     |
+| Reranking | BAAI/bge-reranker-base    |
+| LLM       | Intel/neural-chat-7b-v3-3 |
+
+Change the `xxx_MODEL_ID` below for your needs.
 
 ### Setup Environment Variables
 
@@ -183,7 +210,7 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 
 **Append the value of the public IP address to the no_proxy list**
 
-```
+```bash
 export your_no_proxy=${your_no_proxy},"External_Public_IP"
 ```
 
@@ -226,7 +253,10 @@ cd GenAIExamples/ChatQnA/docker/xeon/
 If use TGI backend.
 
 ```bash
+# Start ChatQnA with Rerank Pipeline
 docker compose -f compose.yaml up -d
+# Start ChatQnA without Rerank Pipeline
+docker compose -f compose_without_rerank.yaml up -d
 ```
 
 If use vLLM backend.
@@ -239,145 +269,190 @@ docker compose -f compose_vllm.yaml up -d
 
 1. TEI Embedding Service
 
-```bash
-curl ${host_ip}:6006/embed \
-    -X POST \
-    -d '{"inputs":"What is Deep Learning?"}' \
-    -H 'Content-Type: application/json'
-```
+   ```bash
+   curl ${host_ip}:6006/embed \
+       -X POST \
+       -d '{"inputs":"What is Deep Learning?"}' \
+       -H 'Content-Type: application/json'
+   ```
 
 2. Embedding Microservice
 
-```bash
-curl http://${host_ip}:6000/v1/embeddings\
-  -X POST \
-  -d '{"text":"hello"}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:6000/v1/embeddings\
+     -X POST \
+     -d '{"text":"hello"}' \
+     -H 'Content-Type: application/json'
+   ```
 
 3. Retriever Microservice
 
-To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
-is determined by the embedding model.
-Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
+   To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
+   is determined by the embedding model.
+   Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
 
-Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
+   Check the vector dimension of your embedding model, set `your_embedding` dimension equals to it.
 
-```bash
-export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-curl http://${host_ip}:7000/v1/retrieval \
-  -X POST \
-  -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+   curl http://${host_ip}:7000/v1/retrieval \
+     -X POST \
+     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
+     -H 'Content-Type: application/json'
+   ```
 
 4. TEI Reranking Service
 
-```bash
-curl http://${host_ip}:8808/rerank \
-    -X POST \
-    -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-    -H 'Content-Type: application/json'
-```
+   > Skip for ChatQnA without Rerank pipeline
+
+   ```bash
+   curl http://${host_ip}:8808/rerank \
+       -X POST \
+       -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
+       -H 'Content-Type: application/json'
+   ```
 
 5. Reranking Microservice
 
-```bash
-curl http://${host_ip}:8000/v1/reranking\
-  -X POST \
-  -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-  -H 'Content-Type: application/json'
-```
+   > Skip for ChatQnA without Rerank pipeline
+
+   ```bash
+   curl http://${host_ip}:8000/v1/reranking\
+     -X POST \
+     -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
+     -H 'Content-Type: application/json'
+   ```
 
 6. LLM backend Service
 
-In first startup, this service will take more time to download the LLM file. After it's finished, the service will be ready.
+   In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
 
-Use `docker logs CONTAINER_ID` to check if the download is finished.
+   Try the command below to check whether the LLM serving is ready.
 
-```bash
-# TGI service
-curl http://${host_ip}:9009/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   docker logs ${CONTAINER_ID} | grep Connected
+   ```
 
-```bash
-# vLLM Service
-curl http://${host_ip}:9009/v1/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
-```
+   If the service is ready, you will get the response like below.
+
+   ```
+   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   ```
+
+   Then try the `cURL` command below to validate services.
+
+   ```bash
+   # TGI service
+   curl http://${host_ip}:9009/generate \
+     -X POST \
+     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -H 'Content-Type: application/json'
+   ```
+
+   ```bash
+   # vLLM Service
+   curl http://${host_ip}:9009/v1/completions \
+     -H "Content-Type: application/json" \
+     -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+   ```
 
 7. LLM Microservice
 
-This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
+   This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
-```bash
-curl http://${host_ip}:9000/v1/chat/completions\
-  -X POST \
-  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:9000/v1/chat/completions\
+     -X POST \
+     -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -H 'Content-Type: application/json'
+   ```
 
 8. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-     "messages": "What is the revenue of Nike in 2023?"
-     }'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+        }'
+   ```
 
 9. Dataprep Microservice（Optional）
 
-If you want to update the default knowledge base, you can use the following commands:
+   If you want to update the default knowledge base, you can use the following commands:
 
-Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) Upload:
+   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf)
+   Click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+   Or run this command to get the file on a terminal.
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F "files=@./nke-10k-2023.pdf"
-```
+   ```bash
+   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf
+   ```
 
-This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+   Upload:
 
-Add Knowledge Base via HTTP Links:
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+        -H "Content-Type: multipart/form-data" \
+        -F "files=@./nke-10k-2023.pdf"
+   ```
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F 'link_list=["https://opea.dev"]'
-```
+   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-This command updates a knowledge base by submitting a list of HTTP links for processing.
+   Add Knowledge Base via HTTP Links:
 
-Also, you are able to get the file list that you uploaded:
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+        -H "Content-Type: multipart/form-data" \
+        -F 'link_list=["https://opea.dev"]'
+   ```
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
-     -H "Content-Type: application/json"
-```
+   This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-To delete the file/link you uploaded:
+   Also, you are able to get the file list that you uploaded:
 
-```bash
-# delete link
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "https://opea.dev"}' \
-     -H "Content-Type: application/json"
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+        -H "Content-Type: application/json"
+   ```
 
-# delete file
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "nke-10k-2023.pdf"}' \
-     -H "Content-Type: application/json"
+   Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
 
-# delete all uploaded files and links
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "all"}' \
-     -H "Content-Type: application/json"
-```
+   ```json
+   [
+     {
+       "name": "nke-10k-2023.pdf",
+       "id": "nke-10k-2023.pdf",
+       "type": "File",
+       "parent": ""
+     },
+     {
+       "name": "https://opea.dev.txt",
+       "id": "https://opea.dev.txt",
+       "type": "File",
+       "parent": ""
+     }
+   ]
+   ```
+
+   To delete the file/link you uploaded:
+
+   The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
+
+   ```bash
+   # delete link
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+        -d '{"file_path": "https://opea.dev.txt"}' \
+        -H "Content-Type: application/json"
+
+   # delete file
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+        -d '{"file_path": "nke-10k-2023.pdf"}' \
+        -H "Content-Type: application/json"
+
+   # delete all uploaded files and links
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+        -d '{"file_path": "all"}' \
+        -H "Content-Type: application/json"
+   ```
 
 ## 🚀 Launch the UI
 

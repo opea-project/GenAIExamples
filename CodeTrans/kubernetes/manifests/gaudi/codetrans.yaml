@@ -8,10 +8,10 @@ kind: ConfigMap
 metadata:
   name: codetrans-llm-uservice-config
   labels:
-    helm.sh/chart: llm-uservice-0.8.0
+    helm.sh/chart: llm-uservice-1.0.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 data:
   TGI_LLM_ENDPOINT: "http://codetrans-tgi"
@@ -20,9 +20,7 @@ data:
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
-  LANGCHAIN_TRACING_V2: "false"
-  LANGCHAIN_API_KEY: insert-your-langchain-key-here
-  LANGCHAIN_PROJECT: "opea-llm-uservice"
+  LOGFLAG: ""
 ---
 # Source: codetrans/charts/tgi/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -33,7 +31,7 @@ kind: ConfigMap
 metadata:
   name: codetrans-tgi-config
   labels:
-    helm.sh/chart: tgi-0.8.0
+    helm.sh/chart: tgi-1.0.0
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: codetrans
     app.kubernetes.io/version: "2.1.0"
@@ -47,7 +45,6 @@ data:
   no_proxy: ""
   HABANA_LOGS: "/tmp/habana_logs"
   NUMBA_CACHE_DIR: "/tmp"
-  TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
   MAX_INPUT_LENGTH: "1024"
   MAX_TOTAL_TOKENS: "2048"
@@ -61,10 +58,10 @@ kind: Service
 metadata:
   name: codetrans-llm-uservice
   labels:
-    helm.sh/chart: llm-uservice-0.8.0
+    helm.sh/chart: llm-uservice-1.0.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -86,7 +83,7 @@ kind: Service
 metadata:
   name: codetrans-tgi
   labels:
-    helm.sh/chart: tgi-0.8.0
+    helm.sh/chart: tgi-1.0.0
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: codetrans
     app.kubernetes.io/version: "2.1.0"
@@ -111,10 +108,10 @@ kind: Service
 metadata:
   name: codetrans
   labels:
-    helm.sh/chart: codetrans-0.8.0
+    helm.sh/chart: codetrans-1.0.0
     app.kubernetes.io/name: codetrans
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -136,10 +133,10 @@ kind: Deployment
 metadata:
   name: codetrans-llm-uservice
   labels:
-    helm.sh/chart: llm-uservice-0.8.0
+    helm.sh/chart: llm-uservice-1.0.0
     app.kubernetes.io/name: llm-uservice
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -214,12 +211,13 @@ kind: Deployment
 metadata:
   name: codetrans-tgi
   labels:
-    helm.sh/chart: tgi-0.8.0
+    helm.sh/chart: tgi-1.0.0
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: codetrans
     app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
   replicas: 1
   selector:
     matchLabels:
@@ -239,7 +237,15 @@ spec:
             - configMapRef:
                 name: codetrans-tgi-config
           securityContext:
-            {}
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           image: "ghcr.io/huggingface/tgi-gaudi:2.0.1"
           imagePullPolicy: IfNotPresent
           volumeMounts:
@@ -273,9 +279,7 @@ spec:
               habana.ai/gaudi: 1
       volumes:
         - name: model-volume
-          hostPath:
-            path: /mnt/opea-models
-            type: Directory
+          emptyDir: {}
         - name: tmp
           emptyDir: {}
 ---
@@ -288,10 +292,10 @@ kind: Deployment
 metadata:
   name: codetrans
   labels:
-    helm.sh/chart: codetrans-0.8.0
+    helm.sh/chart: codetrans-1.0.0
     app.kubernetes.io/name: codetrans
     app.kubernetes.io/instance: codetrans
-    app.kubernetes.io/version: "v0.8"
+    app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -338,3 +342,75 @@ spec:
       volumes:
         - name: tmp
           emptyDir: {}
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: codetrans-nginx-config
+data:
+  default.conf: |
+    server {
+        listen       80;
+        listen  [::]:80;
+
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+
+        location /v1/codetrans {
+            proxy_pass http://codetrans:7777;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codetrans-nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+      volumes:
+      - name: nginx-config-volume
+        configMap:
+          name: codetrans-nginx-config
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-svc
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30789
+  type: NodePort
