@@ -20,7 +20,7 @@ data:
   EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
   RETRIEVER_SERVICE_HOST_IP: retriever-svc
   # RERANK_SERVICE_HOST_IP: reranking-svc
-  RERANK_SERVER_HOST_IP: rerank-dependency-svc
+  RERANK_SERVER_HOST_IP: reranking-dependency-svc
   NODE_SELECTOR: chatqna-opea
   # LLM_SERVICE_HOST_IP: llm-svc
   LLM_SERVER_HOST_IP: llm-dependency-svc
