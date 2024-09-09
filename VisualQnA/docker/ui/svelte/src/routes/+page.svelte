@@ -17,9 +17,11 @@
 <script lang="ts">
 	export let data;
 	import {
+	base64ImageStore,
 		ifStoreMsg,
 		isCheckedStore,
 		knowledge1,
+		stepValueStore,
 	} from "$lib/shared/stores/common/Store";
 	import { onMount } from "svelte";
 	import Header from "$lib/shared/components/header/header.svelte";
@@ -46,13 +48,9 @@
 	let query: string = "";
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
-	// ·········
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
 	console.log("chatMessages", chatMessages);
 
-	// ··············
-
-	$: knowledge_1 = $knowledge1?.id ? $knowledge1.id : "default";
 
 	onMount(async () => {
 		scrollToDiv = document
@@ -88,12 +86,16 @@
 	const callTextStream = async (query: string) => {
 		const eventSource = await fetchTextStream(
 			query,
-			knowledge_1,
-			$isCheckedStore
+			$stepValueStore,
+			$base64ImageStore
 		);
 
 		eventSource.addEventListener("message", (e: any) => {
+			console.log('e', e);
+
 			let Msg = e.data;
+			console.log('Msg', Msg);
+
 			if (Msg.startsWith("b")) {
 				let trimmedData = Msg.slice(2, -1);
 

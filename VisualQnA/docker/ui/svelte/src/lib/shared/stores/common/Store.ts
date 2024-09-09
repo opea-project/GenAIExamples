@@ -39,3 +39,7 @@ export const knowledge1 = writable<{
 }>();
 
 export const knowledgeName = writable("");
+
+export const base64ImageStore = writable("");
+
+export const stepValueStore = writable(512);
