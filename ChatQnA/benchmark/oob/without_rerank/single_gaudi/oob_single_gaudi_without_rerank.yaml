@@ -72,6 +72,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: chatqna-backend-server-svc
+  namespace: default
 spec:
   type: NodePort
   selector:
@@ -147,6 +148,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: dataprep-svc
+  namespace: default
 spec:
   type: ClusterIP
   selector:
@@ -220,6 +222,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: embedding-dependency-svc
+  namespace: default
 spec:
   type: ClusterIP
   selector:
@@ -279,6 +282,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: embedding-svc
+  namespace: default
 spec:
   type: ClusterIP
   selector:
@@ -372,6 +376,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: llm-dependency-svc
+  namespace: default
 spec:
   type: ClusterIP
   selector:
@@ -431,6 +436,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: llm-svc
+  namespace: default
 spec:
   type: ClusterIP
   selector:
@@ -508,6 +514,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: retriever-svc
+  namespace: default
 spec:
   type: ClusterIP
   selector:
@@ -528,6 +535,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: vector-db
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -558,6 +566,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: vector-db
+  namespace: default
 spec:
   type: ClusterIP
   selector:
