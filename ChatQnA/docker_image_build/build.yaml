@@ -26,7 +26,7 @@ services:
   chatqna-no-wrapper:
     build:
       context: ../
-      dockerfile: ./Dockerfile_no_wrapper
+      dockerfile: ./Dockerfile.no_wrapper
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-no-wrapper:${TAG:-latest}
   chatqna-ui:
