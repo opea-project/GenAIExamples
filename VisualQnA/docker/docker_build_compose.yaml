@@ -22,3 +22,9 @@ services:
       dockerfile: comps/lvms/Dockerfile_tgi
     extends: visualqna
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+  nginx:
+    build:
+      context: GenAIComps
+      dockerfile: comps/nginx/docker/Dockerfile
+    extends: visualqna
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
