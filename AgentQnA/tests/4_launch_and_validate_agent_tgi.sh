@@ -20,7 +20,7 @@ ls $HF_CACHE_DIR
 
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
-    docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+    docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
 
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker/gaudi
@@ -66,9 +66,6 @@ function validate_agent_service() {
 function main() {
     echo "==================== Start agent ===================="
     start_agent_and_api_server
-    echo "Waiting for LLM endpoint to be ready"
-    sleep 300
-    docker logs tgi-server
     echo "==================== Agent started ===================="
 
     echo "==================== Validate agent service ===================="
