@@ -54,7 +54,7 @@ function start_services() {
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get_file"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/delete_file"
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose -f compose_no_wrapper.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -194,7 +194,7 @@ function validate_megaservice() {
 
 function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
-    cd $WORKPATH/docker/ui/svelte
+    cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
