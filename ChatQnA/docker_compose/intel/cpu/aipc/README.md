@@ -14,19 +14,19 @@ cd GenAIComps
 ### 1. Build Embedding Image
 
 ```bash
-docker build --no-cache -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/embedding-tei:latest -f comps/embeddings/tei/langchain/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
+docker build --no-cache -t opea/retriever-redis:latest -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest -f comps/reranks/tei/Dockerfile .
 ```
 
 ### 4. Build LLM Image
@@ -34,13 +34,13 @@ docker build --no-cache -t opea/reranking-tei:latest -f comps/reranks/tei/docker
 We use [Ollama](https://ollama.com/) as our LLM service for AIPC. Please pre-download Ollama on your PC.
 
 ```bash
-docker build --no-cache -t opea/llm-ollama:latest -f comps/llms/text-generation/ollama/Dockerfile .
+docker build --no-cache -t opea/llm-ollama:latest -f comps/llms/text-generation/ollama/langchain/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/Dockerfile .
 cd ..
 ```
 

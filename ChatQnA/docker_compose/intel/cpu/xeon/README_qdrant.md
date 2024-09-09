@@ -73,19 +73,19 @@ cd GenAIComps
 ### 1. Build Embedding Image
 
 ```bash
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/haystack/qdrant/docker/Dockerfile .
+docker build --no-cache -t opea/retriever-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/qdrant/haystack/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
 ```
 
 ### 4. Build LLM Image
@@ -97,7 +97,7 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 ### 5. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/docker/Dockerfile .
+docker build --no-cache -t opea/dataprep-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/langchain/Dockerfile .
 cd ..
 ```
 

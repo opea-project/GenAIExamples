@@ -14,19 +14,19 @@ services:
   embedding-tei:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/langchain/docker/Dockerfile
+      dockerfile: comps/embeddings/tei/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
   retriever-redis:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/langchain/redis/docker/Dockerfile
+      dockerfile: comps/retrievers/redis/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
   reranking-tei:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/tei/docker/Dockerfile
+      dockerfile: comps/reranks/tei/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
   llm-tgi:
@@ -38,19 +38,19 @@ services:
   dataprep-redis:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain/docker/Dockerfile
+      dockerfile: comps/dataprep/redis/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
   promptregistry-mongo:
     build:
       context: GenAIComps
-      dockerfile: comps/prompt_registry/mongo/docker/Dockerfile
+      dockerfile: comps/prompt_registry/mongo/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}
   chathistory-mongo:
     build:
       context: GenAIComps
-      dockerfile: comps/chathistory/mongo/docker/Dockerfile
+      dockerfile: comps/chathistory/mongo/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
   productivity-suite-react-ui:
@@ -89,12 +89,12 @@ services:
   llm_faqgen:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/faq-generation/tgi/Dockerfile
+      dockerfile: comps/llms/faq-generation/tgi/langchain/Dockerfile
     extends: faqgen
     image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
   llm_docsum_server:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/summarization/tgi/Dockerfile
+      dockerfile: comps/llms/summarization/tgi/langchain/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}

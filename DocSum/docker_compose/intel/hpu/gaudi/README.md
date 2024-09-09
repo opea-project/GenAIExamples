@@ -22,7 +22,7 @@ docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
 ### 2. Build LLM Image
 
 ```bash
-docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/Dockerfile .
+docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/langchain/Dockerfile .
 ```
 
 ### 3. Build MegaService Docker Image

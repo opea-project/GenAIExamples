@@ -16,13 +16,13 @@ cd GenAIComps
 ### 2. Build Embedding Image
 
 ```bash
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
 ```
 
 ### 3. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/redis/docker/Dockerfile .
+docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
 ### 4. Build Rerank Image
@@ -30,7 +30,7 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 > Skip for ChatQnA without Rerank pipeline
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
 ```
 
 ### 5. Build LLM Image
@@ -48,13 +48,13 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 Build vllm docker.
 
 ```bash
-docker build --no-cache -t opea/llm-vllm-hpu:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.hpu .
+docker build --no-cache -t opea/llm-vllm-hpu:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/langchain/dependency/Dockerfile.intel_hpu .
 ```
 
 Build microservice docker.
 
 ```bash
-docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
+docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/langchain/Dockerfile .
 ```
 
 #### 5.3 Use VLLM-on-Ray
@@ -62,19 +62,19 @@ docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_p
 Build vllm-on-ray docker.
 
 ```bash
-docker build --no-cache -t opea/llm-vllm-ray-hpu:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.vllmray .
+docker build --no-cache -t opea/llm-vllm-ray-hpu:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/ray/dependency/Dockerfile .
 ```
 
 Build microservice docker.
 
 ```bash
-docker build --no-cache -t opea/llm-vllm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm-ray/docker/Dockerfile.microservice .
+docker build --no-cache -t opea/llm-vllm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/ray/Dockerfile .
 ```
 
 ### 6. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/docker/Dockerfile .
+docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
 ```
 
 ### 7. Build TEI Gaudi Image
@@ -151,7 +151,7 @@ To fortify AI initiatives in production, Guardrails microservice can secure mode
 
 ```bash
 cd GenAIExamples/ChatQnA/docker
-docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/docker/Dockerfile .
+docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/langchain/Dockerfile .
 cd ../../..
 ```
 

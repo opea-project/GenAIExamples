@@ -22,7 +22,7 @@ cd GenAIComps
 ### 1. Build LLM Image
 
 ```bash
-docker build -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/Dockerfile .
+docker build -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/langchain/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image

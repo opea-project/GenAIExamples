@@ -26,6 +26,6 @@ services:
   llm-docsum-tgi:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/summarization/tgi/Dockerfile
+      dockerfile: comps/llms/summarization/tgi/langchain/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}

@@ -22,7 +22,7 @@ cd GenAIComps
 ### 1. Build LLM Image
 
 ```bash
-docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/Dockerfile .
+docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/langchain/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:

@@ -20,6 +20,6 @@ services:
   llm-visualqna-tgi:
     build:
       context: GenAIComps
-      dockerfile: comps/lvms/Dockerfile_tgi
+      dockerfile: comps/lvms/tgi-llava/Dockerfile
     extends: visualqna
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}

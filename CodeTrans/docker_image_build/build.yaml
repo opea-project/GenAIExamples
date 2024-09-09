@@ -26,6 +26,6 @@ services:
   nginx:
     build:
       context: GenAIComps
-      dockerfile: comps/nginx/docker/Dockerfile
+      dockerfile: comps/nginx/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

@@ -44,7 +44,7 @@ cd GenAIComps
 ### 1. Build LVM Image
 
 ```bash
-docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/Dockerfile_tgi .
+docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image

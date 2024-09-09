@@ -17,9 +17,9 @@ function build_docker_images() {
     cd GenAIComps
     git status
 
-    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/retriever-redis:latest -f comps/retrievers/langchain/redis/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
+    docker build -t opea/embedding-tei:latest -f comps/embeddings/tei/langchain/Dockerfile .
+    docker build -t opea/retriever-redis:latest -f comps/retrievers/redis/langchain/Dockerfile .
+    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/Dockerfile .
     docker build -t opea/dataprep-on-ray-redis:latest -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:latest
