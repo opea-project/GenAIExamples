@@ -4,5 +4,5 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 
 ## We provided DocRetriever with different deployment infra
 
-- [docker xeon version](docker_compose/Intel/CPU/) => minimum endpoints, easy to setup
-- [docker gaudi version](docker_compose/Intel/HPU/) => with extra tei_gaudi endpoint, faster
+- [docker xeon version](docker_compose/intel/cpu/xeon/) => minimum endpoints, easy to setup
+- [docker gaudi version](docker_compose/intel/hpu/gaudi/) => with extra tei_gaudi endpoint, faster

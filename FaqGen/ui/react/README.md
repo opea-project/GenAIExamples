@@ -2,8 +2,8 @@
 
 ## 📸 Project Screenshots
 
-![project-screenshot](../../../assets/img/faqgen_react_ui_text.png)
-![project-screenshot](../../../assets/img/faqgen_react_ui_text_file.png)
+![project-screenshot](../../assets/img/faqgen_react_ui_text.png)
+![project-screenshot](../../assets/img/faqgen_react_ui_text_file.png)
 
 ## 🧐 Features
 

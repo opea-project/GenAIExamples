@@ -323,4 +323,4 @@ Once the services are up, open the following URL in your browser: http://{host_i
       - "80:80"
 ```
 
-![project-screenshot](../../assets/img/chat_ui_init.png)
+![project-screenshot](../../../assets/img/chat_ui_init.png)

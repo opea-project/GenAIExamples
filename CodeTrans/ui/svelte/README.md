@@ -2,9 +2,9 @@
 
 ## 📸 Project Screenshots
 
-![project-screenshot](../../../assets/img/codeTrans_ui_init.png)
-![project-screenshot](../../../assets/img/codeTrans_ui_select.png)
-![project-screenshot](../../../assets/img/codeTrans_ui_response.png)
+![project-screenshot](../../assets/img/codeTrans_ui_init.png)
+![project-screenshot](../../assets/img/codeTrans_ui_select.png)
+![project-screenshot](../../assets/img/codeTrans_ui_response.png)
 
 ## 🧐 Features
 

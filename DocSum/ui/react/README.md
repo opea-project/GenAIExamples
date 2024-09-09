@@ -2,9 +2,9 @@
 
 ## 📸 Project Screenshots
 
-![project-screenshot](../../../assets/img/docsum-ui-react.png)
-![project-screenshot](../../../assets/img/docsum-ui-react-file.png)
-![project-screenshot](../../../assets/img/docsum-ui-react-error.png)
+![project-screenshot](../../assets/img/docsum-ui-react.png)
+![project-screenshot](../../assets/img/docsum-ui-react-file.png)
+![project-screenshot](../../assets/img/docsum-ui-react-error.png)
 
 ## 🧐 Features
 

@@ -2,8 +2,8 @@
 
 ## 📸 Project Screenshots
 
-![project-screenshot](../../../assets/img/chat_qna_init.png)
-![project-screenshot](../../../assets/img/Login_page.png)
+![project-screenshot](../../assets/img/chat_qna_init.png)
+![project-screenshot](../../assets/img/Login_page.png)
 
 ## 🧐 Features
 
@@ -21,7 +21,7 @@ Here're some of the project's features:
 
 ##### Screen Shot
 
-![project-screenshot](../../../assets/img/data_source.png)
+![project-screenshot](../../assets/img/data_source.png)
 
 - Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
 - Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
@@ -29,15 +29,15 @@ Here're some of the project's features:
 
 ##### Screen Shots
 
-![project-screenshot](../../../assets/img/chat_qna_init.png)
-![project-screenshot](../../../assets/img/chatqna_with_conversation.png)
+![project-screenshot](../../assets/img/chat_qna_init.png)
+![project-screenshot](../../assets/img/chatqna_with_conversation.png)
 
 ### CODEGEN
 
 - Generate code: generate the corresponding code based on the current user's input.
 
   Screen Shot
-  ![project-screenshot](../../../assets/img/codegen.png)
+  ![project-screenshot](../../assets/img/codegen.png)
 
 ### DOC SUMMARY
 
@@ -47,8 +47,8 @@ Here're some of the project's features:
 
 #### Screen Shot
 
-![project-screenshot](../../../assets/img/doc_summary_paste.png)
-![project-screenshot](../../../assets/img/doc_summary_file.png)
+![project-screenshot](../../assets/img/doc_summary_paste.png)
+![project-screenshot](../../assets/img/doc_summary_file.png)
 
 ### FAQ Generator
 
@@ -58,7 +58,7 @@ Here're some of the project's features:
 
 #### Screen Shot
 
-![project-screenshot](../../../assets/img/faq_generator.png)
+![project-screenshot](../../assets/img/faq_generator.png)
 
 ## 🛠️ Get it Running
 

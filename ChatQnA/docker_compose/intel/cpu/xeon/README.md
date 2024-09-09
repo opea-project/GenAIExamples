@@ -247,7 +247,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ChatQnA/docker_compose/Intel/CPU/
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 ```
 
 If use TGI backend.
@@ -487,12 +487,12 @@ Once the services are up, open the following URL in your browser: http://{host_i
       - "80:80"
 ```
 
-![project-screenshot](../../../assets/img/chat_ui_init.png)
+![project-screenshot](../../../../assets/img/chat_ui_init.png)
 
 Here is an example of running ChatQnA:
 
-![project-screenshot](../../../assets/img/chat_ui_response.png)
+![project-screenshot](../../../../assets/img/chat_ui_response.png)
 
 Here is an example of running ChatQnA with Conversational UI (React):
 
-![project-screenshot](../../../assets/img/conversation_ui_response.png)
+![project-screenshot](../../../../assets/img/conversation_ui_response.png)

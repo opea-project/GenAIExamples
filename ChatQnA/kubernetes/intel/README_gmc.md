@@ -31,7 +31,7 @@ For Gaudi:
 - tgi-service: ghcr.io/huggingface/tgi-gaudi:1.2.1
 
 > [NOTE]  
-> Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/Intel/CPU/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/Intel/HPU/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.
+> Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/hpu/gaudi/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.
 
 ## Deploy ChatQnA pipeline
 This involves deploying the ChatQnA custom resource. You can use chatQnA_xeon.yaml or if you have a Gaudi cluster, you could use chatQnA_gaudi.yaml. 

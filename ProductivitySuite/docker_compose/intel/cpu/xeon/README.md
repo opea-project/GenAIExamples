@@ -104,7 +104,7 @@ Build frontend Docker image that enables via below command:
 
 ```bash
 cd GenAIExamples/ProductivitySuite/
-docker build --no-cache -t ProductivitySuite/docker_compose/Intel/CPU/compose.yaml Dockerfile_ui.react .
+docker build --no-cache -t ProductivitySuite/docker_compose/intel/cpu/xeon/compose.yaml Dockerfile_ui.react .
 cd ../../../..
 ```
 
@@ -191,7 +191,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ProductivitySuite/docker_compose/Intel/CPU
+cd GenAIExamples/ProductivitySuite/docker_compose/intel/cpu/xeon
 ```
 
 ```bash
@@ -495,8 +495,8 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 ```
 
 Here is an example of running Productivity Suite
-![project-screenshot](../../../assets/img/chat_qna_init.png)
-![project-screenshot](../../../assets/img/Login_page.png)
+![project-screenshot](../../../../assets/img/chat_qna_init.png)
+![project-screenshot](../../../../assets/img/Login_page.png)
 
 ## 🧐 Features
 
@@ -514,7 +514,7 @@ Here're some of the project's features:
 
 #### Screen Shot
 
-![project-screenshot](../../../assets/img/data_source.png)
+![project-screenshot](../../../../assets/img/data_source.png)
 
 - Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
 - Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
@@ -522,8 +522,8 @@ Here're some of the project's features:
 
 #### Screen Shots
 
-![project-screenshot](../../../assets/img/chat_qna_init.png)
-![project-screenshot](../../../assets/img/chatqna_with_conversation.png)
+![project-screenshot](../../../../assets/img/chat_qna_init.png)
+![project-screenshot](../../../../assets/img/chatqna_with_conversation.png)
 
 ### CODEGEN
 
@@ -540,8 +540,8 @@ Here're some of the project's features:
 
 #### Screen Shot
 
-![project-screenshot](../../../assets/img/doc_summary_paste.png)
-![project-screenshot](../../../assets/img/doc_summary_file.png)
+![project-screenshot](../../../../assets/img/doc_summary_paste.png)
+![project-screenshot](../../../../assets/img/doc_summary_file.png)
 
 ### FAQ Generator
 
@@ -551,4 +551,4 @@ Here're some of the project's features:
 
 #### Screen Shot
 
-![project-screenshot](../../../assets/img/faq_generator.png)
+![project-screenshot](../../../../assets/img/faq_generator.png)

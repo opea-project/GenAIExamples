@@ -2,7 +2,7 @@
 
 ## 📸 Project Screenshots
 
-![project-screenshot](../../../assets/img/faqgen_ui_text.png)
+![project-screenshot](../../assets/img/faqgen_ui_text.png)
 
 ## 🧐 Features
 

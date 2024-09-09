@@ -20,7 +20,7 @@ Currently we support two ways of deploying Code Translation services on docker:
    docker pull opea/codetrans:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker_compose/Intel/CPU/README.md)
+2. Start services using the docker images `built from source`: [Guide](./docker_compose/intel/cpu/xeon/README.md)
 
 ### Required Models
 
@@ -65,27 +65,27 @@ To set up environment variables for deploying Code Translation services, follow 
 
 #### Deploy Code Translation on Gaudi
 
-Find the corresponding [compose.yaml](./docker_compose/Intel/HPU/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
 
 ```bash
-cd GenAIExamples/CodeTrans/docker_compose/Intel/HPU
+cd GenAIExamples/CodeTrans/docker_compose/intel/hpu/gaudi
 docker compose up -d
 ```
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-Refer to the [Gaudi Guide](./docker_compose/Intel/HPU/README.md) to build docker images from source.
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 #### Deploy Code Translation on Xeon
 
-Find the corresponding [compose.yaml](./docker_compose/Intel/CPU/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
 ```bash
-cd GenAIExamples/CodeTrans/docker_compose/Intel/CPU
+cd GenAIExamples/CodeTrans/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
-Refer to the [Xeon Guide](./docker_compose/Intel/CPU/README.md) for more instructions on building docker images from source.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
 
 ### Deploy using Kubernetes with GMC
 
@@ -121,7 +121,7 @@ By default, the UI runs on port 5173 internally.
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/CodeTrans/docker_compose/Intel/CPU#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/CodeTrans/docker_compose/intel/cpu/xeon#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy=""

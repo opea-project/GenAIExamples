@@ -90,7 +90,7 @@ Change the `LLM_MODEL_ID` below for your needs.
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/CodeTrans/docker_compose/Intel/HPU
+cd GenAIExamples/CodeTrans/docker_compose/intel/hpu/gaudi
 docker compose up -d
 ```
 

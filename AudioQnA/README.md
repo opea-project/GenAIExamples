@@ -8,11 +8,11 @@ The AudioQnA service can be deployed on either Intel Gaudi2 or Intel XEON Scalab
 
 ### Deploy AudioQnA on Gaudi
 
-Refer to the [Gaudi Guide](./docker_compose/Intel/HPU/README.md) for instructions on deploying AudioQnA on Gaudi.
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instructions on deploying AudioQnA on Gaudi.
 
 ### Deploy AudioQnA on Xeon
 
-Refer to the [Xeon Guide](./docker_compose/Intel/CPU/README.md) for instructions on deploying AudioQnA on Xeon.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for instructions on deploying AudioQnA on Xeon.
 
 ## Supported Models
 

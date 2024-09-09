@@ -91,7 +91,7 @@ Note: Please replace with `host_ip` with your external IP address, do not use lo
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/FaqGen/docker_compose/Intel/HPU
+cd GenAIExamples/FaqGen/docker_compose/intel/hpu/gaudi
 docker compose up -d
 ```
 
@@ -127,7 +127,7 @@ docker compose up -d
 
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
-![project-screenshot](../../../assets/img/faqgen_ui_text.png)
+![project-screenshot](../../../../assets/img/faqgen_ui_text.png)
 
 ## 🚀 Launch the React UI (Optional)
 
@@ -152,7 +152,7 @@ To access the FAQGen (react based) frontend, modify the UI service in the `compo
 Open this URL `http://{host_ip}:5174` in your browser to access the react based frontend.
 
 - Create FAQs from Text input
-  ![project-screenshot](../../../assets/img/faqgen_react_ui_text.png)
+  ![project-screenshot](../../../../assets/img/faqgen_react_ui_text.png)
 
 - Create FAQs from Text Files
-  ![project-screenshot](../../../assets/img/faqgen_react_ui_text_file.png)
+  ![project-screenshot](../../../../assets/img/faqgen_react_ui_text_file.png)

@@ -2,7 +2,7 @@
 
 ## 📸 Project Screenshots
 
-![project-screenshot](../../../assets/img/codeGen_ui_init.jpg)
+![project-screenshot](../../assets/img/codeGen_ui_init.jpg)
 
 ## 🧐 Features
 

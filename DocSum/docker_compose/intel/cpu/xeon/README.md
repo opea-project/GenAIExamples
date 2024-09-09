@@ -99,7 +99,7 @@ Note: Please replace with `host_ip` with your external IP address, do not use lo
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/DocSum/docker_compose/Intel/CPU
+cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
@@ -141,7 +141,7 @@ Open this URL `http://{host_ip}:5174` in your browser to access the React based 
 
 ### Svelte UI
 
-![project-screenshot](../../../assets/img/docSum_ui_text.png)
+![project-screenshot](../../../../assets/img/docSum_ui_text.png)
 
 ### React UI (Optional)
 
@@ -163,4 +163,4 @@ docsum-xeon-react-ui-server:
   restart: always
 ```
 
-![preject-react-screenshot](../../../assets/img/docsum-ui-react.png)
+![preject-react-screenshot](../../../../assets/img/docsum-ui-react.png)

@@ -16,8 +16,8 @@ OPEA Productivity Suite, is a powerful tool designed to streamline your workflow
 
 - Identity and access management: uses OpenSource platform (Keycloak) for single sign-on identity and access management.
 
-Refer to the [Keycloak Configuration Guide](./docker_compose/Intel/CPU/keycloak_setup_guide.md) for more instruction on setup Keycloak.
+Refer to the [Keycloak Configuration Guide](./docker_compose/intel/cpu/xeon/keycloak_setup_guide.md) for more instruction on setup Keycloak.
 
-Refer to the [Xeon Guide](./docker_compose/Intel/CPU/README.md) for more instructions on building docker images from source and running the application via docker compose.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source and running the application via docker compose.
 
 Refer to the [Xeon Kubernetes Guide](./kubernetes/manifests/README.md) for more instruction on deploying the application via kubernetes.

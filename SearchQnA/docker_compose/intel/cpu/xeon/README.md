@@ -87,7 +87,7 @@ export LLM_SERVICE_PORT=3007
 ## 🚀 Start the MegaService
 
 ```bash
-cd GenAIExamples/SearchQnA/docker_compose/Intel/CPU
+cd GenAIExamples/SearchQnA/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 

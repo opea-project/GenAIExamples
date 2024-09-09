@@ -216,7 +216,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ChatQnA/docker_compose/Intel/CPU/
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 docker compose -f compose_qdrant.yaml up -d
 ```
 

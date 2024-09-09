@@ -76,7 +76,7 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 ### Start all the services Docker Containers
 
 ```bash
-cd GenAIExamples/VisualQnA/docker_compose/Intel/HPU/
+cd GenAIExamples/VisualQnA/docker_compose/intel/hpu/gaudi/
 ```
 
 ```bash

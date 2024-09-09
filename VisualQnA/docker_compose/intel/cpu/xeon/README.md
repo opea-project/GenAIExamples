@@ -120,7 +120,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/VisualQnA/docker_compose/Intel/CPU
+cd GenAIExamples/VisualQnA/docker_compose/intel/cpu/xeon
 ```
 
 ```bash

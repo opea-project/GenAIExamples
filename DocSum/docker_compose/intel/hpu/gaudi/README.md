@@ -90,7 +90,7 @@ Note: Please replace with `host_ip` with your external IP address, do not use lo
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/DocSum/docker_compose/Intel/HPU
+cd GenAIExamples/DocSum/docker_compose/intel/hpu/gaudi
 docker compose up -d
 ```
 
@@ -153,4 +153,4 @@ docsum-gaudi-react-ui-server:
 
 Open this URL `http://{host_ip}:5175` in your browser to access the frontend.
 
-![project-screenshot](../../../assets/img/docsum-ui-react.png)
+![project-screenshot](../../../../assets/img/docsum-ui-react.png)

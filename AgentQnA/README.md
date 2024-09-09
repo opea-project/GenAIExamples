@@ -67,7 +67,7 @@ This example showcases a hierarchical multi-agent system for question-answering 
    To use openai llm, run command below.
 
    ```
-   cd docker_compose/Intel/CPU/openai
+   cd docker_compose/intel/cpu/xeon
    bash launch_agent_service_openai.sh
    ```
 
