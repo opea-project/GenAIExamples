@@ -60,8 +60,8 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-ui:latest -f ./docker/Dockerfile .
+cd GenAIExamples/ChatQnA/docker/ui/
+docker build --no-cache -t opea/chatqna-ui:latest -f ./docker/Dockerfile . --target svelte-server
 cd ../../../..
 ```
 

@@ -33,12 +33,14 @@ services:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile
+      target: svelte-server
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
   chatqna-conversation-ui:
     build:
-      context: ../ui
-      dockerfile: ./docker/Dockerfile.react
+      context: ui
+      dockerfile: ./docker/Dockerfile
+      target: react-server
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}
   embedding-tei:

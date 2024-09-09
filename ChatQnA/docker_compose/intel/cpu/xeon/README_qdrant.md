@@ -117,8 +117,8 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/ChatQnA/docker/ui/
+docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile . --target svelte-server
 cd ../../../..
 ```
 
@@ -129,10 +129,10 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
 ```bash
-cd GenAIExamples/ChatQnA//ui
+cd GenAIExamples/ChatQnA/docker/ui/
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep"
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile . --target react-server
 cd ../../../..
 ```
 

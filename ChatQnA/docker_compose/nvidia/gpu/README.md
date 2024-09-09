@@ -59,8 +59,8 @@ cd ../../..
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/ChatQnA/docker/ui/
+docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile . --target svelte-server
 cd ../../../..
 ```
 
@@ -69,8 +69,8 @@ cd ../../../..
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
+cd GenAIExamples/ChatQnA/docker/ui/
+docker build --no-cache -t opea/chatqna-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile . --target react-server
 cd ../../../..
 ```
 

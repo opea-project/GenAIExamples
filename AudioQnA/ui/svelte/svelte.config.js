@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import adapter from "@sveltejs/adapter-auto";
+import adapter from "@sveltejs/adapter-node";
 import preprocess from "svelte-preprocess";
 import postcssPresetEnv from "postcss-preset-env";
 

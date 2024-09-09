@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { env } from "$env/dynamic/public";
-
-const UPLOAD_FILE_BASE_URL = env.UPLOAD_FILE_BASE_URL;
-const GET_FILE = env.GET_FILE;
-const DELETE_FILE = env.DELETE_FILE;
+import { UPLOAD_FILE_BASE_URL, GET_FILE, DELETE_FILE } from "$env/static/public";
 
 async function fetchFunc(url, init) {
 	try {
