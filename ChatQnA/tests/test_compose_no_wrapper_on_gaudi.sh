@@ -15,13 +15,13 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/docker
+    cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git
     git clone https://github.com/huggingface/tei-gaudi
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna-no-wrapper chatqna-ui dataprep-redis retriever-redis tei-gaudi"
-    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -30,7 +30,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/gaudi
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
@@ -221,7 +221,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/gaudi
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose stop && docker compose rm -f
 }
 

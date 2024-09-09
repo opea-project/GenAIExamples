@@ -15,12 +15,12 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/docker
+    cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna-no-wrapper chatqna-ui chatqna-conversation-ui dataprep-redis retriever-redis"
-    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -29,7 +29,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/xeon//xeon
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -223,7 +223,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/xeon//xeon
     docker compose stop && docker compose rm -f
 }
 
