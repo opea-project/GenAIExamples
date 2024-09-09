@@ -381,11 +381,12 @@ docker compose -f compose_vllm.yaml up -d
 
    Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf)
    Click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
-   Or run this command to get the file on a terminal. 
+   Or run this command to get the file on a terminal.
+
    ```bash
    wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf
    ```
-   
+
    Upload:
 
    ```bash
