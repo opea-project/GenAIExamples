@@ -12,14 +12,14 @@ services:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
   docsum-ui:
     build:
-      context:
-      dockerfile: ../ui/docker/Dockerfile
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
   docsum-react-ui:
     build:
-      context:
-      dockerfile: ../ui/docker/Dockerfile.react
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.react
     extends: docsum
     image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
   llm-docsum-tgi:

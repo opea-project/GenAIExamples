@@ -12,8 +12,8 @@ services:
     image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}
   codetrans-ui:
     build:
-      context:
-      dockerfile: ../ui/docker/Dockerfile
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}
   llm-tgi:

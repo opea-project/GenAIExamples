@@ -12,14 +12,14 @@ services:
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
   faqgen-ui:
     build:
-      context:
-      dockerfile: ../ui/docker/Dockerfile
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
     extends: faqgen
     image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
   faqgen-react-ui:
     build:
-      context:
-      dockerfile: ../ui/docker/Dockerfile.react
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.react
     extends: faqgen
     image: ${REGISTRY:-opea}/faqgen-react-ui:${TAG:-latest}
   llm-faqgen-tgi:

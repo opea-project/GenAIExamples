@@ -12,8 +12,8 @@ services:
     image: ${REGISTRY:-opea}/visualqna:${TAG:-latest}
   visualqna-ui:
     build:
-      context:
-      dockerfile: ../ui/docker/Dockerfile
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
     extends: visualqna
     image: ${REGISTRY:-opea}/visualqna-ui:${TAG:-latest}
   llm-visualqna-tgi:
