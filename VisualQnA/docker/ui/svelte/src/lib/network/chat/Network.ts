@@ -17,14 +17,10 @@ import { SSE } from "sse.js";
 
 const BACKEND_BASE_URL = env.BACKEND_BASE_URL;
 
-export async function fetchTextStream(
-	query: string,
-	stepValueStore: number,
-	base64ImageStore: string
-) {
+export async function fetchTextStream(query: string, stepValueStore: number, base64ImageStore: string) {
 	let payload = {};
 	let url = "";
-	base64ImageStore = base64ImageStore.replace(/^data:[a-zA-Z]+\/[a-zA-Z]+;base64,/, '');
+	base64ImageStore = base64ImageStore.replace(/^data:[a-zA-Z]+\/[a-zA-Z]+;base64,/, "");
 
 	payload = {
 		messages: [
@@ -43,10 +39,10 @@ export async function fetchTextStream(
 			},
 		],
 		max_tokens: stepValueStore,
-		stream: true
+		stream: true,
 	};
-	console.log('payload', payload);
-	
+	console.log("payload", payload);
+
 	url = `${BACKEND_BASE_URL}`;
 
 	return new SSE(url, {

@@ -17,9 +17,9 @@
 	const uploadImage = async () => {
 		try {
 			if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-				base64ImageStore.set(imageUrl); 
+				base64ImageStore.set(imageUrl);
 				console.log("Image URL Stored:", imageUrl);
-				return; 
+				return;
 			}
 		} catch (error) {
 			console.error("Error converting image to Base64:", error);

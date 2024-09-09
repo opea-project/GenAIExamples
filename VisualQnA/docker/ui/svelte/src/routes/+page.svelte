@@ -95,7 +95,7 @@
 
 			let Msg = e.data;
 			console.log('Msg', Msg);
-			
+
 			if (Msg.startsWith("b")) {
 				let trimmedData = Msg.slice(2, -1);
 
