@@ -38,6 +38,7 @@ class MegaServiceEndpoint(Enum):
     CHAT_QNA = "/v1/chatqna"
     AUDIO_QNA = "/v1/audioqna"
     VISUAL_QNA = "/v1/visualqna"
+    VIDEO_RAG_QNA = "/v1/videoragqna"
     CODE_GEN = "/v1/codegen"
     CODE_TRANS = "/v1/codetrans"
     DOC_SUMMARY = "/v1/docsum"

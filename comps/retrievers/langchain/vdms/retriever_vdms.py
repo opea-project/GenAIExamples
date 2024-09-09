@@ -89,7 +89,7 @@ if __name__ == "__main__":
     # Create vectorstore
 
     if use_clip:
-        embeddings = vCLIP({"model_name": "openai/clip-vit-base-patch32", "num_frm": 4})
+        embeddings = vCLIP({"model_name": "openai/clip-vit-base-patch32", "num_frm": 64})
         dimensions = embeddings.get_embedding_length()
     elif tei_embedding_endpoint:
         embeddings = HuggingFaceEndpointEmbeddings(model=tei_embedding_endpoint, huggingfacehub_api_token=hf_token)

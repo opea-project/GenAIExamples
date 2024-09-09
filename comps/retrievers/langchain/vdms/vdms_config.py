@@ -77,4 +77,4 @@ INDEX_NAME = os.getenv("INDEX_NAME", "rag-vdms")
 # VDMS_SCHEMA = os.getenv("VDMS_SCHEMA", "vdms_schema.yml")
 # INDEX_SCHEMA = os.path.join(parent_dir, VDMS_SCHEMA)
 SEARCH_ENGINE = "FaissFlat"
-DISTANCE_STRATEGY = "L2"
+DISTANCE_STRATEGY = "IP"
