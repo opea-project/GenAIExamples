@@ -10,23 +10,44 @@ echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
-function stop_agent_and_api_server() {
-    echo "Stopping CRAG server"
-    docker stop $(docker ps -q --filter ancestor=docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0)
-    echo "Stopping Agent services"
-    docker compose -f $WORKDIR/GenAIExamples/AgentQnA/docker/gaudi/compose.yaml down
+function stop_crag() {
+    container_list=$(docker ps -q --filter ancestor=docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0)
+    for container_name in $container_list; do
+        cid=$(docker ps -aq --filter "name=$container_name")
+        echo "Stopping container $container_name"
+        if [[ ! -z "$cid" ]]; then docker stop $cid && sleep 1s; fi
+    done
+}
+
+function stop_docker() {
+    cd $WORKPATH/docker/gaudi
+    container_list=$(cat compose.yaml | grep container_name | cut -d':' -f2)
+    for container_name in $container_list; do
+        cid=$(docker ps -aq --filter "name=$container_name")
+        echo "Stopping container $container_name"
+        if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
+    done
 }
 
 function stop_retrieval_tool() {
     echo "Stopping Retrieval tool"
-    docker compose -f $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/docker/docker-compose-retrieval-tool.yaml down
+    local RETRIEVAL_TOOL_PATH=$WORKPATH/../DocIndexRetriever
+    cd $RETRIEVAL_TOOL_PATH/docker/gaudi
+    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
+    for container_name in $container_list; do
+        cid=$(docker ps -aq --filter "name=$container_name")
+        echo "Stopping container $container_name"
+        if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
+    done
 }
-
+echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
-stop_agent_and_api_server
+stop_crag
+stop_docker
 stop_retrieval_tool
 
 echo "=================== #1 Building docker images===================="
+cd $WORKPATH/tests
 bash 1_build_images.sh
 echo "=================== #1 Building docker images completed===================="
 
@@ -43,11 +64,9 @@ bash 4_launch_and_validate_agent_tgi.sh
 echo "=================== #4 Agent test passed ===================="
 
 echo "=================== #5 Stop agent and API server===================="
-stop_agent_and_api_server
-echo "=================== #5 Agent and API server stopped===================="
-
-echo "=================== #6 Stop retrieval tool===================="
+stop_crag
+stop_docker
 stop_retrieval_tool
-echo "=================== #6 Retrieval tool stopped===================="
+echo "=================== #5 Agent and API server stopped===================="
 
 echo "ALL DONE!"
