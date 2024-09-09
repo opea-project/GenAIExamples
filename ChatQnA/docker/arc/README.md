@@ -3,8 +3,9 @@
 ## 🚀 Build Docker Images
 
 Docker images for Intel Arc GPU are almost same as Nvidia GPU, except for the "LLM image".
-* Follow below steps to build "LLM images".
-* For other images, please follow [Nvidia GPU](../gpu/README.md) to build.
+
+- Follow below steps to build "LLM images".
+- For other images, please follow [Nvidia GPU](../gpu/README.md) to build.
 
 ### 1. Source Code install GenAIComps
 
@@ -12,16 +13,21 @@ Docker images for Intel Arc GPU are almost same as Nvidia GPU, except for the "L
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
+
 ### 2. Build LLM Image
 
 vLLM backend
+
 ```bash
 docker build --no-cache -t opea/vllm:arc --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.arc .
 ```
+
 Microservice
+
 ```bash
 docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/docker/Dockerfile.microservice .
 ```
+
 ### Start all the services Docker Containers
 
 ```bash
