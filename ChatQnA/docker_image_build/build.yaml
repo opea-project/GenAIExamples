@@ -8,20 +8,24 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      dockerfile: ../Dockerfile
+      context: ../
+      dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
   chatqna-guardrails:
     build:
-      dockerfile: ../Dockerfile.guardrails
+      context: ../
+      dockerfile: ./Dockerfile.guardrails
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-guardrails:${TAG:-latest}
   chatqna-without-rerank:
     build:
-      dockerfile: ../Dockerfile.without_rerank
+      context: ../
+      dockerfile: ./Dockerfile.without_rerank
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
   chatqna-no-wrapper:
     build:
+      context: ../
       dockerfile: ./Dockerfile_no_wrapper
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-no-wrapper:${TAG:-latest}

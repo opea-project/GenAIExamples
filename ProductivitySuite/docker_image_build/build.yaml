@@ -9,7 +9,7 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: ../../ChatQnA/
-      dockerfile: ../Dockerfile
+      dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
   embedding-tei:
     build:
@@ -66,7 +66,7 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: ../../CodeGen/
-      dockerfile: ../Dockerfile
+      dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
   docsum:
     build:
@@ -75,7 +75,7 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: ../../DocSum/
-      dockerfile: ../Dockerfile
+      dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
   faqgen:
     build:
@@ -84,7 +84,7 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: ../../FaqGen/
-      dockerfile: ../Dockerfile
+      dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
   llm_faqgen:
     build:
