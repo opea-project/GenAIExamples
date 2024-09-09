@@ -35,7 +35,7 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7778/v1/codegen"
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/svelte/.env
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -110,7 +110,7 @@ function validate_megaservice() {
 }
 
 function validate_frontend() {
-    cd $WORKPATH/svelte
+    cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
