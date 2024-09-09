@@ -11,12 +11,9 @@ export ip_address=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
 function stop_crag() {
-    container_list=$(docker ps -q --filter ancestor=docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        echo "Stopping container $container_name"
-        if [[ ! -z "$cid" ]]; then docker stop $cid && sleep 1s; fi
-    done
+    cid=$(docker ps -aq --filter "name=kdd-cup-24-crag-service")
+    echo "Stopping container kdd-cup-24-crag-service with cid $cid"
+    if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
 }
 
 function stop_docker() {
@@ -48,7 +45,7 @@ stop_retrieval_tool
 
 echo "=================== #1 Building docker images===================="
 cd $WORKPATH/tests
-bash 1_build_images.sh
+#bash 1_build_images.sh
 echo "=================== #1 Building docker images completed===================="
 
 echo "=================== #2 Start retrieval tool===================="
