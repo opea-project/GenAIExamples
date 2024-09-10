@@ -14,8 +14,8 @@ The Translation service can be effortlessly deployed on either Intel Gaudi2 or I
 
 ### Deploy Translation on Gaudi
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying Translation on Gaudi.
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instructions on deploying Translation on Gaudi.
 
 ### Deploy Translation on Xeon
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying Translation on Xeon.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for instructions on deploying Translation on Xeon.

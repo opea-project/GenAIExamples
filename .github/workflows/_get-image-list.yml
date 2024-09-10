@@ -37,7 +37,7 @@ jobs:
               examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
               for example in ${examples[@]}
               do
-                  images=$(cat ${{ github.workspace }}/${example}/docker/docker_build_compose.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
+                  images=$(cat ${{ github.workspace }}/${example}/docker_image_build/build.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
                   image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
               done
           fi
