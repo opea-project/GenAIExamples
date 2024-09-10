@@ -23,7 +23,7 @@ export COLLECTION_NAME=${COLLECTION_NAME}
 
 ```bash
 cd ../../../../
-docker build -t opea/chathistory-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/mongo/docker/Dockerfile .
+docker build -t opea/chathistory-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/mongo/Dockerfile .
 ```
 
 ### Run Docker with CLI

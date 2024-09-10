@@ -5,21 +5,21 @@
 services:
   dataprep-redis-llama-index:
     build:
-      dockerfile: comps/dataprep/redis/llama_index/docker/Dockerfile
+      dockerfile: comps/dataprep/redis/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-redis-llama-index:${TAG:-latest}
   dataprep-on-ray-redis:
     build:
-      dockerfile: comps/dataprep/redis/langchain_ray/docker/Dockerfile
+      dockerfile: comps/dataprep/redis/langchain_ray/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-on-ray-redis:${TAG:-latest}
   dataprep-milvus:
     build:
-      dockerfile: comps/dataprep/milvus/docker/Dockerfile
+      dockerfile: comps/dataprep/milvus/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-milvus:${TAG:-latest}
   dataprep-pgvector:
     build:
-      dockerfile: comps/dataprep/pgvector/langchain/docker/Dockerfile
+      dockerfile: comps/dataprep/pgvector/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-pgvector:${TAG:-latest}
   dataprep-pinecone:
     build:
-      dockerfile: comps/dataprep/pinecone/docker/Dockerfile
+      dockerfile: comps/dataprep/pinecone/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-pinecone:${TAG:-latest}

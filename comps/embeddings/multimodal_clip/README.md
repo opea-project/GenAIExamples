@@ -22,13 +22,13 @@ Users are albe to configure and build embedding-related services according to th
 
 ```bash
 cd ../../..
-docker build -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/docker/Dockerfile .
+docker build -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/Dockerfile .
 ```
 
 ### 1.2 Run Docker with Docker Compose
 
 ```bash
-cd comps/embeddings/multimodal_clip/docker
+cd comps/embeddings/multimodal_clip
 docker compose -f docker_compose_embedding.yaml up -d
 ```
 

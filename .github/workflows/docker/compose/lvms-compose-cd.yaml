@@ -5,19 +5,19 @@
 services:
   lvm:
     build:
-      dockerfile: comps/lvms/Dockerfile
+      dockerfile: comps/lvms/llava/Dockerfile
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
   # Xeon CPU
   llava:
     build:
-      dockerfile: comps/lvms/llava/Dockerfile
+      dockerfile: comps/lvms/llava/dependency/Dockerfile
     image: ${REGISTRY:-opea}/llava:${TAG:-latest}
   # Gaudi2 HPU
   llava-hpu:
     build:
-      dockerfile: comps/lvms/llava/Dockerfile_hpu
+      dockerfile: comps/lvms/llava/dependency/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/llava-hpu:${TAG:-latest}
   lvm-tgi:
     build:
-      dockerfile: comps/lvms/Dockerfile_tgi
+      dockerfile: comps/lvms/tgi-llava/Dockerfile
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}

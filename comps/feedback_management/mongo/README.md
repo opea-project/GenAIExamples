@@ -27,7 +27,7 @@ python feedback.py
 
 ```bash
 cd ~/GenAIComps
-docker build -t opea/feedbackmanagement-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/feedback_management/mongo/docker/Dockerfile .
+docker build -t opea/feedbackmanagement-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/feedback_management/mongo/Dockerfile .
 ```
 
 ### Run Docker with CLI

@@ -57,7 +57,7 @@ intro placeholder
 
 ```bash
 cd ../../../ # back to GenAIComps/ folder
-docker build -t opea/guardrails-pii-detection:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/pii_detection/docker/Dockerfile .
+docker build -t opea/guardrails-pii-detection:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/pii_detection/Dockerfile .
 ```
 
 ### 2.3 Run Docker with CLI

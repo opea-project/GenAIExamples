@@ -5,5 +5,5 @@
 services:
   vectorstore-pathway:
     build:
-      dockerfile: comps/vectorstores/langchain/pathway
+      dockerfile: comps/vectorstores/pathway
     image: ${REGISTRY:-opea}/vectorstore-pathway:${TAG:-latest}

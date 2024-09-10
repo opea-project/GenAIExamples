@@ -4,7 +4,7 @@
 name: Example-test
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -44,22 +44,22 @@ jobs:
         run: |
           cd ../ && sudo rm -rf GenAIExamples
           git clone https://github.com/opea-project/GenAIExamples.git
-          cd GenAIExamples/ChatQnA/docker
+          cd GenAIExamples/ChatQnA/docker_image_build
           cp -r ${{ github.workspace }}/../GenAIComps .
 
           cd ../tests
-          sed -i '/GenAIComps.git/d' test_chatqna_on_gaudi.sh
-          cat test_chatqna_on_gaudi.sh
+          sed -i '/GenAIComps.git/d' test_compose_on_gaudi.sh
+          cat test_compose_on_gaudi.sh
 
           echo "Run test..."
           echo "LOG_DIR=$(pwd)" >> $GITHUB_ENV
           export IMAGE_TAG="comps"
-          timeout 50m bash test_chatqna_on_gaudi.sh
+          timeout 50m bash test_compose_on_gaudi.sh
 
       - name: Clean up container
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/../GenAIExamples/ChatQnA/docker/gaudi
+          cd ${{ github.workspace }}/../GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi
           docker compose stop && docker compose rm -f
           docker system prune -f
 

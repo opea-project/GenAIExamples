@@ -5,17 +5,17 @@
 services:
   retriever-pgvector:
     build:
-      dockerfile: comps/retrievers/langchain/pgvector/docker/Dockerfile
+      dockerfile: comps/retrievers/pgvector/langchain/Dockerfile
     image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}
   retriever-pinecone:
     build:
-      dockerfile: comps/retrievers/langchain/pinecone/docker/Dockerfile
+      dockerfile: comps/retrievers/pinecone/langchain/Dockerfile
     image: ${REGISTRY:-opea}/retriever-pinecone:${TAG:-latest}
   retriever-milvus:
     build:
-      dockerfile: comps/retrievers/langchain/milvus/docker/Dockerfile
+      dockerfile: comps/retrievers/milvus/langchain/Dockerfile
     image: ${REGISTRY:-opea}/retriever-milvus:${TAG:-latest}
   retriever-redis-llamaindex:
     build:
-      dockerfile: comps/retrievers/llamaindex/docker/Dockerfile
+      dockerfile: comps/retrievers/redis/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/retriever-redis-llamaindex:${TAG:-latest}

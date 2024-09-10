@@ -1,0 +1,41 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3"
+services:
+  pgvector-vector-db:
+    hostname: db
+    container_name: pgvector-vector-db
+    image: pgvector/pgvector:0.7.0-pg16
+    ports:
+      - "5432:5432"
+    restart: always
+    ipc: host
+    environment:
+      - POSTGRES_DB=vectordb
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpwd
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - no_proxy= ${no_proxy}
+      - http_proxy= ${http_proxy}
+      - https_proxy= ${https_proxy}
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  dataprep-pgvector:
+    image: opea/dataprep-pgvector:latest
+    container_name: dataprep-pgvector
+    ports:
+      - "6007:6007"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PG_CONNECTION_STRING: ${PG_CONNECTION_STRING}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_ENDPOINT}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

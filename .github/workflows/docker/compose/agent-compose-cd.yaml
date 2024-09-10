@@ -5,5 +5,5 @@
 services:
   comps-agent-langchain:
     build:
-      dockerfile: comps/agent/langchain/docker/Dockerfile
+      dockerfile: comps/agent/langchain/Dockerfile
     image: ${REGISTRY:-opea}/comps-agent-langchain:${TAG:-latest}

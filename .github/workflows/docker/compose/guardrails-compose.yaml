@@ -7,5 +7,5 @@
 services:
   guardrails-tgi:
     build:
-      dockerfile: comps/guardrails/llama_guard/docker/Dockerfile
+      dockerfile: comps/guardrails/llama_guard/langchain/Dockerfile
     image: ${REGISTRY:-opea}/guardrails-tgi:${TAG:-latest}

@@ -4,15 +4,15 @@
 services:
   reranking-fastrag:
     build:
-      dockerfile: comps/reranks/fastrag/docker/Dockerfile
+      dockerfile: comps/reranks/fastrag/Dockerfile
     image: ${REGISTRY:-opea}/reranking-fastrag:${TAG:-latest}
   reranking-langchain-mosec-endpoint:
     build:
-      dockerfile: comps/reranks/langchain-mosec/mosec-docker/Dockerfile
+      dockerfile: comps/reranks/mosec/langchain/dependency/Dockerfile
     image: ${REGISTRY:-opea}/reranking-langchain-mosec-endpoint:${TAG:-latest}
   reranking-langchain-mosec:
     build:
-      dockerfile: comps/reranks/langchain-mosec/docker/Dockerfile
+      dockerfile: comps/reranks/mosec/langchain/Dockerfile
     image: ${REGISTRY:-opea}/reranking-langchain-mosec:${TAG:-latest}
   reranking-mosec-neural-speed:
     build:

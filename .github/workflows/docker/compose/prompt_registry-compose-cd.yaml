@@ -5,5 +5,5 @@
 services:
   promptregistry-mongo-server:
     build:
-      dockerfile: comps/prompt_registry/mongo/docker/Dockerfile
+      dockerfile: comps/prompt_registry/mongo/Dockerfile
     image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}

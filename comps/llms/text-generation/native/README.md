@@ -18,7 +18,7 @@ export LLM_NATIVE_MODEL="Qwen/Qwen2-7B-Instruct"
 
 ```bash
 cd ../../../../
-docker build -t opea/llm-native:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/native/docker/Dockerfile .
+docker build -t opea/llm-native:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/native/Dockerfile .
 ```
 
 To start a docker container, you have two options:
@@ -37,7 +37,6 @@ docker run -d --runtime=habana --name="llm-native-server" -p 9000:9000 -e https_
 ### 1.4 Run Docker with Docker Compose (Option B)
 
 ```bash
-cd docker
 docker compose -f docker_compose_llm.yaml up -d
 ```
 

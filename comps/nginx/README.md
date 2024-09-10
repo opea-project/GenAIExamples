@@ -8,7 +8,7 @@ In GenAIComps, we utilize nginx to streamline our network services. We provide a
 
 ```bash
 cd ../..
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/docker/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
 ## 🚀2. Environment Settings
@@ -59,7 +59,6 @@ docker run -d --name opea-nginx -p ${NGINX_PORT}:80 \
 ### 3.2 Start with Docker Compose (Option 2)
 
 ```bash
-cd docker
 docker compose -f docker_compose.yaml up -d
 ```
 

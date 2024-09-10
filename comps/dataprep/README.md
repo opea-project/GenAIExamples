@@ -19,20 +19,20 @@ export SUMMARIZE_IMAGE_VIA_LVM=1
 
 ## Dataprep Microservice with Redis
 
-For details, please refer to this [readme](redis/README.md)
+For details, please refer to this [langchain readme](langchain/redis/README.md) or [llama index readme](llama_index/redis/README.md)
 
 ## Dataprep Microservice with Milvus
 
-For details, please refer to this [readme](milvus/README.md)
+For details, please refer to this [readme](langchain/milvus/README.md)
 
 ## Dataprep Microservice with Qdrant
 
-For details, please refer to this [readme](qdrant/README.md)
+For details, please refer to this [readme](langchain/qdrant/README.md)
 
 ## Dataprep Microservice with Pinecone
 
-For details, please refer to this [readme](pinecone/README.md)
+For details, please refer to this [readme](langchain/pinecone/README.md)
 
 ## Dataprep Microservice with PGVector
 
-For details, please refer to this [readme](pgvector/README.md)
+For details, please refer to this [readme](langchain/pgvector/README.md)

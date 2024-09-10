@@ -34,7 +34,7 @@ export HUGGINGFACEHUB_API_TOKEN=${HP_TOKEN}
 
 ```bash
 cd ../../../ # back to GenAIComps/ folder
-docker build -t opea/guardrails-toxicity-detection:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/toxicity_detection/docker/Dockerfile .
+docker build -t opea/guardrails-toxicity-detection:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/toxicity_detection/Dockerfile .
 ```
 
 ### 2.3 Run Docker Container with Microservice

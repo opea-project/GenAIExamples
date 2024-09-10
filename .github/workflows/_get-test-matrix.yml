@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - name: Get checkout ref
         run: |
@@ -35,7 +36,6 @@ jobs:
       - name: Get test matrix
         id: get-test-matrix
         run: |
-          set -xe
           if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             LATEST_COMMIT_SHA=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/opea-project/GenAIComps/commits?sha=${{ github.event.pull_request.base.ref }}" | jq -r '.[0].sha')
@@ -46,52 +46,8 @@ jobs:
           fi
           merged_commit=$(git log -1 --format='%H')
 
-          changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
-          grep 'comps/' | grep -vE '*.md|comps/cores')" || true
-          services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u) || true
-          run_matrix="{\"include\":["
-          for service in ${services}; do
-              hardware="gaudi" # default hardware, set based on the changed files
-              if [[ $(ls comps/${service} | grep -E "Dockerfile*|docker*") ]]; then
-                  run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
-              fi
-              vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | cut -d'/' -f3 | grep -vE '*.py|Dockerfile|*.sh|docker|*.yaml|*.yml' | sort -u)
-              for vendor in ${vendors}; do
-                  if [[ $(ls comps/${service}/${vendor} | grep -E "Dockerfile*|docker*") ]]; then
-                      run_matrix="${run_matrix}{\"service\":\"${service}/${vendor}\",\"hardware\":\"${hardware}\"},"
-                  fi
-                  sub_vendors=$(printf '%s\n' "${changed_files[@]}" | grep ${service} | grep ${vendor} | cut -d'/' -f4 | grep -vE '*.py|Dockerfile|*.sh|docker|*.yaml|*.yml' | sort -u)
-                  for sub_vendor in ${sub_vendors}; do
-                      if [[ $(ls comps/${service}/${vendor}/${sub_vendor} | grep -E "Dockerfile*|docker*") ]]; then
-                          run_matrix="${run_matrix}{\"service\":\"${service}/${vendor}/${sub_vendor}\",\"hardware\":\"${hardware}\"},"
-                      fi
-                  done
-              done
-          done
+          changed_files="$(git diff --name-only ${base_commit} ${merged_commit})" || true
+          export changed_files_full=$changed_files
 
-          # add test for comps/dataprep/utils.py
-          if [[ "${changed_files[@]}" =~ "comps/dataprep/utils.py" ]]; then
-              service_list=("dataprep/qdrant" "dataprep/redis/langchain")
-              hardware="gaudi" # default hardware, set based on the changed files
-              for service in ${service_list[@]}; do
-                  if [ $(echo ${run_matrix} | grep -c ${service}) == 0 ]; then
-                      run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
-                  fi
-              done
-          fi
-
-          # add test for test scripts update
-          changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
-          grep 'tests/' | grep -vE '*.md|*.txt|tests/cores')" || true
-          run_matrix_match=$(echo $run_matrix | tr '/' '_')
-          test_files=$(printf '%s\n' "${changed_files[@]}" | grep -E "tests/test_*" | grep -E "*.sh") || true
-          for test_file in ${test_files}; do
-              service=$(echo $test_file | cut -d'/' -f2 | cut -d'.' -f1 | cut -c6-)
-              hardware="gaudi" # default hardware, set based on the changed files
-              if [ $(echo ${run_matrix_match} | grep -c ${service}) == 0 ]; then
-                  run_matrix="${run_matrix}{\"service\":\"${service}\",\"hardware\":\"${hardware}\"},"
-              fi
-          done
-
-          run_matrix=$run_matrix"]}"
-          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+          export WORKSPACE=${{ github.workspace }}
+          bash .github/workflows/scripts/get_test_matrix.sh

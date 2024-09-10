@@ -57,7 +57,7 @@ python agent.py
 
 ```bash
 cd GenAIComps/ # back to GenAIComps/ folder
-docker build -t opea/comps-agent-langchain:latest -f comps/agent/langchain/docker/Dockerfile .
+docker build -t opea/comps-agent-langchain:latest -f comps/agent/langchain/Dockerfile .
 ```
 
 #### 2.2.2 Start microservices

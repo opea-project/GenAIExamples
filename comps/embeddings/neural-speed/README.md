@@ -3,13 +3,13 @@
 ## build Mosec endpoint docker image
 
 ```
-docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -t langchain-mosec:neuralspeed -f comps/embeddings/neural-speed/neuralspeed-docker/Dockerfile .
+docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -t langchain-mosec:neuralspeed -f comps/embeddings/neural-speed/server/docker/Dockerfile .
 ```
 
 ## build embedding microservice docker image
 
 ```
-docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -t opea/embedding-langchain-mosec:neuralspeed -f comps/embeddings/neural-speed/docker/Dockerfile .
+docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -t opea/embedding-langchain-mosec:neuralspeed -f comps/embeddings/neural-speed/Dockerfile .
 ```
 
 Note: Please contact us to request model files before building images.

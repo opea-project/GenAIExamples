@@ -10,7 +10,7 @@ For the `VideoRAGQnA` usecase, during the data preparation phase, frames are ext
 
 ```bash
 cd GenAIComps
-docker build --no-cache -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/docker/Dockerfile .
+docker build --no-cache -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/Dockerfile .
 ```
 
 ### 1.2 Start Rerank Service

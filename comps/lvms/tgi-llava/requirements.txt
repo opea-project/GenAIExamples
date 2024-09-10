@@ -1,0 +1,14 @@
+datasets
+docarray[full]
+fastapi
+huggingface_hub
+langchain-core
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+optimum[habana]
+prometheus-fastapi-instrumentator
+pydantic==2.7.2
+pydub
+shortuuid
+uvicorn

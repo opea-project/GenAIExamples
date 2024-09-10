@@ -5,10 +5,9 @@ import os
 
 from langchain import LLMChain, PromptTemplate
 from langchain_community.llms import HuggingFaceEndpoint
-from langsmith import traceable
+from template import IntentTemplate
 
 from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
-from comps.intent_detection.langchain.template import IntentTemplate
 
 
 @register_microservice(
@@ -18,7 +17,6 @@ from comps.intent_detection.langchain.template import IntentTemplate
     host="0.0.0.0",
     port=9000,
 )
-@traceable(run_type="llm")
 def llm_generate(input: LLMParamsDoc):
     llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
     llm = HuggingFaceEndpoint(
@@ -33,7 +31,8 @@ def llm_generate(input: LLMParamsDoc):
         timeout=600,
     )
 
-    prompt = PromptTemplate(template=IntentTemplate.generate_intent_template, input_variables=["query"])
+    prompt_template = 'Please identify the intent of the user query. You may only respond with "chitchat" or \QA" without explanations or engaging in conversation.### User Query: {query}, ### Response: '
+    prompt = PromptTemplate(template=prompt_template, input_variables=["query"])
 
     llm_chain = LLMChain(prompt=prompt, llm=llm)
 

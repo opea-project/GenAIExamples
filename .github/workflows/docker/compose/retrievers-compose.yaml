@@ -5,9 +5,9 @@
 services:
   retriever-redis:
     build:
-      dockerfile: comps/retrievers/langchain/redis/docker/Dockerfile
+      dockerfile: comps/retrievers/redis/langchain/Dockerfile
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
   retriever-qdrant:
     build:
-      dockerfile: comps/retrievers/haystack/qdrant/docker/Dockerfile
+      dockerfile: comps/retrievers/qdrant/haystack/Dockerfile
     image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}

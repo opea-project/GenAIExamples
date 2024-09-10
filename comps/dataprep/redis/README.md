@@ -1,6 +1,6 @@
 # Dataprep Microservice with Redis
 
-We have provided dataprep microservice for multimodal data input (e.g., text and image) [here](multimodal_langchain/README.md).
+We have provided dataprep microservice for multimodal data input (e.g., text and image) [here](../../multimodal/redis/langchain/README.md).
 
 For dataprep microservice for text input, we provide here two frameworks: `Langchain` and `LlamaIndex`. We also provide `Langchain_ray` which uses ray to parallel the data prep for multi-file performance improvement(observed 5x - 15x speedup by processing 1000 files/links.).
 
@@ -33,7 +33,7 @@ cd langchain_ray; pip install -r requirements_ray.txt
 
 ### 1.2 Start Redis Stack Server
 
-Please refer to this [readme](../../vectorstores/langchain/redis/README.md).
+Please refer to this [readme](../../../vectorstores/redis/README.md).
 
 ### 1.3 Setup Environment Variables
 
@@ -50,8 +50,7 @@ First, you need to start a TEI service.
 ```bash
 your_port=6006
 model="BAAI/bge-base-en-v1.5"
-revision="refs/pr/5"
-docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
+docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $model
 ```
 
 Then you need to test your TEI service using the following commands:
@@ -76,12 +75,14 @@ Start document preparation microservice for Redis with below command.
 - option 1: Start single-process version (for 1-10 files processing)
 
 ```bash
+cd langchain
 python prepare_doc_redis.py
 ```
 
 - option 2: Start multi-process version (for >10 files processing)
 
 ```bash
+cd langchain_ray
 python prepare_doc_redis_on_ray.py
 ```
 
@@ -89,7 +90,7 @@ python prepare_doc_redis_on_ray.py
 
 ### 2.1 Start Redis Stack Server
 
-Please refer to this [readme](../../vectorstores/langchain/redis/README.md).
+Please refer to this [readme](../../../vectorstores/redis/README.md).
 
 ### 2.2 Setup Environment Variables
 
@@ -108,22 +109,22 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 - option 1: Start single-process version (for 1-10 files processing)
 
 ```bash
-cd ../../../../
-docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/docker/Dockerfile .
+cd ../../../
+docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
 ```
 
 - Build docker image with llama_index
 
 ```bash
-cd ../../../../
-docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/llama_index/docker/Dockerfile .
+cd ../../../
+docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/llama_index/Dockerfile .
 ```
 
 - option 2: Start multi-process version (for >10 files processing)
 
 ```bash
 cd ../../../../
-docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
+docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/Dockerfile .
 ```
 
 ### 2.4 Run Docker with CLI (Option A)
@@ -144,9 +145,12 @@ docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=h
 
 ```bash
 # for langchain
-cd comps/dataprep/redis/langchain/docker
+cd comps/dataprep/redis/langchain
+# for langchain_ray
+cd comps/dataprep/redis/langchain_ray
 # for llama_index
-cd comps/dataprep/redis/llama_index/docker
+cd comps/dataprep/redis/llama_index
+# common command
 docker compose -f docker-compose-dataprep-redis.yaml up -d
 ```
 

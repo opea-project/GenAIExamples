@@ -72,7 +72,7 @@ jobs:
           if [[ "$is_use" == "TRUE" ]]; then
             echo "Warning: Changed Dockerfile paths:"
             echo "$used_files"
-            echo "Please modify the corresponding README in GenAIComps and ask suyue.chen@intel.com for final confirmation."
+            echo "Please modify the corresponding README in GenAIComps."
             exit 1
           fi
 

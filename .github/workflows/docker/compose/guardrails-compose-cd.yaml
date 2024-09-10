@@ -4,5 +4,5 @@
 services:
   guardrails-pii-detection:
     build:
-      dockerfile: comps/guardrails/pii_detection/docker/Dockerfile
+      dockerfile: comps/guardrails/pii_detection/Dockerfile
     image: ${REGISTRY:-opea}/guardrails-pii-detection:${TAG:-latest}
