@@ -208,7 +208,7 @@ For customers with proxy issues, the models from [ModelScope](https://www.models
    - Run the following command to start TGI service.
 
      ```bash
-     export HF_TOKEN="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"
+     export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
      docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id /data
      ```
