@@ -220,6 +220,7 @@ curl http://${host_ip}:9399/v1/lvm  \
 ```
 
 Also, validate LVM TGI Gaudi Server with empty retrieval results
+
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
     -X POST \
@@ -239,6 +240,7 @@ wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoing
 Test dataprep microservice. This command updates a knowledge base by uploading a local video .mp4.
 
 Test dataprep microservice with generating transcript using whisper model
+
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT} \
@@ -247,6 +249,7 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
 ```
 
 Also, test dataprep microservice with generating caption using lvm-tgi
+
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT} \
