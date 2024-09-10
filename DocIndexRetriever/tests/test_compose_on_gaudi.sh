@@ -24,8 +24,8 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/tgi-gaudi:latest
     docker pull redis/redis-stack:7.2.0-v9
 
-    cd $WORKPATH/../../
-    docker build -t opea/doc-index-retriever:latest -f GenAIExamples/DocIndexRetriever/Dockerfile .
+    cd $WORKPATH/
+    docker build -t opea/doc-index-retriever:latest -f ./Dockerfile .
 }
 
 function start_services() {
@@ -47,7 +47,7 @@ function start_services() {
     export RERANK_SERVICE_PORT=18000
 
     # Start Docker Containers
-    docker compose -f docker_compose.yaml up -d
+    docker compose up -d
     sleep 20
 }
 
