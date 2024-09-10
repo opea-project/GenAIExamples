@@ -10,10 +10,10 @@ services:
       - "8001:8001"
   multimodal-data-prep-service:
     image: ${REGISTRY:-opea}/multimodal-dataprep-redis:${TAG:-latest}
-    container_name: multimodaldataprep-redis-service
+    container_name: multimodal-dataprep-redis-server
     depends_on:
       - redis-vector-db
-      - llava-server
+      - lvm-tgi
     ports:
       - "6007:6007"
     environment:
@@ -23,12 +23,12 @@ services:
       REDIS_URL: ${REDIS_URL}
       REDIS_HOST: ${REDIS_HOST}
       INDEX_NAME: ${INDEX_NAME}
-      LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:9399/v1/lvm"
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   bridgetower-embedding-server:
     image: ${REGISTRY:-opea}/bridgetower-embedder:${TAG:-latest}
-    container_name: bridgetower-embedding-server
+    container_name: bridgetower-embedder-server
     ports:
       - ${EMBEDDER_PORT}:${EMBEDDER_PORT}
     environment:
@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
   multimodal-embedding:
     image: ${REGISTRY:-opea}/multimodal-embedding:${TAG:-latest}
-    container_name: multimodal-embedding-service
+    container_name: multimodal-embedding-server
     depends_on:
       - bridgetower-embedding-server
     ports:
@@ -54,7 +54,7 @@ services:
     restart: unless-stopped
   multimodal-retriever:
     image: ${REGISTRY:-opea}/multimodal-retriever-redis:${TAG:-latest}
-    container_name: multimodal-retriever-redis-service
+    container_name: multimodal-retriever-redis-server
     depends_on:
       - redis-vector-db
     ports:
@@ -105,15 +105,15 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
-  multimodalragwithvideos-xeon-backend-server:
+  multimodalragwithvideos-backend-server:
     image: ${REGISTRY:-opea}/multimodalragwithvideos:${TAG:-latest}
-    container_name: multimodalragwithvideos-xeon-backend-server
+    container_name: multimodalragwithvideos-backend-server
     depends_on:
       - redis-vector-db
       - multimodal-data-prep-service
       - multimodal-embedding
       - multimodal-retriever
-      - lvm
+      - lvm-tgi
     ports:
       - "8888:8888"
     environment:
@@ -127,11 +127,11 @@ services:
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  # multimodalragwithvideos-xeon-ui-server:
+  # multimodalragwithvideos-gradio-ui-server:
   #   image: ${REGISTRY:-opea}/multimodalragwithvideos-ui:${TAG:-latest}
-  #   container_name: multimodalragwithvideos-xeon-ui-server
+  #   container_name: multimodalragwithvideos-gradio-ui-server
   #   depends_on:
-  #     - multimodalragwithvideos-xeon-backend-server
+  #     - multimodalragwithvideos-backend-server
   #   ports:
   #     - "5173:5173"
   #   environment:

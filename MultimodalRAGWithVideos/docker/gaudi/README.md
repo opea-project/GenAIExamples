@@ -60,7 +60,7 @@ cd GenAIComps
 
 ### 1. Build Multimodal-Embedding Image
 
-Build bridgetower_embedder_service docker image
+Build bridgetower-embedder-server docker image
 
 ```bash
 docker build --no-cache -t opea/bridgetower-embedder:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_embeddings/bridgetower/docker/Dockerfile .
@@ -124,8 +124,8 @@ cd ../../../../..
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/multimodal-dataprep-redis:latest`
-2. `opea/lvm:latest`
-3. `opea/llava:latest`
+2. `opea/lvm-tgi:latest`
+3. `ghcr.io/huggingface/tgi-gaudi:2.0.4`
 4. `opea/multimodal-retriever-redis:latest`
 5. `opea/multimodal-embedding:latest`
 6. `opea/bridgetower-embedder:latest`
@@ -141,14 +141,14 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 | Service              | Model                                       |
 | -------------------- | ------------------------------------------- |
 | Multimodal-Embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
-| LVM                  | llava-hf/llava-1.5-7b-hf                    |
+| LVM                  | llava-hf/llava-v1.6-vicuna-13b-hf           |
 
 ### Start all the services Docker Containers
 
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/xeon/
+cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/gaudi/
 docker compose -f compose.yaml up -d
 ```
 
@@ -196,16 +196,16 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
 
-4. LLaVA Server
+4. TGI LLaVA Gaudi Server
 
 ```bash
 curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
-     -X POST \
-     -H "Content-Type:application/json" \
-     -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+    -X POST \
+    -d '{"inputs":"![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/rabbit.png)What is this a picture of?\n\n","parameters":{"max_new_tokens":16, "seed": 42}}' \
+    -H 'Content-Type: application/json'
 ```
 
-5. LVM Microservice
+5. LVM TGI Gaudi Server
 
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
@@ -221,6 +221,13 @@ curl http://${host_ip}:9399/v1/lvm  \
     -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 ```
 
+Also, validate LVM TGI Gaudi Server with empty retrieval results
+```bash
+curl http://${host_ip}:9399/v1/lvm \
+    -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
+```
 6. Multimodal Dataprep Microservice
 
 Download a sample video
@@ -232,9 +239,18 @@ wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoing
 
 Test dataprep microservice. This command updates a knowledge base by uploading a local video .mp4.
 
+Test dataprep microservice with generating transcript using whisper model
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT} \
+    -H 'Content-Type: multipart/form-data' \
+    -X POST -F "files=@./${video_fn}"
+```
+
+Also, test dataprep microservice with generating caption using lvm-tgi
+```bash
+curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+    ${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
     -X POST -F "files=@./${video_fn}"
 ```
