@@ -1,0 +1,583 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qna-config
+  namespace: default
+data:
+  EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
+  RERANK_MODEL_ID: BAAI/bge-reranker-base
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
+  TEI_EMBEDDING_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
+  TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
+  REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
+  INDEX_NAME: rag-redis
+  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+  EMBEDDING_SERVICE_HOST_IP: embedding-svc
+  RETRIEVER_SERVICE_HOST_IP: retriever-svc
+  RERANK_SERVICE_HOST_IP: reranking-svc
+  NODE_SELECTOR: chatqna-opea
+  LLM_SERVICE_HOST_IP: llm-svc
+
+
+---
+
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-backend-server-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatqna-backend-server-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: chatqna-backend-server-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: chatqna-backend-server-deploy
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: opea/chatqna-without-rerank:latest
+        imagePullPolicy: IfNotPresent
+        name: chatqna-backend-server-deploy
+        args: null
+        ports:
+        - containerPort: 8888
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: chatqna-backend-server-svc
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: chatqna-backend-server-deploy
+  ports:
+  - name: service
+    port: 8888
+    targetPort: 8888
+    nodePort: 30888
+
+
+---
+
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dataprep-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dataprep-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: dataprep-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: dataprep-deploy
+      hostIPC: true
+      containers:
+      - env:
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: REDIS_URL
+        - name: TEI_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: TEI_EMBEDDING_ENDPOINT
+        - name: INDEX_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: INDEX_NAME
+        image: opea/dataprep-redis:latest
+        imagePullPolicy: IfNotPresent
+        name: dataprep-deploy
+        args: null
+        ports:
+        - containerPort: 6007
+        - containerPort: 6008
+        - containerPort: 6009
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dataprep-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: dataprep-deploy
+  ports:
+  - name: port1
+    port: 6007
+    targetPort: 6007
+  - name: port2
+    port: 6008
+    targetPort: 6008
+  - name: port3
+    port: 6009
+    targetPort: 6009
+
+
+---
+
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embedding-dependency-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: embedding-dependency-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: embedding-dependency-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+        name: embedding-dependency-deploy
+        args:
+        - --model-id
+        - $(EMBEDDING_MODEL_ID)
+        - --auto-truncate
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+      serviceAccountName: default
+      volumes:
+      - name: model-volume
+        hostPath:
+          path: /mnt/models
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: embedding-dependency-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: embedding-dependency-deploy
+  ports:
+  - name: service
+    port: 6006
+    targetPort: 80
+
+
+---
+
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embedding-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: embedding-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: embedding-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: embedding-deploy
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: opea/embedding-tei:latest
+        imagePullPolicy: IfNotPresent
+        name: embedding-deploy
+        args: null
+        ports:
+        - containerPort: 6000
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: embedding-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: embedding-deploy
+  ports:
+  - name: service
+    port: 6000
+    targetPort: 6000
+
+
+---
+
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-dependency-deploy
+  namespace: default
+spec:
+  replicas: 16
+  selector:
+    matchLabels:
+      app: llm-dependency-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: llm-dependency-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+        name: llm-dependency-deploy-demo
+        securityContext:
+          capabilities:
+            add:
+            - SYS_NICE
+        args:
+        - --model-id
+        - $(LLM_MODEL_ID)
+        - --max-input-length
+        - '2048'
+        - --max-total-tokens
+        - '4096'
+        - --max-batch-total-tokens
+        - '65536'
+        - --max-batch-prefill-tokens
+        - '4096'
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            habana.ai/gaudi: 1
+        env:
+        - name: OMPI_MCA_btl_vader_single_copy_mechanism
+          value: none
+        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+          value: 'true'
+        - name: runtime
+          value: habana
+        - name: HABANA_VISIBLE_DEVICES
+          value: all
+        - name: HF_TOKEN
+          value: ${HF_TOKEN}
+      serviceAccountName: default
+      volumes:
+      - name: model-volume
+        hostPath:
+          path: /mnt/models
+          type: Directory
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: llm-dependency-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: llm-dependency-deploy
+  ports:
+  - name: service
+    port: 9009
+    targetPort: 80
+
+
+---
+
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: llm-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: llm-deploy
+      hostIPC: true
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        image: opea/llm-tgi:latest
+        imagePullPolicy: IfNotPresent
+        name: llm-deploy
+        args: null
+        ports:
+        - containerPort: 9000
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: llm-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: llm-deploy
+  ports:
+  - name: service
+    port: 9000
+    targetPort: 9000
+
+
+---
+
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: retriever-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: retriever-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: retriever-deploy
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: retriever-deploy
+      hostIPC: true
+      containers:
+      - env:
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: REDIS_URL
+        - name: TEI_EMBEDDING_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: TEI_EMBEDDING_ENDPOINT
+        - name: HUGGINGFACEHUB_API_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: HUGGINGFACEHUB_API_TOKEN
+        - name: INDEX_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: qna-config
+              key: INDEX_NAME
+        image: opea/retriever-redis:latest
+        imagePullPolicy: IfNotPresent
+        name: retriever-deploy
+        args: null
+        ports:
+        - containerPort: 7000
+      serviceAccountName: default
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: retriever-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: retriever-deploy
+  ports:
+  - name: service
+    port: 7000
+    targetPort: 7000
+
+
+---
+
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vector-db
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vector-db
+  template:
+    metadata:
+      labels:
+        app: vector-db
+    spec:
+      nodeSelector:
+        node-type: chatqna-opea
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: vector-db
+      containers:
+      - name: vector-db
+        image: redis/redis-stack:7.2.0-v9
+        ports:
+        - containerPort: 6379
+        - containerPort: 8001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vector-db
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: vector-db
+  ports:
+  - name: vector-db-service
+    port: 6379
+    targetPort: 6379
+  - name: vector-db-insight
+    port: 8001
+    targetPort: 8001
+
+
+---
