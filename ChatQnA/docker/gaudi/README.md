@@ -188,6 +188,31 @@ By default, the embedding, reranking and LLM models are set to a default value a
 
 Change the `xxx_MODEL_ID` below for your needs.
 
+For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA with TGI serving. ModelScope models are supported in two ways for TGI:
+
+1. Online
+
+   ```bash
+   export HF_TOKEN=${your_hf_token}
+   export HF_ENDPOINT="https://hf-mirror.com"
+   model_name="Intel/neural-chat-7b-v3-3"
+   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model_name
+   ```
+
+2. Offline
+
+   - Search your model name in ModelScope. For example, check [this page](https://www.modelscope.cn/models/ai-modelscope/neural-chat-7b-v3-1/files) for model `neural-chat-7b-v3-1`.
+
+   - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
+
+   - Run the following command to start TGI service.
+
+     ```bash
+     export HF_TOKEN=${your_hf_token}
+     export model_path="/path/to/model"
+     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id /data
+     ```
+
 ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
