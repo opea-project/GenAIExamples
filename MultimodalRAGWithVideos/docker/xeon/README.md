@@ -270,6 +270,7 @@ curl http://${host_ip}:9399/v1/lvm  \
 ```
 
 Also, validate LVM Microservice with empty retrieval results
+
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
     -X POST \
@@ -296,6 +297,7 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
 ```
 
 Also, test dataprep microservice with generating caption using lvm microservice
+
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT} \
