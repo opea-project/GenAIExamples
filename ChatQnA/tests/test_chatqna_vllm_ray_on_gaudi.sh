@@ -20,7 +20,7 @@ function build_docker_images() {
     git clone https://github.com/huggingface/tei-gaudi
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-redis embedding-tei retriever-redis reranking-tei tei-gaudi llm-vllm-ray-hpu llm-vllm-ray"
+    service_list="chatqna chatqna-ui dataprep-redis embedding-tei retriever-redis reranking-tei tei-gaudi vllm-ray-hpu llm-vllm-ray"
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
