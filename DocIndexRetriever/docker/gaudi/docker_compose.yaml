@@ -82,7 +82,7 @@ services:
     image: opea/reranking-tei:latest
     container_name: reranking-tei-server
     ports:
-      - "18000:8000"
+      - "8000:8000"
     ipc: host
     entrypoint: python local_reranking.py
     environment:
