@@ -4,8 +4,8 @@
 name: E2E test with docker compose
 
 on:
-  pull_request:
-    branches: ["main", "*rc", "refactor_folder"]
+  pull_request_target:
+    branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/Dockerfile**"

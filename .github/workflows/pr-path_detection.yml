@@ -23,7 +23,6 @@ jobs:
         run: |
           cd ..
           git clone https://github.com/opea-project/GenAIComps.git
-          cd GenAIComps && git checkout reorg && cd ../
 
       - name: Check for missing Dockerfile paths in GenAIComps
         run: |

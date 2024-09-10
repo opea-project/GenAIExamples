@@ -4,8 +4,8 @@
 name: E2E test with manifests
 
 on:
-  pull_request:
-    branches: ["main", "*rc", "refactor_folder"]
+  pull_request_target:
+    branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/kubernetes/**/manifests/**"
@@ -24,7 +24,7 @@ jobs:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
       diff_excluded_files: '.github|docker_compose|gmc|assets|*.md|*.txt|benchmark'
-      deploy_method: "manifest"
+      test_mode: "manifest"
 
   run-example:
     needs: job1
@@ -37,5 +37,4 @@ jobs:
       example: ${{ matrix.example }}
       tag: ${{ github.event.pull_request.head.sha }}
       test_k8s: true
-      opea_branch: "reorg" # for re-org test only
     secrets: inherit

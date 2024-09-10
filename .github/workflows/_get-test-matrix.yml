@@ -11,7 +11,7 @@ on:
         required: false
         type: string
         default: '.github|README.md|*.txt'
-      deploy_method:
+      test_mode:
         required: false
         type: string
         default: 'docker_compose'
@@ -58,6 +58,6 @@ jobs:
           grep -vE '${{ inputs.diff_excluded_files }}')" || true
           echo "changed_files=$changed_files"
           export changed_files=$changed_files
-          export deploy_method=${{ inputs.deploy_method }}
+          export test_mode=${{ inputs.test_mode }}
           export WORKSPACE=${{ github.workspace }}
           bash .github/workflows/scripts/get_test_matrix.sh

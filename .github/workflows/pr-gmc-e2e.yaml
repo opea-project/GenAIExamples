@@ -4,8 +4,8 @@
 name: E2E test with GMC
 
 on:
-  pull_request:
-    branches: ["main", "*rc", "refactor_folder"]
+  pull_request_target:
+    branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/kubernetes/**/gmc/**"
@@ -23,7 +23,7 @@ jobs:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
       diff_excluded_files: '.github|docker_compose|manifest|assets|*.md|*.txt'
-      deploy_method: "gmc"
+      test_mode: "gmc"
 
   gmc-test:
     needs: [job1]

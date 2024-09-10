@@ -7,14 +7,14 @@
 
 set -e
 changed_files=$changed_files
-deploy_method=$deploy_method
+test_mode=$test_mode
 run_matrix="{\"include\":["
 hardware_list="xeon gaudi" # current support hardware list
 
 examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
 for example in ${examples}; do
     cd $WORKSPACE/$example
-    if [[ ! $(find . -type f | grep ${deploy_method}) ]]; then continue; fi
+    if [[ ! $(find . -type f | grep ${test_mode}) ]]; then continue; fi
 
     run_hardware=""
     if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '*.py|Dockerfile*|ui|docker_image_build' ) ]]; then
