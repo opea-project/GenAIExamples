@@ -58,7 +58,7 @@ function setup_env() {
 
 function start_services() {
     cd $WORKPATH/docker/xeon
-    
+
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -71,7 +71,7 @@ function prepare_data() {
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
 
     sleep 2s
-    
+
 }
 function validate_service() {
     local URL="$1"
@@ -216,7 +216,7 @@ function validate_megaservice() {
         "multimodalragwithvideos" \
         "multimodalragwithvideos-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
-    
+
     echo "Validate megaservice with follow-up query"
     validate_service \
         "http://${host_ip}:8888/v1/mmragvideoqna" \
