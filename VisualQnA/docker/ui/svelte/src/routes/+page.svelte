@@ -44,6 +44,7 @@
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 	import Upload from "$lib/modules/upload/upload.svelte";
+	import ImagePrompt from "$lib/modules/upload/imagePrompt.svelte";
 
 	let query: string = "";
 	let loading: boolean = false;
@@ -183,6 +184,7 @@
 >
 <div class="w-1/5 bg-gray-200 p-4">
     <Upload />
+	<ImagePrompt />
   </div>
   <div class="flex-1 bg-gray-100 p-4">
     <div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[80%] bg-white px-10">
