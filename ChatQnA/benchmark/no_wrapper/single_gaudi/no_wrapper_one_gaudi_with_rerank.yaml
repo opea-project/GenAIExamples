@@ -60,7 +60,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/chatqna_no_wrapper:latest
+        image: opea/chatqna-no-wrapper:latest
         imagePullPolicy: IfNotPresent
         name: chatqna-backend-server-deploy
         args: null
