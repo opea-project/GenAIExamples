@@ -30,7 +30,7 @@ services:
     depends_on:
       - tgi-server
     volumes:
-      - ${WORKDIR}/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
+      # - ${WORKDIR}/GenAIExamples/AgentQnA/docker_image_build/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
       - ${TOOLSET_PATH}:/home/user/tools/
     ports:
       - "9095:9095"
@@ -65,7 +65,7 @@ services:
       - tgi-server
       - worker-docgrader-agent
     volumes:
-      - ${WORKDIR}/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
+      # - ${WORKDIR}/GenAIExamples/AgentQnA/docker_image_build/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
       - ${TOOLSET_PATH}:/home/user/tools/
     ports:
       - "9090:9090"
