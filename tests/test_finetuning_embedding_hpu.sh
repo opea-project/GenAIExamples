@@ -28,6 +28,7 @@ function start_service() {
     sleep 1m
 }
 
+
 function validate_microservice() {
     cd $LOG_PATH
     export no_proxy="localhost,127.0.0.1,"${ip_address}
@@ -79,7 +80,9 @@ function validate_microservice() {
     HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' -d '{"training_file": "test_embed_data.json","model": "BAAI/bge-base-en-v1.5","General":{"task":"embedding","lora_cofig":null,"save_strategy":"epoch"},"Dataset":{"query_max_len":128,"passage_max_len":128,"padding":"max_length"},"Training":{"epochs":3}}' "$URL")
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+    FINTUNING_ID=$(echo "$RESPONSE_BODY" | jq -r '.id')
     SERVICE_NAME="finetuning-server - create finetuning job"
+
 
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
@@ -96,10 +99,80 @@ function validate_microservice() {
         echo "[ $SERVICE_NAME ] Content is as expected."
     fi
 
-    sleep 10m
+    # test /v1/fine_tuning/jobs/retrieve
+    URL="http://${ip_address}:$finetuning_service_port/v1/fine_tuning/jobs/retrieve"
+    for((i=1;i<=10;i++));
+    do
+	HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": "'$FINTUNING_ID'"}' "$URL")
+	echo $HTTP_RESPONSE
+	RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+	STATUS=$(echo "$RESPONSE_BODY" | jq -r '.status')
+	if [[ "$STATUS" == "succeeded" ]]; then
+	    echo "training: succeeded."
+	    break
+	elif [[ "$STATUS" == "failed" ]]; then
+	    echo "training: failed."
+	    exit 1
+	else
+	    echo "training: '$STATUS'"
+	fi
+	sleep 1m
+    done
 
-    # get logs
-    docker logs finetuning-server >> ${LOG_PATH}/finetuning-server_create.log
+    # test /v1/finetune/list_checkpoints
+    URL="http://${ip_address}:$finetuning_service_port/v1/finetune/list_checkpoints"
+    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": "'$FINTUNING_ID'"}' "$URL")
+    echo $HTTP_RESPONSE
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+    fine_tuned_model_checkpoint=$(echo "$RESPONSE_BODY" | jq -r '.[0].fine_tuned_model_checkpoint')
+    echo $fine_tuned_model_checkpoint
+
+    echo "start resume checkpoint............................................."
+    # resume checkpoint /v1/fine_tuning/jobs
+    URL="http://${ip_address}:$finetuning_service_port/v1/fine_tuning/jobs"
+    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' -d '{"training_file": "test_embed_data.json","model": "BAAI/bge-base-en-v1.5","General":{"task":"embedding","lora_cofig":null,"save_strategy":"epoch","resume_from_checkpoint":"'$fine_tuned_model_checkpoint'"},"Dataset":{"query_max_len":128,"passage_max_len":128,"padding":"max_length"},"Training":{"epochs":5}}' "$URL")
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+    FINTUNING_ID=$(echo "$RESPONSE_BODY" | jq -r '.id')
+    SERVICE_NAME="finetuning-server - resume checkpoint"
+
+
+    if [ "$HTTP_STATUS" -ne "200" ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs finetuning-server >> ${LOG_PATH}/finetuning-server_create.log
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    fi
+    if [[ "$RESPONSE_BODY" != *'{"id":"ft-job'* ]]; then
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        docker logs finetuning-server >> ${LOG_PATH}/finetuning-server_create.log
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
+    # check training status /v1/fine_tuning/jobs/retrieve
+    URL="http://${ip_address}:$finetuning_service_port/v1/fine_tuning/jobs/retrieve"
+    for((i=1;i<=10;i++));
+    do
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": "'$FINTUNING_ID'"}' "$URL")
+        echo $HTTP_RESPONSE
+        RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+        STATUS=$(echo "$RESPONSE_BODY" | jq -r '.status')
+        if [[ "$STATUS" == "succeeded" ]]; then
+            echo "training: succeeded."
+            break
+        elif [[ "$STATUS" == "failed" ]]; then
+            echo "training: failed."
+            exit 1
+        else
+            echo "training: '$STATUS'"
+        fi
+        sleep 1m
+    done
+
+
 }
 
 function stop_docker() {
