@@ -23,8 +23,10 @@ function build_docker_images() {
 
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalragwithvideos bridgetower-embedding-server multimodal-embedding multimodal-retriever llava-server lvm multimodal-data-prep-service"
+    service_list="multimodalragwithvideos bridgetower-embedding-server multimodal-embedding multimodal-retriever lvm-tgi multimodal-data-prep-service"
     docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.4
 
     docker images && sleep 1s
 }
@@ -40,6 +42,7 @@ function setup_env() {
     export LLAVA_SERVER_PORT=8399
     export LVM_ENDPOINT="http://${host_ip}:8399"
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
+    export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
     export WHISPER_MODEL="base"
     export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
     export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
@@ -54,8 +57,7 @@ function setup_env() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/xeon
-
+    cd $WORKPATH/docker/gaudi
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -155,12 +157,12 @@ function validate_microservices() {
         "multimodal-data-prep-service" \
         "multimodal-dataprep-redis-server"
 
-    # echo "Data Prep with Generating Caption"
-    # validate_service \
-    #     "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
-    #     "Data preparation succeeded" \
-    #     "multimodal-data-prep-service" \
-    #     "multimodal-dataprep-redis-server"
+    echo "Data Prep with Generating Transcript"
+    validate_service \
+        "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
+        "Data preparation succeeded" \
+        "multimodal-data-prep-service" \
+        "multimodal-dataprep-redis-server"
 
     echo "Validating get file"
     validate_service \
@@ -184,13 +186,13 @@ function validate_microservices() {
     sleep 10s
 
     # llava server
-    echo "Evaluating LLAVA Server"
+    echo "Evaluating LLAVA TGI Server"
     validate_service \
         "http://${host_ip}:${LLAVA_SERVER_PORT}/generate" \
-        '"text":' \
-        "llava-server" \
-        "llava-server" \
-        '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+        '"generated_text":' \
+        "llava-tgi-service" \
+        "tgi-llava-gaudi-server" \
+        '{"inputs":"![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/rabbit.png)What is this a picture of?\n\n","parameters":{"max_new_tokens":16, "seed": 42}}'
 
     # lvm
     echo "Evaluating LVM"
@@ -198,10 +200,10 @@ function validate_microservices() {
         "http://${host_ip}:9399/v1/lvm" \
         '"text":"' \
         "lvm" \
-        "lvm-service" \
+        "lvm-tgi-gaudi-server" \
         '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 
-    sleep 3m
+    sleep 1m
 }
 
 function validate_megaservice() {
