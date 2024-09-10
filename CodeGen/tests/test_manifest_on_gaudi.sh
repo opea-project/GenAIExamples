@@ -68,12 +68,12 @@ fi
 
 case "$1" in
     init_CodeGen)
-        pushd CodeGen/kubernetes/manifests/gaudi
+        pushd CodeGen/kubernetes/intel/hpu/gaudi/manifest
         init_codegen
         popd
         ;;
     install_CodeGen)
-        pushd CodeGen/kubernetes/manifests/gaudi
+        pushd CodeGen/kubernetes/intel/hpu/gaudi/manifest
         NAMESPACE=$2
         install_codegen
         popd

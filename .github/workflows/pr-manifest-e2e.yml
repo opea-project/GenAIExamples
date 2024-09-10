@@ -4,14 +4,15 @@
 name: E2E test with manifests
 
 on:
-  pull_request:
-    branches: [main]
+  pull_request_target:
+    branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - "**/kubernetes/manifests/**"
+      - "**/kubernetes/**/manifests/**"
       - "**/tests/test_manifest**"
       - "!**.md"
       - "!**.txt"
+      - "!**/kubernetes/**/gmc/**"
   workflow_dispatch:
 
 concurrency:
@@ -22,27 +23,18 @@ jobs:
   job1:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '.github|deprecated|docker|assets|*.md|*.txt'
-      xeon_server_label: 'xeon'
-      gaudi_server_label: 'gaudi'
+      diff_excluded_files: '.github|docker_compose|gmc|assets|*.md|*.txt|benchmark'
+      test_mode: "manifest"
 
-  mega-image-build:
+  run-example:
     needs: job1
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    uses: ./.github/workflows/_image-build.yml
+      fail-fast: false
+    uses: ./.github/workflows/_example-workflow.yml
     with:
-      image_tag: ${{ github.event.pull_request.head.sha }}
-      mega_service: "${{ matrix.example }}"
-      runner_label: "docker-build-${{ matrix.hardware }}"
-
-  manifest-test:
-    needs: [job1, mega-image-build]
-    strategy:
-      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
-    uses: ./.github/workflows/_manifest-e2e.yml
-    with:
+      node: ${{ matrix.hardware }}
       example: ${{ matrix.example }}
-      hardware: ${{ matrix.hardware }}
-      tag: ${{ needs.mega-image-build.outputs.image_tag }}
+      tag: ${{ github.event.pull_request.head.sha }}
+      test_k8s: true
     secrets: inherit

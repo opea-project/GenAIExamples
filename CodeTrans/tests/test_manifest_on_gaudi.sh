@@ -69,12 +69,12 @@ fi
 
 case "$1" in
     init_CodeTrans)
-        pushd CodeTrans/kubernetes/manifests/gaudi
+        pushd CodeTrans/kubernetes/intel/hpu/gaudi/manifest
         init_codetrans
         popd
         ;;
     install_CodeTrans)
-        pushd CodeTrans/kubernetes/manifests/gaudi
+        pushd CodeTrans/kubernetes/intel/hpu/gaudi/manifest
         NAMESPACE=$2
         install_codetrans
         popd

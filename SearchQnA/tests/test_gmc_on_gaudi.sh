@@ -114,12 +114,12 @@ fi
 
 case "$1" in
     install_SearchQnA)
-        pushd SearchQnA/kubernetes
+        pushd SearchQnA/kubernetes/intel/hpu/gaudi/gmc
         install_searchqa
         popd
         ;;
     validate_SearchQnA)
-        pushd SearchQnA/kubernetes
+        pushd SearchQnA/kubernetes/intel/hpu/gaudi/gmc
         validate_searchqa
         popd
         ;;
