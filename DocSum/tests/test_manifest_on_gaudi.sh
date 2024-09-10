@@ -28,7 +28,7 @@ function init_docsum() {
 
 function install_docsum {
     echo "namespace is $NAMESPACE"
-    kubectl apply -f . -n $NAMESPACE
+    kubectl apply -f docsum.yaml -n $NAMESPACE
 }
 
 function validate_docsum() {

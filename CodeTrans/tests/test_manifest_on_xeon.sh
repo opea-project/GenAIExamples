@@ -28,7 +28,7 @@ function init_codetrans() {
 
 function install_codetrans {
     echo "namespace is $NAMESPACE"
-    kubectl apply -f . -n $NAMESPACE
+    kubectl apply -f codetrans.yaml -n $NAMESPACE
 }
 
 function validate_codetrans() {

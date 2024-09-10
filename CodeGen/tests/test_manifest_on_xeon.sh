@@ -28,7 +28,7 @@ function init_codegen() {
 
 function install_codegen {
     echo "namespace is $NAMESPACE"
-    kubectl apply -f . -n $NAMESPACE
+    kubectl apply -f codegen.yaml -n $NAMESPACE
 }
 
 function validate_codegen() {
