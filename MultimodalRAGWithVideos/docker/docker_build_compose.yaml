@@ -1,0 +1,54 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  multimodalragwithvideos:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/multimodalragwithvideos:${TAG:-latest}
+  # multimodalragwithvideos-ui:
+  #   build:
+  #     context: ui
+  #     dockerfile: ./ui/Dockerfile
+  #   extends: multimodalragwithvideos
+  #   image: ${REGISTRY:-opea}/multimodalragwithvideos-ui-ui:${TAG:-latest}
+  bridgetower-embedding-server:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/multimodal_embeddings/bridgetower/docker/Dockerfile
+    extends: multimodalragwithvideos
+    image: ${REGISTRY:-opea}/bridgetower-embedder:${TAG:-latest}
+  multimodal-embedding:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/multimodal_embeddings/multimodal_langchain/docker/Dockerfile
+    extends: multimodalragwithvideos
+    image: ${REGISTRY:-opea}/multimodal-embedding:${TAG:-latest}
+  multimodal-retriever:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/langchain/redis_multimodal/docker/Dockerfile
+    extends: multimodalragwithvideos
+    image: ${REGISTRY:-opea}/multimodal-retriever-redis:${TAG:-latest}
+  llava-server:
+    build:
+      context: GenAIComps
+      dockerfile: comps/lvms/llava/Dockerfile
+    extends: multimodalragwithvideos
+    image: ${REGISTRY:-opea}/llava:${TAG:-latest}
+  lvm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/lvms/Dockerfile
+    extends: multimodalragwithvideos
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+  multimodal-data-prep-service:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/redis/multimodal_langchain/docker/Dockerfile
+    extends: multimodalragwithvideos
+    image: ${REGISTRY:-opea}/multimodal-dataprep-redis:${TAG:-latest}
