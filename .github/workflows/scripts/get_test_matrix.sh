@@ -30,7 +30,7 @@ function find_test_1() {
         service=$pre_service/$service
         if [[ $(ls ${service} | grep -E "Dockerfile*") ]]; then
             service_name=$(echo $service | tr '/' '_' | cut -c7-) # comps/dataprep/redis/langchain -> dataprep_redis_langchain
-            default_service_script_path=$(find ./tests -type f -name test_${service_name}*.sh) || true
+            default_service_script_path=$(find ./tests -type f -name test_${service_name}.sh) || true
             if [ "$default_service_script_path" ]; then
                 run_matrix="${run_matrix}{\"service\":\"${service_name}\",\"hardware\":\"intel_cpu\"},"
             fi
