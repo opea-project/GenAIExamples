@@ -23,7 +23,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       REDIS_HOST: ${REDIS_HOST}
       INDEX_NAME: ${INDEX_NAME}
-      LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:9399/v1/lvm"
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   bridgetower-embedding-server:
