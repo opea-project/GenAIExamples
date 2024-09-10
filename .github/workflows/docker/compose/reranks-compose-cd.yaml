@@ -14,3 +14,11 @@ services:
     build:
       dockerfile: comps/reranks/langchain-mosec/docker/Dockerfile
     image: ${REGISTRY:-opea}/reranking-langchain-mosec:${TAG:-latest}
+  reranking-mosec-neural-speed:
+    build:
+      dockerfile: comps/reranks/neural-speed/docker/Dockerfile
+    image: ${REGISTRY:-opea}/reranking-mosec-neural-speed:${TAG:-latest}
+  reranking-mosec-neural-speed-endpoint:
+    build:
+      dockerfile: comps/reranks/neural-speed/neuralspeed-docker/Dockerfile
+    image: ${REGISTRY:-opea}/reranking-mosec-neural-speed-endpoint:${TAG:-latest}
