@@ -18,7 +18,7 @@ cd GenAIComps
 Build docker image with below command:
 
 ```bash
-docker build -t opea/finetuning-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/finetuning/docker/Dockerfile_hpu .
+docker build -t opea/finetuning-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/finetuning/Dockerfile.intel_hpu .
 ```
 
 ### 3. Run Docker with CLI

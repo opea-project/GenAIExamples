@@ -42,8 +42,8 @@ docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build
 Build the frontend Docker image via the command below:
 
 ```bash
-cd GenAIExamples/CodeGen/
-docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile_ui .
+cd GenAIExamples/CodeGen/ui
+docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 3 Docker Images:

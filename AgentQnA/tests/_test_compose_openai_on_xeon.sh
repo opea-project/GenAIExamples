@@ -19,7 +19,7 @@ function build_agent_docker_image() {
     fi
     cd GenAIComps
     echo PWD: $(pwd)
-    docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/docker/Dockerfile .
+    docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
 }
 
 function start_services() {

@@ -63,8 +63,8 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/VisualQnA
-docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_ui .
+cd GenAIExamples/VisualQnA/ui
+docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 cd ../../../..
 ```
 

@@ -50,7 +50,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA/docker
+cd GenAIExamples/ChatQnA
 docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
 cd ../../..
 ```
@@ -60,7 +60,7 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/ChatQnA//
+cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest -f ./docker/Dockerfile .
 cd ../../../..
 ```

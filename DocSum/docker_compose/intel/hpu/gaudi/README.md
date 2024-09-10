@@ -49,9 +49,9 @@ docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --bui
 Build the frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/DocSum/
+cd GenAIExamples/DocSum/ui
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./Dockerfile_ui.react .
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:

@@ -13,7 +13,7 @@ ray_port=8265
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg HF_TOKEN=$HF_TOKEN -f comps/finetuning/docker/Dockerfile_cpu .
+    docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg HF_TOKEN=$HF_TOKEN -f comps/finetuning/Dockerfile .
     if [ $? -ne 0 ]; then
         echo "opea/finetuning built fail"
         exit 1

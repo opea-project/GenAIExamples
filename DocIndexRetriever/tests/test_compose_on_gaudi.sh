@@ -20,7 +20,7 @@ function build_docker_images() {
     docker build -t opea/embedding-tei:latest -f comps/embeddings/tei/langchain/Dockerfile .
     docker build -t opea/retriever-redis:latest -f comps/retrievers/redis/langchain/Dockerfile .
     docker build -t opea/reranking-tei:latest -f comps/reranks/tei/Dockerfile .
-    docker build -t opea/dataprep-on-ray-redis:latest -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
+    docker build -t opea/dataprep-on-ray-redis:latest -f comps/dataprep/redis/langchain_ray/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:latest
     docker pull redis/redis-stack:7.2.0-v9

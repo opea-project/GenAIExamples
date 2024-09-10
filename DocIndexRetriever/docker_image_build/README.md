@@ -27,7 +27,7 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 - Dataprep Image
 
   ```bash
-  docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
+  docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/Dockerfile .
   ```
 
 ## 2. Build Images for MegaService

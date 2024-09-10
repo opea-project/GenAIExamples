@@ -69,8 +69,8 @@ cd ../../../..
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/ChatQnA/
-docker build --no-cache -t opea/chatqna-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile_ui.react .
+cd GenAIExamples/ChatQnA/ui
+docker build --no-cache -t opea/chatqna-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
 
