@@ -5,7 +5,6 @@ import os
 
 from langchain import LLMChain, PromptTemplate
 from langchain_community.llms import HuggingFaceEndpoint
-from template import IntentTemplate
 
 from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
 

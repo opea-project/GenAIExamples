@@ -40,7 +40,7 @@ function start_service() {
 
 function validate_microservice() {
     intent_port=5043
-    result=$(http_proxy="" curl http://${ip_address}:${intent_port}/v1/chat/intent\
+    result=$(http_proxy="" curl http://localhost:${intent_port}/v1/chat/intent\
         -X POST \
         -d '{"query":"What is Deep Learning?","max_new_tokens":10,"top_k":1,"temperature":0.001,"streaming":false}' \
         -H 'Content-Type: application/json')
