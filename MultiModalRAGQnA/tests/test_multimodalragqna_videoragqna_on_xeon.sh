@@ -33,7 +33,7 @@ function start_services() {
     source set_env.sh
     docker volume create video-llama-model
     docker compose up vdms-vector-db dataprep -d
-    sleep 1m
+    sleep 30s
 
     # Insert some sample data to the DB
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep \
@@ -195,7 +195,7 @@ function validate_microservices() {
         "lvm-video-llama" \
         '{"video_url":"https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4","chunk_start": 0,"chunk_duration": 7,"prompt":"What is the person doing?","max_new_tokens": 50}'
 
-    sleep 10
+    sleep 1s
 }
 
 function validate_megaservice() {
