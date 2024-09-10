@@ -41,19 +41,19 @@ services:
       dockerfile: comps/dataprep/redis/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
-  promptregistry-mongo:
+  promptregistry-mongo-server:
     build:
       context: GenAIComps
       dockerfile: comps/prompt_registry/mongo/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}
-  chathistory-mongo:
+  chathistory-mongo-server:
     build:
       context: GenAIComps
       dockerfile: comps/chathistory/mongo/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
-  productivity-suite-react-ui:
+  productivity-suite-react-ui-server:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile.react
@@ -86,13 +86,13 @@ services:
       context: ../../FaqGen/
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
-  llm_faqgen:
+  llm-faqgen-tgi:
     build:
       context: GenAIComps
       dockerfile: comps/llms/faq-generation/tgi/langchain/Dockerfile
     extends: faqgen
     image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
-  llm_docsum_server:
+  llm-docsum-tgi:
     build:
       context: GenAIComps
       dockerfile: comps/llms/summarization/tgi/langchain/Dockerfile

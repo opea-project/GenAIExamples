@@ -30,8 +30,8 @@ docker build -t opea/codetrans:latest --build-arg https_proxy=$https_proxy --bui
 ### 4. Build UI Docker Image
 
 ```bash
-cd GenAIExamples/CodeTrans
-docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_ui .
+cd GenAIExamples/CodeTrans/ui
+docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
 ### 5. Build Nginx Docker Image

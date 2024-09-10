@@ -107,8 +107,8 @@ cd ../..
 
    ```bash
    git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA/docker
-   docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_guardrails .
+   cd GenAIExamples/ChatQnA/
+   docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.guardrails .
    cd ../../..
    ```
 
@@ -119,7 +119,7 @@ cd ../..
    ```bash
    git clone https://github.com/opea-project/GenAIExamples.git
    cd GenAIExamples/ChatQnA/docker
-   docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_without_rerank .
+   docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.without_rerank .
    cd ../../..
    ```
 
@@ -140,8 +140,8 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 **Export the value of the public IP address of your Gaudi node to the `host_ip` environment variable**
 
 ```bash
-cd GenAIExamples/ChatQnA/
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile_ui.react .
+cd GenAIExamples/ChatQnA/ui
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
 

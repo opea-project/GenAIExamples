@@ -15,11 +15,11 @@ export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
 function build_agent_docker_image() {
     cd $WORKDIR
     if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps &&  git checkout "${opea_branch:-"main"}" && cd ../
+        git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
     cd GenAIComps
     echo PWD: $(pwd)
-    docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/docker/Dockerfile .
+    docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
 }
 
 function start_services() {

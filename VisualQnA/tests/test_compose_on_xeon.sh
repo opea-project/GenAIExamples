@@ -16,7 +16,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps &&  git checkout "${opea_branch:-"main"}" && cd ../
+    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="visualqna visualqna-ui llm-visualqna-tgi"
@@ -36,6 +36,12 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LVM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/visualqna"
+    export FRONTEND_SERVICE_IP=${ip_address}
+    export FRONTEND_SERVICE_PORT=5173
+    export BACKEND_SERVICE_NAME=visualqna
+    export BACKEND_SERVICE_IP=${ip_address}
+    export BACKEND_SERVICE_PORT=8888
+    export NGINX_PORT=80
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -100,6 +106,33 @@ function validate_megaservice() {
     "The image" \
     "visualqna-xeon-backend-server" \
     "visualqna-xeon-backend-server" \
+    '{
+        "messages": [
+        {
+            "role": "user",
+            "content": [
+            {
+                "type": "text",
+                "text": "What'\''s in this image?"
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+                }
+            }
+            ]
+        }
+        ],
+        "max_tokens": 300
+    }'
+
+    # test the megeservice via nginx
+    validate_services \
+    "${ip_address}:80/v1/visualqna" \
+    "The image" \
+    "visualqna-xeon-nginx-server" \
+    "visualqna-xeon-nginx-server" \
     '{
         "messages": [
         {

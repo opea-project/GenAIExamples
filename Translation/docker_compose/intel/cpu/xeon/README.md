@@ -40,8 +40,8 @@ docker build -t opea/translation:latest --build-arg https_proxy=$https_proxy --b
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/Translation
-docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_ui .
+cd GenAIExamples/Translation/ui
+docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:

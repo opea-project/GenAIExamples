@@ -27,7 +27,7 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 - Dataprep Image
 
   ```bash
-  docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/docker/Dockerfile .
+  docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/Dockerfile .
   ```
 
 ## 2. Build Images for MegaService
@@ -35,7 +35,8 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 ```bash
 cd ..
 git clone https://github.com/opea-project/GenAIExamples.git
-docker build --no-cache -t opea/doc-index-retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f GenAIExamples/DocIndexRetriever/docker/Dockerfile .
+cd GenAIExamples/DocIndexRetriever/docker
+docker build --no-cache -t opea/doc-index-retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile .
 ```
 
 ## 3. Start all the services Docker Containers

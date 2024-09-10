@@ -103,8 +103,8 @@ Build frontend Docker image that enables via below command:
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
 ```bash
-cd GenAIExamples/ProductivitySuite/
-docker build --no-cache -t ProductivitySuite/docker_compose/intel/cpu/xeon/compose.yaml Dockerfile_ui.react .
+cd GenAIExamples/ProductivitySuite/ui
+docker build --no-cache -t ProductivitySuite/docker_compose/intel/cpu/xeon/compose.yaml docker/Dockerfile.react .
 cd ../../../..
 ```
 

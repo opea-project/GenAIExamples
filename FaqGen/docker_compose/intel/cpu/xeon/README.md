@@ -40,8 +40,8 @@ docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_pro
 Build the frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/FaqGen
-docker build -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile_ui .
+cd GenAIExamples/FaqGen/ui
+docker build -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
 ### 4. Build react UI Docker Image (Optional)
@@ -49,9 +49,9 @@ docker build -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --bui
 Build the frontend Docker image based on react framework via below command:
 
 ```bash
-cd GenAIExamples/FaqGen
+cd GenAIExamples/FaqGen/ui
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
-docker build -t opea/faqgen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f Dockerfile_ui.react .
+docker build -t opea/faqgen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f docker/Dockerfile.react .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:

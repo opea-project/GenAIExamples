@@ -19,7 +19,7 @@ Build docker image with below command:
 
 ```bash
 export HF_TOKEN=${your_huggingface_token}
-docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg HF_TOKEN=$HF_TOKEN -f comps/finetuning/docker/Dockerfile_cpu .
+docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg HF_TOKEN=$HF_TOKEN -f comps/finetuning/Dockerfile .
 ```
 
 ### 3. Run Docker with CLI
