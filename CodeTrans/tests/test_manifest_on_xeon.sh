@@ -28,7 +28,7 @@ function init_codetrans() {
 
 function install_codetrans {
     echo "namespace is $NAMESPACE"
-    kubectl apply -f . -n $NAMESPACE
+    kubectl apply -f codetrans.yaml -n $NAMESPACE
 }
 
 function validate_codetrans() {
@@ -69,12 +69,12 @@ fi
 
 case "$1" in
     init_CodeTrans)
-        pushd CodeTrans/kubernetes/manifests/xeon
+        pushd CodeTrans/kubernetes/intel/cpu/xeon/manifest
         init_codetrans
         popd
         ;;
     install_CodeTrans)
-        pushd CodeTrans/kubernetes/manifests/xeon
+        pushd CodeTrans/kubernetes/intel/cpu/xeon/manifest
         NAMESPACE=$2
         install_codetrans
         popd

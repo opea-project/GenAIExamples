@@ -5,15 +5,14 @@ name: E2E test with GMC
 
 on:
   pull_request_target:
-    branches: [main]
+    branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - "**/kubernetes/**"
+      - "**/kubernetes/**/gmc/**"
       - "**/tests/test_gmc**"
       - "!**.md"
       - "!**.txt"
-      - "!**/kubernetes/manifests/**"
-  workflow_dispatch:
+      - "!**/kubernetes/**/manifests/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -23,9 +22,8 @@ jobs:
   job1:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '.github|deprecated|docker|assets|*.md|*.txt'
-      xeon_server_label: 'xeon'
-      gaudi_server_label: 'gaudi'
+      diff_excluded_files: '.github|docker_compose|manifest|assets|*.md|*.txt'
+      test_mode: "gmc"
 
   gmc-test:
     needs: [job1]
