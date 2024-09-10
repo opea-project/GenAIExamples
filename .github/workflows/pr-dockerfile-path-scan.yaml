@@ -134,12 +134,14 @@ jobs:
           changed_files="$(git diff --name-status --diff-filter=DR ${{ github.event.pull_request.base.sha }} ${merged_commit} -- '**/Dockerfile**' | cut -f2)"
           if [ -n "$changed_files" ]; then
             for file in $changed_files; do
-              matching_files=$(grep -rl "$file" ../GenAIExamples/**/*.md)
+              matching_files=$(grep -rl "$file" ../GenAIExamples/**/*.md) || true
               if [ -n "$matching_files" ]; then
                 is_use="TRUE"
                 used_files+="$file "
                 echo "Modified Dockerfile '$file' is referenced in:"
                 echo "$matching_files"
+              else
+                echo "Modified Dockerfile '$file' is not referenced"
               fi
             done
           fi
