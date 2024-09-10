@@ -10,7 +10,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/docker
+    cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
