@@ -24,6 +24,10 @@ on:
         description: Hardware to run the test on
         required: true
         type: string
+      diff_excluded_files:
+        required: false
+        type: string
+        default: ""
 jobs:
   get-test-case:
     runs-on: ubuntu-latest
@@ -52,10 +56,37 @@ jobs:
         shell: bash
         id: test-case-matrix
         run: |
-          set -x
           example_l=$(echo ${{ inputs.example }} | tr '[:upper:]' '[:lower:]')
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
-          test_cases=$(find . -type f -name "test_${example_l}*on_${{ inputs.hardware }}.sh" -print | cut -d/ -f2 | jq -R '.' | jq -sc '.')
+          run_test_cases=""
+
+          default_test_case=$(find . -type f -name "test_compose_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          if [ "$default_test_case" ]; then run_test_cases="$default_test_case"; fi
+          other_test_cases=$(find . -type f -name "test_compose_*_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          echo "default_test_case=$default_test_case"
+          echo "other_test_cases=$other_test_cases"
+
+          if [ "${{ inputs.tag }}" == "ci" ]; then
+              base_commit=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/opea-project/GenAIExamples/commits?sha=${{ github.event.pull_request.base.ref }}" | jq -r '.[0].sha')
+              merged_commit=$(git log -1 --format='%H')
+              changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | grep -vE '${{ inputs.diff_excluded_files }}')" || true
+          fi
+
+          for test_case in $other_test_cases; do
+              if [ "${{ inputs.tag }}" == "ci" ]; then
+                  flag=${test_case%_on_*}
+                  flag=${flag#test_compose_}
+                  if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep ${flag}) ]]; then
+                      run_test_cases="$run_test_cases $test_case"
+                  fi
+              else
+                  run_test_cases="$run_test_cases $test_case"
+              fi
+          done
+
+          test_cases=$(echo $run_test_cases | tr ' ' '\n' | sort -u | jq -R '.' | jq -sc '.')
+          echo "test_cases=$test_cases"
           echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
 
   run-test:
@@ -101,11 +132,13 @@ jobs:
         shell: bash
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}/docker/${{ inputs.hardware }}
-          yaml_files=$(find . -type f -name "*compose*yaml")
-          for file in $yaml_files; do
-              docker compose -f ${file} stop && docker compose -f ${file} rm -f || true
-          done
+          cd ${{ github.workspace }}/${{ inputs.example }}/docker_compose
+          test_case=${{ matrix.test_case }}
+          flag=${test_case%_on_*}
+          flag=${flag#test_}
+          yaml_file=$(find . -type f -wholename "*${{ inputs.hardware }}/${flag}.yaml")
+          echo $yaml_file
+          docker compose -f $yaml_file stop && docker compose -f $yaml_file rm -f || true
           docker system prune -f
           docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
 
@@ -113,5 +146,5 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.test_case }}
+          name: ${{ inputs.example }}_${{ matrix.test_case }}
           path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log
