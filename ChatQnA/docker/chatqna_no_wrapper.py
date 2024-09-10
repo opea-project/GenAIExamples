@@ -7,6 +7,7 @@ import re
 
 from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
 from langchain_core.prompts import PromptTemplate
+import argparse
 
 
 class ChatTemplate:
@@ -260,6 +261,13 @@ class ChatQnAService:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()action='store_true',
+    parser.add_argument("--without-rerank", action='store_true')
+
+    args = parser.parse_args()
+
     chatqna = ChatQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
-    chatqna.add_remote_service()
-    # chatqna.add_remote_service_without_rerank()
+    if args.without_rerank:
+        chatqna.add_remote_service_without_rerank()
+    else:
+        chatqna.add_remote_service()
