@@ -95,7 +95,7 @@ Build MegaService Docker image via below command:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/MultiModalRAGQnA/VideoRAGQnA/docker
+cd GenAIExamples/VideoRAGQnA/docker
 docker build -t opea/videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
@@ -189,7 +189,7 @@ There are 2 parts of the pipeline:
 In the deploy steps, you need to start the VDMS DB and dataprep firstly, then insert some sample data into it. After that you could get the megaservice up.
 
 ```bash
-cd GenAIExamples/MultiModalRAGQnA/VideoRAGQnA/docker/xeon/
+cd GenAIExamples/VideoRAGQnA/docker/xeon/
 
 docker volume create video-llama-model
 docker compose up vdms-vector-db dataprep -d
