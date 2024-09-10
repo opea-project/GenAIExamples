@@ -49,7 +49,7 @@ First, you need to start a TEI service.
 
 ```bash
 your_port=6006
-model="BAAI/bge-large-en-v1.5"
+model="BAAI/bge-base-en-v1.5"
 revision="refs/pr/5"
 docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.2 --model-id $model --revision $revision
 ```

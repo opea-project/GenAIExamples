@@ -33,7 +33,7 @@ function build_docker_images() {
 
 function start_service() {
     mosec_endpoint=5006
-    model="BAAI/bge-reranker-large"
+    model="BAAI/bge-reranker-base"
     unset http_proxy
     docker run -d --name="test-comps-reranking-langchain-mosec-endpoint" -p $mosec_endpoint:8000  opea/reranking-langchain-mosec-endpoint:comps
     export MOSEC_RERANKING_ENDPOINT="http://${ip_address}:${mosec_endpoint}"

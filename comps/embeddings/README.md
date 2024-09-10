@@ -43,7 +43,7 @@ First, you need to start a TEI service.
 
 ```bash
 your_port=8090
-model="BAAI/bge-large-en-v1.5"
+model="BAAI/bge-base-en-v1.5"
 docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $model
 ```
 
@@ -64,7 +64,7 @@ cd langchain
 # run with llama_index
 cd llama_index
 export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
-export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-large-en-v1.5"
+export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-base-en-v1.5"
 python embedding_tei.py
 ```
 
@@ -86,7 +86,7 @@ First, you need to start a TEI service.
 
 ```bash
 your_port=8090
-model="BAAI/bge-large-en-v1.5"
+model="BAAI/bge-base-en-v1.5"
 docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $model
 ```
 
@@ -103,7 +103,7 @@ Export the `TEI_EMBEDDING_ENDPOINT` for later usage:
 
 ```bash
 export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
-export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-large-en-v1.5"
+export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-base-en-v1.5"
 ```
 
 ### 2.2 Build Docker Image

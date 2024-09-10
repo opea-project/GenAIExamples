@@ -18,7 +18,7 @@ RUN pip3 install intel-extension-for-pytorch==2.2.0
 RUN pip3 install transformers sentence-transformers
 RUN pip3 install llmspec mosec
 
-RUN cd /home/user/ && export HF_ENDPOINT=https://hf-mirror.com && huggingface-cli download --resume-download BAAI/bge-reranker-large --local-dir /home/user/bge-reranker-large
+RUN cd /home/user/ && export HF_ENDPOINT=https://hf-mirror.com && huggingface-cli download --resume-download BAAI/bge-reranker-base --local-dir /home/user/bge-reranker-large
 USER user
 ENV EMB_MODEL="/home/user/bge-reranker-large/"
 

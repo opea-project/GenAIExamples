@@ -41,5 +41,5 @@ def reranking(input: SearchedDoc) -> RerankedDoc:
 
 
 if __name__ == "__main__":
-    reranker_model = CrossEncoder(model_name="BAAI/bge-reranker-large", max_length=512)
+    reranker_model = CrossEncoder(model_name="BAAI/bge-reranker-base", max_length=512)
     opea_microservices["opea_service@local_reranking"].start()

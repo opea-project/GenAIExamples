@@ -31,7 +31,7 @@ def embedding(input: TextDoc) -> EmbedDoc:
 
 
 if __name__ == "__main__":
-    tei_embedding_model_name = os.getenv("TEI_EMBEDDING_MODEL_NAME", "BAAI/bge-large-en-v1.5")
+    tei_embedding_model_name = os.getenv("TEI_EMBEDDING_MODEL_NAME", "BAAI/bge-base-en-v1.5")
     tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT", "http://localhost:8090")
     embeddings = TextEmbeddingsInference(model_name=tei_embedding_model_name, base_url=tei_embedding_endpoint)
     logger.info("TEI Gaudi Embedding initialized.")
