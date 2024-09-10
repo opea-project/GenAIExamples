@@ -9,7 +9,7 @@ metadata:
 data:
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
   RERANK_MODEL_ID: BAAI/bge-reranker-base
-  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct # Intel/neural-chat-7b-v3-3
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3 # meta-llama/Meta-Llama-3-8B-Instruct
   TEI_EMBEDDING_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
   TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
   TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
