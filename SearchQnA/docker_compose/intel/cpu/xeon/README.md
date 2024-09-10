@@ -46,6 +46,15 @@ docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_
 cd ../../..
 ```
 
+### 7. Build UI Docker Image
+Build frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/SearchQnA/ui
+docker build --no-cache -t opea/opea/searchqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd ../../../..
+```
+
 Then run the command `docker images`, you will have following images ready:
 
 1. `opea/embedding-tei:latest`
@@ -53,6 +62,7 @@ Then run the command `docker images`, you will have following images ready:
 3. `opea/reranking-tei:latest`
 4. `opea/llm-tgi:latest`
 5. `opea/searchqna:latest`
+5. `opea/searchqna-ui:latest`
 
 ## 🚀 Set the environment variables
 
@@ -65,11 +75,12 @@ export GOOGLE_API_KEY=<your google api key>
 export HUGGINGFACEHUB_API_TOKEN=<your HF token>
 
 export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
-export TEI_EMBEDDING_ENDPOINT=http://$host_ip:3001
+export TEI_EMBEDDING_ENDPOINT=http://${host_ip}:3001
 export RERANK_MODEL_ID=BAAI/bge-reranker-base
-export TEI_RERANKING_ENDPOINT=http://$host_ip:3004
+export TEI_RERANKING_ENDPOINT=http://${host_ip}:3004
+export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:3008/v1/searchqna
 
-export TGI_LLM_ENDPOINT=http://$host_ip:3006
+export TGI_LLM_ENDPOINT=http://${host_ip}:3006
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
 
 export MEGA_SERVICE_HOST_IP=${host_ip}
