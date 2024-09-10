@@ -13,24 +13,24 @@ services:
   embedding-tei:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/langchain/docker/Dockerfile
+      dockerfile: comps/embeddings/tei/langchain/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
   retriever-redis:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/langchain/redis/docker/Dockerfile
+      dockerfile: comps/retrievers/redis/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
   reranking-tei:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/tei/docker/Dockerfile
+      dockerfile: comps/reranks/tei/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
   dataprep-on-ray-redis:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain_ray/docker/Dockerfile
+      dockerfile: comps/dataprep/redis/langchain_ray/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/dataprep-on-ray-redis:${TAG:-latest}
