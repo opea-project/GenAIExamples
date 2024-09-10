@@ -23,7 +23,7 @@ function start_agent_and_api_server() {
     docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
 
     echo "Starting Agent services"
-    cd $WORKDIR/GenAIExamples/AgentQnA/docker/gaudi
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
     bash launch_agent_service_tgi_gaudi.sh
 }
 

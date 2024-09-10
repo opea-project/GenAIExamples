@@ -2,17 +2,7 @@
 
 The retrieval tool in this example is an OPEA megaservice that is comprised of a query embedder, a document retriever and a document reranker.
 
-## Follow the instructions here to launch microservices.
-
-1. Build images
-
-```
-cd docker
-build_images.sh
-```
-
-2. Launch services
-
+## Launch microservices
 ```
 bash launch_retrieval_tool.sh
 ```
