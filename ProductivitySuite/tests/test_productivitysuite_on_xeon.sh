@@ -19,8 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna dataprep-redis embedding-tei promptregistry-mongo llm_docsum_server llm_faqgen chathistory-mongo retriever-redis reranking-tei llm-tgi productivity-suite-react-ui codegen docsum faqgen"
-    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f docker_build_compose.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/text-generation-inference:2.1.0
