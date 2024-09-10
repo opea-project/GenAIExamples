@@ -139,6 +139,8 @@ By default, the embedding, reranking and LLM models are set to a default value a
 
 Change the `xxx_MODEL_ID` in `docker/xxx/set_env.sh` for your needs.
 
+For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA. Refer to [this readme](docker/xeon/README.md) for details.
+
 ### Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
