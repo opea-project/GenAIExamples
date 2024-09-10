@@ -70,14 +70,12 @@ Build microservice image
 
 ```bash
 docker build --no-cache -t opea/multimodal-embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_embeddings/multimodal_langchain/docker/Dockerfile .
-
 ```
 
 ### 2. Build Multimodal-Retriever Image
 
 ```bash
 docker build --no-cache -t opea/multimodal-retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/redis_multimodal/docker/Dockerfile .
-
 ```
 
 ### 3. Build LVM Image
@@ -106,9 +104,9 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker
+cd GenAIExamples/MultimodalRAGWithVideos/docker
 docker build --no-cache -t opea/multimodalragwithvideos:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../../..
+cd ../../..
 ```
 
 ### 6. Build UI Docker Image
@@ -116,9 +114,9 @@ cd ../../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/ui
+cd GenAIExamples/MultimodalRAGWithVideos/docker/ui
 docker build --no-cache -t opea/multimodalragwithvideos-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../../..
+cd ../../../..
 ```
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
@@ -148,7 +146,7 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/gaudi/
+cd GenAIExamples/MultimodalRAGWithVideos/docker/gaudi/
 docker compose -f compose.yaml up -d
 ```
 
@@ -228,6 +226,7 @@ curl http://${host_ip}:9399/v1/lvm \
     -H 'Content-Type: application/json' \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
+
 6. Multimodal Dataprep Microservice
 
 Download a sample video

@@ -20,15 +20,15 @@ redis-vector-db
 Port 6379 - Open to 0.0.0.0/0
 Port 8001 - Open to 0.0.0.0/0
 
-bridgetower_embedder_service
+bridgetower_embedder_server
 =====================
 Port 6006 - Open to 0.0.0.0/0
 
-multimodal_embedding
+multimodal-embedding-server
 =========
 Port 6000 - Open to 0.0.0.0/0
 
-multimodal_retriever
+multimodal-retriever-redis-server
 =========
 Port 7000 - Open to 0.0.0.0/0
 
@@ -40,15 +40,15 @@ lvm
 ===
 Port 9399 - Open to 0.0.0.0/0
 
-multimodal-data-prep-service
+multimodal-dataprep-redis-server
 ===
 Port 6007 - Open to 0.0.0.0/0
 
-multimodalragwithvideos-xeon-backend-server
+multimodalragwithvideos-backend-server
 ==========================
 Port 8888 - Open to 0.0.0.0/0
 
-multimodalragwithvideos-xeon-ui-server
+multimodalragwithvideos-gradio-ui-server
 =====================
 Port 5173 - Open to 0.0.0.0/0
 ```
@@ -110,7 +110,7 @@ cd GenAIComps
 
 ### 1. Build Multimodal-Embedding Image
 
-Build bridgetower_embedder_service docker image
+Build bridgetower-embedder-server docker image
 
 ```bash
 docker build --no-cache -t opea/bridgetower-embedder:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_embeddings/bridgetower/docker/Dockerfile .
@@ -120,14 +120,12 @@ Build microservice image
 
 ```bash
 docker build --no-cache -t opea/multimodal-embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_embeddings/multimodal_langchain/docker/Dockerfile .
-
 ```
 
 ### 2. Build Multimodal-Retriever Image
 
 ```bash
 docker build --no-cache -t opea/multimodal-retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/redis_multimodal/docker/Dockerfile .
-
 ```
 
 ### 3. Build LVM Image
@@ -156,9 +154,9 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker
+cd GenAIExamples/MultimodalRAGWithVideos/docker
 docker build --no-cache -t opea/multimodalragwithvideos:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../../..
+cd ../../..
 ```
 
 ### 6. Build UI Docker Image
@@ -166,9 +164,9 @@ cd ../../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/ui
+cd GenAIExamples/MultimodalRAGWithVideos/docker/ui
 docker build --no-cache -t opea/multimodalragwithvideos-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../../..
+cd ../../../..
 ```
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
@@ -198,7 +196,7 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/MultiModalRAGQnA/MultimodalRAGWithVideos/docker/xeon/
+cd GenAIExamples/MultimodalRAGWithVideos/docker/xeon/
 docker compose -f compose.yaml up -d
 ```
 
@@ -271,6 +269,14 @@ curl http://${host_ip}:9399/v1/lvm  \
     -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 ```
 
+Also, validate LVM Microservice with empty retrieval results
+```bash
+curl http://${host_ip}:9399/v1/lvm \
+    -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
+```
+
 6. Multimodal Dataprep Microservice
 
 Download a sample video
@@ -285,6 +291,14 @@ Test dataprep microservice. This command updates a knowledge base by uploading a
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT} \
+    -H 'Content-Type: multipart/form-data' \
+    -X POST -F "files=@./${video_fn}"
+```
+
+Also, test dataprep microservice with generating caption using lvm microservice
+```bash
+curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+    ${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
     -X POST -F "files=@./${video_fn}"
 ```
