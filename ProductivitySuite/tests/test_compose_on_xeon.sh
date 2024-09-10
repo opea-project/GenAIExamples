@@ -333,7 +333,7 @@ function validate_megaservice() {
 
 function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
-    cd $WORKPATH/react
+    cd $WORKPATH/ui/react
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
 #    conda remove -n ${conda_env_name} --all -y
