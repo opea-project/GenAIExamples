@@ -1,13 +1,13 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
 import json
 import os
 import re
 
 from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType
 from langchain_core.prompts import PromptTemplate
-import argparse
 
 
 class ChatTemplate:
