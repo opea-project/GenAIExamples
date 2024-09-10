@@ -86,7 +86,7 @@ docker run --runtime=habana -e HABANA_VISIBLE_DEVICES=all -p 8015:8015 -e OMPI_M
 
 ## 🚀3. Consume Finetuning Service
 
-## 3.1 Upload a training file
+### 3.1 Upload a training file
 
 Download a training file, such as `alpaca_data.json` for instruction tuning and upload it to the server with below command, this file can be downloaded in [here](https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json):
 
@@ -97,9 +97,9 @@ curl http://${your_ip}:8015/v1/files -X POST -H "Content-Type: multipart/form-da
 
 For reranking and embedding models finetuning, the training file [toy_finetune_data.jsonl](https://github.com/FlagOpen/FlagEmbedding/blob/master/examples/finetune/toy_finetune_data.jsonl) is an toy example.
 
-## 3.2 Create fine-tuning job
+### 3.2 Create fine-tuning job
 
-### 3.2.1 Instruction Tuning
+#### 3.2.1 Instruction Tuning
 
 After a training file like `alpaca_data.json` is uploaded, use the following command to launch a finetuning job using `meta-llama/Llama-2-7b-chat-hf` as base model:
 
@@ -114,7 +114,7 @@ curl http://${your_ip}:8015/v1/fine_tuning/jobs \
   }'
 ```
 
-### 3.2.2 Reranking Model Training
+#### 3.2.2 Reranking Model Training
 
 Use the following command to launch a finetuning job for reranking model finetuning, such as `BAAI/bge-reranker-large`:
 
@@ -133,7 +133,7 @@ curl http://${your_ip}:8015/v1/fine_tuning/jobs \
   }'
 ```
 
-### 3.2.3 Embedding Model Training
+#### 3.2.3 Embedding Model Training
 
 Use the following command to launch a finetuning job for embedding model finetuning, such as `BAAI/bge-base-en-v1.5`:
 
@@ -173,7 +173,7 @@ curl http://${your_ip}:8015/v1/fine_tuning/jobs \
 
 ```
 
-### 3.2.4 LLM Pretraining
+#### 3.2.4 LLM Pretraining
 
 Use the following command to launch a job for LLM pretraining, such as `meta-llama/Llama-2-7b-hf`:
 
@@ -199,7 +199,7 @@ Below is an example for the format of the pretraining dataset:
 {"text": "A boy with a blue tank top sitting watching three dogs."}
 ```
 
-## 3.3 Manage fine-tuning job
+### 3.3 Manage fine-tuning job
 
 Below commands show how to list finetuning jobs, retrieve a finetuning job, cancel a finetuning job and list checkpoints of a finetuning job.
 
@@ -216,6 +216,10 @@ curl http://localhost:8015/v1/fine_tuning/jobs/cancel -X POST -H "Content-Type: 
 # list checkpoints of a finetuning job
 curl http://${your_ip}:8015/v1/finetune/list_checkpoints -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
 ```
+
+### 3.4 Leverage fine-tuned model
+
+After fine-tuning job is done, fine-tuned model can be chosen from listed checkpoints, then the fine-tuned model can be used in other microservices. For example, fine-tuned reranking model can be used in [reranks](../reranks/README.md) microservice by assign its path to the environment variable `RERANK_MODEL_ID`, fine-tuned embedding model can be used in [embeddings](../embeddings/README.md) microservice by assign its path to the environment variable `model`, LLMs after instruction tuning can be used in [llms](../llms/README.md) microservice by assign its path to the environment variable `your_hf_llm_model`.
 
 ## 🚀4. Descriptions for Finetuning parameters
 
