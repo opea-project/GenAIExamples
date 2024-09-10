@@ -46,6 +46,7 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
           PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PREDICTIONGUARD_API_KEY: ${{ secrets.PREDICTIONGUARD_API_KEY }}
           service_path: ${{ matrix.service }}
           hardware: ${{ matrix.hardware }}
         run: |
