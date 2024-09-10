@@ -1,4 +1,31 @@
 ---
+# Source: chatqna/charts/chatqna-ui/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chatqna-chatqna-ui-config
+  labels:
+    helm.sh/chart: chatqna-ui-1.0.0
+    app.kubernetes.io/name: chatqna-ui
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  APP_BACKEND_SERVICE_ENDPOINT: "/v1/chatqna"
+  APP_DATA_PREP_SERVICE_URL: "/v1/dataprep"
+  CHAT_BASE_URL: "/v1/chatqna"
+  UPLOAD_FILE_BASE_URL: "/v1/dataprep"
+  GET_FILE: "/v1/dataprep/get_file"
+  DELETE_FILE: "/v1/dataprep/delete_file"
+  BASE_URL: "/v1/chatqna"
+  DOC_BASE_URL: "/v1/chatqna"
+  BASIC_URL: "/v1/chatqna"
+  VITE_CODE_GEN_URL: "/v1/chatqna"
+  VITE_DOC_SUM_URL: "/v1/chatqna"
+---
 # Source: chatqna/charts/data-prep/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -245,6 +272,92 @@ data:
   HF_HOME: "/tmp/.cache/huggingface"
   MAX_INPUT_LENGTH: "1024"
   MAX_TOTAL_TOKENS: "2048"
+---
+# Source: chatqna/templates/nginx-deployment.yaml
+apiVersion: v1
+data:
+  default.conf: |+
+    # Copyright (C) 2024 Intel Corporation
+    # SPDX-License-Identifier: Apache-2.0
+
+
+    server {
+        listen       80;
+        listen  [::]:80;
+
+        location /home {
+            alias  /usr/share/nginx/html/index.html;
+        }
+
+        location / {
+            proxy_pass http://chatqna-chatqna-ui:5174;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/chatqna {
+            proxy_pass http://chatqna:8888;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/dataprep {
+            proxy_pass http://chatqna-data-prep:6007;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/dataprep/get_file {
+            proxy_pass http://chatqna-data-prep:6007;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/dataprep/delete_file {
+            proxy_pass http://chatqna-data-prep:6007;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+
+kind: ConfigMap
+metadata:
+  name: chatqna-nginx-config
+---
+# Source: chatqna/charts/chatqna-ui/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-chatqna-ui
+  labels:
+    helm.sh/chart: chatqna-ui-1.0.0
+    app.kubernetes.io/name: chatqna-ui
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5174
+      targetPort: ui
+      protocol: TCP
+      name: ui
+  selector:
+    app.kubernetes.io/name: chatqna-ui
+    app.kubernetes.io/instance: chatqna
 ---
 # Source: chatqna/charts/data-prep/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -525,6 +638,22 @@ spec:
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: chatqna
 ---
+# Source: chatqna/templates/nginx-deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/name: chatqna
+    app.kubernetes.io/instance: chatqna
+    app: chatqna-nginx
+  type: NodePort
+---
 # Source: chatqna/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -549,6 +678,60 @@ spec:
   selector:
     app.kubernetes.io/name: chatqna
     app.kubernetes.io/instance: chatqna
+    app: chatqna
+---
+# Source: chatqna/charts/chatqna-ui/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-chatqna-ui
+  labels:
+    helm.sh/chart: chatqna-ui-1.0.0
+    app.kubernetes.io/name: chatqna-ui
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chatqna-ui
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: chatqna-ui-1.0.0
+        app.kubernetes.io/name: chatqna-ui
+        app.kubernetes.io/instance: chatqna
+        app.kubernetes.io/version: "v1.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: chatqna-ui
+          envFrom:
+            - configMapRef:
+                name: chatqna-chatqna-ui-config
+          securityContext:
+            {}
+          image: "opea/chatqna-conversation-ui:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: ui
+              containerPort: 80
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
 ---
 # Source: chatqna/charts/data-prep/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -1449,17 +1632,20 @@ metadata:
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
+    app: chatqna
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: chatqna
       app.kubernetes.io/instance: chatqna
+      app: chatqna
   template:
     metadata:
       labels:
         app.kubernetes.io/name: chatqna
         app.kubernetes.io/instance: chatqna
+        app: chatqna
     spec:
       securityContext:
         null
@@ -1495,24 +1681,47 @@ spec:
             - name: chatqna
               containerPort: 8888
               protocol: TCP
-                #          startupProbe:
-                #            httpGet:
-                #              host: chatqna-llm-uservice
-                #              port: 9000
-                #              path: /
-                #            initialDelaySeconds: 5
-                #            periodSeconds: 5
-                #            failureThreshold: 120
-                #          livenessProbe:
-                #            httpGet:
-                #              path: /
-                #              port: 8888
-                #          readinessProbe:
-                #            httpGet:
-                #              path: /
-                #              port: 8888
           resources:
             null
       volumes:
         - name: tmp
           emptyDir: {}
+---
+# Source: chatqna/templates/nginx-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-nginx
+  labels:
+    helm.sh/chart: chatqna-1.0.0
+    app.kubernetes.io/name: chatqna
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: chatqna-nginx
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chatqna
+      app.kubernetes.io/instance: chatqna
+      app: chatqna-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chatqna
+        app.kubernetes.io/instance: chatqna
+        app: chatqna-nginx
+    spec:
+      containers:
+      - image: nginx:1.27.1
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-config-volume
+      securityContext: {}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: chatqna-nginx-config
+        name: nginx-config-volume

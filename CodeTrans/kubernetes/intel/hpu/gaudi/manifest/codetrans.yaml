@@ -1,4 +1,31 @@
 ---
+# Source: codetrans/charts/codetrans-ui/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: codetrans-codetrans-ui-config
+  labels:
+    helm.sh/chart: codetrans-ui-1.0.0
+    app.kubernetes.io/name: codetrans-ui
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  APP_BACKEND_SERVICE_ENDPOINT: "/v1/codetrans"
+  APP_DATA_PREP_SERVICE_URL: "/v1/dataprep"
+  CHAT_BASE_URL: "/v1/codetrans"
+  UPLOAD_FILE_BASE_URL: "/v1/dataprep"
+  GET_FILE: "/v1/dataprep/get_file"
+  DELETE_FILE: "/v1/dataprep/delete_file"
+  BASE_URL: "/v1/codetrans"
+  DOC_BASE_URL: "/v1/codetrans"
+  BASIC_URL: "/v1/codetrans"
+  VITE_CODE_GEN_URL: "/v1/codetrans"
+  VITE_DOC_SUM_URL: "/v1/codetrans"
+---
 # Source: codetrans/charts/llm-uservice/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -48,6 +75,68 @@ data:
   HF_HOME: "/tmp/.cache/huggingface"
   MAX_INPUT_LENGTH: "1024"
   MAX_TOTAL_TOKENS: "2048"
+---
+# Source: codetrans/templates/nginx-deployment.yaml
+apiVersion: v1
+data:
+  default.conf: |+
+    # Copyright (C) 2024 Intel Corporation
+    # SPDX-License-Identifier: Apache-2.0
+
+
+    server {
+        listen       80;
+        listen  [::]:80;
+
+        location /home {
+            alias  /usr/share/nginx/html/index.html;
+        }
+
+        location / {
+            proxy_pass http://codetrans-codetrans-ui:5174;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/codetrans {
+            proxy_pass http://codetrans:7777;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+
+kind: ConfigMap
+metadata:
+  name: codetrans-nginx-config
+---
+# Source: codetrans/charts/codetrans-ui/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codetrans-codetrans-ui
+  labels:
+    helm.sh/chart: codetrans-ui-1.0.0
+    app.kubernetes.io/name: codetrans-ui
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5174
+      targetPort: ui
+      protocol: TCP
+      name: ui
+  selector:
+    app.kubernetes.io/name: codetrans-ui
+    app.kubernetes.io/instance: codetrans
 ---
 # Source: codetrans/charts/llm-uservice/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -99,6 +188,22 @@ spec:
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: codetrans
 ---
+# Source: codetrans/templates/nginx-deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: codetrans-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
+    app: codetrans-nginx
+  type: NodePort
+---
 # Source: codetrans/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -123,6 +228,60 @@ spec:
   selector:
     app.kubernetes.io/name: codetrans
     app.kubernetes.io/instance: codetrans
+    app: codetrans
+---
+# Source: codetrans/charts/codetrans-ui/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codetrans-codetrans-ui
+  labels:
+    helm.sh/chart: codetrans-ui-1.0.0
+    app.kubernetes.io/name: codetrans-ui
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: codetrans-ui
+      app.kubernetes.io/instance: codetrans
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: codetrans-ui-1.0.0
+        app.kubernetes.io/name: codetrans-ui
+        app.kubernetes.io/instance: codetrans
+        app.kubernetes.io/version: "v1.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: codetrans-ui
+          envFrom:
+            - configMapRef:
+                name: codetrans-codetrans-ui-config
+          securityContext:
+            {}
+          image: "opea/codetrans-ui:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: ui
+              containerPort: 5173
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
 ---
 # Source: codetrans/charts/llm-uservice/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -297,17 +456,20 @@ metadata:
     app.kubernetes.io/instance: codetrans
     app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
+    app: codetrans
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: codetrans
       app.kubernetes.io/instance: codetrans
+      app: codetrans
   template:
     metadata:
       labels:
         app.kubernetes.io/name: codetrans
         app.kubernetes.io/instance: codetrans
+        app: codetrans
     spec:
       securityContext:
         null
@@ -343,74 +505,41 @@ spec:
         - name: tmp
           emptyDir: {}
 ---
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: codetrans-nginx-config
-data:
-  default.conf: |
-    server {
-        listen       80;
-        listen  [::]:80;
-
-        location / {
-            root   /usr/share/nginx/html;
-            index  index.html index.htm;
-        }
-
-        location /v1/codetrans {
-            proxy_pass http://codetrans:7777;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-    }
----
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
+# Source: codetrans/templates/nginx-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: codetrans-nginx-deployment
+  name: codetrans-nginx
+  labels:
+    helm.sh/chart: codetrans-1.0.0
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: codetrans-nginx
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: nginx
+      app.kubernetes.io/name: codetrans
+      app.kubernetes.io/instance: codetrans
+      app: codetrans-nginx
   template:
     metadata:
       labels:
-        app: nginx
+        app.kubernetes.io/name: codetrans
+        app.kubernetes.io/instance: codetrans
+        app: codetrans-nginx
     spec:
       containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
+      - image: nginx:1.27.1
+        imagePullPolicy: IfNotPresent
+        name: nginx
         volumeMounts:
-        - name: nginx-config-volume
-          mountPath: /etc/nginx/conf.d/default.conf
-          subPath: default.conf
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-config-volume
+      securityContext: {}
       volumes:
-      - name: nginx-config-volume
-        configMap:
+      - configMap:
+          defaultMode: 420
           name: codetrans-nginx-config
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: nginx-svc
-spec:
-  selector:
-    app: nginx
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-      nodePort: 30789
-  type: NodePort
+        name: nginx-config-volume

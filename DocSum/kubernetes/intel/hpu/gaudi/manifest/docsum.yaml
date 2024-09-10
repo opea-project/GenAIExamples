@@ -1,4 +1,31 @@
 ---
+# Source: docsum/charts/docsum-ui/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docsum-docsum-ui-config
+  labels:
+    helm.sh/chart: docsum-ui-1.0.0
+    app.kubernetes.io/name: docsum-ui
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  APP_BACKEND_SERVICE_ENDPOINT: "/v1/docsum"
+  APP_DATA_PREP_SERVICE_URL: "/v1/dataprep"
+  CHAT_BASE_URL: "/v1/docsum"
+  UPLOAD_FILE_BASE_URL: "/v1/dataprep"
+  GET_FILE: "/v1/dataprep/get_file"
+  DELETE_FILE: "/v1/dataprep/delete_file"
+  BASE_URL: "/v1/docsum"
+  DOC_BASE_URL: "/v1/docsum"
+  BASIC_URL: "/v1/docsum"
+  VITE_CODE_GEN_URL: "/v1/docsum"
+  VITE_DOC_SUM_URL: "/v1/docsum"
+---
 # Source: docsum/charts/llm-uservice/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -48,6 +75,68 @@ data:
   HF_HOME: "/tmp/.cache/huggingface"
   MAX_INPUT_LENGTH: "1024"
   MAX_TOTAL_TOKENS: "2048"
+---
+# Source: docsum/templates/nginx-deployment.yaml
+apiVersion: v1
+data:
+  default.conf: |+
+    # Copyright (C) 2024 Intel Corporation
+    # SPDX-License-Identifier: Apache-2.0
+
+
+    server {
+        listen       80;
+        listen  [::]:80;
+
+        location /home {
+            alias  /usr/share/nginx/html/index.html;
+        }
+
+        location / {
+            proxy_pass http://docsum-docsum-ui:5174;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/docsum {
+            proxy_pass http://docsum:8888;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+
+kind: ConfigMap
+metadata:
+  name: docsum-nginx-config
+---
+# Source: docsum/charts/docsum-ui/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-docsum-ui
+  labels:
+    helm.sh/chart: docsum-ui-1.0.0
+    app.kubernetes.io/name: docsum-ui
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5174
+      targetPort: ui
+      protocol: TCP
+      name: ui
+  selector:
+    app.kubernetes.io/name: docsum-ui
+    app.kubernetes.io/instance: docsum
 ---
 # Source: docsum/charts/llm-uservice/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -99,6 +188,22 @@ spec:
     app.kubernetes.io/name: tgi
     app.kubernetes.io/instance: docsum
 ---
+# Source: docsum/templates/nginx-deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/name: docsum
+    app.kubernetes.io/instance: docsum
+    app: docsum-nginx
+  type: NodePort
+---
 # Source: docsum/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -123,6 +228,60 @@ spec:
   selector:
     app.kubernetes.io/name: docsum
     app.kubernetes.io/instance: docsum
+    app: docsum
+---
+# Source: docsum/charts/docsum-ui/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-docsum-ui
+  labels:
+    helm.sh/chart: docsum-ui-1.0.0
+    app.kubernetes.io/name: docsum-ui
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: docsum-ui
+      app.kubernetes.io/instance: docsum
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: docsum-ui-1.0.0
+        app.kubernetes.io/name: docsum-ui
+        app.kubernetes.io/instance: docsum
+        app.kubernetes.io/version: "v1.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: docsum-ui
+          envFrom:
+            - configMapRef:
+                name: docsum-docsum-ui-config
+          securityContext:
+            {}
+          image: "opea/docsum-ui:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: ui
+              containerPort: 5173
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
 ---
 # Source: docsum/charts/llm-uservice/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -297,17 +456,20 @@ metadata:
     app.kubernetes.io/instance: docsum
     app.kubernetes.io/version: "v1.0"
     app.kubernetes.io/managed-by: Helm
+    app: docsum
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: docsum
       app.kubernetes.io/instance: docsum
+      app: docsum
   template:
     metadata:
       labels:
         app.kubernetes.io/name: docsum
         app.kubernetes.io/instance: docsum
+        app: docsum
     spec:
       securityContext:
         null
@@ -342,3 +504,42 @@ spec:
       volumes:
         - name: tmp
           emptyDir: {}
+---
+# Source: docsum/templates/nginx-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-nginx
+  labels:
+    helm.sh/chart: docsum-1.0.0
+    app.kubernetes.io/name: docsum
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: docsum-nginx
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: docsum
+      app.kubernetes.io/instance: docsum
+      app: docsum-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: docsum
+        app.kubernetes.io/instance: docsum
+        app: docsum-nginx
+    spec:
+      containers:
+      - image: nginx:1.27.1
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-config-volume
+      securityContext: {}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: docsum-nginx-config
+        name: nginx-config-volume
