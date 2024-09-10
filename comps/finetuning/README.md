@@ -173,6 +173,32 @@ curl http://${your_ip}:8015/v1/fine_tuning/jobs \
 
 ```
 
+### 3.2.4 LLM Pretraining
+
+Use the following command to launch a job for LLM pretraining, such as `meta-llama/Llama-2-7b-hf`:
+
+```bash
+# create a finetuning job
+curl http://${your_ip}:8015/v1/fine_tuning/jobs \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "training_file": "test_data.json",
+    "model": "meta-llama/Llama-2-7b-hf",
+    "General":{
+      "task":"pretraining",
+      "lora_config":null
+    }
+  }'
+```
+
+Below is an example for the format of the pretraining dataset:
+
+```json
+{"text": "A girl with a blue tank top sitting watching three dogs."}
+{"text": "A boy with a blue tank top sitting watching three dogs."}
+```
+
 ## 3.3 Manage fine-tuning job
 
 Below commands show how to list finetuning jobs, retrieve a finetuning job, cancel a finetuning job and list checkpoints of a finetuning job.

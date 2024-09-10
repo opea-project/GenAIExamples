@@ -18,7 +18,7 @@ from transformers import BatchEncoding, DataCollatorWithPadding
 IGNORE_INDEX = -100
 
 
-class DataProcessor:
+class InstructionDataProcessor:
     # We used the following prompts for fine-tuning the Alpaca model. You can find reference doc form this URL(https://github.com/tatsu-lab/stanford_alpaca/blob/main/README.md#data-release)
     def __init__(self, config, tokenizer):
         self.tokenizer = tokenizer
@@ -196,6 +196,39 @@ class DataProcessor:
                 if self.mask_response:
                     labels[input_id_len:input_len] = [IGNORE_INDEX] * (input_len - input_id_len)
 
+            examples["input_ids"].append(results["input_ids"])
+            examples["labels"].append(labels)
+            examples["attention_mask"].append(results["attention_mask"])
+        return examples
+
+
+class PretrainingDataProcessor:
+    def __init__(self, config, tokenizer):
+        self.tokenizer = tokenizer
+        self.max_length = self.max_seq_length = config["Dataset"].get("max_length", 512)
+        self.truncation = config["Dataset"].get("truncation", True)
+        self.padding = config["Dataset"].get("padding", True)
+
+    def tokenize(self, examples):
+        keys = list(examples.data.keys())
+        if len(keys) != 1 and "text" not in keys:
+            raise ValueError("Unsupported dataset format")
+
+        key = keys[0] if len(keys) == 1 else "text"
+        examples["input_ids"] = []
+        examples["labels"] = []
+        examples["attention_mask"] = []
+        for exp in examples[key]:
+            results = self.tokenizer(
+                exp,
+                padding=self.padding,
+                truncation=self.truncation,
+                return_tensors=None,
+                max_length=self.max_length,
+            )
+
+            input_ids = results["input_ids"]
+            labels = copy.deepcopy(input_ids)
             examples["input_ids"].append(results["input_ids"])
             examples["labels"].append(labels)
             examples["attention_mask"].append(results["attention_mask"])

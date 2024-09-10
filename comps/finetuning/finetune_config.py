@@ -16,6 +16,7 @@ PRECISION_NO = "no"
 DEVICE_CPU = "cpu"
 DEVICE_HPU = "hpu"
 DEVICE_GPU = "gpu"
+DEVICE_CUDA = "cuda"
 
 ACCELERATE_STRATEGY_DDP = "DDP"
 ACCELERATE_STRATEGY_FSDP = "FSDP"
@@ -57,7 +58,7 @@ class GeneralConfig(BaseModel):
 
     @validator("task")
     def check_task(cls, v: str):
-        assert v in ["instruction_tuning", "rerank", "embedding"]
+        assert v in ["instruction_tuning", "pretraining", "rerank", "embedding"]
         return v
 
 
@@ -136,7 +137,7 @@ class TrainingConfig(BaseModel):
     def check_device(cls, v: str):
         # will convert to lower case
         if v:
-            assert v.lower() in [DEVICE_CPU, DEVICE_GPU, DEVICE_HPU]
+            assert v.lower() in [DEVICE_CPU, DEVICE_GPU, DEVICE_HPU, DEVICE_CUDA]
         return v.lower()
 
     @validator("hpu_execution_mode")
