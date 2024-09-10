@@ -39,6 +39,9 @@ function build_docker_images_for_retrieval_tool(){
 
     RETRIEVAL_TOOL_PATH=$WORKPATH/../DocIndexRetriever
     cd $RETRIEVAL_TOOL_PATH/docker/
+    if [ ! -d "GenAIComps" ] ; then
+        git clone https://github.com/opea-project/GenAIComps.git
+    fi
     echo "==============Building retrieval-tool image================="
     docker build -t opea/doc-index-retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./Dockerfile .
     echo "==============Successfully built retrieval-tool image================="
