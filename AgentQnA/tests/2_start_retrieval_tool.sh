@@ -16,7 +16,7 @@ fi
 
 function start_retrieval_tool() {
     echo "Starting Retrieval tool"
-    cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/docker/
+    cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/
     bash launch_retrieval_tool.sh
 }
 

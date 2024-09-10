@@ -10,32 +10,33 @@ export ip_address=$(hostname -I | awk '{print $1}')
 
 
 function get_genai_comps() {
-    cd $WORKPATH/docker
     if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git
+        git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
 }
 
+
 function build_docker_images_for_retrieval_tool(){
-    RETRIEVAL_TOOL_PATH=$WORKPATH/retrieval_tool
-    cd $RETRIEVAL_TOOL_PATH/docker/
-    echo "==============Building retrieval-tool image================="
-    echo "current_path: $PWD"
-    bash build_images.sh
-    echo "==============Successfully built retrieval-tool image================="
+    cd $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/
+    # git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    get_genai_comps
+    echo "Build all the images with --no-cache..."
+    service_list="doc-index-retriever dataprep-redis embedding-tei retriever-redis reranking-tei"
+    docker compose -f build.yaml build ${service_list} --no-cache
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+
+    docker images && sleep 1s
 }
 
 function build_agent_docker_image() {
-    cd $WORKDIR/GenAIComps
-    docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/docker/Dockerfile .
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_image_build/
+    get_genai_comps
+    echo "Build agent image with --no-cache..."
+    service_list="agent-endpoint"
+    docker compose -f build.yaml build ${service_list} --no-cache
 }
 
 function main() {
-
-    echo "==================== Get GenAI components ===================="
-    get_genai_comps
-    echo "==================== GenAI components downloaded ===================="
-
     echo "==================== Build docker images for retrieval tool ===================="
     build_docker_images_for_retrieval_tool
     echo "==================== Build docker images for retrieval tool completed ===================="
