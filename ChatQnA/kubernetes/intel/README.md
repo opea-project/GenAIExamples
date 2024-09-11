@@ -11,7 +11,7 @@
 ## Deploy On Xeon
 
 ```
-cd GenAIExamples/ChatQnA/kubernetes/manifests/xeon
+cd GenAIExamples/ChatQnA/kubernetes/intel/cpu/xeon/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chatqna.yaml
 kubectl apply -f chatqna.yaml
@@ -20,7 +20,7 @@ kubectl apply -f chatqna.yaml
 ## Deploy On Gaudi
 
 ```
-cd GenAIExamples/ChatQnA/kubernetes/manifests/gaudi
+cd GenAIExamples/ChatQnA/kubernetes/intel/hpu/gaudi/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chatqna.yaml
 kubectl apply -f chatqna.yaml

@@ -21,7 +21,7 @@ Currently we support two ways of deploying Document Summarization services with 
    docker pull opea/docsum:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker)
+2. Start services using the docker images `built from source`: [Guide](./docker_compose)
 
 ### Required Models
 

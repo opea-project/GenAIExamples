@@ -17,7 +17,7 @@ If use gated models, you also need to provide [huggingface token](https://huggin
 ## Deploy On Xeon
 
 ```
-cd GenAIExamples/FaqGen/kubernetes/manifests/xeon
+cd GenAIExamples/FaqGen/kubernetes/intel/cpu/xeon/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" faqgen.yaml
 kubectl apply -f faqgen.yaml
@@ -26,7 +26,7 @@ kubectl apply -f faqgen.yaml
 ## Deploy On Gaudi
 
 ```
-cd GenAIExamples/FaqGen/kubernetes/manifests/gaudi
+cd GenAIExamples/FaqGen/kubernetes/intel/hpu/gaudi/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" faqgen.yaml
 kubectl apply -f faqgen.yaml

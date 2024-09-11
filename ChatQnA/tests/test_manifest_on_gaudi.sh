@@ -166,7 +166,7 @@ case "$1" in
         if [ $ret -ne 0 ]; then
             exit $ret
         fi
-        pushd ChatQnA/kubernetes/manifests/gaudi
+        pushd ChatQnA/kubernetes/intel/hpu/gaudi/manifests
         set +e
         install_and_validate_chatqna_guardrail
         popd

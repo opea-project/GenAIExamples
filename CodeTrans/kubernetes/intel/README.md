@@ -21,7 +21,7 @@ Change the `MODEL_ID` in `codetrans.yaml` for your needs.
 ## Deploy On Xeon
 
 ```bash
-cd GenAIExamples/CodeTrans/kubernetes/manifests/xeon
+cd GenAIExamples/CodeTrans/kubernetes/intel/cpu/xeon/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" codetrans.yaml
 kubectl apply -f codetrans.yaml
@@ -30,7 +30,7 @@ kubectl apply -f codetrans.yaml
 ## Deploy On Gaudi
 
 ```bash
-cd GenAIExamples/CodeTrans/kubernetes/manifests/gaudi
+cd GenAIExamples/CodeTrans/kubernetes/intel/hpu/gaudi/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" codetrans.yaml
 kubectl apply -f codetrans.yaml

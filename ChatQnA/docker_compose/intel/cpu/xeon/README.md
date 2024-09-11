@@ -147,7 +147,7 @@ cd ..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/ChatQnA/
+cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 cd ../../../..
 ```

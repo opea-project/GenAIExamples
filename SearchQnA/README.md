@@ -32,7 +32,7 @@ Currently we support two ways of deploying SearchQnA services with docker compos
    docker pull opea/searchqna:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker)
+2. Start services using the docker images `built from source`: [Guide](./docker_compose)
 
 ### Setup Environment Variable
 
