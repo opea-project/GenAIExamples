@@ -15,12 +15,12 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH/docker
-    git clone https://github.com/opea-project/GenAIComps.git
+    cd $WORKPATH/docker_image_build
+    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="videoragqna videoragqna-ui dataprep embedding retriever reranking lvm-video-llama lvm"
-    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull intellabs/vdms:latest
     docker images && sleep 1s
@@ -28,7 +28,7 @@ function build_docker_images() {
 
 
 function start_services() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     source set_env.sh
     docker volume create video-llama-model
@@ -140,7 +140,7 @@ function validate_services() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
-    cd $WORKPATH/docker/xeon/data
+    cd $WORKPATH/docker_compose/intel/cpu/xeon//data
 
     # dataprep microservice
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep \
@@ -228,7 +228,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose stop && docker compose rm -f
     docker volume rm video-llama-model
 }

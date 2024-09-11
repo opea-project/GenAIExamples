@@ -62,19 +62,19 @@ docker build -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_
 ### 2. Build Retriever Image
 
 ```bash
-docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/langchain/vdms/docker/Dockerfile .
+docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/vdms/langchain/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
 
 ```bash
-docker build -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/docker/Dockerfile .
+docker build -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/Dockerfile .
 ```
 
 ### 4. Build LVM Image (Xeon)
 
 ```bash
-docker build -t opea/video-llama-lvm-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/server/docker/Dockerfile .
+docker build -t opea/video-llama-lvm-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/dependency/Dockerfile .
 
 # LVM Service Image
 docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/Dockerfile .
@@ -83,7 +83,7 @@ docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy
 ### 5. Build Dataprep Image
 
 ```bash
-docker build -t opea/dataprep-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/docker/Dockerfile .
+docker build -t opea/dataprep-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/Dockerfile .
 cd ..
 ```
 
@@ -95,7 +95,7 @@ Build MegaService Docker image via below command:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/VideoRAGQnA/docker
+cd GenAIExamples/VideoRAGQnA/
 docker build -t opea/videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
@@ -189,7 +189,7 @@ There are 2 parts of the pipeline:
 In the deploy steps, you need to start the VDMS DB and dataprep firstly, then insert some sample data into it. After that you could get the megaservice up.
 
 ```bash
-cd GenAIExamples/VideoRAGQnA/docker/xeon/
+cd GenAIExamples/VideoRAGQnA/docker_compose/intel/cpu/xeon/
 
 docker volume create video-llama-model
 docker compose up vdms-vector-db dataprep -d
