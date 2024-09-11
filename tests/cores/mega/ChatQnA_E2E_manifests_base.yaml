@@ -673,4 +673,3 @@ spec:
     app: vector-db
   type: ClusterIP
 ---
-
