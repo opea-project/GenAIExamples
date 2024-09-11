@@ -132,8 +132,10 @@ docker compose -f compose.yaml up -d
 
 ### Validate Microservices
 
-Follow the instructions to validate MicroServices. Note that it may take a few minutes for the microservice to be ready.
+Follow the instructions to validate MicroServices.
 
+> Note: If you see an "Internal Server Error" from the `curl` command, wait a few minutes for the microserver to be ready and then try again.
+ 
 1. LLM Microservice
 
    ```bash
