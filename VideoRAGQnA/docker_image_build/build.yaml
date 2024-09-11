@@ -1,0 +1,55 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  videoragqna:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/videoragqna:${TAG:-latest}
+  videoragqna-xeon-ui-server:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: videoragqna
+    image: ${REGISTRY:-opea}/videoragqna-ui:${TAG:-latest}
+  dataprep:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/vdms/multimodal_langchain/Dockerfile
+    extends: videoragqna
+    image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}
+  embedding:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/multimodal_clip/Dockerfile
+    extends: videoragqna
+    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+  retriever:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/vdms/langchain/Dockerfile
+    extends: videoragqna
+    image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
+  reranking:
+    build:
+      context: GenAIComps
+      dockerfile: comps/reranks/video-rag-qna/Dockerfile
+    extends: videoragqna
+    image: ${REGISTRY:-opea}/reranking-videoragqna:${TAG:-latest}
+  lvm-video-llama:
+    build:
+      context: GenAIComps
+      dockerfile: comps/lvms/video-llama/dependency/Dockerfile
+    extends: videoragqna
+    image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
+  lvm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/lvms/video-llama/Dockerfile
+    extends: videoragqna
+    image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
