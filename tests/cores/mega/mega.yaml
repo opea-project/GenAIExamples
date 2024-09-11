@@ -1,0 +1,117 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+environment_variables:
+  common: &common
+    no_proxy: "localhost"
+    http_proxy: ""
+    https_proxy: ""
+    HUGGINGFACEHUB_API_TOKEN: ""
+
+  redis: &redis
+    REDIS_URL: "redis://localhost:6379"
+    INDEX_NAME: "rag-redis"
+
+  tei_embedding: &tei_embedding
+    TEI_EMBEDDING_ENDPOINT: "http://localhost:8090"
+
+  tei_reranking: &tei_reranking
+    TEI_RERANKING_ENDPOINT: "http://localhost:8808"
+
+  llm: &llm
+    TGI_LLM_ENDPOINT: "http://localhost:8005"
+
+  chatqna: &chatqna
+    MEGA_SERVICE_HOST_IP: localhost
+    EMBEDDING_SERVICE_HOST_IP: localhost
+    RETRIEVER_SERVICE_HOST_IP: localhost
+    RERANK_SERVICE_HOST_IP: localhost
+    LLM_SERVICE_HOST_IP: localhost
+
+  ui: &ui
+    CHAT_BASE_URL: "http://localhost:8888/v1/chatqna"
+    DATAPREP_SERVICE_ENDPOINT: "http://localhost:6007/v1/dataprep"
+    DATAPREP_GET_FILE_ENDPOINT: "http://localhost:6007/v1/dataprep/get_file"
+    DATAPREP_DELETE_FILE_ENDPOINT: "http://localhost:6007/v1/dataprep/delete_file"
+
+opea_micro_services:
+  embedding:
+    opea/embedding-tei:
+      tag: latest
+      type: cpu
+      dependency:
+        ghcr.io/huggingface/text-embeddings-inference:
+          tag: cpu-1.5
+          type: cpu
+          requirements:
+            model_id: "BAAI/bge-base-en-v1.5"
+        opea/tei-gaudi:
+          tag: latest
+          type: hpu
+          requirements:
+            model_id: "BAAI/bge-base-en-v1.5"
+      environment:
+        <<: [*common, *tei_embedding]
+
+  llm:
+    opea/llm-tgi:
+      tag: latest
+      type: cpu
+      dependency:
+        ghcr.io/huggingface/text-generation-inference:
+          tag: 2.2.0
+          type: cpu
+          requirements:
+            model_id: "Intel/neural-chat-7b-v3-3"
+        ghcr.io/huggingface/tgi-gaudi:
+          tag: 2.0.4
+          type: hpu
+          requirements:
+            model_id: "Intel/neural-chat-7b-v3-3"
+      environment:
+        <<: [*common, *llm]
+
+  data_prep:
+    opea/dataprep-redis:
+      tag: latest
+      type: cpu
+      environment:
+        <<: [*common, *redis, *tei_embedding]
+
+  retrieval:
+    opea/retriever-redis:
+      tag: latest
+      type: cpu
+      environment:
+        <<: [*common, *redis]
+
+  reranking:
+    opea/reranking-tei:
+      tag: latest
+      type: cpu
+      dependency:
+        ghcr.io/huggingface/text-embeddings-inference:
+          tag: cpu-1.5
+          type: cpu
+          requirements:
+            model_id: "BAAI/bge-reranker-base"
+        opea/tei-gaudi:
+          tag: latest
+          type: hpu
+          requirements:
+            model_id: "BAAI/bge-reranker-base"
+      environment:
+        <<: [*common, *tei_reranking]
+
+opea_mega_service:
+  opea/chatqna:
+    tag: latest
+    type: cpu
+    environment:
+      <<: [*common, *chatqna]
+
+  opea/chatqna-ui:
+    tag: latest
+    type: cpu
+    environment:
+      <<: [*common, *ui]

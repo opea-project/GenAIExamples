@@ -68,6 +68,7 @@ if __name__ == "__main__":
         package_data={"": ["*.yaml", "../*.py"]},
         include_package_data=True,
         install_requires=fetch_requirements("requirements.txt"),
+        entry_points={"console_scripts": ["opea = comps.cores.mega.cli:opea_execute"]},
         python_requires=">=3.8.0",
         classifiers=[
             "Intended Audience :: Science/Research",
