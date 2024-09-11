@@ -106,7 +106,3 @@
 		<img src={imageUrl} alt="Uploaded Image" class="m-2 mx-auto block" />
 	{/if}
 </Dropzone>
-
-{#if value.length !== 0}
-	<p class="bg-white p-2 text-center">{showFiles(value)}</p>
-{/if}
