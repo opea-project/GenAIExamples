@@ -3,7 +3,7 @@
 
 cd ../../../../
 docker build  \
-    -t opea/llm-vllm:latest \
+    -t opea/llm-vllm-llamaindex:latest \
     --build-arg https_proxy=$https_proxy \
     --build-arg http_proxy=$http_proxy \
-    -f comps/llms/text-generation/vllm/langchain/Dockerfile .
+    -f comps/llms/text-generation/vllm/llama_index/Dockerfile .

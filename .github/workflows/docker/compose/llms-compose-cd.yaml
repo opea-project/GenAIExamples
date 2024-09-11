@@ -11,3 +11,11 @@ services:
       context: vllm-openvino
       dockerfile: Dockerfile.openvino
     image: ${REGISTRY:-opea}/vllm-openvino:${TAG:-latest}
+  llm-vllm-llamaindex:
+    build:
+      dockerfile: comps/llms/text-generation/vllm/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/llm-vllm-llamaindex:${TAG:-latest}
+  llm-vllm-llamaindex-hpu:
+    build:
+      dockerfile: comps/llms/text-generation/vllm/llama_index/dependency/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/llm-vllm-llamaindex-hpu:${TAG:-latest}

@@ -1,0 +1,12 @@
+docarray[full]
+fastapi
+huggingface_hub
+llama-index-llms-openai-like
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+prometheus-fastapi-instrumentator
+shortuuid
+transformers
+uvicorn
+vllm

@@ -1,0 +1,46 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  vllm-service:
+    image: opea/vllm:hpu
+    container_name: vllm-gaudi-server
+    ports:
+      - "8008:80"
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      LLM_MODEL: ${LLM_MODEL}
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: /bin/bash -c "export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --enforce-eager --model $LLM_MODEL --tensor-parallel-size 1 --host 0.0.0.0 --port 80"
+  llm:
+    image: opea/llm-vllm-llamaindex:latest
+    container_name: llm-vllm-gaudi-server
+    depends_on:
+      - vllm-service
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL: ${LLM_MODEL}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
