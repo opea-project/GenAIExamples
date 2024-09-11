@@ -89,11 +89,11 @@ Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more in
 
 ### Deploy using Kubernetes with GMC
 
-Refer to the [Code Translation Kubernetes Guide](./kubernetes/README.md)
+Refer to the [Code Translation Kubernetes Guide](./kubernetes/intel/README_gmc.md)
 
 ### Deploy using Kubernetes without GMC
 
-Refer to the [Code Translation Kubernetes Guide](./kubernetes/manifests/README.md)
+Refer to the [Code Translation Kubernetes Guide](./kubernetes/intel/README.md)
 
 ### Deploy CodeTrans into Kubernetes using Helm Chart
 
