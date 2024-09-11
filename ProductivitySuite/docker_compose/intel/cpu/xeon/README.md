@@ -530,7 +530,7 @@ Here're some of the project's features:
 - Generate code: generate the corresponding code based on the current user's input.
 
   Screen Shot
-  ![project-screenshot](../../assets/img/codegen.png)
+  ![project-screenshot](../../../../assets/img/codegen.png)
 
 ### DOC SUMMARY
 

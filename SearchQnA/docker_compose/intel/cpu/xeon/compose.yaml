@@ -129,7 +129,7 @@ services:
       - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
     ipc: host
     restart: always
-  searchqna-gaudi-ui-server:
+  searchqna-xeon-ui-server:
     image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
     container_name: searchqna-xeon-ui-server
     depends_on:
