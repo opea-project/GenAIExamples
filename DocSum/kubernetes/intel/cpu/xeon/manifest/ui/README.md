@@ -16,7 +16,7 @@ Before deploying the react-docsum.yaml file, ensure that you have the following 
        ```
        # You may set the HUGGINGFACEHUB_API_TOKEN via method:
        export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
-       cd GenAIExamples/DocSum/kubernetes/manifests/xeon/ui/
+       cd GenAIExamples/DocSum/kubernetes/intel/cpu/xeon/manifests/ui/
        sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" react-docsum.yaml
        ```
     b. Set the proxies based on your network configuration

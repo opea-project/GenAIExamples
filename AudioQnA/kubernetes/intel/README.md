@@ -7,14 +7,14 @@
 
 ## Deploy On Xeon
 ```
-cd GenAIExamples/AudioQnA/kubernetes/manifests/xeon
+cd GenAIExamples/AudioQnA/kubernetes/intel/cpu/xeon/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" audioqna.yaml
 kubectl apply -f audioqna.yaml
 ```
 ## Deploy On Gaudi
 ```
-cd GenAIExamples/AudioQnA/kubernetes/manifests/gaudi
+cd GenAIExamples/AudioQnA/kubernetes/intel/hpu/gaudi/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" audioqna.yaml
 kubectl apply -f audioqna.yaml

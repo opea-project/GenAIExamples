@@ -159,7 +159,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/aipc/
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc/
 docker compose up -d
 
 # let ollama service runs

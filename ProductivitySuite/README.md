@@ -20,4 +20,4 @@ Refer to the [Keycloak Configuration Guide](./docker_compose/intel/cpu/xeon/keyc
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source and running the application via docker compose.
 
-Refer to the [Xeon Kubernetes Guide](./kubernetes/manifests/README.md) for more instruction on deploying the application via kubernetes.
+Refer to the [Xeon Kubernetes Guide](./kubernetes/intel/README.md) for more instruction on deploying the application via kubernetes.
