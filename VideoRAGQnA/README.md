@@ -102,6 +102,6 @@ By default, the embedding and LVM models are set to a default value as listed be
 
 ### Deploy VideoRAGQnA on Xeon
 
-For full instruction of deployment, please check [Guide](docker/xeon/README.md)
+For full instruction of deployment, please check [Guide](docker_compose/intel/cpu/xeon/README.md)
 
-Currently we support deploying VideoRAGQnA services with docker compose, using the docker images `built from source`. Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
+Currently we support deploying VideoRAGQnA services with docker compose, using the docker images `built from source`. Find the corresponding [compose.yaml](docker_compose/intel/cpu/xeon/compose.yaml).
