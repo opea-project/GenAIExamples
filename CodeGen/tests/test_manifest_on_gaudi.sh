@@ -28,7 +28,7 @@ function init_codegen() {
 
 function install_codegen {
     echo "namespace is $NAMESPACE"
-    kubectl apply -f . -n $NAMESPACE
+    kubectl apply -f codegen.yaml -n $NAMESPACE
 }
 
 function validate_codegen() {
@@ -68,12 +68,12 @@ fi
 
 case "$1" in
     init_CodeGen)
-        pushd CodeGen/kubernetes/manifests/gaudi
+        pushd CodeGen/kubernetes/intel/hpu/gaudi/manifest
         init_codegen
         popd
         ;;
     install_CodeGen)
-        pushd CodeGen/kubernetes/manifests/gaudi
+        pushd CodeGen/kubernetes/intel/hpu/gaudi/manifest
         NAMESPACE=$2
         install_codegen
         popd

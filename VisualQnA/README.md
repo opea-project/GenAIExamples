@@ -18,9 +18,9 @@ This example guides you through how to deploy a [LLaVA-NeXT](https://github.com/
 ![llava screenshot](./assets/img/llava_screenshot1.png)
 ![llava-screenshot](./assets/img/llava_screenshot2.png)
 
-# Required Models
+## Required Models
 
-By default, the model is set to `llava-hf/llava-v1.6-mistral-7b-hf`. To use a different model, update the `LVM_MODEL_ID` variable in the [`set_env.sh`](./docker/gaudi/set_env.sh) file.
+By default, the model is set to `llava-hf/llava-v1.6-mistral-7b-hf`. To use a different model, update the `LVM_MODEL_ID` variable in the [`set_env.sh`](./docker_compose/intel/hpu/gaudi/set_env.sh) file.
 
 ```
 export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
@@ -28,13 +28,13 @@ export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
 
 You can choose other llava-next models, such as `llava-hf/llava-v1.6-vicuna-13b-hf`, as needed.
 
-# Deploy VisualQnA Service
+## Deploy VisualQnA Service
 
 The VisualQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
 Currently we support deploying VisualQnA services with docker compose.
 
-## Setup Environment Variable
+### Setup Environment Variable
 
 To set up environment variables for deploying VisualQnA services, follow these steps:
 
@@ -60,31 +60,31 @@ To set up environment variables for deploying VisualQnA services, follow these s
 
    ```bash
    # on Gaudi
-   source ./docker/gaudi/set_env.sh
+   source ./docker_compose/intel/hpu/gaudi/set_env.sh
    # on Xeon
-   source ./docker/xeon/set_env.sh
+   source ./docker_compose/intel/cpu/xeon/set_env.sh
    ```
 
-## Deploy VisualQnA on Gaudi
+### Deploy VisualQnA on Gaudi
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
-Find the corresponding [compose.yaml](./docker/gaudi/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
 
 ```bash
-cd GenAIExamples/VisualQnA/docker/gaudi/
+cd GenAIExamples/VisualQnA/docker_compose/intel/hpu/gaudi/
 docker compose up -d
 ```
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-## Deploy VisualQnA on Xeon
+### Deploy VisualQnA on Xeon
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
 
-Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
 ```bash
-cd GenAIExamples/VisualQnA/docker/xeon/
+cd GenAIExamples/VisualQnA/docker_compose/intel/cpu/xeon/
 docker compose up -d
 ```

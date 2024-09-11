@@ -112,12 +112,12 @@ fi
 
 case "$1" in
     install_Translation)
-        pushd Translation/kubernetes
+        pushd Translation/kubernetes/intel/cpu/xeon/gmc
         install_translation
         popd
         ;;
     validate_Translation)
-        pushd Translation/kubernetes
+        pushd Translation/kubernetes/intel/cpu/xeon/gmc
         validate_translation
         popd
         ;;
