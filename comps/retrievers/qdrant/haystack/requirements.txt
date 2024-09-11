@@ -1,7 +1,7 @@
 docarray[full]
 easyocr
 fastapi
-haystack-ai==2.2.4
+haystack-ai==2.3.1
 langchain_community
 opentelemetry-api
 opentelemetry-exporter-otlp

@@ -3,7 +3,7 @@
 
 import os
 
-from haystack.components.embedders import HuggingFaceTEITextEmbedder, SentenceTransformersTextEmbedder
+from haystack.components.embedders import HuggingFaceAPITextEmbedder, SentenceTransformersTextEmbedder
 from haystack_integrations.components.retrievers.qdrant import QdrantEmbeddingRetriever
 from haystack_integrations.document_stores.qdrant import QdrantDocumentStore
 from qdrant_config import EMBED_DIMENSION, EMBED_ENDPOINT, EMBED_MODEL, INDEX_NAME, QDRANT_HOST, QDRANT_PORT
@@ -46,7 +46,7 @@ def retrieve(input: EmbedDoc) -> SearchedDoc:
 if __name__ == "__main__":
     if EMBED_ENDPOINT:
         # create embeddings using TEI endpoint service
-        embedder = HuggingFaceTEITextEmbedder(url=EMBED_ENDPOINT)
+        embedder = HuggingFaceAPITextEmbedder(api_type="text_embeddings_inference", api_params={"url": EMBED_ENDPOINT})
     else:
         # create embeddings using local embedding model
         embedder = SentenceTransformersTextEmbedder(model=EMBED_MODEL)
