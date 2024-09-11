@@ -1,10 +1,15 @@
+<!--
+  Copyright (C) 2024 Intel Corporation
+  SPDX-License-Identifier: Apache-2.0
+-->
+
 <script>
 	import { createEventDispatcher } from "svelte";
   import extreme_ironing from '$lib/assets/imageData/extreme_ironing.jpg';
   import waterview from '$lib/assets/imageData/waterview.jpg';
 	import { base64ImageStore } from "$lib/shared/stores/common/Store";
 
-  let dispatch = createEventDispatcher(); 
+  let dispatch = createEventDispatcher();
 
   let images = [
     {
@@ -32,7 +37,7 @@
   }
 
 
-  async function handleImageClick() {    
+  async function handleImageClick() {
     const imgUrl = images[currentIndex].imgurl;
     const base64Data = await convertImageToBase64(imgUrl);
     const currentPrompt = images[currentIndex].prompt;
@@ -90,5 +95,3 @@
     object-fit: cover;
   }
 </style>
-
-

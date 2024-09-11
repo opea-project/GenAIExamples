@@ -257,7 +257,7 @@
 						/>
 					{/each}
 				</Scrollbar>
-				
+
 			</div>
 			<!-- gallery -->
 		</div>

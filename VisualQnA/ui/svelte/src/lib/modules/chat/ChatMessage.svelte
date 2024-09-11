@@ -45,14 +45,14 @@
 	<div class="group relative flex items-start">
 		<div class="flex flex-col items-start">
 			<img src={msg.imgSrc} alt="Uploaded Image" class="m-2 max-w-28 max-h-28" />
-	
+
 			<p
 				class="xl:max-w-[65vw] max-w-[60vw] items-start whitespace-pre-line break-keep text-[0.8rem] leading-5 sm:max-w-[50rem]"
 			>
 				{@html msg.content}
 			</p>
 		</div>
-	</div>	
+	</div>
 </div>
 {#if time}
 	<div>
