@@ -66,7 +66,7 @@ echo "=================== #4 Agent test passed ===================="
 
 echo "=================== #5 Stop agent and API server===================="
 stop_crag
-stop_docker
+stop_agent_docker
 stop_retrieval_tool
 echo "=================== #5 Agent and API server stopped===================="
 
