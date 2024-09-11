@@ -210,11 +210,11 @@ Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for more instructions on
 
 ### Deploy ChatQnA into Kubernetes on Xeon & Gaudi with GMC
 
-Refer to the [Kubernetes Guide](./kubernetes/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi with GMC.
+Refer to the [Kubernetes Guide](./kubernetes/intel/README_gmc.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi with GMC.
 
 ### Deploy ChatQnA into Kubernetes on Xeon & Gaudi without GMC
 
-Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi without GMC.
+Refer to the [Kubernetes Guide](./kubernetes/kubernetes/intel/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi without GMC.
 
 ### Deploy ChatQnA into Kubernetes using Helm Chart
 
