@@ -4,6 +4,11 @@
 
 set -e
 echo "IMAGE_REPO=${IMAGE_REPO}"
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -36,7 +41,7 @@ function start_services() {
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
-    export REDIS_URL="redis://${ip_address}:16379"
+    export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
