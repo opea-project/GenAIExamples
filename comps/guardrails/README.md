@@ -4,7 +4,7 @@ The Guardrails service enhances the security of LLM-based applications by offeri
 
 | MicroService                                         | Description                                                                                                              |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| [Llama Guard](./llama_guard/README.md)               | Provides guardrails for inputs and outputs to ensure safe interactions                                                   |
+| [Llama Guard](./llama_guard/langchain/README.md)     | Provides guardrails for inputs and outputs to ensure safe interactions                                                   |
 | [PII Detection](./pii_detection/README.md)           | Detects Personally Identifiable Information (PII) and Business Sensitive Information (BSI)                               |
 | [Toxicity Detection](./toxicity_detection/README.md) | Detects Toxic language (rude, disrespectful, or unreasonable language that is likely to make someone leave a discussion) |
 

@@ -27,7 +27,7 @@ cd langchain_ray; pip install -r requirements_ray.txt
 
 ## 1.2 Start VDMS Server
 
-Please refer to this [readme](../../vectorstores/langchain/vdms/README.md).
+Please refer to this [readme](../../vectorstores/vdms/README.md).
 
 ## 1.3 Setup Environment Variables
 
@@ -37,8 +37,6 @@ export https_proxy=${your_http_proxy}
 export VDMS_HOST=${host_ip}
 export VDMS_PORT=55555
 export COLLECTION_NAME=${your_collection_name}
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_PROJECT="opea/gen-ai-comps:dataprep"
 export PYTHONPATH=${path_to_comps}
 ```
 
@@ -62,7 +60,7 @@ python prepare_doc_redis_on_ray.py
 
 ## 2.1 Start VDMS Server
 
-Please refer to this [readme](../../vectorstores/langchain/vdms/README.md).
+Please refer to this [readme](../../vectorstores/vdms/README.md).
 
 ## 2.2 Setup Environment Variables
 

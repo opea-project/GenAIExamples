@@ -1,4 +1,4 @@
-# LanceDB
+# Start LanceDB Server
 
 LanceDB is an embedded vector database for AI applications. It is open source and distributed with an Apache-2.0 license.
 

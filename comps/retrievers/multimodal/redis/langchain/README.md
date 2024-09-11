@@ -29,7 +29,7 @@ docker run -d --name="redis-vector-db" -p 6379:6379 -p 8001:8001 redis/redis-sta
 
 ### 1.3 Ingest images or video
 
-Upload a video or images using the dataprep microservice, instructions can be found [here](https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep/redis/multimodal_langchain/README.md).
+Upload a video or images using the dataprep microservice, instructions can be found [here](https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/multimodal/redis/langchain/README.md).
 
 ### 1.4 Start Retriever Service
 
@@ -50,7 +50,7 @@ export INDEX_NAME=${your_index_name}
 ### 2.2 Build Docker Image
 
 ```bash
-cd ../../../../
+cd ../../../../../
 docker build -t opea/multimodal-retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/multimodal/redis/langchain/Dockerfile .
 ```
 
@@ -81,7 +81,7 @@ docker compose -f docker_compose_retriever.yaml up -d
 To consume the Retriever Microservice, you can generate a mock embedding vector of length 512 with Python.
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
 curl http://${your_ip}:7000/v1/multimodal_retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding}}" \
@@ -91,7 +91,7 @@ curl http://${your_ip}:7000/v1/multimodal_retrieval \
 You can set the parameters for the retriever.
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
 curl http://localhost:7000/v1/multimodal_retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"similarity\", \"k\":4}" \
@@ -99,7 +99,7 @@ curl http://localhost:7000/v1/multimodal_retrieval \
 ```
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
 curl http://localhost:7000/v1/multimodal_retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"similarity_distance_threshold\", \"k\":4, \"distance_threshold\":1.0}" \
@@ -107,7 +107,7 @@ curl http://localhost:7000/v1/multimodal_retrieval \
 ```
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
 curl http://localhost:7000/v1/multimodal_retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"similarity_score_threshold\", \"k\":4, \"score_threshold\":0.2}" \
@@ -115,7 +115,7 @@ curl http://localhost:7000/v1/multimodal_retrieval \
 ```
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
 curl http://localhost:7000/v1/multimodal_retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"mmr\", \"k\":4, \"fetch_k\":20, \"lambda_mult\":0.5}" \

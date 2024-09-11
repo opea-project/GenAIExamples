@@ -139,7 +139,7 @@ export CHAT_PROCESSOR="ChatModelLlama"
 #### 2.2.1 TGI
 
 ```bash
-cd ../../
+cd ../../../
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
@@ -155,7 +155,7 @@ bash build_docker_vllm.sh
 Build microservice docker.
 
 ```bash
-cd ../../
+cd ../../../
 docker build -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/langchain/Dockerfile .
 ```
 
@@ -171,8 +171,8 @@ bash build_docker_vllmray.sh
 Build microservice docker.
 
 ```bash
-cd ../../
-docker build -t opea/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/Dockerfile .
+cd ../../../
+docker build -t opea/llm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/ray/Dockerfile .
 ```
 
 To start a docker container, you have two options:

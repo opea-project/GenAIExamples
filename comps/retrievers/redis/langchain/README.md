@@ -68,7 +68,7 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_token}
 ### 2.2 Build Docker Image
 
 ```bash
-cd ../../
+cd ../../../../
 docker build -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
@@ -106,7 +106,7 @@ curl http://localhost:7000/v1/health_check \
 To consume the Retriever Microservice, you can generate a mock embedding vector of length 768 with Python.
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${your_ip}:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding}}" \
@@ -116,7 +116,7 @@ curl http://${your_ip}:7000/v1/retrieval \
 You can set the parameters for the retriever.
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://localhost:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"similarity\", \"k\":4}" \
@@ -124,7 +124,7 @@ curl http://localhost:7000/v1/retrieval \
 ```
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://localhost:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"similarity_distance_threshold\", \"k\":4, \"distance_threshold\":1.0}" \
@@ -132,7 +132,7 @@ curl http://localhost:7000/v1/retrieval \
 ```
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://localhost:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"similarity_score_threshold\", \"k\":4, \"score_threshold\":0.2}" \
@@ -140,7 +140,7 @@ curl http://localhost:7000/v1/retrieval \
 ```
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://localhost:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"mmr\", \"k\":4, \"fetch_k\":20, \"lambda_mult\":0.5}" \

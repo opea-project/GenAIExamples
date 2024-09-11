@@ -35,7 +35,7 @@ export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 Start intent detection microservice with below command.
 
 ```bash
-cd /your_project_path/GenAIComps/
+cd ../../../
 cp comps/intent_detection/langchain/intent_detection.py .
 python intent_detection.py
 ```
@@ -55,7 +55,7 @@ export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 ### 2.3 Build Docker Image
 
 ```bash
-cd /your_project_path/GenAIComps
+cd ../../../
 docker build --no-cache -t opea/llm-tgi:latest -f comps/intent_detection/langchain/Dockerfile .
 ```
 
@@ -68,7 +68,6 @@ docker run -it --name="intent-tgi-server" --net=host --ipc=host -e http_proxy=$h
 ### 2.5 Run with Docker Compose (Option B)
 
 ```bash
-cd /your_project_path/GenAIComps/comps/intent_detection/langchain
 export LLM_MODEL_ID=${your_hf_llm_model}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}

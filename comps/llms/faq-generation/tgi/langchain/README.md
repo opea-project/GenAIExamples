@@ -19,7 +19,7 @@ export LLM_MODEL_ID=${your_hf_llm_model}
 ### 1.2 Build Docker Image
 
 ```bash
-cd ../../../../
+cd ../../../../../
 docker build -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/langchain/Dockerfile .
 ```
 
@@ -43,7 +43,6 @@ docker run -d --name="llm-faqgen-server" -p 9000:9000 --ipc=host -e http_proxy=$
 ### 1.4 Run Docker with Docker Compose (Option B)
 
 ```bash
-cd faq-generation/tgi/docker
 docker compose -f docker_compose_llm.yaml up -d
 ```
 

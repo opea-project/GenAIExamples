@@ -73,7 +73,7 @@ curl $LLM_ENDPOINT/generate \
 ### 1.4 Start Microservice
 
 ```bash
-cd ../..
+cd ../../../
 docker build -t opea/knowledge_graphs:latest \
     --build-arg https_proxy=$https_proxy \
     --build-arg http_proxy=$http_proxy \

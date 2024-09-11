@@ -63,14 +63,14 @@ docker build -t opea/llava:latest --build-arg https_proxy=$https_proxy --build-a
 - Gaudi2 HPU
 
 ```bash
-cd ../..
+cd ../../../
 docker build -t opea/llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/dependency/Dockerfile.intel_hpu .
 ```
 
 #### 2.1.2 LVM Service Image
 
 ```bash
-cd ../..
+cd ../../../
 docker build -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/Dockerfile .
 ```
 

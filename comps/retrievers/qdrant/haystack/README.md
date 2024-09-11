@@ -25,7 +25,7 @@ export INDEX_NAME=${your_index_name}
 
 ```bash
 export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:6060"
-python haystack/qdrant/retriever_qdrant.py
+python retriever_qdrant.py
 ```
 
 ## 2. 🚀Start Microservice with Docker (Option 2)
@@ -41,7 +41,7 @@ export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:6060"
 ### 2.2 Build Docker Image
 
 ```bash
-cd ../../
+cd ../../../../
 docker build -t opea/retriever-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/qdrant/haystack/Dockerfile .
 ```
 
@@ -66,7 +66,7 @@ curl http://${your_ip}:7000/v1/health_check \
 To consume the Retriever Microservice, you can generate a mock embedding vector of length 768 with Python.
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${your_ip}:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding}}" \

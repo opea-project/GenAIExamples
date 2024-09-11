@@ -53,7 +53,7 @@ export LLM_MODEL_ID=${your_hf_llm_model}
 ### 2.2 Build Docker Image
 
 ```bash
-cd ../../
+cd ../../../../../
 docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/langchain/Dockerfile .
 ```
 

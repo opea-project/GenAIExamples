@@ -22,15 +22,15 @@ For details, please refer to this [readme](pinecone/README.md)
 
 For details, please refer to this [readme](pathway/README.md)
 
-# Vectorstores Microservice with Milvus
+## Vectorstores Microservice with Milvus
 
 For details, please refer to this [readme](milvus/README.md)
 
-# Vectorstores Microservice with LanceDB
+## Vectorstores Microservice with LanceDB
 
 For details, please refer to this [readme](lancedb/README.md)
 
-# Vectorstores Microservice with Chroma
+## Vectorstores Microservice with Chroma
 
 For details, please refer to this [readme](chroma/README.md)
 

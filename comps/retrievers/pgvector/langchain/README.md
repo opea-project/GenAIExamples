@@ -110,7 +110,7 @@ curl http://localhost:7000/v1/health_check \
 To consume the Retriever Microservice, you can generate a mock embedding vector of length 768 with Python.
 
 ```bash
-your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://${your_ip}:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding}}" \

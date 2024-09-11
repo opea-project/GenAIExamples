@@ -18,20 +18,16 @@ Users are albe to configure and build embedding-related services according to th
 
 We support both `langchain` and `llama_index` for TEI serving.
 
-For details, please refer to [langchain readme](langchain/tei/README.md) or [llama index readme](llama_index/tei/README.md).
+For details, please refer to [langchain readme](tei/langchain/README.md) or [llama index readme](tei/llama_index/README.md).
 
 ## Embeddings Microservice with Mosec
 
-For details, please refer to this [readme](langchain/mosec/README.md).
+For details, please refer to this [readme](mosec/langchain/README.md).
 
-## Embeddings Microservice with Neural Speed
+## Embeddings Microservice with Multimodal
 
-For details, please refer to this [readme](neural-speed/README.md).
+For details, please refer to this [readme](multimodal/README.md).
 
 ## Embeddings Microservice with Multimodal Clip
 
 For details, please refer to this [readme](multimodal_clip/README.md).
-
-## Embeddings Microservice with Multimodal Langchain
-
-For details, please refer to this [readme](multimodal_embeddings/README.md).

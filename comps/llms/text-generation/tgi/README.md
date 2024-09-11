@@ -32,7 +32,7 @@ curl http://${your_ip}:8008/generate \
 
 ```bash
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
-python text-generation/tgi/llm.py
+python llm.py
 ```
 
 ## 🚀2. Start Microservice with Docker (Option 2)
@@ -52,7 +52,7 @@ export LLM_MODEL_ID=${your_hf_llm_model}
 ### 2.2 Build Docker Image
 
 ```bash
-cd ../../
+cd ../../../../
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 

@@ -1,4 +1,6 @@
-# Introduction
+# Start Chroma server
+
+## Introduction
 
 Chroma is a AI-native open-source vector database focused on developer productivity and happiness. Chroma is licensed under Apache 2.0. Chroma runs in various modes, we can deploy it as a server running your local machine or in the cloud.
 

@@ -8,20 +8,28 @@ Overall, this microservice provides robust backend support for applications requ
 
 ## Retriever Microservice with Redis
 
-For details, please refer to this [readme](redis/README.md)
+For details, please refer to this [langchain readme](redis/langchain/README.md) or [llama_index readme](redis/llama_index/README.md)
 
 ## Retriever Microservice with Milvus
 
-For details, please refer to this [readme](milvus/README.md)
+For details, please refer to this [readme](milvus/langchain/README.md)
 
 ## Retriever Microservice with PGVector
 
-For details, please refer to this [readme](pgvector/README.md)
+For details, please refer to this [readme](pgvector/langchain/README.md)
 
 ## Retriever Microservice with Pathway
 
-For details, please refer to this [readme](pathway/README.md)
+For details, please refer to this [readme](pathway/langchain/README.md)
+
+## Retriever Microservice with QDrant
+
+For details, please refer to this [readme](qdrant/haystack/README.md)
 
 ## Retriever Microservice with VDMS
 
-For details, please refer to this [readme](vdms/README.md)
+For details, please refer to this [readme](vdms/langchain/README.md)
+
+## Retriever Microservice with Multimodal
+
+For details, please refer to this [readme](multimodal/redis/langchain/README.md)

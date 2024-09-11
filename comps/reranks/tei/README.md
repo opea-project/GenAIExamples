@@ -51,7 +51,7 @@ export TEI_RERANKING_ENDPOINT="http://${your_ip}:8808"
 ### 2.2 Build Docker Image
 
 ```bash
-cd ../../
+cd ../../../
 docker build -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
 ```
 
