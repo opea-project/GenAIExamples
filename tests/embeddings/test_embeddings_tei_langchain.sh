@@ -46,6 +46,16 @@ function validate_microservice() {
     fi
 }
 
+function validate_microservice_with_openai() {
+    tei_service_port=5001
+    python3 ${WORKPATH}/tests/utils/validate_svc_with_openai.py $ip_address $tei_service_port "embedding"
+    if [ $? -ne 0 ]; then
+        docker logs test-comps-embedding-tei-endpoint
+        docker logs test-comps-embedding-tei-server
+        exit 1
+    fi
+}
+
 function stop_docker() {
     cid=$(docker ps -aq --filter "name=test-comps-embedding-*")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
@@ -59,6 +69,8 @@ function main() {
     start_service
 
     validate_microservice
+    pip install openai
+    validate_microservice_with_openai
 
     stop_docker
     echo y | docker system prune

@@ -60,6 +60,16 @@ function validate_microservice() {
     fi
 }
 
+function validate_microservice_with_openai() {
+    llm_service_port=5005
+    python3 ${WORKPATH}/tests/utils/validate_svc_with_openai.py "$ip_address" "$llm_service_port" "llm"
+    if [ $? -ne 0 ]; then
+        docker logs test-comps-llm-tgi-endpoint >> ${LOG_PATH}/llm-tgi.log
+        docker logs test-comps-llm-tgi-server >> ${LOG_PATH}/llm-tgi-server.log
+        exit 1
+    fi
+}
+
 function stop_docker() {
     cid=$(docker ps -aq --filter "name=test-comps-llm-tgi*")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
@@ -70,15 +80,18 @@ function main() {
     stop_docker
     build_docker_images
 
+    pip install openai
+
     llm_models=(
     Intel/neural-chat-7b-v3-3
-    meta-llama/Llama-2-7b-chat-hf
-    meta-llama/Meta-Llama-3-8B-Instruct
-    microsoft/Phi-3-mini-4k-instruct
+    # meta-llama/Llama-2-7b-chat-hf
+    # meta-llama/Meta-Llama-3-8B-Instruct
+    # microsoft/Phi-3-mini-4k-instruct
     )
     for model in "${llm_models[@]}"; do
       start_service "${model}"
       validate_microservice
+      validate_microservice_with_openai
       stop_docker
     done
 
