@@ -14,10 +14,6 @@ services:
     build:
       dockerfile: comps/embeddings/tei/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/embedding-tei-llama-index:${TAG:-latest}
-  embedding-multimodal:
-    build:
-      dockerfile: comps/embeddings/multimodal_clip/Dockerfile
-    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
   bridgetower-embedder:
     build:
       dockerfile: comps/embeddings/multimodal/bridgetower/Dockerfile

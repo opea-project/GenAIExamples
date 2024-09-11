@@ -14,7 +14,3 @@ services:
     build:
       dockerfile: comps/reranks/mosec/langchain/Dockerfile
     image: ${REGISTRY:-opea}/reranking-langchain-mosec:${TAG:-latest}
-  reranking-videoragqna:
-    build:
-      dockerfile: comps/reranks/video-rag-qna/Dockerfile
-    image: ${REGISTRY:-opea}/reranking-videoragqna:${TAG:-latest}

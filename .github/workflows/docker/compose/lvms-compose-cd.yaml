@@ -17,11 +17,3 @@ services:
     build:
       dockerfile: comps/lvms/llava/dependency/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/llava-hpu:${TAG:-latest}
-  lvm-video-llama:
-    build:
-      dockerfile: comps/lvms/video-llama/Dockerfile
-    image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
-  video-llama-lvm-server:
-    build:
-      dockerfile: comps/lvms/video-llama/dependency/Dockerfile
-    image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}

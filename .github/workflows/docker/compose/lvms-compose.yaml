@@ -7,3 +7,11 @@ services:
     build:
       dockerfile: comps/lvms/tgi-llava/Dockerfile
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+  lvm-video-llama:
+    build:
+      dockerfile: comps/lvms/video-llama/Dockerfile
+    image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
+  video-llama-lvm-server:
+    build:
+      dockerfile: comps/lvms/video-llama/dependency/Dockerfile
+    image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
