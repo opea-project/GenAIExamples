@@ -216,7 +216,7 @@ class RAGAgent(BaseAgent):
             return False
 
     def prepare_initial_state(self, query):
-        return {"messages": [HumanMessage(content=query)]}
+        return {"messages": [HumanMessage(content=query)], "query_time": ""}
 
     async def stream_generator(self, query, config):
         initial_state = self.prepare_initial_state(query)
