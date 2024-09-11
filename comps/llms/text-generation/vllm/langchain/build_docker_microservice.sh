@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-cd ../../../../
+cd ../../../../../
 docker build  \
     -t opea/llm-vllm:latest \
     --build-arg https_proxy=$https_proxy \

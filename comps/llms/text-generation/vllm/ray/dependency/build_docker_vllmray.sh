@@ -1,10 +1,10 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-cd ../../../../
+cd ../../../../../../
 
 docker build \
-    -f comps/llms/text-generation/vllm/ray/server/docker/Dockerfile \
+    -f comps/llms/text-generation/vllm/ray/dependency/Dockerfile \
     -t opea/vllm_ray:habana \
     --network=host \
     --build-arg http_proxy=${http_proxy} \
