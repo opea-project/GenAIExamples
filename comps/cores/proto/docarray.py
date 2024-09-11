@@ -20,6 +20,13 @@ class TextDoc(BaseDoc, TopologyInfo):
     text: str = None
 
 
+class MetadataTextDoc(TextDoc):
+    metadata: Optional[Dict[str, Any]] = Field(
+        description="This encloses all metadata associated with the textdoc.",
+        default=None,
+    )
+
+
 class ImageDoc(BaseDoc):
     url: Optional[ImageUrl] = Field(
         description="The path to the image. It can be remote (Web) URL, or a local file path",

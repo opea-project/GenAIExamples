@@ -16,6 +16,7 @@ from comps.cores.proto.docarray import (
     LVMSearchedMultimodalDoc,
     RerankedDoc,
     TextDoc,
+    MetadataTextDoc,
     RAGASParams,
     RAGASScores,
     GraphDoc,

@@ -8,6 +8,7 @@ import time
 from typing import Union
 
 import requests
+from fastapi import HTTPException
 from langchain_core.prompts import PromptTemplate
 from template import ChatTemplate
 
@@ -15,6 +16,7 @@ from comps import (
     CustomLogger,
     LVMDoc,
     LVMSearchedMultimodalDoc,
+    MetadataTextDoc,
     ServiceType,
     TextDoc,
     opea_microservices,
@@ -35,7 +37,7 @@ logflag = os.getenv("LOGFLAG", False)
     port=9399,
 )
 @register_statistics(names=["opea_service@lvm"])
-async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> TextDoc:
+async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> Union[TextDoc, MetadataTextDoc]:
     if logflag:
         logger.info(request)
     start = time.time()
@@ -43,6 +45,12 @@ async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> TextDoc:
         if logflag:
             logger.info("[LVMSearchedMultimodalDoc ] input from retriever microservice")
         retrieved_metadatas = request.metadata
+        if retrieved_metadatas is None or len(retrieved_metadatas) == 0:
+            # there is no video segments retrieved.
+            # Raise HTTPException status_code 204
+            # due to llava-tgi-gaudi should receive image as input; Otherwise, the generated text is bad.
+            raise HTTPException(status_code=500, detail="There is no video segments retrieved given the query!")
+
         img_b64_str = retrieved_metadatas[0]["b64_img_str"]
         initial_query = request.initial_query
         context = retrieved_metadatas[0]["transcript_for_inference"]
@@ -75,7 +83,15 @@ async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> TextDoc:
     result = response.json()["text"]
     if logflag:
         logger.info(result)
-    return TextDoc(text=result)
+    if isinstance(request, LVMSearchedMultimodalDoc):
+        retrieved_metadata = request.metadata[0]
+        return_metadata = {}  # this metadata will be used to construct proof for generated text
+        return_metadata["video_id"] = retrieved_metadata["video_id"]
+        return_metadata["source_video"] = retrieved_metadata["source_video"]
+        return_metadata["time_of_frame_ms"] = retrieved_metadata["time_of_frame_ms"]
+        return MetadataTextDoc(text=result, metadata=return_metadata)
+    else:
+        return TextDoc(text=result)
 
 
 if __name__ == "__main__":

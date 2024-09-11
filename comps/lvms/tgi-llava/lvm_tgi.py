@@ -5,6 +5,7 @@ import os
 import time
 from typing import Union
 
+from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 from huggingface_hub import AsyncInferenceClient
 from langchain_core.prompts import PromptTemplate
@@ -14,6 +15,7 @@ from comps import (
     CustomLogger,
     LVMDoc,
     LVMSearchedMultimodalDoc,
+    MetadataTextDoc,
     ServiceType,
     TextDoc,
     opea_microservices,
@@ -36,7 +38,7 @@ logflag = os.getenv("LOGFLAG", False)
     output_datatype=TextDoc,
 )
 @register_statistics(names=["opea_service@lvm_tgi"])
-async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> TextDoc:
+async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> Union[TextDoc, MetadataTextDoc]:
     if logflag:
         logger.info(request)
     start = time.time()
@@ -46,6 +48,11 @@ async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> TextDoc:
         if logflag:
             logger.info("[LVMSearchedMultimodalDoc ] input from retriever microservice")
         retrieved_metadatas = request.metadata
+        if not retrieved_metadatas or len(retrieved_metadatas) == 0:
+            # there is no video segments retrieved.
+            # Raise HTTPException status_code 204
+            # due to llava-tgi-gaudi should receive image as input; Otherwise, the generated text is bad.
+            raise HTTPException(status_code=500, detail="There is no video segments retrieved given the query!")
         img_b64_str = retrieved_metadatas[0]["b64_img_str"]
         initial_query = request.initial_query
         context = retrieved_metadatas[0]["transcript_for_inference"]
@@ -121,7 +128,15 @@ async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> TextDoc:
         statistics_dict["opea_service@lvm_tgi"].append_latency(time.time() - start, None)
         if logflag:
             logger.info(generated_str)
-        return TextDoc(text=generated_str)
+        if isinstance(request, LVMSearchedMultimodalDoc):
+            retrieved_metadata = request.metadata[0]
+            return_metadata = {}  # this metadata will be used to construct proof for generated text
+            return_metadata["video_id"] = retrieved_metadata["video_id"]
+            return_metadata["source_video"] = retrieved_metadata["source_video"]
+            return_metadata["time_of_frame_ms"] = retrieved_metadata["time_of_frame_ms"]
+            return MetadataTextDoc(text=generated_str, metadata=return_metadata)
+        else:
+            return TextDoc(text=generated_str)
 
 
 if __name__ == "__main__":

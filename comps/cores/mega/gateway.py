@@ -777,7 +777,22 @@ class MultimodalRAGWithVideosGateway(Gateway):
             ):
                 return response
         last_node = runtime_graph.all_leaves()[-1]
-        response = result_dict[last_node]["text"]
+
+        if "text" in result_dict[last_node].keys():
+            response = result_dict[last_node]["text"]
+        else:
+            # text in not response message
+            # something wrong, for example due to empty retrieval results
+            if "detail" in result_dict[last_node].keys():
+                response = result_dict[last_node]["detail"]
+            else:
+                response = "The server fail to generate answer to your query!"
+        if "metadata" in result_dict[last_node].keys():
+            # from retrieval results
+            metadata = result_dict[last_node]["metadata"]
+        else:
+            # follow-up question, no retrieval
+            metadata = None
         choices = []
         usage = UsageInfo()
         choices.append(
@@ -785,6 +800,7 @@ class MultimodalRAGWithVideosGateway(Gateway):
                 index=0,
                 message=ChatMessage(role="assistant", content=response),
                 finish_reason="stop",
+                metadata=metadata,
             )
         )
         return ChatCompletionResponse(model="multimodalragwithvideos", choices=choices, usage=usage)

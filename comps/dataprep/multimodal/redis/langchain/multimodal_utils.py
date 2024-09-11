@@ -123,13 +123,13 @@ def str2time(strtime: str):
 
 def convert_img_to_base64(image):
     "Convert image to base64 string"
-    _, buffer = cv2.imencode(".jpg", image)
+    _, buffer = cv2.imencode(".png", image)
     encoded_string = base64.b64encode(buffer)
     return encoded_string.decode()
 
 
 def extract_frames_and_annotations_from_transcripts(video_id: str, video_path: str, vtt_path: str, output_dir: str):
-    """Extract frames (.jpg) and annotations (.json) from video file (.mp4) and captions file (.vtt)"""
+    """Extract frames (.png) and annotations (.json) from video file (.mp4) and captions file (.vtt)"""
     # Set up location to store frames and annotations
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(os.path.join(output_dir, "frames"), exist_ok=True)
@@ -157,7 +157,7 @@ def extract_frames_and_annotations_from_transcripts(video_id: str, video_path: s
         if success:
             # Save frame for further processing
             img_fname = f"frame_{idx}"
-            img_fpath = os.path.join(output_dir, "frames", img_fname + ".jpg")
+            img_fpath = os.path.join(output_dir, "frames", img_fname + ".png")
             cv2.imwrite(img_fpath, frame)
 
             # Convert image to base64 encoded string
@@ -195,7 +195,7 @@ def use_lvm(endpoint: str, img_b64_string: str, prompt: str = "Provide a short d
 def extract_frames_and_generate_captions(
     video_id: str, video_path: str, lvm_endpoint: str, output_dir: str, key_frame_per_second: int = 1
 ):
-    """Extract frames (.jpg) and annotations (.json) from video file (.mp4) by generating captions using LVM microservice."""
+    """Extract frames (.png) and annotations (.json) from video file (.mp4) by generating captions using LVM microservice."""
     # Set up location to store frames and annotations
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(os.path.join(output_dir, "frames"), exist_ok=True)
@@ -225,7 +225,7 @@ def extract_frames_and_generate_captions(
 
             # Save frame for further processing
             img_fname = f"frame_{idx}"
-            img_fpath = os.path.join(output_dir, "frames", img_fname + ".jpg")
+            img_fpath = os.path.join(output_dir, "frames", img_fname + ".png")
             cv2.imwrite(img_fpath, frame)
 
             # Convert image to base64 encoded string

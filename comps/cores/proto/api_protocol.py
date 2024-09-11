@@ -299,6 +299,7 @@ class ChatCompletionResponseChoice(BaseModel):
     index: int
     message: ChatMessage
     finish_reason: Optional[Literal["stop", "length"]] = None
+    metadata: Optional[Dict[str, Any]] = None
 
 
 class ChatCompletionResponse(BaseModel):

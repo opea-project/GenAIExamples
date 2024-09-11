@@ -199,7 +199,7 @@ def prepare_data_and_metadata_from_annotation(
     metadatas = []
     for i, frame in enumerate(annotation):
         frame_index = frame["sub_video_id"]
-        path_to_frame = os.path.join(path_to_frames, f"frame_{frame_index}.jpg")
+        path_to_frame = os.path.join(path_to_frames, f"frame_{frame_index}.png")
         # augment this frame's transcript with a reasonable number of neighboring frames' transcripts helps semantic retrieval
         lb_ingesting = max(0, i - num_transcript_concat_for_ingesting)
         ub_ingesting = min(len(annotation), i + num_transcript_concat_for_ingesting + 1)
@@ -275,6 +275,7 @@ async def ingest_videos_generate_transcripts(files: List[UploadFile] = File(None
 
     if files:
         video_files = []
+        uploaded_videos_saved_videos_map = {}
         for file in files:
             if os.path.splitext(file.filename)[1] == ".mp4":
                 video_files.append(file)
@@ -298,6 +299,8 @@ async def ingest_videos_generate_transcripts(files: List[UploadFile] = File(None
             # Save video file in upload_directory
             with open(os.path.join(upload_folder, video_file_name), "wb") as f:
                 shutil.copyfileobj(video_file.file, f)
+
+            uploaded_videos_saved_videos_map[video_name] = video_file_name
 
             # Extract temporary audio wav file from video mp4
             audio_file = video_dir_name + ".wav"
@@ -345,7 +348,11 @@ async def ingest_videos_generate_transcripts(files: List[UploadFile] = File(None
             end = time.time()
             print(str(end - st))
 
-        return {"status": 200, "message": "Data preparation succeeded"}
+        return {
+            "status": 200,
+            "message": "Data preparation succeeded",
+            "video_id_maps": uploaded_videos_saved_videos_map,
+        }
 
     raise HTTPException(status_code=400, detail="Must provide at least one video (.mp4) file.")
 
@@ -358,6 +365,7 @@ async def ingest_videos_generate_caption(files: List[UploadFile] = File(None)):
 
     if files:
         video_files = []
+        uploaded_videos_saved_videos_map = {}
         for file in files:
             if os.path.splitext(file.filename)[1] == ".mp4":
                 video_files.append(file)
@@ -380,6 +388,7 @@ async def ingest_videos_generate_caption(files: List[UploadFile] = File(None)):
             # Save video file in upload_directory
             with open(os.path.join(upload_folder, video_file_name), "wb") as f:
                 shutil.copyfileobj(video_file.file, f)
+            uploaded_videos_saved_videos_map[video_name] = video_file_name
 
             # Store frames and caption annotations in a new directory
             extract_frames_and_generate_captions(
@@ -397,7 +406,11 @@ async def ingest_videos_generate_caption(files: List[UploadFile] = File(None)):
 
             print(f"Processed video {video_file.filename}")
 
-        return {"status": 200, "message": "Data preparation succeeded"}
+        return {
+            "status": 200,
+            "message": "Data preparation succeeded",
+            "video_id_maps": uploaded_videos_saved_videos_map,
+        }
 
     raise HTTPException(status_code=400, detail="Must provide at least one video (.mp4) file.")
 
@@ -413,6 +426,7 @@ async def ingest_videos_with_transcripts(files: List[UploadFile] = File(None)):
     if files:
         video_files, video_file_names = [], []
         captions_files, captions_file_names = [], []
+        uploaded_videos_saved_videos_map = {}
         for file in files:
             if os.path.splitext(file.filename)[1] == ".mp4":
                 video_files.append(file)
@@ -451,6 +465,7 @@ async def ingest_videos_with_transcripts(files: List[UploadFile] = File(None)):
             # Save video file in upload_directory
             with open(os.path.join(upload_folder, video_file_name), "wb") as f:
                 shutil.copyfileobj(video_file.file, f)
+            uploaded_videos_saved_videos_map[video_name] = video_file_name
 
             # Save captions file in upload directory
             vtt_file_name = os.path.splitext(video_file.filename)[0] + ".vtt"
@@ -482,7 +497,11 @@ async def ingest_videos_with_transcripts(files: List[UploadFile] = File(None)):
 
             print(f"Processed video {video_file.filename}")
 
-        return {"status": 200, "message": "Data preparation succeeded"}
+        return {
+            "status": 200,
+            "message": "Data preparation succeeded",
+            "video_id_maps": uploaded_videos_saved_videos_map,
+        }
 
     raise HTTPException(
         status_code=400, detail="Must provide at least one pair consisting of video (.mp4) and captions (.vtt)"
