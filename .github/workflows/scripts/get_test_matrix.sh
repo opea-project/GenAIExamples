@@ -16,7 +16,7 @@ function find_test_1() {
     local n=$2
     local all_service=$3
 
-    common_file_change=$(printf '%s\n' "${changed_files[@]}"| grep ${pre_service} | cut -d'/' -f$n | grep -E '*.py' | grep -v '__init__.py|setup.py' | sort -u) || true
+    common_file_change=$(printf '%s\n' "${changed_files[@]}"| grep ${pre_service} | cut -d'/' -f$n | grep -E '*.py' | grep -vE '__init__.py|version.py' | sort -u) || true
     if [ "$common_file_change" ] || [ "$all_service" = "true" ]; then
         # if common files changed, run all services
         services=$(ls ${pre_service} | cut -d'/' -f$n | grep -vE '*.md|*.py|*.sh|*.yaml|*.yml|*.pdf' | sort -u) || true
