@@ -13,10 +13,12 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 2. Build LLM Image
+### 2. Build LVM and NGINX Docker Images
 
 ```bash
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
+
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
 ### 3. Pull TGI Gaudi Image
@@ -31,9 +33,9 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/VisualQnA/docker
+cd GenAIExamples/VisualQnA
 docker build --no-cache -t opea/visualqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
+cd ../..
 ```
 
 ### 5. Build UI Docker Image
@@ -41,17 +43,18 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/VisualQnA//
+cd GenAIExamples/VisualQnA/ui
 docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../..
+cd ../../..
 ```
 
-Then run the command `docker images`, you will have the following 4 Docker Images:
+Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `opea/llava-tgi:latest`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`
+5. `opea/nginx`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -88,6 +91,8 @@ docker compose -f compose.yaml up -d
 ### Validate MicroServices and MegaService
 
 Follow the instructions to validate MicroServices.
+
+> Note: If you see an "Internal Server Error" from the `curl` command, wait a few minutes for the microserver to be ready and then try again.
 
 1. LLM Microservice
 
