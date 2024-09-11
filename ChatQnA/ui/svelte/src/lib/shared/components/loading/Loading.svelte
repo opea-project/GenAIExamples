@@ -15,7 +15,7 @@
 -->
 
 <div
-	class="flex items-center justify-center self-center bg-black text-sm text-gray-500"
+	class="mb-6 flex items-center justify-center self-center bg-black text-sm text-gray-500"
 />
 <div class="flex items-center justify-center gap-3">
 	<div class="relative inline-flex">
