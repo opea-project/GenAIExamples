@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import adapter from '@sveltejs/adapter-static';
+import adapter from "@sveltejs/adapter-static";
 import preprocess from "svelte-preprocess";
 import postcssPresetEnv from "postcss-preset-env";
 
@@ -28,7 +28,7 @@ const config = {
 	}),
 
 	kit: {
-		adapter: adapter({ fallback: 'index.html' }),
+		adapter: adapter({ fallback: "index.html" }),
 		env: {
 			publicPrefix: "",
 		},
