@@ -1,0 +1,28 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3"
+services:
+  vdms-vector-db:
+    image: intellabs/vdms:latest
+    container_name: vdms-vector-db
+    ports:
+      - "55555:55555"
+  dataprep-vdms:
+    image: opea/dataprep-vdms:latest
+    container_name: dataprep-vdms-server
+    ports:
+      - "6007:6007"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      VDMS_HOST: ${VDMS_HOST}
+      VDMS_PORT: ${VDMS_PORT}
+      INDEX_NAME: ${INDEX_NAME}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
