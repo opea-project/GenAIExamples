@@ -98,7 +98,7 @@ Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more in
 
 ### Deploy CodeGen using Kubernetes
 
-Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
+Refer to the [Kubernetes Guide](./kubernetes/intel/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
 
 ### Deploy CodeGen into Kubernetes using Helm Chart
 
