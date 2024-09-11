@@ -1,6 +1,3 @@
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 apiVersion: v1
 data:
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
@@ -109,8 +106,6 @@ spec:
         name: dataprep-deploy
         ports:
         - containerPort: 6007
-        - containerPort: 6008
-        - containerPort: 6009
       hostIPC: true
       nodeSelector:
         node-type: chatqna-opea
@@ -133,12 +128,6 @@ spec:
   - name: port1
     port: 6007
     targetPort: 6007
-  - name: port2
-    port: 6008
-    targetPort: 6008
-  - name: port3
-    port: 6009
-    targetPort: 6009
   selector:
     app: dataprep-deploy
   type: ClusterIP
@@ -175,10 +164,10 @@ spec:
         - containerPort: 80
         resources:
           limits:
-            cpu: 72
+            cpu: 80
             memory: 20000Mi
           requests:
-            cpu: 72
+            cpu: 80
             memory: 20000Mi
         volumeMounts:
         - mountPath: /data
@@ -248,7 +237,7 @@ spec:
         - containerPort: 6000
         resources:
           requests:
-            cpu: 8
+            cpu: 4
             memory: 4000Mi
       hostIPC: true
       nodeSelector:
@@ -399,7 +388,7 @@ spec:
         - containerPort: 9000
         resources:
           requests:
-            cpu: 8
+            cpu: 4
             memory: 4000Mi
       hostIPC: true
       nodeSelector:
@@ -541,7 +530,7 @@ spec:
         - containerPort: 8000
         resources:
           requests:
-            cpu: 8
+            cpu: 4
             memory: 4000Mi
       hostIPC: true
       nodeSelector:
@@ -597,7 +586,7 @@ spec:
         - containerPort: 7000
         resources:
           requests:
-            cpu: 8
+            cpu: 4
             memory: 4000Mi
       hostIPC: true
       nodeSelector:
@@ -681,3 +670,4 @@ spec:
     app: vector-db
   type: ClusterIP
 ---
+
