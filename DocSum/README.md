@@ -88,11 +88,11 @@ Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more in
 
 ### Deploy using Kubernetes with GMC
 
-Refer to [Kubernetes deployment](./kubernetes/README.md)
+Refer to [Kubernetes deployment](./kubernetes/intel/README_gmc.md)
 
 ### Deploy using Kubernetes without GMC
 
-Refer to [Kubernetes deployment](./kubernetes/manifests/README.md)
+Refer to [Kubernetes deployment](./kubernetes/intel/README.md)
 
 ### Deploy DocSum into Kubernetes using Helm Chart
 
