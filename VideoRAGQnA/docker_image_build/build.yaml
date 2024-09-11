@@ -11,12 +11,12 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/videoragqna:${TAG:-latest}
-  videoragqna-ui:
+  videoragqna-xeon-ui-server:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile
     extends: videoragqna
-    image: ${REGISTRY:-opea}/videoragqna-xeon-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/videoragqna-ui:${TAG:-latest}
   dataprep:
     build:
       context: GenAIComps
