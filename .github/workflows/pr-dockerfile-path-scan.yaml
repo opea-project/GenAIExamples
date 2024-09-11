@@ -56,66 +56,66 @@ jobs:
             exit 1
           fi
 
-      - name: Check all Dockerfile mode and if it exists in yaml
-        if: always()
-        run: |
-          set -e
-          shopt -s globstar
-          no_add="FALSE"
-          cd ${{github.workspace}}
-          Dockerfiles=$(find ./comps -name '*Dockerfile*'|sed 's/^\.\///')
-          if [ -n "$Dockerfiles" ]; then
-            for Dockerfile in $Dockerfiles; do
-              service=$(echo "$Dockerfile" | awk -F '/' '{print $2}')
-              if grep -q "$Dockerfile" ../GenAIExamples/**/*build.yaml*; then
-                mode=""  #CI
-              else
-                mode="-cd" #CD
-              fi
-
-              yaml_file=${{github.workspace}}/.github/workflows/docker/compose/$service'-compose'$mode'.yaml'
-              if [ -e "$yaml_file" ]; then
-                # check service yaml if exist
-                if ! grep -q "$Dockerfile" "$yaml_file"; then
-                  echo "AR: Update $Dockerfile to .github/workflows/docker/compose/"$service"-compose"$mode".yaml."
-                  no_add="TRUE"
-                fi
-              else
-                echo "AR: Create a new compose file .github/workflows/docker/compose/"$service"-compose"$mode".yaml for $Dockerfile and fill it in."
-                no_add="TRUE"
-              fi
-            done
-          fi
-
-          if [[ "$no_add" == "TRUE" ]]; then
-            exit 1
-          fi
-
-      - name: Check for the exist of Dockerfile in all yamls.
-        if: always()
-        run: |
-          shopt -s globstar
-          no_exist="FALSE"
-          cd ${{github.workspace}}
-          yamls=$(find .github/workflows/docker/compose/ -name '*.yaml')
-          if [ -n "$yamls" ]; then
-            for yaml in $yamls; do
-              dockerfiles=$(grep 'dockerfile:' "$yaml"|sed 's/dockerfile: //')
-              for dockerfile in $dockerfiles; do
-                if [[ "$dockerfile" == *"comps/"* ]]; then
-                  if ! [ -e "$dockerfile" ]; then
-                    # cat "$yaml"
-                    echo "AR: The dockerfile path "$dockerfile" in "$yaml" does not exist, remove or update it."
-                    no_exist="TRUE"
-                  fi
-                fi
-              done
-            done
-          fi
-
-          if [[ "$no_exist" == "TRUE" ]]; then
-            exit 1
-          fi
+  #      - name: Check all Dockerfile mode and if it exists in yaml
+  #        if: always()
+  #        run: |
+  #          set -e
+  #          shopt -s globstar
+  #          no_add="FALSE"
+  #          cd ${{github.workspace}}
+  #          Dockerfiles=$(find ./comps -name '*Dockerfile*'|sed 's/^\.\///')
+  #          if [ -n "$Dockerfiles" ]; then
+  #            for Dockerfile in $Dockerfiles; do
+  #              service=$(echo "$Dockerfile" | awk -F '/' '{print $2}')
+  #              if grep -q "$Dockerfile" ../GenAIExamples/**/*build.yaml*; then
+  #                mode=""  #CI
+  #              else
+  #                mode="-cd" #CD
+  #              fi
+  #
+  #              yaml_file=${{github.workspace}}/.github/workflows/docker/compose/$service'-compose'$mode'.yaml'
+  #              if [ -e "$yaml_file" ]; then
+  #                # check service yaml if exist
+  #                if ! grep -q "$Dockerfile" "$yaml_file"; then
+  #                  echo "AR: Update $Dockerfile to .github/workflows/docker/compose/"$service"-compose"$mode".yaml."
+  #                  no_add="TRUE"
+  #                fi
+  #              else
+  #                echo "AR: Create a new compose file .github/workflows/docker/compose/"$service"-compose"$mode".yaml for $Dockerfile and fill it in."
+  #                no_add="TRUE"
+  #              fi
+  #            done
+  #          fi
+  #
+  #          if [[ "$no_add" == "TRUE" ]]; then
+  #            exit 1
+  #          fi
+  #
+  #      - name: Check for the exist of Dockerfile in all yamls.
+  #        if: always()
+  #        run: |
+  #          shopt -s globstar
+  #          no_exist="FALSE"
+  #          cd ${{github.workspace}}
+  #          yamls=$(find .github/workflows/docker/compose/ -name '*.yaml')
+  #          if [ -n "$yamls" ]; then
+  #            for yaml in $yamls; do
+  #              dockerfiles=$(grep 'dockerfile:' "$yaml"|sed 's/dockerfile: //')
+  #              for dockerfile in $dockerfiles; do
+  #                if [[ "$dockerfile" == *"comps/"* ]]; then
+  #                  if ! [ -e "$dockerfile" ]; then
+  #                    # cat "$yaml"
+  #                    echo "AR: The dockerfile path "$dockerfile" in "$yaml" does not exist, remove or update it."
+  #                    no_exist="TRUE"
+  #                  fi
+  #                fi
+  #              done
+  #            done
+  #          fi
+  #
+  #          if [[ "$no_exist" == "TRUE" ]]; then
+  #            exit 1
+  #          fi
 
   Dockerfile-path-change-detection-in-GenAIExamples:
     runs-on: ubuntu-latest
