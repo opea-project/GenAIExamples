@@ -7,9 +7,8 @@ on:
   push:
     branches: [ 'main' ]
     paths:
-      - "**/docker/*.py"
-      - "**/docker/Dockerfile"
-      - "**/docker/ui/**"
+      - "**.py"
+      - "**Dockerfile"
   workflow_dispatch:
 
 concurrency:
@@ -19,39 +18,18 @@ concurrency:
 jobs:
   job1:
     uses: ./.github/workflows/_get-test-matrix.yml
+    with:
+      test_mode: "docker_image_build/build.yaml"
 
-  mega-image-build:
+  image-build:
     needs: job1
     strategy:
       matrix:
-        workload: ${{ fromJSON(needs.job1.outputs.run_matrix).include.*.example }}
-        hardware: ["gaudi","xeon"]
-    runs-on: docker-build-${{ matrix.hardware }}
-    steps:
-      - name: Clean up Working Directory
-        run: |
-          sudo rm -rf ${{github.workspace}}/*
-
-      - name: Checkout out Repo
-        uses: actions/checkout@v4
-
-      - name: Check Docker Compose File Exists
-        env:
-          service: ${{ matrix.workload }}
-        run: |
-          docker_compose_path="${{ github.workspace }}/.github/workflows/docker/compose/${service}-compose.yaml"
-          if [ -e $docker_compose_path ]; then
-            echo "file_exists=true" >> $GITHUB_ENV
-            echo "docker_compose_path=${docker_compose_path}" >> $GITHUB_ENV
-          else
-            echo "file_exists=false" >> $GITHUB_ENV
-            echo "docker_compose_path=${docker_compose_path} for this service does not exist, so skipping image build for this service!!!"
-          fi
-
-      - name: Build Image
-        if: env.file_exists == 'true'
-        uses: opea-project/validation/actions/image-build@main
-        with:
-          work_dir: ${{ github.workspace }}/${{ matrix.workload }}
-          docker_compose_path: ${{ env.docker_compose_path }}
-          registry: ${OPEA_IMAGE_REPO}opea
+        example: ${{ fromJSON(needs.job1.outputs.run_matrix).include.*.example }}
+        node: ["gaudi","xeon"]
+      fail-fast: false
+    uses: ./.github/workflows/_example-workflow.yml
+    with:
+      node: ${{ matrix.node }}
+      example: ${{ matrix.example }}
+    secrets: inherit

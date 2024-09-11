@@ -6,7 +6,7 @@ Rerank model finetuning is the process of further training rerank model on a dat
 
 ### Deploy Rerank Model Finetuning Service on Xeon
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for detail.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for detail.
 
 ## Consume Rerank Model Finetuning Service
 
