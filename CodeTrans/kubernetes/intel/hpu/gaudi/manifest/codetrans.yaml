@@ -1,0 +1,545 @@
+---
+# Source: codetrans/charts/codetrans-ui/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: codetrans-codetrans-ui-config
+  labels:
+    helm.sh/chart: codetrans-ui-1.0.0
+    app.kubernetes.io/name: codetrans-ui
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  APP_BACKEND_SERVICE_ENDPOINT: "/v1/codetrans"
+  APP_DATA_PREP_SERVICE_URL: "/v1/dataprep"
+  CHAT_BASE_URL: "/v1/codetrans"
+  UPLOAD_FILE_BASE_URL: "/v1/dataprep"
+  GET_FILE: "/v1/dataprep/get_file"
+  DELETE_FILE: "/v1/dataprep/delete_file"
+  BASE_URL: "/v1/codetrans"
+  DOC_BASE_URL: "/v1/codetrans"
+  BASIC_URL: "/v1/codetrans"
+  VITE_CODE_GEN_URL: "/v1/codetrans"
+  VITE_DOC_SUM_URL: "/v1/codetrans"
+---
+# Source: codetrans/charts/llm-uservice/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: codetrans-llm-uservice-config
+  labels:
+    helm.sh/chart: llm-uservice-1.0.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  TGI_LLM_ENDPOINT: "http://codetrans-tgi"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  HF_HOME: "/tmp/.cache/huggingface"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  LOGFLAG: ""
+---
+# Source: codetrans/charts/tgi/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: codetrans-tgi-config
+  labels:
+    helm.sh/chart: tgi-1.0.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  MODEL_ID: "HuggingFaceH4/mistral-7b-grok"
+  PORT: "2080"
+  HF_TOKEN: "insert-your-huggingface-token-here"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  HABANA_LOGS: "/tmp/habana_logs"
+  NUMBA_CACHE_DIR: "/tmp"
+  HF_HOME: "/tmp/.cache/huggingface"
+  MAX_INPUT_LENGTH: "1024"
+  MAX_TOTAL_TOKENS: "2048"
+---
+# Source: codetrans/templates/nginx-deployment.yaml
+apiVersion: v1
+data:
+  default.conf: |+
+    # Copyright (C) 2024 Intel Corporation
+    # SPDX-License-Identifier: Apache-2.0
+
+
+    server {
+        listen       80;
+        listen  [::]:80;
+
+        location /home {
+            alias  /usr/share/nginx/html/index.html;
+        }
+
+        location / {
+            proxy_pass http://codetrans-codetrans-ui:5174;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/codetrans {
+            proxy_pass http://codetrans:7777;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+
+kind: ConfigMap
+metadata:
+  name: codetrans-nginx-config
+---
+# Source: codetrans/charts/codetrans-ui/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codetrans-codetrans-ui
+  labels:
+    helm.sh/chart: codetrans-ui-1.0.0
+    app.kubernetes.io/name: codetrans-ui
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5174
+      targetPort: ui
+      protocol: TCP
+      name: ui
+  selector:
+    app.kubernetes.io/name: codetrans-ui
+    app.kubernetes.io/instance: codetrans
+---
+# Source: codetrans/charts/llm-uservice/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codetrans-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-1.0.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: llm-uservice
+  selector:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codetrans
+---
+# Source: codetrans/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codetrans-tgi
+  labels:
+    helm.sh/chart: tgi-1.0.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 2080
+      protocol: TCP
+      name: tgi
+  selector:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codetrans
+---
+# Source: codetrans/templates/nginx-deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: codetrans-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
+    app: codetrans-nginx
+  type: NodePort
+---
+# Source: codetrans/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codetrans
+  labels:
+    helm.sh/chart: codetrans-1.0.0
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7777
+      targetPort: 7777
+      protocol: TCP
+      name: codetrans
+  selector:
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
+    app: codetrans
+---
+# Source: codetrans/charts/codetrans-ui/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codetrans-codetrans-ui
+  labels:
+    helm.sh/chart: codetrans-ui-1.0.0
+    app.kubernetes.io/name: codetrans-ui
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: codetrans-ui
+      app.kubernetes.io/instance: codetrans
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: codetrans-ui-1.0.0
+        app.kubernetes.io/name: codetrans-ui
+        app.kubernetes.io/instance: codetrans
+        app.kubernetes.io/version: "v1.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: codetrans-ui
+          envFrom:
+            - configMapRef:
+                name: codetrans-codetrans-ui-config
+          securityContext:
+            {}
+          image: "opea/codetrans-ui:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: ui
+              containerPort: 5173
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: codetrans/charts/llm-uservice/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codetrans-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-1.0.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llm-uservice
+      app.kubernetes.io/instance: codetrans
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llm-uservice
+        app.kubernetes.io/instance: codetrans
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: codetrans
+          envFrom:
+            - configMapRef:
+                name: codetrans-llm-uservice-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/llm-tgi:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: llm-uservice
+              containerPort: 9000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: codetrans/charts/tgi/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codetrans-tgi
+  labels:
+    helm.sh/chart: tgi-1.0.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tgi
+      app.kubernetes.io/instance: codetrans
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tgi
+        app.kubernetes.io/instance: codetrans
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: tgi
+          envFrom:
+            - configMapRef:
+                name: codetrans-tgi-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.1"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: http
+              containerPort: 2080
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          startupProbe:
+            failureThreshold: 120
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          resources:
+            limits:
+              habana.ai/gaudi: 1
+      volumes:
+        - name: model-volume
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+# Source: codetrans/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codetrans
+  labels:
+    helm.sh/chart: codetrans-1.0.0
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: codetrans
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: codetrans
+      app.kubernetes.io/instance: codetrans
+      app: codetrans
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: codetrans
+        app.kubernetes.io/instance: codetrans
+        app: codetrans
+    spec:
+      securityContext:
+        null
+      containers:
+        - name: codetrans
+          env:
+            - name: LLM_SERVICE_HOST_IP
+              value: codetrans-llm-uservice
+            #- name: MEGA_SERVICE_PORT
+            #  value: 7777
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/codetrans:latest"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: codetrans
+              containerPort: 7777
+              protocol: TCP
+          resources:
+            null
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: codetrans/templates/nginx-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codetrans-nginx
+  labels:
+    helm.sh/chart: codetrans-1.0.0
+    app.kubernetes.io/name: codetrans
+    app.kubernetes.io/instance: codetrans
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+    app: codetrans-nginx
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: codetrans
+      app.kubernetes.io/instance: codetrans
+      app: codetrans-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: codetrans
+        app.kubernetes.io/instance: codetrans
+        app: codetrans-nginx
+    spec:
+      containers:
+      - image: nginx:1.27.1
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-config-volume
+      securityContext: {}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: codetrans-nginx-config
+        name: nginx-config-volume
