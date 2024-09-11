@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="videoragqna videoragqna-ui dataprep embedding retriever reranking lvm-video-llama lvm"
+    service_list="videoragqna videoragqna-xeon-ui-server dataprep embedding retriever reranking lvm-video-llama lvm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull intellabs/vdms:v2.8.0
