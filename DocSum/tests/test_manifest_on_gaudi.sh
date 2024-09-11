@@ -28,7 +28,7 @@ function init_docsum() {
 
 function install_docsum {
     echo "namespace is $NAMESPACE"
-    kubectl apply -f . -n $NAMESPACE
+    kubectl apply -f docsum.yaml -n $NAMESPACE
 }
 
 function validate_docsum() {
@@ -69,12 +69,12 @@ fi
 
 case "$1" in
     init_DocSum)
-        pushd DocSum/kubernetes/manifests/gaudi
+        pushd DocSum/kubernetes/intel/hpu/gaudi/manifest
         init_docsum
         popd
         ;;
     install_DocSum)
-        pushd DocSum/kubernetes/manifests/gaudi
+        pushd DocSum/kubernetes/intel/hpu/gaudi/manifest
         NAMESPACE=$2
         install_docsum
         popd

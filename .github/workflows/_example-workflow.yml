@@ -46,13 +46,25 @@ jobs:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
 
+      - name: Get checkout ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+          echo "checkout ref ${{ env.CHECKOUT_REF }}"
+
       - name: Checkout out Repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
+          fetch-depth: 0
 
       - name: Clone required Repo
         run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}/docker
-          docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
+          cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
+          docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           if [[ $(grep -c "tei-gaudi:" ${docker_compose_path}) != 0 ]]; then
               git clone https://github.com/huggingface/tei-gaudi.git
           fi
@@ -66,8 +78,8 @@ jobs:
         if: ${{ fromJSON(inputs.build) }}
         uses: opea-project/validation/actions/image-build@main
         with:
-          work_dir: ${{ github.workspace }}/${{ inputs.example }}/docker
-          docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker/docker_build_compose.yaml
+          work_dir: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
+          docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           registry: ${OPEA_IMAGE_REPO}opea
           tag: ${{ inputs.tag }}
 
