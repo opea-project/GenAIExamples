@@ -11,7 +11,7 @@
 ## Deploy On Xeon
 
 ```
-cd GenAIExamples/DocSum/kubernetes/manifests/xeon
+cd GenAIExamples/DocSum/kubernetes/intel/cpu/xeon/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" docsum.yaml
 kubectl apply -f docsum.yaml
@@ -20,7 +20,7 @@ kubectl apply -f docsum.yaml
 ## Deploy On Gaudi
 
 ```
-cd GenAIExamples/DocSum/kubernetes/manifests/gaudi
+cd GenAIExamples/DocSum/kubernetes/intel/hpu/gaudi/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" docsum.yaml
 kubectl apply -f docsum.yaml

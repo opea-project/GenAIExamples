@@ -12,7 +12,7 @@
 ## Deploy On Xeon
 
 ```
-cd GenAIExamples/CodeGen/kubernetes/manifests/xeon
+cd GenAIExamples/CodeGen/kubernetes/intel/cpu/xeon/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 export MODEL_ID="meta-llama/CodeLlama-7b-hf"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" codegen.yaml
@@ -23,7 +23,7 @@ kubectl apply -f codegen.yaml
 ## Deploy On Gaudi
 
 ```
-cd GenAIExamples/CodeGen/kubernetes/manifests/gaudi
+cd GenAIExamples/CodeGen/kubernetes/intel/hpu/gaudi/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" codegen.yaml
 kubectl apply -f codegen.yaml
