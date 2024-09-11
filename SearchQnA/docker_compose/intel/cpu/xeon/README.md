@@ -47,6 +47,7 @@ cd ../../..
 ```
 
 ### 7. Build UI Docker Image
+
 Build frontend Docker image via below command:
 
 ```bash
@@ -62,7 +63,7 @@ Then run the command `docker images`, you will have following images ready:
 3. `opea/reranking-tei:latest`
 4. `opea/llm-tgi:latest`
 5. `opea/searchqna:latest`
-5. `opea/searchqna-ui:latest`
+6. `opea/searchqna-ui:latest`
 
 ## 🚀 Set the environment variables
 
