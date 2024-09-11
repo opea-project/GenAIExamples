@@ -49,7 +49,6 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_PORT=18000
 
     # Start Docker Containers
     docker compose up -d
@@ -116,6 +115,8 @@ function main() {
 
     stop_docker
     build_docker_images
+    echo "Dump current docker ps"
+    docker ps
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
