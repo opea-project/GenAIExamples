@@ -2,6 +2,7 @@ aiohttp
 docarray
 fastapi
 httpx
+kubernetes
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
