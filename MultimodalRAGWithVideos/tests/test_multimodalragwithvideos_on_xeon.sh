@@ -17,14 +17,14 @@ ip_address=$(hostname -I | awk '{print $1}')
 export video_fn="WeAreGoingOnBullrun.mp4"
 
 function build_docker_images() {
-    cd $WORKPATH/docker
+    cd $WORKPATH/docker_image_build
     # git clone https://github.com/opea-project/GenAIComps.git
 
 
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="multimodalragwithvideos bridgetower-embedding-server multimodal-embedding multimodal-retriever llava-server lvm multimodal-data-prep-service"
-    docker compose -f docker_build_compose.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
 }
@@ -54,7 +54,7 @@ function setup_env() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
 
 
     # Start Docker Containers
@@ -234,7 +234,7 @@ function validate_delete {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
     docker compose -f compose.yaml stop && docker compose -f compose.yaml rm -f
 }
 
@@ -249,18 +249,18 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
     prepare_data
-    if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/tests/chatqna_benchmark.py
-    elif [ "${mode}" == "" ]; then
-        validate_microservices
-        echo "==== microservices validated ===="
-        validate_megaservice
-        echo "==== megaservice validated ===="
-        # validate_frontend
-        # echo "==== frontend validated ===="
-        validate_delete
-        echo "==== delete validated ===="
-    fi
+    # if [ "${mode}" == "perf" ]; then
+    #     python3 $WORKPATH/tests/chatqna_benchmark.py
+    # elif [ "${mode}" == "" ]; then
+    validate_microservices
+    echo "==== microservices validated ===="
+    validate_megaservice
+    echo "==== megaservice validated ===="
+    # validate_frontend
+    # echo "==== frontend validated ===="
+    validate_delete
+    echo "==== delete validated ===="
+    # fi
 
     stop_docker
     echo y | docker system prune
