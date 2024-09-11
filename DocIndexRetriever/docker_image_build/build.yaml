@@ -21,7 +21,7 @@ services:
     build:
       context: GenAIComps
       dockerfile: comps/retrievers/redis/langchain/Dockerfile
-    extends: chatqna
+    extends: doc-index-retriever
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
   reranking-tei:
     build:
@@ -29,9 +29,9 @@ services:
       dockerfile: comps/reranks/tei/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
-  dataprep-on-ray-redis:
+  dataprep-redis:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain_ray/Dockerfile
+      dockerfile: comps/dataprep/redis/langchain/Dockerfile
     extends: doc-index-retriever
-    image: ${REGISTRY:-opea}/dataprep-on-ray-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
