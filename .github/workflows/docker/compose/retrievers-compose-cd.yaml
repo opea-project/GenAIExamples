@@ -19,3 +19,15 @@ services:
     build:
       dockerfile: comps/retrievers/redis/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/retriever-redis-llamaindex:${TAG:-latest}
+  retriever-pathway:
+    build:
+      dockerfile: comps/retrievers/pathway/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-pathway:${TAG:-latest}
+  multimodal-retriever-redis:
+    build:
+      dockerfile: comps/retrievers/multimodal/redis/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/multimodal-retriever-redis:${TAG:-latest}
+  retriever-vdms:
+    build:
+      dockerfile: comps/retrievers/vdms/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}

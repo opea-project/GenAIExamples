@@ -1,0 +1,10 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+# images used by GenAIExamples: reranking-tei
+services:
+  tts: #need to rename
+    build:
+      dockerfile: comps/tts/Dockerfile
+    image: ${REGISTRY:-opea}/tts:${TAG:-latest}

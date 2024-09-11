@@ -7,10 +7,6 @@ services:
     build:
       dockerfile: comps/dataprep/redis/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-redis-llama-index:${TAG:-latest}
-  dataprep-on-ray-redis:
-    build:
-      dockerfile: comps/dataprep/redis/langchain_ray/Dockerfile
-    image: ${REGISTRY:-opea}/dataprep-on-ray-redis:${TAG:-latest}
   dataprep-milvus:
     build:
       dockerfile: comps/dataprep/milvus/langchain/Dockerfile
@@ -23,7 +19,15 @@ services:
     build:
       dockerfile: comps/dataprep/pinecone/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-pinecone:${TAG:-latest}
+  dataprep-redis: #need to rename
+    build:
+      dockerfile: comps/dataprep/multimodal/redis/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
   dataprep-vdms:
     build:
-      dockerfile: comps/dataprep/vdms/multimodal_langchain/docker/Dockerfile
+      dockerfile: comps/dataprep/vdms/multimodal_langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}
+  dataprep-vdmsxx: #need to rename
+    build:
+      dockerfile: comps/dataprep/vdms/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}

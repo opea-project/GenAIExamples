@@ -3,7 +3,7 @@
 
 # this file should be run in the root of the repo
 services:
-  vectorstore-pathway:
+  feedbackmanagement:
     build:
-      dockerfile: comps/vectorstores/pathway/Dockerfile
-    image: ${REGISTRY:-opea}/vectorstore-pathway:${TAG:-latest}
+      dockerfile: comps/feedback_management/mongo/Dockerfile
+    image: ${REGISTRY:-opea}/feedbackmanagement:${TAG:-latest}

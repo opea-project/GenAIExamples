@@ -13,3 +13,7 @@ services:
     build:
       dockerfile: comps/dataprep/qdrant/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
+  dataprep-on-ray-redis:
+    build:
+      dockerfile: comps/dataprep/redis/langchain_ray/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-on-ray-redis:${TAG:-latest}

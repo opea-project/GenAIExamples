@@ -6,3 +6,7 @@ services:
     build:
       dockerfile: comps/guardrails/pii_detection/Dockerfile
     image: ${REGISTRY:-opea}/guardrails-pii-detection:${TAG:-latest}
+  guardrails-toxicity-detection:
+    build:
+      dockerfile: comps/guardrails/toxicity_detection/Dockerfile
+    image: ${REGISTRY:-opea}/guardrails-toxicity-detection:${TAG:-latest}
