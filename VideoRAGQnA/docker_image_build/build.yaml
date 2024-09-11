@@ -17,7 +17,7 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: videoragqna
     image: ${REGISTRY:-opea}/videoragqna-xeon-ui:${TAG:-latest}
-  dataprep: # TODO: test this when merged
+  dataprep:
     build:
       context: GenAIComps
       dockerfile: comps/dataprep/vdms/multimodal_langchain/Dockerfile

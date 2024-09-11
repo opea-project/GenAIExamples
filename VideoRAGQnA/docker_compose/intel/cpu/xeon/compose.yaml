@@ -5,12 +5,12 @@
 
 services:
   vdms-vector-db:
-    image: intellabs/vdms:latest
+    image: intellabs/vdms:v2.8.0
     container_name: vdms-vector-db
     ports:
       - "8001:55555"
   dataprep:
-    image: opea/dataprep-vdms:latest
+    image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}
     container_name: dataprep-vdms-server
     depends_on:
       - vdms-vector-db
@@ -28,7 +28,7 @@ services:
       - /home/$USER/.cache/clip:/home/user/.cache/clip
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   embedding:
-    image: opea/embedding-multimodal:latest
+    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
     container_name: embedding-multimodal-server
     ports:
       - "6000:6000"
@@ -41,7 +41,7 @@ services:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
     restart: unless-stopped
   retriever:
-    image: opea/retriever-vdms:latest
+    image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
     container_name: retriever-vdms-server
     depends_on:
       - vdms-vector-db
@@ -61,7 +61,7 @@ services:
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   reranking:
-    image: opea/reranking-videoragqna:latest
+    image: ${REGISTRY:-opea}/reranking-videoragqna:${TAG:-latest}
     container_name: reranking-videoragqna-server
     ports:
       - "8000:8000"
@@ -75,7 +75,7 @@ services:
       DATAPREP_GET_VIDEO_LIST_ENDPOINT: ${DATAPREP_GET_VIDEO_LIST_ENDPOINT}
     restart: unless-stopped
   lvm-video-llama:
-    image: opea/video-llama-lvm-server:latest
+    image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
     container_name: video-llama-lvm-server
     ports:
       - "9009:9009"
@@ -90,7 +90,7 @@ services:
       - video-llama-model:/home/user/model
     restart: unless-stopped
   lvm:
-    image: opea/lvm-video-llama:latest
+    image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
     container_name: lvm-video-llama
     ports:
       - "9000:9000"
@@ -104,7 +104,7 @@ services:
     depends_on:
       - lvm-video-llama
   videoragqna-xeon-backend-server:
-    image: opea/videoragqna:latest
+    image: ${REGISTRY:-opea}/videoragqna:${TAG:-latest}
     container_name: videoragqna-xeon-backend-server
     depends_on:
       - vdms-vector-db
@@ -129,7 +129,7 @@ services:
     ipc: host
     restart: always
   videoragqna-xeon-ui-server:
-    image: opea/videoragqna-ui:latest
+    image: ${REGISTRY:-opea}/videoragqna-ui:${TAG:-latest}
     container_name: videoragqna-xeon-ui-server
     depends_on:
       - videoragqna-xeon-backend-server

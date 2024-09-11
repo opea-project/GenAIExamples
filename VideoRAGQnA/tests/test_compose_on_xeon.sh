@@ -22,7 +22,7 @@ function build_docker_images() {
     service_list="videoragqna videoragqna-ui dataprep embedding retriever reranking lvm-video-llama lvm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull intellabs/vdms:latest
+    docker pull intellabs/vdms:v2.8.0
     docker images && sleep 1s
 }
 
