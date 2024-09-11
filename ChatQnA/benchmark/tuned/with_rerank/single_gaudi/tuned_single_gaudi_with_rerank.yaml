@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 apiVersion: v1
 data:
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
@@ -678,4 +681,3 @@ spec:
     app: vector-db
   type: ClusterIP
 ---
-
