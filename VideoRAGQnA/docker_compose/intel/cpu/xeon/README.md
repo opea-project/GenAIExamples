@@ -56,7 +56,7 @@ cd GenAIComps
 ### 1. Build Embedding Image
 
 ```bash
-docker build -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/docker/Dockerfile .
+docker build -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
