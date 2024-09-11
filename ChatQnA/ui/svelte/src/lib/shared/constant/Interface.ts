@@ -35,6 +35,7 @@ type Map<T> = T extends MessageType.Text | MessageType.SingleAudio
 			: { imgSrc: string; imgId: string }[];
 
 export interface Message {
+	imgSrc: string | null | undefined;
 	role: MessageRole;
 	type: MessageType;
 	content: Map<Message["type"]>;
