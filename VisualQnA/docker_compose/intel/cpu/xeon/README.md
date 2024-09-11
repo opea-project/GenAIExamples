@@ -41,7 +41,7 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 1. Build LVM and NGINX Docker Image
+### 1. Build LVM and NGINX Docker Images
 
 ```bash
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
