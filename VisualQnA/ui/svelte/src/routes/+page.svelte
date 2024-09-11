@@ -88,11 +88,7 @@
 		);
 
 		eventSource.addEventListener("message", (e: any) => {
-			console.log("e", e);
-
 			let Msg = e.data;
-			console.log("Msg", Msg);
-
 			if (Msg.startsWith("b")) {
 				let trimmedData = Msg.slice(2, -1);
 
