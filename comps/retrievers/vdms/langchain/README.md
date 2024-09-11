@@ -43,10 +43,12 @@ docker run -d -p 6060:80 -v $volume:/data -e http_proxy=$http_proxy -e https_pro
 
 ### 1.3 Verify the TEI Service
 
+Health check the embedding service with:
+
 ```bash
-curl 127.0.0.1:6060/rerank \
+curl 127.0.0.1:6060/embed \
     -X POST \
-    -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
+    -d '{"inputs":"What is Deep Learning?"}' \
     -H 'Content-Type: application/json'
 ```
 
