@@ -39,7 +39,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HABANA_VISIBLE_DEVICES: all
+      HABANA_VISIBLE_DEVICES: ${tei_embedding_devices}
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       MAX_WARMUP_SEQUENCE_LENGTH: 512
       INIT_HCCL_ON_ACQUIRE: 0
@@ -121,7 +121,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-      HABANA_VISIBLE_DEVICES: all
+      HABANA_VISIBLE_DEVICES: ${llm_service_devices}
       OMPI_MCA_btl_vader_single_copy_mechanism: none
     runtime: habana
     cap_add:

@@ -50,6 +50,8 @@ function start_services() {
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6008/v1/dataprep/get_file"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6009/v1/dataprep/delete_file"
+    export llm_service_devices=all
+    export tei_embedding_devices=all
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
