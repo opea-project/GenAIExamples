@@ -97,6 +97,21 @@ flowchart LR
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
 
+In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
+
+<details>
+<summary><b>Gaudi default compose.yaml</b></summary>
+
+| MicroService | Open Source Project | HW    | Port | Endpoint             |
+| ------------ | ------------------- | ----- | ---- | -------------------- |
+| Embedding    | Langchain           | Xeon  | 6000 | /v1/embaddings       |
+| Retriever    | Langchain, Redis    | Xeon  | 7000 | /v1/retrieval        |
+| Reranking    | Langchain, TEI      | Gaudi | 8000 | /v1/reranking        |
+| LLM          | Langchain, TGI      | Gaudi | 9000 | /v1/chat/completions |
+| Dataprep     | Redis, Langchain    | Xeon  | 6007 | /v1/dataprep         |
+
+</details>
+
 ## Deploy ChatQnA Service
 
 The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
@@ -123,7 +138,7 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
    docker pull opea/chatqna-conversation-ui:latest
    ```
 
-2. Using the docker images `built from source`: [Guide](docker/xeon/README.md)
+2. Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md)
 
    > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
 
@@ -139,7 +154,7 @@ By default, the embedding, reranking and LLM models are set to a default value a
 
 Change the `xxx_MODEL_ID` in `docker/xxx/set_env.sh` for your needs.
 
-For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA. Refer to [this readme](docker/xeon/README.md) for details.
+For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA. Refer to [this readme](docker_compose/intel/cpu/xeon/README.md) for details.
 
 ### Setup Environment Variable
 
@@ -202,11 +217,11 @@ Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more in
 ### Deploy ChatQnA on NVIDIA GPU
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/gpu/
+cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
 docker compose up -d
 ```
 
-Refer to the [NVIDIA GPU Guide](./docker/gpu/README.md) for more instructions on building docker images from source.
+Refer to the [NVIDIA GPU Guide](./docker_compose/nvidia/gpu/README.md) for more instructions on building docker images from source.
 
 ### Deploy ChatQnA into Kubernetes on Xeon & Gaudi with GMC
 
@@ -214,7 +229,7 @@ Refer to the [Kubernetes Guide](./kubernetes/intel/README_gmc.md) for instructio
 
 ### Deploy ChatQnA into Kubernetes on Xeon & Gaudi without GMC
 
-Refer to the [Kubernetes Guide](./kubernetes/kubernetes/intel/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi without GMC.
+Refer to the [Kubernetes Guide](./kubernetes/intel/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi without GMC.
 
 ### Deploy ChatQnA into Kubernetes using Helm Chart
 
@@ -224,7 +239,7 @@ Refer to the [ChatQnA helm chart](https://github.com/opea-project/GenAIInfra/tre
 
 ### Deploy ChatQnA on AI PC
 
-Refer to the [AI PC Guide](./docker/aipc/README.md) for instructions on deploying ChatQnA on AI PC.
+Refer to the [AI PC Guide](./docker_compose/intel/cpu/aipc/README.md) for instructions on deploying ChatQnA on AI PC.
 
 ### Deploy ChatQnA on Red Hat OpenShift Container Platform (RHOCP)
 

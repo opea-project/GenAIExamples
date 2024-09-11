@@ -59,7 +59,7 @@ cd ../../..
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/ChatQnA/
+cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 cd ../../../..
 ```
@@ -132,7 +132,7 @@ Note: Please replace with `host_ip` with you external IP address, do **NOT** use
 ### Start all the services Docker Containers
 
 ```bash
-cd GenAIExamples/ChatQnA/docker/gpu/
+cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
 docker compose up -d
 ```
 

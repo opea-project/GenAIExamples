@@ -27,7 +27,7 @@ To begin with, ensure that you have following prerequisites in place:
       ```
       # You may set the HUGGINGFACEHUB_API_TOKEN via method:
       export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
-      cd GenAIExamples/ProductivitySuite/kubernetes/manifests/xeon/
+      cd GenAIExamples/ProductivitySuite/kubernetes/intel/cpu/xeon/manifests/
       sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" *.yaml
       ```
 
@@ -48,7 +48,7 @@ To begin with, ensure that you have following prerequisites in place:
 ## Deploying ProductivitySuite
 You can use yaml files in xeon folder to deploy ProductivitySuite with reactUI.
 ```
-cd GenAIExamples/ProductivitySuite/kubernetes/manifests/xeon/
+cd GenAIExamples/ProductivitySuite/kubernetes/intel/cpu/xeon/manifests/
 kubectl apply -f *.yaml
 ```
 
