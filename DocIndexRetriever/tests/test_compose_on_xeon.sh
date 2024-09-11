@@ -7,8 +7,8 @@ echo "IMAGE_REPO=${IMAGE_REPO}"
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
-export REGISTRY=${IMAGE_REPO}
-export TAG=${IMAGE_TAG}
+# export REGISTRY=${IMAGE_REPO}
+# export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
