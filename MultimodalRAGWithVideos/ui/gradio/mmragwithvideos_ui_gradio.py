@@ -281,10 +281,14 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=5173)
     parser.add_argument("--concurrency-count", type=int, default=20)
     parser.add_argument("--share", action="store_true")
-    
+
     backend_service_endpoint = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/multimodalragwithvideos")
-    dataprep_gen_transcript_endpoint = os.getenv("DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_transcripts")
-    dataprep_gen_caption_endpoint = os.getenv("DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_captions")
+    dataprep_gen_transcript_endpoint = os.getenv(
+        "DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_transcripts"
+    )
+    dataprep_gen_caption_endpoint = os.getenv(
+        "DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_captions"
+    )
     args = parser.parse_args()
     logger.info(f"args: {args}")
     global gateway_addr
