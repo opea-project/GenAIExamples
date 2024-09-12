@@ -17,10 +17,7 @@
 <script lang="ts">
 	export let data;
 	import {
-	base64ImageStore,
-		ifStoreMsg,
-		isCheckedStore,
-		knowledge1,
+		base64ImageStore,
 		stepValueStore,
 	} from "$lib/shared/stores/common/Store";
 	import { onMount } from "svelte";
@@ -44,13 +41,13 @@
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 	import Upload from "$lib/modules/upload/upload.svelte";
+	import ImagePrompt from "$lib/modules/upload/imagePrompt.svelte";
 
 	let query: string = "";
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
 	console.log("chatMessages", chatMessages);
-
 
 	onMount(async () => {
 		scrollToDiv = document
@@ -91,11 +88,7 @@
 		);
 
 		eventSource.addEventListener("message", (e: any) => {
-			console.log('e', e);
-
 			let Msg = e.data;
-			console.log('Msg', Msg);
-
 			if (Msg.startsWith("b")) {
 				let trimmedData = Msg.slice(2, -1);
 
@@ -106,10 +99,9 @@
 				}
 
 				if (trimmedData !== "</s>") {
-				        trimmedData = trimmedData.replace(/\\n/g, "\n");
+					trimmedData = trimmedData.replace(/\\n/g, "\n");
 				}
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-
 					chatMessages = [
 						...chatMessages,
 						{
@@ -117,6 +109,7 @@
 							type: MessageType.Text,
 							content: trimmedData,
 							time: getCurrentTimeStamp(),
+							imgSrc: null, // Add the imgSrc property here
 						},
 					];
 					console.log("? chatMessages", chatMessages);
@@ -143,10 +136,13 @@
 
 	const handleTextSubmit = async () => {
 		loading = true;
+		console.log("handleTextSubmit", $base64ImageStore);
+
 		const newMessage = {
 			role: MessageRole.User,
 			type: MessageType.Text,
 			content: query,
+			imgSrc: $base64ImageStore,
 			time: 0,
 		};
 		chatMessages = [...chatMessages, newMessage];
@@ -165,110 +161,107 @@
 		chatMessages = [];
 	}
 
-	function isEmptyObject(obj: any): boolean {
-		for (let key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				return false;
-			}
+	function handleUpdateQuery(event) {
+		if (event.detail && event.detail.content) {
+			query = event.detail.content;
+			handleTextSubmit();
 		}
-		return true;
 	}
-
-
 </script>
 
 <Header />
-<div
-	class="h-full gap-5 bg-white sm:flex sm:pb-2 lg:rounded-tl-3xl"
->
-<div class="w-1/5 bg-gray-200 p-4">
-    <Upload />
-  </div>
-  <div class="flex-1 bg-gray-100 p-4">
-    <div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[80%] bg-white px-10">
-		<div
-			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0"
-		>
-			<div class="relative my-4 flex w-full flex-row justify-center">
-				<div class="relative w-full focus:border-none">
-					<input
-						class="text-md block w-full border-0 border-b-2 border-gray-300 px-1 py-4
-						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-						type="text"
-						data-testid="chat-input"
-						placeholder="Enter prompt here"
-						disabled={loading}
-						maxlength="1200"
-						bind:value={query}
-						on:keydown={(event) => {
-							if (event.key === "Enter" && !event.shiftKey && query) {
-								event.preventDefault();
-								handleTextSubmit();
-							}
-						}}
-					/>
-					<button
-						on:click={() => {
-							if (query) {
-								handleTextSubmit();
-							}
-						}}
-						type="submit"
-						class="absolute bottom-2.5 end-2.5 px-4 py-2 text-sm font-medium text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-						><PaperAirplane /></button
-					>
-				</div>
-			</div>
-		</div>
-
-		<!-- clear -->
-		{#if Array.isArray(chatMessages) && chatMessages.length > 0 && !loading}
-			<div class="flex w-full justify-between pr-5">
-				<div class="flex items-center">
-					<button
-						class="bg-primary text-primary-foreground hover:bg-primary/90 group flex items-center justify-center space-x-2 p-2"
-						type="button"
-						on:click={() => handelClearHistory()}
-						><svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 20 20"
-							width="24"
-							height="24"
-							class="fill-[#0597ff] group-hover:fill-[#0597ff]"
-							><path
-								d="M12.6 12 10 9.4 7.4 12 6 10.6 8.6 8 6 5.4 7.4 4 10 6.6 12.6 4 14 5.4 11.4 8l2.6 2.6zm7.4 8V2q0-.824-.587-1.412A1.93 1.93 0 0 0 18 0H2Q1.176 0 .588.588A1.93 1.93 0 0 0 0 2v12q0 .825.588 1.412Q1.175 16 2 16h14zm-3.15-6H2V2h16v13.125z"
-							/></svg
-						><span class="font-medium text-[#0597ff]">CLEAR</span></button
-					>
-				</div>
-			</div>
-		{/if}
-		<!-- clear -->
-
-		<div class="mx-auto flex h-full w-full flex-col">
-			<Scrollbar
-				classLayout="flex flex-col gap-1 mr-4"
-				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 mr-5"
-			>
-				{#each chatMessages as message, i}
-					<ChatMessage
-						on:scrollTop={() => handleTop()}
-						msg={message}
-						time={i === 0 || (message.time > 0 && message.time < 100)
-							? message.time
-							: ""}
-					/>
-				{/each}
-			</Scrollbar>
-			<!-- Loading text -->
-			{#if loading}
-				<LoadingAnimation />
-			{/if}
-		</div>
-		<!-- gallery -->
+<div class="h-full gap-5 bg-white sm:flex sm:pb-2 lg:rounded-tl-3xl">
+	<div class="w-1/5 bg-gray-200 p-4">
+		<Upload />
+		<ImagePrompt on:imagePrompt={handleUpdateQuery} />
 	</div>
-  </div>
+	<div class="flex-1 bg-gray-100 p-4">
+		<div
+			class="mx-auto flex h-full w-full flex-col bg-white px-10 sm:mt-0 sm:w-[80%]"
+		>
+			<div
+				class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0"
+			>
+				<div class="relative my-4 flex w-full flex-row justify-center">
+					<div class="relative w-full focus:border-none">
+						<input
+							class="text-md block w-full border-0 border-b-2 border-gray-300 px-1 py-4
+						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+							type="text"
+							data-testid="chat-input"
+							placeholder="Enter prompt here"
+							disabled={loading}
+							maxlength="1200"
+							bind:value={query}
+							on:keydown={(event) => {
+								if (event.key === "Enter" && !event.shiftKey && query) {
+									event.preventDefault();
+									handleTextSubmit();
+								}
+							}}
+						/>
+						<button
+							on:click={() => {
+								if (query) {
+									handleTextSubmit();
+								}
+							}}
+							type="submit"
+							class="absolute bottom-2.5 end-2.5 px-4 py-2 text-sm font-medium text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+							><PaperAirplane /></button
+						>
+					</div>
+				</div>
+			</div>
 
+			<!-- clear -->
+			{#if Array.isArray(chatMessages) && chatMessages.length > 0 && !loading}
+				<div class="flex w-full justify-between pr-5">
+					<div class="flex items-center">
+						<button
+							class="bg-primary text-primary-foreground hover:bg-primary/90 group flex items-center justify-center space-x-2 p-2"
+							type="button"
+							on:click={() => handelClearHistory()}
+							><svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 20 20"
+								width="24"
+								height="24"
+								class="fill-[#0597ff] group-hover:fill-[#0597ff]"
+								><path
+									d="M12.6 12 10 9.4 7.4 12 6 10.6 8.6 8 6 5.4 7.4 4 10 6.6 12.6 4 14 5.4 11.4 8l2.6 2.6zm7.4 8V2q0-.824-.587-1.412A1.93 1.93 0 0 0 18 0H2Q1.176 0 .588.588A1.93 1.93 0 0 0 0 2v12q0 .825.588 1.412Q1.175 16 2 16h14zm-3.15-6H2V2h16v13.125z"
+								/></svg
+							><span class="font-medium text-[#0597ff]">CLEAR</span></button
+						>
+					</div>
+				</div>
+			{/if}
+			<!-- clear -->
+
+			<div class="mx-auto flex h-full w-full flex-col">
+				<!-- Loading text -->
+				{#if loading}
+					<LoadingAnimation />
+				{/if}
+				<Scrollbar
+					classLayout="flex flex-col gap-1 mr-4"
+					className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 mr-5"
+				>
+					{#each chatMessages as message, i}
+						<ChatMessage
+							on:scrollTop={() => handleTop()}
+							msg={message}
+							time={i === 0 || (message.time > 0 && message.time < 100)
+								? message.time
+								: ""}
+						/>
+					{/each}
+				</Scrollbar>
+
+			</div>
+			<!-- gallery -->
+		</div>
+	</div>
 </div>
 
 <style>

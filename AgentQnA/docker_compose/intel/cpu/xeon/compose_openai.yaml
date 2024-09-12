@@ -14,7 +14,7 @@ services:
     environment:
       ip_address: ${ip_address}
       strategy: rag_agent
-      recursion_limit: ${recursion_limit}
+      recursion_limit: ${recursion_limit_worker}
       llm_engine: openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       model: ${model}
@@ -23,6 +23,7 @@ services:
       streaming: false
       tools: /home/user/tools/worker_agent_tools.yaml
       require_human_feedback: false
+      RETRIEVAL_TOOL_URL: ${RETRIEVAL_TOOL_URL}
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
@@ -30,6 +31,7 @@ services:
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-worker-agent-service"
       port: 9095
+
 
   supervisor-react-agent:
     image: opea/comps-agent-langchain:latest
@@ -43,13 +45,13 @@ services:
     environment:
       ip_address: ${ip_address}
       strategy: react_langgraph
-      recursion_limit: ${recursion_limit}
+      recursion_limit: ${recursion_limit_supervisor}
       llm_engine: openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
-      streaming: ${streaming}
+      streaming: false
       tools: /home/user/tools/supervisor_agent_tools.yaml
       require_human_feedback: false
       no_proxy: ${no_proxy}

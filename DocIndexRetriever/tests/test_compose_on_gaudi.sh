@@ -4,6 +4,11 @@
 
 set -e
 echo "IMAGE_REPO=${IMAGE_REPO}"
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+# export REGISTRY=${IMAGE_REPO}
+# export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -19,7 +24,7 @@ function build_docker_images() {
     docker build -t opea/embedding-tei:latest -f comps/embeddings/tei/langchain/Dockerfile .
     docker build -t opea/retriever-redis:latest -f comps/retrievers/redis/langchain/Dockerfile .
     docker build -t opea/reranking-tei:latest -f comps/reranks/tei/Dockerfile .
-    docker build -t opea/dataprep-on-ray-redis:latest -f comps/dataprep/redis/langchain_ray/Dockerfile .
+    docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/Dockerfile .
 
     docker pull ghcr.io/huggingface/tgi-gaudi:latest
     docker pull redis/redis-stack:7.2.0-v9
@@ -36,7 +41,7 @@ function start_services() {
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
-    export REDIS_URL="redis://${ip_address}:16379"
+    export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
@@ -44,7 +49,6 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_PORT=18000
 
     # Start Docker Containers
     docker compose up -d
@@ -99,7 +103,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    container_list=$(cat docker_compose.yaml | grep container_name | cut -d':' -f2)
+    container_list=$(cat compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
         echo "Stopping container $container_name"
@@ -111,6 +115,8 @@ function main() {
 
     stop_docker
     build_docker_images
+    echo "Dump current docker ps"
+    docker ps
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
