@@ -17,7 +17,7 @@ services:
     build:
       dockerfile: comps/dataprep/redis/langchain_ray/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-on-ray-redis:${TAG:-latest}
-  dataprep-vdms:
+  dataprep-multimodal-vdms:
     build:
       dockerfile: comps/dataprep/vdms/multimodal_langchain/Dockerfile
-    image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-multimodal-vdms:${TAG:-latest}

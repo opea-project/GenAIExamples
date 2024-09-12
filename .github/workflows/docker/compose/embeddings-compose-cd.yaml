@@ -22,7 +22,7 @@ services:
     build:
       dockerfile: comps/embeddings/multimodal/bridgetower/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/bridgetower-embedder-gaudi:${TAG:-latest}
-  embedding-multimodalxx: #need to rename
+  embedding-multimodal:
     build:
       dockerfile: comps/embeddings/multimodal/multimodal_langchain/Dockerfile
     image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}

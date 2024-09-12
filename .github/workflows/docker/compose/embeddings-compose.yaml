@@ -8,7 +8,7 @@ services:
     build:
       dockerfile: comps/embeddings/tei/langchain/Dockerfile
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-  embedding-multimodal:
+  embedding-multimodal-clip:
     build:
       dockerfile: comps/embeddings/multimodal_clip/Dockerfile
-    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+    image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}

@@ -1,4 +1,4 @@
 langchain_openai
 pathway[xpack-llm] >= 0.14.1
-sentence_transformers
+sentence-transformers
 unstructured[all-docs] >= 0.10.28,<0.15

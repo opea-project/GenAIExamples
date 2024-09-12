@@ -11,10 +11,10 @@ services:
       context: vllm-openvino
       dockerfile: Dockerfile.openvino
     image: ${REGISTRY:-opea}/vllm-openvino:${TAG:-latest}
-  llm-nativexx: #need to rename
+  llm-eval:
     build:
       dockerfile: comps/llms/utils/lm-eval/Dockerfile
-    image: ${REGISTRY:-opea}/llm-native:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-eval:${TAG:-latest}
   llm-vllm-llamaindex:
     build:
       dockerfile: comps/llms/text-generation/vllm/llama_index/Dockerfile
