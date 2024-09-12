@@ -17,7 +17,7 @@ Before deploying the react-codegen.yaml file, ensure that you have the following
     ```
     # You may set the HUGGINGFACEHUB_API_TOKEN via method:
     export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
-    cd GenAIExamples/CodeGen/kubernetes/manifests/xeon/ui/
+    cd GenAIExamples/CodeGen/kubernetes/intel/cpu/xeon/manifests/ui/
     sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" react-codegen.yaml
     ```
     b. Set the proxies based on your network configuration
