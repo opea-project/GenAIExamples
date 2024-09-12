@@ -46,7 +46,7 @@ from comps.cores.mega.gateway import (
     AudioQnAGateway,
     RetrievalToolGateway,
     FaqGenGateway,
-    VideoRAGQnAGateway,
+    VideoQnAGateway,
     VisualQnAGateway,
     MultimodalRAGWithVideosGateway,
 )

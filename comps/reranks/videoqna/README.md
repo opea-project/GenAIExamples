@@ -1,8 +1,8 @@
 # Rerank Microservice
 
-This is a Docker-based microservice that do result rerank for VideoRAGQnA use case. Local rerank is used rather than rerank model.
+This is a Docker-based microservice that do result rerank for VideoQnA use case. Local rerank is used rather than rerank model.
 
-For the `VideoRAGQnA` usecase, during the data preparation phase, frames are extracted from videos and stored in a vector database. To identify the most relevant video, we count the occurrences of each video source among the retrieved data with rerank function `get_top_doc`. This sorts the video as a descending list of names, ranked by their degree of match with the query. Then we could send the `top_n` videos to the downstream LVM.
+For the `VideoQnA` usecase, during the data preparation phase, frames are extracted from videos and stored in a vector database. To identify the most relevant video, we count the occurrences of each video source among the retrieved data with rerank function `get_top_doc`. This sorts the video as a descending list of names, ranked by their degree of match with the query. Then we could send the `top_n` videos to the downstream LVM.
 
 ## 🚀1. Start Microservice with Docker
 
@@ -10,22 +10,22 @@ For the `VideoRAGQnA` usecase, during the data preparation phase, frames are ext
 
 ```bash
 cd GenAIComps
-docker build --no-cache -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/Dockerfile .
+docker build --no-cache -t opea/reranking-videoqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/videoqna/Dockerfile .
 ```
 
 ### 1.2 Start Rerank Service
 
 ```bash
-docker compose -f comps/reranks/video-rag-qna/docker/docker_compose_reranking.yaml up -d
+docker compose -f comps/reranks/videoqna/docker_compose_reranking.yaml up -d
 # wait until ready
-until docker logs reranking-videoragqna-server 2>&1 | grep -q "Uvicorn running on"; do
+until docker logs reranking-videoqna-server 2>&1 | grep -q "Uvicorn running on"; do
     sleep 2
 done
 ```
 
 Available configuration by environment variable:
 
-- CHUNK_DURATION: target chunk duration, should be aligned with VideoRAGQnA dataprep. Default 10s.
+- CHUNK_DURATION: target chunk duration, should be aligned with VideoQnA dataprep. Default 10s.
 
 ## ✅ 2. Test
 
@@ -57,6 +57,6 @@ The result should be:
 
 ```bash
 # remove the container
-cid=$(docker ps -aq --filter "name=reranking-videoragqna-server")
+cid=$(docker ps -aq --filter "name=reranking-videoqna-server")
 if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 ```

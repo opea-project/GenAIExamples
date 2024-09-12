@@ -548,7 +548,7 @@ class VisualQnAGateway(Gateway):
         return ChatCompletionResponse(model="visualqna", choices=choices, usage=usage)
 
 
-class VideoRAGQnAGateway(Gateway):
+class VideoQnAGateway(Gateway):
     def __init__(self, megaservice, host="0.0.0.0", port=8888):
         super().__init__(
             megaservice,
@@ -594,7 +594,7 @@ class VideoRAGQnAGateway(Gateway):
                 finish_reason="stop",
             )
         )
-        return ChatCompletionResponse(model="videoragqna", choices=choices, usage=usage)
+        return ChatCompletionResponse(model="videoqna", choices=choices, usage=usage)
 
 
 class RetrievalToolGateway(Gateway):

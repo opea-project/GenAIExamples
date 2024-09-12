@@ -75,7 +75,7 @@ def format_video_name(video_name):
 
 
 @register_microservice(
-    name="opea_service@reranking_visual_rag",
+    name="opea_service@reranking_videoqna",
     service_type=ServiceType.RERANK,
     endpoint="/v1/reranking",
     host="0.0.0.0",
@@ -83,7 +83,7 @@ def format_video_name(video_name):
     input_datatype=SearchedMultimodalDoc,
     output_datatype=LVMVideoDoc,
 )
-@register_statistics(names=["opea_service@reranking_visual_rag"])
+@register_statistics(names=["opea_service@reranking_videoqna"])
 def reranking(input: SearchedMultimodalDoc) -> LVMVideoDoc:
     start = time.time()
     try:
@@ -110,10 +110,10 @@ def reranking(input: SearchedMultimodalDoc) -> LVMVideoDoc:
         # Handle any other exceptions with a generic server error response
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
-    statistics_dict["opea_service@reranking_visual_rag"].append_latency(time.time() - start, None)
+    statistics_dict["opea_service@reranking_videoqna"].append_latency(time.time() - start, None)
 
     return result
 
 
 if __name__ == "__main__":
-    opea_microservices["opea_service@reranking_visual_rag"].start()
+    opea_microservices["opea_service@reranking_videoqna"].start()

@@ -9,11 +9,11 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH
-    docker build --no-cache -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/Dockerfile .
+    docker build --no-cache -t opea/reranking-videoqna:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/videoqna/Dockerfile .
 }
 
 function start_service() {
-    docker run -d --name "test-comps-reranking-videoragqna-server" \
+    docker run -d --name "test-comps-reranking-videoqna-server" \
         -p 5037:8000 \
         --ipc=host \
         -e no_proxy=${no_proxy} \
@@ -21,10 +21,10 @@ function start_service() {
         -e https_proxy=${https_proxy} \
         -e CHUNK_DURATION=${CHUNK_DURATION} \
         -e FILE_SERVER_ENDPOINT=${FILE_SERVER_ENDPOINT} \
-        opea/reranking-videoragqna:latest
+        opea/reranking-videoqna:comps
 
 
-    until docker logs test-comps-reranking-videoragqna-server 2>&1 | grep -q "Uvicorn running on"; do
+    until docker logs test-comps-reranking-videoqna-server 2>&1 | grep -q "Uvicorn running on"; do
         sleep 2
     done
 }

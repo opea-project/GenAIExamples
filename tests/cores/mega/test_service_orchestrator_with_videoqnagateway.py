@@ -6,14 +6,7 @@ import unittest
 
 from fastapi.responses import StreamingResponse
 
-from comps import (
-    ServiceOrchestrator,
-    ServiceType,
-    TextDoc,
-    VideoRAGQnAGateway,
-    opea_microservices,
-    register_microservice,
-)
+from comps import ServiceOrchestrator, ServiceType, TextDoc, VideoQnAGateway, opea_microservices, register_microservice
 from comps.cores.proto.docarray import LLMParams
 
 
@@ -51,7 +44,7 @@ class TestServiceOrchestrator(unittest.IsolatedAsyncioTestCase):
 
         self.service_builder.add(opea_microservices["s1"]).add(opea_microservices["s2"])
         self.service_builder.flow_to(self.s1, self.s2)
-        self.gateway = VideoRAGQnAGateway(self.service_builder, port=9898)
+        self.gateway = VideoQnAGateway(self.service_builder, port=9898)
 
     def tearDown(self):
         self.s1.stop()

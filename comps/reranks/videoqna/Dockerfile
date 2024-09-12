@@ -15,10 +15,10 @@ USER user
 COPY comps /home/user/comps
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/user/comps/reranks/video-rag-qna/requirements.txt
+    pip install --no-cache-dir -r /home/user/comps/reranks/videoqna/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/reranks/video-rag-qna
+WORKDIR /home/user/comps/reranks/videoqna
 
 ENTRYPOINT ["python", "local_reranking.py"]

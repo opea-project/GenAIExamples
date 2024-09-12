@@ -3,8 +3,8 @@
 
 services:
   reranking:
-    image: opea/reranking-videoragqna:latest
-    container_name: reranking-videoragqna-server
+    image: opea/reranking-videoqna:latest
+    container_name: reranking-videoqna-server
     ports:
       - "8000:8000"
     ipc: host
