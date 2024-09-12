@@ -58,7 +58,7 @@ function start_services() {
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 20s
+    sleep 2m
 }
 
 function prepare_data() {
@@ -66,7 +66,7 @@ function prepare_data() {
     echo "Downloading video"
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
 
-    sleep 2s
+    sleep 30s
 
 }
 function validate_service() {
