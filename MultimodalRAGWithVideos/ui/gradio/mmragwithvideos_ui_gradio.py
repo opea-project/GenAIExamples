@@ -26,19 +26,6 @@ h1 {
 }
 """
 
-dropdown_list = [
-    "What did Intel present at Nasdaq?",
-    "From Chips Act Funding Announcement, by which year is Intel committed to Net Zero gas emissions?",
-    "What percentage of renewable energy is Intel planning to use?",
-    "a band playing music",
-    "Which US state is Silicon Desert referred to?",
-    "and which US state is Silicon Forest referred to?",
-    "How do trigate fins work?",
-    "What is the advantage of trigate over planar transistors?",
-    "What are key objectives of transistor design?",
-    "How fast can transistors switch?",
-]
-
 # create a FastAPI app
 app = FastAPI()
 cur_dir = os.getcwd()
@@ -98,8 +85,6 @@ def http_bot(state, request: gr.Request):
 
     # Construct prompt
     prompt = state.get_prompt()
-    # print(f"prompt is {prompt}")
-    # image = state.get_b64_image()
 
     # Make requests
 
@@ -109,10 +94,6 @@ def http_bot(state, request: gr.Request):
 
     logger.info(f"==== request ====\n{pload}")
     logger.info(f"==== url request ====\n{gateway_addr}")
-    # uncomment this for testing UI only
-    # state.messages[-1][-1] = f"response {len(state.messages)}"
-    # yield (state, state.to_gradio_chatbot()) + (enable_btn,) * 1
-    # return
 
     state.messages[-1][-1] = "▌"
     yield (state, state.to_gradio_chatbot(), state.split_video) + (disable_btn,) * 1
@@ -154,8 +135,6 @@ def http_bot(state, request: gr.Request):
         return
 
     state.messages[-1][-1] = message
-    # path_to_sub_videos = state.get_path_to_subvideos()
-    # print(path_to_sub_videos)
     yield (state, state.to_gradio_chatbot(), state.split_video) + (enable_btn,) * 1
 
     logger.info(f"{state.messages[-1][-1]}")
@@ -163,7 +142,6 @@ def http_bot(state, request: gr.Request):
 
 
 def ingest_video(filepath, request: gr.Request):
-    print(filepath)
     yield (gr.Textbox(visible=True, value="Please wait for ingesting your uploaded video into database..."))
     basename = os.path.basename(filepath)
     dest = os.path.join(static_dir, basename)
@@ -220,7 +198,6 @@ with gr.Blocks() as upload:
         video_upload.clear(clear_uploaded_video, [], [text_upload_result])
 with gr.Blocks() as qna:
     state = gr.State(mm_rag_with_videos.copy())
-    # gr.Markdown("# Multimodal RAG with Videos")
     with gr.Row():
         with gr.Column(scale=4):
             video = gr.Video(height=512, width=512, elem_id="video")
@@ -229,13 +206,11 @@ with gr.Blocks() as qna:
             with gr.Row():
                 with gr.Column(scale=6):
                     # textbox.render()
-                    textbox = gr.Dropdown(
-                        dropdown_list,
-                        allow_custom_value=True,
+                    textbox = gr.Textbox(
                         # show_label=False,
                         # container=False,
                         label="Query",
-                        info="Enter your query here or choose a sample from the dropdown list!",
+                        info="Enter your query here!",
                     )
                 with gr.Column(scale=1, min_width=100):
                     with gr.Row():
