@@ -127,7 +127,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
-> Change the External_Public_IP below with the actual IPV4 value
+> Change the `External_Public_IP` below with the actual IPV4 value
 
 ```
 export host_ip="External_Public_IP"
@@ -135,7 +135,7 @@ export host_ip="External_Public_IP"
 
 **Export the value of your Huggingface API token to the `your_hf_api_token` environment variable**
 
-> Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
+> Change the `Your_Huggingface_API_Token` below with your actual Huggingface API Token value
 
 ```
 export your_hf_api_token="Your_Huggingface_API_Token"
@@ -175,7 +175,7 @@ export USECLIP=1
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 ```
 
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+Note: Replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start all the services with Docker Containers
 
@@ -209,110 +209,110 @@ docker compose up -d
 
 1. Dataprep Microservice
 
-Once the microservice is up, please ingest the videos files into vector store using dataprep microservice. Both single and multiple file(s) upload are supported.
+   Once the microservice is up, ingest the videos files into vector store using dataprep microservice. Both single and multiple file(s) uploads are supported.
 
-```bash
-# Single file upload
-curl -X POST ${DATAPREP_SERVICE_ENDPOINT} \
-    -H "Content-Type: multipart/form-data" \
-    -F "files=@./file1.mp4"
-# Multiple file upload
-curl -X POST ${DATAPREP_SERVICE_ENDPOINT} \
-    -H "Content-Type: multipart/form-data" \
-    -F "files=@./file1.mp4" \
-    -F "files=@./file2.mp4" \
-    -F "files=@./file3.mp4"
-```
+   ```bash
+   # Single file upload
+   curl -X POST ${DATAPREP_SERVICE_ENDPOINT} \
+       -H "Content-Type: multipart/form-data" \
+       -F "files=@./file1.mp4"
+   # Multiple file upload
+   curl -X POST ${DATAPREP_SERVICE_ENDPOINT} \
+       -H "Content-Type: multipart/form-data" \
+       -F "files=@./file1.mp4" \
+       -F "files=@./file2.mp4" \
+       -F "files=@./file3.mp4"
+   ```
 
-Use below method to check and download available videos the microservice. The download endpoint is also used for LVM and UI.
+   Use below method to check and download available videos the microservice. The download endpoint is also used for LVM and UI.
 
-```bash
-# List available videos
-curl -X 'GET' ${DATAPREP_GET_VIDEO_LIST_ENDPOINT} -H 'accept: application/json'
-# Download available video
-curl -X 'GET' ${DATAPREP_GET_FILE_ENDPOINT}/video_name.mp4' -H 'accept: application/json'
-```
+   ```bash
+   # List available videos
+   curl -X 'GET' ${DATAPREP_GET_VIDEO_LIST_ENDPOINT} -H 'accept: application/json'
+   # Download available video
+   curl -X 'GET' ${DATAPREP_GET_FILE_ENDPOINT}/video_name.mp4 -H 'accept: application/json'
+   ```
 
 2. Embedding Microservice
 
-```bash
-curl http://${host_ip}:6000/v1/embeddings \
-    -X POST \
-    -d '{"text":"Sample text"}' \
-    -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:6000/v1/embeddings \
+       -X POST \
+       -d '{"text":"Sample text"}' \
+       -H 'Content-Type: application/json'
+   ```
 
 3. Retriever Microservice
 
-To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
-is determined by the embedding model.
-Here we use the model `openai/clip-vit-base-patch32`, which vector size is 512.
+   To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
+   is determined by the embedding model.
+   Here we use the model `openai/clip-vit-base-patch32`, which vector size is 512.
 
-Check the vector dimension of your embedding model, set `your_embedding` dimension equals to it.
+   Check the vector dimension of your embedding model, set `your_embedding` dimension equals to it.
 
-```bash
-export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
-curl http://${host_ip}:7000/v1/retrieval \
-  -X POST \
-  -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+   curl http://${host_ip}:7000/v1/retrieval \
+     -X POST \
+     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
+     -H 'Content-Type: application/json'
+   ```
 
 4. Reranking Microservice
 
-```bash
-curl http://${host_ip}:8000/v1/reranking \
-  -X 'POST' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "retrieved_docs": [{"doc": [{"text": "this is the retrieved text"}]}],
-    "initial_query": "this is the query",
-    "top_n": 1,
-    "metadata": [
-        {"other_key": "value", "video":"top_video_name", "timestamp":"20"}
-    ]
-  }'
-```
+   ```bash
+   curl http://${host_ip}:8000/v1/reranking \
+     -X 'POST' \
+     -H 'accept: application/json' \
+     -H 'Content-Type: application/json' \
+     -d '{
+       "retrieved_docs": [{"doc": [{"text": "this is the retrieved text"}]}],
+       "initial_query": "this is the query",
+       "top_n": 1,
+       "metadata": [
+           {"other_key": "value", "video":"top_video_name", "timestamp":"20"}
+       ]
+     }'
+   ```
 
 5. LVM backend Service
 
-In first startup, this service will take times to download the LLM file. After it's finished, the service will be ready.
+   In first startup, this service will take times to download the LLM file. After it's finished, the service will be ready.
 
-Use `docker logs video-llama-lvm-server` to check if the download is finished.
+   Use `docker logs video-llama-lvm-server` to check if the download is finished.
 
-```bash
-curl -X POST \
-  "http://${host_ip}:9009/generate?video_url=silence_girl.mp4&start=0.0&duration=9&prompt=What%20is%20the%20person%20doing%3F&max_new_tokens=150" \
-  -H "accept: */*" \
-  -d ''
-```
+   ```bash
+   curl -X POST \
+     "http://${host_ip}:9009/generate?video_url=silence_girl.mp4&start=0.0&duration=9&prompt=What%20is%20the%20person%20doing%3F&max_new_tokens=150" \
+     -H "accept: */*" \
+     -d ''
+   ```
 
-> To avoid re-download for the model in case of restart, please see [here](#clean-microservices)
+   > To avoid re-download for the model in case of restart, see [here](#clean-microservices)
 
 6. LVM Microservice
 
-This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
+   This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
-```bash
-curl http://${host_ip}:9000/v1/lvm\
-  -X POST \
-  -d '{"video_url":"https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4","chunk_start": 0,"chunk_duration": 7,"prompt":"What is the person doing?","max_new_tokens": 50}' \
-  -H 'Content-Type: application/json'
-```
+   ```bash
+   curl http://${host_ip}:9000/v1/lvm\
+     -X POST \
+     -d '{"video_url":"https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4","chunk_start": 0,"chunk_duration": 7,"prompt":"What is the person doing?","max_new_tokens": 50}' \
+     -H 'Content-Type: application/json'
+   ```
 
-> Please note that the local video file will be deleted after completion to conserve disk space.
+   > Note that the local video file will be deleted after completion to conserve disk space.
 
 7. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/videoragqna -H "Content-Type: application/json" -d '{
-      "messages": "What is the man doing?",
-      "stream": "True"
-      }'
-```
+   ```bash
+   curl http://${host_ip}:8888/v1/videoragqna -H "Content-Type: application/json" -d '{
+         "messages": "What is the man doing?",
+         "stream": "True"
+         }'
+   ```
 
-> Please note that the megaservice support only stream output.
+   > Note that the megaservice support only stream output.
 
 ## 🚀 Launch the UI
 
@@ -328,7 +328,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 Here is an example of running videoragqna:
 
-![project-screenshot](../../assets/img/video-rag-qna.gif)
+![project-screenshot](../../../../assets/img/video-rag-qna.gif)
 
 ## Clean Microservices
 
