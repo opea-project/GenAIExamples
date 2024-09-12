@@ -19,6 +19,10 @@ function build_docker_images() {
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
+    if [ ! -d "tei-gaudi" ] ; then
+        git clone https://github.com/huggingface/tei-gaudi
+    fi
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
@@ -28,7 +32,6 @@ function build_docker_images() {
 }
 
 function start_services() {
-    # build tei-gaudi for each test instead of pull from local registry
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
