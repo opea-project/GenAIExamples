@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  videoragqna:
+  videoqna:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -10,46 +10,47 @@ services:
         no_proxy: ${no_proxy}
       context: ../
       dockerfile: ./Dockerfile
-    image: ${REGISTRY:-opea}/videoragqna:${TAG:-latest}
-  videoragqna-ui:
+    image: ${REGISTRY:-opea}/videoqna:${TAG:-latest}
+  videoqna-ui:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile
-    extends: videoragqna
-    image: ${REGISTRY:-opea}/videoragqna-ui:${TAG:-latest}
+    extends: videoqna
+    image: ${REGISTRY:-opea}/videoqna-ui:${TAG:-latest}
   dataprep-multimodal-vdms:
     build:
       context: GenAIComps
       dockerfile: comps/dataprep/vdms/multimodal_langchain/Dockerfile
-    extends: videoragqna
+    extends: videoqna
     image: ${REGISTRY:-opea}/dataprep-multimodal-vdms:${TAG:-latest}
   embedding-multimodal-clip:
     build:
       context: GenAIComps
       dockerfile: comps/embeddings/multimodal_clip/Dockerfile
-    extends: videoragqna
+    extends: videoqna
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
   retriever-vdms:
     build:
       context: GenAIComps
       dockerfile: comps/retrievers/vdms/langchain/Dockerfile
-    extends: videoragqna
+    extends: videoqna
     image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
-  reranking-videoragqna:
+  reranking-videoqna:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/video-rag-qna/Dockerfile
-    extends: videoragqna
-    image: ${REGISTRY:-opea}/reranking-videoragqna:${TAG:-latest}
+  video-llama-lvm-server:
+      dockerfile: comps/reranks/videoqna/Dockerfile
+    extends: videoqna
+    image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
   video-llama-lvm-server:
     build:
       context: GenAIComps
       dockerfile: comps/lvms/video-llama/dependency/Dockerfile
-    extends: videoragqna
+    extends: videoqna
     image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
   lvm-video-llama:
     build:
       context: GenAIComps
       dockerfile: comps/lvms/video-llama/Dockerfile
-    extends: videoragqna
+    extends: videoqna
     image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}

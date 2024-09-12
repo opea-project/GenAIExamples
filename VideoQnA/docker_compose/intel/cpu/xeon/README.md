@@ -1,8 +1,8 @@
-# Build Mega Service of videoragqna on Xeon
+# Build Mega Service of videoqna on Xeon
 
-This document outlines the deployment process for a videoragqna application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `lvm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for a videoqna application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `lvm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
-VideoRAGQnA is a pipeline that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search.
+VideoQnA is a pipeline that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search.
 
 ## 🚀 Port used for the microservices
 
@@ -68,7 +68,7 @@ docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy 
 ### 3. Build Rerank Image
 
 ```bash
-docker build -t opea/reranking-videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/video-rag-qna/Dockerfile .
+docker build -t opea/reranking-videoqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/videoqna/Dockerfile .
 ```
 
 ### 4. Build LVM Image (Xeon)
@@ -89,14 +89,14 @@ cd ..
 
 ### 6. Build MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `videoragqna.py` Python script.
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `videoqna.py` Python script.
 
 Build MegaService Docker image via below command:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/VideoRAGQnA/
-docker build -t opea/videoragqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd GenAIExamples/VideoQnA/
+docker build -t opea/videoqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 ### 7. Build UI Docker Image
@@ -105,7 +105,7 @@ Build frontend Docker image via below command:
 
 ```bash
 cd ui
-docker build -t opea/videoragqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+docker build -t opea/videoqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
@@ -113,11 +113,11 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 1. `opea/dataprep-multimodal-vdms:latest`
 2. `opea/embedding-multimodal-clip:latest`
 3. `opea/retriever-vdms:latest`
-4. `opea/reranking-videoragqna:latest`
+4. `opea/reranking-videoqna:latest`
 5. `opea/video-llama-lvm-server:latest`
 6. `opea/lvm-video-llama:latest`
-7. `opea/videoragqna:latest`
-8. `opea/videoragqna-ui:latest`
+7. `opea/videoqna:latest`
+8. `opea/videoqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -168,7 +168,7 @@ export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_
 
 export VDMS_HOST=${host_ip}
 export VDMS_PORT=8001
-export INDEX_NAME="mega-videoragqna"
+export INDEX_NAME="mega-videoqna"
 export LLM_DOWNLOAD="True"
 export USECLIP=1
 
@@ -189,7 +189,7 @@ There are 2 parts of the pipeline:
 In the deploy steps, you need to start the VDMS DB and dataprep firstly, then insert some sample data into it. After that you could get the megaservice up.
 
 ```bash
-cd GenAIExamples/VideoRAGQnA/docker_compose/intel/cpu/xeon/
+cd GenAIExamples/VideoQnA/docker_compose/intel/cpu/xeon/
 
 docker volume create video-llama-model
 docker compose up vdms-vector-db dataprep -d
@@ -306,7 +306,7 @@ docker compose up -d
 7. MegaService
 
    ```bash
-   curl http://${host_ip}:8888/v1/videoragqna -H "Content-Type: application/json" -d '{
+   curl http://${host_ip}:8888/v1/videoqna -H "Content-Type: application/json" -d '{
          "messages": "What is the man doing?",
          "stream": "True"
          }'
@@ -319,16 +319,16 @@ docker compose up -d
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  videoragqna-xeon-ui-server:
-    image: opea/videoragqna-ui:latest
+  videoqna-xeon-ui-server:
+    image: opea/videoqna-ui:latest
     ...
     ports:
       - "80:5173" # port map to host port 80
 ```
 
-Here is an example of running videoragqna:
+Here is an example of running videoqna:
 
-![project-screenshot](../../../../assets/img/video-rag-qna.gif)
+![project-screenshot](../../../../assets/img/videoqna.gif)
 
 ## Clean Microservices
 
