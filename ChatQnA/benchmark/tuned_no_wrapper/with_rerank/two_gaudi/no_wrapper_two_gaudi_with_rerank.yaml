@@ -35,7 +35,7 @@ metadata:
   name: chatqna-backend-server-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: chatqna-backend-server-deploy
@@ -66,6 +66,13 @@ spec:
         args: null
         ports:
         - containerPort: 8888
+        resources:
+          limits:
+            cpu: 8
+            memory: 8000Mi
+          requests:
+            cpu: 8
+            memory: 8000Mi
       serviceAccountName: default
 ---
 kind: Service
