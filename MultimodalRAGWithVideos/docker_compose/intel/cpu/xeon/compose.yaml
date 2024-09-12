@@ -8,12 +8,12 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
-  multimodal-data-prep-service:
+  multimodal-dataprep-redis:
     image: ${REGISTRY:-opea}/multimodal-dataprep-redis:${TAG:-latest}
     container_name: multimodal-dataprep-redis-server
     depends_on:
       - redis-vector-db
-      - llava-server
+      - llava
     ports:
       - "6007:6007"
     environment:
@@ -26,7 +26,7 @@ services:
       LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:9399/v1/lvm"
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
-  bridgetower-embedding-server:
+  bridgetower-embedder:
     image: ${REGISTRY:-opea}/bridgetower-embedder:${TAG:-latest}
     container_name: bridgetower-embedder-server
     ports:
@@ -41,7 +41,7 @@ services:
     image: ${REGISTRY:-opea}/multimodal-embedding:${TAG:-latest}
     container_name: multimodal-embedding-server
     depends_on:
-      - bridgetower-embedding-server
+      - bridgetower-embedder
     ports:
       - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
     ipc: host
@@ -52,7 +52,7 @@ services:
       MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
     restart: unless-stopped
-  multimodal-retriever:
+  multimodal-retriever-redis:
     image: ${REGISTRY:-opea}/multimodal-retriever-redis:${TAG:-latest}
     container_name: multimodal-retriever-redis-server
     depends_on:
@@ -67,7 +67,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
-  llava-server:
+  llava:
     image: ${REGISTRY:-opea}/llava:${TAG:-latest}
     container_name: llava-server
     ports:
@@ -81,7 +81,7 @@ services:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
     container_name: lvm-service
     depends_on:
-      - llava-server
+      - llava
     ports:
       - "9399:9399"
     ipc: host
@@ -96,9 +96,9 @@ services:
     container_name: multimodalragwithvideos-backend-server
     depends_on:
       - redis-vector-db
-      - multimodal-data-prep-service
+      - multimodal-dataprep-redis
       - multimodal-embedding
-      - multimodal-retriever
+      - multimodal-retriever-redis
       - lvm
     ports:
       - "8888:8888"
@@ -113,23 +113,22 @@ services:
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  # multimodalragwithvideos-gradio-ui-server:
-  #   image: ${REGISTRY:-opea}/multimodalragwithvideos-ui:${TAG:-latest}
-  #   container_name: multimodalragwithvideos-gradio-ui-server
-  #   depends_on:
-  #     - multimodalragwithvideos-backend-server
-  #   ports:
-  #     - "5173:5173"
-  #   environment:
-  #     - no_proxy=${no_proxy}
-  #     - https_proxy=${https_proxy}
-  #     - http_proxy=${http_proxy}
-  #     - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
-  #     - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
-  #     - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
-  #     - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
-  #   ipc: host
-  #   restart: always
+  multimodalragwithvideos-ui:
+    image: ${REGISTRY:-opea}/multimodalragwithvideos-ui:${TAG:-latest}
+    container_name: multimodalragwithvideos-gradio-ui-server
+    depends_on:
+      - multimodalragwithvideos
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
 
 networks:
   default:

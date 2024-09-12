@@ -1,26 +1,30 @@
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
+FROM python:3.11-slim
 
-# Use node 20.11.1 as the base image
-FROM node:20.11.1
+ENV LANG=C.UTF-8
 
-# Update package manager and install Git
-RUN apt-get update -y && apt-get install -y git
+ARG ARCH="cpu"
 
-# Copy the front-end code repository
-COPY svelte /home/user/svelte
+RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    build-essential \
+    libgl1-mesa-glx \
+    libjemalloc-dev \
+    default-jre \
+    wget \
+    vim
 
-# Set the working directory
-WORKDIR /home/user/svelte
+# Install ffmpeg static build
+RUN cd /root && wget https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz && \
+    mkdir ffmpeg-git-amd64-static && tar -xvf ffmpeg-git-amd64-static.tar.xz -C ffmpeg-git-amd64-static --strip-components 1 && \
+    export PATH=/root/ffmpeg-git-amd64-static:$PATH && \
+    cp /root/ffmpeg-git-amd64-static/ffmpeg /usr/local/bin/
 
-# Install front-end dependencies
-RUN npm install
+RUN mkdir -p /home/user
 
-# Build the front-end application
-RUN npm run build
+COPY gradio /home/user/gradio
 
-# Expose the port of the front-end application
-EXPOSE 5173
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
+pip install --no-cache-dir -r /home/user/gradio/requirements.txt
 
-# Run the front-end application in preview mode
-CMD ["npm", "run", "preview", "--", "--port", "5173", "--host", "0.0.0.0"]
+WORKDIR /home/user/gradio
+# ENTRYPOINT ["python", "multimodalragwithvideos.py"]
+ENTRYPOINT ["/usr/bin/sleep", "infinity"]

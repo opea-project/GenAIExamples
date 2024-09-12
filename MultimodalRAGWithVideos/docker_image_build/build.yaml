@@ -8,15 +8,16 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
+      context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/multimodalragwithvideos:${TAG:-latest}
-  # multimodalragwithvideos-ui:
-  #   build:
-  #     context: ui
-  #     dockerfile: ./ui/Dockerfile
-  #   extends: multimodalragwithvideos
-  #   image: ${REGISTRY:-opea}/multimodalragwithvideos-ui-ui:${TAG:-latest}
-  bridgetower-embedding-server:
+  multimodalragwithvideos-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: multimodalragwithvideos
+    image: ${REGISTRY:-opea}/multimodalragwithvideos-ui:${TAG:-latest}
+  bridgetower-embedder:
     build:
       context: GenAIComps
       dockerfile: comps/embeddings/multimodal/bridgetower/Dockerfile
@@ -28,13 +29,13 @@ services:
       dockerfile: comps/embeddings/multimodal/multimodal_langchain/Dockerfile
     extends: multimodalragwithvideos
     image: ${REGISTRY:-opea}/multimodal-embedding:${TAG:-latest}
-  multimodal-retriever:
+  multimodal-retriever-redis:
     build:
       context: GenAIComps
       dockerfile: comps/retrievers/multimodal/redis/langchain/Dockerfile
     extends: multimodalragwithvideos
     image: ${REGISTRY:-opea}/multimodal-retriever-redis:${TAG:-latest}
-  llava-server:
+  llava:
     build:
       context: GenAIComps
       dockerfile: comps/lvms/llava/dependency/Dockerfile
@@ -52,7 +53,7 @@ services:
       dockerfile: comps/lvms/tgi-llava/Dockerfile
     extends: multimodalragwithvideos
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-  multimodal-data-prep-service:
+  multimodal-dataprep-redis:
     build:
       context: GenAIComps
       dockerfile: comps/dataprep/multimodal/redis/langchain/Dockerfile

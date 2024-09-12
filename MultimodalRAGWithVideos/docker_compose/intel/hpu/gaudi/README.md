@@ -41,7 +41,6 @@ export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalragwithvideos"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
-export DATAPREP_VIDEO_WITH_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/videos_with_transcripts"
 export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
 export DATAPREP_GET_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
 export DATAPREP_DELETE_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_videos"
@@ -114,9 +113,9 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd  GenAIExamples/MultimodalRAGWithVideos/ui/docker
-docker build --no-cache -t opea/multimodalragwithvideos-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../../..
+cd  GenAIExamples/MultimodalRAGWithVideos/ui/
+docker build --no-cache -t opea/multimodalragwithvideos-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd ../../../
 ```
 
 Then run the command `docker images`, you will have the following 8 Docker Images:

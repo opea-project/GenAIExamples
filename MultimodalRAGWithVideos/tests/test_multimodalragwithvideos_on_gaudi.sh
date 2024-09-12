@@ -18,12 +18,10 @@ export video_fn="WeAreGoingOnBullrun.mp4"
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    # git clone https://github.com/opea-project/GenAIComps.git
-
-
+    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalragwithvideos bridgetower-embedding-server multimodal-embedding multimodal-retriever lvm-tgi multimodal-data-prep-service"
+    service_list="multimodalragwithvideos multimodalragwithvideos-ui bridgetower-embedder multimodal-embedding multimodal-retriever-redis lvm-tgi multimodal-dataprep-redis"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.4

@@ -175,7 +175,7 @@ def ingest_video(filepath, request: gr.Request):
     files = {
         "files": open(dest, "rb"),
     }
-    response = requests.post(dataprep_addr, headers=headers, files=files)
+    response = requests.post(dataprep_gen_transcript_addr, headers=headers, files=files)
     print(response.status_code)
     if response.status_code == 200:
         response = response.json()
@@ -281,17 +281,17 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=5173)
     parser.add_argument("--concurrency-count", type=int, default=20)
     parser.add_argument("--share", action="store_true")
-    parser.add_argument(
-        "--backend_service_endpoint", type=str, default="http://localhost:8888/v1/multimodalragwithvideos"
-    )
-    parser.add_argument(
-        "--dataprep_gen_transcript_endpoint", type=str, default="http://localhost:6007/v1/generate_transcripts"
-    )
-
+    
+    backend_service_endpoint = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/multimodalragwithvideos")
+    dataprep_gen_transcript_endpoint = os.getenv("DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_transcripts")
+    dataprep_gen_caption_endpoint = os.getenv("DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_captions")
     args = parser.parse_args()
     logger.info(f"args: {args}")
     global gateway_addr
-    gateway_addr = args.backend_service_endpoint
-    global dataprep_addr
-    dataprep_addr = args.dataprep_gen_transcript_endpoint
+    gateway_addr = backend_service_endpoint
+    global dataprep_gen_transcript_addr
+    dataprep_gen_transcript_addr = dataprep_gen_transcript_endpoint
+    global dataprep_gen_captiono_addr
+    dataprep_gen_captiono_addr = dataprep_gen_caption_endpoint
+
     uvicorn.run(app, host=args.host, port=args.port)
