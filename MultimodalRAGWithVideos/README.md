@@ -2,7 +2,7 @@
 
 Suppose you possess a set of videos and wish to perform question-answering to extract insights from these videos. To respond to your questions, it typically necessitates comprehension of visual cues within the videos, knowledge derived from the audio content, or often a mix of both these visual elements and auditory facts. The Multimodal-RAG with Videos framework offers an optimal solution for this purpose.
 
-`The Multimodal-RAG (MM-RAG) with Videos` addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos. For this purpose, MM-RAG with Videos utilizes [BridgeTower model](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi), a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the video ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MM-RAG with Videos will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVLM) as input context to generate a response for the user. 
+`The Multimodal-RAG (MM-RAG) with Videos` addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos. For this purpose, MM-RAG with Videos utilizes [BridgeTower model](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi), a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the video ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MM-RAG with Videos will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVLM) as input context to generate a response for the user.
 
 The Multimodal-RAG with Videos (MM-RAG for short) architecture shows below:
 
@@ -98,15 +98,17 @@ In the below, we provide a table that describes for each microservice component 
 <details>
 <summary><b>Gaudi default compose.yaml</b></summary>
 
-| MicroService | Open Source Project      | HW     | Port | Endpoint                  |
-| ------------ | -------------------      | -----  | ---- | --------------------      |
-| Embedding    | Langchain                | Xeon   | 6000 | /v1/embeddings            |
-| Retriever    | Langchain, Redis         | Xeon   | 7000 | /v1/multimodal_retrieval  |
-| LVLM         | Langchain, TGI           | Gaudi  | 9399 | /v1/lvm                   |
-| Dataprep     | Redis, Langchain, TGI    | Gaudi  | 6007 | /v1/generate_transcripts, /v1/generate_captions  |
+| MicroService | Open Source Project   | HW    | Port | Endpoint                                        |
+| ------------ | --------------------- | ----- | ---- | ----------------------------------------------- |
+| Embedding    | Langchain             | Xeon  | 6000 | /v1/embeddings                                  |
+| Retriever    | Langchain, Redis      | Xeon  | 7000 | /v1/multimodal_retrieval                        |
+| LVLM         | Langchain, TGI        | Gaudi | 9399 | /v1/lvm                                         |
+| Dataprep     | Redis, Langchain, TGI | Gaudi | 6007 | /v1/generate_transcripts, /v1/generate_captions |
+
 </details>
 
 ## Required Models
+
 By default, the embedding and LVM models are set to a default value as listed below:
 
 | Service              | Model                                       |
@@ -128,12 +130,12 @@ To set up environment variables for deploying MM-RAGwithVideos services, follow 
 
 1. Set the required environment variables:
 
-    ```bash
-    # Example: export host_ip=$(hostname -I | awk '{print $1}')
-    export host_ip="External_Public_IP"
-    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-    export no_proxy="Your_No_Proxy"
-    ```
+   ```bash
+   # Example: export host_ip=$(hostname -I | awk '{print $1}')
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+   ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
 
