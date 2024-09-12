@@ -17,45 +17,45 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: multimodalragwithvideos
     image: ${REGISTRY:-opea}/multimodalragwithvideos-ui:${TAG:-latest}
-  bridgetower-embedder:
+  embedding-multimodal-bridgetower:
     build:
       context: GenAIComps
       dockerfile: comps/embeddings/multimodal/bridgetower/Dockerfile
     extends: multimodalragwithvideos
-    image: ${REGISTRY:-opea}/bridgetower-embedder:${TAG:-latest}
-  multimodal-embedding:
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
+  embedding-multimodal:
     build:
       context: GenAIComps
       dockerfile: comps/embeddings/multimodal/multimodal_langchain/Dockerfile
     extends: multimodalragwithvideos
-    image: ${REGISTRY:-opea}/multimodal-embedding:${TAG:-latest}
-  multimodal-retriever-redis:
+    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+  retriever-multimodal-redis:
     build:
       context: GenAIComps
       dockerfile: comps/retrievers/multimodal/redis/langchain/Dockerfile
     extends: multimodalragwithvideos
-    image: ${REGISTRY:-opea}/multimodal-retriever-redis:${TAG:-latest}
-  llava:
+    image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}
+  lvm-llava:
     build:
       context: GenAIComps
       dockerfile: comps/lvms/llava/dependency/Dockerfile
     extends: multimodalragwithvideos
-    image: ${REGISTRY:-opea}/llava:${TAG:-latest}
-  lvm:
+    image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
+  lvm-llava-svc:
     build:
       context: GenAIComps
       dockerfile: comps/lvms/llava/Dockerfile
     extends: multimodalragwithvideos
-    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
   lvm-tgi:
     build:
       context: GenAIComps
       dockerfile: comps/lvms/tgi-llava/Dockerfile
     extends: multimodalragwithvideos
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-  multimodal-dataprep-redis:
+  dataprep-multimodal-redis:
     build:
       context: GenAIComps
       dockerfile: comps/dataprep/multimodal/redis/langchain/Dockerfile
     extends: multimodalragwithvideos
-    image: ${REGISTRY:-opea}/multimodal-dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}

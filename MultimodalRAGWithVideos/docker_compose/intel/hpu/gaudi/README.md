@@ -57,27 +57,27 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 1. Build Multimodal-Embedding Image
+### 1. Build embedding-multimodal-bridgetower Image
 
-Build bridgetower-embedder-server docker image
-
-```bash
-docker build --no-cache -t opea/bridgetower-embedder:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
-```
-
-Build microservice image
+Build embedding-multimodal-bridgetower docker image
 
 ```bash
-docker build --no-cache -t opea/multimodal-embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/multimodal_langchain/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
 ```
 
-### 2. Build Multimodal-Retriever Image
+Build embedding-multimodal microservice image
 
 ```bash
-docker build --no-cache -t opea/multimodal-retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/multimodal_langchain/Dockerfile .
 ```
 
-### 3. Build LVM Image
+### 2. Build retriever-multimodal-redis Image
+
+```bash
+docker build --no-cache -t opea/retriever-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/multimodal/redis/langchain/Dockerfile .
+```
+
+### 3. Build LVM Images
 
 Build TGI Gaudi image
 
@@ -85,16 +85,16 @@ Build TGI Gaudi image
 docker pull ghcr.io/huggingface/tgi-gaudi:2.0.4
 ```
 
-Build LVM TGI microservice image
+Build lvm-tgi microservice image
 
 ```bash
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
 ```
 
-### 4. Build Multimodal-Data-Prep Image
+### 4. Build dataprep-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/multimodal-dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
 ```
 
 ### 5. Build MegaService Docker Image
@@ -120,12 +120,12 @@ cd ../../../
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
-1. `opea/multimodal-dataprep-redis:latest`
+1. `opea/dataprep-multimodal-redis:latest`
 2. `opea/lvm-tgi:latest`
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.4`
-4. `opea/multimodal-retriever-redis:latest`
-5. `opea/multimodal-embedding:latest`
-6. `opea/bridgetower-embedder:latest`
+4. `opea/retriever-multimodal-redis:latest`
+5. `opea/embedding-multimodal:latest`
+6. `opea/embedding-multimodal-bridgetower:latest`
 7. `opea/multimodalragwithvideos:latest`
 8. `opea/multimodalragwithvideos-ui:latest`
 
@@ -137,7 +137,7 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 
 | Service              | Model                                       |
 | -------------------- | ------------------------------------------- |
-| Multimodal-Embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
+| embedding-multimodal | BridgeTower/bridgetower-large-itm-mlm-gaudi |
 | LVM                  | llava-hf/llava-v1.6-vicuna-13b-hf           |
 
 ### Start all the services Docker Containers

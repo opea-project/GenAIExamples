@@ -21,7 +21,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalragwithvideos multimodalragwithvideos-ui bridgetower-embedder multimodal-embedding multimodal-retriever-redis lvm-tgi multimodal-dataprep-redis"
+    service_list="multimodalragwithvideos multimodalragwithvideos-ui embedding-multimodal-bridgetower embedding-multimodal retriever-multimodal-redis lvm-tgi dataprep-multimodal-redis"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.4
@@ -76,7 +76,7 @@ function validate_service() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    if [[ $SERVICE_NAME == *"multimodal-data-prep"* ]]; then
+    if [[ $SERVICE_NAME == *"dataprep-multimodal-redis"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${video_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
@@ -113,35 +113,35 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # Bridgetower Embedding Server
-    echo "Validating BridgeTower Embedding Server"
+    echo "Validating embedding-multimodal-bridgetower"
     validate_service \
         "http://${host_ip}:${EMBEDDER_PORT}/v1/encode" \
         '"embedding":[' \
-        "bridgetower-embedding-server" \
-        "bridgetower-embedder-server" \
+        "embedding-multimodal-bridgetower" \
+        "embedding-multimodal-bridgetower" \
         '{"text":"This is example"}'
 
     validate_service \
         "http://${host_ip}:${EMBEDDER_PORT}/v1/encode" \
         '"embedding":[' \
-        "bridgetower-embedding-server" \
-        "bridgetower-embedder-server" \
+        "embedding-multimodal-bridgetower" \
+        "embedding-multimodal-bridgetower" \
         '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 
     # embedding microservice
-    echo "Validating Multimodal Embedding Server"
+    echo "Validating embedding-multimodal"
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "multimodal-embedding-service" \
-        "multimodal-embedding-server" \
+        "embedding-multimodal" \
+        "embedding-multimodal" \
         '{"text" : "This is some sample text."}'
 
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "multimodal-embedding-service" \
-        "multimodal-embedding-server" \
+        "embedding-multimodal" \
+        "embedding-multimodal" \
         '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -151,53 +151,53 @@ function validate_microservices() {
     validate_service \
         "${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}" \
         "Data preparation succeeded" \
-        "multimodal-data-prep-service" \
-        "multimodal-dataprep-redis-server"
+        "dataprep-multimodal-redis" \
+        "dataprep-multimodal-redis"
 
     echo "Data Prep with Generating Transcript"
     validate_service \
         "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
         "Data preparation succeeded" \
-        "multimodal-data-prep-service" \
-        "multimodal-dataprep-redis-server"
+        "dataprep-multimodal-redis" \
+        "dataprep-multimodal-redis"
 
     echo "Validating get file"
     validate_service \
         "${DATAPREP_GET_VIDEO_ENDPOINT}" \
         '.mp4' \
         "dataprep_get" \
-        "multimodal-dataprep-redis-server"
+        "dataprep-multimodal-redis"
 
     sleep 1m
 
     # multimodal retrieval microservice
-    echo "Validating multimodal retrieval microservice"
+    echo "Validating retriever-multimodal-redis"
     your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
     validate_service \
         "http://${host_ip}:7000/v1/multimodal_retrieval" \
         "retrieved_docs" \
-        "multimodal-retrieval-microservice" \
-        "multimodal-retriever-redis-server" \
+        "retriever-multimodal-redis" \
+        "retriever-multimodal-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
     sleep 10s
 
     # llava server
-    echo "Evaluating LLAVA TGI Server"
+    echo "Evaluating LLAVA tgi-gaudi"
     validate_service \
         "http://${host_ip}:${LLAVA_SERVER_PORT}/generate" \
         '"generated_text":' \
-        "llava-tgi-service" \
+        "tgi-gaudi" \
         "tgi-llava-gaudi-server" \
         '{"inputs":"![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/rabbit.png)What is this a picture of?\n\n","parameters":{"max_new_tokens":16, "seed": 42}}'
 
     # lvm
-    echo "Evaluating LVM"
+    echo "Evaluating lvm-tgi"
     validate_service \
         "http://${host_ip}:9399/v1/lvm" \
         '"text":"' \
-        "lvm" \
-        "lvm-tgi-gaudi-server" \
+        "lvm-tgi" \
+        "lvm-tgi" \
         '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 
     sleep 1m
@@ -229,7 +229,7 @@ function validate_delete {
         "${DATAPREP_DELETE_VIDEO_ENDPOINT}" \
         '{"status":true}' \
         "dataprep_del" \
-        "multimodal-dataprep-redis-server"
+        "dataprep-multimodal-redis"
 }
 
 function stop_docker() {
@@ -248,18 +248,13 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
     prepare_data
-    # if [ "${mode}" == "perf" ]; then
-    #     python3 $WORKPATH/tests/chatqna_benchmark.py
-    # elif [ "${mode}" == "" ]; then
+
     validate_microservices
     echo "==== microservices validated ===="
     validate_megaservice
     echo "==== megaservice validated ===="
-    # validate_frontend
-    # echo "==== frontend validated ===="
     validate_delete
     echo "==== delete validated ===="
-    # fi
 
     stop_docker
     echo y | docker system prune

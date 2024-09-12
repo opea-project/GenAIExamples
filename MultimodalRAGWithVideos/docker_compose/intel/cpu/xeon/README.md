@@ -20,35 +20,35 @@ redis-vector-db
 Port 6379 - Open to 0.0.0.0/0
 Port 8001 - Open to 0.0.0.0/0
 
-bridgetower_embedder_server
+embedding-multimodal-bridgetower
 =====================
 Port 6006 - Open to 0.0.0.0/0
 
-multimodal-embedding-server
+embedding-multimodal
 =========
 Port 6000 - Open to 0.0.0.0/0
 
-multimodal-retriever-redis-server
+retriever-multimodal-redis
 =========
 Port 7000 - Open to 0.0.0.0/0
 
-llava_service
+lvm-llava
 ================
 Port 8399 - Open to 0.0.0.0/0
 
-lvm
+lvm-llava-svc
 ===
 Port 9399 - Open to 0.0.0.0/0
 
-multimodal-dataprep-redis-server
+dataprep-multimodal-redis
 ===
 Port 6007 - Open to 0.0.0.0/0
 
-multimodalragwithvideos-backend-server
+multimodalragwithvideos
 ==========================
 Port 8888 - Open to 0.0.0.0/0
 
-multimodalragwithvideos-gradio-ui-server
+multimodalragwithvideos-ui
 =====================
 Port 5173 - Open to 0.0.0.0/0
 ```
@@ -107,44 +107,44 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 1. Build Multimodal-Embedding Image
+### 1. Build embedding-multimodal-bridgetower Image
 
-Build bridgetower-embedder-server docker image
+Build embedding-multimodal-bridgetower docker image
 
 ```bash
-docker build --no-cache -t opea/bridgetower-embedder:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
 ```
 
-Build microservice image
+Build embedding-multimodal microservice image
 
 ```bash
-docker build --no-cache -t opea/multimodal-embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/multimodal_langchain/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/multimodal_langchain/Dockerfile .
 ```
 
-### 2. Build Multimodal-Retriever Image
+### 2. Build retriever-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/multimodal-retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/multimodal/redis/langchain/Dockerfile .
 ```
 
-### 3. Build LVM Image
+### 3. Build LVM Images
 
-Build LLaVA server image
+Build lvm-llava image
 
 ```bash
-docker build --no-cache -t opea/llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/dependency/Dockerfile .
+docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/dependency/Dockerfile .
 ```
 
-Build LVM microservice image
+Build lvm-llava-svc microservice image
 
 ```bash
-docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/Dockerfile .
+docker build --no-cache -t opea/lvm-llava-svc:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/Dockerfile .
 ```
 
-### 4. Build Multimodal-Data-Prep Image
+### 4. Build dataprep-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/multimodal-dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
 ```
 
 ### 5. Build MegaService Docker Image
@@ -170,12 +170,12 @@ cd ../../../
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
-1. `opea/multimodal-dataprep-redis:latest`
-2. `opea/lvm:latest`
-3. `opea/llava:latest`
-4. `opea/multimodal-retriever-redis:latest`
-5. `opea/multimodal-embedding:latest`
-6. `opea/bridgetower-embedder:latest`
+1. `opea/dataprep-multimodal-redis:latest`
+2. `opea/lvm-llava-svc:latest`
+3. `opea/lvm-llava:latest`
+4. `opea/retriever-multimodal-redis:latest`
+5. `opea/embedding-multimodal:latest`
+6. `opea/embedding-multimodal-bridgetower:latest`
 7. `opea/multimodalragwithvideos:latest`
 8. `opea/multimodalragwithvideos-ui:latest`
 
@@ -187,7 +187,7 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 
 | Service              | Model                                       |
 | -------------------- | ------------------------------------------- |
-| Multimodal-Embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
+| embedding-multimodal | BridgeTower/bridgetower-large-itm-mlm-gaudi |
 | LVM                  | llava-hf/llava-1.5-7b-hf                    |
 
 ### Start all the services Docker Containers
