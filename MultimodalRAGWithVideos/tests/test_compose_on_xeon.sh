@@ -24,7 +24,7 @@ function build_docker_images() {
     service_list="multimodalragwithvideos multimodalragwithvideos-ui bridgetower-embedder multimodal-embedding multimodal-retriever-redis llava lvm multimodal-dataprep-redis"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker images && sleep 1s
+    docker images && sleep 1m
 }
 
 function setup_env() {
@@ -56,7 +56,7 @@ function start_services() {
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 20s
+    sleep 2m
 }
 
 function prepare_data() {
@@ -64,7 +64,7 @@ function prepare_data() {
     echo "Downloading video"
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
 
-    sleep 2s
+    sleep 1m
 
 }
 function validate_service() {

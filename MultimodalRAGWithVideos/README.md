@@ -179,8 +179,8 @@ docker compose -f compose.yaml up -d
 
 ## MultimodalRAGWithVideos Demo on Gaudi2
 
-![MultimodalRAGWithVideos-upload-waiting-screenshot](./assets/img/upload_waiting.png)
+![MultimodalRAGWithVideos-upload-waiting-screenshot](./assets/img/upload-gen-trans.png)
 
-![MultimodalRAGWithVideos-upload-done-screenshot](./assets/img/upload_done.png)
+![MultimodalRAGWithVideos-upload-done-screenshot](./assets/img/upload-gen-captions.png)
 
 ![MultimodalRAGWithVideos-query-example-screenshot](./assets/img/example_query.png)

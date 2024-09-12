@@ -141,7 +141,7 @@ def http_bot(state, request: gr.Request):
     return
 
 
-def ingest_video(filepath, request: gr.Request):
+def ingest_video_gen_transcript(filepath, request: gr.Request):
     yield (gr.Textbox(visible=True, value="Please wait for ingesting your uploaded video into database..."))
     basename = os.path.basename(filepath)
     dest = os.path.join(static_dir, basename)
@@ -182,20 +182,73 @@ def ingest_video(filepath, request: gr.Request):
         time.sleep(2)
     return
 
+def ingest_video_gen_caption(filepath, request: gr.Request):
+    yield (gr.Textbox(visible=True, value="Please wait for ingesting your uploaded video into database..."))
+    basename = os.path.basename(filepath)
+    dest = os.path.join(static_dir, basename)
+    shutil.copy(filepath, dest)
+    print("Done copy uploaded file to static folder!")
+    headers = {
+        # 'Content-Type': 'multipart/form-data'
+    }
+    files = {
+        "files": open(dest, "rb"),
+    }
+    response = requests.post(dataprep_gen_captiono_addr, headers=headers, files=files)
+    print(response.status_code)
+    if response.status_code == 200:
+        response = response.json()
+        print(response)
+        yield (gr.Textbox(visible=True, value="Video ingestion is done. Saving your uploaded video..."))
+        time.sleep(2)
+        fn_no_ext = Path(dest).stem
+        if "video_id_maps" in response and fn_no_ext in response["video_id_maps"]:
+            new_dst = os.path.join(static_dir, response["video_id_maps"][fn_no_ext])
+            print(response["video_id_maps"][fn_no_ext])
+            os.rename(dest, new_dst)
+            yield (
+                gr.Textbox(
+                    visible=True,
+                    value="Congratulation! Your upload is done!\nClick the X button on the top right of the video upload box to upload another video.",
+                )
+            )
+            return
+    else:
+        yield (
+            gr.Textbox(
+                visible=True,
+                value="Something wrong!\nPlease click the X button on the top right of the video upload boxreupload your video!",
+            )
+        )
+        time.sleep(2)
+    return
 
 def clear_uploaded_video(request: gr.Request):
     return gr.Textbox(visible=False)
 
 
-with gr.Blocks() as upload:
-    gr.Markdown("# Ingest Your Own Video")
+with gr.Blocks() as upload_gen_trans:
+    gr.Markdown("# Ingest Your Own Video - Utilizing Generated Transcripts")
+    gr.Markdown("Please use this interface to ingest your own video if the video has meaningful audio (e.g., announcements, discussions, etc...)")
     with gr.Row():
         with gr.Column(scale=6):
             video_upload = gr.Video(sources="upload", height=512, width=512, elem_id="video_upload")
         with gr.Column(scale=3):
             text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
-        video_upload.upload(ingest_video, [video_upload], [text_upload_result])
+        video_upload.upload(ingest_video_gen_transcript, [video_upload], [text_upload_result])
         video_upload.clear(clear_uploaded_video, [], [text_upload_result])
+
+with gr.Blocks() as upload_gen_captions:
+    gr.Markdown("# Ingest Your Own Video - Utilizing Generated Captions")
+    gr.Markdown("Please use this interface to ingest your own video if the video has meaningless audio (e.g., background musics, etc...)")
+    with gr.Row():
+        with gr.Column(scale=6):
+            video_upload_cap = gr.Video(sources="upload", height=512, width=512, elem_id="video_upload_cap")
+        with gr.Column(scale=3):
+            text_upload_result_cap = gr.Textbox(visible=False, interactive=False, label="Upload Status")
+        video_upload_cap.upload(ingest_video_gen_transcript, [video_upload_cap], [text_upload_result_cap])
+        video_upload_cap.clear(clear_uploaded_video, [], [text_upload_result_cap])
+
 with gr.Blocks() as qna:
     state = gr.State(mm_rag_with_videos.copy())
     with gr.Row():
@@ -238,12 +291,14 @@ with gr.Blocks() as qna:
         [state, chatbot, video, clear_btn],
     )
 with gr.Blocks(css=css) as demo:
-    gr.Markdown("# Multimodal RAG Wwith Videos")
+    gr.Markdown("# Multimodal RAG With Videos")
     with gr.Tabs():
         with gr.TabItem("QnA With Your Videos"):
             qna.render()
         with gr.TabItem("Upload Your Own Videos"):
-            upload.render()
+            upload_gen_trans.render()
+        with gr.TabItem("Upload Your Own Videos"):
+            upload_gen_captions.render()
 
 demo.queue()
 app = gr.mount_gradio_app(app, demo, path="/")
