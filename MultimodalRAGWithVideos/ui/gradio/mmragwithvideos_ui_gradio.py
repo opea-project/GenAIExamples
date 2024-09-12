@@ -1,24 +1,19 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from utils import (
-    build_logger,
-    moderation_msg,
-    server_error_msg,
-    split_video,
-)
+import argparse
 import os
+import shutil
+import time
+from pathlib import Path
+
+import gradio as gr
+import requests
+import uvicorn
+from conversation import mm_rag_with_videos
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-import gradio as gr
-import argparse
-import uvicorn
-
-from conversation import mm_rag_with_videos
-from pathlib import Path
-import time
-import requests
-import shutil
+from utils import build_logger, moderation_msg, server_error_msg, split_video
 
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
 
@@ -59,6 +54,7 @@ no_change_btn = gr.Button()
 enable_btn = gr.Button(interactive=True)
 disable_btn = gr.Button(interactive=False)
 
+
 def clear_history(state, request: gr.Request):
     logger.info(f"clear_history. ip: {request.client.host}")
     if state.split_video and os.path.exists(state.split_video):
@@ -66,9 +62,10 @@ def clear_history(state, request: gr.Request):
     state = mm_rag_with_videos.copy()
     return (state, state.to_gradio_chatbot(), "", None) + (disable_btn,) * 1
 
+
 def add_text(state, text, request: gr.Request):
     logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
-    if len(text) <= 0 :
+    if len(text) <= 0:
         state.skip_next = True
         return (state, state.to_gradio_chatbot(), "", None) + (no_change_btn,) * 1
 
@@ -79,9 +76,8 @@ def add_text(state, text, request: gr.Request):
     state.skip_next = False
     return (state, state.to_gradio_chatbot(), "") + (disable_btn,) * 1
 
-def http_bot(
-    state, request: gr.Request
-):
+
+def http_bot(state, request: gr.Request):
     global gateway_addr
     logger.info(f"http_bot. ip: {request.client.host}")
     url = gateway_addr
@@ -106,18 +102,18 @@ def http_bot(
     # image = state.get_b64_image()
 
     # Make requests
-    
+
     pload = {
-            "messages": prompt,
-        }
-    
+        "messages": prompt,
+    }
+
     logger.info(f"==== request ====\n{pload}")
     logger.info(f"==== url request ====\n{gateway_addr}")
-    #uncomment this for testing UI only
+    # uncomment this for testing UI only
     # state.messages[-1][-1] = f"response {len(state.messages)}"
     # yield (state, state.to_gradio_chatbot()) + (enable_btn,) * 1
     # return
-    
+
     state.messages[-1][-1] = "▌"
     yield (state, state.to_gradio_chatbot(), state.split_video) + (disable_btn,) * 1
 
@@ -132,23 +128,29 @@ def http_bot(
         print(response.json())
         if response.status_code == 200:
             response = response.json()
-            choice = response['choices'][-1]
-            metadata = choice['metadata']
-            message = choice['message']['content']
-            if is_very_first_query and not state.video_file and 'source_video' in metadata and not state.time_of_frame_ms and 'time_of_frame_ms' in metadata:
-                video_file = metadata['source_video']
-                state.video_file = os.path.join(static_dir, metadata['source_video'])
-                state.time_of_frame_ms = metadata['time_of_frame_ms']
-                splited_video_path = split_video(state.video_file, state.time_of_frame_ms, tmp_dir, f"{state.time_of_frame_ms}__{video_file}")
+            choice = response["choices"][-1]
+            metadata = choice["metadata"]
+            message = choice["message"]["content"]
+            if (
+                is_very_first_query
+                and not state.video_file
+                and "source_video" in metadata
+                and not state.time_of_frame_ms
+                and "time_of_frame_ms" in metadata
+            ):
+                video_file = metadata["source_video"]
+                state.video_file = os.path.join(static_dir, metadata["source_video"])
+                state.time_of_frame_ms = metadata["time_of_frame_ms"]
+                splited_video_path = split_video(
+                    state.video_file, state.time_of_frame_ms, tmp_dir, f"{state.time_of_frame_ms}__{video_file}"
+                )
                 state.split_video = splited_video_path
                 print(splited_video_path)
         else:
             raise requests.exceptions.RequestException
     except requests.exceptions.RequestException as e:
         state.messages[-1][-1] = server_error_msg
-        yield (state, state.to_gradio_chatbot(), None) + (
-            enable_btn,
-        )
+        yield (state, state.to_gradio_chatbot(), None) + (enable_btn,)
         return
 
     state.messages[-1][-1] = message
@@ -158,6 +160,7 @@ def http_bot(
 
     logger.info(f"{state.messages[-1][-1]}")
     return
+
 
 def ingest_video(filepath, request: gr.Request):
     print(filepath)
@@ -170,7 +173,7 @@ def ingest_video(filepath, request: gr.Request):
         # 'Content-Type': 'multipart/form-data'
     }
     files = {
-        'files': open(dest, 'rb'),
+        "files": open(dest, "rb"),
     }
     response = requests.post(dataprep_addr, headers=headers, files=files)
     print(response.status_code)
@@ -180,26 +183,37 @@ def ingest_video(filepath, request: gr.Request):
         yield (gr.Textbox(visible=True, value="Video ingestion is done. Saving your uploaded video..."))
         time.sleep(2)
         fn_no_ext = Path(dest).stem
-        if 'video_id_maps' in response and fn_no_ext in response['video_id_maps']:
-            new_dst = os.path.join(static_dir, response['video_id_maps'][fn_no_ext])
-            print(response['video_id_maps'][fn_no_ext])
+        if "video_id_maps" in response and fn_no_ext in response["video_id_maps"]:
+            new_dst = os.path.join(static_dir, response["video_id_maps"][fn_no_ext])
+            print(response["video_id_maps"][fn_no_ext])
             os.rename(dest, new_dst)
-            yield (gr.Textbox(visible=True, value="Congratulation! Your upload is done!\nClick the X button on the top right of the video upload box to upload another video."))
+            yield (
+                gr.Textbox(
+                    visible=True,
+                    value="Congratulation! Your upload is done!\nClick the X button on the top right of the video upload box to upload another video.",
+                )
+            )
             return
     else:
-        yield (gr.Textbox(visible=True, value="Something wrong!\nPlease click the X button on the top right of the video upload boxreupload your video!"))
+        yield (
+            gr.Textbox(
+                visible=True,
+                value="Something wrong!\nPlease click the X button on the top right of the video upload boxreupload your video!",
+            )
+        )
         time.sleep(2)
     return
 
+
 def clear_uploaded_video(request: gr.Request):
-    return (gr.Textbox(visible=False))
+    return gr.Textbox(visible=False)
 
 
 with gr.Blocks() as upload:
     gr.Markdown("# Ingest Your Own Video")
     with gr.Row():
         with gr.Column(scale=6):
-            video_upload = gr.Video(sources="upload", height=512, width=512, elem_id="video_upload" )
+            video_upload = gr.Video(sources="upload", height=512, width=512, elem_id="video_upload")
         with gr.Column(scale=3):
             text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
         video_upload.upload(ingest_video, [video_upload], [text_upload_result])
@@ -209,11 +223,9 @@ with gr.Blocks() as qna:
     # gr.Markdown("# Multimodal RAG with Videos")
     with gr.Row():
         with gr.Column(scale=4):
-            video = gr.Video(height=512, width=512, elem_id="video" )
+            video = gr.Video(height=512, width=512, elem_id="video")
         with gr.Column(scale=7):
-            chatbot = gr.Chatbot(
-                        elem_id="chatbot", label="Multimodal RAG Chatbot", height=390
-                )
+            chatbot = gr.Chatbot(elem_id="chatbot", label="Multimodal RAG Chatbot", height=390)
             with gr.Row():
                 with gr.Column(scale=6):
                     # textbox.render()
@@ -223,18 +235,20 @@ with gr.Blocks() as qna:
                         # show_label=False,
                         # container=False,
                         label="Query",
-                        info="Enter your query here or choose a sample from the dropdown list!"
+                        info="Enter your query here or choose a sample from the dropdown list!",
                     )
                 with gr.Column(scale=1, min_width=100):
                     with gr.Row():
-                        submit_btn = gr.Button(
-                            value="Send", variant="primary", interactive=True
-                        )
+                        submit_btn = gr.Button(value="Send", variant="primary", interactive=True)
                     with gr.Row(elem_id="buttons") as button_row:
                         clear_btn = gr.Button(value="🗑️  Clear", interactive=False)
 
     clear_btn.click(
-        clear_history, [state,], [state, chatbot, textbox, video, clear_btn]
+        clear_history,
+        [
+            state,
+        ],
+        [state, chatbot, textbox, video, clear_btn],
     )
 
     submit_btn.click(
@@ -243,7 +257,9 @@ with gr.Blocks() as qna:
         [state, chatbot, textbox, clear_btn],
     ).then(
         http_bot,
-        [state, ],
+        [
+            state,
+        ],
         [state, chatbot, video, clear_btn],
     )
 with gr.Blocks(css=css) as demo:
@@ -255,7 +271,7 @@ with gr.Blocks(css=css) as demo:
             upload.render()
 
 demo.queue()
-app = gr.mount_gradio_app(app, demo, path='/')
+app = gr.mount_gradio_app(app, demo, path="/")
 share = False
 enable_queue = True
 
@@ -265,13 +281,17 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=5173)
     parser.add_argument("--concurrency-count", type=int, default=20)
     parser.add_argument("--share", action="store_true")
-    parser.add_argument("--backend_service_endpoint", type=str, default="http://localhost:8888/v1/multimodalragwithvideos")
-    parser.add_argument("--dataprep_gen_transcript_endpoint", type=str, default="http://localhost:6007/v1/generate_transcripts")
+    parser.add_argument(
+        "--backend_service_endpoint", type=str, default="http://localhost:8888/v1/multimodalragwithvideos"
+    )
+    parser.add_argument(
+        "--dataprep_gen_transcript_endpoint", type=str, default="http://localhost:6007/v1/generate_transcripts"
+    )
 
     args = parser.parse_args()
     logger.info(f"args: {args}")
-    global gateway_addr 
+    global gateway_addr
     gateway_addr = args.backend_service_endpoint
-    global dataprep_addr 
+    global dataprep_addr
     dataprep_addr = args.dataprep_gen_transcript_endpoint
     uvicorn.run(app, host=args.host, port=args.port)

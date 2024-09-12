@@ -1,15 +1,16 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import base64
 import logging
 import logging.handlers
 import os
 import sys
 from pathlib import Path
-from moviepy.video.io.VideoFileClip import VideoFileClip
+
 import cv2
+from moviepy.video.io.VideoFileClip import VideoFileClip
 from PIL import Image
-import base64
 
 LOGDIR = "."
 
@@ -18,6 +19,7 @@ moderation_msg = "YOUR INPUT VIOLATES OUR CONTENT MODERATION GUIDELINES. PLEASE 
 
 handler = None
 save_log = False
+
 
 def build_logger(logger_name, logger_filename):
     global handler
@@ -51,8 +53,7 @@ def build_logger(logger_name, logger_filename):
     if save_log and handler is None:
         os.makedirs(LOGDIR, exist_ok=True)
         filename = os.path.join(LOGDIR, logger_filename)
-        handler = logging.handlers.TimedRotatingFileHandler(
-            filename, when='D', utc=True)
+        handler = logging.handlers.TimedRotatingFileHandler(filename, when="D", utc=True)
         handler.setFormatter(formatter)
 
         for name, item in logging.root.manager.loggerDict.items():
@@ -61,37 +62,38 @@ def build_logger(logger_name, logger_filename):
 
     return logger
 
+
 class StreamToLogger(object):
-    """
-    Fake file-like stream object that redirects writes to a logger instance.
-    """
+    """Fake file-like stream object that redirects writes to a logger instance."""
+
     def __init__(self, logger, log_level=logging.INFO):
         self.terminal = sys.stdout
         self.logger = logger
         self.log_level = log_level
-        self.linebuf = ''
+        self.linebuf = ""
 
     def __getattr__(self, attr):
         return getattr(self.terminal, attr)
 
     def write(self, buf):
         temp_linebuf = self.linebuf + buf
-        self.linebuf = ''
+        self.linebuf = ""
         for line in temp_linebuf.splitlines(True):
             # From the io.TextIOWrapper docs:
             #   On output, if newline is None, any '\n' characters written
             #   are translated to the system default line separator.
             # By default sys.stdout.write() expects '\n' newlines and then
             # translates them so this is still cross platform.
-            if line[-1] == '\n':
+            if line[-1] == "\n":
                 self.logger.log(self.log_level, line.rstrip())
             else:
                 self.linebuf += line
 
     def flush(self):
-        if self.linebuf != '':
+        if self.linebuf != "":
             self.logger.log(self.log_level, self.linebuf.rstrip())
-        self.linebuf = ''
+        self.linebuf = ""
+
 
 def maintain_aspect_ratio_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # Grab the image size and initialize dimensions
@@ -116,8 +118,16 @@ def maintain_aspect_ratio_resize(image, width=None, height=None, inter=cv2.INTER
     # Return the resized image
     return cv2.resize(image, dim, interpolation=inter)
 
+
 # function to split video at a timestamp
-def split_video(video_path, timestamp_in_ms, output_video_path: str = "./public/splitted_videos", output_video_name: str="video_tmp.mp4", play_before_sec: int=5, play_after_sec: int=5):
+def split_video(
+    video_path,
+    timestamp_in_ms,
+    output_video_path: str = "./public/splitted_videos",
+    output_video_name: str = "video_tmp.mp4",
+    play_before_sec: int = 5,
+    play_after_sec: int = 5,
+):
     timestamp_in_sec = int(timestamp_in_ms) / 1000
     # create output_video_name folder if not exist:
     Path(output_video_path).mkdir(parents=True, exist_ok=True)
@@ -127,8 +137,9 @@ def split_video(video_path, timestamp_in_ms, output_video_path: str = "./public/
         start_time = max(timestamp_in_sec - play_before_sec, 0)
         end_time = min(timestamp_in_sec + play_after_sec, duration)
         new = video.subclip(start_time, end_time)
-        new.write_videofile(output_video, audio_codec='aac')
+        new.write_videofile(output_video, audio_codec="aac")
     return output_video
+
 
 def delete_split_video(video_path):
     if os.path.exists(video_path):
@@ -138,12 +149,14 @@ def delete_split_video(video_path):
         print("The file does not exist")
         return False
 
+
 def convert_img_to_base64(image):
     "Convert image to base64 string"
     _, buffer = cv2.imencode(".png", image)
     encoded_string = base64.b64encode(buffer)
     return encoded_string.decode("utf-8")
-    
+
+
 def get_b64_frame_from_timestamp(video_path, timestamp_in_ms, maintain_aspect_ratio: bool = False):
     print(f"video path: {video_path}")
     vidcap = cv2.VideoCapture(video_path)
