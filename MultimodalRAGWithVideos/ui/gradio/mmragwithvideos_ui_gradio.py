@@ -161,17 +161,49 @@ def http_bot(
 
 def ingest_video(filepath, request: gr.Request):
     print(filepath)
+    yield (gr.Textbox(visible=True, value="Please wait for ingesting your uploaded video into database..."))
     basename = os.path.basename(filepath)
     dest = os.path.join(static_dir, basename)
     shutil.copy(filepath, dest)
     print("Done copy uploaded file to static folder!")
-    
+    headers = {
+        # 'Content-Type': 'multipart/form-data'
+    }
+    files = {
+        'files': open(dest, 'rb'),
+    }
+    response = requests.post(dataprep_addr, headers=headers, files=files)
+    print(response.status_code)
+    if response.status_code == 200:
+        response = response.json()
+        print(response)
+        yield (gr.Textbox(visible=True, value="Video ingestion is done. Saving your uploaded video..."))
+        time.sleep(2)
+        fn_no_ext = Path(dest).stem
+        if 'video_id_maps' in response and fn_no_ext in response['video_id_maps']:
+            new_dst = os.path.join(static_dir, response['video_id_maps'][fn_no_ext])
+            print(response['video_id_maps'][fn_no_ext])
+            os.rename(dest, new_dst)
+            yield (gr.Textbox(visible=True, value="Congratulation! Your upload is done!\nClick the X button on the top right of the video upload box to upload another video."))
+            return
+    else:
+        yield (gr.Textbox(visible=True, value="Something wrong!\nPlease click the X button on the top right of the video upload boxreupload your video!"))
+        time.sleep(2)
+    return
+
+def clear_uploaded_video(request: gr.Request):
+    return (gr.Textbox(visible=False))
+
 
 with gr.Blocks() as upload:
     gr.Markdown("# Ingest Your Own Video")
-    video_upload = gr.Video(sources="upload", height=512, width=512, elem_id="video_upload" )
-    video_upload.upload(ingest_video, [video_upload], [])
-
+    with gr.Row():
+        with gr.Column(scale=6):
+            video_upload = gr.Video(sources="upload", height=512, width=512, elem_id="video_upload" )
+        with gr.Column(scale=3):
+            text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
+        video_upload.upload(ingest_video, [video_upload], [text_upload_result])
+        video_upload.clear(clear_uploaded_video, [], [text_upload_result])
 with gr.Blocks() as qna:
     state = gr.State(mm_rag_with_videos.copy())
     # gr.Markdown("# Multimodal RAG with Videos")
@@ -234,9 +266,12 @@ if __name__ == "__main__":
     parser.add_argument("--concurrency-count", type=int, default=20)
     parser.add_argument("--share", action="store_true")
     parser.add_argument("--backend_service_endpoint", type=str, default="http://localhost:8888/v1/multimodalragwithvideos")
+    parser.add_argument("--dataprep_gen_transcript_endpoint", type=str, default="http://localhost:6007/v1/generate_transcripts")
 
     args = parser.parse_args()
     logger.info(f"args: {args}")
     global gateway_addr 
     gateway_addr = args.backend_service_endpoint
+    global dataprep_addr 
+    dataprep_addr = args.dataprep_gen_transcript_endpoint
     uvicorn.run(app, host=args.host, port=args.port)
