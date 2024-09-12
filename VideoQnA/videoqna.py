@@ -3,7 +3,7 @@
 
 import os
 
-from comps import MicroService, ServiceOrchestrator, ServiceType, VideoRAGQnAGateway
+from comps import MicroService, ServiceOrchestrator, ServiceType, VideoQnAGateway
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
@@ -17,7 +17,7 @@ LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9000))
 
 
-class VideoRAGQnAService:
+class VideoQnAService:
     def __init__(self, host="0.0.0.0", port=8888):
         self.host = host
         self.port = port
@@ -60,9 +60,9 @@ class VideoRAGQnAService:
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, rerank)
         self.megaservice.flow_to(rerank, lvm)
-        self.gateway = VideoRAGQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+        self.gateway = VideoQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
 
 if __name__ == "__main__":
-    videoragqna = VideoRAGQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
-    videoragqna.add_remote_service()
+    videoqna = VideoQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    videoqna.add_remote_service()
