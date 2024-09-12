@@ -19,8 +19,8 @@ function build_docker_images() {
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
-    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
+    service_list="dataprep-redis embedding-tei retriever-redis reranking-tei doc-index-retriever"
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull redis/redis-stack:7.2.0-v9
