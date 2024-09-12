@@ -182,6 +182,7 @@ def ingest_video_gen_transcript(filepath, request: gr.Request):
         time.sleep(2)
     return
 
+
 def ingest_video_gen_caption(filepath, request: gr.Request):
     yield (gr.Textbox(visible=True, value="Please wait for ingesting your uploaded video into database..."))
     basename = os.path.basename(filepath)
@@ -223,13 +224,16 @@ def ingest_video_gen_caption(filepath, request: gr.Request):
         time.sleep(2)
     return
 
+
 def clear_uploaded_video(request: gr.Request):
     return gr.Textbox(visible=False)
 
 
 with gr.Blocks() as upload_gen_trans:
     gr.Markdown("# Ingest Your Own Video - Utilizing Generated Transcripts")
-    gr.Markdown("Please use this interface to ingest your own video if the video has meaningful audio (e.g., announcements, discussions, etc...)")
+    gr.Markdown(
+        "Please use this interface to ingest your own video if the video has meaningful audio (e.g., announcements, discussions, etc...)"
+    )
     with gr.Row():
         with gr.Column(scale=6):
             video_upload = gr.Video(sources="upload", height=512, width=512, elem_id="video_upload")
@@ -240,7 +244,9 @@ with gr.Blocks() as upload_gen_trans:
 
 with gr.Blocks() as upload_gen_captions:
     gr.Markdown("# Ingest Your Own Video - Utilizing Generated Captions")
-    gr.Markdown("Please use this interface to ingest your own video if the video has meaningless audio (e.g., background musics, etc...)")
+    gr.Markdown(
+        "Please use this interface to ingest your own video if the video has meaningless audio (e.g., background musics, etc...)"
+    )
     with gr.Row():
         with gr.Column(scale=6):
             video_upload_cap = gr.Video(sources="upload", height=512, width=512, elem_id="video_upload_cap")
