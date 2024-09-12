@@ -27,7 +27,7 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 - Dataprep Image
 
   ```bash
-  docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/Dockerfile .
+  docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/Dockerfile .
   ```
 
 ## 2. Build Images for MegaService
@@ -59,8 +59,8 @@ export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 export llm_hardware='cpu/xeon' #cpu/xeon, xpu, hpu/gaudi
-cd GenAIExamples/DocIndexRetriever/intel/${llm_hardware}/
-docker compose -f compose.yaml up -d
+cd GenAIExamples/DocIndexRetriever/intel/hpu/gaudi/
+docker compose up -d
 ```
 
 ## 4. Validation

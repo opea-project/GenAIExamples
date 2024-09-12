@@ -1,0 +1,13 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  agent-endpoint:
+    build:
+      context: GenAIComps
+      dockerfile: comps/agent/langchain/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+    image: ${REGISTRY:-opea}/comps-agent-langchain:${TAG:-latest}
