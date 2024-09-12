@@ -51,7 +51,7 @@ function start_services() {
     sleep 1m
 
     # List of containers running uvicorn
-    list=("dataprep-vdms-server" "embedding-multimodal-server" "retriever-vdms-server" "reranking-videoragqna-server" "video-llama-lvm-server" "lvm-video-llama" "videoragqna-xeon-backend-server")
+    list=("dataprep-vdms-server" "embedding-multimodal-server" "retriever-vdms-server" "reranking-videoqna-server" "video-llama-lvm-server" "lvm-video-llama" "videoqna-xeon-backend-server")
 
     # Define the maximum time limit in seconds
     TIME_LIMIT=5400
@@ -101,7 +101,7 @@ function start_services() {
         sleep 5m
     done
 
-    if docker logs videoragqna-xeon-ui-server 2>&1 | grep -q "Streamlit app"; then
+    if docker logs videoqna-xeon-ui-server 2>&1 | grep -q "Streamlit app"; then
         return 0
     else
         return 1
@@ -176,7 +176,7 @@ function validate_microservices() {
         "${ip_address}:8000/v1/reranking" \
         "video_url" \
         "reranking" \
-        "reranking-videoragqna-server" \
+        "reranking-videoqna-server" \
         '{
             "retrieved_docs": [{"doc": [{"text": "retrieved text"}]}],
             "initial_query": "query",
@@ -199,10 +199,10 @@ function validate_microservices() {
 
 function validate_megaservice() {
     validate_services \
-    "${ip_address}:8888/v1/videoragqna" \
+    "${ip_address}:8888/v1/videoqna" \
     "man" \
-    "videoragqna-xeon-backend-server" \
-    "videoragqna-xeon-backend-server" \
+    "videoqna-xeon-backend-server" \
+    "videoqna-xeon-backend-server" \
     '{"messages":"What is the man doing?","stream":"True"}'
 }
 
@@ -216,12 +216,12 @@ function validate_frontend() {
             echo "Frontend Content is as expected."
         else
             echo "Frontend Content does not match the expected result: $CONTENT"
-            docker logs videoragqna-xeon-ui-server >> ${LOG_PATH}/ui.log
+            docker logs videoqna-xeon-ui-server >> ${LOG_PATH}/ui.log
             exit 1
         fi
     else
         echo "Frontend is not running correctly. Received status was $HTTP_STATUS"
-        docker logs videoragqna-xeon-ui-server >> ${LOG_PATH}/ui.log
+        docker logs videoqna-xeon-ui-server >> ${LOG_PATH}/ui.log
         exit 1
     fi
 }
