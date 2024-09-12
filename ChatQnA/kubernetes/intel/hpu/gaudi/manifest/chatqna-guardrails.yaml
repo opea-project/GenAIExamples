@@ -688,9 +688,6 @@ spec:
         {}
       containers:
         - name: chatqna-ui
-          envFrom:
-            - configMapRef:
-                name: chatqna-chatqna-ui-config
           securityContext:
             {}
           image: "opea/chatqna-conversation-ui:latest"
