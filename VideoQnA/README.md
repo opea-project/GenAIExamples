@@ -90,7 +90,6 @@ flowchart LR
 - Query Handling: When a user submits a query, the system performs a similarity search in the vector store to retrieve the best-matching videos.
 - Contextual Inference: The retrieved videos are then sent to the Large Vision Model (LVM) for inference, providing supplemental context for the query.
 
-
 ## Deploy VideoQnA Service
 
 The VideoQnA service can be effortlessly deployed on Intel XEON Scalable Processors.
