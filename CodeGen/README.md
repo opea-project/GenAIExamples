@@ -30,7 +30,7 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
    docker pull opea/codegen:latest
    ```
 
-2. Start services using the docker images built from source. See the [Gaudi Guide](./docker/gaudi/README.md) or [Xeon Guide](./docker/xeon/README.md) for more information.
+2. Start services using the docker images built from source. See the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) or [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more information.
 
 ### Required Models
 
@@ -74,31 +74,31 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 #### Deploy CodeGen on Gaudi
 
-Find the corresponding [compose.yaml](./docker/gaudi/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
 
 ```bash
-cd GenAIExamples/CodeGen/docker/gaudi
+cd GenAIExamples/CodeGen/docker_compose/intel/hpu/gaudi
 docker compose up -d
 ```
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 #### Deploy CodeGen on Xeon
 
-Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
 ```bash
-cd GenAIExamples/CodeGen/docker/xeon
+cd GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
 
 ### Deploy CodeGen using Kubernetes
 
-Refer to the [Kubernetes Guide](./kubernetes/manifests/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
+Refer to the [Kubernetes Guide](./kubernetes/intel/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
 
 ### Deploy CodeGen into Kubernetes using Helm Chart
 
@@ -126,7 +126,7 @@ Two ways of consuming CodeGen Service:
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen/docker/xeon#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen/docker_compose/intel/cpu/xeon#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy=""

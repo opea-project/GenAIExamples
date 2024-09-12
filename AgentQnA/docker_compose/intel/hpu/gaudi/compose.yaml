@@ -1,0 +1,94 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  tgi-server:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.4
+    container_name: tgi-server
+    ports:
+      - "8085:80"
+    volumes:
+      - ${HF_CACHE_DIR}:/data
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      PT_HPU_ENABLE_LAZY_COLLECTIVES: true
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192 --sharded true --num-shard ${NUM_SHARDS}
+  worker-docgrader-agent:
+    image: opea/comps-agent-langchain:latest
+    container_name: docgrader-agent-endpoint
+    depends_on:
+      - tgi-server
+    volumes:
+      # - ${WORKDIR}/GenAIExamples/AgentQnA/docker_image_build/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
+      - ${TOOLSET_PATH}:/home/user/tools/
+    ports:
+      - "9095:9095"
+    ipc: host
+    environment:
+      ip_address: ${ip_address}
+      strategy: rag_agent
+      recursion_limit: ${recursion_limit_worker}
+      llm_engine: tgi
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+      model: ${LLM_MODEL_ID}
+      temperature: ${temperature}
+      max_new_tokens: ${max_new_tokens}
+      streaming: false
+      tools: /home/user/tools/worker_agent_tools.yaml
+      require_human_feedback: false
+      RETRIEVAL_TOOL_URL: ${RETRIEVAL_TOOL_URL}
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-worker-agent-service"
+      port: 9095
+
+
+  supervisor-react-agent:
+    image: opea/comps-agent-langchain:latest
+    container_name: react-agent-endpoint
+    depends_on:
+      - tgi-server
+      - worker-docgrader-agent
+    volumes:
+      # - ${WORKDIR}/GenAIExamples/AgentQnA/docker_image_build/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
+      - ${TOOLSET_PATH}:/home/user/tools/
+    ports:
+      - "9090:9090"
+    ipc: host
+    environment:
+      ip_address: ${ip_address}
+      strategy: react_langgraph
+      recursion_limit: ${recursion_limit_supervisor}
+      llm_engine: tgi
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+      model: ${LLM_MODEL_ID}
+      temperature: ${temperature}
+      max_new_tokens: ${max_new_tokens}
+      streaming: false
+      tools: /home/user/tools/supervisor_agent_tools.yaml
+      require_human_feedback: false
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-supervisor-agent-service"
+      CRAG_SERVER: $CRAG_SERVER
+      WORKER_AGENT_URL: $WORKER_AGENT_URL
+      port: 9090

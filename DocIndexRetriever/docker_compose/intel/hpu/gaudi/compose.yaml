@@ -1,0 +1,121 @@
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  dataprep-redis-service:
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+    ports:
+      - "6007:6007"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+  tei-embedding-service:
+    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}
+    container_name: tei-embedding-gaudi-server
+    ports:
+      - "8090:80"
+    volumes:
+      - "./data:/data"
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HABANA_VISIBLE_DEVICES: ${tei_embedding_devices:-all}
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      MAX_WARMUP_SEQUENCE_LENGTH: 512
+      INIT_HCCL_ON_ACQUIRE: 0
+      ENABLE_EXPERIMENTAL_FLAGS: true
+    command: --model-id ${EMBEDDING_MODEL_ID}  --auto-truncate
+  embedding:
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+    container_name: embedding-tei-server
+    ports:
+      - "6000:6000"
+    ipc: host
+    depends_on:
+      - tei-embedding-service
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+    restart: unless-stopped
+  retriever:
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    container_name: retriever-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+    restart: unless-stopped
+  reranking:
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+    container_name: reranking-tei-gaudi-server
+    ports:
+      - "8000:8000"
+    ipc: host
+    entrypoint: python local_reranking.py
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    restart: unless-stopped
+  doc-index-retriever-server:
+    image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
+    container_name: doc-index-retriever-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+      - embedding
+      - retriever
+      - reranking
+    ports:
+      - "8889:8889"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
+      - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
+      - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
