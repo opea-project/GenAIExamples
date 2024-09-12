@@ -152,7 +152,7 @@ By default, the embedding, reranking and LLM models are set to a default value a
 | Reranking | BAAI/bge-reranker-base    |
 | LLM       | Intel/neural-chat-7b-v3-3 |
 
-Change the `xxx_MODEL_ID` in `docker/xxx/set_env.sh` for your needs.
+Change the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh` for your needs.
 
 For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA. Refer to [this readme](docker_compose/intel/cpu/xeon/README.md) for details.
 
