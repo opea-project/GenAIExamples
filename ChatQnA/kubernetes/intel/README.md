@@ -17,6 +17,17 @@ sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chat
 kubectl apply -f chatqna.yaml
 ```
 
+Since CPUs, such as Intel Cooper Lake, Sapphire Rapids, support `bfloat16`, we can add `--dtype bfloat16` when setup the `huggingface/text-generation-inference` server. And if you have such CPUs, you can run the following commands:
+
+```
+# label your node for scheduling the service on it automatically
+kubectl label node 'your-node-name' node-type=node-bfloat16
+
+# add `nodeSelector` for the `huggingface/text-generation-inference` server at `chatqna_bf16.yaml`
+# create
+kubectl apply -f chatqna_bf16.yaml
+```
+
 ## Deploy On Gaudi
 
 ```
