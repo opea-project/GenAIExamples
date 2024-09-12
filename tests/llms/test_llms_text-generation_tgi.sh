@@ -21,10 +21,10 @@ function build_docker_images() {
 
 function start_service() {
     tgi_endpoint_port=5004
-    export your_hf_llm_model=$1
+    export hf_llm_model=$1
     # Remember to set HF_TOKEN before invoking this test!
     export HF_TOKEN=${HF_TOKEN}
-    docker run -d --name="test-comps-llm-tgi-endpoint" -p $tgi_endpoint_port:80 -v ./data:/data --shm-size 1g -e HF_TOKEN=${HF_TOKEN} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id ${your_hf_llm_model} --max-input-tokens 1024 --max-total-tokens 2048
+    docker run -d --name="test-comps-llm-tgi-endpoint" -p $tgi_endpoint_port:80 -v ~/.cache/huggingface/hub:/data --shm-size 1g -e HF_TOKEN=${HF_TOKEN} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id ${hf_llm_model} --max-input-tokens 1024 --max-total-tokens 2048
     export TGI_LLM_ENDPOINT="http://${ip_address}:${tgi_endpoint_port}"
 
     llm_port=5005
@@ -34,9 +34,9 @@ function start_service() {
     # check whether tgi is fully ready
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
-        docker logs test-comps-llm-tgi-endpoint >> ${LOG_PATH}/llm-tgi.log
+        docker logs test-comps-llm-tgi-endpoint >> ${LOG_PATH}/${hf_llm_model}-llm-tgi.log
         n=$((n+1))
-        if grep -q Connected ${LOG_PATH}/llm-tgi.log; then
+        if grep -q Connected ${LOG_PATH}/${hf_llm_model}-llm-tgi.log; then
             break
         fi
         sleep 5s
