@@ -44,7 +44,7 @@ function start_services() {
     export TTS_SERVICE_PORT=3002
     export LLM_SERVICE_PORT=3007
 
-    # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+    # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -81,7 +81,7 @@ function validate_megaservice() {
 }
 
 #function validate_frontend() {
-#    cd $WORKPATH/docker/ui/svelte
+#    cd $WORKPATH/ui/svelte
 #    local conda_env_name="OPEA_e2e"
 #    export PATH=${HOME}/miniforge3/bin/:$PATH
 ##    conda remove -n ${conda_env_name} --all -y

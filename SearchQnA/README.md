@@ -60,7 +60,7 @@ To set up environment variables for deploying SearchQnA services, follow these s
 3. Set up other environment variables:
 
    ```bash
-   source ./docker/set_env.sh
+   source ./docker_compose/set_env.sh
    ```
 
 ### Deploy SearchQnA on Gaudi

@@ -25,7 +25,7 @@ Currently we support two ways of deploying Document Summarization services with 
 
 ### Required Models
 
-We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "set_env.sh" if you want to use other models.
+We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "docker_compose/set_env.sh" if you want to use other models.
 
 ```
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
@@ -57,7 +57,7 @@ To set up environment variables for deploying Document Summarization services, f
 3. Set up other environment variables:
 
    ```bash
-   source ./docker/set_env.sh
+   source ./docker_compose/set_env.sh
    ```
 
 ### Deploy using Docker
