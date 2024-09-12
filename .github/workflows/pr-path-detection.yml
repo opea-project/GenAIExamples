@@ -42,3 +42,32 @@ jobs:
           fi
 
         shell: bash
+
+  Check-the-validity-of-hyperlinks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout repo GenAIExamples
+        uses: actions/checkout@v4
+
+      - name: Check the validity of hyperlinks
+        run: |
+          cd ${{github.workspace}}
+          url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r .)
+          if [ -n "$url_lines" ]; then
+            for url_line in $url_lines; do
+              url=$(echo "$url_lines"|cut -d '(' -f2 | cut -d ')' -f1)
+              path=$(echo "$url_lines"|cut -d ':' -f1)
+              response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+              if [ "$response" -eq 200 ]; then
+                  echo "Valid link: $url"
+              else
+                  echo "Invalid link: $url, $path"
+              fi
+            done
+          fi
+
+
+
