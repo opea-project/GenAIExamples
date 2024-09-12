@@ -57,13 +57,11 @@ def llm_generate(input: LLMParamsDoc):
     if input.streaming:
 
         def stream_generator():
-            chat_response = ""
             for text in llm.stream_complete(input.query):
-                chat_response += text
-                chunk_repr = repr(text.encode("utf-8"))
-                yield f"data: {chunk_repr}\n\n"
+                output = text.text
+                yield f"data: {output}\n\n"
             if logflag:
-                logger.info(f"[llm - chat_stream] stream response: {chat_response}")
+                logger.info(f"[llm - chat_stream] stream response: {output}")
             yield "data: [DONE]\n\n"
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
