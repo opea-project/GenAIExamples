@@ -37,10 +37,11 @@ function install_chatqna {
 
 function get_end_point() {
     # $1 is service name, $2 is namespace
-    ip_address=$(kubectl get svc $1 -n $2 -o jsonpath='{.spec.clusterIP}')
-    port=$(kubectl get svc $1 -n $2 -o jsonpath='{.spec.ports[0].port}')
+    ip_address=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')
+    port=$(kubectl get svc $1 -n $2 -o jsonpath='{.spec.ports[0].nodePort}')
     echo "$ip_address:$port"
 }
+
 
 function validate_chatqna() {
     local ns=$1
