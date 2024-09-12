@@ -9,7 +9,7 @@ from io import BytesIO
 import requests
 import streamlit as st
 
-BACKEND_SERVICE_ENDPOINT = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/videoragqna")
+BACKEND_SERVICE_ENDPOINT = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/videoqna")
 BACKEND_HEALTH_CHECK_ENDPOINT = os.getenv("BACKEND_HEALTH_CHECK_ENDPOINT", "http://localhost:8888/v1/health_check")
 
 
@@ -137,7 +137,7 @@ def display_messages():
 
 def main():
     st.set_page_config(initial_sidebar_state="collapsed", layout="wide")
-    st.title("Video RAG QnA")
+    st.title("VideoQnA")
     title_alignment = """
     <style>
     h1 {
