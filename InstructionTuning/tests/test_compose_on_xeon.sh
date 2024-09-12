@@ -3,6 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -x
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -11,24 +17,16 @@ finetuning_service_port=8015
 ray_port=8265
 
 function build_docker_images() {
-    cd $WORKPATH
+    cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git
     fi
-    cd GenAIComps
-    echo PWD: $(pwd)
-    docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg HF_TOKEN=$HF_TOKEN -f comps/finetuning/Dockerfile .
-    if [ $? -ne 0 ]; then
-        echo "opea/finetuning built fail"
-        exit 1
-    else
-        echo "opea/finetuning built successful"
-    fi
+    docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 }
 
 function start_service() {
     export no_proxy="localhost,127.0.0.1,"${ip_address}
-    docker run -d --name="finetuning-server" -p $finetuning_service_port:$finetuning_service_port -p $ray_port:$ray_port --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy opea/finetuning:latest
+    docker run -d --name="finetuning-server" -p $finetuning_service_port:$finetuning_service_port -p $ray_port:$ray_port --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy ${IMAGE_REPO}/finetuning:${IMAGE_TAG}
     sleep 1m
 }
 

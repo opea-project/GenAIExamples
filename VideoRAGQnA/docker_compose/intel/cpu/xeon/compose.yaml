@@ -10,7 +10,7 @@ services:
     ports:
       - "8001:55555"
   dataprep:
-    image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-multimodal-vdms:${TAG:-latest}
     container_name: dataprep-vdms-server
     depends_on:
       - vdms-vector-db
@@ -28,7 +28,7 @@ services:
       - /home/$USER/.cache/clip:/home/user/.cache/clip
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   embedding:
-    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+    image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
     container_name: embedding-multimodal-server
     ports:
       - "6000:6000"

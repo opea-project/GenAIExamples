@@ -1,0 +1,13 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  finetuning:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: GenAIComps
+      dockerfile: comps/finetuning/Dockerfile
+    image: ${REGISTRY:-opea}/finetuning:${TAG:-latest}

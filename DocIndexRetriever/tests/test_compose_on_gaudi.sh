@@ -3,12 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-echo "IMAGE_REPO=${IMAGE_REPO}"
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
-# export REGISTRY=${IMAGE_REPO}
-# export TAG=${IMAGE_TAG}
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -19,22 +19,18 @@ function build_docker_images() {
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
-    cd GenAIComps
+    if [ ! -d "tei-gaudi" ] ; then
+        git clone https://github.com/huggingface/tei-gaudi
+    fi
 
-    docker build -t opea/embedding-tei:latest -f comps/embeddings/tei/langchain/Dockerfile .
-    docker build -t opea/retriever-redis:latest -f comps/retrievers/redis/langchain/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/Dockerfile .
-    docker build -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/Dockerfile .
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:latest
     docker pull redis/redis-stack:7.2.0-v9
-
-    cd $WORKPATH/
-    docker build -t opea/doc-index-retriever:latest -f ./Dockerfile .
+    docker images && sleep 1s
 }
 
 function start_services() {
-    # build tei-gaudi for each test instead of pull from local registry
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"

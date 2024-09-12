@@ -56,7 +56,7 @@ cd GenAIComps
 ### 1. Build Embedding Image
 
 ```bash
-docker build -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/Dockerfile .
+docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
@@ -83,7 +83,7 @@ docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy
 ### 5. Build Dataprep Image
 
 ```bash
-docker build -t opea/dataprep-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/Dockerfile .
+docker build -t opea/dataprep-multimodal-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/Dockerfile .
 cd ..
 ```
 
@@ -110,8 +110,8 @@ docker build -t opea/videoragqna-ui:latest --build-arg https_proxy=$https_proxy 
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
-1. `opea/dataprep-vdms:latest`
-2. `opea/embedding-multimodal:latest`
+1. `opea/dataprep-multimodal-vdms:latest`
+2. `opea/embedding-multimodal-clip:latest`
 3. `opea/retriever-vdms:latest`
 4. `opea/reranking-videoragqna:latest`
 5. `opea/video-llama-lvm-server:latest`

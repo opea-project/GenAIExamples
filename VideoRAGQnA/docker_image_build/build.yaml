@@ -11,43 +11,43 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/videoragqna:${TAG:-latest}
-  videoragqna-xeon-ui-server:
+  videoragqna-ui:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile
     extends: videoragqna
     image: ${REGISTRY:-opea}/videoragqna-ui:${TAG:-latest}
-  dataprep:
+  dataprep-multimodal-vdms:
     build:
       context: GenAIComps
       dockerfile: comps/dataprep/vdms/multimodal_langchain/Dockerfile
     extends: videoragqna
-    image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}
-  embedding:
+    image: ${REGISTRY:-opea}/dataprep-multimodal-vdms:${TAG:-latest}
+  embedding-multimodal-clip:
     build:
       context: GenAIComps
       dockerfile: comps/embeddings/multimodal_clip/Dockerfile
     extends: videoragqna
-    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
-  retriever:
+    image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
+  retriever-vdms:
     build:
       context: GenAIComps
       dockerfile: comps/retrievers/vdms/langchain/Dockerfile
     extends: videoragqna
     image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
-  reranking:
+  reranking-videoragqna:
     build:
       context: GenAIComps
       dockerfile: comps/reranks/video-rag-qna/Dockerfile
     extends: videoragqna
     image: ${REGISTRY:-opea}/reranking-videoragqna:${TAG:-latest}
-  lvm-video-llama:
+  video-llama-lvm-server:
     build:
       context: GenAIComps
       dockerfile: comps/lvms/video-llama/dependency/Dockerfile
     extends: videoragqna
     image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
-  lvm:
+  lvm-video-llama:
     build:
       context: GenAIComps
       dockerfile: comps/lvms/video-llama/Dockerfile
