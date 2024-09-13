@@ -10,7 +10,7 @@ The architecture for document summarization will be illustrated/described below:
 
 ## Deploy Document Summarization Service
 
-The Document Summarization service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
+The Document Summarization service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
 Based on whether you want to use Docker or Kubernetes, follow the instructions below.
 
 Currently we support two ways of deploying Document Summarization services with docker compose:
