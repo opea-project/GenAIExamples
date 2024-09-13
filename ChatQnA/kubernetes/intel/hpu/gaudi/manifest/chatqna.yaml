@@ -614,7 +614,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: ui
-              containerPort: 80
+              containerPort: 5173
               protocol: TCP
           resources:
             {}
