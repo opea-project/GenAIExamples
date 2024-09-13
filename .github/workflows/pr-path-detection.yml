@@ -54,13 +54,14 @@ jobs:
 
       - name: Check the validity of hyperlinks
         run: |
+          set -x
           cd ${{github.workspace}}
           url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r ./*/*.md)
           if [ -n "$url_lines" ]; then
             for url_line in $url_lines; do
               url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1)
               path=$(echo "$url_line"|cut -d ':' -f1)
-              echo $path $url
+              echo "XXXXXX"$path $url
               response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
               if [ "$response" -eq 200 ]; then
                   echo "Valid link: $url"
