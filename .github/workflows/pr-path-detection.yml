@@ -96,7 +96,7 @@ jobs:
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
-          png_lines=$(grep -Eo '\]\([^)]+\)' -r .|grep -Ev 'http')
+          png_lines=$(grep -Eo '\]\([^)]+\)' -r -I .|grep -Ev 'http')
           if [ -n "$png_lines" ]; then
             for png_line in $png_lines; do
               refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
