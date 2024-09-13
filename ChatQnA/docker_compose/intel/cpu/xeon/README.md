@@ -374,12 +374,12 @@ docker compose -f compose_vllm.yaml up -d
      -H 'Content-Type: application/json'
    ```
 
-  ```bash
-  # vLLM Service
-  curl http://${host_ip}:9009/v1/completions \
-    -H "Content-Type: application/json" \
-    -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_new_tokens": 32, "temperature": 0}'
-  ```
+```bash
+# vLLM Service
+curl http://${host_ip}:9009/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_new_tokens": 32, "temperature": 0}'
+```
 
 7. LLM Microservice
 
@@ -392,6 +392,7 @@ docker compose -f compose_vllm.yaml up -d
      -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
      -H 'Content-Type: application/json'
    ```
+
    For parameters in above modes, please refer to [HuggingFace InferenceClient API](https://huggingface.co/docs/huggingface_hub/package_reference/inference_client#huggingface_hub.InferenceClient.text_generation)
 
    ```bash
@@ -400,16 +401,18 @@ docker compose -f compose_vllm.yaml up -d
     -X POST \
     -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_p":1,"temperature":0.7,"frequency_penalty":0,"presence_penalty":0, "streaming":false}' \
     -H 'Content-Type: application/json'
-  ```
-  For parameters, can refer to [LangChain VLLMOpenAI API](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.vllm.VLLMOpenAI.html)
+   ```
+
+````
+For parameters, can refer to [LangChain VLLMOpenAI API](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.vllm.VLLMOpenAI.html)
 
 8. MegaService
 
-   ```bash
-   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "messages": "What is the revenue of Nike in 2023?"
-        }'
-   ```
+ ```bash
+ curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+      "messages": "What is the revenue of Nike in 2023?"
+      }'
+````
 
 9. Dataprep Microservice（Optional）
 
