@@ -3,7 +3,7 @@
 
 import os
 
-from comps import MicroService, MultimodalRAGWithVideosGateway, ServiceOrchestrator, ServiceType
+from comps import MicroService, MultimodalQnAGateway, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
@@ -15,7 +15,7 @@ LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9399))
 
 
-class MultimodalRAGWithVideosService:
+class MultimodalQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
@@ -57,7 +57,7 @@ class MultimodalRAGWithVideosService:
         # for lvm megaservice
         self.lvm_megaservice.add(lvm)
 
-        self.gateway = MultimodalRAGWithVideosGateway(
+        self.gateway = MultimodalQnAGateway(
             multimodal_rag_megaservice=self.mmrag_megaservice,
             lvm_megaservice=self.lvm_megaservice,
             host="0.0.0.0",
@@ -66,5 +66,5 @@ class MultimodalRAGWithVideosService:
 
 
 if __name__ == "__main__":
-    mmragwithvideos = MultimodalRAGWithVideosService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    mmragwithvideos = MultimodalQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     mmragwithvideos.add_remote_service()
