@@ -47,7 +47,7 @@ function validate_microservice() {
 }
 
 function validate_microservice_with_openai() {
-    tei_service_port=5001
+    tei_service_port=5002
     python3 ${WORKPATH}/tests/utils/validate_svc_with_openai.py $ip_address $tei_service_port "embedding"
     if [ $? -ne 0 ]; then
         docker logs test-comps-embedding-tei-endpoint
