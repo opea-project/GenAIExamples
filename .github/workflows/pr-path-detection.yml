@@ -100,10 +100,12 @@ jobs:
             for png_line in $png_lines; do
               refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
               png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
-              check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
-              if [ ! -e $check_path ]; then
-                echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
-                fail="TRUE"
+              if ! grep -q 'http' <<< "$png_path"; then
+                check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+                if [ ! -e $check_path ]; then
+                  echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
+                  fail="TRUE"
+                fi
               fi
             done
           fi
