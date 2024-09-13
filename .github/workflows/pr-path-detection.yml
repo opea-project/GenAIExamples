@@ -55,12 +55,12 @@ jobs:
       - name: Check the validity of hyperlinks
         run: |
           cd ${{github.workspace}}
+          fail="FALSE"
           url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r ./*/*.md)
           if [ -n "$url_lines" ]; then
             for url_line in $url_lines; do
               url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1)
               path=$(echo "$url_line"|cut -d ':' -f1)
-              echo "XXXXXX"$path $url
               response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
               if [ "$response" -eq 200 ]; then
                 echo "Valid link: $url"
@@ -70,9 +70,14 @@ jobs:
                 if [ "$response_retry" -eq 200 ]; then
                   echo "Valid link: $url"
                 else
-                    echo "Invalid link: $url, $path"
+                  echo "Invalid link: $url , $path"
+                  fail="TRUE"
                 fi
               fi
             done
+          fi
+
+          if [[ "$fail" == "TRUE" ]]; then
+            exit 1
           fi
         shell: bash
