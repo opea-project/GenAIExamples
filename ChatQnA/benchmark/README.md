@@ -37,6 +37,7 @@ Results will be displayed in the terminal and saved as CSV file named `1_stats.c
 - Set up kubectl on the master node with access to the Kubernetes cluster.
 - Install Python 3.8+ on the master node for running the stress tool.
 - Ensure all nodes have a local /mnt/models folder, which will be mounted by the pods.
+- Ensure that the container's ulimit can meet the the number of requests.
 
 ### Kubernetes Cluster Example
 
