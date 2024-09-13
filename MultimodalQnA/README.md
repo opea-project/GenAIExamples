@@ -84,7 +84,7 @@ flowchart LR
     direction TB
     %% Vector DB interaction
     R_RET <-.->|d|VDB
-    DP <-.->|d|VDB
+    DP <-.->|e|VDB
 
 
 
