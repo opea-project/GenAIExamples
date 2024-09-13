@@ -40,7 +40,7 @@ docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --bu
 
 ### 8. Build CodeGen React UI Docker Image (Optional)
 
-Build react frontend Docker image  via below command:
+Build react frontend Docker image via below command:
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 

@@ -54,7 +54,7 @@ Then run the command `docker images`, you will have the following 3 Docker Image
 
 ### 8. Build CodeGen React UI Docker Image (Optional)
 
-Build react frontend Docker image  via below command:
+Build react frontend Docker image via below command:
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
@@ -69,7 +69,6 @@ Then run the command `docker images`, you will have the following 3 Docker Image
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
 - `opea/codegen-react-ui:latest` (optional)
-
 
 ## 🚀 Start Microservices and MegaService
 
