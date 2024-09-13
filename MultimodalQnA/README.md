@@ -6,7 +6,7 @@ Suppose you possess a set of videos and wish to perform question-answering to ex
 
 The MultimodalQnA architecture shows below:
 
-![architecture](./assets/img/mm-rag-architecture.png)
+![architecture](./assets/img/MultimodalQnA.png)
 
 MultimodalQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the MultimodalQnA Flow Chart shows below:
 
