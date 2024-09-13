@@ -38,13 +38,15 @@ cd GenAIExamples/CodeGen/ui
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-### 5. Build the React UI Docker Image
+### 8. Build CodeGen React UI Docker Image (Optional)
 
-Construct the React frontend Docker image via the command below:
+Build react frontend Docker image  via below command:
+
+**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
 ```bash
 cd GenAIExamples/CodeGen/ui
-docker build -t opea/codegen-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 ```
 
 Then run the command `docker images`, you will have the following 3 Docker images:
@@ -160,6 +162,7 @@ codegen-gaudi-react-ui-server:
     - no_proxy=${no_proxy}
     - https_proxy=${https_proxy}
     - http_proxy=${http_proxy}
+    - APP_CODE_GEN_URL=${BACKEND_SERVICE_ENDPOINT}
   depends_on:
     - codegen-gaudi-backend-server
   ports:
