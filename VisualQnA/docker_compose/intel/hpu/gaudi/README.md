@@ -50,7 +50,7 @@ cd ../../..
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `opea/llava-tgi:latest`
+1. `ghcr.io/huggingface/tgi-gaudi:2.0.4`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`
