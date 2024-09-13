@@ -70,11 +70,10 @@ This document introduces the supported examples of GenAIExamples. The supported 
 
 By default, the embedding and LVM models are set to a default value as listed below:
 
-| Service   | Model                                                                               | HW     | Description              |
-| --------- | ----------------------------------------------------------------------------------- | ------ | ------------------------ |
-| Embedding | [openai/clip-vit-base-patch32](https://huggingface.co/openai/clip-vit-base-patch32) | Xeon   | Video embeddings service |
-| LVM       | [DAMO-NLP-SG/Video-LLaMA](https://huggingface.co/DAMO-NLP-SG/VideoLLaMA2-7B)        | Xeon   | LVM service              |
-
+| Service   | Model                                                                               | HW   | Description              |
+| --------- | ----------------------------------------------------------------------------------- | ---- | ------------------------ |
+| Embedding | [openai/clip-vit-base-patch32](https://huggingface.co/openai/clip-vit-base-patch32) | Xeon | Video embeddings service |
+| LVM       | [DAMO-NLP-SG/Video-LLaMA](https://huggingface.co/DAMO-NLP-SG/VideoLLaMA2-7B)        | Xeon | LVM service              |
 
 ### RerankFinetuning
 
@@ -82,10 +81,9 @@ Rerank model finetuning example is for training rerank model on a dataset for im
 
 By default, the base model is set to a default value as listed below:
 
-| Service           | Base Model                                                                | HW     | Description                     |
-| ----------------- | ------------------------------------------------------------------------- | ------ | ------------------------------- |
-| Rerank Finetuning | [BAAI/bge-reranker-large](https://huggingface.co/BAAI/bge-reranker-large) | Xeon   | Rerank model finetuning service |
-
+| Service           | Base Model                                                                | HW   | Description                     |
+| ----------------- | ------------------------------------------------------------------------- | ---- | ------------------------------- |
+| Rerank Finetuning | [BAAI/bge-reranker-large](https://huggingface.co/BAAI/bge-reranker-large) | Xeon | Rerank model finetuning service |
 
 ### InstructionTuning
 
@@ -93,20 +91,17 @@ The Instruction Tuning example is designed to further train large language model
 
 By default, the base model is set to a default value as listed below:
 
-| Service           | Base Model                                                                            | HW           | Description                     |
-| ----------------- | ------------------------------------------------------------------------------------- | ------------ | ------------------------------- |
-| InstructionTuning | [meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) | Xeon/Gaudi   | LLM model Instruction Tuning service |
-
+| Service           | Base Model                                                                            | HW         | Description                          |
+| ----------------- | ------------------------------------------------------------------------------------- | ---------- | ------------------------------------ |
+| InstructionTuning | [meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) | Xeon/Gaudi | LLM model Instruction Tuning service |
 
 ### DocIndexRetriever
 
 The DocRetriever example demonstrates how to match user queries with free-text records using various retrieval methods. It plays a key role in Retrieval-Augmented Generation (RAG) systems by dynamically fetching relevant information from external sources, ensuring responses are factual and up-to-date. Powered by vector databases, DocRetriever enables efficient, semantic retrieval by storing data as vectors and quickly identifying the most relevant documents based on similarity.
 
-
-| Framework                                                                      | Embedding                                           | Vector Database                      | Serving                                                                                                                         | HW              | Description |
-| ------------------------------------------------------------------------------ | --------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | --------------- | ----------- |
-| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [BGE-Base](https://huggingface.co/BAAI/bge-base-en) | [Redis](https://redis.io/)           | [TEI](https://github.com/huggingface/text-embeddings-inference) | Xeon/Gaudi2 | Document Retrieval Service     |
-
+| Framework                                                                      | Embedding                                           | Vector Database            | Serving                                                         | HW          | Description                |
+| ------------------------------------------------------------------------------ | --------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | ----------- | -------------------------- |
+| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [BGE-Base](https://huggingface.co/BAAI/bge-base-en) | [Redis](https://redis.io/) | [TEI](https://github.com/huggingface/text-embeddings-inference) | Xeon/Gaudi2 | Document Retrieval Service |
 
 ### AgentQnA
 
