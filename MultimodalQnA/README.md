@@ -41,7 +41,7 @@ flowchart LR
         Ingest([Ingest data]):::orchid
         UI([UI server<br>]):::orchid
     end
-    subgraph MM-RAG GateWay
+    subgraph MultimodalQnA GateWay
         direction LR
         invisible1[ ]:::invisible
         GW([MultimodalQnA GateWay<br>]):::orange
@@ -91,7 +91,7 @@ flowchart LR
 
 ```
 
-This MultimodalQnA use case performs multimodal-RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel Xeon Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
+This MultimodalQnA use case performs Multimodal-RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel Xeon Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
 
 In the below, we provide a table that describes for each microservice component in the MultimodalQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 

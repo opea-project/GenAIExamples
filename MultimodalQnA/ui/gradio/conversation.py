@@ -2,10 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import dataclasses
-import json
-import os
 from enum import Enum, auto
-from typing import List, Tuple
+from typing import List
 
 from utils import get_b64_frame_from_timestamp
 
@@ -141,23 +139,8 @@ class Conversation:
             "split_video": self.split_video,
         }
 
-    # def get_path_to_subvideos(self):
-    #     if self.video_title is not None and self.path_to_img is not None:
-    #         info = video_helper_map[self.video_title]
-    #         path = info['path']
-    #         prefix = info['prefix']
-    #         vid_index = self.path_to_img.split('/')[-1]
-    #         vid_index = vid_index.split('_')[-1]
-    #         vid_index = vid_index.replace('.jpg', '')
-    #         ret = f"{prefix}{vid_index}.mp4"
-    #         ret = os.path.join(path, ret)
-    #         return ret
-    #     elif self.path_to_img is not None:
-    #         return self.path_to_img
-    #     return None
 
-
-mm_rag_with_videos = Conversation(
+multimodalqna_conv = Conversation(
     system="",
     roles=("user", "assistant"),
     messages=(),

@@ -10,7 +10,7 @@ from pathlib import Path
 import gradio as gr
 import requests
 import uvicorn
-from conversation import mm_rag_with_videos
+from conversation import multimodalqna_conv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from utils import build_logger, moderation_msg, server_error_msg, split_video
@@ -35,7 +35,7 @@ tmp_dir = Path(os.path.join(cur_dir, "split_tmp_videos/"))
 Path(static_dir).mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-description = "This Space lets you engage with multimodal RAG on a video through a chat box."
+description = "This Space lets you engage with MultimodalQnA on a video through a chat box."
 
 no_change_btn = gr.Button()
 enable_btn = gr.Button(interactive=True)
@@ -46,7 +46,7 @@ def clear_history(state, request: gr.Request):
     logger.info(f"clear_history. ip: {request.client.host}")
     if state.split_video and os.path.exists(state.split_video):
         os.remove(state.split_video)
-    state = mm_rag_with_videos.copy()
+    state = multimodalqna_conv.copy()
     return (state, state.to_gradio_chatbot(), "", None) + (disable_btn,) * 1
 
 
@@ -78,7 +78,7 @@ def http_bot(state, request: gr.Request):
     if len(state.messages) == state.offset + 2:
         # First round of conversation
         is_very_first_query = True
-        new_state = mm_rag_with_videos.copy()
+        new_state = multimodalqna_conv.copy()
         new_state.append_message(new_state.roles[0], state.messages[-2][1])
         new_state.append_message(new_state.roles[1], None)
         state = new_state
@@ -256,12 +256,12 @@ with gr.Blocks() as upload_gen_captions:
         video_upload_cap.clear(clear_uploaded_video, [], [text_upload_result_cap])
 
 with gr.Blocks() as qna:
-    state = gr.State(mm_rag_with_videos.copy())
+    state = gr.State(multimodalqna_conv.copy())
     with gr.Row():
         with gr.Column(scale=4):
             video = gr.Video(height=512, width=512, elem_id="video")
         with gr.Column(scale=7):
-            chatbot = gr.Chatbot(elem_id="chatbot", label="Multimodal RAG Chatbot", height=390)
+            chatbot = gr.Chatbot(elem_id="chatbot", label="MultimodalQnA Chatbot", height=390)
             with gr.Row():
                 with gr.Column(scale=6):
                     # textbox.render()
@@ -297,9 +297,9 @@ with gr.Blocks() as qna:
         [state, chatbot, video, clear_btn],
     )
 with gr.Blocks(css=css) as demo:
-    gr.Markdown("# Multimodal RAG With Videos")
+    gr.Markdown("# MultimodalQnA")
     with gr.Tabs():
-        with gr.TabItem("QnA With Your Videos"):
+        with gr.TabItem("MultimodalQnA With Your Videos"):
             qna.render()
         with gr.TabItem("Upload Your Own Videos"):
             upload_gen_trans.render()
@@ -318,7 +318,7 @@ if __name__ == "__main__":
     parser.add_argument("--concurrency-count", type=int, default=20)
     parser.add_argument("--share", action="store_true")
 
-    backend_service_endpoint = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/multimodalragwithvideos")
+    backend_service_endpoint = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/multimodalqna")
     dataprep_gen_transcript_endpoint = os.getenv(
         "DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_transcripts"
     )

@@ -31,5 +31,5 @@ RUN pip install --no-cache-dir --upgrade pip setuptools && \
 pip install --no-cache-dir -r /home/user/gradio/requirements.txt
 
 WORKDIR /home/user/gradio
-ENTRYPOINT ["python", "mmragwithvideos_ui_gradio.py"]
+ENTRYPOINT ["python", "multimodalqna_ui_gradio.py"]
 # ENTRYPOINT ["/usr/bin/sleep", "infinity"]

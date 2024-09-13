@@ -10,7 +10,6 @@ from pathlib import Path
 
 import cv2
 from moviepy.video.io.VideoFileClip import VideoFileClip
-from PIL import Image
 
 LOGDIR = "."
 
