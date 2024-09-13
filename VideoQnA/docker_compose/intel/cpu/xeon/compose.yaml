@@ -10,7 +10,7 @@ services:
     ports:
       - "8001:55555"
   dataprep:
-    image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-multimodal-vdms:${TAG:-latest}
     container_name: dataprep-vdms-server
     depends_on:
       - vdms-vector-db
@@ -28,7 +28,7 @@ services:
       - /home/$USER/.cache/clip:/home/user/.cache/clip
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   embedding:
-    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+    image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
     container_name: embedding-multimodal-server
     ports:
       - "6000:6000"
@@ -61,8 +61,8 @@ services:
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   reranking:
-    image: ${REGISTRY:-opea}/reranking-videoragqna:${TAG:-latest}
-    container_name: reranking-videoragqna-server
+    image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
+    container_name: reranking-videoqna-server
     ports:
       - "8000:8000"
     ipc: host
@@ -103,9 +103,9 @@ services:
     restart: unless-stopped
     depends_on:
       - lvm-video-llama
-  videoragqna-xeon-backend-server:
-    image: ${REGISTRY:-opea}/videoragqna:${TAG:-latest}
-    container_name: videoragqna-xeon-backend-server
+  videoqna-xeon-backend-server:
+    image: ${REGISTRY:-opea}/videoqna:${TAG:-latest}
+    container_name: videoqna-xeon-backend-server
     depends_on:
       - vdms-vector-db
       - dataprep
@@ -116,7 +116,7 @@ services:
       - lvm
     ports:
       - "8888:8888"
-    entrypoint: sh -c 'sleep 45 && python videoragqna.py'
+    entrypoint: sh -c 'sleep 45 && python videoqna.py'
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
@@ -128,11 +128,11 @@ services:
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  videoragqna-xeon-ui-server:
-    image: ${REGISTRY:-opea}/videoragqna-ui:${TAG:-latest}
-    container_name: videoragqna-xeon-ui-server
+  videoqna-xeon-ui-server:
+    image: ${REGISTRY:-opea}/videoqna-ui:${TAG:-latest}
+    container_name: videoqna-xeon-ui-server
     depends_on:
-      - videoragqna-xeon-backend-server
+      - videoqna-xeon-backend-server
     ports:
       - "5173:5173"
     environment:

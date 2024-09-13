@@ -1,8 +1,8 @@
-# VideoRAGQnA Application
+# VideoQnA Application
 
-Video RAG QnA is a framework that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search.
+VideoQnA is a framework that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search.
 
-VideoRAGQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), with the architecture flow chart shows below:
+VideoQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), with the architecture flow chart shows below:
 
 ```mermaid
 ---
@@ -21,9 +21,9 @@ flowchart LR
     classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef invisible fill:transparent,stroke:transparent;
-    style VideoRAGQnA-MegaService stroke:#000000
+    style VideoQnA-MegaService stroke:#000000
     %% Subgraphs %%
-    subgraph VideoRAGQnA-MegaService["VideoRAGQnA-MegaService"]
+    subgraph VideoQnA-MegaService["VideoQnA-MegaService"]
         direction LR
         EM([Embedding <br>]):::blue
         RET([Retrieval <br>]):::blue
@@ -36,10 +36,10 @@ flowchart LR
         UI([UI server<br>]):::orchid
         Ingest([Ingest<br>]):::orchid
     end
-    subgraph VideoRAGQnA GateWay
+    subgraph VideoQnA GateWay
         direction LR
         invisible1[ ]:::invisible
-        GW([VideoRAGQnA GateWay<br>]):::orange
+        GW([VideoQnA GateWay<br>]):::orange
     end
     subgraph .
         X([OPEA Micsrservice]):::blue
@@ -66,7 +66,7 @@ flowchart LR
     direction LR
     a[User Input Query] -->|1| UI
     UI -->|2| GW
-    GW <==>|3| VideoRAGQnA-MegaService
+    GW <==>|3| VideoQnA-MegaService
     EM ==>|4| RET
     RET ==>|5| RER
     RER ==>|6| LLM
@@ -85,11 +85,14 @@ flowchart LR
     DP <-.->|d|VDB
 ```
 
-This VideoRAGQnA use case performs RAG using LangChain, Intel VDMS VectorDB and Text Generation Inference on Intel XEON Scalable Processors.
+- This project implements a Retrieval-Augmented Generation (RAG) workflow using LangChain, Intel VDMS VectorDB, and Text Generation Inference, optimized for Intel Xeon Scalable Processors.
+- Video Processing: Videos are converted into feature vectors using mean aggregation and stored in the VDMS vector store.
+- Query Handling: When a user submits a query, the system performs a similarity search in the vector store to retrieve the best-matching videos.
+- Contextual Inference: The retrieved videos are then sent to the Large Vision Model (LVM) for inference, providing supplemental context for the query.
 
-## Deploy VideoRAGQnA Service
+## Deploy VideoQnA Service
 
-The VideoRAGQnA service can be effortlessly deployed on Intel XEON Scalable Processors.
+The VideoQnA service can be effortlessly deployed on Intel Xeon Scalable Processors.
 
 ### Required Models
 
@@ -100,8 +103,8 @@ By default, the embedding and LVM models are set to a default value as listed be
 | Embedding | openai/clip-vit-base-patch32 |
 | LVM       | DAMO-NLP-SG/Video-LLaMA      |
 
-### Deploy VideoRAGQnA on Xeon
+### Deploy VideoQnA on Xeon
 
 For full instruction of deployment, please check [Guide](docker_compose/intel/cpu/xeon/README.md)
 
-Currently we support deploying VideoRAGQnA services with docker compose, using the docker images `built from source`. Find the corresponding [compose.yaml](docker_compose/intel/cpu/xeon/compose.yaml).
+Currently we support deploying VideoQnA services with docker compose, using the docker images `built from source`. Find the corresponding [compose.yaml](docker_compose/intel/cpu/xeon/compose.yaml).
