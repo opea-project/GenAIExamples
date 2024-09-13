@@ -234,7 +234,7 @@ spec:
         - --model-id
         - $(LLM_MODEL_ID)
         - --max-input-length
-        - '1024'
+        - '1280'
         - --max-total-tokens
         - '2048'
         - --max-batch-total-tokens
