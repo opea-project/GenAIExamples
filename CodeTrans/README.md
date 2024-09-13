@@ -6,7 +6,7 @@ The workflow falls into the following architecture:
 
 ![architecture](./assets/img/code_trans_architecture.png)
 
-This Code Translation use case demonstrates Text Generation Inference across multiple platforms. Currently, we provide examples for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html?cid=sem&source=sa360&campid=2024_ao_cbu_us_gmocoma_gmocrbu_awa_text-link_brand_exact_cd_HQ-ai-gaudi_3500231769_google_b2b_is_non-pbm_intel&ad_group=AI_Brand-Gaudi_Gaudi_Exact&intel_term=gaudi+intel&sa360id=43700079829610448&gad_source=1&gclid=EAIaIQobChMIw4CB3r2_iAMVjCmtBh1-6wA7EAAYASAAEgIGvfD_BwE&gclsrc=aw.ds) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html?cid=sem&source=sa360&campid=2024_ao_cbu_us_gmocoma_gmocrbu_awa_text-link_brand_exact_cd_HQ-dcai-xeon_3500231769_google_b2b_is_non-pbm_intel&ad_group=DCAI_XEON_Core_Exact&intel_term=intel+xeon&sa360id=43700079954001732&gad_source=1&gclid=EAIaIQobChMI2sjE772_iAMV-B-tBh3oPA_-EAAYASAAEgIvVPD_BwE&gclsrc=aw.ds), and we invite contributions from other hardware vendors to expand our ecosystem.
+This Code Translation use case demonstrates Text Generation Inference across multiple platforms. Currently, we provide examples for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html), and we invite contributions from other hardware vendors to expand our ecosystem.
 
 ## Deploy Code Translation Service
 
