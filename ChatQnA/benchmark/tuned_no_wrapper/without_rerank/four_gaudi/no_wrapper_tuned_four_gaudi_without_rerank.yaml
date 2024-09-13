@@ -1,41 +1,32 @@
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 apiVersion: v1
+data:
+  EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
+  EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
+  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+  INDEX_NAME: rag-redis
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
+  LLM_SERVER_HOST_IP: llm-dependency-svc
+  NODE_SELECTOR: chatqna-opea
+  REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
+  RERANK_MODEL_ID: BAAI/bge-reranker-base
+  RERANK_SERVER_HOST_IP: reranking-dependency-svc
+  RETRIEVER_SERVICE_HOST_IP: retriever-svc
+  TEI_EMBEDDING_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  TEI_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
+  TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
 kind: ConfigMap
 metadata:
   name: qna-config
   namespace: default
-data:
-  EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
-  RERANK_MODEL_ID: BAAI/bge-reranker-base
-  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3 # meta-llama/Meta-Llama-3-8B-Instruct
-  TEI_EMBEDDING_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
-  TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
-  TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
-  REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
-  INDEX_NAME: rag-redis
-  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-  # EMBEDDING_SERVICE_HOST_IP: embedding-svc
-  EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
-  RETRIEVER_SERVICE_HOST_IP: retriever-svc
-  # RERANK_SERVICE_HOST_IP: reranking-svc
-  RERANK_SERVER_HOST_IP: reranking-dependency-svc
-  NODE_SELECTOR: chatqna-opea
-  # LLM_SERVICE_HOST_IP: llm-svc
-  LLM_SERVER_HOST_IP: llm-dependency-svc
-
-
 ---
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: chatqna-backend-server-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: chatqna-backend-server-deploy
@@ -46,16 +37,6 @@ spec:
       labels:
         app: chatqna-backend-server-deploy
     spec:
-      nodeSelector:
-        node-type: chatqna-opea
-      topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-        labelSelector:
-          matchLabels:
-            app: chatqna-backend-server-deploy
-      hostIPC: true
       containers:
       - envFrom:
         - configMapRef:
@@ -63,29 +44,42 @@ spec:
         image: opea/chatqna-no-wrapper-without-rerank:latest
         imagePullPolicy: IfNotPresent
         name: chatqna-backend-server-deploy
-        args: null
         ports:
         - containerPort: 8888
+        resources:
+          limits:
+            cpu: 8
+            memory: 8000Mi
+          requests:
+            cpu: 8
+            memory: 8000Mi
+      hostIPC: true
+      nodeSelector:
+        node-type: chatqna-opea
       serviceAccountName: default
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: chatqna-backend-server-deploy
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: chatqna-backend-server-svc
+  namespace: default
 spec:
-  type: NodePort
-  selector:
-    app: chatqna-backend-server-deploy
   ports:
   - name: service
+    nodePort: 30888
     port: 8888
     targetPort: 8888
-    nodePort: 30888
-
-
+  selector:
+    app: chatqna-backend-server-deploy
+  type: NodePort
 ---
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -103,73 +97,48 @@ spec:
       labels:
         app: dataprep-deploy
     spec:
-      nodeSelector:
-        node-type: chatqna-opea
-      topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-        labelSelector:
-          matchLabels:
-            app: dataprep-deploy
-      hostIPC: true
       containers:
-      - env:
-        - name: REDIS_URL
-          valueFrom:
-            configMapKeyRef:
-              name: qna-config
-              key: REDIS_URL
-        - name: TEI_ENDPOINT
-          valueFrom:
-            configMapKeyRef:
-              name: qna-config
-              key: TEI_EMBEDDING_ENDPOINT
-        - name: INDEX_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: qna-config
-              key: INDEX_NAME
+      - envFrom:
+        - configMapRef:
+            name: qna-config
         image: opea/dataprep-redis:latest
         imagePullPolicy: IfNotPresent
         name: dataprep-deploy
-        args: null
         ports:
         - containerPort: 6007
-        - containerPort: 6008
-        - containerPort: 6009
+      hostIPC: true
+      nodeSelector:
+        node-type: chatqna-opea
       serviceAccountName: default
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: dataprep-deploy
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: dataprep-svc
+  namespace: default
 spec:
-  type: ClusterIP
-  selector:
-    app: dataprep-deploy
   ports:
   - name: port1
     port: 6007
     targetPort: 6007
-  - name: port2
-    port: 6008
-    targetPort: 6008
-  - name: port3
-    port: 6009
-    targetPort: 6009
-
-
+  selector:
+    app: dataprep-deploy
+  type: ClusterIP
 ---
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: embedding-dependency-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: embedding-dependency-deploy
@@ -180,60 +149,73 @@ spec:
       labels:
         app: embedding-dependency-deploy
     spec:
-      nodeSelector:
-        node-type: chatqna-opea
       containers:
-      - envFrom:
-        - configMapRef:
-            name: qna-config
-        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-        name: embedding-dependency-deploy
-        args:
+      - args:
         - --model-id
         - $(EMBEDDING_MODEL_ID)
         - --auto-truncate
+        envFrom:
+        - configMapRef:
+            name: qna-config
+        image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+        imagePullPolicy: IfNotPresent
+        name: embedding-dependency-deploy
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 80
+            memory: 20000Mi
+          requests:
+            cpu: 80
+            memory: 20000Mi
         volumeMounts:
         - mountPath: /data
           name: model-volume
         - mountPath: /dev/shm
           name: shm
-        ports:
-        - containerPort: 80
+      hostIPC: true
+      nodeSelector:
+        node-type: chatqna-opea
       serviceAccountName: default
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: embedding-dependency-deploy
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
       volumes:
-      - name: model-volume
-        hostPath:
+      - hostPath:
           path: /mnt/models
           type: Directory
-      - name: shm
-        emptyDir:
+        name: model-volume
+      - emptyDir:
           medium: Memory
           sizeLimit: 1Gi
+        name: shm
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: embedding-dependency-svc
+  namespace: default
 spec:
-  type: ClusterIP
-  selector:
-    app: embedding-dependency-deploy
   ports:
   - name: service
     port: 6006
     targetPort: 80
-
-
+  selector:
+    app: embedding-dependency-deploy
+  type: ClusterIP
 ---
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: llm-dependency-deploy
   namespace: default
 spec:
-  replicas: 31
+  replicas: 32
   selector:
     matchLabels:
       app: llm-dependency-deploy
@@ -244,40 +226,18 @@ spec:
       labels:
         app: llm-dependency-deploy
     spec:
-      nodeSelector:
-        node-type: chatqna-opea
-      hostIPC: true
       containers:
-      - envFrom:
-        - configMapRef:
-            name: qna-config
-        image: ghcr.io/huggingface/tgi-gaudi:2.0.1
-        name: llm-dependency-deploy-demo
-        securityContext:
-          capabilities:
-            add:
-            - SYS_NICE
-        args:
+      - args:
         - --model-id
         - $(LLM_MODEL_ID)
         - --max-input-length
-        - '2048'
+        - '1280'
         - --max-total-tokens
-        - '4096'
+        - '2048'
         - --max-batch-total-tokens
         - '65536'
         - --max-batch-prefill-tokens
         - '4096'
-        volumeMounts:
-        - mountPath: /data
-          name: model-volume
-        - mountPath: /dev/shm
-          name: shm
-        ports:
-        - containerPort: 80
-        resources:
-          limits:
-            habana.ai/gaudi: 1
         env:
         - name: OMPI_MCA_btl_vader_single_copy_mechanism
           value: none
@@ -289,128 +249,68 @@ spec:
           value: all
         - name: HF_TOKEN
           value: ${HF_TOKEN}
+        envFrom:
+        - configMapRef:
+            name: qna-config
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.4
+        imagePullPolicy: IfNotPresent
+        name: llm-dependency-deploy
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            habana.ai/gaudi: 1
+        securityContext:
+          capabilities:
+            add:
+            - SYS_NICE
+        volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+      hostIPC: true
+      nodeSelector:
+        node-type: chatqna-opea
       serviceAccountName: default
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: llm-dependency-deploy
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
       volumes:
-      - name: model-volume
-        hostPath:
+      - hostPath:
           path: /mnt/models
           type: Directory
-      - name: shm
-        emptyDir:
+        name: model-volume
+      - emptyDir:
           medium: Memory
           sizeLimit: 1Gi
+        name: shm
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: llm-dependency-svc
+  namespace: default
 spec:
-  type: ClusterIP
-  selector:
-    app: llm-dependency-deploy
   ports:
   - name: service
     port: 9009
     targetPort: 80
-
-
----
-
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: reranking-dependency-deploy
-  namespace: default
-spec:
-  replicas: 1
   selector:
-    matchLabels:
-      app: reranking-dependency-deploy
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
-      labels:
-        app: reranking-dependency-deploy
-    spec:
-      nodeSelector:
-        node-type: chatqna-opea
-      topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-        labelSelector:
-          matchLabels:
-            app: reranking-dependency-deploy
-      containers:
-      - envFrom:
-        - configMapRef:
-            name: qna-config
-        image: opea/tei-gaudi:latest
-        name: reranking-dependency-deploy
-        args:
-        - --model-id
-        - $(RERANK_MODEL_ID)
-        - --auto-truncate
-        volumeMounts:
-        - mountPath: /data
-          name: model-volume
-        - mountPath: /dev/shm
-          name: shm
-        ports:
-        - containerPort: 80
-        resources:
-          limits:
-            habana.ai/gaudi: 1
-        env:
-        - name: OMPI_MCA_btl_vader_single_copy_mechanism
-          value: none
-        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
-          value: 'true'
-        - name: runtime
-          value: habana
-        - name: HABANA_VISIBLE_DEVICES
-          value: all
-        - name: HF_TOKEN
-          value: ${HF_TOKEN}
-        - name: MAX_WARMUP_SEQUENCE_LENGTH
-          value: '512'
-      serviceAccountName: default
-      volumes:
-      - name: model-volume
-        hostPath:
-          path: /mnt/models
-          type: Directory
-      - name: shm
-        emptyDir:
-          medium: Memory
-          sizeLimit: 1Gi
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: reranking-dependency-svc
-spec:
+    app: llm-dependency-deploy
   type: ClusterIP
-  selector:
-    app: reranking-dependency-deploy
-  ports:
-  - name: service
-    port: 8808
-    targetPort: 80
-
-
 ---
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: retriever-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: retriever-deploy
@@ -421,67 +321,50 @@ spec:
       labels:
         app: retriever-deploy
     spec:
-      nodeSelector:
-        node-type: chatqna-opea
-      topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-        labelSelector:
-          matchLabels:
-            app: retriever-deploy
-      hostIPC: true
       containers:
-      - env:
-        - name: REDIS_URL
-          valueFrom:
-            configMapKeyRef:
-              name: qna-config
-              key: REDIS_URL
-        - name: TEI_EMBEDDING_ENDPOINT
-          valueFrom:
-            configMapKeyRef:
-              name: qna-config
-              key: TEI_EMBEDDING_ENDPOINT
-        - name: HUGGINGFACEHUB_API_TOKEN
-          valueFrom:
-            configMapKeyRef:
-              name: qna-config
-              key: HUGGINGFACEHUB_API_TOKEN
-        - name: INDEX_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: qna-config
-              key: INDEX_NAME
+      - envFrom:
+        - configMapRef:
+            name: qna-config
         image: opea/retriever-redis:latest
         imagePullPolicy: IfNotPresent
         name: retriever-deploy
-        args: null
         ports:
         - containerPort: 7000
+        resources:
+          requests:
+            cpu: 4
+            memory: 4000Mi
+      hostIPC: true
+      nodeSelector:
+        node-type: chatqna-opea
       serviceAccountName: default
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: retriever-deploy
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: retriever-svc
+  namespace: default
 spec:
-  type: ClusterIP
-  selector:
-    app: retriever-deploy
   ports:
   - name: service
     port: 7000
     targetPort: 7000
-
-
+  selector:
+    app: retriever-deploy
+  type: ClusterIP
 ---
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: vector-db
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -489,33 +372,39 @@ spec:
       app: vector-db
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
       labels:
         app: vector-db
     spec:
-      nodeSelector:
-        node-type: chatqna-opea
-      topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-        labelSelector:
-          matchLabels:
-            app: vector-db
       containers:
-      - name: vector-db
+      - envFrom:
+        - configMapRef:
+            name: qna-config
         image: redis/redis-stack:7.2.0-v9
+        imagePullPolicy: IfNotPresent
+        name: vector-db
         ports:
         - containerPort: 6379
         - containerPort: 8001
+      hostIPC: true
+      nodeSelector:
+        node-type: chatqna-opea
+      serviceAccountName: default
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: vector-db
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: vector-db
+  namespace: default
 spec:
-  type: ClusterIP
-  selector:
-    app: vector-db
   ports:
   - name: vector-db-service
     port: 6379
@@ -523,6 +412,7 @@ spec:
   - name: vector-db-insight
     port: 8001
     targetPort: 8001
-
-
+  selector:
+    app: vector-db
+  type: ClusterIP
 ---
