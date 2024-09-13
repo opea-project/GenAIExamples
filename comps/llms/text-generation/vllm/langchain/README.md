@@ -165,7 +165,7 @@ curl http://${your_ip}:8008/v1/completions \
 
 ## 🚀3. Set up LLM microservice
 
-Then we warp the VLLM service into LLM microcervice.
+Then we warp the VLLM service into LLM microservice.
 
 ### Build docker
 
@@ -179,11 +179,48 @@ bash build_docker_microservice.sh
 bash launch_microservice.sh
 ```
 
-### Query the microservice
+### Consume the microservice
+
+#### Check microservice status
 
 ```bash
+curl http://${your_ip}:9000/v1/health_check\
+  -X GET \
+  -H 'Content-Type: application/json'
+
+# Output
+# {"Service Title":"opea_service@llm_vllm/MicroService","Service Description":"OPEA Microservice Infrastructure"}
+```
+
+#### Consume vLLM Service
+
+User can set the following model parameters according to needs:
+
+- max_new_tokens: Total output token
+- streaming(true/false): return text response in streaming mode or non-streaming mode
+
+```bash
+# 1. Non-streaming mode
 curl http://${your_ip}:9000/v1/chat/completions \
   -X POST \
   -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_p":0.95,"temperature":0.01,"streaming":false}' \
+  -H 'Content-Type: application/json'
+
+# 2. Streaming mode
+curl http://${your_ip}:9000/v1/chat/completions \
+  -X POST \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+  -H 'Content-Type: application/json'
+
+# 3. Custom chat template with streaming mode
+curl http://${your_ip}:9000/v1/chat/completions \
+  -X POST \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true, "chat_template":"### You are a helpful, respectful and honest assistant to help the user with questions.\n### Context: {context}\n### Question: {question}\n### Answer:"}' \
+  -H 'Content-Type: application/json'
+
+4. #  Chat with SearchedDoc (Retrieval context)
+curl http://${your_ip}:9000/v1/chat/completions \
+  -X POST \
+  -d '{"initial_query":"What is Deep Learning?","retrieved_docs":[{"text":"Deep Learning is a ..."},{"text":"Deep Learning is b ..."}]}' \
   -H 'Content-Type: application/json'
 ```
