@@ -63,9 +63,15 @@ jobs:
               echo "XXXXXX"$path $url
               response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
               if [ "$response" -eq 200 ]; then
-                  echo "Valid link: $url"
+                echo "Valid link: $url"
               else
-                  echo "Invalid link: $url, $path"
+                echo "**********Validation failed, try again**********"
+                response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                if [ "$response_retry" -eq 200 ]; then
+                  echo "Valid link: $url"
+                else
+                    echo "Invalid link: $url, $path"
+                fi
               fi
             done
           fi
