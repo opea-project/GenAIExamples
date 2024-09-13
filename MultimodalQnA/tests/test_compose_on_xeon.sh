@@ -205,7 +205,7 @@ function validate_megaservice() {
     # Curl the Mega Service with retrieval
     echo "Validate megaservice with first query"
     validate_service \
-        "http://${host_ip}:8888/v1/mmragvideoqna" \
+        "http://${host_ip}:8888/v1/multimodalqna" \
         '"time_of_frame_ms":' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
@@ -213,7 +213,7 @@ function validate_megaservice() {
 
     echo "Validate megaservice with follow-up query"
     validate_service \
-        "http://${host_ip}:8888/v1/mmragvideoqna" \
+        "http://${host_ip}:8888/v1/multimodalqna" \
         '"content":"' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
