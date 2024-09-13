@@ -22,7 +22,7 @@ The workflow falls into the following architecture:
 
 ## Deploy SearchQnA Service
 
-The SearchQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
+The SearchQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
 
 Currently we support two ways of deploying SearchQnA services with docker compose:
 
@@ -32,7 +32,7 @@ Currently we support two ways of deploying SearchQnA services with docker compos
    docker pull opea/searchqna:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker)
+2. Start services using the docker images `built from source`: [Guide](./docker_compose)
 
 ### Setup Environment Variable
 
@@ -60,32 +60,32 @@ To set up environment variables for deploying SearchQnA services, follow these s
 3. Set up other environment variables:
 
    ```bash
-   source ./docker/set_env.sh
+   source ./docker_compose/set_env.sh
    ```
 
 ### Deploy SearchQnA on Gaudi
 
-If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start SearchQnA services. Find the corresponding [compose.yaml](./docker/gaudi/compose.yaml).
+If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start SearchQnA services. Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
 
 ```bash
-cd GenAIExamples/SearchQnA/docker/gaudi/
+cd GenAIExamples/SearchQnA/docker_compose/intel/hpu/gaudi/
 docker compose up -d
 ```
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 ### Deploy SearchQnA on Xeon
 
-Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
 ```bash
-cd GenAIExamples/SearchQnA/docker/xeon/
+cd GenAIExamples/SearchQnA/docker_compose/intel/cpu/xeon/
 docker compose up -d
 ```
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
 
 ## Consume SearchQnA Service
 
@@ -110,7 +110,7 @@ Two ways of consuming SearchQnA Service:
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker/xeon#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy=""

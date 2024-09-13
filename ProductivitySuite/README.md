@@ -1,6 +1,6 @@
 # OPEA Productivity Suite Application
 
-OPEA Productivity Suite, is a powerful tool designed to streamline your workflow and boost productivity. This application leverages the cutting-edge OPEA microservices to provide a comprehensive suite of features that cater to the diverse needs of modern enterprises.
+OPEA Productivity Suite streamlines your workflow to boost productivity. It leverages the OPEA microservices to provide a comprehensive suite of features to cater to the diverse needs of modern enterprises.
 
 ## Key Features
 
@@ -14,10 +14,10 @@ OPEA Productivity Suite, is a powerful tool designed to streamline your workflow
 
 - User Context Management: Maintain a seamless workflow by managing your user's context within the application. Our context management system keeps track of your documents and chat history, allowing for personalized experiences.
 
-- Identity and access management: uses OpenSource platform (Keycloak) for single sign-on identity and access management.
+- Identity and access management: uses the open source platform Keycloak for single sign-on identity and access management.
 
-Refer to the [Keycloak Configuration Guide](./docker/xeon/keycloak_setup_guide.md) for more instruction on setup Keycloak.
+Refer to the [Keycloak Configuration Guide](./docker_compose/intel/cpu/xeon/keycloak_setup_guide.md) for instructions to setup Keycloak.
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source and running the application via docker compose.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for instructions to build docker images from source and running the application via docker compose.
 
-Refer to the [Xeon Kubernetes Guide](./kubernetes/manifests/README.md) for more instruction on deploying the application via kubernetes.
+Refer to the [Xeon Kubernetes Guide](./kubernetes/intel/README.md) for instructions to deploy the application via kubernetes.

@@ -1,0 +1,78 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+@import "../../styles/styles";
+@import "../../styles/components/content.scss";
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.conversationWrapper {
+  @include flex(row, nowrap, flex-start, flex-start);
+  flex: 1 1 auto;
+  height: 100%;
+  & > * {
+    height: 100%;
+  }
+  .conversationContent {
+    flex: 1 1 auto;
+    position: relative;
+    .conversationContentMessages {
+      @include absolutes;
+
+      display: grid;
+      height: 100vh;
+      grid-template-areas:
+        "header"
+        "messages"
+        "inputs";
+
+      grid-template-columns: auto;
+      grid-template-rows: 60px 1fr 80px;
+
+      .conversationTitle {
+        grid-area: header;
+        width: 100%;
+        flex: 1;
+        @include flex(row, nowrap, center, flex-start);
+        height: 60px;
+        padding: 8px 24px;
+        border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+        .title {
+          @include textWrapEllipsis;
+          width: 70vw;
+        }
+      }
+
+      .historyContainer {
+        grid-area: messages;
+        overflow: auto;
+        width: 100%;
+        .newConversation {
+          @include flex(row, nowrap, flex-start, flex-start);
+          .infoMessages {
+            padding: 16px 32px;
+            flex: 80;
+          }
+        }
+        & > * {
+          width: 100%;
+        }
+      }
+
+      .conversationActions {
+        grid-area: inputs;
+        width: 100%;
+        padding: 10px;
+        border-top: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+      }
+    }
+
+    .conversationSplash {
+      @include absolutes;
+      @include flex(column, nowrap, center, center);
+      font-size: 32px;
+    }
+  }
+}

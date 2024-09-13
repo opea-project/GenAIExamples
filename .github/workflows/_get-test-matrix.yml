@@ -11,14 +11,10 @@ on:
         required: false
         type: string
         default: '.github|README.md|*.txt'
-      xeon_server_label:
+      test_mode:
         required: false
         type: string
-        default: 'xeon'
-      gaudi_server_label:
-        required: false
-        type: string
-        default: 'gaudi'
+        default: 'docker_compose'
     outputs:
       run_matrix:
         description: "The matrix string"
@@ -49,10 +45,9 @@ jobs:
       - name: Get test matrix
         id: get-test-matrix
         run: |
-          set -xe
           if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             LATEST_COMMIT_SHA=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/opea-project/GenAIExamples/commits?sha=main" | jq -r '.[0].sha')
+            "https://api.github.com/repos/opea-project/GenAIExamples/commits?sha=${{ github.event.pull_request.base.ref }}" | jq -r '.[0].sha')
             echo "Latest commit SHA is $LATEST_COMMIT_SHA"
             base_commit=$LATEST_COMMIT_SHA
           else
@@ -61,20 +56,8 @@ jobs:
           merged_commit=$(git log -1 --format='%H')
           changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
           grep -vE '${{ inputs.diff_excluded_files }}')" || true
-          examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
-          run_matrix="{\"include\":["
-          for example in ${examples}; do
-              run_hardware=""
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c gaudi) != 0 ]; then run_hardware="gaudi"; fi
-              if [ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c xeon) != 0 ]; then run_hardware="xeon ${run_hardware}"; fi
-              if [ "$run_hardware" == "" ]; then run_hardware="gaudi"; fi
-              for hw in ${run_hardware}; do
-                  if [ "$hw" == "gaudi" ] && [ "${{ inputs.gaudi_server_label }}" != "" ]; then
-                    run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.gaudi_server_label }}\"},"
-                  elif [ "${{ inputs.xeon_server_label }}" != "" ]; then
-                    run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${{ inputs.xeon_server_label }}\"},"
-                  fi
-              done
-          done
-          run_matrix=$run_matrix"]}"
-          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+          echo "changed_files=$changed_files"
+          export changed_files=$changed_files
+          export test_mode=${{ inputs.test_mode }}
+          export WORKSPACE=${{ github.workspace }}
+          bash .github/workflows/scripts/get_test_matrix.sh

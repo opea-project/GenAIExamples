@@ -20,7 +20,7 @@ Currently we support two ways of deploying Code Translation services on docker:
    docker pull opea/codetrans:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker/xeon/README.md)
+2. Start services using the docker images `built from source`: [Guide](./docker_compose/intel/cpu/xeon/README.md)
 
 ### Required Models
 
@@ -30,7 +30,7 @@ By default, the LLM model is set to a default value as listed below:
 | ------- | ----------------------------- |
 | LLM     | HuggingFaceH4/mistral-7b-grok |
 
-Change the `LLM_MODEL_ID` in `docker/set_env.sh` for your needs.
+Change the `LLM_MODEL_ID` in `docker_compose/set_env.sh` for your needs.
 
 ### Setup Environment Variable
 
@@ -58,42 +58,42 @@ To set up environment variables for deploying Code Translation services, follow 
 3. Set up other environment variables:
 
    ```bash
-   source ./docker/set_env.sh
+   source ./docker_compose/set_env.sh
    ```
 
 ### Deploy with Docker
 
 #### Deploy Code Translation on Gaudi
 
-Find the corresponding [compose.yaml](./docker/gaudi/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
 
 ```bash
-cd GenAIExamples/CodeTrans/docker/gaudi
+cd GenAIExamples/CodeTrans/docker_compose/intel/hpu/gaudi
 docker compose up -d
 ```
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) to build docker images from source.
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 #### Deploy Code Translation on Xeon
 
-Find the corresponding [compose.yaml](./docker/xeon/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
 ```bash
-cd GenAIExamples/CodeTrans/docker/xeon
+cd GenAIExamples/CodeTrans/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for more instructions on building docker images from source.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
 
 ### Deploy using Kubernetes with GMC
 
-Refer to the [Code Translation Kubernetes Guide](./kubernetes/README.md)
+Refer to the [Code Translation Kubernetes Guide](./kubernetes/intel/README_gmc.md)
 
 ### Deploy using Kubernetes without GMC
 
-Refer to the [Code Translation Kubernetes Guide](./kubernetes/manifests/README.md)
+Refer to the [Code Translation Kubernetes Guide](./kubernetes/intel/README.md)
 
 ### Deploy CodeTrans into Kubernetes using Helm Chart
 
@@ -121,7 +121,7 @@ By default, the UI runs on port 5173 internally.
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/CodeTrans/docker/xeon#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/CodeTrans/docker_compose/intel/cpu/xeon#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy=""

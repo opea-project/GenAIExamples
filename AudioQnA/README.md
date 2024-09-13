@@ -4,15 +4,15 @@ AudioQnA is an example that demonstrates the integration of Generative AI (GenAI
 
 ## Deploy AudioQnA Service
 
-The AudioQnA service can be deployed on either Intel Gaudi2 or Intel XEON Scalable Processor.
+The AudioQnA service can be deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
 
 ### Deploy AudioQnA on Gaudi
 
-Refer to the [Gaudi Guide](./docker/gaudi/README.md) for instructions on deploying AudioQnA on Gaudi.
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instructions on deploying AudioQnA on Gaudi.
 
 ### Deploy AudioQnA on Xeon
 
-Refer to the [Xeon Guide](./docker/xeon/README.md) for instructions on deploying AudioQnA on Xeon.
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for instructions on deploying AudioQnA on Xeon.
 
 ## Supported Models
 

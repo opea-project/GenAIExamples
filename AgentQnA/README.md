@@ -36,7 +36,7 @@ This example showcases a hierarchical multi-agent system for question-answering 
 
    ```
    cd GenAIComps
-   docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/docker/Dockerfile .
+   docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
    ```
 
 2. Launch tool services </br>
@@ -67,7 +67,7 @@ This example showcases a hierarchical multi-agent system for question-answering 
    To use openai llm, run command below.
 
    ```
-   cd docker/openai/
+   cd docker_compose/intel/cpu/xeon
    bash launch_agent_service_openai.sh
    ```
 
@@ -103,4 +103,4 @@ curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: app
 
 ## How to register your own tools with agent
 
-You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/minmin-intel/GenAIComps/tree/agent-comp-dev/comps/agent/langchain#-4-provide-your-own-tools).
+You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/langchain#5-customize-agent-strategy).

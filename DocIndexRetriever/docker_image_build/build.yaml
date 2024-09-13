@@ -1,0 +1,43 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  doc-index-retriever:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
+  embedding-tei:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/tei/langchain/Dockerfile
+    extends: doc-index-retriever
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+  retriever-redis:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/redis/langchain/Dockerfile
+    extends: doc-index-retriever
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+  reranking-tei:
+    build:
+      context: GenAIComps
+      dockerfile: comps/reranks/tei/Dockerfile
+    extends: doc-index-retriever
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+  dataprep-redis:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/redis/langchain/Dockerfile
+    extends: doc-index-retriever
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+  tei-gaudi:
+    build:
+      context: tei-gaudi
+      dockerfile: Dockerfile-hpu
+    extends: doc-index-retriever
+    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}
