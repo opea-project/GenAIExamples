@@ -11,7 +11,7 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: opea/dataprep-redis:latest
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
@@ -24,8 +24,10 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${REDIS_HOST}
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
@@ -41,7 +43,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
-    image: opea/embedding-tei:latest
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
     ports:
       - "6000:6000"
@@ -54,12 +56,9 @@ services:
       https_proxy: ${https_proxy}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-embedding-service"
     restart: unless-stopped
   retriever:
-    image: opea/retriever-redis:latest
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -74,38 +73,14 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-retriever-service"
     restart: unless-stopped
-
-  tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    container_name: tei-reranking-server
-    ports:
-      - "8808:80"
-    volumes:
-      - "./data:/data"
-    shm_size: 1g
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
-
   reranking:
-    image: opea/reranking-tei:latest
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-xeon-server
-    volumes:
-      - ${WORKDIR}/GenAIComps/comps/:/home/user/comps
-    depends_on:
-      - tei-reranking-service
     ports:
       - "8000:8000"
     ipc: host
+    entrypoint: python local_reranking.py
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -114,19 +89,15 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
-      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
-      LANGCHAIN_PROJECT: "opea-reranking-service"
     restart: unless-stopped
   doc-index-retriever-server:
-    image: opea/doc-index-retriever:latest
+    image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
     container_name: doc-index-retriever-server
     depends_on:
       - redis-vector-db
       - tei-embedding-service
       - embedding
       - retriever
-      - tei-reranking-service
       - reranking
     ports:
       - "8889:8889"

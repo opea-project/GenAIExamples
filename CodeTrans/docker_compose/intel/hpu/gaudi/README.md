@@ -84,7 +84,8 @@ Change the `LLM_MODEL_ID` below for your needs.
 3. Set up other environment variables:
 
    ```bash
-   source ../set_env.sh
+   cd GenAIExamples/CodeTrans/docker_compose
+   source ./set_env.sh
    ```
 
 ### Start Microservice Docker Containers
