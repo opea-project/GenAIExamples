@@ -38,6 +38,7 @@ Results will be displayed in the terminal and saved as CSV file named `1_stats.c
 - Install Python 3.8+ on the master node for running the stress tool.
 - Ensure all nodes have a local /mnt/models folder, which will be mounted by the pods.
 - Ensure that the container's ulimit can meet the the number of requests.
+
 ```bash
 # The way to modify the containered ulimit:
 sudo systemctl edit containerd
