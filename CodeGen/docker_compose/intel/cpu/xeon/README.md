@@ -13,6 +13,7 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 ## 🚀 Download or Build Docker Images
 
 Should the Docker image you seek not yet be available on Docker Hub, you can build the Docker image locally.
+
 ### 1. Git Clone GenAIComps
 
 ```bash

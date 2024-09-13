@@ -4,7 +4,7 @@ This document outlines the deployment process for a CodeTrans application utiliz
 
 ## 🚀 Create an AWS Xeon Instance
 
-To run the example on a AWS Xeon instance, start by creating an AWS account if you don't have one already. Then, get started with the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home). AWS EC2 M7i, C7i, C7i-flex and M7i-flex are Intel Xeon Scalable processor instances suitable for the task.  (code named Sapphire Rapids).
+To run the example on a AWS Xeon instance, start by creating an AWS account if you don't have one already. Then, get started with the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home). AWS EC2 M7i, C7i, C7i-flex and M7i-flex are Intel Xeon Scalable processor instances suitable for the task. (code named Sapphire Rapids).
 
 For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
 
