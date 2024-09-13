@@ -60,7 +60,7 @@ jobs:
           if [ -n "$url_lines" ]; then
             for url_line in $url_lines; do
               url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1)
-              path=$(echo "$url_line"|cut -d '.' -f1 |cut -d ':' -f1)
+              path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
               response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
               if [ "$response" -eq 200 ]; then
                 echo "Valid link: $url"
@@ -70,7 +70,7 @@ jobs:
                 if [ "$response_retry" -eq 200 ]; then
                   echo "Valid link: $url"
                 else
-                  echo "Invalid link from ${{github.workspace}}$path: $url"
+                  echo "Invalid link from ${{github.workspace}}/$path: $url"
                   fail="TRUE"
                 fi
               fi
