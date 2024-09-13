@@ -1,4 +1,4 @@
-# Build Mega Service of ChatQnA on Xeon
+![image](https://github.com/user-attachments/assets/e2b6792d-bb1c-469f-83e7-6db3df688cbf)# Build Mega Service of ChatQnA on Xeon
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
@@ -404,12 +404,13 @@ docker compose -f compose_vllm.yaml up -d
 
    If you want to update the default knowledge base, you can use the following commands:
 
-   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf)
-   Click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/redis/data/nke-10k-2023.pdf). Or 
+   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
    Or run this command to get the file on a terminal.
 
    ```bash
-   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf
+   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+
    ```
 
    Upload:
