@@ -3,34 +3,33 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-echo "IMAGE_REPO=${IMAGE_REPO}"
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    cd $WORKPATH
+    cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
 
-    docker build -t opea/embedding-tei:latest -f comps/embeddings/langchain/docker/Dockerfile .
-    docker build -t opea/retriever-pinecone:latest -f comps/retrievers/langchain/pinecone/docker/Dockerfile .
-    docker build -t opea/reranking-tei:latest -f comps/reranks/tei/docker/Dockerfile .
-    docker build -t opea/llm-tgi:latest -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/dataprep-pinecone:latest -f comps/dataprep/pinecone/docker/Dockerfile .
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="chatqna chatqna-ui chatqna-conversation-ui dataprep-pinecone embedding-tei retriever-pinecone reranking-tei llm-tgi"
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    cd $WORKPATH/docker
-    docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
-    cd $WORKPATH/docker/ui
-    docker build --no-cache -t opea/chatqna-ui:latest -f docker/Dockerfile .
-
-    docker images
+    docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -54,16 +53,6 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
-    if [[ "$IMAGE_REPO" != "" ]]; then
-        # Replace the container name with a test-specific name
-        echo "using image repository $IMAGE_REPO and image tag $IMAGE_TAG"
-        sed -i "s#image: opea/chatqna:latest#image: opea/chatqna:${IMAGE_TAG}#g" compose_pinecone.yaml
-        sed -i "s#image: opea/chatqna-ui:latest#image: opea/chatqna-ui:${IMAGE_TAG}#g" compose_pinecone.yaml
-        sed -i "s#image: opea/chatqna-conversation-ui:latest#image: opea/chatqna-conversation-ui:${IMAGE_TAG}#g" compose_pinecone.yaml
-        sed -i "s#image: opea/*#image: ${IMAGE_REPO}opea/#g" compose_pinecone.yaml
-        cat compose_pinecone.yaml
-    fi
-
     # Start Docker Containers
     docker compose -f compose_pinecone.yaml up -d
     n=0
@@ -84,24 +73,34 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
+    if [[ $SERVICE_NAME == *"dataprep_upload_file"* ]]; then
+        cd $LOG_PATH
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "all"}' -H 'Content-Type: application/json' "$URL")
     else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+
+    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+
+    # check response status
+    if [ "$HTTP_STATUS" -ne "200" ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    fi
+    # check response body
+    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
     sleep 1s
 }
 
@@ -125,6 +124,21 @@ function validate_microservices() {
         '{"text":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
+
+    # test /v1/dataprep upload file
+    echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
+    validate_service \
+        "http://${ip_address}:6007/v1/dataprep" \
+        "Data preparation succeeded" \
+        "dataprep_upload_file" \
+        "dataprep-pinecone-server"
+
+     # test /v1/dataprep/delete_file
+    validate_service \
+        "http://${ip_address}:6007/v1/dataprep/delete_file" \
+        '{"status":true}' \
+        "dataprep_del" \
+        "dataprep-pinecone-server"
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -181,16 +195,21 @@ function validate_megaservice() {
 }
 
 function validate_frontend() {
-    cd $WORKPATH/docker/ui/svelte
+    echo "[ TEST INFO ]: --------- frontend test started ---------"
+    cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-#    conda remove -n ${conda_env_name} --all -y
-#    conda create -n ${conda_env_name} python=3.12 -y
+    if conda info --envs | grep -q "$conda_env_name"; then
+        echo "$conda_env_name exist!"
+    else
+        conda create -n ${conda_env_name} python=3.12 -y
+    fi
     source activate ${conda_env_name}
+    echo "[ TEST INFO ]: --------- conda env activated ---------"
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-#    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
@@ -206,8 +225,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker/xeon
-    docker compose stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    docker compose stop -f compose_pinecone.yaml && docker compose rm -f compose_pinecone.yaml
 }
 
 function main() {
@@ -220,9 +239,16 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
 
-    validate_microservices
-    validate_megaservice
-    validate_frontend
+    if [ "${mode}" == "perf" ]; then
+        python3 $WORKPATH/tests/chatqna_benchmark.py
+    elif [ "${mode}" == "" ]; then
+        validate_microservices
+        echo "==== microservices validated ===="
+        validate_megaservice
+        echo "==== megaservice validated ===="
+        validate_frontend
+        echo "==== frontend validated ===="
+    fi
 
     stop_docker
     echo y | docker system prune
