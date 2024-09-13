@@ -85,14 +85,14 @@ flowchart LR
     DP <-.->|d|VDB
 ```
 
-- This project implements a Retrieval-Augmented Generation (RAG) workflow using LangChain, Intel VDMS VectorDB, and Text Generation Inference, optimized for Intel XEON Scalable Processors.
+- This project implements a Retrieval-Augmented Generation (RAG) workflow using LangChain, Intel VDMS VectorDB, and Text Generation Inference, optimized for Intel Xeon Scalable Processors.
 - Video Processing: Videos are converted into feature vectors using mean aggregation and stored in the VDMS vector store.
 - Query Handling: When a user submits a query, the system performs a similarity search in the vector store to retrieve the best-matching videos.
 - Contextual Inference: The retrieved videos are then sent to the Large Vision Model (LVM) for inference, providing supplemental context for the query.
 
 ## Deploy VideoQnA Service
 
-The VideoQnA service can be effortlessly deployed on Intel XEON Scalable Processors.
+The VideoQnA service can be effortlessly deployed on Intel Xeon Scalable Processors.
 
 ### Required Models
 

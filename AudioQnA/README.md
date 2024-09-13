@@ -4,7 +4,7 @@ AudioQnA is an example that demonstrates the integration of Generative AI (GenAI
 
 ## Deploy AudioQnA Service
 
-The AudioQnA service can be deployed on either Intel Gaudi2 or Intel XEON Scalable Processor.
+The AudioQnA service can be deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
 
 ### Deploy AudioQnA on Gaudi
 

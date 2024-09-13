@@ -30,7 +30,7 @@ You can choose other llava-next models, such as `llava-hf/llava-v1.6-vicuna-13b-
 
 ## Deploy VisualQnA Service
 
-The VisualQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
+The VisualQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
 
 Currently we support deploying VisualQnA services with docker compose.
 

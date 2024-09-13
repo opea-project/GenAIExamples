@@ -22,7 +22,7 @@ The workflow falls into the following architecture:
 
 ## Deploy SearchQnA Service
 
-The SearchQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
+The SearchQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
 
 Currently we support two ways of deploying SearchQnA services with docker compose:
 
