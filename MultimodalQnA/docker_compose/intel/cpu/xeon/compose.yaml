@@ -91,9 +91,9 @@ services:
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
     restart: unless-stopped
-  multimodalragwithvideos-backend-server:
-    image: ${REGISTRY:-opea}/multimodalragwithvideos:${TAG:-latest}
-    container_name: multimodalragwithvideos-backend-server
+  multimodalqna:
+    image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
+    container_name: multimodalqna-backend-server
     depends_on:
       - redis-vector-db
       - dataprep-multimodal-redis
@@ -113,11 +113,11 @@ services:
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  multimodalragwithvideos-ui:
-    image: ${REGISTRY:-opea}/multimodalragwithvideos-ui:${TAG:-latest}
-    container_name: multimodalragwithvideos-gradio-ui-server
+  multimodalqna-ui:
+    image: ${REGISTRY:-opea}/multimodalqna-ui:${TAG:-latest}
+    container_name: multimodalqna-gradio-ui-server
     depends_on:
-      - multimodalragwithvideos
+      - multimodalqna
     ports:
       - "5173:5173"
     environment:

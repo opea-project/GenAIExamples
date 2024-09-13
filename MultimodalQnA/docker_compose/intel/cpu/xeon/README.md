@@ -1,6 +1,6 @@
-# Build Mega Service of MultimodalRAGWithVideos on Xeon
+# Build Mega Service of MultimodalQnA on Xeon
 
-This document outlines the deployment process for a MultimodalRAGWithVideos application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `multimodal_embedding` that employs [BridgeTower](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) model as embedding model, `multimodal_retriever`, `lvm`, and `multimodal-data-prep`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for a MultimodalQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `multimodal_embedding` that employs [BridgeTower](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) model as embedding model, `multimodal_retriever`, `lvm`, and `multimodal-data-prep`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
 ## 🚀 Apply Xeon Server on AWS
 
@@ -44,11 +44,11 @@ dataprep-multimodal-redis
 ===
 Port 6007 - Open to 0.0.0.0/0
 
-multimodalragwithvideos
+multimodalqna
 ==========================
 Port 8888 - Open to 0.0.0.0/0
 
-multimodalragwithvideos-ui
+multimodalqna-ui
 =====================
 Port 5173 - Open to 0.0.0.0/0
 ```
@@ -89,7 +89,7 @@ export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/mmragvideoqna"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
 export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
 export DATAPREP_GET_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
@@ -149,13 +149,13 @@ docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg htt
 
 ### 5. Build MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalragwithvideos.py](../multimodalragwithvideos.py) Python script. Build MegaService Docker image via below command:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalqna.py](../../../../multimodalqna.py) Python script. Build MegaService Docker image via below command:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/MultimodalRAGWithVideos
-docker build --no-cache -t opea/multimodalragwithvideos:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
+cd GenAIExamples/MultimodalQnA
+docker build --no-cache -t opea/multimodalqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd ../..
 ```
 
 ### 6. Build UI Docker Image
@@ -163,8 +163,8 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/MultimodalRAGWithVideos/ui/
-docker build --no-cache -t opea/multimodalragwithvideos-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/MultimodalQnA/ui/
+docker build --no-cache -t opea/multimodalqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 cd ../../../
 ```
 
@@ -176,8 +176,8 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 4. `opea/retriever-multimodal-redis:latest`
 5. `opea/embedding-multimodal:latest`
 6. `opea/embedding-multimodal-bridgetower:latest`
-7. `opea/multimodalragwithvideos:latest`
-8. `opea/multimodalragwithvideos-ui:latest`
+7. `opea/multimodalqna:latest`
+8. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -195,13 +195,13 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/MultimodalRAGWithVideos/docker_compose/intel/cpu/xeon/
+cd GenAIExamples/MultimodalQnA/docker_compose/intel/cpu/xeon/
 docker compose -f compose.yaml up -d
 ```
 
 ### Validate Microservices
 
-1. Bridgetower Embedding Server
+1. embedding-multimodal-bridgetower
 
 ```bash
 curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
@@ -217,7 +217,7 @@ curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
      -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-2. Multimodal-Embedding Microservice
+2. embedding-multimodal
 
 ```bash
 curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
@@ -233,7 +233,7 @@ curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
     -d '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
 ```
 
-3. Multimodal-Retriever Microservice
+3. retriever-multimodal-redis
 
 ```bash
 export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
@@ -243,7 +243,7 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
 
-4. LLaVA Server
+4. lvm-llava
 
 ```bash
 curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
@@ -252,7 +252,7 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
      -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-5. LVM Microservice
+5. lvm-llava-svc
 
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
@@ -277,7 +277,7 @@ curl http://${host_ip}:9399/v1/lvm \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
-6. Multimodal Dataprep Microservice
+6. dataprep-multimodal-redis
 
 Download a sample video
 
@@ -332,14 +332,14 @@ curl -X POST \
 7. MegaService
 
 ```bash
-curl http://${host_ip}:8888/v1/mmragvideoqna \
+curl http://${host_ip}:8888/v1/multimodalqna \
     -H "Content-Type: application/json" \
     -X POST \
     -d '{"messages": "What is the revenue of Nike in 2023?"}'
 ```
 
 ```bash
-curl http://${host_ip}:8888/v1/mmragvideoqna \
+curl http://${host_ip}:8888/v1/multimodalqna \
 	-H "Content-Type: application/json" \
 	-d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
 ```
