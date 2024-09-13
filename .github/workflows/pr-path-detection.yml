@@ -59,7 +59,7 @@ jobs:
           url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r .)
           if [ -n "$url_lines" ]; then
             for url_line in $url_lines; do
-              url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1)
+              url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
               path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
               response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
               if [ "$response" -ne 200 ]; then
@@ -68,8 +68,8 @@ jobs:
                 if [ "$response_retry" -eq 200 ]; then
                   echo "Valid link: $url"
                 else
-                  # echo "Invalid link from ${{github.workspace}}/$path: $url"
-                  echo "Invalid link from $path: $url"
+                  echo "Invalid link from ${{github.workspace}}/$path: $url"
+                  # echo "Invalid link from $path: $url"
                   fail="TRUE"
                 fi
               fi
