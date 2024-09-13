@@ -1,22 +1,4 @@
 ---
-# Source: chatqna/charts/chatqna-ui/templates/configmap.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: chatqna-chatqna-ui-config
-  labels:
-    helm.sh/chart: chatqna-ui-1.0.0
-    app.kubernetes.io/name: chatqna-ui
-    app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v1.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  APP_BACKEND_SERVICE_ENDPOINT: "/v1/chatqna"
-  APP_DATA_PREP_SERVICE_URL: "/v1/dataprep"
----
 # Source: chatqna/charts/data-prep/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -605,9 +587,6 @@ spec:
         {}
       containers:
         - name: chatqna-ui
-          envFrom:
-            - configMapRef:
-                name: chatqna-chatqna-ui-config
           securityContext:
             {}
           image: "opea/chatqna-conversation-ui:latest"
