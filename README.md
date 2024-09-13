@@ -48,6 +48,8 @@ Deployment are based on released docker images by default, check [docker image l
 | Translation | [Xeon Instructions](Translation/docker_compose/intel/cpu/xeon/README.md) | [Gaudi Instructions](Translation/docker_compose/intel/hpu/gaudi/README.md) | Not Supported                                                    | Not Supported                                                                                                      | [Translation with GMC](Translation/kubernetes/intel/README_gmc.md) |
 | AudioQnA    | [Xeon Instructions](AudioQnA/docker_compose/intel/cpu/xeon/README.md)    | [Gaudi Instructions](AudioQnA/docker_compose/intel/hpu/gaudi/README.md)    | [AudioQnA with Manifests](AudioQnA/kubernetes/intel/README.md)   | Not Supported                                                                                                      | [AudioQnA with GMC](AudioQnA/kubernetes/intel/README_gmc.md)       |
 | VisualQnA   | [Xeon Instructions](VisualQnA/docker_compose/intel/cpu/xeon/README.md)   | [Gaudi Instructions](VisualQnA/docker_compose/intel/hpu/gaudi/README.md)   | [VisualQnA with Manifests](VisualQnA/kubernetes/intel/README.md) | Not Supported                                                                                                      | [VisualQnA with GMC](VisualQnA/kubernetes/intel/README_gmc.md)     |
+| ProductivitySuite   | [Xeon Instructions](ProductivitySuite/docker_compose/intel/cpu/xeon/README.md)   |  Not Supported   | [ProductivitySuite with Manifests](ProductivitySuite/kubernetes/intel/README.md) | Not Supported                                                                                                      | Not Supported     |
+
 
 ## Supported Examples
 
