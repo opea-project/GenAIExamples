@@ -44,7 +44,7 @@ jobs:
         shell: bash
 
   Check-the-validity-of-hyperlinks-in-README:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
@@ -82,7 +82,7 @@ jobs:
           fi
         shell: bash
 
-  Check-the-validity-of-PNGs-in-README:
+  Check-the-validity-of-pictures-in-README:
     runs-on: ubuntu-latest
     steps:
       - name: Clean Up Working Directory
@@ -91,21 +91,19 @@ jobs:
       - name: Checkout repo GenAIExamples
         uses: actions/checkout@v4
 
-      - name: Check the validity of PNGs
+      - name: Check the validity of pictures
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
-          png_lines=$(grep -Eo '\]\(.*assets.*\)' -r .)
+          png_lines=$(grep -Eo '\]\([^)]+\)' -r .|grep -Ev 'http'|wc -l)
           if [ -n "$png_lines" ]; then
             for png_line in $png_lines; do
               refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
               png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
-              if ! grep -q 'http' <<< "$png_path"; then
-                check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
-                if [ ! -e $check_path ]; then
-                  echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
-                  fail="TRUE"
-                fi
+              check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+              if [ ! -e $check_path ]; then
+                echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
+                fail="TRUE"
               fi
             done
           fi
