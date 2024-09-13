@@ -51,7 +51,7 @@ export INDEX_NAME=${your_index_name}
 
 ```bash
 cd ../../../../../
-docker build -t opea/multimodal-retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/multimodal/redis/langchain/Dockerfile .
+docker build -t opea/retriever-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/multimodal/redis/langchain/Dockerfile .
 ```
 
 To start a docker container, you have two options:
@@ -64,7 +64,7 @@ You can choose one as needed.
 ### 2.3 Run Docker with CLI (Option A)
 
 ```bash
-docker run -d --name="multimodal-retriever-redis-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME opea/multimodal-retriever-redis:latest
+docker run -d --name="retriever-multimodal-redis" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME opea/retriever-multimodal-redis:latest
 ```
 
 ### 2.4 Run Docker with Docker Compose (Option B)

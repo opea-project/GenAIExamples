@@ -52,7 +52,7 @@ Currently, we employ [**BridgeTower**](https://huggingface.co/BridgeTower/bridge
 
 ```bash
 cd ../../..
-docker build -t opea/bridgetower-embedder:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile.intel_hpu .
+docker build -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile.intel_hpu .
 cd comps/embeddings/multimodal/bridgetower/
 docker compose -f docker_compose_bridgetower_embedding_endpoint.yaml up -d
 ```
@@ -61,7 +61,7 @@ docker compose -f docker_compose_bridgetower_embedding_endpoint.yaml up -d
 
 ```bash
 cd ../../..
-docker build -t opea/bridgetower-embedder:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
+docker build -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
 cd comps/embeddings/multimodal/bridgetower/
 docker compose -f docker_compose_bridgetower_embedding_endpoint.yaml up -d
 ```
@@ -116,7 +116,7 @@ Currently, we employ [**BridgeTower**](https://huggingface.co/BridgeTower/bridge
 
 ```bash
 cd ../../..
-docker build -t opea/bridgetower-embedder:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile.intel_hpu .
+docker build -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile.intel_hpu .
 cd comps/embeddings/multimodal/bridgetower/
 docker compose -f docker_compose_bridgetower_embedding_endpoint.yaml up -d
 ```
@@ -125,7 +125,7 @@ docker compose -f docker_compose_bridgetower_embedding_endpoint.yaml up -d
 
 ```bash
 cd ../../..
-docker build -t opea/bridgetower-embedder:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
+docker build -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
 cd comps/embeddings/multimodal/bridgetower/
 docker compose -f docker_compose_bridgetower_embedding_endpoint.yaml up -d
 ```

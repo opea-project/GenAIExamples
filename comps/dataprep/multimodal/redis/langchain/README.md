@@ -83,13 +83,13 @@ export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 
 ```bash
 cd ../../../../
-docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
+docker build -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
 ```
 
 ### 2.5 Run Docker with CLI (Option A)
 
 ```bash
-docker run -d --name="dataprep-redis-server" -p 6007:6007 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e LVM_ENDPOINT=$LVM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/dataprep-redis:latest
+docker run -d --name="dataprep-multimodal-redis" -p 6007:6007 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e LVM_ENDPOINT=$LVM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/dataprep-multimodal-redis:latest
 ```
 
 ### 2.6 Run with Docker Compose (Option B - deprecated, will move to genAIExample in future)
@@ -102,7 +102,7 @@ docker compose -f docker-compose-dataprep-redis.yaml up -d
 ## 🚀3. Status Microservice
 
 ```bash
-docker container logs -f dataprep-redis-server
+docker container logs -f dataprep-multimodal-redis
 ```
 
 ## 🚀4. Consume Microservice

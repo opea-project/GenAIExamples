@@ -43,7 +43,7 @@ class MegaServiceEndpoint(Enum):
     CODE_TRANS = "/v1/codetrans"
     DOC_SUMMARY = "/v1/docsum"
     SEARCH_QNA = "/v1/searchqna"
-    MULTIMODAL_RAG_WITH_VIDEOS = "/v1/mmragvideoqna"
+    MULTIMODAL_QNA = "/v1/multimodalqna"
     TRANSLATION = "/v1/translation"
     RETRIEVALTOOL = "/v1/retrievaltool"
     FAQ_GEN = "/v1/faqgen"

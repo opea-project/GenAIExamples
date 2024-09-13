@@ -9,9 +9,9 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
-  dataprep-redis:
-    image: opea/dataprep-redis:latest
-    container_name: dataprep-redis-server
+  dataprep-multimodal-redis:
+    image: opea/dataprep-multimodal-redis:latest
+    container_name: dataprep-multimodal-redis
     ports:
       - "6007:6007"
     ipc: host

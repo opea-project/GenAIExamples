@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  embedding:
+  embedding-multimodal:
     image: opea/embedding-multimodal:latest
-    container_name: embedding-multimodal-server
+    container_name: embedding-multimodal
     ports:
       - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
     ipc: host

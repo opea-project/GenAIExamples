@@ -16,13 +16,13 @@ unset http_proxy
 function build_mmei_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build --no-cache -t opea/bridgetower-embedder:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
+    docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
 
     if [ $? -ne 0 ]; then
-        echo "opea/bridgetower-embedder built fail"
+        echo "opea/embedding-multimodal-bridgetower built fail"
         exit 1
     else
-        echo "opea/bridgetower-embedder built successful"
+        echo "opea/embedding-multimodal-bridgetower built successful"
     fi
 }
 
@@ -63,8 +63,8 @@ function validate_microservice_text_embedding() {
         echo "Result correct."
     else
         echo "Result wrong. Received was $result"
-        docker logs bridgetower-embedding-server
-        docker logs embedding-multimodal-server
+        docker logs embedding-multimodal-bridgetower
+        docker logs embedding-multimodal
         exit 1
     fi
 }
@@ -79,8 +79,8 @@ function validate_microservice_image_text_pair_embedding() {
         echo "Result correct."
     else
         echo "Result wrong. Received was $result"
-        docker logs bridgetower-embedding-server
-        docker logs embedding-multimodal-server
+        docker logs embedding-multimodal-bridgetower
+        docker logs embedding-multimodal
         exit 1
     fi
 }
@@ -91,7 +91,7 @@ function validate_microservice() {
 }
 
 function stop_docker() {
-    cid=$(docker ps -aq --filter "name=bridgetower-embedding-server" --filter "name=embedding-multimodal-server")
+    cid=$(docker ps -aq --filter "name=embedding-multimodal-bridgetower" --filter "name=embedding-multimodal")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 }
 

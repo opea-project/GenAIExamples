@@ -14,7 +14,7 @@ from comps import (
     LVMDoc,
     LVMSearchedMultimodalDoc,
     MultimodalDoc,
-    MultimodalRAGWithVideosGateway,
+    MultimodalQnAGateway,
     SearchedMultimodalDoc,
     ServiceOrchestrator,
     TextDoc,
@@ -93,9 +93,7 @@ class TestServiceOrchestrator(unittest.IsolatedAsyncioTestCase):
         cls.follow_up_query_service_builder = ServiceOrchestrator()
         cls.follow_up_query_service_builder.add(cls.lvm)
 
-        cls.gateway = MultimodalRAGWithVideosGateway(
-            cls.service_builder, cls.follow_up_query_service_builder, port=9898
-        )
+        cls.gateway = MultimodalQnAGateway(cls.service_builder, cls.follow_up_query_service_builder, port=9898)
 
     @classmethod
     def tearDownClass(cls):
@@ -115,13 +113,13 @@ class TestServiceOrchestrator(unittest.IsolatedAsyncioTestCase):
         # print(result_dict)
         self.assertEqual(result_dict[self.lvm.name]["text"], "<image>\nUSER: chao, \nASSISTANT:")
 
-    def test_multimodal_rag_with_videos_gateway(self):
+    def test_MultimodalQnAGateway_gateway(self):
         json_data = {"messages": "hello, "}
-        response = requests.post("http://0.0.0.0:9898/v1/mmragvideoqna", json=json_data)
+        response = requests.post("http://0.0.0.0:9898/v1/multimodalqna", json=json_data)
         response = response.json()
         self.assertEqual(response["choices"][-1]["message"]["content"], "hello, opea project!")
 
-    def test_follow_up_mm_rag_with_videos_gateway(self):
+    def test_follow_up_MultimodalQnAGateway_gateway(self):
         json_data = {
             "messages": [
                 {
@@ -139,7 +137,7 @@ class TestServiceOrchestrator(unittest.IsolatedAsyncioTestCase):
             ],
             "max_tokens": 300,
         }
-        response = requests.post("http://0.0.0.0:9898/v1/mmragvideoqna", json=json_data)
+        response = requests.post("http://0.0.0.0:9898/v1/multimodalqna", json=json_data)
         response = response.json()
         self.assertEqual(
             response["choices"][-1]["message"]["content"],

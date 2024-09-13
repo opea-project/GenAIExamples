@@ -134,6 +134,7 @@ async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> Union[TextDoc
             return_metadata["video_id"] = retrieved_metadata["video_id"]
             return_metadata["source_video"] = retrieved_metadata["source_video"]
             return_metadata["time_of_frame_ms"] = retrieved_metadata["time_of_frame_ms"]
+            return_metadata["transcript_for_inference"] = retrieved_metadata["transcript_for_inference"]
             return MetadataTextDoc(text=generated_str, metadata=return_metadata)
         else:
             return TextDoc(text=generated_str)

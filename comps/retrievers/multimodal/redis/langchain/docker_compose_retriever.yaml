@@ -4,9 +4,9 @@
 version: "1.0"
 
 services:
-  retriever:
-    image: opea/multimodal-retriever-redis:latest
-    container_name: multimodal-retriever-redis-server
+  retriever-multimodal-redis:
+    image: opea/retriever-multimodal-redis:latest
+    container_name: retriever-multimodal-redis
     ports:
       - "7000:7000"
     ipc: host
