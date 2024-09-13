@@ -96,7 +96,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             next_data["texts"] = [doc["text"] for doc in data["retrieved_docs"]]
         else:
             # forward to llm
-            if not docs:
+            if not docs and with_rerank:
                 # delete the rerank from retriever -> rerank -> llm
                 for ds in reversed(runtime_graph.downstream(cur_node)):
                     for nds in runtime_graph.downstream(ds):
