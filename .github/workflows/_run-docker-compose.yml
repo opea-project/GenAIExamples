@@ -55,7 +55,7 @@ jobs:
           set -x
           service_l=$(echo ${{ inputs.service }} | tr '[:upper:]' '[:lower:]')
           cd ${{ github.workspace }}/tests
-          test_cases=$(find . -type f -name "test_${service_l}*.sh" -print | cut -d/ -f2 | jq -R '.' | jq -sc '.')
+          test_cases=$(find . -type f -name "test_${service_l}*.sh" -print | jq -R '.' | jq -sc '.')
           echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
 
   run-test:
@@ -92,7 +92,7 @@ jobs:
           test_case: ${{ matrix.test_case }}
         run: |
           cd ${{ github.workspace }}/tests
-          service=$(echo "${test_case}" | sed 's/test_\(.*\)\.sh/\1/')
+          service=$(echo "${test_case}" | cut -d'_' -f2- |cut -d'.' -f1)
           echo "service=${service}" >> $GITHUB_ENV
           if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
 
