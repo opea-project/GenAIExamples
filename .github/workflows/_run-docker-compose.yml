@@ -20,10 +20,6 @@ on:
         description: Example to test
         required: true
         type: string
-      hardware:
-        description: Hardware to run the test on
-        required: true
-        type: string
 jobs:
   get-test-case:
     runs-on: ubuntu-latest
@@ -57,6 +53,7 @@ jobs:
           cd ${{ github.workspace }}/tests
           test_cases=$(find . -type f -name "test_${service_l}*.sh" -print | jq -R '.' | jq -sc '.')
           echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
+          # TODO: get hardware for test matrix
 
   run-test:
     needs: [get-test-case]
@@ -64,7 +61,7 @@ jobs:
       matrix:
         test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
       fail-fast: false
-    runs-on: ${{ inputs.hardware }}
+    runs-on: gaudi
     continue-on-error: true
     steps:
       - name: Clean up Working Directory
@@ -88,7 +85,6 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
           service: ${{ inputs.service }}
-          hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}
         run: |
           cd ${{ github.workspace }}/tests

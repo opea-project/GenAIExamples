@@ -6,9 +6,6 @@ permissions: read-all
 on:
   workflow_call:
     inputs:
-      node:
-        required: true
-        type: string
       service:
         required: true
         type: string
@@ -36,7 +33,7 @@ jobs:
   # Image Build
   ####################################################################################################
   build-images:
-    runs-on: "docker-build-${{ inputs.node }}"
+    runs-on: "docker-build-gaudi"
     continue-on-error: true
     outputs:
       file_exists: ${{ steps.get-yaml-path.outputs.file_exists }}
@@ -84,10 +81,9 @@ jobs:
   ####################################################################################################
   test-service-compose:
     needs: [build-images]
-    if: ${{ fromJSON(inputs.test) && needs.build-images.outputs.file_exists == 'true' }}
+    if: ${{ fromJSON(inputs.test) }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       tag: ${{ inputs.tag }}
       service: ${{ inputs.service }}
-      hardware: ${{ inputs.node }}
     secrets: inherit
