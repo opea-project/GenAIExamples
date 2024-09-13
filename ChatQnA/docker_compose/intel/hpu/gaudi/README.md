@@ -391,7 +391,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
      -d '{
      "model": "${LLM_MODEL_ID}",
      "prompt": "What is Deep Learning?",
-     "max_tokens": 32,
+     "max_new_tokens": 32,
      "temperature": 0
      }'
    ```

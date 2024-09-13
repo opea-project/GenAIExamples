@@ -123,7 +123,7 @@ function validate_megaservice() {
             ]
         }
         ],
-        "max_tokens": 300
+        "max_new_tokens": 300
     }'
 
     # test the megeservice via nginx
@@ -150,7 +150,7 @@ function validate_megaservice() {
             ]
         }
         ],
-        "max_tokens": 300
+        "max_new_tokens": 300
     }'
 }
 
