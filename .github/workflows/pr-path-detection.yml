@@ -68,7 +68,8 @@ jobs:
                 if [ "$response_retry" -eq 200 ]; then
                   echo "Valid link: $url"
                 else
-                  echo "Invalid link from ${{github.workspace}}/$path: $url"
+                  # echo "Invalid link from ${{github.workspace}}/$path: $url"
+                  echo "Invalid link from $path: $url"
                   fail="TRUE"
                 fi
               fi
@@ -82,7 +83,7 @@ jobs:
           fi
         shell: bash
 
-  Check-the-validity-of-pictures-in-README:
+  Check-the-validity-of-relative-path:
     runs-on: ubuntu-latest
     steps:
       - name: Clean Up Working Directory
@@ -91,11 +92,11 @@ jobs:
       - name: Checkout repo GenAIExamples
         uses: actions/checkout@v4
 
-      - name: Check the validity of pictures
+      - name: Checking relative path validity
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
-          png_lines=$(grep -Eo '\]\([^)]+\)' -r .|grep -Ev 'http'|wc -l)
+          png_lines=$(grep -Eo '\]\([^)]+\)' -r .|grep -Ev 'http')
           if [ -n "$png_lines" ]; then
             for png_line in $png_lines; do
               refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
