@@ -43,7 +43,7 @@ jobs:
 
         shell: bash
 
-  Check-the-validity-of-hyperlinks:
+  Check-the-validity-of-hyperlinks-in-README:
     runs-on: ubuntu-latest
     steps:
       - name: Clean Up Working Directory
@@ -56,15 +56,13 @@ jobs:
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
-          url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r ./*/*.md)
+          url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r .)
           if [ -n "$url_lines" ]; then
             for url_line in $url_lines; do
               url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1)
               path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
               response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-              if [ "$response" -eq 200 ]; then
-                echo "Valid link: $url"
-              else
+              if [ "$response" -ne 200 ]; then
                 echo "**********Validation failed, try again**********"
                 response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
                 if [ "$response_retry" -eq 200 ]; then
@@ -79,5 +77,40 @@ jobs:
 
           if [[ "$fail" == "TRUE" ]]; then
             exit 1
+          else
+            echo "All hyperlinks are valid."
+          fi
+        shell: bash
+
+  Check-the-validity-of-PNGs-in-README:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout repo GenAIExamples
+        uses: actions/checkout@v4
+
+      - name: Check the validity of PNGs
+        run: |
+          cd ${{github.workspace}}
+          fail="FALSE"
+          png_lines=$(grep -Eo '\]\(.*assets.*\)' -r .)
+          if [ -n "$png_lines" ]; then
+            for png_line in $png_lines; do
+              refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
+              png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
+              check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+              if [ ! -e $check_path ]; then
+                echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
+                fail="TRUE"
+              fi
+            done
+          fi
+
+          if [[ "$fail" == "TRUE" ]]; then
+            exit 1
+          else
+            echo "All png paths exist."
           fi
         shell: bash
