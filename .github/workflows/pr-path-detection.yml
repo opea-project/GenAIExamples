@@ -54,7 +54,6 @@ jobs:
 
       - name: Check the validity of hyperlinks
         run: |
-          set -x
           cd ${{github.workspace}}
           url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r ./*/*.md)
           if [ -n "$url_lines" ]; then
