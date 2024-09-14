@@ -1,0 +1,134 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Check Paths and Hyperlinks
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
+
+jobs:
+  check-dockerfile-paths:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+
+      - name: Clone Repo GenAIComps
+        run: |
+          cd ..
+          git clone https://github.com/opea-project/GenAIComps.git
+
+      - name: Check for Missing Dockerfile Paths in GenAIComps
+        run: |
+          cd ${{github.workspace}}
+          miss="FALSE"
+          while IFS=: read -r file line content; do
+              dockerfile_path=$(echo "$content" | awk -F '-f ' '{print $2}' | awk '{print $1}')
+              if [[ ! -f "../GenAIComps/${dockerfile_path}" ]]; then
+                  miss="TRUE"
+                  echo "Missing Dockerfile: GenAIComps/${dockerfile_path} (Referenced in GenAIExamples/${file}:${line})"
+              fi
+          done < <(grep -Ern 'docker build .* -f comps/.+/Dockerfile' --include='*.md' .)
+
+
+          if [[ "$miss" == "TRUE" ]]; then
+            exit 1
+          fi
+
+        shell: bash
+
+  check-the-validity-of-hyperlinks-in-README:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+
+      - name: Check the Validity of Hyperlinks
+        run: |
+          cd ${{github.workspace}}
+          fail="FALSE"
+          url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' --include='*.md' -r .)
+          if [ -n "$url_lines" ]; then
+            for url_line in $url_lines; do
+              url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
+              path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
+              response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")
+              if [ "$response" -ne 200 ]; then
+                echo "**********Validation failed, try again**********"
+                response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                if [ "$response_retry" -eq 200 ]; then
+                  echo "*****Retry successfully*****"
+                else
+                  echo "Invalid link from ${{github.workspace}}/$path: $url"
+                  fail="TRUE"
+                fi
+              fi
+            done
+          fi
+
+          if [[ "$fail" == "TRUE" ]]; then
+            exit 1
+          else
+            echo "All hyperlinks are valid."
+          fi
+        shell: bash
+
+  check-the-validity-of-relative-path:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+
+      - name: Checking Relative Path Validity
+        run: |
+          cd ${{github.workspace}}
+          fail="FALSE"
+          link_head="https://github.com/opea-project/GenAIExamples/blob/main/"
+          png_lines=$(grep -Eo '\]\([^)]+\)' -r -I .|grep -Ev 'http')
+          if [ -n "$png_lines" ]; then
+            for png_line in $png_lines; do
+              refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
+              png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
+              if [[ "${png_path:0:1}" == "/" ]]; then
+                check_path=${{github.workspace}}$png_path
+              else
+                check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+              fi
+              real_path=$(realpath $check_path)
+              if [ $? -ne 0 ]; then
+                echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
+                fail="TRUE"
+              else
+                url=$link_head$(echo "$real_path" | sed 's|.*/GenAIExamples/||')
+                response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
+                if [ "$response" -ne 200 ]; then
+                  echo "**********Validation failed, try again**********"
+                  response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                  if [ "$response_retry" -eq 200 ]; then
+                    echo "*****Retry successfully*****"
+                  else
+                    echo "Invalid link from $check_path: $url"
+                    fail="TRUE"
+                  fi
+                fi
+              fi
+            done
+          fi
+
+          if [[ "$fail" == "TRUE" ]]; then
+            exit 1
+          else
+            echo "All hyperlinks are valid."
+          fi
+        shell: bash
