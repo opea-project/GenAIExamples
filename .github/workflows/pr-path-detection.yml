@@ -61,7 +61,7 @@ jobs:
             for url_line in $url_lines; do
               url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
               path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
-              response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
+              response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")
               if [ "$response" -ne 200 ]; then
                 echo "**********Validation failed, try again**********"
                 response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
@@ -101,7 +101,11 @@ jobs:
             for png_line in $png_lines; do
               refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
               png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
-              check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+              if [[ "${png_path:0:1}" == "/" ]]; then
+                check_path=${{github.workspace}}$png_path
+              else
+                check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+              fi
               real_path=$(realpath $check_path)
               if [ $? -ne 0 ]; then
                 echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
