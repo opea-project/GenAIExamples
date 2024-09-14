@@ -51,7 +51,7 @@ function start_services() {
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get_file"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/delete_file"
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
+    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -226,8 +226,9 @@ function validate_frontend() {
 }
 
 function stop_docker() {
+    echo $WORKPATH
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose stop -f compose_pinecone.yaml && docker compose rm -f compose_pinecone.yaml
+    docker compose -f compose_pinecone.yaml down 
 }
 
 function main() {
