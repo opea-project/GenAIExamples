@@ -125,21 +125,21 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 
 Using the docker image on `docker hub`:
 
-   ```bash
-   docker pull opea/chatqna:latest
-   ```
+```bash
+docker pull opea/chatqna:latest
+```
 
     <details>
     <summary><b>UI docker is optional, depends on the usage</b></summary>
     Two type of UI are supported now, choose one you like and pull the referred docker image.
 
-   If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/hpu/gaudi#-launch-the-conversational-ui-optional) and modify the [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
+If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/hpu/gaudi#-launch-the-conversational-ui-optional) and modify the [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
-   ```bash
-   docker pull opea/chatqna-ui:latest
-   # or
-   docker pull opea/chatqna-conversation-ui:latest
-   ```
+```bash
+docker pull opea/chatqna-ui:latest
+# or
+docker pull opea/chatqna-conversation-ui:latest
+```
 
     </details>
 
@@ -181,8 +181,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md)
 
-   > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
-
+> Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
 
 ### Required Models
 
@@ -197,8 +196,6 @@ By default, the embedding, reranking and LLM models are set to a default value a
 Change the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh` for your needs.
 
 For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA. Refer to [this readme](docker_compose/intel/cpu/xeon/README.md) for details.
-
-
 
 ### Deploy ChatQnA on Gaudi
 
