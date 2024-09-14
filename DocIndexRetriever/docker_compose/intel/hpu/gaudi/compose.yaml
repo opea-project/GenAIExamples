@@ -28,7 +28,7 @@ services:
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
-    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}
+    image: ghcr.io/huggingface/tei-gaudi:latest
     container_name: tei-embedding-gaudi-server
     ports:
       - "8090:80"
