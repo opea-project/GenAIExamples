@@ -92,6 +92,7 @@ flowchart LR
 
 
 ```
+
 <!-- Begin Tab Container -->
 <div class="tab">
   <button class="tablinks" onclick="openTab(event, 'Tab1')">Tab 1</button>
@@ -158,7 +159,6 @@ flowchart LR
     evt.currentTarget.className += " active";
   }
 </script>
-
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
