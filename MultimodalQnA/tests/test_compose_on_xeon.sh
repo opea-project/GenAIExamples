@@ -21,7 +21,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalragwithvideos multimodalragwithvideos-ui embedding-multimodal-bridgetower embedding-multimodal retriever-multimodal-redis lvm-llava lvm-llava-svc dataprep-multimodal-redis"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-multimodal-redis lvm-llava lvm-llava-svc dataprep-multimodal-redis"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -43,7 +43,7 @@ function setup_env() {
     export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
     export LVM_SERVICE_HOST_IP=${host_ip}
     export MEGA_SERVICE_HOST_IP=${host_ip}
-    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/mmragvideoqna"
+    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
     export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
     export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
     export DATAPREP_GET_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
@@ -205,18 +205,18 @@ function validate_megaservice() {
     # Curl the Mega Service with retrieval
     echo "Validate megaservice with first query"
     validate_service \
-        "http://${host_ip}:8888/v1/mmragvideoqna" \
+        "http://${host_ip}:8888/v1/multimodalqna" \
         '"time_of_frame_ms":' \
-        "multimodalragwithvideos" \
-        "multimodalragwithvideos-backend-server" \
+        "multimodalqna" \
+        "multimodalqna-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
     echo "Validate megaservice with follow-up query"
     validate_service \
-        "http://${host_ip}:8888/v1/mmragvideoqna" \
+        "http://${host_ip}:8888/v1/multimodalqna" \
         '"content":"' \
-        "multimodalragwithvideos" \
-        "multimodalragwithvideos-backend-server" \
+        "multimodalqna" \
+        "multimodalqna-backend-server" \
         '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
 
 }

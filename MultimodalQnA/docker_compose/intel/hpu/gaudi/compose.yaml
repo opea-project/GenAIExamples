@@ -13,7 +13,7 @@ services:
     container_name: dataprep-multimodal-redis
     depends_on:
       - redis-vector-db
-      - lvm-llava
+      - lvm-tgi
     ports:
       - "6007:6007"
     environment:
@@ -67,21 +67,33 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
-  lvm-llava:
-    image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
-    container_name: lvm-llava
+  tgi-gaudi:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.4
+    container_name: tgi-llava-gaudi-server
     ports:
-      - "8399:8399"
+      - "8399:80"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      PREFILL_BATCH_BUCKET_SIZE: 1
+      BATCH_BUCKET_SIZE: 1
+      MAX_BATCH_TOTAL_TOKENS: 4096
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LVM_MODEL_ID} --max-input-tokens 3048 --max-total-tokens 4096
     restart: unless-stopped
-  lvm-llava-svc:
-    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
-    container_name: lvm-llava-svc
+  lvm-tgi:
+    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+    container_name: lvm-tgi
     depends_on:
-      - lvm-llava
+      - tgi-gaudi
     ports:
       - "9399:9399"
     ipc: host
@@ -90,16 +102,18 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
-  multimodalragwithvideos-backend-server:
-    image: ${REGISTRY:-opea}/multimodalragwithvideos:${TAG:-latest}
-    container_name: multimodalragwithvideos-backend-server
+  multimodalqna:
+    image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
+    container_name: multimodalqna-backend-server
     depends_on:
       - redis-vector-db
       - dataprep-multimodal-redis
       - embedding-multimodal
       - retriever-multimodal-redis
-      - lvm-llava-svc
+      - lvm-tgi
     ports:
       - "8888:8888"
     environment:
@@ -113,11 +127,11 @@ services:
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  multimodalragwithvideos-ui:
-    image: ${REGISTRY:-opea}/multimodalragwithvideos-ui:${TAG:-latest}
-    container_name: multimodalragwithvideos-gradio-ui-server
+  multimodalqna-ui:
+    image: ${REGISTRY:-opea}/multimodalqna-ui:${TAG:-latest}
+    container_name: multimodalqna-gradio-ui-server
     depends_on:
-      - multimodalragwithvideos
+      - multimodalqna
     ports:
       - "5173:5173"
     environment:

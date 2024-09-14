@@ -1,14 +1,14 @@
-# Multimodal-RAG with Videos
+# MultimodalQnA Application
 
-Suppose you possess a set of videos and wish to perform question-answering to extract insights from these videos. To respond to your questions, it typically necessitates comprehension of visual cues within the videos, knowledge derived from the audio content, or often a mix of both these visual elements and auditory facts. The Multimodal-RAG with Videos framework offers an optimal solution for this purpose.
+Suppose you possess a set of videos and wish to perform question-answering to extract insights from these videos. To respond to your questions, it typically necessitates comprehension of visual cues within the videos, knowledge derived from the audio content, or often a mix of both these visual elements and auditory facts. The MultimodalQnA framework offers an optimal solution for this purpose.
 
-`The Multimodal-RAG (MM-RAG) with Videos` addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos. For this purpose, MM-RAG with Videos utilizes [BridgeTower model](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi), a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the video ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MM-RAG with Videos will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVM) as input context to generate a response for the user.
+`MultimodalQnA` addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos. For this purpose, MultimodalQnA utilizes [BridgeTower model](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi), a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the video ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MultimodalQnA will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVM) as input context to generate a response for the user.
 
-The Multimodal-RAG with Videos (MM-RAG for short) architecture shows below:
+The MultimodalQnA architecture shows below:
 
-![architecture](./assets/img/mm-rag-architecture.png)
+![architecture](./assets/img/MultimodalQnA.png)
 
-MM-RAG is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the MM-RAG Flow Chart shows below:
+MultimodalQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the MultimodalQnA Flow Chart shows below:
 
 ```mermaid
 ---
@@ -27,9 +27,9 @@ flowchart LR
     classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef invisible fill:transparent,stroke:transparent;
-    style MM-RAG-MegaService stroke:#000000
+    style MultimodalQnA-MegaService stroke:#000000
     %% Subgraphs %%
-    subgraph MM-RAG-MegaService["MM-RAG-MegaService"]
+    subgraph MultimodalQnA-MegaService["MultimodalQnA-MegaService"]
         direction LR
         EM([Embedding <br>]):::blue
         RET([Retrieval <br>]):::blue
@@ -41,10 +41,10 @@ flowchart LR
         Ingest([Ingest data]):::orchid
         UI([UI server<br>]):::orchid
     end
-    subgraph MM-RAG GateWay
+    subgraph MultimodalQnA GateWay
         direction LR
         invisible1[ ]:::invisible
-        GW([MM-RAG GateWay<br>]):::orange
+        GW([MultimodalQnA GateWay<br>]):::orange
     end
     subgraph .
         X([OPEA Microservice]):::blue
@@ -70,7 +70,7 @@ flowchart LR
     direction LR
     a[User Input Query] -->|1| UI
     UI -->|2| GW
-    GW <==>|3| MM-RAG-MegaService
+    GW <==>|3| MultimodalQnA-MegaService
     EM ==>|4| RET
     RET ==>|5| LVM
 
@@ -84,16 +84,16 @@ flowchart LR
     direction TB
     %% Vector DB interaction
     R_RET <-.->|d|VDB
-    DP <-.->|d|VDB
+    DP <-.->|e|VDB
 
 
 
 
 ```
 
-This MM-RAGwithVideos use case performs multimodal-RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel Xeon Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
+This MultimodalQnA use case performs Multimodal-RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel Xeon Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
 
-In the below, we provide a table that describes for each microservice component in the MM-RAGwithVideos architecture, the default configuration of the open source project, hardware, port, and endpoint.
+In the below, we provide a table that describes for each microservice component in the MultimodalQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
 <details>
 <summary><b>Gaudi default compose.yaml</b></summary>
@@ -118,15 +118,15 @@ By default, the embedding and LVM models are set to a default value as listed be
 
 You can choose other LVM models, such as `llava-hf/llava-1.5-7b-hf ` and `llava-hf/llava-1.5-13b-hf`, as needed.
 
-## Deploy MM-RAGwithVideos Service
+## Deploy MultimodalQnA Service
 
-The MM-RAGwithVideos service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
+The MultimodalQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
-Currently we support deploying MM-RAGwithVideos services with docker compose.
+Currently we support deploying MultimodalQnA services with docker compose.
 
 ### Setup Environment Variable
 
-To set up environment variables for deploying MM-RAGwithVideos services, follow these steps:
+To set up environment variables for deploying MultimodalQnA services, follow these steps:
 
 1. Set the required environment variables:
 
@@ -155,34 +155,34 @@ To set up environment variables for deploying MM-RAGwithVideos services, follow 
    source ./docker_compose/intel/cpu/xeon/set_env.sh
    ```
 
-### Deploy VisualQnA on Gaudi
+### Deploy MultimodalQnA on Gaudi
 
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
 
 ```bash
-cd GenAIExamples/MultimodalRAGWithVideos/docker_compose/intel/hpu/gaudi/
+cd GenAIExamples/MultimodalQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f compose.yaml up -d
 ```
 
 > Notice: Currently only the **Habana Driver 1.17.x** is supported for Gaudi.
 
-### Deploy VisualQnA on Xeon
+### Deploy MultimodalQnA on Xeon
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
 
 Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
 ```bash
-cd GenAIExamples/MultimodalRAGWithVideos/docker_compose/intel/cpu/xeon/
+cd GenAIExamples/MultimodalQnA/docker_compose/intel/cpu/xeon/
 docker compose -f compose.yaml up -d
 ```
 
-## MultimodalRAGWithVideos Demo on Gaudi2
+## MultimodalQnA Demo on Gaudi2
 
-![MultimodalRAGWithVideos-upload-waiting-screenshot](./assets/img/upload-gen-trans.png)
+![MultimodalQnA-upload-waiting-screenshot](./assets/img/upload-gen-trans.png)
 
-![MultimodalRAGWithVideos-upload-done-screenshot](./assets/img/upload-gen-captions.png)
+![MultimodalQnA-upload-done-screenshot](./assets/img/upload-gen-captions.png)
 
-![MultimodalRAGWithVideos-query-example-screenshot](./assets/img/example_query.png)
+![MultimodalQnA-query-example-screenshot](./assets/img/example_query.png)

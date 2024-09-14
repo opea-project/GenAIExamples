@@ -19,7 +19,7 @@ WORKDIR /home/user/GenAIComps
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
 
-COPY ./multimodalragwithvideos.py /home/user/multimodalragwithvideos.py
+COPY ./multimodalqna.py /home/user/multimodalqna.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
@@ -27,5 +27,5 @@ USER user
 
 WORKDIR /home/user
 
-ENTRYPOINT ["python", "multimodalragwithvideos.py"]
+ENTRYPOINT ["python", "multimodalqna.py"]
 # ENTRYPOINT ["/usr/bin/sleep", "infinity"]
