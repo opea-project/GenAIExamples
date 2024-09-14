@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Check for missing Dockerfile paths in repo comps
+name: Check Paths and Hyperlinks
 
 on:
   pull_request:
@@ -11,20 +11,19 @@ on:
 jobs:
   check-dockerfile-paths:
     runs-on: ubuntu-latest
-
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
 
-      - name: Checkout repo GenAIExamples
+      - name: Checkout Repo GenAIExamples
         uses: actions/checkout@v4
 
-      - name: Clone repo GenAIComps
+      - name: Clone Repo GenAIComps
         run: |
           cd ..
           git clone https://github.com/opea-project/GenAIComps.git
 
-      - name: Check for missing Dockerfile paths in GenAIComps
+      - name: Check for Missing Dockerfile Paths in GenAIComps
         run: |
           cd ${{github.workspace}}
           miss="FALSE"
@@ -43,16 +42,16 @@ jobs:
 
         shell: bash
 
-  Check-the-validity-of-hyperlinks-in-README:
-    runs-on: self-hosted
+  check-the-validity-of-hyperlinks-in-README:
+    runs-on: ubuntu-latest
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
 
-      - name: Checkout repo GenAIExamples
+      - name: Checkout Repo GenAIExamples
         uses: actions/checkout@v4
 
-      - name: Check the validity of hyperlinks
+      - name: Check the Validity of Hyperlinks
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
@@ -82,16 +81,16 @@ jobs:
           fi
         shell: bash
 
-  Check-the-validity-of-relative-path:
-    runs-on: self-hosted   #ubuntu-latest
+  check-the-validity-of-relative-path:
+    runs-on: ubuntu-latest
     steps:
-      - name: Clean Up Working Directory
+      - name: Clean up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
 
-      - name: Checkout repo GenAIExamples
+      - name: Checkout Repo GenAIExamples
         uses: actions/checkout@v4
 
-      - name: Checking relative path validity
+      - name: Checking Relative Path Validity
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
