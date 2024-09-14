@@ -1,4 +1,4 @@
-# Build Mega Service of videoqna on Xeon
+# Build Mega Service of VideoQnA on Xeon
 
 This document outlines the deployment process for a videoqna application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `lvm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
