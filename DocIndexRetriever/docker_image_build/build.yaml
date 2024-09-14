@@ -35,4 +35,3 @@ services:
       dockerfile: comps/dataprep/redis/langchain/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
-
