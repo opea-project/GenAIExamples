@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY ./visualqna.py /home/user/visualqna.py
 
-ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
+ENV PYTHONPATH=/home/user/GenAIComps
 
 USER user
 
