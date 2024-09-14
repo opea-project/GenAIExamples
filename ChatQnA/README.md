@@ -91,44 +91,74 @@ flowchart LR
     DP <-.->|d|VDB
 
 
-
-
 ```
-
-<div>
-  <input type="radio" id="tab1" name="tabs" checked>
-  <label for="tab1">Tab 1</label>
-  
-  <input type="radio" id="tab2" name="tabs">
-  <label for="tab2">Tab 2</label>
-  
-  <input type="radio" id="tab3" name="tabs">
-  <label for="tab3">Tab 3</label>
-  
-  <div id="content1">
-    <p>Content for Tab 1</p>
-  </div>
-  
-  <div id="content2">
-    <p>Content for Tab 2</p>
-  </div>
-  
-  <div id="content3">
-    <p>Content for Tab 3</p>
-  </div>
+<!-- Begin Tab Container -->
+<div class="tab">
+  <button class="tablinks" onclick="openTab(event, 'Tab1')">Tab 1</button>
+  <button class="tablinks" onclick="openTab(event, 'Tab2')">Tab 2</button>
+  <button class="tablinks" onclick="openTab(event, 'Tab3')">Tab 3</button>
 </div>
 
+<!-- Tab Content -->
+<div id="Tab1" class="tabcontent">
+  <h3>Tab 1</h3>
+  <p>Content for Tab 1.</p>
+</div>
+
+<div id="Tab2" class="tabcontent">
+  <h3>Tab 2</h3>
+  <p>Content for Tab 2.</p>
+</div>
+
+<div id="Tab3" class="tabcontent">
+  <h3>Tab 3</h3>
+  <p>Content for Tab 3.</p>
+</div>
+
+<!-- Styling and Script -->
 <style>
-  /* Hide all elements except the first one */
-  [id^="content"]:not(:first-of-type) {
-    display: none;
+  .tab {
+    overflow: hidden;
+    border-bottom: 1px solid #ccc;
   }
-  
-  /* Show content for selected tab */
-  input[name="tabs"]:checked + label + [id^="content"] {
-    display: block;
+
+  .tab button {
+    background-color: #f1f1f1;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 16px;
+    transition: 0.3s;
+  }
+
+  .tab button:hover {
+    background-color: #ddd;
+  }
+
+  .tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border-top: none;
   }
 </style>
+
+<script>
+  function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
+</script>
+
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
