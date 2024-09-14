@@ -95,25 +95,30 @@ flowchart LR
 
 <!-- Begin Tab Container -->
 <div class="tab">
-  <button class="tablinks" onclick="openTab(event, 'Tab1')">Tab 1</button>
-  <button class="tablinks" onclick="openTab(event, 'Tab2')">Tab 2</button>
-  <button class="tablinks" onclick="openTab(event, 'Tab3')">Tab 3</button>
+  <button class="tablinks" onclick="openTab(event, 'Introduction')">Introduction</button>
+  <button class="tablinks" onclick="openTab(event, 'Installation')">Installation</button>
+  <button class="tablinks" onclick="openTab(event, 'Usage')">Usage</button>
 </div>
 
 <!-- Tab Content -->
-<div id="Tab1" class="tabcontent">
-  <h3>Tab 1</h3>
-  <p>Content for Tab 1.</p>
+<div id="Introduction" class="tabcontent">
+  <h3>Introduction</h3>
+  <p>This section provides an introduction to the project, outlining its purpose and goals.</p>
 </div>
 
-<div id="Tab2" class="tabcontent">
-  <h3>Tab 2</h3>
-  <p>Content for Tab 2.</p>
+<div id="Installation" class="tabcontent">
+  <h3>Installation</h3>
+  <p>Here are the steps to install the project on your local machine.</p>
+  <pre><code>
+  git clone https://github.com/your-repo/project.git
+  cd project
+  npm install
+  </code></pre>
 </div>
 
-<div id="Tab3" class="tabcontent">
-  <h3>Tab 3</h3>
-  <p>Content for Tab 3.</p>
+<div id="Usage" class="tabcontent">
+  <h3>Usage</h3>
+  <p>Instructions on how to use the project after installation.</p>
 </div>
 
 <!-- Styling and Script -->
@@ -159,6 +164,7 @@ flowchart LR
     evt.currentTarget.className += " active";
   }
 </script>
+
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
