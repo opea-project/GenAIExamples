@@ -57,15 +57,19 @@ jobs:
           cd ${{github.workspace}}
           fail="FALSE"
           url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r .)
+          echo $?
           if [ -n "$url_lines" ]; then
             for url_line in $url_lines; do
               url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
+              echo $?
               path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
+              echo $?
               response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
-
+              echo $?
               if [ "$response" -ne 200 ]; then
                 echo "**********Validation failed, try again**********"
                 response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                echo $?
                 if [ "$response_retry" -eq 200 ]; then
                   echo "*****Retry successfully*****"
                 else
@@ -103,12 +107,12 @@ jobs:
               refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
               png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
               check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
-              realpath $check_path
+              real_path=$(realpath $check_path)
               if [ $? -ne 0 ]; then
                 echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
                 fail="TRUE"
               else
-                url=$link_head$(echo "$(realpath $check_path)" | sed 's|.*/GenAIExamples/||')
+                url=$link_head$(echo "$real_path" | sed 's|.*/GenAIExamples/||')
                 response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
                 if [ "$response" -ne 200 ]; then
                   echo "**********Validation failed, try again**********"
