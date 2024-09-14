@@ -228,7 +228,7 @@ function validate_frontend() {
 function stop_docker() {
     echo $WORKPATH
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose_pinecone.yaml down 
+    docker compose -f compose_pinecone.yaml down
 }
 
 function main() {
