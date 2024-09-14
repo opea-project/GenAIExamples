@@ -1,0 +1,149 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  dataprep-multimodal-redis:
+    image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
+    container_name: dataprep-multimodal-redis
+    depends_on:
+      - redis-vector-db
+      - lvm-tgi
+    ports:
+      - "6007:6007"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      INDEX_NAME: ${INDEX_NAME}
+      LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:9399/v1/lvm"
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  embedding-multimodal-bridgetower:
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
+    container_name: embedding-multimodal-bridgetower
+    ports:
+      - ${EMBEDDER_PORT}:${EMBEDDER_PORT}
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PORT: ${EMBEDDER_PORT}
+    restart: unless-stopped
+  embedding-multimodal:
+    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+    container_name: embedding-multimodal
+    depends_on:
+      - embedding-multimodal-bridgetower
+    ports:
+      - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+    restart: unless-stopped
+  retriever-multimodal-redis:
+    image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}
+    container_name: retriever-multimodal-redis
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+    restart: unless-stopped
+  tgi-gaudi:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.4
+    container_name: tgi-llava-gaudi-server
+    ports:
+      - "8399:80"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      PREFILL_BATCH_BUCKET_SIZE: 1
+      BATCH_BUCKET_SIZE: 1
+      MAX_BATCH_TOTAL_TOKENS: 4096
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LVM_MODEL_ID} --max-input-tokens 3048 --max-total-tokens 4096
+    restart: unless-stopped
+  lvm-tgi:
+    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+    container_name: lvm-tgi
+    depends_on:
+      - tgi-gaudi
+    ports:
+      - "9399:9399"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    restart: unless-stopped
+  multimodalqna:
+    image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
+    container_name: multimodalqna-backend-server
+    depends_on:
+      - redis-vector-db
+      - dataprep-multimodal-redis
+      - embedding-multimodal
+      - retriever-multimodal-redis
+      - lvm-tgi
+    ports:
+      - "8888:8888"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      MM_EMBEDDING_SERVICE_HOST_IP: ${MM_EMBEDDING_SERVICE_HOST_IP}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
+      LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  multimodalqna-ui:
+    image: ${REGISTRY:-opea}/multimodalqna-ui:${TAG:-latest}
+    container_name: multimodalqna-gradio-ui-server
+    depends_on:
+      - multimodalqna
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
