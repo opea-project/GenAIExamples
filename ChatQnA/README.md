@@ -127,13 +127,14 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 <summary><b>UI docker is optional, depends on the usage</b></summary>
    Two type of UI are supported now, choose one you like and pull the referred docker image.
 
-   If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/hpu/gaudi#-launch-the-conversational-ui-optional) and modify the [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
+If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/hpu/gaudi#-launch-the-conversational-ui-optional) and modify the [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
-   ```bash
-   docker pull opea/chatqna-ui:latest
-   # or
-   docker pull opea/chatqna-conversation-ui:latest
-   ```  
+```bash
+docker pull opea/chatqna-ui:latest
+# or
+docker pull opea/chatqna-conversation-ui:latest
+```
+
 </details>
 
 2. Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md)
