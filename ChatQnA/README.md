@@ -113,7 +113,8 @@ The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel
 
 Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
 
-Quick Start Deployment Steps: 
+Quick Start Deployment Steps:
+
 1. Prepare the Docker image (UI Docker is optional).
 2. Set up the environment variables.
 3. Run Docker Compose.
