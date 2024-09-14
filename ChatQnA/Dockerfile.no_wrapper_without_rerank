@@ -31,4 +31,4 @@ USER user
 
 WORKDIR /home/user
 
-ENTRYPOINT ["python", "chatqna_no_wrapper.py"]
+ENTRYPOINT ["python", "chatqna_no_wrapper.py", "--without-rerank"]
