@@ -60,17 +60,16 @@ jobs:
           if [ -n "$url_lines" ]; then
             for url_line in $url_lines; do
               url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
-              #(|sed 's/\.md$//')
               path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
               response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
+
               if [ "$response" -ne 200 ]; then
                 echo "**********Validation failed, try again**********"
                 response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
                 if [ "$response_retry" -eq 200 ]; then
-                  echo "Valid link: $url"
+                  echo "*****Retry successfully*****"
                 else
                   echo "Invalid link from ${{github.workspace}}/$path: $url"
-                  # echo "Invalid link from $path: $url"
                   fail="TRUE"
                 fi
               fi
@@ -85,7 +84,7 @@ jobs:
         shell: bash
 
   Check-the-validity-of-relative-path:
-    runs-on: self-hosted  #ubuntu-latest
+    runs-on: self-hosted   #ubuntu-latest
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
@@ -104,7 +103,6 @@ jobs:
               refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
               png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
               check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
-              echo $check_path
               realpath $check_path
               if [ $? -ne 0 ]; then
                 echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
@@ -116,10 +114,9 @@ jobs:
                   echo "**********Validation failed, try again**********"
                   response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
                   if [ "$response_retry" -eq 200 ]; then
-                    echo "Valid link: $url"
+                    echo "*****Retry successfully*****"
                   else
                     echo "Invalid link from $check_path: $url"
-                    # echo "Invalid link from $path: $url"
                     fail="TRUE"
                   fi
                 fi
