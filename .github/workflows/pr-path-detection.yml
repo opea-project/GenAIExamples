@@ -70,12 +70,13 @@ jobs:
                 else
                   echo "Invalid link from ${{github.workspace}}/$path: $url"
                   fail="TRUE"
-                  echo $?
+                  echo "$fail"$?
                 fi
               fi
             done
+            echo "exit for:"$?
           fi
-          echo $?
+          echo "exit if:"$?
 
           if [[ "$fail" == "TRUE" ]]; then
             exit 1
