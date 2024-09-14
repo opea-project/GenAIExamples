@@ -57,11 +57,9 @@ jobs:
           cd ${{github.workspace}}
           fail="FALSE"
           url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r .)
-          echo $?
           if [ -n "$url_lines" ]; then
             for url_line in $url_lines; do
               url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
-              echo $?
               path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
               echo $?
               response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
@@ -69,11 +67,12 @@ jobs:
               if [ "$response" -ne 200 ]; then
                 echo "**********Validation failed, try again**********"
                 response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-                echo $?
                 if [ "$response_retry" -eq 200 ]; then
                   echo "*****Retry successfully*****"
+                  echo $?
                 else
                   echo "Invalid link from ${{github.workspace}}/$path: $url"
+                  echo $?
                   fail="TRUE"
                 fi
               fi
