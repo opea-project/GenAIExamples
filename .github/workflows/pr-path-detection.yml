@@ -57,6 +57,7 @@ jobs:
           cd ${{github.workspace}}
           fail="FALSE"
           url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' -r .)
+          echo $url_lines
           if [ -n "$url_lines" ]; then
             for url_line in $url_lines; do
               echo $? $url_line
