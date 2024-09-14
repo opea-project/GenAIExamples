@@ -17,6 +17,17 @@ sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chat
 kubectl apply -f chatqna.yaml
 ```
 
+Newer CPUs such as Intel Cooper Lake, Sapphire Rapids, support [`bfloat16` data type](https://en.wikipedia.org/wiki/Bfloat16_floating-point_format). If you have such CPUs, and given model supports `bfloat16`, adding `--dtype bfloat16` argument for `huggingface/text-generation-inference` server halves its memory usage and speeds it a bit. To use it, run the following commands:
+
+```
+# label your node for scheduling the service on it automatically
+kubectl label node 'your-node-name' node-type=node-bfloat16
+
+# add `nodeSelector` for the `huggingface/text-generation-inference` server at `chatqna_bf16.yaml`
+# create
+kubectl apply -f chatqna_bf16.yaml
+```
+
 ## Deploy On Gaudi
 
 ```

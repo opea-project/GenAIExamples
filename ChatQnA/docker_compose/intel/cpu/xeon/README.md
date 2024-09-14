@@ -4,7 +4,7 @@ This document outlines the deployment process for a ChatQnA application utilizin
 
 ## 🚀 Apply Xeon Server on AWS
 
-To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage the power of 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
+To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors that are optimized for demanding workloads.
 
 For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
 
@@ -404,12 +404,13 @@ docker compose -f compose_vllm.yaml up -d
 
    If you want to update the default knowledge base, you can use the following commands:
 
-   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf)
-   Click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
+   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
    Or run this command to get the file on a terminal.
 
    ```bash
-   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf
+   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+
    ```
 
    Upload:

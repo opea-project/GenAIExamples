@@ -4,7 +4,7 @@ This document outlines the deployment process for a VisualQnA application utiliz
 
 ## 🚀 Apply Xeon Server on AWS
 
-To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage the power of 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
+To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
 
 For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
 
@@ -41,10 +41,12 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 1. Build LVM Image
+### 1. Build LVM and NGINX Docker Images
 
 ```bash
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
+
+docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -55,7 +57,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/VisualQnA
 docker build --no-cache -t opea/visualqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
+cd ../..
 ```
 
 ### 3. Build UI Docker Image
@@ -65,7 +67,7 @@ Build frontend Docker image via below command:
 ```bash
 cd GenAIExamples/VisualQnA/ui
 docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-cd ../../../..
+cd ../../..
 ```
 
 ### 4. Pull TGI Xeon Image
@@ -74,12 +76,13 @@ cd ../../../..
 docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
 ```
 
-Then run the command `docker images`, you will have the following 4 Docker Images:
+Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`
+5. `opea/nginx`
 
 ## 🚀 Start Microservices
 
@@ -98,7 +101,7 @@ export host_ip="External_Public_IP"
 **Append the value of the public IP address to the no_proxy list**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
+export your_no_proxy="${your_no_proxy},${host_ip}"
 ```
 
 ```bash
@@ -130,6 +133,8 @@ docker compose -f compose.yaml up -d
 ### Validate Microservices
 
 Follow the instructions to validate MicroServices.
+
+> Note: If you see an "Internal Server Error" from the `curl` command, wait a few minutes for the microserver to be ready and then try again.
 
 1. LLM Microservice
 
