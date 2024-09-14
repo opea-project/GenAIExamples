@@ -123,7 +123,7 @@ Quick Start Deployment Steps:
 
 Currently we support two ways of deploying ChatQnA services with docker compose:
 
-1. Using the docker image on `docker hub`:
+Using the docker image on `docker hub`:
 
    ```bash
    docker pull opea/chatqna:latest
@@ -143,23 +143,7 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 
     </details>
 
-2. Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md)
-
-   > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
-
-### Required Models
-
-By default, the embedding, reranking and LLM models are set to a default value as listed below:
-
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
-
-Change the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh` for your needs.
-
-For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA. Refer to [this readme](docker_compose/intel/cpu/xeon/README.md) for details.
+<details>
 
 ### Setup Environment Variable
 
@@ -194,6 +178,27 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    # on Nvidia GPU
    source ./docker_compose/nvidia/gpu/set_env.sh
    ```
+
+Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md)
+
+   > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
+
+
+### Required Models
+
+By default, the embedding, reranking and LLM models are set to a default value as listed below:
+
+| Service   | Model                     |
+| --------- | ------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5     |
+| Reranking | BAAI/bge-reranker-base    |
+| LLM       | Intel/neural-chat-7b-v3-3 |
+
+Change the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh` for your needs.
+
+For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA. Refer to [this readme](docker_compose/intel/cpu/xeon/README.md) for details.
+
+
 
 ### Deploy ChatQnA on Gaudi
 
