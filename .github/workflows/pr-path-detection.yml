@@ -65,7 +65,7 @@ jobs:
               response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
               if [ "$response" -ne 200 ]; then
                 echo "**********Validation failed, try again**********"
-                response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                response_retry=$(curl -s -o -I /dev/null -w "%{http_code}" "$url")
                 if [ "$response_retry" -eq 200 ]; then
                   echo "Valid link: $url"
                 else
@@ -97,6 +97,7 @@ jobs:
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
+          link_head="https://github.com/opea-project/GenAIExamples/blob/main/"
           png_lines=$(grep -Eo '\]\([^)]+\)' -r -I .|grep -Ev 'http')
           if [ -n "$png_lines" ]; then
             for png_line in $png_lines; do
@@ -106,10 +107,10 @@ jobs:
               echo $check_path
               realpath $check_path
               if [ $? -ne 0 ]; then
-                Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
+                echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
                 fail="TRUE"
               else
-                url="https://github.com/opea-project/GenAIExamples/blob/main/"$(echo "$(realpath $check_path)" | sed 's|.*/GenAIExamples/||')
+                url=$link_head$(echo "$(realpath $check_path)" | sed 's|.*/GenAIExamples/||')
                 response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
                 if [ "$response" -ne 200 ]; then
                   echo "**********Validation failed, try again**********"
@@ -117,7 +118,7 @@ jobs:
                   if [ "$response_retry" -eq 200 ]; then
                     echo "Valid link: $url"
                   else
-                    echo 'Invalid link from $check_path: $url'
+                    echo "Invalid link from $check_path: $url"
                     # echo "Invalid link from $path: $url"
                     fail="TRUE"
                   fi
