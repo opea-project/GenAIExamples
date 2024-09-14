@@ -62,10 +62,10 @@ jobs:
               url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
               #(|sed 's/\.md$//')
               path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
-              response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+              response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
               if [ "$response" -ne 200 ]; then
                 echo "**********Validation failed, try again**********"
-                response_retry=$(curl -s -o -I /dev/null -w "%{http_code}" "$url")
+                response_retry=$(curl -I -s -o /dev/null -w "%{http_code}" "$url")
                 if [ "$response_retry" -eq 200 ]; then
                   echo "Valid link: $url"
                 else
@@ -111,10 +111,10 @@ jobs:
                 fail="TRUE"
               else
                 url=$link_head$(echo "$(realpath $check_path)" | sed 's|.*/GenAIExamples/||')
-                response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
                 if [ "$response" -ne 200 ]; then
                   echo "**********Validation failed, try again**********"
-                  response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                  response_retry=$(curl -I -s -o /dev/null -w "%{http_code}" "$url")
                   if [ "$response_retry" -eq 200 ]; then
                     echo "Valid link: $url"
                   else
