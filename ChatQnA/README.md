@@ -140,10 +140,7 @@ docker pull opea/chatqna-ui:latest
 # or
 docker pull opea/chatqna-conversation-ui:latest
 ```
-
     </details>
-
-<details>
 
 ### Setup Environment Variable
 
