@@ -52,6 +52,24 @@ Then run the command `docker images`, you will have the following 3 Docker Image
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
 
+### 8. Build CodeGen React UI Docker Image (Optional)
+
+Build react frontend Docker image via below command:
+
+**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
+
+```bash
+cd GenAIExamples/CodeGen/ui
+docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
+```
+
+Then run the command `docker images`, you will have the following 3 Docker Images:
+
+- `opea/llm-tgi:latest`
+- `opea/codegen:latest`
+- `opea/codegen-ui:latest`
+- `opea/codegen-react-ui:latest` (optional)
+
 ## 🚀 Start Microservices and MegaService
 
 The CodeGen megaservice manages a single microservice called LLM within a Directed Acyclic Graph (DAG). In the diagram above, the LLM microservice is a language model microservice that generates code snippets based on the user's input query. The TGI service serves as a text generation interface, providing a RESTful API for the LLM microservice. The CodeGen Gateway acts as the entry point for the CodeGen application, invoking the Megaservice to generate code snippets in response to the user's input query.
@@ -167,6 +185,7 @@ codegen-xeon-react-ui-server:
     - no_proxy=${no_proxy}
     - https_proxy=${https_proxy}
     - http_proxy=${http_proxy}
+    - APP_CODE_GEN_URL=${BACKEND_SERVICE_ENDPOINT}
   depends_on:
     - codegen-xeon-backend-server
   ports:
