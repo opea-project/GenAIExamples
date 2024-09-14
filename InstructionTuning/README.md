@@ -20,16 +20,16 @@ Download a training file `alpaca_data.json` and upload it to the server with bel
 
 ```bash
 # upload a training file
-curl http://${your_ip}:8005/v1/finetune/upload_training_files -X POST -H "Content-Type: multipart/form-data" -F "files=@./alpaca_data.json"
+curl http://${your_ip}:8015/v1/files -X POST -H "Content-Type: multipart/form-data" -F "file=@./alpaca_data.json" -F purpose="fine-tune"
 ```
 
 ### 2. Create fine-tuning job
 
-After a training file `alpaca_data.json` is uploaded, use the following command to launch a finetuning job using `meta-llama/Llama-2-7b-chat-hf` as base model:
+After a training file like `alpaca_data.json` is uploaded, use the following command to launch a finetuning job using `meta-llama/Llama-2-7b-chat-hf` as base model:
 
 ```bash
 # create a finetuning job
-curl http://${your_ip}:8005/v1/fine_tuning/jobs \
+curl http://${your_ip}:8015/v1/fine_tuning/jobs \
   -X POST \
   -H "Content-Type: application/json" \
   -d '{
@@ -44,17 +44,14 @@ Below commands show how to list finetuning jobs, retrieve a finetuning job, canc
 
 ```bash
 # list finetuning jobs
-curl http://${your_ip}:8005/v1/fine_tuning/jobs   -X GET
+curl http://${your_ip}:8015/v1/fine_tuning/jobs -X GET
 
 # retrieve one finetuning job
-curl http://localhost:8005/v1/fine_tuning/jobs/retrieve   -X POST   -H "Content-Type: application/json"   -d '{
-    "fine_tuning_job_id": ${fine_tuning_job_id}}'
+curl http://${your_ip}:8015/v1/fine_tuning/jobs/retrieve -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
 
 # cancel one finetuning job
-
-curl http://localhost:8005/v1/fine_tuning/jobs/cancel   -X POST   -H "Content-Type: application/json"   -d '{
-    "fine_tuning_job_id": ${fine_tuning_job_id}}'
+curl http://${your_ip}:8015/v1/fine_tuning/jobs/cancel -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
 
 # list checkpoints of a finetuning job
-curl http://${your_ip}:8005/v1/finetune/list_checkpoints -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
+curl http://${your_ip}:8015/v1/finetune/list_checkpoints -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
 ```

@@ -27,5 +27,5 @@ docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --bu
 Start docker container with below command:
 
 ```bash
-docker run -d --name="finetuning-server" -p 8005:8005 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/finetuning:latest
+docker run -d --name="finetuning-server" -p 8015:8015 --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/finetuning:latest
 ```

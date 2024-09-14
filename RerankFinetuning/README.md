@@ -8,6 +8,10 @@ Rerank model finetuning is the process of further training rerank model on a dat
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for detail.
 
+### Deploy Rerank Model Finetuning Service on Gaudi
+
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for detail.
+
 ## Consume Rerank Model Finetuning Service
 
 ### 1. Upload a training file
@@ -47,10 +51,10 @@ Below commands show how to list finetuning jobs, retrieve a finetuning job, canc
 curl http://${your_ip}:8015/v1/fine_tuning/jobs -X GET
 
 # retrieve one finetuning job
-curl http://localhost:8015/v1/fine_tuning/jobs/retrieve -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
+curl http://${your_ip}:8015/v1/fine_tuning/jobs/retrieve -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
 
 # cancel one finetuning job
-curl http://localhost:8015/v1/fine_tuning/jobs/cancel -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
+curl http://${your_ip}:8015/v1/fine_tuning/jobs/cancel -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
 
 # list checkpoints of a finetuning job
 curl http://${your_ip}:8015/v1/finetune/list_checkpoints -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
