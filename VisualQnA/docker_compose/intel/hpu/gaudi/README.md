@@ -24,7 +24,7 @@ docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_prox
 ### 3. Pull TGI Gaudi Image
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.4
+docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
 ```
 
 ### 4. Build MegaService Docker Image
@@ -50,7 +50,7 @@ cd ../../..
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `ghcr.io/huggingface/tgi-gaudi:2.0.4`
+1. `ghcr.io/huggingface/tgi-gaudi:2.0.5`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`

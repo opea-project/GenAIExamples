@@ -323,7 +323,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.5
         name: llm-dependency-deploy-demo
         securityContext:
           capabilities:
@@ -483,7 +483,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/tei-gaudi:latest
+        image: ghcr.io/huggingface/tei-gaudi:latest
         name: reranking-dependency-deploy
         args:
         - --model-id

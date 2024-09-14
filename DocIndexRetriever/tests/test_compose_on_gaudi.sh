@@ -19,14 +19,12 @@ function build_docker_images() {
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
-    if [ ! -d "tei-gaudi" ] ; then
-        git clone https://github.com/huggingface/tei-gaudi
-    fi
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull redis/redis-stack:7.2.0-v9
+    docker pull ghcr.io/huggingface/tei-gaudi:latest
     docker images && sleep 1s
 }
 

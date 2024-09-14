@@ -9,7 +9,7 @@ This page shows the benchmark data of GenAIExamples. More data for different exa
 | opea/embedding-tei:v0.9                               |
 | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 |
 | opea/llm-tgi:v0.9                                     |
-| ghcr.io/huggingface/tgi-gaudi:2.0.1                   |
+| ghcr.io/huggingface/tgi-gaudi:2.0.5                   |
 | opea/dataprep-redis:v0.9                              |
 | redis/redis-stack:7.2.0-v9                            |
 | opea/reranking-tei:v0.9                               |

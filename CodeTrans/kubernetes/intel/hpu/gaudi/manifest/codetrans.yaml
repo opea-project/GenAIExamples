@@ -405,7 +405,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/tgi-gaudi:2.0.1"
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.5"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data

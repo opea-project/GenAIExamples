@@ -22,7 +22,7 @@ function build_docker_images() {
     service_list="chatqna-without-rerank chatqna-ui chatqna-conversation-ui dataprep-redis embedding-tei retriever-redis llm-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
