@@ -1,0 +1,61 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  multimodalqna:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
+  multimodalqna-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/multimodalqna-ui:${TAG:-latest}
+  embedding-multimodal-bridgetower:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/multimodal/bridgetower/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
+  embedding-multimodal:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/multimodal/multimodal_langchain/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+  retriever-multimodal-redis:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/multimodal/redis/langchain/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}
+  lvm-llava:
+    build:
+      context: GenAIComps
+      dockerfile: comps/lvms/llava/dependency/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
+  lvm-llava-svc:
+    build:
+      context: GenAIComps
+      dockerfile: comps/lvms/llava/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
+  lvm-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/lvms/tgi-llava/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+  dataprep-multimodal-redis:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/multimodal/redis/langchain/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
