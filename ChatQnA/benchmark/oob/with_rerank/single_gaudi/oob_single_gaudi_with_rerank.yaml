@@ -359,8 +359,16 @@ spec:
           value: habana
         - name: HABANA_VISIBLE_DEVICES
           value: all
-        - name: HF_TOKEN
+        - name: HUGGING_FACE_HUB_TOKEN
           value: ${HF_TOKEN}
+        - name: ENABLE_HPU_GRAPH
+          value: 'true'
+        - name: LIMIT_HPU_GRAPH
+          value: 'true'
+        - name: USE_FLASH_ATTENTION
+          value: 'true'
+        - name: FLASH_ATTENTION_RECOMPUTE
+          value: 'true'
       serviceAccountName: default
       volumes:
       - name: model-volume
