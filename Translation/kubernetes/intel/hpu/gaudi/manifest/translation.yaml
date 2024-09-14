@@ -12,7 +12,7 @@ metadata:
 data:
   LLM_MODEL_ID: "haoranxu/ALMA-13B"
   PORT: "2080"
-  HF_TOKEN: "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"
+  HF_TOKEN: "insert-your-huggingface-token-here"
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
@@ -35,7 +35,7 @@ metadata:
     app.kubernetes.io/version: "v1.0"
 data:
   TGI_LLM_ENDPOINT: "http://translation-tgi"
-  HUGGINGFACEHUB_API_TOKEN: "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"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
