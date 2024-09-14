@@ -207,8 +207,6 @@ spec:
         app.kubernetes.io/instance: translation
         app.kubernetes.io/version: "v1.0"
     spec:
-      nodeSelector:
-        task: "translation"
       securityContext:
         {}
       containers:
@@ -256,8 +254,6 @@ spec:
         app.kubernetes.io/name: llm-uservice
         app.kubernetes.io/instance: translation
     spec:
-      nodeSelector:
-        task: "translation"
       securityContext:
         {}
       containers:
@@ -334,8 +330,6 @@ spec:
         app.kubernetes.io/name: tgi
         app.kubernetes.io/instance: translation
     spec:
-      nodeSelector:
-        task: "translation"
       securityContext:
         {}
       containers:
@@ -415,8 +409,6 @@ spec:
         app.kubernetes.io/instance: translation
         app: translation
     spec:
-      nodeSelector:
-        task: "translation"
       securityContext:
         null
       containers:
@@ -474,8 +466,6 @@ spec:
         app.kubernetes.io/instance: translation
         app: translation-nginx
     spec:
-      nodeSelector:
-        task: "translation"
       containers:
       - image: nginx:1.27.1
         imagePullPolicy: IfNotPresent
