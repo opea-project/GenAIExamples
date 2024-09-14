@@ -204,7 +204,7 @@ metadata:
   name: llm-dependency-deploy
   namespace: default
 spec:
-  replicas: 7
+  replicas: 8
   selector:
     matchLabels:
       app: llm-dependency-deploy
