@@ -4,15 +4,15 @@
 apiVersion: v1
 data:
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
-  EMBEDDING_SERVICE_HOST_IP: embedding-svc
+  EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
   HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
   INDEX_NAME: rag-redis
   LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
-  LLM_SERVICE_HOST_IP: llm-svc
+  LLM_SERVER_HOST_IP: llm-dependency-svc
   NODE_SELECTOR: chatqna-opea
   REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
   RERANK_MODEL_ID: BAAI/bge-reranker-base
-  RERANK_SERVICE_HOST_IP: reranking-svc
+  RERANK_SERVER_HOST_IP: reranking-dependency-svc
   RETRIEVER_SERVICE_HOST_IP: retriever-svc
   TEI_EMBEDDING_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
   TEI_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
@@ -44,7 +44,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/chatqna:latest
+        image: opea/chatqna-no-wrapper-without-rerank:latest
         imagePullPolicy: IfNotPresent
         name: chatqna-backend-server-deploy
         ports:
@@ -201,62 +201,10 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: embedding-deploy
-  namespace: default
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: embedding-deploy
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
-      labels:
-        app: embedding-deploy
-    spec:
-      containers:
-      - envFrom:
-        - configMapRef:
-            name: qna-config
-        image: opea/embedding-tei:latest
-        imagePullPolicy: IfNotPresent
-        name: embedding-deploy
-        ports:
-        - containerPort: 6000
-      hostIPC: true
-      nodeSelector:
-        node-type: chatqna-opea
-      serviceAccountName: default
-      topologySpreadConstraints:
-      - labelSelector:
-          matchLabels:
-            app: embedding-deploy
-        maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: embedding-svc
-  namespace: default
-spec:
-  ports:
-  - name: service
-    port: 6000
-    targetPort: 6000
-  selector:
-    app: embedding-deploy
-  type: ClusterIP
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: llm-dependency-deploy
   namespace: default
 spec:
-  replicas: 7
+  replicas: 64
   selector:
     matchLabels:
       app: llm-dependency-deploy
@@ -288,20 +236,12 @@ spec:
           value: habana
         - name: HABANA_VISIBLE_DEVICES
           value: all
-        - name: HUGGING_FACE_HUB_TOKEN
+        - name: HF_TOKEN
           value: ${HF_TOKEN}
-        - name: ENABLE_HPU_GRAPH
-          value: 'true'
-        - name: LIMIT_HPU_GRAPH
-          value: 'true'
-        - name: USE_FLASH_ATTENTION
-          value: 'true'
-        - name: FLASH_ATTENTION_RECOMPUTE
-          value: 'true'
         envFrom:
         - configMapRef:
             name: qna-config
-        image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.4
         imagePullPolicy: IfNotPresent
         name: llm-dependency-deploy
         ports:
@@ -351,196 +291,6 @@ spec:
     targetPort: 80
   selector:
     app: llm-dependency-deploy
-  type: ClusterIP
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: llm-deploy
-  namespace: default
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: llm-deploy
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
-      labels:
-        app: llm-deploy
-    spec:
-      containers:
-      - envFrom:
-        - configMapRef:
-            name: qna-config
-        image: opea/llm-tgi:latest
-        imagePullPolicy: IfNotPresent
-        name: llm-deploy
-        ports:
-        - containerPort: 9000
-      hostIPC: true
-      nodeSelector:
-        node-type: chatqna-opea
-      serviceAccountName: default
-      topologySpreadConstraints:
-      - labelSelector:
-          matchLabels:
-            app: llm-deploy
-        maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: llm-svc
-  namespace: default
-spec:
-  ports:
-  - name: service
-    port: 9000
-    targetPort: 9000
-  selector:
-    app: llm-deploy
-  type: ClusterIP
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: reranking-dependency-deploy
-  namespace: default
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: reranking-dependency-deploy
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
-      labels:
-        app: reranking-dependency-deploy
-    spec:
-      containers:
-      - args:
-        - --model-id
-        - $(RERANK_MODEL_ID)
-        - --auto-truncate
-        env:
-        - name: OMPI_MCA_btl_vader_single_copy_mechanism
-          value: none
-        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
-          value: 'true'
-        - name: runtime
-          value: habana
-        - name: HABANA_VISIBLE_DEVICES
-          value: all
-        - name: HF_TOKEN
-          value: ${HF_TOKEN}
-        - name: MAX_WARMUP_SEQUENCE_LENGTH
-          value: '512'
-        envFrom:
-        - configMapRef:
-            name: qna-config
-        image: opea/tei-gaudi:latest
-        imagePullPolicy: IfNotPresent
-        name: reranking-dependency-deploy
-        ports:
-        - containerPort: 80
-        resources:
-          limits:
-            habana.ai/gaudi: 1
-        volumeMounts:
-        - mountPath: /data
-          name: model-volume
-        - mountPath: /dev/shm
-          name: shm
-      hostIPC: true
-      nodeSelector:
-        node-type: chatqna-opea
-      serviceAccountName: default
-      topologySpreadConstraints:
-      - labelSelector:
-          matchLabels:
-            app: reranking-dependency-deploy
-        maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-      volumes:
-      - hostPath:
-          path: /mnt/models
-          type: Directory
-        name: model-volume
-      - emptyDir:
-          medium: Memory
-          sizeLimit: 1Gi
-        name: shm
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: reranking-dependency-svc
-  namespace: default
-spec:
-  ports:
-  - name: service
-    port: 8808
-    targetPort: 80
-  selector:
-    app: reranking-dependency-deploy
-  type: ClusterIP
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: reranking-deploy
-  namespace: default
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: reranking-deploy
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
-      labels:
-        app: reranking-deploy
-    spec:
-      containers:
-      - envFrom:
-        - configMapRef:
-            name: qna-config
-        image: opea/reranking-tei:latest
-        imagePullPolicy: IfNotPresent
-        name: reranking-deploy
-        ports:
-        - containerPort: 8000
-      hostIPC: true
-      nodeSelector:
-        node-type: chatqna-opea
-      serviceAccountName: default
-      topologySpreadConstraints:
-      - labelSelector:
-          matchLabels:
-            app: reranking-deploy
-        maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: reranking-svc
-  namespace: default
-spec:
-  ports:
-  - name: service
-    port: 8000
-    targetPort: 8000
-  selector:
-    app: reranking-deploy
   type: ClusterIP
 ---
 apiVersion: apps/v1
