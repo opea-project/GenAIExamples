@@ -59,7 +59,6 @@ opea_micro_services:
       HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       ENABLE_HPU_GRAPH: true
       LIMIT_HPU_GRAPH: true
       USE_FLASH_ATTENTION: true
