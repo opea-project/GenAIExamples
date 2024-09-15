@@ -134,7 +134,7 @@ metadata:
   name: embedding-dependency-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 8
   selector:
     matchLabels:
       app: embedding-dependency-deploy
