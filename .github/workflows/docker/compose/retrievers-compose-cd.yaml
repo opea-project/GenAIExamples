@@ -27,3 +27,7 @@ services:
     build:
       dockerfile: comps/retrievers/multimodal/redis/langchain/Dockerfile
     image: ${REGISTRY:-opea}/multimodal-retriever-redis:${TAG:-latest}
+  retriever-neo4j:
+    build:
+      dockerfile: comps/retrievers/neo4j/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-neo4j:${TAG:-latest}

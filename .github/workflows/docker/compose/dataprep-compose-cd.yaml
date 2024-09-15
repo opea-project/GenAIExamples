@@ -27,3 +27,7 @@ services:
     build:
       dockerfile: comps/dataprep/vdms/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}
+  dataprep-neo4j:
+    build:
+      dockerfile: comps/dataprep/neo4j/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-neo4j:${TAG:-latest}

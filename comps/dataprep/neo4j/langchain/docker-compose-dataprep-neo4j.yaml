@@ -1,0 +1,48 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3"
+services:
+  neo4j-vector-db:
+    image: neo4j/neo4j
+    container_name: neo4j-graph-db
+    ports:
+      - "6337:6337"
+      - "6338:6338"
+  tgi_gaudi_service:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+    container_name: tgi-service
+    ports:
+      - "8088:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+    command: --model-id ${LLM_MODEL_ID} --auto-truncate --max-input-tokens 1024 --max-total-tokens 2048
+  dataprep-neo4j:
+    image: opea/gen-ai-comps:dataprep-neo4j-xeon-server
+    container_name: dataprep-neo4j-server
+    depends_on:
+      - neo4j-vector-db
+      - tgi_gaudi_service
+    ports:
+      - "6007:6007"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      NEO4J_URL: ${NEO4J_URL}
+      NEO4J_USERNAME: ${NEO4J_USERNAME}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+      TGI_LLM_ENDPOINT: ${TEI_ENDPOINT}
+      OPENAI_KEY: ${OPENAI_API_KEY}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
