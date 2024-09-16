@@ -61,7 +61,6 @@ Port 5173 - Open to 0.0.0.0/0
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-
 ### 1. Build Embedding Image
 
 ```bash
