@@ -22,6 +22,7 @@
 cd GenAIExamples/ChatQnA/kubernetes/intel/cpu/xeon/manifest
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s|insert-your-huggingface-token-here|${HUGGINGFACEHUB_API_TOKEN}|g" chatqna.yaml
+kubectl apply -f shared-storage.yaml
 kubectl apply -f chatqna.yaml
 ```
 
@@ -42,6 +43,7 @@ kubectl apply -f chatqna_bf16.yaml
 cd GenAIExamples/ChatQnA/kubernetes/intel/hpu/gaudi/manifest
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s|insert-your-huggingface-token-here|${HUGGINGFACEHUB_API_TOKEN}|g" chatqna.yaml
+kubectl apply -f shared-storage.yaml
 kubectl apply -f chatqna.yaml
 ```
 
