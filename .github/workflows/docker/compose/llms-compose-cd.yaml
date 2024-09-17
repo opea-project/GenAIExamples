@@ -4,8 +4,12 @@
 services:
   llm-native:
     build:
-      dockerfile: comps/llms/text-generation/native/Dockerfile
+      dockerfile: comps/llms/text-generation/native/langchain/Dockerfile
     image: ${REGISTRY:-opea}/llm-native:${TAG:-latest}
+  llm-native-llamaindex:
+    build:
+      dockerfile: comps/llms/text-generation/native/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/llm-native-llamaindex:${TAG:-latest}
   vllm-openvino:
     build:
       context: vllm-openvino

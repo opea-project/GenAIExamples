@@ -1,0 +1,28 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  llm:
+    image: opea/llm-native:latest
+    container_name: llm-native-server
+    ports:
+      - "9000:9000"
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_NATIVE_MODEL: ${LLM_NATIVE_MODEL}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      TOKENIZERS_PARALLELISM: false
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
