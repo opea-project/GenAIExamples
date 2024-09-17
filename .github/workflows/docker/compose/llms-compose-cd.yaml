@@ -23,3 +23,7 @@ services:
     build:
       dockerfile: comps/llms/text-generation/vllm/llama_index/dependency/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/llm-vllm-llamaindex-hpu:${TAG:-latest}
+  llm-predictionguard:
+    build:
+      dockerfile: comps/llms/text-generation/predictionguard/Dockerfile
+    image: ${REGISTRY:-opea}/llm-textgen-predictionguard:${TAG:-latest}
