@@ -31,3 +31,7 @@ For details, please refer to this [readme](multimodal/README.md).
 ## Embeddings Microservice with Multimodal Clip
 
 For details, please refer to this [readme](multimodal_clip/README.md).
+
+## Embeddings Microservice with Prediction Guard
+
+For details, please refer to this [readme](predictionguard/README.md).

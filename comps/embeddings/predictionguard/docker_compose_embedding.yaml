@@ -1,0 +1,21 @@
+# Copyright (C) 2024 Prediction Guard, Inc
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  embedding:
+    image: opea/embedding-predictionguard:latest
+    container_name: embedding-predictionguard
+    ports:
+      - "6000:6000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PG_EMBEDDING_MODEL_NAME: ${PG_EMBEDDING_MODEL_NAME}
+      PREDICTIONGUARD_API_KEY: ${PREDICTIONGUARD_API_KEY}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
