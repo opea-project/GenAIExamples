@@ -128,8 +128,8 @@ cd ../..
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+cd GenAIExamples/ChatQnA/docker/ui/
+docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile . --target svelte-server
 cd ../../../..
 ```
 
@@ -140,8 +140,8 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 **Export the value of the public IP address of your Gaudi node to the `host_ip` environment variable**
 
 ```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
+cd GenAIExamples/ChatQnA/docker/ui/
+docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile . --target react-server
 cd ../../../..
 ```
 
@@ -525,8 +525,8 @@ chaqna-gaudi-conversation-ui-server:
   image: opea/chatqna-conversation-ui:latest
   container_name: chatqna-gaudi-conversation-ui-server
   environment:
-    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
-    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
+    - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
   ports:
     - "5174:80"
   depends_on:

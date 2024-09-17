@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { env } from "$env/dynamic/public";
+import { CHAT_BASE_URL } from "$env/static/public";
 import { SSE } from "sse.js";
-
-const CHAT_BASE_URL = env.CHAT_BASE_URL;
 
 export async function fetchTextStream(query: string) {
 	let payload = {};
