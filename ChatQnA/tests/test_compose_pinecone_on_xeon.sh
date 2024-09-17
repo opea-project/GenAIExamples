@@ -28,9 +28,22 @@ function build_docker_images() {
     docker images && sleep 1s
 }
 
+function build_pinecone_docker_images() {
+    echo "In pinecone build"
+    cd $WORKPATH/docker_image_build
+    git clone https://github.com/opea-project/GenAIComps.git
+
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="dataprep-pinecone retriever-pinecone"
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+
+    docker images && sleep 1s
+}
+
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
+    export no_proxy=${no_proxy},${ip_address}
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
@@ -54,7 +67,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_pinecone.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 200 ]]; do
@@ -94,6 +107,7 @@ function validate_services() {
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
+
     # check response body
     if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
@@ -111,7 +125,7 @@ function validate_microservices() {
     # tei for embedding service
     validate_services \
         "${ip_address}:6006/embed" \
-        "\[\[" \
+        "[[" \
         "tei-embedding" \
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
@@ -119,7 +133,7 @@ function validate_microservices() {
     # embedding microservice
     validate_services \
         "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":\[' \
+        '"text":"What is Deep Learning?","embedding":[' \
         "embedding" \
         "embedding-tei-server" \
         '{"text":"What is Deep Learning?"}'
@@ -128,14 +142,14 @@ function validate_microservices() {
 
     # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
-    validate_service \
+    validate_services \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-pinecone-server"
 
      # test /v1/dataprep/delete_file
-    validate_service \
+    validate_services \
         "http://${ip_address}:6007/v1/dataprep/delete_file" \
         '{"status":true}' \
         "dataprep_del" \
@@ -226,6 +240,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
+    echo "In stop docker"
     echo $WORKPATH
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose -f compose_pinecone.yaml down
@@ -235,6 +250,7 @@ function main() {
 
     stop_docker
     if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    build_pinecone_docker_images
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)

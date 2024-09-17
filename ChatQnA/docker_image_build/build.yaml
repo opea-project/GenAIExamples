@@ -118,7 +118,7 @@ services:
       context: GenAIComps
       dockerfile: comps/dataprep/pinecone/langchain/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-pinecone:${TAG:-latest}
   guardrails-tgi:
     build:
       context: GenAIComps
