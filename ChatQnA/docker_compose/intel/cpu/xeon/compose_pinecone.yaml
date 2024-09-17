@@ -67,6 +67,7 @@ services:
       PINECONE_INDEX_NAME: ${PINECONE_INDEX_NAME}
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
