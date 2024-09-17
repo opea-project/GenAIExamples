@@ -14,11 +14,11 @@ The ChatQnA example is implemented using the component-level microservices defin
 ---
 config:
   flowchart:
-    nodeSpacing: 100
+    nodeSpacing: 400
     rankSpacing: 100
     curve: linear
   themeVariables:
-    fontSize: 60px
+    fontSize: 50px
 ---
 flowchart LR
     %% Colors %%
@@ -27,36 +27,29 @@ flowchart LR
     classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef invisible fill:transparent,stroke:transparent;
     style ChatQnA-MegaService stroke:#000000
-    %% Subgraphs %%
 
-    subgraph ChatQnA-MegaService["<div style="margin:1ex 52ex 0 0;"> ChatQnA MegaService <br></div>"]
+    %% Subgraphs %%
+    subgraph ChatQnA-MegaService["ChatQnA MegaService "]
         direction LR
-        EM([Embedding]):::blue
-        RET([Retrieval ]):::blue
-        RER([Rerank ]):::blue
-        LLM([LLM ]):::blue
+        EM([Embedding MicroService]):::blue
+        RET([Retrieval MicroService]):::blue
+        RER([Rerank MicroService]):::blue
+        LLM([LLM MicroService]):::blue
     end
-    subgraph UserInterface["<div style="margin:1ex 52ex 0 0;"> User Interface </div>"]
+    subgraph UserInterface[" User Interface "]
         direction LR
         a([User Input Query]):::orchid
         Ingest([Ingest data]):::orchid
         UI([UI server<br>]):::orchid
     end
-    subgraph .
-        direction TB
-        invisible1[ ]:::invisible
-        X([OPEA Microservice]):::blue
-        Y{{Open Source Service}}
-        Z([OPEA Gateway]):::orange
-        Z1([UI]):::orchid
-    end
+
 
 
     TEI_RER{{Reranking service<br>}}
     TEI_EM{{Embedding service <br>}}
     VDB{{Vector DB<br><br>}}
     R_RET{{Retriever service <br>}}
-    DP([Data Preparation<br>]):::blue
+    DP([Data Preparation MicroService]):::blue
     LLM_gen{{LLM Service <br>}}
     GW([ChatQnA GateWay<br>]):::orange
 
@@ -93,6 +86,7 @@ flowchart LR
 
 
 ```
+
 
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
