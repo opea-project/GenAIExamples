@@ -779,7 +779,8 @@ spec:
             {}
       volumes:
         - name: model-volume
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: shared-storage-pvc
         - name: shm
           emptyDir:
             medium: Memory
@@ -870,7 +871,8 @@ spec:
             {}
       volumes:
         - name: model-volume
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: shared-storage-pvc
         - name: shm
           emptyDir:
             medium: Memory
@@ -954,7 +956,8 @@ spec:
             {}
       volumes:
         - name: model-volume
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: shared-storage-pvc
         - name: tmp
           emptyDir: {}
 ---
