@@ -29,7 +29,7 @@ curl -X POST http://localhost:9000/v1/chat/completions \
     -d '{
         "model": "Hermes-2-Pro-Llama-3-8B",
         "query": "Tell me a joke.",
-        "max_new_tokens": 100,
+        "max_tokens": 100,
         "temperature": 0.7,
         "top_p": 0.9,
         "top_k": 50,
@@ -45,7 +45,7 @@ curl -N -X POST http://localhost:9000/v1/chat/completions \
     -d '{
         "model": "Hermes-2-Pro-Llama-3-8B",
         "query": "Tell me a joke.",
-        "max_new_tokens": 100,
+        "max_tokens": 100,
         "temperature": 0.7,
         "top_p": 0.9,
         "top_k": 50,

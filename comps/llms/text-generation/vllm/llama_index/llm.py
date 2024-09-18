@@ -47,7 +47,7 @@ def llm_generate(input: LLMParamsDoc):
     llm = OpenAILike(
         api_key="fake",
         api_base=llm_endpoint + "/v1",
-        max_tokens=input.max_new_tokens,
+        max_tokens=input.max_tokens,
         model=model_name,
         top_p=input.top_p,
         temperature=input.temperature,

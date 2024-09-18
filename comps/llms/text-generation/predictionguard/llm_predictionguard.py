@@ -49,7 +49,7 @@ def llm_generate(input: LLMParamsDoc):
             for res in client.chat.completions.create(
                 model=input.model,
                 messages=messages,
-                max_tokens=input.max_new_tokens,
+                max_tokens=input.max_tokens,
                 temperature=input.temperature,
                 top_p=input.top_p,
                 top_k=input.top_k,
@@ -69,7 +69,7 @@ def llm_generate(input: LLMParamsDoc):
             response = client.chat.completions.create(
                 model=input.model,
                 messages=messages,
-                max_tokens=input.max_new_tokens,
+                max_tokens=input.max_tokens,
                 temperature=input.temperature,
                 top_p=input.top_p,
                 top_k=input.top_k,

@@ -374,7 +374,7 @@ curl http://${your_ip}:8008/v1/chat/completions \
 
 ### 3.3 Consume LLM Service
 
-You can set the following model parameters according to your actual needs, such as `max_new_tokens`, `streaming`.
+You can set the following model parameters according to your actual needs, such as `max_tokens`, `streaming`.
 
 The `streaming` parameter determines the format of the data returned by the API. It will return text string with `streaming=false`, return text streaming flow with `streaming=true`.
 
@@ -385,7 +385,7 @@ curl http://${your_ip}:9000/v1/chat/completions \
   -H 'Content-Type: application/json' \
   -d '{
   "query":"What is Deep Learning?",
-  "max_new_tokens":17,
+  "max_tokens":17,
   "top_k":10,
   "top_p":0.95,
   "typical_p":0.95,
@@ -401,7 +401,7 @@ curl http://${your_ip}:9000/v1/chat/completions \
   -H 'Content-Type: application/json' \
   -d '{
   "query":"What is Deep Learning?",
-  "max_new_tokens":17,
+  "max_tokens":17,
   "top_k":10,
   "top_p":0.95,
   "typical_p":0.95,

@@ -145,11 +145,14 @@ class RerankedDoc(BaseDoc):
 class LLMParamsDoc(BaseDoc):
     model: Optional[str] = None  # for openai and ollama
     query: str
+    max_tokens: int = 1024
     max_new_tokens: int = 1024
     top_k: int = 10
     top_p: float = 0.95
     typical_p: float = 0.95
     temperature: float = 0.01
+    frequency_penalty: float = 0.0
+    presence_penalty: float = 0.0
     repetition_penalty: float = 1.03
     streaming: bool = True
 
@@ -179,11 +182,14 @@ class LLMParamsDoc(BaseDoc):
 
 
 class LLMParams(BaseDoc):
+    max_tokens: int = 1024
     max_new_tokens: int = 1024
     top_k: int = 10
     top_p: float = 0.95
     typical_p: float = 0.95
     temperature: float = 0.01
+    frequency_penalty: float = 0.0
+    presence_penalty: float = 0.0
     repetition_penalty: float = 1.03
     streaming: bool = True
 

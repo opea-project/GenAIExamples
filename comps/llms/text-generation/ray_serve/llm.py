@@ -47,7 +47,7 @@ def llm_generate(input: LLMParamsDoc):
         openai_api_base=llm_endpoint + "/v1",
         model_name=llm_model,
         openai_api_key=os.getenv("OPENAI_API_KEY", "not_needed"),
-        max_tokens=input.max_new_tokens,
+        max_tokens=input.max_tokens,
         temperature=input.temperature,
         streaming=input.streaming,
         request_timeout=600,

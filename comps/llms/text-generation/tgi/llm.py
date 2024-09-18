@@ -69,7 +69,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
         text_generation = await llm.text_generation(
             prompt=prompt,
             stream=new_input.streaming,
-            max_new_tokens=new_input.max_new_tokens,
+            max_new_tokens=new_input.max_tokens,
             repetition_penalty=new_input.repetition_penalty,
             temperature=new_input.temperature,
             top_k=new_input.top_k,
@@ -119,7 +119,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
         text_generation = await llm.text_generation(
             prompt=prompt,
             stream=input.streaming,
-            max_new_tokens=input.max_new_tokens,
+            max_new_tokens=input.max_tokens,
             repetition_penalty=input.repetition_penalty,
             temperature=input.temperature,
             top_k=input.top_k,

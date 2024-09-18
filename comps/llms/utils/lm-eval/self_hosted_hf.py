@@ -22,7 +22,7 @@ lm_eval.api.registry.MODEL_REGISTRY["gaudi-hf"] = GaudiHFModelAdapter
 class LLMCompletionDoc(BaseDoc):
     batched_inputs: List
     logprobs: int = 10
-    max_tokens: int = 0
+    max_new_tokens: int = 0
     temperature: float = 0.0
 
 

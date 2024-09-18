@@ -48,7 +48,7 @@ function validate_microservice() {
     llm_port=5005
     result=$(http_proxy="" curl http://${ip_address}:${llm_port}/v1/chat/completions \
         -X POST \
-        -d '{"query":"What is Deep Learning?", "max_new_tokens": 128}' \
+        -d '{"query":"What is Deep Learning?", "max_tokens": 128}' \
         -H 'Content-Type: application/json')
     if [[ $result == *"DONE"* ]]; then
         echo "Result correct."

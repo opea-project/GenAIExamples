@@ -15,5 +15,5 @@ curl http://${your_ip}:8008/v1/completions \
 ##query microservice
 curl http://${your_ip}:9000/v1/chat/completions \
   -X POST \
-  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_p":0.95,"temperature":0.01,"streaming":false}' \
+  -d '{"query":"What is Deep Learning?","max_tokens":17,"top_p":1,"temperature":0.7,"frequency_penalty":0,"presence_penalty":0, "streaming":false}' \
   -H 'Content-Type: application/json'

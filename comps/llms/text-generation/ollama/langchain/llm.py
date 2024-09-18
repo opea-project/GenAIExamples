@@ -25,7 +25,7 @@ def llm_generate(input: LLMParamsDoc):
     ollama = Ollama(
         base_url=ollama_endpoint,
         model=input.model if input.model else model_name,
-        num_predict=input.max_new_tokens,
+        num_predict=input.max_tokens,
         top_k=input.top_k,
         top_p=input.top_p,
         temperature=input.temperature,
