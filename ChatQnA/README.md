@@ -88,14 +88,13 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
 Gaudi default compose.yaml
-| MicroService | Open Source Project | HW    | Port | Endpoint             |
+| MicroService | Open Source Project | HW | Port | Endpoint |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding    | Langchain           | Xeon  | 6000 | /v1/embaddings       |
-| Retriever    | Langchain, Redis    | Xeon  | 7000 | /v1/retrieval        |
-| Reranking    | Langchain, TEI      | Gaudi | 8000 | /v1/reranking        |
-| LLM          | Langchain, TGI      | Gaudi | 9000 | /v1/chat/completions |
-| Dataprep     | Redis, Langchain    | Xeon  | 6007 | /v1/dataprep         |
-
+| Embedding | Langchain | Xeon | 6000 | /v1/embaddings |
+| Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
+| Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
+| LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
+| Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep |
 
 ## Deploy ChatQnA Service
 
@@ -164,6 +163,7 @@ It will automatically download the docker image on `docker hub`:
 docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
+
 If you want to build docker by yourself, please refer to [More Details](docker_compose/).
 
 ### Required Models
