@@ -112,7 +112,7 @@ Quick Start Deployment Steps:
 2. Set up the environment variables.
 3. Run Docker Compose.
 
-### Prepare Docker Image
+### Quick Start: 1.Prepare Docker Image
 
 Currently we support two ways of deploying ChatQnA services with docker compose:
 
@@ -136,7 +136,7 @@ docker pull opea/chatqna-conversation-ui:latest
 
     </details>
 
-### Setup Environment Variable
+### Quick Start: 2.Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
 
@@ -174,7 +174,7 @@ Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xe
 
 > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
 
-### Run Docker Compose
+### Quick Start: 3.Run Docker Compose
 
 Select the compose.yaml file that matches your hardware.
 CPU example:
@@ -185,6 +185,8 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 # cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
 docker compose up -d
 ```
+
+The quick start is now complete.
 
 ### Required Models
 
