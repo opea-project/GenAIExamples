@@ -26,7 +26,7 @@ export async function fetchAudioText(file) {
 	const url = `${CHAT_URL}`;
 	const requestBody = {
 		audio: file,
-		max_new_tokens: 64,
+		max_tokens: 64,
 	};
 
 	const init: RequestInit = {

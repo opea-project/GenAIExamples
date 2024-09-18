@@ -38,7 +38,7 @@ export async function fetchTextStream(query: string, stepValueStore: number, bas
 				],
 			},
 		],
-		max_new_tokens: stepValueStore,
+		max_tokens: stepValueStore,
 		stream: true,
 	};
 	console.log("payload", payload);

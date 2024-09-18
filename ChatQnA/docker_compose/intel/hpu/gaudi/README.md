@@ -367,7 +367,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
      -d '{
      "model": "${LLM_MODEL_ID}",
      "prompt": "What is Deep Learning?",
-     "max_new_tokens": 32,
+     "max_tokens": 32,
      "temperature": 0
      }'
    ```
@@ -385,7 +385,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
    # TGI service
    curl http://${host_ip}:9000/v1/chat/completions\
      -X POST \
-     -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
      -H 'Content-Type: application/json'
    ```
 
@@ -395,7 +395,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
    # vLLM Service
    curl http://${host_ip}:9000/v1/chat/completions \
     -X POST \
-    -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_p":1,"temperature":0.7,"frequency_penalty":0,"presence_penalty":0, "streaming":false}' \
+    -d '{"query":"What is Deep Learning?","max_tokens":17,"top_p":1,"temperature":0.7,"frequency_penalty":0,"presence_penalty":0, "streaming":false}' \
     -H 'Content-Type: application/json'
    ```
 
@@ -405,7 +405,7 @@ For parameters, can refer to [LangChain VLLMOpenAI API](https://api.python.langc
 ```bash
 curl http://${your_ip}:9000/v1/chat/completions \
   -X POST \
-  -d '{"query":"What is Deep Learning?","max_new_tokens":17,"presence_penalty":1.03","streaming":false}' \
+  -d '{"query":"What is Deep Learning?","max_tokens":17,"presence_penalty":1.03","streaming":false}' \
   -H 'Content-Type: application/json'
 ````
 
@@ -493,7 +493,7 @@ For parameters, can refer to [LangChain ChatOpenAI API](https://python.langchain
 ```bash
 curl http://${host_ip}:9090/v1/guardrails\
   -X POST \
-  -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
+  -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_tokens":32}}' \
   -H 'Content-Type: application/json'
 ```
 

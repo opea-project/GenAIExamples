@@ -47,5 +47,5 @@ curl http://localhost:8888/v1/visualqna \
         ]
       }
     ],
-    "max_new_tokens": 128}'
+    "max_tokens": 128}'
 ```

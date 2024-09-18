@@ -28,5 +28,5 @@ Make sure all the pods are running, and restart the audioqna-xxxx pod if necessa
 ```bash
 kubectl get pods
 
-curl http://${host_ip}:3008/v1/audioqna   -X POST   -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_new_tokens":64}'   -H 'Content-Type: application/json'
+curl http://${host_ip}:3008/v1/audioqna   -X POST   -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}'   -H 'Content-Type: application/json'
 ```

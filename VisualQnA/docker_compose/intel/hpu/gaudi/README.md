@@ -114,7 +114,7 @@ curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d 
         ]
       }
     ],
-    "max_new_tokens": 300
+    "max_tokens": 300
     }'
 ```
 
