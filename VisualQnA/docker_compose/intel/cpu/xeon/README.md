@@ -138,28 +138,28 @@ Follow the instructions to validate MicroServices.
 
 2. MegaService
 
-```bash
-curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
-     "messages": [
-      {
-        "role": "user",
-        "content": [
-          {
-            "type": "text",
-            "text": "What'\''s in this image?"
-          },
-          {
-            "type": "image_url",
-            "image_url": {
-              "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+  ```bash
+  curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "What'\''s in this image?"
+            },
+            {
+              "type": "image_url",
+              "image_url": {
+                "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+              }
             }
-          }
-        ]
-      }
-    ],
-    "max_new_tokens": 300
-    }'
-```
+          ]
+        }
+      ],
+      "max_tokens": 300
+      }'
+  ```
 
 ## 🚀 Launch the UI
 
