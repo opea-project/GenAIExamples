@@ -87,8 +87,7 @@ flowchart LR
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
-<details>
-<summary><b>Gaudi default compose.yaml</b></summary>
+Gaudi default compose.yaml
 | MicroService | Open Source Project | HW    | Port | Endpoint             |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
 | Embedding    | Langchain           | Xeon  | 6000 | /v1/embaddings       |
@@ -97,7 +96,6 @@ In the below, we provide a table that describes for each microservice component 
 | LLM          | Langchain, TGI      | Gaudi | 9000 | /v1/chat/completions |
 | Dataprep     | Redis, Langchain    | Xeon  | 6007 | /v1/dataprep         |
 
-</details>
 
 ## Deploy ChatQnA Service
 
@@ -107,36 +105,10 @@ Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. 
 
 Quick Start Deployment Steps:
 
-1. Prepare the Docker image (UI Docker is optional).
-2. Set up the environment variables.
-3. Run Docker Compose.
+1. Set up the environment variables.
+2. Run Docker Compose.
 
-### Quick Start: 1.Prepare Docker Image
-
-Currently we support two ways of deploying ChatQnA services with Docker Compose:
-
-Using the docker image on `docker hub`:
-
-```bash
-docker pull opea/chatqna:latest
-```
-
-<details>
-
-    <summary><b>UI docker is optional, depends on the usage</b></summary>
-    Two type of UI are supported now, choose one you like and pull the referred docker image.
-
-If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/hpu/gaudi#-launch-the-conversational-ui-optional) and modify the [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
-
-```bash
-docker pull opea/chatqna-ui:latest
-# or
-docker pull opea/chatqna-conversation-ui:latest
-```
-
-</details>
-
-### Quick Start: 2.Setup Environment Variable
+### Quick Start: 1.Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
 
@@ -174,7 +146,7 @@ Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xe
 
 > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
 
-### Quick Start: 3.Run Docker Compose
+### Quick Start: 2.Run Docker Compose
 
 Select the compose.yaml file that matches your hardware.
 CPU example:
@@ -186,7 +158,13 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 docker compose up -d
 ```
 
-The quick start is now complete.
+It will automatically download the docker image on `docker hub`:
+
+```bash
+docker pull opea/chatqna:latest
+docker pull opea/chatqna-ui:latest
+```
+If you want to build docker by yourself, please refer to [More Details](docker_compose/).
 
 ### Required Models
 
