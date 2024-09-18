@@ -114,7 +114,7 @@ Quick Start Deployment Steps:
 
 ### Quick Start: 1.Prepare Docker Image
 
-Currently we support two ways of deploying ChatQnA services with docker compose:
+Currently we support two ways of deploying ChatQnA services with Docker Compose:
 
 Using the docker image on `docker hub`:
 
