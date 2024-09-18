@@ -6,7 +6,7 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 
 ## Deploy ChatQnA Service
 
-The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
+The ChatQnA service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors and Nvidia GPU.
 
 Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
 
