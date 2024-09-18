@@ -173,6 +173,6 @@ The AudioQnA example demonstrates the integration of Generative AI (GenAI) model
         <td> <a href="https://huggingface.co/microsoft/speecht5_tts">microsoft/SpeechT5</a></td>
         <td> <a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
         <td> Xeon/Gaudi2</td>
-        <td> Chatbot</td>
+        <td> Talkingbot Serving</td>
     </tr>
 </table>
