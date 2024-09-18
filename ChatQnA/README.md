@@ -8,18 +8,17 @@ ChatQnA architecture shows below:
 
 ![architecture](./assets/img/chatqna_architecture.png)
 
-ChatQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the ChatQnA Flow Chart shows below:
+The ChatQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
 ---
 config:
   flowchart:
-    nodeSpacing: 100
+    nodeSpacing: 400
     rankSpacing: 100
     curve: linear
-  theme: base
   themeVariables:
-    fontSize: 42px
+    fontSize: 50px
 ---
 flowchart LR
     %% Colors %%
@@ -28,75 +27,67 @@ flowchart LR
     classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef invisible fill:transparent,stroke:transparent;
     style ChatQnA-MegaService stroke:#000000
+
     %% Subgraphs %%
-    subgraph ChatQnA-MegaService["ChatQnA-MegaService"]
+    subgraph ChatQnA-MegaService["ChatQnA MegaService "]
         direction LR
-        EM([Embedding <br>]):::blue
-        RET([Retrieval <br>]):::blue
-        RER([Rerank <br>]):::blue
-        LLM([LLM <br>]):::blue
+        EM([Embedding MicroService]):::blue
+        RET([Retrieval MicroService]):::blue
+        RER([Rerank MicroService]):::blue
+        LLM([LLM MicroService]):::blue
     end
-    subgraph User Interface
-        direction TB
+    subgraph UserInterface[" User Interface "]
+        direction LR
         a([User Input Query]):::orchid
         Ingest([Ingest data]):::orchid
         UI([UI server<br>]):::orchid
     end
-    subgraph ChatQnA GateWay
-        direction LR
-        invisible1[ ]:::invisible
-        GW([ChatQnA GateWay<br>]):::orange
-    end
-    subgraph .
-        X([OPEA Micsrservice]):::blue
-        Y{{Open Source Service}}
-        Z([OPEA Gateway]):::orange
-        Z1([UI]):::orchid
-    end
+
+
 
     TEI_RER{{Reranking service<br>}}
     TEI_EM{{Embedding service <br>}}
     VDB{{Vector DB<br><br>}}
     R_RET{{Retriever service <br>}}
-    DP([Data Preparation<br>]):::blue
+    DP([Data Preparation MicroService]):::blue
     LLM_gen{{LLM Service <br>}}
+    GW([ChatQnA GateWay<br>]):::orange
 
     %% Data Preparation flow
     %% Ingest data flow
     direction LR
-    Ingest[Ingest data] -->|a| UI
-    UI -->|b| DP
-    DP <-.->|c| TEI_EM
+    Ingest[Ingest data] --> UI
+    UI --> DP
+    DP <-.-> TEI_EM
 
     %% Questions interaction
     direction LR
-    a[User Input Query] -->|1| UI
-    UI -->|2| GW
-    GW <==>|3| ChatQnA-MegaService
-    EM ==>|4| RET
-    RET ==>|5| RER
-    RER ==>|6| LLM
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> ChatQnA-MegaService
+    EM ==> RET
+    RET ==> RER
+    RER ==> LLM
 
 
     %% Embedding service flow
-    direction TB
-    EM <-.->|3'| TEI_EM
-    RET <-.->|4'| R_RET
-    RER <-.->|5'| TEI_RER
-    LLM <-.->|6'| LLM_gen
+    direction LR
+    EM <-.-> TEI_EM
+    RET <-.-> R_RET
+    RER <-.-> TEI_RER
+    LLM <-.-> LLM_gen
 
     direction TB
     %% Vector DB interaction
-    R_RET <-.->|d|VDB
-    DP <-.->|d|VDB
+    R_RET <-.->VDB
+    DP <-.->VDB
 
 
 
 
 ```
 
-This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel Xeon Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
-
+This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
 <details>

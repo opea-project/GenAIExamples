@@ -1,4 +1,4 @@
-# Build Mega Service of videoqna on Xeon
+# Build Mega Service of VideoQnA on Xeon
 
 This document outlines the deployment process for a videoqna application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `lvm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
@@ -48,14 +48,11 @@ Port 5173 - Open to 0.0.0.0/0
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Build Embedding Image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/Dockerfile .
 ```
 
@@ -84,7 +81,6 @@ docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy
 
 ```bash
 docker build -t opea/dataprep-multimodal-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/Dockerfile .
-cd ..
 ```
 
 ### 6. Build MegaService Docker Image
@@ -104,7 +100,7 @@ docker build -t opea/videoqna:latest --build-arg https_proxy=$https_proxy --buil
 Build frontend Docker image via below command:
 
 ```bash
-cd ui
+cd GenAIExamples/VideoQnA/ui/
 docker build -t opea/videoqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -144,7 +140,7 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 **Append the value of the public IP address to the no_proxy list**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
+export your_no_proxy="${your_no_proxy},${host_ip}"
 ```
 
 Then you can run below commands or `source set_env.sh` to set all the variables
@@ -160,7 +156,7 @@ export RERANK_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 
 export LVM_ENDPOINT="http://${host_ip}:9009"
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/videoqna"
 export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:8888/v1/health_check"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"

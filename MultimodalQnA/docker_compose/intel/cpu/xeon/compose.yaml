@@ -1,0 +1,135 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  dataprep-multimodal-redis:
+    image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
+    container_name: dataprep-multimodal-redis
+    depends_on:
+      - redis-vector-db
+      - lvm-llava
+    ports:
+      - "6007:6007"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      INDEX_NAME: ${INDEX_NAME}
+      LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:9399/v1/lvm"
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  embedding-multimodal-bridgetower:
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
+    container_name: embedding-multimodal-bridgetower
+    ports:
+      - ${EMBEDDER_PORT}:${EMBEDDER_PORT}
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PORT: ${EMBEDDER_PORT}
+    restart: unless-stopped
+  embedding-multimodal:
+    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+    container_name: embedding-multimodal
+    depends_on:
+      - embedding-multimodal-bridgetower
+    ports:
+      - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+    restart: unless-stopped
+  retriever-multimodal-redis:
+    image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}
+    container_name: retriever-multimodal-redis
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      INDEX_NAME: ${INDEX_NAME}
+    restart: unless-stopped
+  lvm-llava:
+    image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
+    container_name: lvm-llava
+    ports:
+      - "8399:8399"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  lvm-llava-svc:
+    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
+    container_name: lvm-llava-svc
+    depends_on:
+      - lvm-llava
+    ports:
+      - "9399:9399"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
+    restart: unless-stopped
+  multimodalqna:
+    image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
+    container_name: multimodalqna-backend-server
+    depends_on:
+      - redis-vector-db
+      - dataprep-multimodal-redis
+      - embedding-multimodal
+      - retriever-multimodal-redis
+      - lvm-llava-svc
+    ports:
+      - "8888:8888"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      MM_EMBEDDING_SERVICE_HOST_IP: ${MM_EMBEDDING_SERVICE_HOST_IP}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
+      LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  multimodalqna-ui:
+    image: ${REGISTRY:-opea}/multimodalqna-ui:${TAG:-latest}
+    container_name: multimodalqna-gradio-ui-server
+    depends_on:
+      - multimodalqna
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
