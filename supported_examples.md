@@ -6,6 +6,20 @@ This document introduces the supported examples of GenAIExamples. The supported 
 
 [ChatQnA](./ChatQnA/README.md) is an example of chatbot for question and answering through retrieval augmented generation (RAG).
 
+    <table>
+        <tr>
+            <th>Framework</th>
+            <th>LLM</th>
+        </tr>
+        <tr>
+            <td rowspan="2">[LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai)</td>
+            <td>[NeuralChat-7B](https://huggingface.co/Intel/neural-chat-7b-v3-3) | [BGE-Base]</td>
+        </tr>
+        <tr>
+            <td>[NeuralChat-7B](https://huggingface.co/Intel/neural-chat-7b-v3-3) | [BGE-Base]</td>
+        </tr>
+    </table>
+
 | Framework                                                                      | LLM                                                               | Embedding                                           | Vector Database                      | Serving                                                                                                                         | HW              | Description |
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | --------------- | ----------- |
 | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [NeuralChat-7B](https://huggingface.co/Intel/neural-chat-7b-v3-3) | [BGE-Base](https://huggingface.co/BAAI/bge-base-en) | [Redis](https://redis.io/)           | [TGI](https://github.com/huggingface/text-generation-inference) [TEI](https://github.com/huggingface/text-embeddings-inference) | Xeon/Gaudi2/GPU | Chatbot     |
