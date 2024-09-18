@@ -95,7 +95,9 @@ jobs:
           cd ${{github.workspace}}
           fail="FALSE"
           echo ${{ github.event.pull_request.head.repo.full_name }}
+          echo ${{ github.event.pull_request.repo.full_name }}
           echo ${{ github.event.pull_request.head.ref }}
+          echo ${{ github.event.pull_request.head_ref }}
           if echo "${{ github.event.pull_request.head.repo.full_name }}" | grep -q "/"; then
             owner="${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1
             branch="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
