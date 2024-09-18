@@ -180,6 +180,9 @@ The AudioQnA example demonstrates the integration of Generative AI (GenAI) model
 ### FaqGen
 
 FAQ Generation Application leverages the power of large language models (LLMs) to revolutionize the way you interact with and comprehend complex textual data. By harnessing cutting-edge natural language processing techniques, our application can automatically generate comprehensive and natural-sounding frequently asked questions (FAQs) from your documents, legal texts, customer queries, and other sources. In this example use case, we utilize LangChain to implement FAQ Generation and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.
+| Framework                                                                      | LLM                                                               | Serving                                                         | HW          | Description |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ----------- |
+| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Chatbot     |
 
 ### MultimodalQnA
 
