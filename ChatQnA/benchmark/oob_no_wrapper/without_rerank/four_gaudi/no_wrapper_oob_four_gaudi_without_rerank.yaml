@@ -134,7 +134,7 @@ metadata:
   name: embedding-dependency-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: embedding-dependency-deploy
@@ -222,10 +222,6 @@ spec:
         - --max-input-length
         - '2048'
         - --max-total-tokens
-        - '4096'
-        - --max-batch-total-tokens
-        - '65536'
-        - --max-batch-prefill-tokens
         - '4096'
         env:
         - name: OMPI_MCA_btl_vader_single_copy_mechanism

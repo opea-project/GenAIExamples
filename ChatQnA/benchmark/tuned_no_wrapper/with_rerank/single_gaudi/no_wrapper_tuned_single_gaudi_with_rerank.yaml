@@ -167,10 +167,10 @@ spec:
         - containerPort: 80
         resources:
           limits:
-            cpu: 80
+            cpu: 76
             memory: 20000Mi
           requests:
-            cpu: 80
+            cpu: 76
             memory: 20000Mi
         volumeMounts:
         - mountPath: /data
@@ -399,7 +399,7 @@ metadata:
   name: retriever-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: retriever-deploy
