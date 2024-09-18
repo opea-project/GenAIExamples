@@ -5,7 +5,7 @@ name: Check Paths and Hyperlinks
 
 on:
   pull_request:
-    branches: [main, letonghan:translation/manifest]
+    branches: [main]
     types: [opened, reopened, ready_for_review, synchronize]
 
 jobs:
