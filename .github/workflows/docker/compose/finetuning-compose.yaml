@@ -3,7 +3,7 @@
 
 # this file should be run in the root of the repo
 services:
-  finetuning-gaudi:
+  finetuning:
     build:
-      dockerfile: comps/finetuning/Dockerfile.intel_hpu
-    image: ${REGISTRY:-opea}/finetuning-gaudi:${TAG:-latest}
+      dockerfile: comps/finetuning/Dockerfile
+    image: ${REGISTRY:-opea}/finetuning:${TAG:-latest}

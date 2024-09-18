@@ -15,3 +15,11 @@ services:
     build:
       dockerfile: comps/lvms/video-llama/dependency/Dockerfile
     image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
+  lvm-llava:
+    build:
+      dockerfile: comps/lvms/llava/dependency/Dockerfile
+    image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
+  lvm-llava-svc:
+    build:
+      dockerfile: comps/lvms/llava/Dockerfile
+    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}

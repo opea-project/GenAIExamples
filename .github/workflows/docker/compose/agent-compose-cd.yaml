@@ -3,7 +3,7 @@
 
 # this file should be run in the root of the repo
 services:
-  comps-agent-langchain:
+  agent-langchain:
     build:
       dockerfile: comps/agent/langchain/Dockerfile
-    image: ${REGISTRY:-opea}/comps-agent-langchain:${TAG:-latest}
+    image: ${REGISTRY:-opea}/agent-langchain:${TAG:-latest}

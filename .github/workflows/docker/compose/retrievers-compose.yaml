@@ -15,3 +15,7 @@ services:
     build:
       dockerfile: comps/retrievers/vdms/langchain/Dockerfile
     image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
+  retriever-multimodal-redis:
+    build:
+      dockerfile: comps/retrievers/multimodal/redis/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}

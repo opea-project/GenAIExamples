@@ -3,16 +3,6 @@
 
 # this file should be run in the root of the repo
 services:
-  lvm:
-    build:
-      dockerfile: comps/lvms/llava/Dockerfile
-    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
-  # Xeon CPU
-  llava:
-    build:
-      dockerfile: comps/lvms/llava/dependency/Dockerfile
-    image: ${REGISTRY:-opea}/llava:${TAG:-latest}
-  # Gaudi2 HPU
   llava-hpu:
     build:
       dockerfile: comps/lvms/llava/dependency/Dockerfile.intel_hpu

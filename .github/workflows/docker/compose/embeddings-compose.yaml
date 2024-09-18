@@ -12,3 +12,11 @@ services:
     build:
       dockerfile: comps/embeddings/multimodal_clip/Dockerfile
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
+  embedding-multimodal-bridgetower:
+    build:
+      dockerfile: comps/embeddings/multimodal/bridgetower/Dockerfile
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
+  embedding-multimodal:
+    build:
+      dockerfile: comps/embeddings/multimodal/multimodal_langchain/Dockerfile
+    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}

@@ -14,18 +14,10 @@ services:
     build:
       dockerfile: comps/embeddings/tei/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/embedding-tei-llama-index:${TAG:-latest}
-  bridgetower-embedder:
-    build:
-      dockerfile: comps/embeddings/multimodal/bridgetower/Dockerfile
-    image: ${REGISTRY:-opea}/bridgetower-embedder:${TAG:-latest}
-  bridgetower-embedder-gaudi:
+  embedding-multimodal-bridgetower-gaudi:
     build:
       dockerfile: comps/embeddings/multimodal/bridgetower/Dockerfile.intel_hpu
-    image: ${REGISTRY:-opea}/bridgetower-embedder-gaudi:${TAG:-latest}
-  embedding-multimodal:
-    build:
-      dockerfile: comps/embeddings/multimodal/multimodal_langchain/Dockerfile
-    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
   embedding-predictionguard:
     build:
       dockerfile: comps/embeddings/predictionguard/Dockerfile

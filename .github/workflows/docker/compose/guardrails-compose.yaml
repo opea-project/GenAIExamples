@@ -9,13 +9,3 @@ services:
     build:
       dockerfile: comps/guardrails/llama_guard/langchain/Dockerfile
     image: ${REGISTRY:-opea}/guardrails-tgi:${TAG:-latest}
-
-  guardrails-bias-detection:
-    build:
-      dockerfile: comps/guardrails/bias_detection/Dockerfile
-    image: ${REGISTRY:-opea}/guardrails-bias-detection:${TAG:-latest}
-
-  guardrails-toxicity-detection:
-    build:
-      dockerfile: comps/guardrails/toxicity_detection/Dockerfile
-    image: ${REGISTRY:-opea}/guardrails-toxicity-detection:${TAG:-latest}
