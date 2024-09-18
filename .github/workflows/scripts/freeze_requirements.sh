@@ -58,6 +58,7 @@ function main() {
     echo "::group::pip install --no-cache-dir pip-tools" && pip install --no-cache-dir pip-tools --upgrade && echo "::endgroup::"
     export -f freeze
     find . -name "requirements.txt" | xargs -n 1 -I {} bash -c 'freeze "$@"' _ {}
+    find . -name "requirements-runtime.txt" | xargs -n 1 -I {} bash -c 'freeze "$@"' _ {}
 }
 
 main
