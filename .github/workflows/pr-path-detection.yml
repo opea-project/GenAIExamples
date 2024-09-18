@@ -95,9 +95,11 @@ jobs:
           cd ${{github.workspace}}
           fail="FALSE"
           echo ${{ github.event.pull_request.head.repo.full_name }}
-          if echo "${{ github.event.pull_request.head.repo.full_name }}" | grep -q ":"; then
-            echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d':' -f1
-            echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d':' -f2
+          echo ${{ github.event.pull_request.head.ref }}
+          if echo "${{ github.event.pull_request.head.repo.full_name }}" | grep -q "/"; then
+            owner="${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1
+            branch="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
+            echo $branch
           else
             echo "letonghan:translation/manifest
           https://github.com/opea-project/GenAIComps/blob/zepan/dev/test
