@@ -386,7 +386,7 @@ spec:
               port: http
           startupProbe:
             failureThreshold: 120
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 5
             tcpSocket:
               port: http

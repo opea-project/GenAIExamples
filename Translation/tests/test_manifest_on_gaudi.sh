@@ -52,7 +52,7 @@ function validate_translation() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOGFILE ]] && \
-    [[ $(grep -c "print" $LOGFILE) != 0 ]]; then
+    [[ $(grep -c "translation" $LOGFILE) != 0 ]]; then
         status=true
     fi
 
