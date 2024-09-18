@@ -34,7 +34,7 @@ function validate_codegen() {
     export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
     echo "$CLIENT_POD"
     accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='codegen')].status.accessUrl}")
-    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":256, "do_sample": true}}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codegen.log
+    kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_tokens":256, "do_sample": true}}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_codegen.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "chatqna failed, please check the logs in ${LOG_PATH}!"
