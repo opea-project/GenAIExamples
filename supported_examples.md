@@ -25,6 +25,14 @@ This document introduces the supported examples of GenAIExamples. The supported 
         <td> Xeon/Gaudi2/GPU</td>
         <td> Chatbot</td>
     </tr>
+        <tr>
+        <td> <a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
+        <td> <a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
+        <td> <a href="https://www.trychroma.com/">Chroma</a></td>
+        <td> <a href="https://github.com/huggingface/text-generation-inference">TGI</a>/<a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
+        <td> Xeon/Gaudi2</td>
+        <td> Chatbot</td>
+    </tr>
 </table>
 
 | Framework                                                                      | LLM                                                               | Embedding                                           | Vector Database                      | Serving                                                                                                                         | HW              | Description |
