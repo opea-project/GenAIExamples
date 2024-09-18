@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  agent-endpoint:
+  agent-langchain:
     build:
       context: GenAIComps
       dockerfile: comps/agent/langchain/Dockerfile
@@ -10,4 +10,4 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-    image: ${REGISTRY:-opea}/comps-agent-langchain:${TAG:-latest}
+    image: ${REGISTRY:-opea}/agent-langchain:${TAG:-latest}

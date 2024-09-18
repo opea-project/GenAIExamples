@@ -29,7 +29,7 @@ metadata:
   name: chatqna-backend-server-deploy
   namespace: default
 spec:
-  replicas: 4
+  replicas: 8
   selector:
     matchLabels:
       app: chatqna-backend-server-deploy
@@ -141,7 +141,7 @@ metadata:
   name: embedding-dependency-deploy
   namespace: default
 spec:
-  replicas: 4
+  replicas: 8
   selector:
     matchLabels:
       app: embedding-dependency-deploy
@@ -167,10 +167,10 @@ spec:
         - containerPort: 80
         resources:
           limits:
-            cpu: 80
+            cpu: 76
             memory: 20000Mi
           requests:
-            cpu: 80
+            cpu: 76
             memory: 20000Mi
         volumeMounts:
         - mountPath: /data
@@ -313,7 +313,7 @@ metadata:
   name: retriever-deploy
   namespace: default
 spec:
-  replicas: 4
+  replicas: 8
   selector:
     matchLabels:
       app: retriever-deploy
