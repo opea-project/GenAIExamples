@@ -19,10 +19,10 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="translation translation-ui llm-tgi"
+    service_list="translation translation-ui llm-tgi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:1.4
+    docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
     docker images && sleep 1s
 }
 
@@ -35,6 +35,12 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
+    export NGINX_PORT=80
+    export FRONTEND_SERVICE_IP=${ip_address}
+    export FRONTEND_SERVICE_PORT=5173
+    export BACKEND_SERVICE_NAME=translation
+    export BACKEND_SERVICE_IP=${ip_address}
+    export BACKEND_SERVICE_PORT=8888
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -42,7 +48,8 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
+    # wait long for llm model download
+    until [[ "$n" -ge 500 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
@@ -108,6 +115,14 @@ function validate_megaservice() {
     "mega-translation" \
     "translation-xeon-backend-server" \
     '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+
+    # test the megeservice via nginx
+    validate_services \
+        "${ip_address}:80/v1/translation" \
+        "translation" \
+        "mega-translation-nginx" \
+        "translation-xeon-nginx-server" \
+        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
 }
 
 function validate_frontend() {
