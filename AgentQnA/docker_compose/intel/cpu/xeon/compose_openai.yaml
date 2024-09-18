@@ -3,7 +3,7 @@
 
 services:
   worker-docgrader-agent:
-    image: opea/comps-agent-langchain:latest
+    image: opea/agent-langchain:latest
     container_name: docgrader-agent-endpoint
     volumes:
       - ${WORKDIR}/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
@@ -34,7 +34,7 @@ services:
 
 
   supervisor-react-agent:
-    image: opea/comps-agent-langchain:latest
+    image: opea/agent-langchain:latest
     container_name: react-agent-endpoint
     volumes:
       - ${WORKDIR}/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/

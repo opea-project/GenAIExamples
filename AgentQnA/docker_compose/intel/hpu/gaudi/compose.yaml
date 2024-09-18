@@ -25,7 +25,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192 --sharded true --num-shard ${NUM_SHARDS}
   worker-docgrader-agent:
-    image: opea/comps-agent-langchain:latest
+    image: opea/agent-langchain:latest
     container_name: docgrader-agent-endpoint
     depends_on:
       - tgi-server
@@ -59,7 +59,7 @@ services:
 
 
   supervisor-react-agent:
-    image: opea/comps-agent-langchain:latest
+    image: opea/agent-langchain:latest
     container_name: react-agent-endpoint
     depends_on:
       - tgi-server
