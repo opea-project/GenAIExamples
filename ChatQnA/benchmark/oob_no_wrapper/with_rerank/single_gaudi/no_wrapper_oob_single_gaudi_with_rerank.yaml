@@ -220,8 +220,12 @@ spec:
         - --model-id
         - $(LLM_MODEL_ID)
         - --max-input-length
-        - '2048'
+        - '1280'
         - --max-total-tokens
+        - '2048'
+        - --max-batch-total-tokens
+        - '65536'
+        - --max-batch-prefill-tokens
         - '4096'
         env:
         - name: OMPI_MCA_btl_vader_single_copy_mechanism
