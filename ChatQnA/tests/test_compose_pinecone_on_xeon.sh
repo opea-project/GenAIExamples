@@ -61,8 +61,8 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get_file"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/delete_file"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6008/v1/dataprep/get_file"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6009/v1/dataprep/delete_file"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -150,7 +150,7 @@ function validate_microservices() {
 
      # test /v1/dataprep/delete_file
     validate_services \
-        "http://${ip_address}:6007/v1/dataprep/delete_file" \
+        "http://${ip_address}:6009/v1/dataprep/delete_file" \
         '{"status":true}' \
         "dataprep_del" \
         "dataprep-pinecone-server"
