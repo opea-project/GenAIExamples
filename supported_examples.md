@@ -12,11 +12,11 @@ This document introduces the supported examples of GenAIExamples. The supported 
         <th>LLM</th>
     </tr>
     <tr>
-        <td rowspan="2"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.langchain.com">LlamaIndex</a></td>
-        <td>[NeuralChat-7B](https://huggingface.co/Intel/neural-chat-7b-v3-3) | [BGE-Base]</td>
+        <td rowspan="2"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai/">LlamaIndex</a></td>
+        <td> <a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
     </tr>
     <tr>
-        <td>[NeuralChat-7B](https://huggingface.co/Intel/neural-chat-7b-v3-3) | [BGE-Base]</td>
+        <td> <a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
     </tr>
 </table>
 
