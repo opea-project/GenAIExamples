@@ -36,7 +36,7 @@ This example showcases a hierarchical multi-agent system for question-answering 
 
    ```
    cd GenAIComps
-   docker build -t opea/comps-agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
+   docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
    ```
 
 2. Launch tool services </br>
