@@ -94,7 +94,8 @@ jobs:
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
-          link_head="https://github.com/opea-project/GenAIExamples/blob/main/"
+          branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
+          link_head="https://github.com/opea-project/GenAIExamples/blob/main"
           png_lines=$(grep -Eo '\]\([^)]+\)' -r -I .|grep -Ev 'http')
           if [ -n "$png_lines" ]; then
             for png_line in $png_lines; do
@@ -102,6 +103,8 @@ jobs:
               png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
               if [[ "${png_path:0:1}" == "/" ]]; then
                 check_path=${{github.workspace}}$png_path
+              elif [[ "${png_path:0:1}" == "#" ]]; then
+                check_path=${{github.workspace}}/$refer_path$png_path
               else
                 check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
               fi
@@ -110,7 +113,7 @@ jobs:
                 echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
                 fail="TRUE"
               else
-                url=$link_head$(echo "$real_path" | sed 's|.*/GenAIExamples/||')
+                url=$link_head$(echo "$real_path" | sed 's|.*/GenAIExamples||')
                 response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
                 if [ "$response" -ne 200 ]; then
                   echo "**********Validation failed, try again**********"
@@ -118,8 +121,21 @@ jobs:
                   if [ "$response_retry" -eq 200 ]; then
                     echo "*****Retry successfully*****"
                   else
-                    echo "Invalid link from $check_path: $url"
-                    fail="TRUE"
+                    echo "Retry failed. Check branch ${{ github.event.pull_request.head.ref }}"
+                    url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')
+                    response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
+                    if [ "$response" -ne 200 ]; then
+                      echo "**********Validation failed, try again**********"
+                      response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url_dev")
+                      if [ "$response_retry" -eq 200 ]; then
+                        echo "*****Retry successfully*****"
+                      else
+                        echo "Invalid link from $real_path: $url_dev"
+                        fail="TRUE"
+                      fi
+                    else
+                      echo "Check branch ${{ github.event.pull_request.head.ref }} successfully."
+                    fi
                   fi
                 fi
               fi
