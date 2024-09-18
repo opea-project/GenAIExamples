@@ -87,7 +87,8 @@ flowchart LR
 This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
-<details><summary><b>Gaudi default compose.yaml</b></summary>
+<details>
+<summary><b>Gaudi default compose.yaml</b></summary>
 | MicroService | Open Source Project | HW    | Port | Endpoint             |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
 | Embedding    | Langchain           | Xeon  | 6000 | /v1/embaddings       |
@@ -95,7 +96,9 @@ In the below, we provide a table that describes for each microservice component 
 | Reranking    | Langchain, TEI      | Gaudi | 8000 | /v1/reranking        |
 | LLM          | Langchain, TGI      | Gaudi | 9000 | /v1/chat/completions |
 | Dataprep     | Redis, Langchain    | Xeon  | 6007 | /v1/dataprep         |
+
 </details>
+
 
 ## Deploy ChatQnA Service
 
