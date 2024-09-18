@@ -1,7 +1,8 @@
 docarray[full]
 fastapi
 huggingface_hub
-langchain==0.1.16
+langchain
+langchain-community
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
