@@ -6,14 +6,11 @@ This document outlines the deployment process for a Translation application util
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Build LLM Image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
@@ -32,7 +29,7 @@ docker build -t opea/translation:latest --build-arg https_proxy=$https_proxy --b
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/Translation//
+cd GenAIExamples/Translation
 docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 

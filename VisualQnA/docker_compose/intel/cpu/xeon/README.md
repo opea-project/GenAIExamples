@@ -36,16 +36,12 @@ Port 5173 - Open to 0.0.0.0/0
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Build LVM and NGINX Docker Images
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
-
 docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
@@ -57,7 +53,6 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/VisualQnA
 docker build --no-cache -t opea/visualqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../..
 ```
 
 ### 3. Build UI Docker Image
@@ -67,7 +62,6 @@ Build frontend Docker image via below command:
 ```bash
 cd GenAIExamples/VisualQnA/ui
 docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-cd ../../..
 ```
 
 ### 4. Pull TGI Xeon Image

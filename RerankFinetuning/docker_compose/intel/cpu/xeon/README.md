@@ -6,23 +6,18 @@ This document outlines the deployment process for a rerank model finetuning serv
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-### 1. Source Code install GenAIComps
-
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
-### 2. Build Docker Image
+### 1. Build Docker Image
 
 Build docker image with below command:
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 export HF_TOKEN=${your_huggingface_token}
 docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg HF_TOKEN=$HF_TOKEN -f comps/finetuning/Dockerfile .
 ```
 
-### 3. Run Docker with CLI
+### 2. Run Docker with CLI
 
 Start docker container with below command:
 

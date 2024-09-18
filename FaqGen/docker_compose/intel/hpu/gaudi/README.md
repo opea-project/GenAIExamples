@@ -6,22 +6,19 @@ This document outlines the deployment process for a FAQ Generation application u
 
 First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Pull TGI Gaudi Image
 
 As TGI Gaudi has been officially published as a Docker image, we simply need to pull it:
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
 ```
 
 ### 2. Build LLM Image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/langchain/Dockerfile .
 ```
 
@@ -56,7 +53,7 @@ docker build -t opea/faqgen-react-ui:latest --build-arg https_proxy=$https_proxy
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `ghcr.io/huggingface/tgi-gaudi:2.0.1`
+1. `ghcr.io/huggingface/tgi-gaudi:2.0.5`
 2. `opea/llm-faqgen-tgi:latest`
 3. `opea/faqgen:latest`
 4. `opea/faqgen-ui:latest`
