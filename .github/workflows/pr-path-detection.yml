@@ -97,7 +97,7 @@ jobs:
           echo ${{ github.event.pull_request.head.repo.full_name }}
           echo ${{ github.event.pull_request.head.ref }}
 
-          owner="${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1
+          owner=$(echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1)
           repo="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
           echo $repo
 
