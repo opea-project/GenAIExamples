@@ -10,13 +10,20 @@ This document introduces the supported examples of GenAIExamples. The supported 
     <tr>
         <th>Framework</th>
         <th>LLM</th>
+        <th>Embedding</th>
+        <th>Vector Database</th>
+        <th>Serving</th>
+        <th>HW</th>
+        <th>Description</th>
     </tr>
     <tr>
-        <td rowspan="2"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai/">LlamaIndex</a></td>
+        <td rowspan="6"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai/">LlamaIndex</a></td>
         <td> <a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
-    </tr>
-    <tr>
-        <td> <a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">NeuralChat-7B</a></td>
+        <td> <a href="https://huggingface.co/BAAI/bge-base-en">BGE-Base</a></td>
+        <td> <a href="https://redis.io/">Redis</a></td>
+        <td> <a href="https://github.com/huggingface/text-generation-inference">TGI</a>/<a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
+        <td> Xeon/Gaudi2/GPU</td>
+        <td> Chatbot</td>
     </tr>
 </table>
 
