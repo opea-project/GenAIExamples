@@ -94,12 +94,14 @@ jobs:
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
-          echo ${{ github.event.pull_request.head.repo.full_name }}
-          echo ${{ github.event.pull_request.head.ref }}
-
-          owner=$(echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1)
-          repo="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
-          echo $repo
+          repo_name=${{ github.event.pull_request.head.repo.full_name }}
+          echo "$repo_name"
+          if [ "$(echo "$repo_name"|cut -d'/' -f1)" != "opea-project" ]; then
+            owner=$(echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1)
+            echo $owner
+            repo="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
+            echo $repo
+          fi
 
           # echo "letonghan:translation/manifest
           # https://github.com/opea-project/GenAIComps/blob/zepan/dev/test
