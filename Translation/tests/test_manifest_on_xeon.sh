@@ -41,7 +41,7 @@ function validate_translation() {
     # Curl the Mega Service
     curl http://${ip_address}:${port}/v1/translation \
     -H 'Content-Type: application/json' \
-    -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}' > $LOGFILE
+    -d '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}' > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Megaservice translation failed, please check the logs in $LOGFILE!"
