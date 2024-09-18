@@ -100,18 +100,13 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ## 🚀 Build Docker Images
 
-First of all, you need to build Docker Images locally and install the python package of it.
-
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Build embedding-multimodal-bridgetower Image
 
 Build embedding-multimodal-bridgetower docker image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
 ```
 
@@ -340,6 +335,6 @@ curl http://${host_ip}:8888/v1/multimodalqna \
 
 ```bash
 curl http://${host_ip}:8888/v1/multimodalqna \
-	-H "Content-Type: application/json" \
-	-d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+    -H "Content-Type: application/json" \
+    -d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
 ```

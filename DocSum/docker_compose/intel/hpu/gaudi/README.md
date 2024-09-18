@@ -6,11 +6,6 @@ This document outlines the deployment process for a Document Summarization appli
 
 First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Pull TGI Gaudi Image
 
 As TGI Gaudi has been officially published as a Docker image, we simply need to pull it:
@@ -22,6 +17,8 @@ docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
 ### 2. Build LLM Image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/langchain/Dockerfile .
 ```
 

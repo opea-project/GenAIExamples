@@ -14,14 +14,11 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Build LLM Image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/langchain/Dockerfile .
 ```
 
