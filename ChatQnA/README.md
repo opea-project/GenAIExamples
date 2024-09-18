@@ -99,7 +99,6 @@ In the below, we provide a table that describes for each microservice component 
 
 </details>
 
-
 ## Deploy ChatQnA Service
 
 The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
