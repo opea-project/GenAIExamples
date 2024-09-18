@@ -45,6 +45,20 @@ data:
 # SPDX-License-Identifier: Apache-2.0
 
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: translation-ui-config
+  labels:
+    app.kubernetes.io/name: translation-ui
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+data:
+  BASE_URL: "/v1/translation"
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
 data:
   default.conf: |+
     # Copyright (C) 2024 Intel Corporation
