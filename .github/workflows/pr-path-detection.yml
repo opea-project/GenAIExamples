@@ -95,19 +95,12 @@ jobs:
           cd ${{github.workspace}}
           fail="FALSE"
           repo_name=${{ github.event.pull_request.head.repo.full_name }}
-          echo "$repo_name"
           if [ "$(echo "$repo_name"|cut -d'/' -f1)" != "opea-project" ]; then
             owner=$(echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1)
-            echo $owner
-            repo="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
-            echo $repo
+            branch="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
+          else
+            branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
           fi
-
-          # echo "letonghan:translation/manifest
-          # https://github.com/opea-project/GenAIComps/blob/zepan/dev/test
-          # https://github.com/letonghan/GenAIExamples/tree/translation/manifest"
-          
-          branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
           link_head="https://github.com/opea-project/GenAIExamples/blob/main"
           png_lines=$(grep -Eo '\]\([^)]+\)' -r -I .|grep -Ev 'http')
           if [ -n "$png_lines" ]; then
