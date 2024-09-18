@@ -4,6 +4,74 @@ Chatbots are the most widely adopted use case for leveraging the powerful chat a
 
 RAG bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that responses generated remain factual and current. The core of this architecture are vector databases, which are instrumental in enabling efficient and semantic retrieval of information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
 
+## Deploy ChatQnA Service
+
+The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
+
+Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
+
+Quick Start Deployment Steps:
+
+1. Set up the environment variables.
+2. Run Docker Compose.
+
+### Quick Start: 1.Setup Environment Variable
+
+To set up environment variables for deploying ChatQnA services, follow these steps:
+
+1. Set the required environment variables:
+
+   ```bash
+   # Example: host_ip="192.168.1.1"
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   ```
+
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   ```
+
+3. Set up other environment variables:
+
+   > Notice that you can only choose **one** command below to set up envs according to your hardware. Other that the port numbers may be set incorrectly.
+
+   ```bash
+   # on Gaudi
+   source ./docker_compose/intel/hpu/gaudi/set_env.sh
+   # on Xeon
+   source ./docker_compose/intel/cpu/xeon/set_env.sh
+   # on Nvidia GPU
+   source ./docker_compose/nvidia/gpu/set_env.sh
+   ```
+
+### Quick Start: 2.Run Docker Compose
+
+Select the compose.yaml file that matches your hardware.
+CPU example:
+
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+# cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
+# cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
+docker compose up -d
+```
+
+It will automatically download the docker image on `docker hub`:
+
+```bash
+docker pull opea/chatqna:latest
+docker pull opea/chatqna-ui:latest
+```
+
+If you want to build docker by yourself, please refer to `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md).
+
+> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
+
 ChatQnA architecture shows below:
 
 ![architecture](./assets/img/chatqna_architecture.png)
@@ -95,74 +163,6 @@ Gaudi default compose.yaml
 | Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
 | LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
 | Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep |
-
-## Deploy ChatQnA Service
-
-The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
-
-Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
-
-Quick Start Deployment Steps:
-
-1. Set up the environment variables.
-2. Run Docker Compose.
-
-### Quick Start: 1.Setup Environment Variable
-
-To set up environment variables for deploying ChatQnA services, follow these steps:
-
-1. Set the required environment variables:
-
-   ```bash
-   # Example: host_ip="192.168.1.1"
-   export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   ```
-
-2. If you are in a proxy environment, also set the proxy-related environment variables:
-
-   ```bash
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   ```
-
-3. Set up other environment variables:
-
-   > Notice that you can only choose **one** command below to set up envs according to your hardware. Other that the port numbers may be set incorrectly.
-
-   ```bash
-   # on Gaudi
-   source ./docker_compose/intel/hpu/gaudi/set_env.sh
-   # on Xeon
-   source ./docker_compose/intel/cpu/xeon/set_env.sh
-   # on Nvidia GPU
-   source ./docker_compose/nvidia/gpu/set_env.sh
-   ```
-
-### Quick Start: 2.Run Docker Compose
-
-Select the compose.yaml file that matches your hardware.
-CPU example:
-
-```bash
-cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
-# cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
-# cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
-docker compose up -d
-```
-
-It will automatically download the docker image on `docker hub`:
-
-```bash
-docker pull opea/chatqna:latest
-docker pull opea/chatqna-ui:latest
-```
-
-If you want to build docker by yourself, please refer to `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md).
-
-> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
 
 ### Required Models
 
