@@ -94,9 +94,15 @@ jobs:
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
-          branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
+          repo_name=${{ github.event.pull_request.head.repo.full_name }}
+          if [ "$(echo "$repo_name"|cut -d'/' -f1)" != "opea-project" ]; then
+            owner=$(echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1)
+            branch="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
+          else
+            branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
+          fi
           link_head="https://github.com/opea-project/GenAIExamples/blob/main"
-          png_lines=$(grep -Eo '\]\([^)]+\)' -r -I .|grep -Ev 'http')
+          png_lines=$(grep -Eo '\]\([^)]+\)' --include='*.md' -r .|grep -Ev 'http')
           if [ -n "$png_lines" ]; then
             for png_line in $png_lines; do
               refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
