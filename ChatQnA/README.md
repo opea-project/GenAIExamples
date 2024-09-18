@@ -174,6 +174,16 @@ Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xe
 
 > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
 
+### Run Docker Compose
+Select the compose.yaml file that matches your hardware. 
+CPU exmaple:
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+# cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
+# cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
+docker compose up -d
+```
+
 ### Required Models
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
