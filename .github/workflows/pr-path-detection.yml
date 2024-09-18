@@ -5,7 +5,7 @@ name: Check Paths and Hyperlinks
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, letonghan:translation/manifest]
     types: [opened, reopened, ready_for_review, synchronize]
 
 jobs:
@@ -94,6 +94,14 @@ jobs:
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
+          if echo "${{ github.event.pull_request.head.repo.full_name }}" | grep -q ":"; then
+            echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d':' -f1
+            echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d':' -f2
+          else
+            echo "letonghan:translation/manifest
+          https://github.com/opea-project/GenAIComps/blob/zepan/dev/test
+          https://github.com/letonghan/GenAIExamples/tree/translation/manifest"
+          fi
           branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
           link_head="https://github.com/opea-project/GenAIExamples/blob/main"
           png_lines=$(grep -Eo '\]\([^)]+\)' -r -I .|grep -Ev 'http')
