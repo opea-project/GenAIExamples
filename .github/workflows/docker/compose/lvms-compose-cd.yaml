@@ -17,3 +17,7 @@ services:
     build:
       dockerfile: comps/lvms/llava/dependency/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/llava-hpu:${TAG:-latest}
+  lvm-predictionguard:
+    build:
+      dockerfile: comps/lvms/predictionguard/Dockerfile
+    image: ${REGISTRY:-opea}/lvm-predictionguard:${TAG:-latest}
