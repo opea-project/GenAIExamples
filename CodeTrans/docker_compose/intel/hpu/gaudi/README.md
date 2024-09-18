@@ -6,20 +6,15 @@ This document outlines the deployment process for a CodeTrans application utiliz
 
 First of all, you need to build Docker Images locally and install the python package of it. This step can be ignored after the Docker images published to Docker hub.
 
-### 1. Source Code install GenAIComps
+### 1. Build the LLM Docker Image
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-```
-
-### 2. Build the LLM Docker Image
-
-```bash
 docker build -t opea/llm-tgi:latest --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 3. Build MegaService Docker Image
+### 2. Build MegaService Docker Image
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -27,14 +22,14 @@ cd GenAIExamples/CodeTrans
 docker build -t opea/codetrans:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-### 4. Build UI Docker Image
+### 3. Build UI Docker Image
 
 ```bash
 cd GenAIExamples/CodeTrans/ui
 docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
-### 5. Build Nginx Docker Image
+### 4. Build Nginx Docker Image
 
 ```bash
 cd GenAIComps

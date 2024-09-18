@@ -48,14 +48,11 @@ Port 5173 - Open to 0.0.0.0/0
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Build Embedding Image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/Dockerfile .
 ```
 
@@ -84,7 +81,6 @@ docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy
 
 ```bash
 docker build -t opea/dataprep-multimodal-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/Dockerfile .
-cd ..
 ```
 
 ### 6. Build MegaService Docker Image
@@ -104,7 +100,7 @@ docker build -t opea/videoqna:latest --build-arg https_proxy=$https_proxy --buil
 Build frontend Docker image via below command:
 
 ```bash
-cd ui
+cd GenAIExamples/VideoQnA/ui/
 docker build -t opea/videoqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 

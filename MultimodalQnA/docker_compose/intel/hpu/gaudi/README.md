@@ -1,4 +1,4 @@
-# Build Mega Service of MultimodalRAGWithVideos on Gaudi
+# Build Mega Service of MultimodalQnA on Gaudi
 
 This document outlines the deployment process for a MultimodalQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `multimodal_embedding` that employs [BridgeTower](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) model as embedding model, `multimodal_retriever`, `lvm`, and `multimodal-data-prep`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
@@ -52,16 +52,13 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Build embedding-multimodal-bridgetower Image
 
 Build embedding-multimodal-bridgetower docker image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
 ```
 
@@ -82,7 +79,7 @@ docker build --no-cache -t opea/retriever-multimodal-redis:latest --build-arg ht
 Build TGI Gaudi image
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.4
+docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
 ```
 
 Build lvm-tgi microservice image
@@ -105,7 +102,6 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/MultimodalQnA
 docker build --no-cache -t opea/multimodalqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../..
 ```
 
 ### 6. Build UI Docker Image
@@ -115,14 +111,13 @@ Build frontend Docker image via below command:
 ```bash
 cd  GenAIExamples/MultimodalQnA/ui/
 docker build --no-cache -t opea/multimodalqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../
 ```
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/dataprep-multimodal-redis:latest`
 2. `opea/lvm-tgi:latest`
-3. `ghcr.io/huggingface/tgi-gaudi:2.0.4`
+3. `ghcr.io/huggingface/tgi-gaudi:2.0.5`
 4. `opea/retriever-multimodal-redis:latest`
 5. `opea/embedding-multimodal:latest`
 6. `opea/embedding-multimodal-bridgetower:latest`
