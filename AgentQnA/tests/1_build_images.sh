@@ -32,8 +32,7 @@ function build_agent_docker_image() {
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_image_build/
     get_genai_comps
     echo "Build agent image with --no-cache..."
-    service_list="agent-endpoint"
-    docker compose -f build.yaml build ${service_list} --no-cache
+    docker compose -f build.yaml build --no-cache
 }
 
 function main() {

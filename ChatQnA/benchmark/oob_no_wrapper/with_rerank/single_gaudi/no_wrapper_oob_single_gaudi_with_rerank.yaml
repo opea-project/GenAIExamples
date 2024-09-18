@@ -223,10 +223,6 @@ spec:
         - '2048'
         - --max-total-tokens
         - '4096'
-        - --max-batch-total-tokens
-        - '65536'
-        - --max-batch-prefill-tokens
-        - '4096'
         env:
         - name: OMPI_MCA_btl_vader_single_copy_mechanism
           value: none

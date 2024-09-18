@@ -216,10 +216,10 @@ spec:
         - containerPort: 80
         resources:
           limits:
-            cpu: 80
+            cpu: 76
             memory: 20000Mi
           requests:
-            cpu: 80
+            cpu: 76
             memory: 20000Mi
       serviceAccountName: default
       volumes:
