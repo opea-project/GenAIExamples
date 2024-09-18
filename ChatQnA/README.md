@@ -141,10 +141,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    source ./docker_compose/nvidia/gpu/set_env.sh
    ```
 
-Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md)
-
-> Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
-
 ### Quick Start: 2.Run Docker Compose
 
 Select the compose.yaml file that matches your hardware.
@@ -164,7 +160,8 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-If you want to build docker by yourself, please refer to [More Details](docker_compose/).
+If you want to build docker by yourself, please refer to `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md).
+> Note: The optional docker image **opea/chatqna-without-rerank:latest**  has not been published yet, users need to build this docker image from source.
 
 ### Required Models
 
