@@ -74,7 +74,7 @@ If you want to build docker by yourself, please refer to `built from source`: [G
 
 ChatQnA architecture shows below:
 
-## Architecture and Deploy
+## Architecture and Deploy details
 ![architecture](./assets/img/chatqna_architecture.png)
 
 The ChatQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
