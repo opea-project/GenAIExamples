@@ -155,3 +155,24 @@ The AgentQnA example demonstrates a hierarchical, multi-agent system designed fo
 Worker agent uses open-source websearch tool (duckduckgo), agents use OpenAI GPT-4o-mini as llm backend.
 
 > **_NOTE:_** This example is in active development. The code structure of these use cases are subject to change.
+
+### AudioQnA
+
+The AudioQnA example demonstrates the integration of Generative AI (GenAI) models for performing question-answering (QnA) on audio files, with the added functionality of Text-to-Speech (TTS) for generating spoken responses. The example showcases how to convert audio input to text using Automatic Speech Recognition (ASR), generate answers to user queries using a language model, and then convert those answers back to speech using Text-to-Speech (TTS).
+
+<table>
+    <tr>
+        <th>ASR</th>
+        <th>TTS</th>
+        <th>LLM</th>
+        <th>HW</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td> <a href="https://huggingface.co/openai/whisper-small">openai/whisper-small</a></td>
+        <td> <a href="https://huggingface.co/microsoft/speecht5_tts">microsoft/SpeechT5</a></td>
+        <td> <a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
+        <td> Xeon/Gaudi2</td>
+        <td> Chatbot</td>
+    </tr>
+</table>
