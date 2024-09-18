@@ -161,7 +161,8 @@ docker pull opea/chatqna-ui:latest
 ```
 
 If you want to build docker by yourself, please refer to `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md).
-> Note: The optional docker image **opea/chatqna-without-rerank:latest**  has not been published yet, users need to build this docker image from source.
+
+> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
 
 ### Required Models
 
