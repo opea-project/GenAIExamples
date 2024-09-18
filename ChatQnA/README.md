@@ -14,7 +14,7 @@ Quick Start Deployment Steps:
 
 1. Set up the environment variables.
 2. Run Docker Compose.
-3. Comsume the ChatQnA Service.
+3. Consume the ChatQnA Service.
 
 ### Quick Start: 1.Setup Environment Variable
 
@@ -74,13 +74,14 @@ If you want to build docker by yourself, please refer to `built from source`: [G
 > Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
 
 ### QuickStart: 3.Consume the ChatQnA Service
-   ```bash
-   curl http://${host_ip}:8888/v1/chatqna \
-       -H "Content-Type: application/json" \
-       -d '{
-           "messages": "What is the revenue of Nike in 2023?"
-       }'
-  ```
+
+```bash
+curl http://${host_ip}:8888/v1/chatqna \
+    -H "Content-Type: application/json" \
+    -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+    }'
+```
 
 ## Architecture and Deploy details
 
