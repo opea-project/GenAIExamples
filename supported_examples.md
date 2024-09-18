@@ -176,3 +176,11 @@ The AudioQnA example demonstrates the integration of Generative AI (GenAI) model
         <td> Talkingbot service</td>
     </tr>
 </table>
+
+### MultimodalQnA
+
+[MultimodalQnA](./MultimodalQnA/README.md) addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos.
+
+### ProductivitySuite
+
+[Productivity Suite](./ProductivitySuite/README.md) streamlines your workflow to boost productivity. It leverages the OPEA microservices to provide a comprehensive suite of features to cater to the diverse needs of modern enterprises.
