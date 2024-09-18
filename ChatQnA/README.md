@@ -175,8 +175,10 @@ Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xe
 > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
 
 ### Run Docker Compose
-Select the compose.yaml file that matches your hardware. 
-CPU exmaple:
+
+Select the compose.yaml file that matches your hardware.
+CPU example:
+
 ```bash
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 # cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
