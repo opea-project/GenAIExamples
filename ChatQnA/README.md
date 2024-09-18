@@ -122,7 +122,8 @@ Using the docker image on `docker hub`:
 docker pull opea/chatqna:latest
 ```
 
-    <details>
+<details>
+
     <summary><b>UI docker is optional, depends on the usage</b></summary>
     Two type of UI are supported now, choose one you like and pull the referred docker image.
 
@@ -134,7 +135,7 @@ docker pull opea/chatqna-ui:latest
 docker pull opea/chatqna-conversation-ui:latest
 ```
 
-    </details>
+</details>
 
 ### Quick Start: 2.Setup Environment Variable
 
