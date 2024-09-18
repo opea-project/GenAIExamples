@@ -6,7 +6,7 @@ The workflow falls into the following architecture:
 
 ![architecture](./assets/img/code_trans_architecture.png)
 
-This Code Translation use case uses Text Generation Inference on Intel Gaudi2 or Intel Xeon Scalable Processor. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
+This Code Translation use case demonstrates Text Generation Inference across multiple platforms. Currently, we provide examples for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html), and we invite contributions from other hardware vendors to expand OPEA ecosystem.
 
 ## Deploy Code Translation Service
 
@@ -30,7 +30,7 @@ By default, the LLM model is set to a default value as listed below:
 | ------- | ----------------------------- |
 | LLM     | HuggingFaceH4/mistral-7b-grok |
 
-Change the `LLM_MODEL_ID` in `docker/set_env.sh` for your needs.
+Change the `LLM_MODEL_ID` in `docker_compose/set_env.sh` for your needs.
 
 ### Setup Environment Variable
 
@@ -58,7 +58,7 @@ To set up environment variables for deploying Code Translation services, follow 
 3. Set up other environment variables:
 
    ```bash
-   source ./docker/set_env.sh
+   source ./docker_compose/set_env.sh
    ```
 
 ### Deploy with Docker

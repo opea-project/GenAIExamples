@@ -4,7 +4,7 @@ This document outlines the deployment process for a ChatQnA application utilizin
 
 ## 🚀 Apply Xeon Server on AWS
 
-To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage the power of 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
+To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors that are optimized for demanding workloads.
 
 For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
 
@@ -61,14 +61,11 @@ Port 5173 - Open to 0.0.0.0/0
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Build Embedding Image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
 ```
 
@@ -128,7 +125,6 @@ cd ..
    git clone https://github.com/opea-project/GenAIExamples.git
    cd GenAIExamples/ChatQnA
    docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-   cd ../../..
    ```
 
 2. MegaService without Rerank
@@ -139,7 +135,6 @@ cd ..
    git clone https://github.com/opea-project/GenAIExamples.git
    cd GenAIExamples/ChatQnA
    docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.without_rerank .
-   cd ../../..
    ```
 
 ### 7. Build UI Docker Image
@@ -149,7 +144,6 @@ Build frontend Docker image via below command:
 ```bash
 cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../..
 ```
 
 ### 8. Build Conversational React UI Docker Image (Optional)
@@ -161,7 +155,6 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 ```bash
 cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
-cd ../../../..
 ```
 
 Then run the command `docker images`, you will have the following 7 Docker Images:
@@ -188,7 +181,7 @@ By default, the embedding, reranking and LLM models are set to a default value a
 
 Change the `xxx_MODEL_ID` below for your needs.
 
-For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA with TGI serving. ModelScope models are supported in two ways for TGI:
+For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. TGI can load the models either online or offline as described below:
 
 1. Online
 
@@ -196,7 +189,7 @@ For customers with proxy issues, the models from [ModelScope](https://www.models
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
-   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model_name
+   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.2.0 --model-id $model_name
    ```
 
 2. Offline
@@ -210,7 +203,7 @@ For customers with proxy issues, the models from [ModelScope](https://www.models
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id /data
+     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.2.0 --model-id /data
      ```
 
 ### Setup Environment Variables
@@ -404,12 +397,13 @@ docker compose -f compose_vllm.yaml up -d
 
    If you want to update the default knowledge base, you can use the following commands:
 
-   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf)
-   Click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
+   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
    Or run this command to get the file on a terminal.
 
    ```bash
-   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/langchain/redis/data/nke-10k-2023.pdf
+   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+
    ```
 
    Upload:

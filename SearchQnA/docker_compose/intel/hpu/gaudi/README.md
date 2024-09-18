@@ -6,38 +6,33 @@ This document outlines the deployment process for a SearchQnA application utiliz
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-### 1. Source Code install GenAIComps
+### 1. Build Embedding Image
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-```
-
-### 2. Build Embedding Image
-
-```bash
 docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
 ```
 
-### 3. Build Retriever Image
+### 2. Build Retriever Image
 
 ```bash
 docker build --no-cache -t opea/web-retriever-chroma:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/web_retrievers/chroma/langchain/Dockerfile .
 ```
 
-### 4. Build Rerank Image
+### 3. Build Rerank Image
 
 ```bash
 docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
 ```
 
-### 5. Build LLM Image
+### 4. Build LLM Image
 
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 6. Build TEI Gaudi Image
+### 5. Build TEI Gaudi Image
 
 Since a TEI Gaudi Docker image hasn't been published, we'll need to build it from the [tei-guadi](https://github.com/huggingface/tei-gaudi) repository.
 
@@ -48,7 +43,7 @@ docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
 cd ../..
 ```
 
-### 7. Build MegaService Docker Image
+### 6. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `searchqna.py` Python script. Build the MegaService Docker image using the command below:
 
@@ -56,7 +51,6 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/SearchQnA/docker
 docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
 ```
 
 Then you need to build the last Docker image `opea/searchqna:latest`, which represents the Mega service through following commands:

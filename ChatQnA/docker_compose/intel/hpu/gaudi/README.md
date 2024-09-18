@@ -6,26 +6,21 @@ This document outlines the deployment process for a ChatQnA application utilizin
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-### 1. Source Code install GenAIComps
+### 1. Build Embedding Image
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-```
-
-### 2. Build Embedding Image
-
-```bash
 docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
 ```
 
-### 3. Build Retriever Image
+### 2. Build Retriever Image
 
 ```bash
 docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
-### 4. Build Rerank Image
+### 3. Build Rerank Image
 
 > Skip for ChatQnA without Rerank pipeline
 
@@ -33,17 +28,17 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
 ```
 
-### 5. Build LLM Image
+### 4. Build LLM Image
 
 You can use different LLM serving solutions, choose one of following four options.
 
-#### 5.1 Use TGI
+#### 4.1 Use TGI
 
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-#### 5.2 Use VLLM
+#### 4.2 Use VLLM
 
 Build vllm docker.
 
@@ -57,7 +52,7 @@ Build microservice docker.
 docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/langchain/Dockerfile .
 ```
 
-#### 5.3 Use VLLM-on-Ray
+#### 4.3 Use VLLM-on-Ray
 
 Build vllm-on-ray docker.
 
@@ -71,24 +66,21 @@ Build microservice docker.
 docker build --no-cache -t opea/llm-vllm-ray:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/ray/Dockerfile .
 ```
 
-### 6. Build Dataprep Image
+### 5. Build Dataprep Image
 
 ```bash
 docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
 ```
 
-### 7. Build TEI Gaudi Image
+### 6. Build Guardrails Docker Image (Optional)
 
-Since a TEI Gaudi Docker image hasn't been published, we'll need to build it from the [tei-gaudi](https://github.com/huggingface/tei-gaudi) repository.
+To fortify AI initiatives in production, Guardrails microservice can secure model inputs and outputs, building Trustworthy, Safe, and Secure LLM-based Applications.
 
 ```bash
-git clone https://github.com/huggingface/tei-gaudi
-cd tei-gaudi/
-docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
-cd ../..
+docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/langchain/Dockerfile .
 ```
 
-### 8. Build MegaService Docker Image
+### 7. Build MegaService Docker Image
 
 1. MegaService with Rerank
 
@@ -98,7 +90,6 @@ cd ../..
    git clone https://github.com/opea-project/GenAIExamples.git
    cd GenAIExamples/ChatQnA/docker
    docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-   cd ../../..
    ```
 
 2. MegaService with Guardrails
@@ -109,7 +100,6 @@ cd ../..
    git clone https://github.com/opea-project/GenAIExamples.git
    cd GenAIExamples/ChatQnA/
    docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.guardrails .
-   cd ../../..
    ```
 
 3. MegaService without Rerank
@@ -120,20 +110,18 @@ cd ../..
    git clone https://github.com/opea-project/GenAIExamples.git
    cd GenAIExamples/ChatQnA/docker
    docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.without_rerank .
-   cd ../../..
    ```
 
-### 9. Build UI Docker Image
+### 8. Build UI Docker Image
 
 Construct the frontend Docker image using the command below:
 
 ```bash
 cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../..
 ```
 
-### 10. Build Conversational React UI Docker Image (Optional)
+### 9. Build Conversational React UI Docker Image (Optional)
 
 Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
 
@@ -142,26 +130,14 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 ```bash
 cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
-cd ../../../..
 ```
 
-### 11. Build Guardrails Docker Image (Optional)
-
-To fortify AI initiatives in production, Guardrails microservice can secure model inputs and outputs, building Trustworthy, Safe, and Secure LLM-based Applications.
-
-```bash
-cd GenAIComps
-docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/langchain/Dockerfile .
-cd ../../..
-```
-
-Then run the command `docker images`, you will have the following 8 Docker Images:
+Then run the command `docker images`, you will have the following 7 Docker Images:
 
 - `opea/embedding-tei:latest`
 - `opea/retriever-redis:latest`
 - `opea/reranking-tei:latest`
 - `opea/llm-tgi:latest` or `opea/llm-vllm:latest` or `opea/llm-vllm-ray:latest`
-- `opea/tei-gaudi:latest`
 - `opea/dataprep-redis:latest`
 - `opea/chatqna:latest` or `opea/chatqna-guardrails:latest` or `opea/chatqna-without-rerank:latest`
 - `opea/chatqna-ui:latest`
@@ -188,7 +164,7 @@ By default, the embedding, reranking and LLM models are set to a default value a
 
 Change the `xxx_MODEL_ID` below for your needs.
 
-For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA with TGI serving. ModelScope models are supported in two ways for TGI:
+For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. TGI can load the models either online or offline as described below:
 
 1. Online
 
@@ -196,7 +172,7 @@ For customers with proxy issues, the models from [ModelScope](https://www.models
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
-   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model_name
+   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.5 --model-id $model_name --max-input-tokens 1024 --max-total-tokens 2048
    ```
 
 2. Offline
@@ -210,7 +186,7 @@ For customers with proxy issues, the models from [ModelScope](https://www.models
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id /data
+     docker run -p 8008:80 -v $model_path:/data --name tgi_service --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.5 --model-id /data --max-input-tokens 1024 --max-total-tokens 2048
      ```
 
 ### Setup Environment Variables
