@@ -146,7 +146,7 @@ The DocRetriever example demonstrates how to match user queries with free-text r
 
 | Framework                                                                      | Embedding                                           | Vector Database            | Serving                                                         | HW          | Description                |
 | ------------------------------------------------------------------------------ | --------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | ----------- | -------------------------- |
-| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [BGE-Base](https://huggingface.co/BAAI/bge-base-en) | [Redis](https://redis.io/) | [TEI](https://github.com/huggingface/text-embeddings-inference) | Xeon/Gaudi2 | Document Retrieval Service |
+| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [BGE-Base](https://huggingface.co/BAAI/bge-base-en) | [Redis](https://redis.io/) | [TEI](https://github.com/huggingface/text-embeddings-inference) | Xeon/Gaudi2 | Document Retrieval service |
 
 ### AgentQnA
 
@@ -173,6 +173,6 @@ The AudioQnA example demonstrates the integration of Generative AI (GenAI) model
         <td> <a href="https://huggingface.co/microsoft/speecht5_tts">microsoft/SpeechT5</a></td>
         <td> <a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
         <td> Xeon/Gaudi2</td>
-        <td> Talkingbot Serving</td>
+        <td> Talkingbot service</td>
     </tr>
 </table>
