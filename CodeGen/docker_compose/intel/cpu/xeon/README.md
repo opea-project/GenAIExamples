@@ -14,20 +14,15 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 Should the Docker image you seek not yet be available on Docker Hub, you can build the Docker image locally.
 
-### 1. Git Clone GenAIComps
+### 1. Build the LLM Docker Image
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-```
-
-### 2. Build the LLM Docker Image
-
-```bash
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 3. Build the MegaService Docker Image
+### 2. Build the MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build MegaService Docker image via the command below:
 
@@ -37,7 +32,7 @@ cd GenAIExamples/CodeGen
 docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-### 4. Build the UI Docker Image
+### 3. Build the UI Docker Image
 
 Build the frontend Docker image via the command below:
 
@@ -52,7 +47,7 @@ Then run the command `docker images`, you will have the following 3 Docker Image
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
 
-### 8. Build CodeGen React UI Docker Image (Optional)
+### 4. Build CodeGen React UI Docker Image (Optional)
 
 Build react frontend Docker image via below command:
 

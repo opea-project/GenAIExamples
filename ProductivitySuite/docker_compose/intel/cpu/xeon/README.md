@@ -6,14 +6,11 @@ This document outlines the deployment process for OPEA Productivity Suite utiliz
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
-
 ### 1. Build Embedding Image
 
 ```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
 docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
 ```
 
@@ -69,7 +66,6 @@ The Productivity Suite is composed of multiple GenAIExample reference solutions 
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/
 docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
 ```
 
 #### 8.2 Build DocSum Megaservice Docker Images
@@ -77,7 +73,6 @@ cd ../../..
 ```bash
 cd GenAIExamples/DocSum
 docker build --no-cache -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
 ```
 
 #### 8.3 Build CodeGen Megaservice Docker Images
@@ -85,7 +80,6 @@ cd ../../..
 ```bash
 cd GenAIExamples/CodeGen
 docker build --no-cache -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
 ```
 
 #### 8.4 Build FAQGen Megaservice Docker Images
@@ -93,7 +87,6 @@ cd ../../..
 ```bash
 cd GenAIExamples/FaqGen
 docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
 ```
 
 ### 9. Build UI Docker Image
@@ -105,7 +98,6 @@ Build frontend Docker image that enables via below command:
 ```bash
 cd GenAIExamples/ProductivitySuite/ui
 docker build --no-cache -t ProductivitySuite/docker_compose/intel/cpu/xeon/compose.yaml docker/Dockerfile.react .
-cd ../../../..
 ```
 
 ## 🚀 Start Microservices
