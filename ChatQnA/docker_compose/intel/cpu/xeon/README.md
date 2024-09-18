@@ -396,7 +396,7 @@ docker compose -f compose_vllm.yaml up -d
     -H 'Content-Type: application/json'
    ```
 
-    For parameters in vLLM modes, can refer to [LangChain VLLMOpenAI API](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.vllm.VLLMOpenAI.html)
+   For parameters in vLLM modes, can refer to [LangChain VLLMOpenAI API](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.vllm.VLLMOpenAI.html)
 
 8. MegaService
 
@@ -404,7 +404,7 @@ docker compose -f compose_vllm.yaml up -d
     curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
           "messages": "What is the revenue of Nike in 2023?"
           }'
-    ```
+   ```
 
 9. Dataprep Microservice（Optional）
 
