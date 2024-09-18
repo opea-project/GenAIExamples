@@ -630,7 +630,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -710,7 +710,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -790,7 +790,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -870,7 +870,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -944,7 +944,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -1024,7 +1024,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -1105,7 +1105,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -1198,7 +1198,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -1291,7 +1291,7 @@ spec:
         app.kubernetes.io/instance: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         {}
       containers:
@@ -1375,7 +1375,7 @@ spec:
         app: chatqna
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       securityContext:
         null
       containers:
@@ -1442,7 +1442,7 @@ spec:
         app: chatqna-nginx
     spec:
       nodeSelector:
-        node-type: chatqna-ui    
+        node-type: chatqna-ui
       containers:
       - image: nginx:1.27.1
         imagePullPolicy: IfNotPresent
