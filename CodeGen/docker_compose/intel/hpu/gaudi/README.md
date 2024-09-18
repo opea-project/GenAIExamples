@@ -6,20 +6,15 @@ This document outlines the deployment process for a CodeGen application utilizin
 
 First of all, you need to build the Docker images locally. This step can be ignored after the Docker images published to the Docker Hub.
 
-### 1. Git Clone GenAIComps
+### 1. Build the LLM Docker Image
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-```
-
-### 2. Build the LLM Docker Image
-
-```bash
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 3. Build the MegaService Docker Image
+### 2. Build the MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build the MegaService Docker image via the command below:
 
@@ -29,7 +24,7 @@ cd GenAIExamples/CodeGen
 docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-### 4. Build the UI Docker Image
+### 3. Build the UI Docker Image
 
 Construct the frontend Docker image via the command below:
 
@@ -38,7 +33,7 @@ cd GenAIExamples/CodeGen/ui
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-### 8. Build CodeGen React UI Docker Image (Optional)
+### 4. Build CodeGen React UI Docker Image (Optional)
 
 Build react frontend Docker image via below command:
 

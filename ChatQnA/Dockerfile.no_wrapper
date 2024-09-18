@@ -31,6 +31,4 @@ USER user
 
 WORKDIR /home/user
 
-RUN echo 'ulimit -S -n 999999' >> ~/.bashrc
-
 ENTRYPOINT ["python", "chatqna_no_wrapper.py"]
