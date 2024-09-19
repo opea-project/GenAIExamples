@@ -88,7 +88,6 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
      Note, it will increase the risk of security, so please confirm before do it.
 
-
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
