@@ -45,11 +45,10 @@ It will automatically download the docker image on `docker hub`:
 ```bash
 docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
+docker pull opea/nginx:latest
 ```
 
-If you want to build docker by yourself, please refer to 'Build Docker Images' in below.
-
-> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
+To use the latest or special version, you could build docker image from source by yourself, please refer to 'Build Docker Images' in below.
 
 ## QuickStart: 3.Consume the ChatQnA Service
 
@@ -69,52 +68,26 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-**Certain ports in the EC2 instance need to opened up in the security group, for the microservices to work with the curl commands**
+### Network Port & Security
 
-> See one example below. Please open up these ports in the EC2 instance based on the IP addresses you want to allow
+- Access the ChatQnA UI by web browser
 
-```
-redis-vector-db
-===============
-Port 6379 - Open to 0.0.0.0/0
-Port 8001 - Open to 0.0.0.0/0
+  It supports to access by `80` port, which is already opened in the firewall of EC2 instance as default.
 
-tei_embedding_service
-=====================
-Port 6006 - Open to 0.0.0.0/0
+- Access the microservice by tool or API
 
-embedding
-=========
-Port 6000 - Open to 0.0.0.0/0
+  1. Login to the EC2 instance and access by **local IP address** and port.
 
-retriever
-=========
-Port 7000 - Open to 0.0.0.0/0
+     It's recommended and do nothing of the network port setting.
 
-tei_xeon_service
-================
-Port 8808 - Open to 0.0.0.0/0
+  2. Login to a remote client and access by **public IP address** and port.
 
-reranking
-=========
-Port 8000 - Open to 0.0.0.0/0
+     You need to open the port of the microservice in the security group setting of firewall of EC2 instance setting.
 
-tgi-service or vLLM_service
-===========
-Port 9009 - Open to 0.0.0.0/0
+     For detailed guide, please refer to [Validate Microservices](#validate-microservices).
 
-llm
-===
-Port 9000 - Open to 0.0.0.0/0
+     Note, it will increase the risk of security, so please confirm before do it.
 
-chaqna-xeon-backend-server
-==========================
-Port 8888 - Open to 0.0.0.0/0
-
-chaqna-xeon-ui-server
-=====================
-Port 5173 - Open to 0.0.0.0/0
-```
 
 ## 🚀 Build Docker Images
 
@@ -343,6 +316,53 @@ docker compose -f compose_vllm.yaml up -d
 ```
 
 ### Validate Microservices
+
+Note, before verify the microservices by curl or API, please make sure the ports of the microservices are opened in the firewall of the cloud node.
+
+> See one example below. Please open up these ports in the EC2 instance based on the IP addresses you want to allow:
+
+```
+redis-vector-db
+===============
+Port 6379 - Open to 0.0.0.0/0
+Port 8001 - Open to 0.0.0.0/0
+
+tei_embedding_service
+=====================
+Port 6006 - Open to 0.0.0.0/0
+
+embedding
+=========
+Port 6000 - Open to 0.0.0.0/0
+
+retriever
+=========
+Port 7000 - Open to 0.0.0.0/0
+
+tei_xeon_service
+================
+Port 8808 - Open to 0.0.0.0/0
+
+reranking
+=========
+Port 8000 - Open to 0.0.0.0/0
+
+tgi-service or vLLM_service
+===========
+Port 9009 - Open to 0.0.0.0/0
+
+llm
+===
+Port 9000 - Open to 0.0.0.0/0
+
+chaqna-xeon-backend-server
+==========================
+Port 8888 - Open to 0.0.0.0/0
+
+chaqna-xeon-ui-server
+=====================
+Port 5173 - Open to 0.0.0.0/0
+```
 
 1. TEI Embedding Service
 
