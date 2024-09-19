@@ -36,6 +36,8 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 ## Quick Start: 2.Run Docker Compose
 
+### Download Docker Image on `docker hub`
+
 ```bash
 docker compose up -d
 ```
@@ -45,10 +47,17 @@ It will automatically download the docker image on `docker hub`:
 ```bash
 docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
-docker pull opea/nginx:latest
 ```
 
-To use the latest or special version, you could build docker image from source by yourself, please refer to 'Build Docker Images' in below.
+### Build Docker Image from Source
+
+In following cases, you could build docker image from source by yourself.
+
+- Download the docker image fault.
+
+- Use the latest or special version.
+
+Please refer to 'Build Docker Images' in below.
 
 ## QuickStart: 3.Consume the ChatQnA Service
 
@@ -72,7 +81,7 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 - Access the ChatQnA UI by web browser
 
-  It supports to access by `80` port, which is already opened in the firewall of EC2 instance as default.
+  It supports to access by `80` port. Please confirm the `80` port is opened in the firewall of EC2 instance.
 
 - Access the microservice by tool or API
 
