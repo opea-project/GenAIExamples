@@ -1,0 +1,8 @@
+datasets
+evaluate
+jiwer
+librosa
+pydub
+soundfile
+torch
+transformers
