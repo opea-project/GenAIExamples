@@ -1,28 +1,25 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-# FROM vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest as hpu
-FROM opea/habanalabs:1.16.1-pytorch-installer-2.2.2 as hpu
+#FROM vault.habana.ai/gaudi-docker/1.17.0/ubuntu22.04/habanalabs/pytorch-installer-2.3.1:latest
+FROM vault.habana.ai/gaudi-docker/1.16.2/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest
 
-RUN useradd -m -s /bin/bash user && \
-    mkdir -p /home/user && \
-    chown -R user /home/user/
-ENV LANG=en_US.UTF-8
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-    service ssh restart
-USER user
-WORKDIR /root
+RUN git clone https://github.com/HabanaAI/vllm-fork.git /workspace/vllm 
 
-RUN pip install --no-cache-dir --upgrade-strategy eager optimum[habana]
+# COPY ./ /workspace/vllm
 
-RUN pip install --no-cache-dir -v git+https://github.com/HabanaAI/vllm-fork.git@cf6952d
+WORKDIR /workspace/vllm
 
-RUN pip install --no-cache-dir setuptools
+RUN pip install -v -r requirements-hpu.txt
 
 ENV no_proxy=localhost,127.0.0.1
-
-ENV PT_HPU_LAZY_ACC_PAR_MODE=0
-
 ENV PT_HPU_ENABLE_LAZY_COLLECTIVES=true
 
+RUN VLLM_TARGET_DEVICE=hpu python3 setup.py install
+
+WORKDIR /workspace/
+
+RUN ln -s /workspace/vllm/tests && ln -s /workspace/vllm/examples && ln -s /workspace/vllm/benchmarks
+
+#ENTRYPOINT ["python3", "-m", "vllm.entrypoints.openai.api_server"]
 CMD ["/bin/bash"]
