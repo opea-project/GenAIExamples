@@ -78,7 +78,6 @@ In following cases, you could build docker image from source by yourself.
 
 Please refer to the 'Build Docker Images' in [Guide](docker_compose/intel/cpu/xeon/README.md).
 
-
 ### QuickStart: 3.Consume the ChatQnA Service
 
 ```bash
