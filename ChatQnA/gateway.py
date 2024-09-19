@@ -1,11 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from fastapi import Request
-from fastapi.responses import StreamingResponse
-
-from comps.cores.mega.gateway import Gateway
 from comps.cores.mega.constants import MegaServiceEndpoint
+from comps.cores.mega.gateway import Gateway
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -13,11 +10,9 @@ from comps.cores.proto.api_protocol import (
     ChatMessage,
     UsageInfo,
 )
-from comps.cores.proto.docarray import (
-    LLMParams,
-    RerankerParms,
-    RetrieverParms
-)
+from comps.cores.proto.docarray import LLMParams, RerankerParms, RetrieverParms
+from fastapi import Request
+from fastapi.responses import StreamingResponse
 
 
 class ChatQnAGateway(Gateway):
