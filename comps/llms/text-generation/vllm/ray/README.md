@@ -1,10 +1,10 @@
 # VLLM-Ray Endpoint Service
 
-[Ray](https://docs.ray.io/en/latest/serve/index.html) is an LLM serving solution that makes it easy to deploy and manage a variety of open source LLMs, built on [Ray Serve](https://docs.ray.io/en/latest/serve/index.html), has native support for autoscaling and multi-node deployments, which is easy to use for LLM inference serving on Intel Gaudi2 accelerators. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](<(https://habana.ai/products)>) for more details.
+[Ray](https://docs.ray.io/en/latest/serve/index.html) is an LLM serving solution that makes it easy to deploy and manage a variety of open source LLMs. Built on [Ray Serve](https://docs.ray.io/en/latest/serve/index.html) it has native support for autoscaling and multi-node deployments, and is easy to use for LLM inference serving across multiple platforms.
 
-[vLLM](https://github.com/vllm-project/vllm) is a fast and easy-to-use library for LLM inference and serving, it delivers state-of-the-art serving throughput with a set of advanced features such as PagedAttention, Continuous batching and etc.. Besides GPUs, vLLM already supported [Intel CPUs](https://www.intel.com/content/www/us/en/products/overview.html) and [Gaudi accelerators](https://habana.ai/products).
+[vLLM](https://github.com/vllm-project/vllm) is a fast and easy-to-use library for LLM inference and serving, it delivers state-of-the-art serving throughput with a set of advanced features such as PagedAttention and Continuous Batching among others. Besides GPUs, vLLM supports [Intel CPUs](https://www.intel.com/content/www/us/en/products/overview.html) and [Intel Gaudi accelerators](https://habana.ai/products).
 
-This guide provides an example on how to launch vLLM with Ray serve endpoint on Gaudi accelerators.
+This guide provides an example on how to launch vLLM with Ray serve endpoint on [Intel Gaudi2 Accelerator](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html).
 
 ## Set up environment
 
