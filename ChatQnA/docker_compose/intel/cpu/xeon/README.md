@@ -302,8 +302,7 @@ docker compose -f compose_vllm.yaml up -d
 
 ### Validate Microservices
 
-
-Note, when verify the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.   
+Note, when verify the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.  
 Follow the instructions to validate MicroServices.
 For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
 
