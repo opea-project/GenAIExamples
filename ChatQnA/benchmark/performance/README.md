@@ -67,7 +67,7 @@ We have created the [BKC manifest](https://github.com/opea-project/GenAIExamples
 ```bash
 # on k8s-master node
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA/benchmark
+cd GenAIExamples/ChatQnA/benchmark/performance
 
 # replace the image tag from latest to v0.9 since we want to test with v0.9 release
 IMAGE_TAG=v0.9
@@ -148,7 +148,7 @@ Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/Cha
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/single_gaudi
+cd GenAIExamples/ChatQnA/benchmark/performance/tuned/with_rerank/single_gaudi
 kubectl apply -f .
 ```
 
@@ -210,7 +210,7 @@ All the test results will come to this folder `/home/sdp/benchmark_output/node_1
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/single_gaudi
+cd GenAIExamples/ChatQnA/benchmark/performance/tuned/with_rerank/single_gaudi
 kubectl delete -f .
 kubectl label nodes k8s-worker1 node-type-
 ```
@@ -231,7 +231,7 @@ Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/Cha
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/two_gaudi
+cd GenAIExamples/ChatQnA/benchmark/performance/tuned/with_rerank/two_gaudi
 kubectl apply -f .
 ```
 
@@ -280,7 +280,7 @@ Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/Cha
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/four_gaudi
+cd GenAIExamples/ChatQnA/benchmark/performance/tuned/with_rerank/four_gaudi
 kubectl apply -f .
 ```
 
@@ -309,7 +309,7 @@ All the test results will come to this folder `/home/sdp/benchmark_output/node_4
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/single_gaudi
+cd GenAIExamples/ChatQnA/benchmark/performance/tuned/with_rerank/single_gaudi
 kubectl delete -f .
 kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type-
 ```
