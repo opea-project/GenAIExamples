@@ -6,9 +6,9 @@ This embedding microservice is designed to efficiently convert text into vectori
 
 **Note** - The BridgeTower model implemented in Prediction Guard can actually embed text, images, or text + images (jointly). For now this service only embeds text, but a follow on contribution will enable the multimodal functionality.
 
-# 🚀 Start Microservice with Docker
+## 🚀 Start Microservice with Docker
 
-## Setup Environment Variables
+### Setup Environment Variables
 
 Setup the following environment variables first
 
@@ -16,20 +16,20 @@ Setup the following environment variables first
 export PREDICTIONGUARD_API_KEY=${your_predictionguard_api_key}
 ```
 
-## Build Docker Images
+### Build Docker Images
 
 ```bash
 cd ../../..
 docker build -t opea/embedding-predictionguard:latest -f comps/embeddings/predictionguard/Dockerfile .
 ```
 
-## Start Service
+### Start Service
 
 ```bash
 docker run -d --name="embedding-predictionguard" -p 6000:6000 -e PREDICTIONGUARD_API_KEY=$PREDICTIONGUARD_API_KEY opea/embedding-predictionguard:latest
 ```
 
-# 🚀 Consume Embeddings Service
+## 🚀 Consume Embeddings Service
 
 ```bash
 curl localhost:6000/v1/embeddings \
