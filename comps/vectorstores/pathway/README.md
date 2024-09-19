@@ -3,7 +3,7 @@
 Set the environment variables for Pathway, and the embedding model.
 
 > Note: If you are using `TEI_EMBEDDING_ENDPOINT`, make sure embedding service is already running.
-> See the instructions under [here](../../../retrievers/langchain/pathway/README.md)
+> See the instructions under [here](../../retrievers/pathway/langchain/README.md)
 
 ```bash
 export PATHWAY_HOST=0.0.0.0

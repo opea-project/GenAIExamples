@@ -156,3 +156,124 @@ jobs:
             echo "Please modify the corresponding README in GenAIExamples repo and ask suyue.chen@intel.com for final confirmation."
             exit 1
           fi
+
+  check-the-validity-of-hyperlinks-in-README:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIComps
+        uses: actions/checkout@v4
+
+      - name: Check the Validity of Hyperlinks
+        # ignore_links=("https://platform.openai.com/docs/api-reference/fine-tuning"
+          #               "https://platform.openai.com/docs/api-reference/"
+          #               "https://openai.com/index/whisper/"
+          #               "https://platform.openai.com/docs/api-reference/chat/create")
+        run: |
+          cd ${{github.workspace}}
+          fail="FALSE"
+          url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' --include='*.md' -r .)
+          if [ -n "$url_lines" ]; then
+            for url_line in $url_lines; do
+              url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
+              path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
+              if [[ "https://platform.openai.com/docs/api-reference/fine-tuning" == "$url" || "https://platform.openai.com/docs/api-reference/" == "$url" || "https://openai.com/index/whisper/" == "$url" || "https://platform.openai.com/docs/api-reference/chat/create" == "$url" ]]; then
+                echo "Link "$url" from ${{github.workspace}}/$path need to be verified by a real person."
+              else
+                response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")
+                if [ "$response" -ne 200 ]; then
+                  echo "**********Validation failed, try again**********"
+                  response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                  if [ "$response_retry" -eq 200 ]; then
+                    echo "*****Retry successfully*****"
+                  else
+                    echo "Invalid link from ${{github.workspace}}/$path: $url"
+                    fail="TRUE"
+                  fi
+                fi
+              fi
+            done
+          fi
+
+          if [[ "$fail" == "TRUE" ]]; then
+            exit 1
+          else
+            echo "All hyperlinks are valid."
+          fi
+        shell: bash
+
+  check-the-validity-of-relative-path:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIComps
+        uses: actions/checkout@v4
+
+      - name: Checking Relative Path Validity
+        run: |
+          cd ${{github.workspace}}
+          fail="FALSE"
+          repo_name=${{ github.event.pull_request.head.repo.full_name }}
+          if [ "$(echo "$repo_name"|cut -d'/' -f1)" != "opea-project" ]; then
+            owner=$(echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1)
+            branch="https://github.com/$owner/GenAIComps/tree/${{ github.event.pull_request.head.ref }}"
+          else
+            branch="https://github.com/opea-project/GenAIComps/blob/${{ github.event.pull_request.head.ref }}"
+          fi
+          link_head="https://github.com/opea-project/GenAIComps/blob/main"
+          png_lines=$(grep -Eo '\]\([^)]+\)' --include='*.md' -r .|grep -Ev 'http')
+          if [ -n "$png_lines" ]; then
+            for png_line in $png_lines; do
+              refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
+              png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
+              if [[ "${png_path:0:1}" == "/" ]]; then
+                check_path=${{github.workspace}}$png_path
+              elif [[ "${png_path:0:1}" == "#" ]]; then
+                check_path=${{github.workspace}}/$refer_path$png_path
+              else
+                check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+              fi
+              real_path=$(realpath $check_path)
+              if [ $? -ne 0 ]; then
+                echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
+                fail="TRUE"
+              else
+                url=$link_head$(echo "$real_path" | sed 's|.*/GenAIComps||')
+                response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
+                if [ "$response" -ne 200 ]; then
+                  echo "**********Validation failed, try again**********"
+                  response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                  if [ "$response_retry" -eq 200 ]; then
+                    echo "*****Retry successfully*****"
+                  else
+                    echo "Retry failed. Check branch ${{ github.event.pull_request.head.ref }}"
+                    url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIComps||')
+                    response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
+                    if [ "$response" -ne 200 ]; then
+                      echo "**********Validation failed, try again**********"
+                      response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url_dev")
+                      if [ "$response_retry" -eq 200 ]; then
+                        echo "*****Retry successfully*****"
+                      else
+                        echo "Invalid path from ${{github.workspace}}/$refer_path: $png_path"
+                        fail="TRUE"
+                      fi
+                    else
+                      echo "Check branch ${{ github.event.pull_request.head.ref }} successfully."
+                    fi
+                  fi
+                fi
+              fi
+            done
+          fi
+
+          if [[ "$fail" == "TRUE" ]]; then
+            exit 1
+          else
+            echo "All hyperlinks are valid."
+          fi
+        shell: bash

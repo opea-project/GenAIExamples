@@ -51,7 +51,7 @@ curl 127.0.0.1:8088/generate \
 
 ### 1.4 Start Guardrails Service
 
-Optional: If you have deployed a Guardrails model with TGI Gaudi Service other than default model (i.e., `meta-llama/Meta-Llama-Guard-2-8B`) [from section 1.2](## 1.2 Start TGI Gaudi Service), you will need to add the eviornment variable `SAFETY_GUARD_MODEL_ID` containing the model id. For example, the following informs the Guardrails Service the deployed model used LlamaGuard2:
+Optional: If you have deployed a Guardrails model with TGI Gaudi Service other than default model (i.e., `meta-llama/Meta-Llama-Guard-2-8B`) [from section 1.2](#12-start-tgi-gaudi-service), you will need to add the eviornment variable `SAFETY_GUARD_MODEL_ID` containing the model id. For example, the following informs the Guardrails Service the deployed model used LlamaGuard2:
 
 ```bash
 export SAFETY_GUARD_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
