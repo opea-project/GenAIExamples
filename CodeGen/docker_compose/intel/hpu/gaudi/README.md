@@ -6,20 +6,15 @@ This document outlines the deployment process for a CodeGen application utilizin
 
 First of all, you need to build the Docker images locally. This step can be ignored after the Docker images published to the Docker Hub.
 
-### 1. Git Clone GenAIComps
+### 1. Build the LLM Docker Image
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-```
-
-### 2. Build the LLM Docker Image
-
-```bash
 docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 3. Build the MegaService Docker Image
+### 2. Build the MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build the MegaService Docker image via the command below:
 
@@ -29,7 +24,7 @@ cd GenAIExamples/CodeGen
 docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-### 4. Build the UI Docker Image
+### 3. Build the UI Docker Image
 
 Construct the frontend Docker image via the command below:
 
@@ -38,13 +33,15 @@ cd GenAIExamples/CodeGen/ui
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-### 5. Build the React UI Docker Image
+### 4. Build CodeGen React UI Docker Image (Optional)
 
-Construct the React frontend Docker image via the command below:
+Build react frontend Docker image via below command:
+
+**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
 ```bash
 cd GenAIExamples/CodeGen/ui
-docker build -t opea/codegen-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 ```
 
 Then run the command `docker images`, you will have the following 3 Docker images:
@@ -122,7 +119,7 @@ docker compose up -d
    ```bash
    curl http://${host_ip}:9000/v1/chat/completions\
      -X POST \
-     -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_new_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
      -H 'Content-Type: application/json'
    ```
 
@@ -160,6 +157,7 @@ codegen-gaudi-react-ui-server:
     - no_proxy=${no_proxy}
     - https_proxy=${https_proxy}
     - http_proxy=${http_proxy}
+    - APP_CODE_GEN_URL=${BACKEND_SERVICE_ENDPOINT}
   depends_on:
     - codegen-gaudi-backend-server
   ports:

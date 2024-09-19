@@ -4,159 +4,19 @@ Chatbots are the most widely adopted use case for leveraging the powerful chat a
 
 RAG bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that responses generated remain factual and current. The core of this architecture are vector databases, which are instrumental in enabling efficient and semantic retrieval of information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
 
-ChatQnA architecture shows below:
-
-![architecture](./assets/img/chatqna_architecture.png)
-
-ChatQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), the ChatQnA Flow Chart shows below:
-
-```mermaid
----
-config:
-  flowchart:
-    nodeSpacing: 100
-    rankSpacing: 100
-    curve: linear
-  theme: base
-  themeVariables:
-    fontSize: 42px
----
-flowchart LR
-    %% Colors %%
-    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef invisible fill:transparent,stroke:transparent;
-    style ChatQnA-MegaService stroke:#000000
-    %% Subgraphs %%
-    subgraph ChatQnA-MegaService["ChatQnA-MegaService"]
-        direction LR
-        EM([Embedding <br>]):::blue
-        RET([Retrieval <br>]):::blue
-        RER([Rerank <br>]):::blue
-        LLM([LLM <br>]):::blue
-    end
-    subgraph User Interface
-        direction TB
-        a([User Input Query]):::orchid
-        Ingest([Ingest data]):::orchid
-        UI([UI server<br>]):::orchid
-    end
-    subgraph ChatQnA GateWay
-        direction LR
-        invisible1[ ]:::invisible
-        GW([ChatQnA GateWay<br>]):::orange
-    end
-    subgraph .
-        X([OPEA Micsrservice]):::blue
-        Y{{Open Source Service}}
-        Z([OPEA Gateway]):::orange
-        Z1([UI]):::orchid
-    end
-
-    TEI_RER{{Reranking service<br>}}
-    TEI_EM{{Embedding service <br>}}
-    VDB{{Vector DB<br><br>}}
-    R_RET{{Retriever service <br>}}
-    DP([Data Preparation<br>]):::blue
-    LLM_gen{{LLM Service <br>}}
-
-    %% Data Preparation flow
-    %% Ingest data flow
-    direction LR
-    Ingest[Ingest data] -->|a| UI
-    UI -->|b| DP
-    DP <-.->|c| TEI_EM
-
-    %% Questions interaction
-    direction LR
-    a[User Input Query] -->|1| UI
-    UI -->|2| GW
-    GW <==>|3| ChatQnA-MegaService
-    EM ==>|4| RET
-    RET ==>|5| RER
-    RER ==>|6| LLM
-
-
-    %% Embedding service flow
-    direction TB
-    EM <-.->|3'| TEI_EM
-    RET <-.->|4'| R_RET
-    RER <-.->|5'| TEI_RER
-    LLM <-.->|6'| LLM_gen
-
-    direction TB
-    %% Vector DB interaction
-    R_RET <-.->|d|VDB
-    DP <-.->|d|VDB
-
-
-
-
-```
-
-This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on Intel Gaudi2 or Intel XEON Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products) for more details.
-
-In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
-
-<details>
-<summary><b>Gaudi default compose.yaml</b></summary>
-
-| MicroService | Open Source Project | HW    | Port | Endpoint             |
-| ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding    | Langchain           | Xeon  | 6000 | /v1/embaddings       |
-| Retriever    | Langchain, Redis    | Xeon  | 7000 | /v1/retrieval        |
-| Reranking    | Langchain, TEI      | Gaudi | 8000 | /v1/reranking        |
-| LLM          | Langchain, TGI      | Gaudi | 9000 | /v1/chat/completions |
-| Dataprep     | Redis, Langchain    | Xeon  | 6007 | /v1/dataprep         |
-
-</details>
-
 ## Deploy ChatQnA Service
 
-The ChatQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
+The ChatQnA service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors and Nvidia GPU.
 
 Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
 
-### Prepare Docker Image
+Quick Start Deployment Steps:
 
-Currently we support two ways of deploying ChatQnA services with docker compose:
+1. Set up the environment variables.
+2. Run Docker Compose.
+3. Consume the ChatQnA Service.
 
-1. Using the docker image on `docker hub`:
-
-   ```bash
-   docker pull opea/chatqna:latest
-   ```
-
-   Two type of UI are supported now, choose one you like and pull the referred docker image.
-
-   If you choose conversational UI, follow the [instruction](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/hpu/gaudi#-launch-the-conversational-ui-optional) and modify the [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
-
-   ```bash
-   docker pull opea/chatqna-ui:latest
-   # or
-   docker pull opea/chatqna-conversation-ui:latest
-   ```
-
-2. Using the docker images `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md)
-
-   > Note: The **opea/chatqna-without-rerank:latest** docker image has not been published yet, users need to build this docker image from source.
-
-### Required Models
-
-By default, the embedding, reranking and LLM models are set to a default value as listed below:
-
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
-
-Change the `xxx_MODEL_ID` in `docker/xxx/set_env.sh` for your needs.
-
-For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA. Refer to [this readme](docker_compose/intel/cpu/xeon/README.md) for details.
-
-### Setup Environment Variable
+### Quick Start: 1.Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
 
@@ -189,6 +49,146 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    # on Nvidia GPU
    source ./docker_compose/nvidia/gpu/set_env.sh
    ```
+
+### Quick Start: 2.Run Docker Compose
+
+Select the compose.yaml file that matches your hardware.
+CPU example:
+
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+# cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
+# cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
+docker compose up -d
+```
+
+It will automatically download the docker image on `docker hub`:
+
+```bash
+docker pull opea/chatqna:latest
+docker pull opea/chatqna-ui:latest
+```
+
+If you want to build docker by yourself, please refer to `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md).
+
+> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
+
+### QuickStart: 3.Consume the ChatQnA Service
+
+```bash
+curl http://${host_ip}:8888/v1/chatqna \
+    -H "Content-Type: application/json" \
+    -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+    }'
+```
+
+## Architecture and Deploy details
+
+ChatQnA architecture shows below:
+![architecture](./assets/img/chatqna_architecture.png)
+
+The ChatQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
+
+```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
+flowchart LR
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style ChatQnA-MegaService stroke:#000000
+
+    %% Subgraphs %%
+    subgraph ChatQnA-MegaService["ChatQnA MegaService "]
+        direction LR
+        EM([Embedding MicroService]):::blue
+        RET([Retrieval MicroService]):::blue
+        RER([Rerank MicroService]):::blue
+        LLM([LLM MicroService]):::blue
+    end
+    subgraph UserInterface[" User Interface "]
+        direction LR
+        a([User Input Query]):::orchid
+        Ingest([Ingest data]):::orchid
+        UI([UI server<br>]):::orchid
+    end
+
+
+
+    TEI_RER{{Reranking service<br>}}
+    TEI_EM{{Embedding service <br>}}
+    VDB{{Vector DB<br><br>}}
+    R_RET{{Retriever service <br>}}
+    DP([Data Preparation MicroService]):::blue
+    LLM_gen{{LLM Service <br>}}
+    GW([ChatQnA GateWay<br>]):::orange
+
+    %% Data Preparation flow
+    %% Ingest data flow
+    direction LR
+    Ingest[Ingest data] --> UI
+    UI --> DP
+    DP <-.-> TEI_EM
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> ChatQnA-MegaService
+    EM ==> RET
+    RET ==> RER
+    RER ==> LLM
+
+
+    %% Embedding service flow
+    direction LR
+    EM <-.-> TEI_EM
+    RET <-.-> R_RET
+    RER <-.-> TEI_RER
+    LLM <-.-> LLM_gen
+
+    direction TB
+    %% Vector DB interaction
+    R_RET <-.->|d|VDB
+    DP <-.->|d|VDB
+
+```
+
+This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
+In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
+
+Gaudi default compose.yaml
+| MicroService | Open Source Project | HW | Port | Endpoint |
+| ------------ | ------------------- | ----- | ---- | -------------------- |
+| Embedding | Langchain | Xeon | 6000 | /v1/embaddings |
+| Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
+| Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
+| LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
+| Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep |
+
+### Required Models
+
+By default, the embedding, reranking and LLM models are set to a default value as listed below:
+
+| Service   | Model                     |
+| --------- | ------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5     |
+| Reranking | BAAI/bge-reranker-base    |
+| LLM       | Intel/neural-chat-7b-v3-3 |
+
+Change the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh` for your needs.
+
+For customers with proxy issues, the models from [ModelScope](https://www.modelscope.cn/models) are also supported in ChatQnA. Refer to [this readme](docker_compose/intel/cpu/xeon/README.md) for details.
 
 ### Deploy ChatQnA on Gaudi
 
@@ -245,7 +245,9 @@ Refer to the [AI PC Guide](./docker_compose/intel/cpu/aipc/README.md) for instru
 
 Refer to the [Intel Technology enabling for Openshift readme](https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/workloads/opea/chatqna/README.md) for instructions to deploy ChatQnA prototype on RHOCP with [Red Hat OpenShift AI (RHOAI)](https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai).
 
-## Consume ChatQnA Service
+## Consume ChatQnA Service with RAG
+
+### Check Service Status
 
 Before consuming ChatQnA Service, make sure the TGI/vLLM service is ready (which takes up to 2 minutes to start).
 
@@ -259,6 +261,23 @@ Consume ChatQnA service until you get the TGI response like below.
 ```log
 2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
 ```
+
+### Upload RAG Files (Optional)
+
+To chat with retrieved information, you need to upload a file using `Dataprep` service.
+
+Here is an example of `Nike 2023` pdf.
+
+```bash
+# download pdf file
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+# upload pdf file with dataprep
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./nke-10k-2023.pdf"
+```
+
+### Consume Chat Service
 
 Two ways of consuming ChatQnA Service:
 

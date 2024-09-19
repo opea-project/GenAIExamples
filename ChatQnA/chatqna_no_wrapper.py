@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
 import json
 import os
 import re
@@ -68,10 +69,12 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs = {}
         next_inputs["model"] = "tgi"  # specifically clarify the fake model to make the format unified
         next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
-        next_inputs["max_tokens"] = llm_parameters_dict["max_new_tokens"]
+        next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
         next_inputs["stream"] = inputs["streaming"]
-        next_inputs["frequency_penalty"] = inputs["repetition_penalty"]
+        next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
+        next_inputs["presence_penalty"] = inputs["presence_penalty"]
+        next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
 
@@ -95,7 +98,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             next_data["texts"] = [doc["text"] for doc in data["retrieved_docs"]]
         else:
             # forward to llm
-            if not docs:
+            if not docs and with_rerank:
                 # delete the rerank from retriever -> rerank -> llm
                 for ds in reversed(runtime_graph.downstream(cur_node)):
                     for nds in runtime_graph.downstream(ds):
@@ -260,6 +263,13 @@ class ChatQnAService:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--without-rerank", action="store_true")
+
+    args = parser.parse_args()
+
     chatqna = ChatQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
-    chatqna.add_remote_service()
-    # chatqna.add_remote_service_without_rerank()
+    if args.without_rerank:
+        chatqna.add_remote_service_without_rerank()
+    else:
+        chatqna.add_remote_service()

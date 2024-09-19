@@ -6,52 +6,48 @@ This document outlines the deployment process for a VisualQnA application utiliz
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-### 1. Source Code install GenAIComps
+### 1. Build LVM and NGINX Docker Images
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-```
-
-### 2. Build LLM Image
-
-```bash
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
+docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
-### 3. Pull TGI Gaudi Image
+### 2. Pull TGI Gaudi Image
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.4
+docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
 ```
 
-### 4. Build MegaService Docker Image
+### 3. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `visuralqna.py` Python script. Build the MegaService Docker image using the command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/VisualQnA/docker
+cd GenAIExamples/VisualQnA
 docker build --no-cache -t opea/visualqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
+cd ../..
 ```
 
-### 5. Build UI Docker Image
+### 4. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/VisualQnA//
+cd GenAIExamples/VisualQnA/ui
 docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../..
 ```
 
-Then run the command `docker images`, you will have the following 4 Docker Images:
+Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `opea/llava-tgi:latest`
+1. `ghcr.io/huggingface/tgi-gaudi:2.0.5`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`
+5. `opea/nginx`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -89,6 +85,8 @@ docker compose -f compose.yaml up -d
 
 Follow the instructions to validate MicroServices.
 
+> Note: If you see an "Internal Server Error" from the `curl` command, wait a few minutes for the microserver to be ready and then try again.
+
 1. LLM Microservice
 
    ```bash
@@ -97,28 +95,28 @@ Follow the instructions to validate MicroServices.
 
 2. MegaService
 
-   ```bash
-   curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
-        "messages": [
-         {
-           "role": "user",
-           "content": [
-             {
-               "type": "text",
-               "text": "What'\''s in this image?"
-             },
-             {
-               "type": "image_url",
-               "image_url": {
-                 "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
-               }
-             }
-           ]
-         }
-       ],
-       "max_tokens": 300
-       }'
-   ```
+```bash
+curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "What'\''s in this image?"
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+            }
+          }
+        ]
+      }
+    ],
+    "max_tokens": 300
+    }'
+```
 
 ## 🚀 Launch the UI
 

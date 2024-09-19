@@ -6,7 +6,7 @@ Our FAQ Generation Application leverages the power of large language models (LLM
 
 ## Deploy FAQ Generation Service
 
-The FAQ Generation service can be deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
+The FAQ Generation service can be deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
 
 ### Deploy FAQ Generation on Gaudi
 
