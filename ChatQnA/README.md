@@ -262,7 +262,7 @@ Consume ChatQnA service until you get the TGI response like below.
 2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
 ```
 
-### Upload RAG Files
+### Upload RAG Files (Optional)
 
 To chat with retrieved information, you need to upload a file using `Dataprep` service.
 
