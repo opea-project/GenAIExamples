@@ -60,7 +60,6 @@ In following cases, you could build docker image from source by yourself.
 
 Please refer to 'Build Docker Images' in below.
 
-
 ## QuickStart: 3.Consume the ChatQnA Service
 
 ```bash
