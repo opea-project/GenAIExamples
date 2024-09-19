@@ -245,7 +245,9 @@ Refer to the [AI PC Guide](./docker_compose/intel/cpu/aipc/README.md) for instru
 
 Refer to the [Intel Technology enabling for Openshift readme](https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/workloads/opea/chatqna/README.md) for instructions to deploy ChatQnA prototype on RHOCP with [Red Hat OpenShift AI (RHOAI)](https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai).
 
-## Consume ChatQnA Service
+## Consume ChatQnA Service with RAG
+
+### Check Service Status
 
 Before consuming ChatQnA Service, make sure the TGI/vLLM service is ready (which takes up to 2 minutes to start).
 
@@ -259,6 +261,23 @@ Consume ChatQnA service until you get the TGI response like below.
 ```log
 2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
 ```
+
+### Upload RAG Files (Optional)
+
+To chat with retrieved information, you need to upload a file using `Dataprep` service.
+
+Here is an example of `Nike 2023` pdf.
+
+```bash
+# download pdf file
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+# upload pdf file with dataprep
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./nke-10k-2023.pdf"
+```
+
+### Consume Chat Service
 
 Two ways of consuming ChatQnA Service:
 

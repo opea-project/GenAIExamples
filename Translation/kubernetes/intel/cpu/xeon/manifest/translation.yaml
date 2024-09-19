@@ -1,0 +1,495 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: translation-tgi-config
+  labels:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "2.1.0"
+data:
+  LLM_MODEL_ID: "haoranxu/ALMA-13B"
+  PORT: "2080"
+  HF_TOKEN: "insert-your-huggingface-token-here"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  HABANA_LOGS: "/tmp/habana_logs"
+  NUMBA_CACHE_DIR: "/tmp"
+  HF_HOME: "/tmp/.cache/huggingface"
+  CUDA_GRAPHS: "0"
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: translation-llm-uservice-config
+  labels:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+data:
+  TGI_LLM_ENDPOINT: "http://translation-tgi"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  LOGFLAG: ""
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: translation-ui-config
+  labels:
+    app.kubernetes.io/name: translation-ui
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+data:
+  BASE_URL: "/v1/translation"
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+data:
+  default.conf: |+
+    # Copyright (C) 2024 Intel Corporation
+    # SPDX-License-Identifier: Apache-2.0
+
+
+    server {
+        listen       80;
+        listen  [::]:80;
+
+        location /home {
+            alias  /usr/share/nginx/html/index.html;
+        }
+
+        location / {
+            proxy_pass http://translation-ui:5173;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/translation {
+            proxy_pass http://translation:8888;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+
+kind: ConfigMap
+metadata:
+  name: translation-nginx-config
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: translation-ui
+  labels:
+    app.kubernetes.io/name: translation-ui
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5173
+      targetPort: ui
+      protocol: TCP
+      name: ui
+  selector:
+    app.kubernetes.io/name: translation-ui
+    app.kubernetes.io/instance: translation
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: translation-llm-uservice
+  labels:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: llm-uservice
+  selector:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: translation
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: translation-tgi
+  labels:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "2.1.0"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 2080
+      protocol: TCP
+      name: tgi
+  selector:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: translation
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: translation-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/name: translation
+    app.kubernetes.io/instance: translation
+    app: translation-nginx
+  type: NodePort
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: translation
+  labels:
+    app.kubernetes.io/name: translation
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8888
+      targetPort: 8888
+      protocol: TCP
+      name: translation
+  selector:
+    app.kubernetes.io/name: translation
+    app.kubernetes.io/instance: translation
+    app: translation
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: translation-ui
+  labels:
+    app.kubernetes.io/name: translation-ui
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: translation-ui
+      app.kubernetes.io/instance: translation
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: translation-ui
+        app.kubernetes.io/instance: translation
+        app.kubernetes.io/version: "v1.0"
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: translation-ui
+          envFrom:
+            - configMapRef:
+                name: translation-ui-config
+          securityContext:
+            {}
+          image: "opea/translation-ui:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: ui
+              containerPort: 80
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: translation-llm-uservice
+  labels:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llm-uservice
+      app.kubernetes.io/instance: translation
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llm-uservice
+        app.kubernetes.io/instance: translation
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: translation
+          envFrom:
+            - configMapRef:
+                name: translation-llm-uservice-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/llm-tgi:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: llm-uservice
+              containerPort: 9000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: llm-uservice
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: translation-tgi
+  labels:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "2.1.0"
+spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tgi
+      app.kubernetes.io/instance: translation
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tgi
+        app.kubernetes.io/instance: translation
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: tgi
+          envFrom:
+            - configMapRef:
+                name: translation-tgi-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: http
+              containerPort: 2080
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          startupProbe:
+            failureThreshold: 120
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          resources:
+            {}
+      volumes:
+        - name: model-volume
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: translation
+  labels:
+    app.kubernetes.io/name: translation
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+    app: translation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: translation
+      app.kubernetes.io/instance: translation
+      app: translation
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: translation
+        app.kubernetes.io/instance: translation
+        app: translation
+    spec:
+      securityContext:
+        null
+      containers:
+        - name: translation
+          env:
+            - name: LLM_SERVICE_HOST_IP
+              value: translation-llm-uservice
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/translation:latest"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: translation
+              containerPort: 8888
+              protocol: TCP
+          resources:
+            null
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: translation-nginx
+  labels:
+    app.kubernetes.io/name: translation
+    app.kubernetes.io/instance: translation
+    app.kubernetes.io/version: "v1.0"
+    app: translation-nginx
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: translation
+      app.kubernetes.io/instance: translation
+      app: translation-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: translation
+        app.kubernetes.io/instance: translation
+        app: translation-nginx
+    spec:
+      containers:
+      - image: nginx:1.27.1
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-config-volume
+      securityContext: {}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: translation-nginx-config
+        name: nginx-config-volume
