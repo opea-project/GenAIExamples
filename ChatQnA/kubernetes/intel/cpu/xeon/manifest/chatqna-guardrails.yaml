@@ -262,7 +262,7 @@ data:
         send_timeout 600;
 
         client_max_body_size 10G;
-        
+
         location /home {
             alias  /usr/share/nginx/html/index.html;
         }
