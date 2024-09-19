@@ -7,6 +7,8 @@
 > You can also customize the "MODEL_ID" if needed.
 >
 > You need to make sure you have created the directory `/mnt/opea-models` to save the cached model on the node where the ChatQnA workload is running. Otherwise, you need to modify the `chatqna.yaml` file to change the `model-volume` to a directory that exists on the node.
+>
+> File upload size limit: The maximum size for uploaded files is 10GB.
 
 ## Deploy On Xeon
 
