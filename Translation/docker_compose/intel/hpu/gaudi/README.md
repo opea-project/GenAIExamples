@@ -8,15 +8,14 @@ For Docker Images, you have two options to prepare them.
 
 1. Pull the docker images from docker hub.
 
-    - More stable to use.
-    
-    - Will be automatically downloaded when using docker compose command.
+   - More stable to use.
+   - Will be automatically downloaded when using docker compose command.
 
 2. Build the docker images from source.
 
-    - Contain the latest new features.
+   - Contain the latest new features.
 
-    - Need to be manually build.
+   - Need to be manually build.
 
 If you choose to pull docker images form docker hub, skip to [Start Microservices](#start-microservices) part directly.
 
