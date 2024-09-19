@@ -456,83 +456,83 @@ docker compose -f compose_vllm.yaml up -d
 
 10. Dataprep Microservice（Optional）
 
-   If you want to update the default knowledge base, you can use the following commands:
+If you want to update the default knowledge base, you can use the following commands:
 
-   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
-   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
-   Or run this command to get the file on a terminal.
+Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
+click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+Or run this command to get the file on a terminal.
 
-   ```bash
-   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+```bash
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
 
-   ```
+```
 
-   Upload:
+Upload:
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F "files=@./nke-10k-2023.pdf"
-   ```
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
+```
 
-   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-   Add Knowledge Base via HTTP Links:
+Add Knowledge Base via HTTP Links:
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F 'link_list=["https://opea.dev"]'
-   ```
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
 
-   This command updates a knowledge base by submitting a list of HTTP links for processing.
+This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-   Also, you are able to get the file list that you uploaded:
+Also, you are able to get the file list that you uploaded:
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
-        -H "Content-Type: application/json"
-   ```
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+     -H "Content-Type: application/json"
+```
 
-   Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
+Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
 
-   ```json
-   [
-     {
-       "name": "nke-10k-2023.pdf",
-       "id": "nke-10k-2023.pdf",
-       "type": "File",
-       "parent": ""
-     },
-     {
-       "name": "https://opea.dev.txt",
-       "id": "https://opea.dev.txt",
-       "type": "File",
-       "parent": ""
-     }
-   ]
-   ```
+```json
+[
+  {
+    "name": "nke-10k-2023.pdf",
+    "id": "nke-10k-2023.pdf",
+    "type": "File",
+    "parent": ""
+  },
+  {
+    "name": "https://opea.dev.txt",
+    "id": "https://opea.dev.txt",
+    "type": "File",
+    "parent": ""
+  }
+]
+```
 
-   To delete the file/link you uploaded:
+To delete the file/link you uploaded:
 
-   The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
+The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
 
-   ```bash
-   # delete link
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "https://opea.dev.txt"}' \
-        -H "Content-Type: application/json"
+```bash
+# delete link
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "https://opea.dev.txt"}' \
+     -H "Content-Type: application/json"
 
-   # delete file
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "nke-10k-2023.pdf"}' \
-        -H "Content-Type: application/json"
+# delete file
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "nke-10k-2023.pdf"}' \
+     -H "Content-Type: application/json"
 
-   # delete all uploaded files and links
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "all"}' \
-        -H "Content-Type: application/json"
-   ```
+# delete all uploaded files and links
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "all"}' \
+     -H "Content-Type: application/json"
+```
 
 ## 🚀 Launch the UI
 
