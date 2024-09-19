@@ -406,8 +406,8 @@ Once the services are up, open the following URL in your browser: http://{host_i
 
 Here is an example of running ChatQnA:
 
-![project-screenshot](../../../../assets/img/chat_ui_response.png)
+![project-screenshot](../../../assets/img/chat_ui_response.png)
 
 Here is an example of running ChatQnA with Conversational UI (React):
 
-![project-screenshot](../../../../assets/img/conversation_ui_response.png)
+![project-screenshot](../../../assets/img/conversation_ui_response.png)
