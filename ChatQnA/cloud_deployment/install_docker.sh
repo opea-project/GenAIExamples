@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Update the package index
 sudo apt-get -y update
 
@@ -30,4 +33,3 @@ sudo usermod -aG docker $USER
 
 # Optional: Verify that Docker is installed correctly
 sudo docker --version
-
