@@ -62,7 +62,7 @@ k8s-work3           Ready    <none>          35d   v1.29.6
 
 ### Manifest preparation
 
-We have created the [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/performance) for single node, two nodes and four nodes K8s cluster. In order to apply, we need to check out and configure some values.
+We have created the [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark) for single node, two nodes and four nodes K8s cluster. In order to apply, we need to check out and configure some values.
 
 ```bash
 # on k8s-master node
@@ -144,7 +144,7 @@ kubectl label nodes k8s-worker1 node-type=chatqna-opea
 
 ##### 2. Install ChatQnA
 
-Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/performance/tuned/with_rerank/single_gaudi) and apply to K8s.
+Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/tuned/with_rerank/single_gaudi) and apply to K8s.
 
 ```bash
 # on k8s-master node
@@ -227,7 +227,7 @@ kubectl label nodes k8s-worker1 k8s-worker2 node-type=chatqna-opea
 
 ##### 2. Install ChatQnA
 
-Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/performance/tuned/with_rerank/two_gaudi) and apply to K8s.
+Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/tuned/with_rerank/two_gaudi) and apply to K8s.
 
 ```bash
 # on k8s-master node
@@ -276,7 +276,7 @@ kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type=cha
 
 ##### 2. Install ChatQnA
 
-Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/performance/tuned/with_rerank/four_gaudi) and apply to K8s.
+Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/tuned/with_rerank/four_gaudi) and apply to K8s.
 
 ```bash
 # on k8s-master node
