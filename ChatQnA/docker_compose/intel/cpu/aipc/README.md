@@ -172,7 +172,7 @@ OLLAMA_HOST=${host_ip}:11434 ollama run $OLLAMA_MODEL
 ### Validate Microservices
 
 Follow the instructions to validate MicroServices.
-For validation details, please refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
+For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
 
 1. TEI Embedding Service
 
