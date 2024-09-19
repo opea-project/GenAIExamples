@@ -263,7 +263,7 @@ data:
         }
 
         location / {
-            proxy_pass http://chatqna-chatqna-ui:5174;
+            proxy_pass http://chatqna-chatqna-ui:5173;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -324,7 +324,7 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 5174
+    - port: 5173
       targetPort: ui
       protocol: TCP
       name: ui
@@ -690,7 +690,7 @@ spec:
         - name: chatqna-ui
           securityContext:
             {}
-          image: "opea/chatqna-conversation-ui:latest"
+          image: "opea/chatqna-ui:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - name: ui

@@ -1,32 +1,4 @@
 ---
-# Source: chatqna/charts/data-prep/templates/configmap.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: chatqna-data-prep-config
-  labels:
-    helm.sh/chart: data-prep-1.0.0
-    app.kubernetes.io/name: data-prep
-    app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v1.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  TEI_ENDPOINT: "http://chatqna-tei"
-  EMBED_MODEL: ""
-  REDIS_URL: "redis://chatqna-redis-vector-db:6379"
-  INDEX_NAME: "rag-redis"
-  KEY_INDEX_NAME: "file-keys"
-  SEARCH_BATCH_SIZE: "10"
-  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
-  HF_HOME: "/tmp/.cache/huggingface"
-  http_proxy: ""
-  https_proxy: ""
-  no_proxy: ""
-  LOGFLAG: ""
----
 # Source: chatqna/charts/embedding-usvc/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -261,7 +233,7 @@ data:
         }
 
         location / {
-            proxy_pass http://chatqna-chatqna-ui:5174;
+            proxy_pass http://chatqna-chatqna-ui:5173;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -322,7 +294,7 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 5174
+    - port: 5173
       targetPort: ui
       protocol: TCP
       name: ui
@@ -684,12 +656,9 @@ spec:
         {}
       containers:
         - name: chatqna-ui
-          envFrom:
-            - configMapRef:
-                name: chatqna-chatqna-ui-config
           securityContext:
             {}
-          image: "opea/chatqna-conversation-ui:latest"
+          image: "opea/chatqna-ui:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - name: ui

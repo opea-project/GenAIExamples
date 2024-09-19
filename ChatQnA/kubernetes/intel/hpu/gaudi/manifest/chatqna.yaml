@@ -1,22 +1,4 @@
 ---
-# Source: chatqna/charts/chatqna-ui/templates/configmap.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: chatqna-chatqna-ui-config
-  labels:
-    helm.sh/chart: chatqna-ui-1.0.0
-    app.kubernetes.io/name: chatqna-ui
-    app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v1.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  APP_BACKEND_SERVICE_ENDPOINT: "/v1/chatqna"
-  APP_DATA_PREP_SERVICE_URL: "/v1/dataprep"
----
 # Source: chatqna/charts/data-prep/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -237,7 +219,7 @@ data:
         }
 
         location / {
-            proxy_pass http://chatqna-chatqna-ui:5174;
+            proxy_pass http://chatqna-chatqna-ui:5173;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -298,7 +280,7 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 5174
+    - port: 5173
       targetPort: ui
       protocol: TCP
       name: ui
@@ -611,10 +593,7 @@ spec:
       securityContext:
         {}
       containers:
-        - name: chatqna-ui
-          envFrom:
-            - configMapRef:
-                name: chatqna-chatqna-ui-config        
+        - name: chatqna-ui 
           securityContext:
             {}
           image: "opea/chatqna-ui:latest"
