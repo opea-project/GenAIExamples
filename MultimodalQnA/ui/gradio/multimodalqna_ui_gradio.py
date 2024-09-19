@@ -151,11 +151,11 @@ def ingest_video_gen_transcript(filepath, request: gr.Request):
     if not verified_filepath.startswith(tmp_upload_folder):
         print("Found malicious video file name!")
         yield (
-                gr.Textbox(
-                    visible=True,
-                    value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
-                )
+            gr.Textbox(
+                visible=True,
+                value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
             )
+        )
         return
     basename = os.path.basename(verified_filepath)
     dest = os.path.join(static_dir, basename)
@@ -203,11 +203,11 @@ def ingest_video_gen_caption(filepath, request: gr.Request):
     if not verified_filepath.startswith(tmp_upload_folder):
         print("Found malicious video file name!")
         yield (
-                gr.Textbox(
-                    visible=True,
-                    value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
-                )
+            gr.Textbox(
+                visible=True,
+                value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
             )
+        )
         return
     basename = os.path.basename(verified_filepath)
     dest = os.path.join(static_dir, basename)
