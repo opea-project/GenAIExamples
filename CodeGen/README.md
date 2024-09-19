@@ -138,9 +138,9 @@ Two ways of consuming CodeGen Service:
      -H 'Content-Type: application/json'
    ```
 
-2. If you get errors like "aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host xx.xx.xx.xx:8028", check the `tgi service` first. If there is "Cannot access gated repo for url 
-https://huggingface.co/meta-llama/CodeLlama-7b-hf/resolve/main/config.json." error of `tgi service`, Then you need to ask for model access first. Follow the instruction in the [Required Models](#required-models) section for more information.
+2. If you get errors like "aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host xx.xx.xx.xx:8028", check the `tgi service` first. If there is "Cannot access gated repo for url
+   https://huggingface.co/meta-llama/CodeLlama-7b-hf/resolve/main/config.json." error of `tgi service`, Then you need to ask for model access first. Follow the instruction in the [Required Models](#required-models) section for more information.
 
-2. (Docker only) If all microservices work well, check the port ${host_ip}:7778, the port may be allocated by other users, you can modify the `compose.yaml`.
+3. (Docker only) If all microservices work well, check the port ${host_ip}:7778, the port may be allocated by other users, you can modify the `compose.yaml`.
 
-3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
+4. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
