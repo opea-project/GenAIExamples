@@ -1,15 +1,17 @@
 # CodeGen accuracy Evaluation
 
 ## Evaluation Framework
-We evaluate accuracy by [bigcode-evaluation-harness](https://github.com/bigcode-project/bigcode-evaluation-harness). It  is a framework for the evaluation of code generation models. 
 
+We evaluate accuracy by [bigcode-evaluation-harness](https://github.com/bigcode-project/bigcode-evaluation-harness). It is a framework for the evaluation of code generation models.
 
 ## Evaluation FAQs
 
 ### Launch CodeGen microservice
+
 Please refer to [CodeGen Examples](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen), follow the guide to deploy CodeGen megeservice.
 
 Use `curl` command to test codegen service and ensure that it has started properly
+
 ```bash
 export CODEGEN_ENDPOINT = "http://${your_ip}:7778/v1/codegen"
 curl $CODEGEN_ENDPOINT \
@@ -18,8 +20,7 @@ curl $CODEGEN_ENDPOINT \
 
 ```
 
-
-### Generation and Evaluation 
+### Generation and Evaluation
 
 For evaluating the models on coding tasks or specifically coding LLMs, we follow the [bigcode-evaluation-harness](https://github.com/bigcode-project/bigcode-evaluation-harness) and provide the command line usage and function call usage. [HumanEval](https://huggingface.co/datasets/openai_humaneval), [HumanEval+](https://huggingface.co/datasets/evalplus/humanevalplus), [InstructHumanEval](https://huggingface.co/datasets/codeparrot/instructhumaneval), [APPS](https://huggingface.co/datasets/codeparrot/apps), [MBPP](https://huggingface.co/datasets/mbpp), [MBPP+](https://huggingface.co/datasets/evalplus/mbppplus), and [DS-1000](https://github.com/HKUNLP/DS-1000/) for both completion (left-to-right) and insertion (FIM) mode are available.
 
@@ -32,7 +33,7 @@ pip install -r requirements.txt
 pip install -e .
 
 cd evals/evaluation/bigcode_evaluation_harness/examples
-python main.py --model Qwen/CodeQwen1.5-7B-Chat \ 
+python main.py --model Qwen/CodeQwen1.5-7B-Chat \
   --tasks humaneval \
   --codegen_url $CODEGEN_ENDPOINT \
   --max_length_generation 2048 \
@@ -42,11 +43,12 @@ python main.py --model Qwen/CodeQwen1.5-7B-Chat \
   --allow_code_execution
 ```
 
-***Note:*** Currently, our framework is designed to execute tasks in full. To ensure the accuracy of results, we advise against using the 'limit' or 'limit_start' parameters to restrict the number of test samples.
-
+**_Note:_** Currently, our framework is designed to execute tasks in full. To ensure the accuracy of results, we advise against using the 'limit' or 'limit_start' parameters to restrict the number of test samples.
 
 ### accuracy Result
+
 Here is the tested result for your reference
+
 ```json
 {
   "humaneval": {
@@ -96,4 +98,3 @@ Here is the tested result for your reference
   }
 }
 ```
-

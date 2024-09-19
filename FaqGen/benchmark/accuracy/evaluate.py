@@ -4,9 +4,8 @@
 import json
 import os
 
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
-
 from evals.metrics.ragas import RagasMetric
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 
 llm_endpoint = os.getenv("LLM_ENDPOINT", "http://0.0.0.0:8082")
 
