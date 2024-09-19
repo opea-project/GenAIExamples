@@ -13,7 +13,7 @@ General architecture of VQA shows below:
 
 ![VQA](./assets/img/vqa.png)
 
-This example guides you through how to deploy a [LLaVA-NeXT](https://github.com/LLaVA-VL/LLaVA-NeXT) (Open Large Multimodal Models) model on Intel Gaudi2 to do visual question and answering task. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products/) for more details.
+This example guides you through how to deploy a [LLaVA-NeXT](https://github.com/LLaVA-VL/LLaVA-NeXT) (Open Large Multimodal Models) model on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html). We invite contributions from other hardware vendors to expand the OPEA ecosystem.
 
 ![llava screenshot](./assets/img/llava_screenshot1.png)
 ![llava-screenshot](./assets/img/llava_screenshot2.png)

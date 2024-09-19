@@ -6,7 +6,7 @@ Translation architecture shows below:
 
 ![architecture](./assets/img/translation_architecture.png)
 
-This Translation use case performs Language Translation Inference on Intel Gaudi2 or Intel Xeon Scalable Processors. The Intel Gaudi2 accelerator supports both training and inference for deep learning models in particular for LLMs. Visit [Habana AI products](https://habana.ai/products/) for more details.
+This Translation use case performs Language Translation Inference across multiple platforms. Currently, we provide the example for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html), and we invite contributions from other hardware vendors to expand OPEA ecosystem.
 
 ## Deploy Translation Service
 

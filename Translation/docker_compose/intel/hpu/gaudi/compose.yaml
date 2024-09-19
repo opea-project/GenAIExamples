@@ -41,6 +41,8 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
   translation-gaudi-backend-server:
     image: ${REGISTRY:-opea}/translation:${TAG:-latest}
@@ -70,6 +72,25 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+  translation-gaudi-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: translation-gaudi-nginx-server
+    depends_on:
+      - translation-gaudi-backend-server
+      - translation-gaudi-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=${FRONTEND_SERVICE_IP}
+      - FRONTEND_SERVICE_PORT=${FRONTEND_SERVICE_PORT}
+      - BACKEND_SERVICE_NAME=${BACKEND_SERVICE_NAME}
+      - BACKEND_SERVICE_IP=${BACKEND_SERVICE_IP}
+      - BACKEND_SERVICE_PORT=${BACKEND_SERVICE_PORT}
     ipc: host
     restart: always
 

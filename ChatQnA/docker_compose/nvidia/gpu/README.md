@@ -2,6 +2,66 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on NVIDIA GPU platform. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as embedding, retriever, rerank, and llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
+Quick Start Deployment Steps:
+
+1. Set up the environment variables.
+2. Run Docker Compose.
+3. Consume the ChatQnA Service.
+
+## Quick Start: 1.Setup Environment Variable
+
+To set up environment variables for deploying ChatQnA services, follow these steps:
+
+1. Set the required environment variables:
+
+   ```bash
+   # Example: host_ip="192.168.1.1"
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   ```
+
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   ```
+
+3. Set up other environment variables:
+
+   ```bash
+   source ./set_env.sh
+   ```
+
+## Quick Start: 2.Run Docker Compose
+
+```bash
+docker compose up -d
+```
+
+It will automatically download the docker image on `docker hub`:
+
+```bash
+docker pull opea/chatqna:latest
+docker pull opea/chatqna-ui:latest
+```
+
+If you want to build docker by yourself, please refer to 'Build Docker Images' in below.
+
+> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
+
+## QuickStart: 3.Consume the ChatQnA Service
+
+```bash
+curl http://${host_ip}:8888/v1/chatqna \
+    -H "Content-Type: application/json" \
+    -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+    }'
+```
+
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
@@ -220,7 +280,7 @@ docker compose up -d
    ```bash
    curl http://${host_ip}:9000/v1/chat/completions \
      -X POST \
-     -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
      -H 'Content-Type: application/json'
    ```
 

@@ -43,6 +43,8 @@ By default, the LLM model is set to a default value as listed below:
 [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) is a gated model that requires submitting an access request through Hugging Face. You can replace it with another model.
 Change the `LLM_MODEL_ID` below for your needs, such as: [Qwen/CodeQwen1.5-7B-Chat](https://huggingface.co/Qwen/CodeQwen1.5-7B-Chat), [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
 
+If you choose to use `meta-llama/CodeLlama-7b-hf` as LLM model, you will need to visit [here](https://huggingface.co/meta-llama/CodeLlama-7b-hf), click the `Expand to review and access` button to ask for model access.
+
 ### Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
@@ -132,10 +134,13 @@ Two ways of consuming CodeGen Service:
    http_proxy=""
    curl http://${host_ip}:8028/generate \
      -X POST \
-     -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":256, "do_sample": true}}' \
+     -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_tokens":256, "do_sample": true}}' \
      -H 'Content-Type: application/json'
    ```
 
-2. (Docker only) If all microservices work well, check the port ${host_ip}:7778, the port may be allocated by other users, you can modify the `compose.yaml`.
+2. If you get errors like "aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host xx.xx.xx.xx:8028", check the `tgi service` first. If there is "Cannot access gated repo for url
+   https://huggingface.co/meta-llama/CodeLlama-7b-hf/resolve/main/config.json." error of `tgi service`, Then you need to ask for model access first. Follow the instruction in the [Required Models](#required-models) section for more information.
 
-3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
+3. (Docker only) If all microservices work well, check the port ${host_ip}:7778, the port may be allocated by other users, you can modify the `compose.yaml`.
+
+4. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.

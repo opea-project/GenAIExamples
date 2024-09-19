@@ -147,9 +147,9 @@ Two ways of consuming Document Summarization Service:
 
    ```bash
    http_proxy=""
-   curl http://${your_ip}:8008/generate \
+   curl http://${host_ip}:8008/generate \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -d '{"inputs":"What is Deep Learning?","parameters":{"max_tokens":17, "do_sample": true}}' \
      -H 'Content-Type: application/json'
    ```
 
