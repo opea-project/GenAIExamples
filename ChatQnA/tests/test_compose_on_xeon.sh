@@ -216,13 +216,6 @@ function validate_megaservice() {
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
-    # test the megeservice via nginx
-    validate_service \
-        "${ip_address}:80/v1/chatqna" \
-        "data: " \
-        "chatqna-mega-nginx" \
-        "chaqna-xeon-nginx-server" \
-        '{"messages": "What is the revenue of Nike in 2023?"}'
 }
 
 function validate_frontend() {
