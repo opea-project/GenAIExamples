@@ -37,8 +37,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 ## Quick Start: 2.Run Docker Compose
 
-### Download Docker Image on `docker hub`
-
 ```bash
 docker compose up -d
 ```
@@ -50,11 +48,9 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-### Build Docker Image from Source
-
 In following cases, you could build docker image from source by yourself.
 
-- Download the docker image fault.
+- Failed to download the docker image.
 
 - Use the latest or special version.
 

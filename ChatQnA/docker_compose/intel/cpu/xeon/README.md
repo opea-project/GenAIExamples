@@ -36,8 +36,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 ## Quick Start: 2.Run Docker Compose
 
-### Download Docker Image on `docker hub`
-
 ```bash
 docker compose up -d
 ```
@@ -49,11 +47,9 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-### Build Docker Image from Source
-
 In following cases, you could build docker image from source by yourself.
 
-- Download the docker image fault.
+- Failed to download the docker image.
 
 - Use the latest or special version.
 
@@ -326,52 +322,7 @@ docker compose -f compose_vllm.yaml up -d
 
 ### Validate Microservices
 
-Note, before verify the microservices by curl or API, please make sure the ports of the microservices are opened in the firewall of the cloud node.
-
-> See one example below. Please open up these ports in the EC2 instance based on the IP addresses you want to allow:
-
-```
-redis-vector-db
-===============
-Port 6379 - Open to 0.0.0.0/0
-Port 8001 - Open to 0.0.0.0/0
-
-tei_embedding_service
-=====================
-Port 6006 - Open to 0.0.0.0/0
-
-embedding
-=========
-Port 6000 - Open to 0.0.0.0/0
-
-retriever
-=========
-Port 7000 - Open to 0.0.0.0/0
-
-tei_xeon_service
-================
-Port 8808 - Open to 0.0.0.0/0
-
-reranking
-=========
-Port 8000 - Open to 0.0.0.0/0
-
-tgi-service or vLLM_service
-===========
-Port 9009 - Open to 0.0.0.0/0
-
-llm
-===
-Port 9000 - Open to 0.0.0.0/0
-
-chaqna-xeon-backend-server
-==========================
-Port 8888 - Open to 0.0.0.0/0
-
-chaqna-xeon-ui-server
-=====================
-Port 5173 - Open to 0.0.0.0/0
-```
+Note, before verify the microservices by curl or API, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.
 
 1. TEI Embedding Service
 
