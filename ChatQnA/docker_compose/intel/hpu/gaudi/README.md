@@ -442,18 +442,41 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
 7. LLM Microservice
 
    ```bash
-   curl http://${host_ip}:9000/v1/chat/completions \
+   # TGI service
+   curl http://${host_ip}:9000/v1/chat/completions\
      -X POST \
-     -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
      -H 'Content-Type: application/json'
    ```
+
+   For parameters in TGI mode, please refer to [HuggingFace InferenceClient API](https://huggingface.co/docs/huggingface_hub/package_reference/inference_client#huggingface_hub.InferenceClient.text_generation) (except we rename "max_new_tokens" to "max_tokens".)
+
+   ```bash
+   # vLLM Service
+   curl http://${host_ip}:9000/v1/chat/completions \
+    -X POST \
+    -d '{"query":"What is Deep Learning?","max_tokens":17,"top_p":1,"temperature":0.7,"frequency_penalty":0,"presence_penalty":0, "streaming":false}' \
+    -H 'Content-Type: application/json'
+   ```
+
+   For parameters in vLLM Mode, can refer to [LangChain VLLMOpenAI API](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.vllm.VLLMOpenAI.html)
+
+   ```bash
+   # vLLM-on-Ray Service
+   curl http://${your_ip}:9000/v1/chat/completions \
+     -X POST \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"presence_penalty":1.03","streaming":false}' \
+     -H 'Content-Type: application/json'
+   ```
+
+   For parameters in vLLM-on-Ray mode, can refer to [LangChain ChatOpenAI API](https://python.langchain.com/v0.2/api_reference/openai/chat_models/langchain_openai.chat_models.base.ChatOpenAI.html)
 
 8. MegaService
 
    ```bash
    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "messages": "What is the revenue of Nike in 2023?"
-        }'
+         "messages": "What is the revenue of Nike in 2023?"
+         }'
    ```
 
 9. Dataprep Microservice（Optional）

@@ -132,7 +132,7 @@ Two ways of consuming CodeGen Service:
    http_proxy=""
    curl http://${host_ip}:8028/generate \
      -X POST \
-     -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":256, "do_sample": true}}' \
+     -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_tokens":256, "do_sample": true}}' \
      -H 'Content-Type: application/json'
    ```
 
