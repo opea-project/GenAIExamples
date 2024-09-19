@@ -1,7 +1,8 @@
 # AudioQnA accuracy Evaluation
 
-## Dataset 
+AudioQnA is an example that demonstrates the integration of Generative AI (GenAI) models for performing question-answering (QnA) on audio scene, which contains Automatic Speech Recognition (ASR) and Text-to-Speech (TTS). The following is the piepline for evaluating the ASR accuracy.
 
+## Dataset 
 
 We evaluate the ASR accuracy on the test set of librispeech [dataset](andreagasparini/librispeech_test_only), which contains 2620 records of audio and texts.
 
