@@ -25,6 +25,7 @@ h1 {
     display:block;
 }
 """
+tmp_upload_folder = "/tmp/gradio/"
 
 # create a FastAPI app
 app = FastAPI()
@@ -122,11 +123,14 @@ def http_bot(state, request: gr.Request):
                 video_file = metadata["source_video"]
                 state.video_file = os.path.join(static_dir, metadata["source_video"])
                 state.time_of_frame_ms = metadata["time_of_frame_ms"]
-                splited_video_path = split_video(
-                    state.video_file, state.time_of_frame_ms, tmp_dir, f"{state.time_of_frame_ms}__{video_file}"
-                )
+                try:
+                    splited_video_path = split_video(
+                        state.video_file, state.time_of_frame_ms, tmp_dir, f"{state.time_of_frame_ms}__{video_file}"
+                    )
+                except:
+                    print(f"video {state.video_file} does not exist in UI host!")
+                    splited_video_path = None
                 state.split_video = splited_video_path
-                print(splited_video_path)
         else:
             raise requests.exceptions.RequestException
     except requests.exceptions.RequestException as e:
@@ -143,9 +147,19 @@ def http_bot(state, request: gr.Request):
 
 def ingest_video_gen_transcript(filepath, request: gr.Request):
     yield (gr.Textbox(visible=True, value="Please wait for ingesting your uploaded video into database..."))
-    basename = os.path.basename(filepath)
+    verified_filepath = os.path.normpath(filepath)
+    if not verified_filepath.startswith(tmp_upload_folder):
+        print("Found malicious video file name!")
+        yield (
+            gr.Textbox(
+                visible=True,
+                value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
+            )
+        )
+        return
+    basename = os.path.basename(verified_filepath)
     dest = os.path.join(static_dir, basename)
-    shutil.copy(filepath, dest)
+    shutil.copy(verified_filepath, dest)
     print("Done copy uploaded file to static folder!")
     headers = {
         # 'Content-Type': 'multipart/form-data'
@@ -185,9 +199,19 @@ def ingest_video_gen_transcript(filepath, request: gr.Request):
 
 def ingest_video_gen_caption(filepath, request: gr.Request):
     yield (gr.Textbox(visible=True, value="Please wait for ingesting your uploaded video into database..."))
-    basename = os.path.basename(filepath)
+    verified_filepath = os.path.normpath(filepath)
+    if not verified_filepath.startswith(tmp_upload_folder):
+        print("Found malicious video file name!")
+        yield (
+            gr.Textbox(
+                visible=True,
+                value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
+            )
+        )
+        return
+    basename = os.path.basename(verified_filepath)
     dest = os.path.join(static_dir, basename)
-    shutil.copy(filepath, dest)
+    shutil.copy(verified_filepath, dest)
     print("Done copy uploaded file to static folder!")
     headers = {
         # 'Content-Type': 'multipart/form-data'
