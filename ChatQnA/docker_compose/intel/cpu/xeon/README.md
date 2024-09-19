@@ -321,7 +321,7 @@ docker compose -f compose_vllm.yaml up -d
 
 ### Validate Microservices
 
-Note, if access from remote client, before verify the microservices by curl or API, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.
+Note, when verify the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.
 
 1. TEI Embedding Service
 
