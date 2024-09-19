@@ -144,7 +144,7 @@ kubectl label nodes k8s-worker1 node-type=chatqna-opea
 
 ##### 2. Install ChatQnA
 
-Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/tuned/with_rerank/single_gaudi) and apply to K8s.
+Go to [BKC manifest](./tuned/with_rerank/single_gaudi) and apply to K8s.
 
 ```bash
 # on k8s-master node
@@ -227,7 +227,7 @@ kubectl label nodes k8s-worker1 k8s-worker2 node-type=chatqna-opea
 
 ##### 2. Install ChatQnA
 
-Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/tuned/with_rerank/two_gaudi) and apply to K8s.
+Go to [BKC manifest](./tuned/with_rerank/two_gaudi) and apply to K8s.
 
 ```bash
 # on k8s-master node
@@ -276,7 +276,7 @@ kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type=cha
 
 ##### 2. Install ChatQnA
 
-Go to [BKC manifest](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark/tuned/with_rerank/four_gaudi) and apply to K8s.
+Go to [BKC manifest](./tuned/with_rerank/four_gaudi) and apply to K8s.
 
 ```bash
 # on k8s-master node
@@ -313,7 +313,3 @@ cd GenAIExamples/ChatQnA/benchmark/performance/tuned/with_rerank/single_gaudi
 kubectl delete -f .
 kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type-
 ```
-
-#### 6. Results
-
-Check OOB performance data [here](/opea_release_data.md#chatqna), tuned performance data will be released soon.

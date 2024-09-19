@@ -136,7 +136,7 @@ jobs:
                       if [ "$response_retry" -eq 200 ]; then
                         echo "*****Retry successfully*****"
                       else
-                        echo "Invalid link from $real_path: $url_dev"
+                        echo "Invalid path from ${{github.workspace}}/$refer_path: $png_path"
                         fail="TRUE"
                       fi
                     else
