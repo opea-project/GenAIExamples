@@ -192,7 +192,14 @@ cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 ```
 
-Then run the command `docker images`, you will have the following 7 Docker Images:
+### 10. Build Nginx Docker Image
+
+```bash
+cd GenAIComps
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following 8 Docker Images:
 
 - `opea/embedding-tei:latest`
 - `opea/retriever-redis:latest`
@@ -201,6 +208,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 - `opea/dataprep-redis:latest`
 - `opea/chatqna:latest` or `opea/chatqna-guardrails:latest` or `opea/chatqna-without-rerank:latest`
 - `opea/chatqna-ui:latest`
+- `opea/nginx:latest`
 
 If Conversation React UI is built, you will find one more image:
 
@@ -251,51 +259,30 @@ For users in China who are unable to download models directly from Huggingface, 
 
 ### Setup Environment Variables
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+1. Set the required environment variables:
 
-```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export LLM_MODEL_ID_NAME="neural-chat-7b-v3-3"
-export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
-export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8005"
-export vLLM_LLM_ENDPOINT="http://${host_ip}:8007"
-export vLLM_RAY_LLM_ENDPOINT="http://${host_ip}:8006"
-export LLM_SERVICE_PORT=9000
-export REDIS_URL="redis://${host_ip}:6379"
-export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
+   ```bash
+   # Example: host_ip="192.168.1.1"
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   # Example: NGINX_PORT=80
+   export NGINX_PORT=${your_nginx_port}
+   ```
 
-export llm_service_devices=all
-export tei_embedding_devices=all
-```
+2. If you are in a proxy environment, also set the proxy-related environment variables:
 
-To specify the device ids, "llm_service_devices" and "tei_embedding_devices"` can be set as "0,1,2,3" alike. More info in [gaudi docs](https://docs.habana.ai/en/latest/Orchestration/Multiple_Tenants_on_HPU/Multiple_Dockers_each_with_Single_Workload.html).
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   ```
 
-If guardrails microservice is enabled in the pipeline, the below environment variables are necessary to be set.
+3. Set up other environment variables:
 
-```bash
-export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
-export SAFETY_GUARD_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
-export SAFETY_GUARD_ENDPOINT="http://${host_ip}:8088"
-export GUARDRAIL_SERVICE_HOST_IP=${host_ip}
-```
-
-Note: Please replace `host_ip` with your external IP address, do **NOT** use localhost.
+   ```bash
+   source ./set_env.sh
+   ```
 
 ### Start all the services Docker Containers
 
@@ -463,7 +450,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
 
    ```bash
    # vLLM-on-Ray Service
-   curl http://${your_ip}:9000/v1/chat/completions \
+   curl http://${host_ip}:9000/v1/chat/completions \
      -X POST \
      -d '{"query":"What is Deep Learning?","max_tokens":17,"presence_penalty":1.03","streaming":false}' \
      -H 'Content-Type: application/json'
@@ -479,74 +466,82 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
          }'
    ```
 
-9. Dataprep Microservice（Optional）
-
-   If you want to update the default knowledge base, you can use the following commands:
-
-   Update Knowledge Base via Local File Upload:
+9. Nginx Service
 
    ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F "files=@./nke-10k-2023.pdf"
+   curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
+       -H "Content-Type: application/json" \
+       -d '{"messages": "What is the revenue of Nike in 2023?"}'
    ```
 
-   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+10. Dataprep Microservice（Optional）
 
-   Add Knowledge Base via HTTP Links:
+If you want to update the default knowledge base, you can use the following commands:
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F 'link_list=["https://opea.dev"]'
-   ```
+Update Knowledge Base via Local File Upload:
 
-   This command updates a knowledge base by submitting a list of HTTP links for processing.
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
+```
 
-   Also, you are able to get the file/link list that you uploaded:
+This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
-        -H "Content-Type: application/json"
-   ```
+Add Knowledge Base via HTTP Links:
 
-   Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
 
-   ```json
-   [
-     {
-       "name": "nke-10k-2023.pdf",
-       "id": "nke-10k-2023.pdf",
-       "type": "File",
-       "parent": ""
-     },
-     {
-       "name": "https://opea.dev.txt",
-       "id": "https://opea.dev.txt",
-       "type": "File",
-       "parent": ""
-     }
-   ]
-   ```
+This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-   To delete the file/link you uploaded:
+Also, you are able to get the file/link list that you uploaded:
 
-   ```bash
-   # delete link
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "https://opea.dev.txt"}' \
-        -H "Content-Type: application/json"
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+     -H "Content-Type: application/json"
+```
 
-   # delete file
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "nke-10k-2023.pdf"}' \
-        -H "Content-Type: application/json"
+Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
 
-   # delete all uploaded files and links
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "all"}' \
-        -H "Content-Type: application/json"
-   ```
+```json
+[
+  {
+    "name": "nke-10k-2023.pdf",
+    "id": "nke-10k-2023.pdf",
+    "type": "File",
+    "parent": ""
+  },
+  {
+    "name": "https://opea.dev.txt",
+    "id": "https://opea.dev.txt",
+    "type": "File",
+    "parent": ""
+  }
+]
+```
+
+To delete the file/link you uploaded:
+
+```bash
+# delete link
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "https://opea.dev.txt"}' \
+     -H "Content-Type: application/json"
+
+# delete file
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "nke-10k-2023.pdf"}' \
+     -H "Content-Type: application/json"
+
+# delete all uploaded files and links
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "all"}' \
+     -H "Content-Type: application/json"
+```
 
 10. Guardrails (Optional)
 
@@ -559,6 +554,8 @@ curl http://${host_ip}:9090/v1/guardrails\
 
 ## 🚀 Launch the UI
 
+### Launch with origin port
+
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
@@ -569,11 +566,9 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
-![project-screenshot](../../../../assets/img/chat_ui_init.png)
+### Launch with Nginx
 
-Here is an example of running ChatQnA:
-
-![project-screenshot](../../../../assets/img/chat_ui_response.png)
+If you want to launch the UI using Nginx, open this URL: `http://${host_ip}:${NGINX_PORT}` in your browser to access the frontend.
 
 ## 🚀 Launch the Conversational UI (Optional)
 
@@ -603,6 +598,12 @@ Once the services are up, open the following URL in your browser: http://{host_i
     ports:
       - "80:80"
 ```
+
+![project-screenshot](../../../../assets/img/chat_ui_init.png)
+
+Here is an example of running ChatQnA:
+
+![project-screenshot](../../../../assets/img/chat_ui_response.png)
 
 Here is an example of running ChatQnA with Conversational UI (React):
 
