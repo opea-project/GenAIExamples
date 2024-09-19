@@ -67,7 +67,7 @@ services:
     ipc: host
     restart: always
   translation-gaudi-nginx-server:
-    image: ${REGISTRY:-opea}/translation-nginx:${TAG:-latest}
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
     container_name: translation-gaudi-nginx-server
     depends_on:
       - translation-gaudi-backend-server
