@@ -22,6 +22,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
 
 COPY ./chatqna.py /home/user/chatqna.py
+COPY ./gateway.py /home/user/gateway.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
