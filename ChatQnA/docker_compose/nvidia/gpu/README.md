@@ -134,7 +134,14 @@ docker build --no-cache -t opea/chatqna-react-ui:latest --build-arg https_proxy=
 cd ../../../..
 ```
 
-Then run the command `docker images`, you will have the following 7 Docker Images:
+### 10. Build Nginx Docker Image
+
+```bash
+cd GenAIComps
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/embedding-tei:latest`
 2. `opea/retriever-redis:latest`
@@ -142,8 +149,8 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 4. `opea/llm-tgi:latest`
 5. `opea/dataprep-redis:latest`
 6. `opea/chatqna:latest`
-7. `opea/chatqna-ui:latest`
-8. `opea/chatqna-react-ui:latest`
+7. `opea/chatqna-ui:latest` or `opea/chatqna-react-ui:latest`
+8. `opea/nginx:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -161,33 +168,30 @@ Change the `xxx_MODEL_ID` below for your needs.
 
 ### Setup Environment Variables
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+1. Set the required environment variables:
 
-```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
-export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
-export REDIS_URL="redis://${host_ip}:6379"
-export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
-```
+   ```bash
+   # Example: host_ip="192.168.1.1"
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   # Example: NGINX_PORT=80
+   export NGINX_PORT=${your_nginx_port}
+   ```
 
-Note: Please replace with `host_ip` with you external IP address, do **NOT** use localhost.
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   ```
+
+3. Set up other environment variables:
+
+   ```bash
+   source ./set_env.sh
+   ```
 
 ### Start all the services Docker Containers
 
@@ -292,57 +296,67 @@ docker compose up -d
         }'
    ```
 
-9. Dataprep Microservice（Optional）
-
-   If you want to update the default knowledge base, you can use the following commands:
-
-   Update Knowledge Base via Local File Upload:
+9. Nginx Service
 
    ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F "files=@./nke-10k-2023.pdf"
+   curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
+       -H "Content-Type: application/json" \
+       -d '{"messages": "What is the revenue of Nike in 2023?"}'
    ```
 
-   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+10. Dataprep Microservice（Optional）
 
-   Add Knowledge Base via HTTP Links:
+If you want to update the default knowledge base, you can use the following commands:
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F 'link_list=["https://opea.dev"]'
-   ```
+Update Knowledge Base via Local File Upload:
 
-   This command updates a knowledge base by submitting a list of HTTP links for processing.
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
+```
 
-   Also, you are able to get the file list that you uploaded:
+This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
-        -H "Content-Type: application/json"
-   ```
+Add Knowledge Base via HTTP Links:
 
-   To delete the file/link you uploaded:
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
 
-   ```bash
-   # delete link
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "https://opea.dev"}' \
-        -H "Content-Type: application/json"
+This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-   # delete file
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "nke-10k-2023.pdf"}' \
-        -H "Content-Type: application/json"
+Also, you are able to get the file list that you uploaded:
 
-   # delete all uploaded files and links
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "all"}' \
-        -H "Content-Type: application/json"
-   ```
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+     -H "Content-Type: application/json"
+```
+
+To delete the file/link you uploaded:
+
+```bash
+# delete link
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "https://opea.dev"}' \
+     -H "Content-Type: application/json"
+
+# delete file
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "nke-10k-2023.pdf"}' \
+     -H "Content-Type: application/json"
+
+# delete all uploaded files and links
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "all"}' \
+     -H "Content-Type: application/json"
+```
 
 ## 🚀 Launch the UI
+
+### Launch with origin port
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
@@ -353,6 +367,10 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
     ports:
       - "80:5173"
 ```
+
+### Launch with Nginx
+
+If you want to launch the UI using Nginx, open this URL: `http://${host_ip}:${NGINX_PORT}` in your browser to access the frontend.
 
 ## 🚀 Launch the Conversational UI (Optional)
 
@@ -384,3 +402,11 @@ Once the services are up, open the following URL in your browser: http://{host_i
 ```
 
 ![project-screenshot](../../../assets/img/chat_ui_init.png)
+
+Here is an example of running ChatQnA:
+
+![project-screenshot](../../../assets/img/chat_ui_response.png)
+
+Here is an example of running ChatQnA with Conversational UI (React):
+
+![project-screenshot](../../../assets/img/conversation_ui_response.png)
