@@ -2,9 +2,24 @@
 
 This document outlines the deployment process for a Translation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
-## 🚀 Build Docker Images
+## 🚀 Prepare Docker Images
 
-First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
+For Docker Images, you have two options to prepare them.
+
+1. Pull the docker images from docker hub.
+
+   - More stable to use.
+   - Will be automatically downloaded when using docker compose command.
+
+2. Build the docker images from source.
+
+   - Contain the latest new features.
+
+   - Need to be manually build.
+
+If you choose to pull docker images form docker hub, skip to [Start Microservices](#start-microservices) part directly.
+
+Follow the instructions below to build the docker images from source.
 
 ### 1. Build LLM Image
 
@@ -37,7 +52,7 @@ docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy 
 
 ```bash
 cd GenAIComps
-docker build -t opea/translation-nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:
@@ -45,7 +60,7 @@ Then run the command `docker images`, you will have the following four Docker Im
 1. `opea/llm-tgi:latest`
 2. `opea/translation:latest`
 3. `opea/translation-ui:latest`
-4. `opea/translation-nginx:latest`
+4. `opea/nginx:latest`
 
 ## 🚀 Start Microservices
 
@@ -91,6 +106,15 @@ Change the `LLM_MODEL_ID` below for your needs.
 
 ```bash
 docker compose up -d
+```
+
+> Note: The docker images will be automatically downloaded from `docker hub`:
+
+```bash
+docker pull opea/llm-tgi:latest
+docker pull opea/translation:latest
+docker pull opea/translation-ui:latest
+docker pull opea/nginx:latest
 ```
 
 ### Validate Microservices

@@ -28,4 +28,4 @@ services:
       context: GenAIComps
       dockerfile: comps/nginx/Dockerfile
     extends: translation
-    image: ${REGISTRY:-opea}/translation-nginx:${TAG:-latest}
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
