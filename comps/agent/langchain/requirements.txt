@@ -4,12 +4,12 @@ docarray[full]
 #used by tools
 duckduckgo-search
 fastapi
-huggingface_hub==0.24.0
-langchain==0.2.9
+huggingface_hub
+langchain
 langchain-huggingface
 langchain-openai
-langchain_community==0.2.7
-langchainhub==0.1.20
+langchain_community
+langchainhub
 langgraph
 langsmith
 numpy

@@ -5,7 +5,7 @@ docx2txt
 easyocr
 fastapi
 huggingface_hub
-langchain==0.2.12
+langchain
 langchain-community
 langchain-text-splitters
 langchain_huggingface
@@ -19,11 +19,11 @@ Pillow
 prometheus-fastapi-instrumentator
 pymupdf
 pyspark
-python-bidi==0.4.2
+python-bidi
 python-docx
 python-pptx
 redis
 sentence_transformers
 shortuuid
-unstructured[all-docs]==0.15.7
+unstructured[all-docs]
 uvicorn

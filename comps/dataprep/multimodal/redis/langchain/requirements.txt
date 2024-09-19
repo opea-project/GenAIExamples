@@ -1,6 +1,7 @@
 docarray[full]
 fastapi
-langchain==0.1.12
+langchain
+langchain-community
 moviepy
 openai-whisper
 opencv-python
@@ -9,7 +10,7 @@ opentelemetry-exporter-otlp
 opentelemetry-sdk
 Pillow
 prometheus-fastapi-instrumentator
-pydantic==2.8.2
+pydantic
 python-multipart
 redis
 shortuuid

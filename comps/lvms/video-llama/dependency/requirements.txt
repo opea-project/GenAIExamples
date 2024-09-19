@@ -9,9 +9,9 @@ faiss-cpu
 fastapi
 ftfy
 iopath
-langchain==0.2.9
-langchain-community==0.2.1
-langchain-core==0.2.21
+langchain
+langchain-community
+langchain-core
 numpy
 omegaconf
 opencv-python-headless
@@ -22,7 +22,7 @@ pandas
 Pillow
 prometheus_fastapi_instrumentator
 pytorchvideo
-sentence-transformers==3.0.1
+sentence-transformers
 sentencepiece
 shortuuid
 timm

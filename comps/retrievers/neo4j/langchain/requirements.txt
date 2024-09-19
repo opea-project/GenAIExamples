@@ -1,8 +1,8 @@
 docarray[full]
 fastapi
-frontend==0.0.3
+frontend
 huggingface_hub
-langchain==0.2
+langchain
 langchain-community
 neo4j
 numpy
@@ -12,9 +12,9 @@ opentelemetry-sdk
 pandas
 Pillow
 prometheus-fastapi-instrumentator
-pydantic==2.7.3
-pymupdf==1.24.5
-python-docx==0.8.11
+pydantic
+pymupdf
+python-docx
 sentence_transformers
 shortuuid
 tiktoken
