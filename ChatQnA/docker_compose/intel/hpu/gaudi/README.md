@@ -48,9 +48,13 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-If you want to build docker by yourself, please refer to 'Build Docker Images' in below.
+In following cases, you could build docker image from source by yourself.
 
-> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
+- Failed to download the docker image.
+
+- Use the latest or special version.
+
+Please refer to 'Build Docker Images' in below.
 
 ## QuickStart: 3.Consume the ChatQnA Service
 

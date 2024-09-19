@@ -53,6 +53,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 ### Quick Start: 2.Run Docker Compose
 
 Select the compose.yaml file that matches your hardware.
+
 CPU example:
 
 ```bash
@@ -69,9 +70,13 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-If you want to build docker by yourself, please refer to `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md).
+In following cases, you could build docker image from source by yourself.
 
-> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
+- Failed to download the docker image.
+
+- Use the latest or special version.
+
+Please refer to the 'Build Docker Images' in [Guide](docker_compose/intel/cpu/xeon/README.md).
 
 ### QuickStart: 3.Consume the ChatQnA Service
 
