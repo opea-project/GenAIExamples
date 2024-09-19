@@ -220,7 +220,7 @@ function validate_megaservice() {
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
     # test the megeservice via nginx
-    validate_services \
+    validate_service \
         "${ip_address}:80/v1/chatqna" \
         "data: " \
         "chatqna-mega-nginx" \
