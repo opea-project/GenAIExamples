@@ -41,7 +41,7 @@ test_cases:
       run_test: false
       service_name: "llm-svc"  # Replace with your service name
       parameters:
-        max_new_tokens: 128
+        max_tokens: 128
         temperature: 0.01
         top_k: 10
         top_p: 0.95
