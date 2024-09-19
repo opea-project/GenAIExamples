@@ -7,6 +7,12 @@
 > You can also customize the "MODEL_ID" if needed.
 >
 > You need to make sure you have created the directory `/mnt/opea-models` to save the cached model on the node where the ChatQnA workload is running. Otherwise, you need to modify the `chatqna.yaml` file to change the `model-volume` to a directory that exists on the node.
+> 
+> The `/mnt/opea-models` directory is used to cache the model files to avoid downloading the model files every time the pod is restarted.
+> 
+> The directory should have the following permission:
+> 
+> `sudo chown 1000:1000 /mnt/opea-models`
 
 ## Deploy On Xeon
 
@@ -14,6 +20,7 @@
 cd GenAIExamples/ChatQnA/kubernetes/intel/cpu/xeon/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chatqna.yaml
+kubectl apply -f shared-storage.yaml
 kubectl apply -f chatqna.yaml
 ```
 
@@ -34,6 +41,7 @@ kubectl apply -f chatqna_bf16.yaml
 cd GenAIExamples/ChatQnA/kubernetes/intel/hpu/gaudi/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chatqna.yaml
+kubectl apply -f shared-storage.yaml
 kubectl apply -f chatqna.yaml
 ```
 
