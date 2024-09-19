@@ -141,7 +141,7 @@ cd GenAIComps
 docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 7 Docker Images:
+Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/embedding-tei:latest`
 2. `opea/retriever-redis:latest`
@@ -149,9 +149,8 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 4. `opea/llm-tgi:latest`
 5. `opea/dataprep-redis:latest`
 6. `opea/chatqna:latest`
-7. `opea/chatqna-ui:latest`
-8. `opea/chatqna-react-ui:latest`
-9. `opea/nginx:latest`
+7. `opea/chatqna-ui:latest` or `opea/chatqna-react-ui:latest`
+8. `opea/nginx:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
