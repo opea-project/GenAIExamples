@@ -313,7 +313,3 @@ cd GenAIExamples/ChatQnA/benchmark/tuned/with_rerank/single_gaudi
 kubectl delete -f .
 kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type-
 ```
-
-#### 6. Results
-
-Check OOB performance data [here](/opea_release_data.md#chatqna), tuned performance data will be released soon.
