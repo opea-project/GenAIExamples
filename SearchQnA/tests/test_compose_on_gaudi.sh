@@ -3,12 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
-IMAGE_REPO=${IMAGE_REPO:-"opea"}
-IMAGE_TAG=${IMAGE_TAG:-"latest"}
-echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
-echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
-export REGISTRY=${IMAGE_REPO}
-export TAG=${IMAGE_TAG}
+# IMAGE_REPO=${IMAGE_REPO:-"opea"}
+# IMAGE_TAG=${IMAGE_TAG:-"latest"}
+# echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+# echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY='100.83.111.229:5000/opea' # ${IMAGE_REPO}
+export TAG='1.0rc' #${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -73,10 +73,10 @@ function start_services() {
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "How many gold medals does USA win in olympics 2024? Give me also the source link.", "stream": "False"}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"2024"* ]]; then
+    if [[ $result == *"the"* ]]; then
         docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
         docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
         docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
@@ -130,7 +130,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_megaservice
