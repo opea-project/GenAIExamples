@@ -244,7 +244,7 @@ kubectl apply -f .
 
 We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.deployment_type`, `test_suite_config.service_ip`, `test_suite_config.service_port`, `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
-```bash
+````bash
 export DEPLOYMENT_TYPE="k8s"
 export SERVICE_IP = None
 export SERVICE_PORT = None
@@ -257,7 +257,7 @@ And then run the benchmark tool by:
 ```bash
 cd GenAIEval/evals/benchmark
 python benchmark.py
-```
+````
 
 ##### 4. Data collection
 
@@ -349,7 +349,6 @@ docker compose up -d
 
 Refer to the [Gaudi Guide](../../docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
-
 #### Deploy ChatQnA on Xeon
 
 ```bash
@@ -367,7 +366,6 @@ docker compose up -d
 ```
 
 Refer to the [NVIDIA GPU Guide](../../docker_compose/nvidia/gpu/README.md) for more instructions on building docker images from source.
-
 
 ### Run tests
 
@@ -395,7 +393,7 @@ All the test results will come to this folder `/home/sdp/benchmark_output/docker
 
 ### Clean up
 
-Take gaudi as example, use the below command to clean up sytem.
+Take gaudi as example, use the below command to clean up system.
 
 ```bash
 cd GenAIExamples/docker_compose/intel/hpu/gaudi
