@@ -72,9 +72,9 @@ docker pull opea/chatqna-ui:latest
 
 In following cases, you could build docker image from source by yourself.
 
-- Failed to download the docker image.
+- Failed to download the docker image. (The `opea/nginx` docker image has not been released for now, users need to build this image first)
 
-- Use the latest or special version.
+- If you want to use a specific version of docker image.
 
 Please refer to the 'Build Docker Images' in [Guide](docker_compose/intel/cpu/xeon/README.md).
 
