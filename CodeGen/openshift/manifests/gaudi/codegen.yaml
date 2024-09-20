@@ -1,0 +1,247 @@
+---
+# Source: codegen/charts/llm-uservice/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codegen-tgi
+  labels:
+    helm.sh/chart: tgi-0.1.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.4"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: tgi
+  selector:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codegen
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: codegen-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.1.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: llm-uservice
+  selector:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codegen
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: codegen
+  labels:
+    helm.sh/chart: codegen-0.1.0
+    app.kubernetes.io/name: codegen
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7778
+      targetPort: 7778
+      protocol: TCP
+      name: codegen
+  selector:
+    app.kubernetes.io/name: codegen
+    app.kubernetes.io/instance: codegen
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codegen-tgi
+  labels:
+    helm.sh/chart: tgi-0.1.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.4"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tgi
+      app.kubernetes.io/instance: codegen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tgi
+        app.kubernetes.io/instance: codegen
+    spec:
+      securityContext: {}
+      containers:
+        - name: tgi
+          env:
+            - name: MODEL_ID
+              value: meta-llama/CodeLlama-7b-hf
+            - name: PORT
+              value: "8080"
+            - name: NUMBA_CACHE_DIR
+              value: /data
+            - name: HF_TOKEN
+              value: "insert-your-huggingface-token-here"
+            - name: PAD_SEQUENCE_TO_MULTIPLE_OF
+              value: "1024"
+          securityContext: {}
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.4"
+          imagePullPolicy: IfNotPresent
+          args:
+          - --max-input-length
+          - "1024"
+          - --max-total-tokens
+          - "2048"
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+            - mountPath: /var/log/habana_logs
+              name: logs-volume
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              habana.ai/gaudi: 1
+            requests:
+              habana.ai/gaudi: 1
+      volumes:
+      - emptyDir:
+          sizeLimit: 50Gi
+        name: model-volume
+      - emptyDir:
+        name: logs-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codegen-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.1.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llm-uservice
+      app.kubernetes.io/instance: codegen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llm-uservice
+        app.kubernetes.io/instance: codegen
+    spec:
+      securityContext: {}
+      containers:
+        - name: codegen
+          env:
+            - name: TGI_LLM_ENDPOINT
+              value: "http://codegen-tgi:8080"
+            - name: HUGGINGFACEHUB_API_TOKEN
+              value: "insert-your-huggingface-token-here"
+            - name: PYTHONPATH
+              value: /home/user/.local/lib/python3.11/site-packages:/home/user
+            - name: HOME
+              value: /tmp/home
+          securityContext: {}
+          image: "insert-your-image-llm-tgi"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: llm-uservice
+              containerPort: 9000
+              protocol: TCP
+          startupProbe:
+            exec:
+              command:
+                - python 
+                - -c 
+                - 'import requests; req = requests.get("http://codegen-tgi:8080/info"); print(req)'
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 120
+          volumeMounts:
+          - mountPath: /tmp/home
+            name: local-dir
+          resources: {}
+      volumes:
+      - emptyDir:
+          sizeLimit: 5Gi
+        name: local-dir
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codegen
+  labels:
+    helm.sh/chart: codegen-0.1.0
+    app.kubernetes.io/name: codegen
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: codegen
+      app.kubernetes.io/instance: codegen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: codegen
+        app.kubernetes.io/instance: codegen
+    spec:
+      securityContext: null
+      containers:
+        - name: codegen
+          env:
+            - name: LLM_SERVICE_HOST_IP
+              value: codegen-llm-uservice
+          securityContext: null
+          image: "insert-your-image-codegen"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: codegen
+              containerPort: 7778
+              protocol: TCP
+          resources: null
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/instance: codegen
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: codegen
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: codegen-0.1.0
+  name: codegen
+spec:
+  port:
+    targetPort: codegen
+  to:
+    kind: Service
+    name: codegen
+    weight: 100
+  wildcardPolicy: None
