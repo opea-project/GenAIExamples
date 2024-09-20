@@ -42,132 +42,27 @@ This modular approach allows developers to independently develop, deploy, and sc
 
 The initially supported `Microservices` are described in the below table. More `Microservices` are on the way.
 
-<table>
-	<tbody>
-		<tr>
-			<td>MicroService</td>
-            <td>Framework</td>
-			<td>Model</td>
-			<td>Serving</td>
-			<td>HW</td>
-			<td>Description</td>
-		</tr>
-		<tr>
-			<td rowspan="2"><a href="./comps/embeddings">Embedding</a></td>
-            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td rowspan="2"><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">BAAI/bge-base-en-v1.5</a></td>
-			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
-			<td>Gaudi2</td>
-			<td>Embedding on Gaudi2</td>
-		</tr>
-		<tr>
-			<td><a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
-			<td>Xeon</td>
-			<td>Embedding on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td><a href="./comps/retrievers">Retriever</a></td>
-			<td><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">BAAI/bge-base-en-v1.5</a></td>
-			<td><a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
-			<td>Xeon</td>
-			<td>Retriever on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td rowspan="2"><a href="./comps/reranks">Reranking</a></td>
-            <td rowspan="2"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td ><a href="https://huggingface.co/BAAI/bge-reranker-base">BAAI/bge-reranker-base</a></td>
-			<td><a href="https://github.com/huggingface/tei-gaudi">TEI-Gaudi</a></td>
-			<td>Gaudi2</td>
-			<td>Reranking on Gaudi2</td>
-		</tr>
-		<tr>
-			<td><a href="https://huggingface.co/BAAI/bge-reranker-base">BBAAI/bge-reranker-base</a></td>
-			<td><a href="https://github.com/huggingface/text-embeddings-inference">TEI</a></td>
-			<td>Xeon</td>
-			<td>Reranking on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td rowspan="2"><a href="./comps/asr/whisper">ASR</a></td>
-            <td rowspan="2">NA</a></td>
-			<td rowspan="2"><a href="https://huggingface.co/openai/whisper-small">openai/whisper-small</a></td>
-			<td rowspan="2">NA</td>
-			<td>Gaudi2</td>
-			<td>Audio-Speech-Recognition on Gaudi2</td>
-		</tr>
-		<tr>
-			<td>Xeon</td>
-			<td>Audio-Speech-RecognitionS on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td rowspan="2"><a href="./comps/tts/speecht5">TTS</a></td>
-            <td rowspan="2">NA</a></td>
-			<td rowspan="2"><a href="https://huggingface.co/microsoft/speecht5_tts">microsoft/speecht5_tts</a></td>
-			<td rowspan="2">NA</td>
-			<td>Gaudi2</td>
-			<td>Text-To-Speech on Gaudi2</td>
-		</tr>
-		<tr>
-			<td>Xeon</td>
-			<td>Text-To-Speech on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td rowspan="4"><a href="./comps/dataprep">Dataprep</a></td>
-            <td rowspan="2"><a href="https://qdrant.tech/">Qdrant</td>
-			<td rowspan="2"><a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">sentence-transformers/all-MiniLM-L6-v2</a></td>
-			<td rowspan="4">NA</td>
-			<td>Gaudi2</td>
-			<td>Dataprep on Gaudi2</td>
-		</tr>
-		<tr>
-			<td>Xeon</td>
-			<td>Dataprep on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td rowspan="2"><a href="https://redis.io/">Redis</td>
-			<td rowspan="2"><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">BAAI/bge-base-en-v1.5</a></td>
-			<td>Gaudi2</td>
-			<td>Dataprep on Gaudi2</td>
-		</tr>
-		<tr>
-			<td>Xeon</td>
-			<td>Dataprep on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td rowspan="6"><a href="./comps/llms">LLM</a></td>
-            <td rowspan="6"><a href="https://www.langchain.com">LangChain</a>/<a href="https://www.llamaindex.ai">LlamaIndex</a></td>
-			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
-			<td><a href="https://github.com/huggingface/tgi-gaudi">TGI Gaudi</a></td>
-			<td>Gaudi2</td>
-			<td>LLM on Gaudi2</td>
-		</tr>
-		<tr>
-			<td><a href="https://github.com/huggingface/text-generation-inference">TGI</a></td>
-			<td>Xeon</td>
-			<td>LLM on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
-			<td rowspan="2"><a href="https://github.com/ray-project/ray">Ray Serve</a></td>
-			<td>Gaudi2</td>
-			<td>LLM on Gaudi2</td>
-		</tr>
-		<tr>
-			<td>Xeon</td>
-			<td>LLM on Xeon CPU</td>
-		</tr>
-		<tr>
-			<td rowspan="2"><a href="https://huggingface.co/Intel/neural-chat-7b-v3-3">Intel/neural-chat-7b-v3-3</a></td>
-			<td rowspan="2"><a href="https://github.com/vllm-project/vllm/">vLLM</a></td>
-			<td>Gaudi2</td>
-			<td>LLM on Gaudi2</td>
-		</tr>
-		<tr>
-			<td>Xeon</td>
-			<td>LLM on Xeon CPU</td>
-		</tr>
-	</tbody>
-</table>
+| MicroService                                  | Framework                                                                      | Model                                                                                                   | Serving                                                         | HW     | Description                           |
+| --------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ------ | ------------------------------------- |
+| [Embedding](./comps/embeddings/README.md)     | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [BAAI/bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5)                                   | [TEI-Gaudi](https://github.com/huggingface/tei-gaudi)           | Gaudi2 | Embedding on Gaudi2                   |
+| [Embedding](./comps/embeddings/README.md)     | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [BAAI/bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5)                                   | [TEI](https://github.com/huggingface/text-embeddings-inference) | Xeon   | Embedding on Xeon CPU                 |
+| [Retriever](./comps/retrievers/README.md)     | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [BAAI/bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5)                                   | [TEI](https://github.com/huggingface/text-embeddings-inference) | Xeon   | Retriever on Xeon CPU                 |
+| [Reranking](./comps/reranks/tei/README.md)    | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [BAAI/bge-reranker-base](https://huggingface.co/BAAI/bge-reranker-base)                                 | [TEI-Gaudi](https://github.com/huggingface/tei-gaudi)           | Gaudi2 | Reranking on Gaudi2                   |
+| [Reranking](./comps/reranks/tei/README.md)    | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [BBAAI/bge-reranker-base](https://huggingface.co/BAAI/bge-reranker-base)                                | [TEI](https://github.com/huggingface/text-embeddings-inference) | Xeon   | Reranking on Xeon CPU                 |
+| [ASR](./comps/asr/whisper/README.md)          | NA                                                                             | [openai/whisper-small](https://huggingface.co/openai/whisper-small)                                     | NA                                                              | Gaudi2 | Audio-Speech-Recognition on Gaudi2    |
+| [ASR](./comps/asr/whisper/README.md)          | NA                                                                             | [openai/whisper-small](https://huggingface.co/openai/whisper-small)                                     | NA                                                              | Xeon   | Audio-Speech-RecognitionS on Xeon CPU |
+| [TTS](./comps/tts/speecht5/README.md)         | NA                                                                             | [microsoft/speecht5_tts](https://huggingface.co/microsoft/speecht5_tts)                                 | NA                                                              | Gaudi2 | Text-To-Speech on Gaudi2              |
+| [TTS](./comps/tts/speecht5/README.md)         | NA                                                                             | [microsoft/speecht5_tts](https://huggingface.co/microsoft/speecht5_tts)                                 | NA                                                              | Xeon   | Text-To-Speech on Xeon CPU            |
+| [Dataprep](./comps/dataprep/README.md)        | [Qdrant](https://qdrant.tech/)                                                 | [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) | NA                                                              | Gaudi2 | Dataprep on Gaudi2                    |
+| [Dataprep](./comps/dataprep/README.md)        | [Qdrant](https://qdrant.tech/)                                                 | [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) | NA                                                              | Xeon   | Dataprep on Xeon CPU                  |
+| [Dataprep](./comps/dataprep/README.md)        | [Redis](https://redis.io/)                                                     | [BAAI/bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5)                                   | NA                                                              | Gaudi2 | Dataprep on Gaudi2                    |
+| [Dataprep](./comps/dataprep/README.md)        | [Redis](https://redis.io/)                                                     | [BAAI/bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5)                                   | NA                                                              | Xeon   | Dataprep on Xeon CPU                  |
+| [LLM](./comps/llms/text-generation/README.md) | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Intel/neural-chat-7b-v3-3](https://huggingface.co/Intel/neural-chat-7b-v3-3)                           | [TGI Gaudi](https://github.com/huggingface/tgi-gaudi)           | Gaudi2 | LLM on Gaudi2                         |
+| [LLM](./comps/llms/text-generation/README.md) | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Intel/neural-chat-7b-v3-3](https://huggingface.co/Intel/neural-chat-7b-v3-3)                           | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon   | LLM on Xeon CPU                       |
+| [LLM](./comps/llms/text-generation/README.md) | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Intel/neural-chat-7b-v3-3](https://huggingface.co/Intel/neural-chat-7b-v3-3)                           | [Ray Serve](https://github.com/ray-project/ray)                 | Gaudi2 | LLM on Gaudi2                         |
+| [LLM](./comps/llms/text-generation/README.md) | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Intel/neural-chat-7b-v3-3](https://huggingface.co/Intel/neural-chat-7b-v3-3)                           | [Ray Serve](https://github.com/ray-project/ray)                 | Xeon   | LLM on Xeon CPU                       |
+| [LLM](./comps/llms/text-generation/README.md) | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Intel/neural-chat-7b-v3-3](https://huggingface.co/Intel/neural-chat-7b-v3-3)                           | [vLLM](https://github.com/vllm-project/vllm/)                   | Gaudi2 | LLM on Gaudi2                         |
+| [LLM](./comps/llms/text-generation/README.md) | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Intel/neural-chat-7b-v3-3](https://huggingface.co/Intel/neural-chat-7b-v3-3)                           | [vLLM](https://github.com/vllm-project/vllm/)                   | Xeon   | LLM on Xeon CPU                       |
 
 A `Microservices` can be created by using the decorator `register_microservice`. Taking the `embedding microservice` as an example:
 
