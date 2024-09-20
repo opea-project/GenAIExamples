@@ -53,20 +53,20 @@ function start_services() {
     export TGI_LLM_ENDPOINT_CODEGEN="http://${ip_address}:8028"
     export TGI_LLM_ENDPOINT_FAQGEN="http://${ip_address}:9009"
     export TGI_LLM_ENDPOINT_DOCSUM="http://${ip_address}:9009"
-    export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
-    export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${host_ip}:8889/v1/faqgen"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
-    export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
-    export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
-    export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get_file"
-    export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
-    export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
-    export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delete"
-    export CHAT_HISTORY_GET_ENDPOINT="http://${host_ip}:6012/v1/chathistory/get"
-    export PROMPT_SERVICE_GET_ENDPOINT="http://${host_ip}:6015/v1/prompt/get"
-    export PROMPT_SERVICE_CREATE_ENDPOINT="http://${host_ip}:6015/v1/prompt/create"
-    export KEYCLOAK_SERVICE_ENDPOINT="http://${host_ip}:8080"
+    export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${ip_address}:8888/v1/chatqna"
+    export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${ip_address}:8889/v1/faqgen"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6009/v1/dataprep/delete_file"
+    export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
+    export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${ip_address}:8890/v1/docsum"
+    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6008/v1/dataprep/get_file"
+    export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
+    export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
+    export CHAT_HISTORY_DELETE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/delete"
+    export CHAT_HISTORY_GET_ENDPOINT="http://${ip_address}:6012/v1/chathistory/get"
+    export PROMPT_SERVICE_GET_ENDPOINT="http://${ip_address}:6015/v1/prompt/get"
+    export PROMPT_SERVICE_CREATE_ENDPOINT="http://${ip_address}:6015/v1/prompt/create"
+    export KEYCLOAK_SERVICE_ENDPOINT="http://${ip_address}:8080"
     export MONGO_HOST=${ip_address}
     export MONGO_PORT=27017
     export DB_NAME="opea"
@@ -235,7 +235,7 @@ function validate_microservices() {
 
     # FAQGen llm microservice
     validate_service \
-        "${ip_address}:${LLM_SERVICE_HOST_PORT_FAQGEN}/v1/faqgen" \
+        "${ip_address}:9002/v1/faqgen" \
         "data: " \
         "llm_faqgen" \
         "llm-faqgen-server" \
@@ -243,7 +243,7 @@ function validate_microservices() {
 
     # Docsum llm microservice
     validate_service \
-        "${ip_address}:${LLM_SERVICE_HOST_PORT_DOCSUM}/v1/chat/docsum" \
+        "${ip_address}:9003/v1/chat/docsum" \
         "data: " \
         "llm_docsum" \
         "llm-docsum-server" \
@@ -251,7 +251,7 @@ function validate_microservices() {
 
     # CodeGen llm microservice
     validate_service \
-        "${ip_address}:${LLM_SERVICE_HOST_PORT_CODEGEN}/v1/chat/completions" \
+        "${ip_address}:9001/v1/chat/completions" \
         "data: " \
         "llm_codegen" \
         "llm-tgi-server-codegen" \
