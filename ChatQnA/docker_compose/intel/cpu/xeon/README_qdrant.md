@@ -222,6 +222,9 @@ docker compose -f compose_qdrant.yaml up -d
 
 ### Validate Microservices
 
+Follow the instructions to validate MicroServices.
+For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
+
 1. TEI Embedding Service
 
    ```bash
