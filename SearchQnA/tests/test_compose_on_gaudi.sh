@@ -3,12 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
-# IMAGE_REPO=${IMAGE_REPO:-"opea"}
-# IMAGE_TAG=${IMAGE_TAG:-"latest"}
-# echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
-# echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
-export REGISTRY='100.83.111.229:5000/opea' # ${IMAGE_REPO}
-export TAG='1.0rc' #${IMAGE_TAG}
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -130,7 +130,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_megaservice
