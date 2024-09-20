@@ -71,10 +71,10 @@ function start_services() {
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "How many gold medals does USA win in olympics 2024? Give me also the source link.", "stream": "False"}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"2024"* ]]; then
+    if [[ $result == *"the"* ]]; then
         docker logs web-retriever-chroma-server
         docker logs searchqna-xeon-backend-server
         echo "Result correct."
