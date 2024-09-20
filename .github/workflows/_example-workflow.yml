@@ -69,7 +69,7 @@ jobs:
               cd tei-gaudi && git rev-parse HEAD && cd ../
           fi
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
-              git clone https://github.com/vllm-project/vllm.git 
+              git clone https://github.com/vllm-project/vllm.git
               cd vllm && git rev-parse HEAD && cd ../
           fi
           git clone https://github.com/opea-project/GenAIComps.git
