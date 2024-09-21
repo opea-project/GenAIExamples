@@ -8,7 +8,7 @@ We evaluate accuracy by [bigcode-evaluation-harness](https://github.com/bigcode-
 
 ### Launch CodeGen microservice
 
-Please refer to [CodeGen Examples](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen), follow the guide to deploy CodeGen megeservice.
+Please refer to [CodeGen Examples](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen/README.md), follow the guide to deploy CodeGen megeservice.
 
 Use `curl` command to test codegen service and ensure that it has started properly
 

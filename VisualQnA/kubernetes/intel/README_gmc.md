@@ -2,7 +2,7 @@
 
 This document outlines the deployment process for a Visual Question Answering (VisualQnA) application that utilizes the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice components on Intel Xeon servers and Gaudi machines.
 
-Please install GMC in your Kubernetes cluster, if you have not already done so, by following the steps in Section "Getting Started" at [GMC Install](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector#readme). We will soon publish images to Docker Hub, at which point no builds will be required, further simplifying install.
+Please install GMC in your Kubernetes cluster, if you have not already done so, by following the steps in Section "Getting Started" at [GMC Install](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector/README.md). We will soon publish images to Docker Hub, at which point no builds will be required, further simplifying install.
 
 If you have only Intel Xeon machines you could use the visualqna_xeon.yaml file or if you have a Gaudi cluster you could use visualqna_gaudi.yaml
 In the below example we illustrate on Xeon.
