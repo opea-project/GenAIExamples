@@ -102,7 +102,7 @@ def your_sync_func():
 
 ### Visualize metrics
 
-Please refer to [OPEA grafana](https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/grafana) to get the details of Prometheus and Grafana server setup. The Grafana dashboard JSON files are also provided under [OPEA grafana](https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/grafana) to visualize the metrics.
+Please refer to [OPEA grafana](https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/grafana/README.md) to get the details of Prometheus and Grafana server setup. The Grafana dashboard JSON files are also provided under [OPEA grafana](https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/grafana) to visualize the metrics.
 
 ### Visualize tracing
 

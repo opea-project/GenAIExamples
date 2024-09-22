@@ -15,7 +15,7 @@ docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-a
 
 To use Nginx for service forwarding, users need to setup environment variables first. The variables set here will be substituted in `nginx.conf.template`.
 
-For example, if you want to use Nginx to forward the frontend, backend services of a [ChatQnA](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA) example, setup environment variables as below.
+For example, if you want to use Nginx to forward the frontend, backend services of a [ChatQnA](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/README.md) example, setup environment variables as below.
 
 ```bash
 export FRONTEND_SERVICE_IP=${your_frontend_service_ip}

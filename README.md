@@ -1,12 +1,6 @@
-<div align="center">
-
 # Generative AI Components (GenAIComps)
 
-<p align="center">
-<b>Build Enterprise-grade Generative AI Applications with Microservice Architecture</b>
-</p>
-
-<div align="left">
+**Build Enterprise-grade Generative AI Applications with Microservice Architecture**
 
 This initiative empowers the development of high-quality Generative AI applications for enterprises via microservices, simplifying the scaling and deployment process for production. It abstracts away infrastructure complexities, facilitating the seamless development and deployment of Enterprise AI services.
 
@@ -159,4 +153,4 @@ Thank you for being a part of this journey. We can't wait to see what we can ach
 
 - [Code of Conduct](https://github.com/opea-project/docs/tree/main/community/CODE_OF_CONDUCT.md)
 - [Security Policy](https://github.com/opea-project/docs/tree/main/community/SECURITY.md)
-- [Legal Information](/LEGAL_INFORMATION.md)
+- [Legal Information](LEGAL_INFORMATION.md)
