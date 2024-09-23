@@ -29,6 +29,10 @@ from comps.cores.proto.docarray import (
     TextImageDoc,
     MultimodalDoc,
     EmbedMultimodalDoc,
+    FactualityDoc,
+    ScoreDoc,
+    PIIRequestDoc,
+    PIIResponseDoc,
 )
 
 # Constants

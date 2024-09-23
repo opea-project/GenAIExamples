@@ -20,6 +20,26 @@ class TextDoc(BaseDoc, TopologyInfo):
     text: str = None
 
 
+class FactualityDoc(BaseDoc):
+    reference: str
+    text: str
+
+
+class ScoreDoc(BaseDoc):
+    score: float
+
+
+class PIIRequestDoc(BaseDoc):
+    prompt: str
+    replace: Optional[bool] = False
+    replace_method: Optional[str] = "random"
+
+
+class PIIResponseDoc(BaseDoc):
+    detected_pii: Optional[List[dict]] = None
+    new_prompt: Optional[str] = None
+
+
 class MetadataTextDoc(TextDoc):
     metadata: Optional[Dict[str, Any]] = Field(
         description="This encloses all metadata associated with the textdoc.",

@@ -1,0 +1,13 @@
+aiohttp
+docarray
+fastapi
+huggingface_hub
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+Pillow
+predictionguard
+prometheus-fastapi-instrumentator
+shortuuid
+transformers
+uvicorn

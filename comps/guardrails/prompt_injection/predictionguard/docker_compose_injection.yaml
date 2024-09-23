@@ -1,0 +1,20 @@
+# Copyright (C) 2024 Prediction Guard, Inc
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  injection:
+    image: opea/guardrails-injection-predictionguard:latest
+    container_name: guardrails-injection-predictionguard
+    ports:
+      - "9085:9085"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PREDICTIONGUARD_API_KEY: ${PREDICTIONGUARD_API_KEY}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
