@@ -64,10 +64,6 @@ jobs:
         run: |
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
-          if [[ $(grep -c "tei-gaudi:" ${docker_compose_path}) != 0 ]]; then
-              git clone https://github.com/huggingface/tei-gaudi.git
-              cd tei-gaudi && git rev-parse HEAD && cd ../
-          fi
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
               git clone https://github.com/vllm-project/vllm.git
               cd vllm && git rev-parse HEAD && cd ../

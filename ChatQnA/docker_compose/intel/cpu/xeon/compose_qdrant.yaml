@@ -69,7 +69,7 @@ services:
       INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-reranking-server
     ports:
       - "6041:80"
