@@ -2,7 +2,9 @@
 
 This document outlines the deployment process for OPEA Productivity Suite utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server and [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) solutions. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
-## 🚀 Build Docker Images
+---
+
+## 🐳 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
@@ -38,15 +40,12 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 
 ```bash
 docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
-
 ```
 
 ### 6. Build Prompt Registry Image
 
 ```bash
 docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/mongo/Dockerfile .
-
-
 ```
 
 ### 7. Build Chat History Image
@@ -99,6 +98,8 @@ Build frontend Docker image that enables via below command:
 cd GenAIExamples/ProductivitySuite/ui
 docker build --no-cache -t ProductivitySuite/docker_compose/intel/cpu/xeon/compose.yaml docker/Dockerfile.react .
 ```
+
+---
 
 ## 🚀 Start Microservices
 
@@ -184,17 +185,19 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ```bash
 cd GenAIExamples/ProductivitySuite/docker_compose/intel/cpu/xeon
-```
 
-```bash
 docker compose -f compose.yaml up -d
 ```
 
-### Setup Keycloak
+---
 
-Please refer to [keycloak_setup_guide](keycloak_setup_guide.md) for more detail related to Keycloak configuration setup.
+### 🔐 Setup Keycloak
 
-### Validate Microservices
+Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more detail related to Keycloak configuration setup.
+
+---
+
+### ✅ Validate Microservices
 
 1. TEI Embedding Service
 
@@ -474,6 +477,8 @@ Please refer to [keycloak_setup_guide](keycloak_setup_guide.md) for more detail 
       "user": "test", "id":"{Conversation id to Delete}"}'
     ```
 
+---
+
 ## 🚀 Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
@@ -490,57 +495,60 @@ Here is an example of running Productivity Suite
 ![project-screenshot](../../../../assets/img/chat_qna_init.png)
 ![project-screenshot](../../../../assets/img/Login_page.png)
 
-## 🧐 Features
+---
+
+## 🛠️ Key Features
 
 Here're some of the project's features:
 
-### CHAT QNA
+### 💬ChatQnA
 
-- Start a Text Chat：Initiate a text chat with the ability to input written conversations, where the dialogue content can also be customized based on uploaded files.
-- Context Awareness: The AI assistant maintains the context of the conversation, understanding references to previous statements or questions. This allows for more natural and coherent exchanges.
+- **Start a Text Chat**：Initiate a text chat with the ability to input written conversations, where the dialogue content can also be customized based on uploaded files.
+- **Context Awareness**: The AI assistant maintains the context of the conversation, understanding references to previous statements or questions. This allows for more natural and coherent exchanges.
 
-### DATA SOURCE
+### 🎛️ Data Source
 
-- The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
-- Uploaded File would get listed and user would be able add or remove file/links
+- **File Upload or Remote Link**: The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
+- **File Management**:Uploaded File would get listed and user would be able add or remove file/links
 
-#### Screen Shot
+#### Screenshots
 
 ![project-screenshot](../../../../assets/img/data_source.png)
 
-- Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
-- Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
-- Conversational Chat : The application maintains a history of the conversation, allowing users to review previous messages and the AI to refer back to earlier points in the dialogue when necessary.
+- **Clear Chat**: Clear the record of the current dialog box without retaining the contents of the dialog box.
+- **Chat history**: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
+- **Conversational Chat**: The application maintains a history of the conversation, allowing users to review previous messages and the AI to refer back to earlier points in the dialogue when necessary.
 
-#### Screen Shots
+#### Screenshots
 
 ![project-screenshot](../../../../assets/img/chat_qna_init.png)
 ![project-screenshot](../../../../assets/img/chatqna_with_conversation.png)
 
-### CODEGEN
+### 💻 Codegen
 
-- Generate code: generate the corresponding code based on the current user's input.
+- **Generate code**: generate the corresponding code based on the current user's input.
 
-  Screen Shot
-  ![project-screenshot](../../../../assets/img/codegen.png)
+#### Screenshots
 
-### DOC SUMMARY
+![project-screenshot](../../../../assets/img/codegen.png)
 
-- Summarizing Uploaded Files: Upload files from their local device, then click 'Generate Summary' to summarize the content of the uploaded file. The summary will be displayed on the 'Summary' box.
-- Summarizing Text via Pasting: Paste the text to be summarized into the text box, then click 'Generate Summary' to produce a condensed summary of the content, which will be displayed in the 'Summary' box on the right.
-- Scroll to Bottom: The summarized content will automatically scroll to the bottom.
+### 📚 Document Summarization
 
-#### Screen Shot
+- **Summarizing Uploaded Files**: Upload files from their local device, then click 'Generate Summary' to summarize the content of the uploaded file. The summary will be displayed on the 'Summary' box.
+- **Summarizing Text via Pasting**: Paste the text to be summarized into the text box, then click 'Generate Summary' to produce a condensed summary of the content, which will be displayed in the 'Summary' box on the right.
+- **Scroll to Bottom**: The summarized content will automatically scroll to the bottom.
+
+#### Screenshots
 
 ![project-screenshot](../../../../assets/img/doc_summary_paste.png)
 ![project-screenshot](../../../../assets/img/doc_summary_file.png)
 
-### FAQ Generator
+### ❓ FAQ Generator
 
-- Generate FAQs from Text via Pasting: Paste the text to into the text box, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
+- **Generate FAQs from Text via Pasting**: Paste the text to into the text box, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
 
-- Generate FAQs from Text via txt file Upload: Upload the file in the Upload bar, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
+- **Generate FAQs from Text via txt file Upload**: Upload the file in the Upload bar, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
 
-#### Screen Shot
+#### Screenshots
 
 ![project-screenshot](../../../../assets/img/faq_generator.png)

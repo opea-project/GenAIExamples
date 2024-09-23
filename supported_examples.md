@@ -190,4 +190,4 @@ FAQ Generation Application leverages the power of large language models (LLMs) t
 
 ### ProductivitySuite
 
-[Productivity Suite](./ProductivitySuite/README.md) streamlines your workflow to boost productivity. It leverages the OPEA microservices to provide a comprehensive suite of features to cater to the diverse needs of modern enterprises.
+[Productivity Suite](./ProductivitySuite/README.md) streamlines your workflow to boost productivity. It leverages the power of OPEA microservices to deliver a comprehensive suite of features tailored to meet the diverse needs of modern enterprises.

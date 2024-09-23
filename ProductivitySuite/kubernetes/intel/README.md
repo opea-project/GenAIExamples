@@ -1,4 +1,4 @@
-# Deploy ProductivitySuite with ReactUI
+# 🚀 Deploy ProductivitySuite with ReactUI
 
 The document outlines the deployment steps for ProductivitySuite via Kubernetes cluster while utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline components and ReactUI, a popular React-based user interface library.
 
@@ -16,12 +16,14 @@ In ProductivitySuite, it consists of following pipelines/examples and components
 - keycloak
 ```
 
-## Prerequisites for Deploying ProductivitySuite with ReactUI
+---
+
+## ⚠️ Prerequisites for Deploying ProductivitySuite with ReactUI
 To begin with, ensure that you have following prerequisites in place:
 
-1. Kubernetes installation: Make sure that you have Kubernetes installed.
-2. Images: Make sure you have all the images ready for the examples and components stated above. You may refer to [README](../../docker_compose/intel/cpu/xeon/README.md) for steps to build the images.
-3. Configuration Values: Set the following values in all the yaml files before proceeding with the deployment:
+1. ☸ Kubernetes installation: Make sure that you have Kubernetes installed.
+2. 🐳 Images: Make sure you have all the images ready for the examples and components stated above. You may refer to [README](../../docker_compose/intel/cpu/xeon/README.md) for steps to build the images.
+3. 🔧 Configuration Values: Set the following values in all the yaml files before proceeding with the deployment:
 
    a. HUGGINGFACEHUB_API_TOKEN (Your HuggingFace token to download your desired model from HuggingFace):
       ```
@@ -42,20 +44,26 @@ To begin with, ensure that you have following prerequisites in place:
       # Look for ENDPOINT in the yaml and insert all the url endpoint for all the required backend service.
       ```
 
-4. MODEL_ID and model-volume (OPTIONAL): You may as well customize the "MODEL_ID" to use different model and model-volume for the volume to be mounted.
+4. MODEL_ID and model-volume **(OPTIONAL)**: You may as well customize the "MODEL_ID" to use different model and model-volume for the volume to be mounted.
 5. After finish with steps above, you can proceed with the deployment of the yaml file.
 
-## Deploying ProductivitySuite
+---
+
+##  🌐 Deploying ProductivitySuite
 You can use yaml files in xeon folder to deploy ProductivitySuite with reactUI.
 ```
 cd GenAIExamples/ProductivitySuite/kubernetes/intel/cpu/xeon/manifests/
 kubectl apply -f *.yaml
 ```
 
-## User Management via Keycloak Configuration
-Please refer to [keycloak_setup_guide](../../docker_compose/intel/cpu/xeon/keycloak_setup_guide.md) for more detail related to Keycloak configuration setup.
+---
 
-## Verify Services
+## 🔐 User Management via Keycloak Configuration
+Please refer to **[keycloak_setup_guide](../../docker_compose/intel/cpu/xeon/keycloak_setup_guide.md)** for more detail related to Keycloak configuration setup.
+
+---
+
+## ✅ Verify Services
 To verify the installation, run command 'kubectl get pod' to make sure all pods are running.
 
 To view all the available services, run command 'kubectl get svc' to obtain ports that need to used as backend service endpoint in productivity_suite_reactui.yaml.
