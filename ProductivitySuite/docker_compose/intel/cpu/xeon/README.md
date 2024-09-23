@@ -529,7 +529,8 @@ Here're some of the project's features:
 - **Generate code**: generate the corresponding code based on the current user's input.
 
 #### Screenshots
-  ![project-screenshot](../../../../assets/img/codegen.png)
+
+![project-screenshot](../../../../assets/img/codegen.png)
 
 ### 📚 Document Summarization
 
