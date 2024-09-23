@@ -32,18 +32,7 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
 
-### 5. Build TEI Gaudi Image
-
-Since a TEI Gaudi Docker image hasn't been published, we'll need to build it from the [tei-guadi](https://github.com/huggingface/tei-gaudi) repository.
-
-```bash
-git clone https://github.com/huggingface/tei-gaudi
-cd tei-gaudi/
-docker build --no-cache -f Dockerfile-hpu -t opea/tei-gaudi:latest .
-cd ../..
-```
-
-### 6. Build MegaService Docker Image
+### 5. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `searchqna.py` Python script. Build the MegaService Docker image using the command below:
 
@@ -62,12 +51,11 @@ docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_
 
 Then run the command `docker images`, you will have
 
-1. `opea/tei-gaudi:latest`
-2. `opea/embedding-tei:latest`
-3. `opea/web-retriever-chroma:latest`
-4. `opea/reranking-tei:latest`
-5. `opea/llm-tgi:latest`
-6. `opea/searchqna:latest`
+1. `opea/embedding-tei:latest`
+2. `opea/web-retriever-chroma:latest`
+3. `opea/reranking-tei:latest`
+4. `opea/llm-tgi:latest`
+5. `opea/searchqna:latest`
 
 ## 🚀 Set the environment variables
 

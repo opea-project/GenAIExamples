@@ -35,9 +35,3 @@ services:
       dockerfile: comps/dataprep/redis/langchain/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
-  tei-gaudi:
-    build:
-      context: tei-gaudi
-      dockerfile: Dockerfile-hpu
-    extends: doc-index-retriever
-    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}

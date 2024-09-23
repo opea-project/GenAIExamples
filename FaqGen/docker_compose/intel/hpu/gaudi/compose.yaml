@@ -3,7 +3,7 @@
 
 services:
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
     container_name: tgi-gaudi-server
     ports:
       - "8008:80"
@@ -18,6 +18,10 @@ services:
       HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       PREFILL_BATCH_BUCKET_SIZE: 1
       BATCH_BUCKET_SIZE: 8
+      ENABLE_HPU_GRAPH: true
+      LIMIT_HPU_GRAPH: true
+      USE_FLASH_ATTENTION: true
+      FLASH_ATTENTION_RECOMPUTE: true
     runtime: habana
     cap_add:
       - SYS_NICE

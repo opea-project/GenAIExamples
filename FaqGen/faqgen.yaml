@@ -6,7 +6,7 @@ opea_micro_services:
   tgi-service:
     host: ${TGI_SERVICE_IP}
     ports: ${TGI_SERVICE_PORT}
-    image: ghcr.io/huggingface/tgi-gaudi:1.2.1
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
     volumes:
       - "./data:/data"
     runtime: habana
@@ -14,10 +14,13 @@ opea_micro_services:
       - SYS_NICE
     ipc: host
     environment:
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      ENABLE_HPU_GRAPH: true
+      LIMIT_HPU_GRAPH: true
+      USE_FLASH_ATTENTION: true
+      FLASH_ATTENTION_RECOMPUTE: true
     model-id: ${LLM_MODEL_ID}
   llm:
     host: ${LLM_SERVICE_HOST_IP}

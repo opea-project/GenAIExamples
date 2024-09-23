@@ -17,13 +17,13 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-    git clone https://github.com/huggingface/tei-gaudi
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-redis embedding-tei retriever-redis reranking-tei tei-gaudi llm-vllm-ray-hpu llm-vllm-ray"
+    service_list="chatqna chatqna-ui dataprep-redis embedding-tei retriever-redis reranking-tei llm-vllm-ray-hpu llm-vllm-ray"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/tei-gaudi:latest
     docker images && sleep 1s
 }
 
