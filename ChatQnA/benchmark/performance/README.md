@@ -29,6 +29,8 @@ Results will be displayed in the terminal and saved as CSV file named `1_stats.c
 
 ## Getting Started
 
+We recommend using Kubernetes to deploy the ChatQnA service, as it offers benefits such as load balancing and improved scalability. However, you can also deploy the service using Docker if that better suits your needs. Below is a description of Kubernetes deployment and benchmarking. For instructions on deploying and benchmarking with Docker, please refer to [this section](#benchmark-with-docker).
+
 ### Prerequisites
 
 - Install Kubernetes by following [this guide](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md).
@@ -187,10 +189,13 @@ curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
 
 ###### 3.2 Run Benchmark Test
 
-We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.deployment_type`, `test_suite_config.service_ip`, `test_suite_config.service_port`, `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
 ```bash
-export USER_QUERIES="[4, 8, 16, 640]"
+export DEPLOYMENT_TYPE="k8s"
+export SERVICE_IP = None
+export SERVICE_PORT = None
+export USER_QUERIES="[640, 640, 640, 640]"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_1"
 envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
@@ -237,20 +242,22 @@ kubectl apply -f .
 
 ##### 3. Run tests
 
-We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.deployment_type`, `test_suite_config.service_ip`, `test_suite_config.service_port`, `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
-```bash
-export USER_QUERIES="[4, 8, 16, 1280]"
+````bash
+export DEPLOYMENT_TYPE="k8s"
+export SERVICE_IP = None
+export SERVICE_PORT = None
+export USER_QUERIES="[1280, 1280, 1280, 1280]"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_2"
 envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
-```
 
 And then run the benchmark tool by:
 
 ```bash
 cd GenAIEval/evals/benchmark
 python benchmark.py
-```
+````
 
 ##### 4. Data collection
 
@@ -286,10 +293,13 @@ kubectl apply -f .
 
 ##### 3. Run tests
 
-We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.deployment_type`, `test_suite_config.service_ip`, `test_suite_config.service_port`, `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
 
 ```bash
-export USER_QUERIES="[4, 8, 16, 2560]"
+export DEPLOYMENT_TYPE="k8s"
+export SERVICE_IP = None
+export SERVICE_PORT = None
+export USER_QUERIES="[2560, 2560, 2560, 2560]"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_4"
 envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
@@ -312,4 +322,81 @@ All the test results will come to this folder `/home/sdp/benchmark_output/node_4
 cd GenAIExamples/ChatQnA/benchmark/performance/tuned/with_rerank/single_gaudi
 kubectl delete -f .
 kubectl label nodes k8s-master k8s-worker1 k8s-worker2 k8s-worker3 node-type-
+```
+
+## Benchmark with Docker
+
+### Deploy ChatQnA service with Docker
+
+In order to set up the environment correctly, you'll need to configure essential environment variables and, if applicable, proxy-related variables.
+
+```bash
+# Example: host_ip="192.168.1.1"
+export host_ip="External_Public_IP"
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+export no_proxy="Your_No_Proxy"
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+```
+
+#### Deploy ChatQnA on Gaudi
+
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
+docker compose up -d
+```
+
+Refer to the [Gaudi Guide](../../docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
+
+#### Deploy ChatQnA on Xeon
+
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+docker compose up -d
+```
+
+Refer to the [Xeon Guide](../../docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
+
+#### Deploy ChatQnA on NVIDIA GPU
+
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
+docker compose up -d
+```
+
+Refer to the [NVIDIA GPU Guide](../../docker_compose/nvidia/gpu/README.md) for more instructions on building docker images from source.
+
+### Run tests
+
+We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.deployment_type`, `test_suite_config.service_ip`, `test_suite_config.service_port`, `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+
+```bash
+export DEPLOYMENT_TYPE="docker"
+export SERVICE_IP = "ChatQnA Service IP"
+export SERVICE_PORT = "ChatQnA Service Port"
+export USER_QUERIES="[640, 640, 640, 640]"
+export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/docker"
+envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
+```
+
+And then run the benchmark tool by:
+
+```bash
+cd GenAIEval/evals/benchmark
+python benchmark.py
+```
+
+### Data collection
+
+All the test results will come to this folder `/home/sdp/benchmark_output/docker` configured by the environment variable `TEST_OUTPUT_DIR` in previous steps.
+
+### Clean up
+
+Take gaudi as example, use the below command to clean up system.
+
+```bash
+cd GenAIExamples/docker_compose/intel/hpu/gaudi
+docker compose stop && docker compose rm -f
+echo y | docker system prune
 ```
