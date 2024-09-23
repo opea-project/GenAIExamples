@@ -1,9 +1,9 @@
 # Document Summary TGI Microservice
 
-In this microservice, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.
+This microservice leverages LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.
 [Text Generation Inference](https://github.com/huggingface/text-generation-inference) (TGI) is a toolkit for deploying and serving Large Language Models (LLMs). TGI enables high-performance text generation for the most popular open-source LLMs, including Llama, Falcon, StarCoder, BLOOM, GPT-NeoX, and more.
 
-## 🚀1. Start Microservice with Python (Option 1)
+## 🚀1. Start Microservice with Python 🐍 (Option 1)
 
 To start the LLM microservice, you need to install python packages first.
 
@@ -36,7 +36,7 @@ export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 python llm.py
 ```
 
-## 🚀2. Start Microservice with Docker (Option 2)
+## 🚀2. Start Microservice with Docker 🐳 (Option 2)
 
 If you start an LLM microservice with docker, the `docker_compose_llm.yaml` file will automatically start a TGI/vLLM service with docker.
 
@@ -89,8 +89,15 @@ curl http://${your_ip}:9000/v1/health_check\
 ### 3.2 Consume LLM Service
 
 ```bash
+# Enable streaming to receive a streaming response. By default, this is set to True.
 curl http://${your_ip}:9000/v1/chat/docsum \
   -X POST \
   -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+  -H 'Content-Type: application/json'
+
+# Disable streaming to receive a non-streaming response.
+curl http://${your_ip}:9000/v1/chat/docsum \
+  -X POST \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "streaming":false}' \
   -H 'Content-Type: application/json'
 ```
