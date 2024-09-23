@@ -262,3 +262,15 @@ class LVMVideoDoc(BaseDoc):
     chunk_duration: float
     prompt: str
     max_new_tokens: conint(ge=0, le=1024) = 512
+
+
+class ImagePath(BaseDoc):
+    image_path: str
+
+
+class ImagesPath(BaseDoc):
+    images_path: DocList[ImagePath]
+
+
+class VideoPath(BaseDoc):
+    video_path: str

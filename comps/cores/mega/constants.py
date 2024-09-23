@@ -29,6 +29,8 @@ class ServiceType(Enum):
     LVM = 12
     KNOWLEDGE_GRAPH = 13
     WEB_RETRIEVER = 14
+    IMAGE2VIDEO = 15
+    TEXT2IMAGE = 16
 
 
 class MegaServiceEndpoint(Enum):

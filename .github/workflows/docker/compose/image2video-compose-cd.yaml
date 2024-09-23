@@ -1,0 +1,18 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+# images used by GenAIExamples: image2video,svd,svd-gaudi
+services:
+  image2video:
+    build:
+      dockerfile: comps/image2video/Dockerfile
+    image: ${REGISTRY:-opea}/image2video:${TAG:-latest}
+  svd:
+    build:
+      dockerfile: comps/image2video/dependency/Dockerfile
+    image: ${REGISTRY:-opea}/svd:${TAG:-latest}
+  svd-gaudi:
+    build:
+      dockerfile: comps/image2video/dependency/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/svd-gaudi:${TAG:-latest}
