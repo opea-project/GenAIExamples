@@ -50,7 +50,7 @@ docker pull opea/chatqna-ui:latest
 
 In following cases, you could build docker image from source by yourself.
 
-- Failed to download the docker image. (The essential Docker image `opea/nginx` has not yet been released, users need to build this image first)
+- Failed to download the docker image.
 
 - If you want to use a specific version of Docker image.
 
