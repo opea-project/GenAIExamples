@@ -9,7 +9,7 @@ The DocSum application is defined as a Custom Resource (CR) file that the above 
 
 The DocSum pipeline uses  prebuilt images. The Xeon version uses the prebuilt image llm-docsum-tgi:latest which internally leverages the
 the image ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu. The service is called tgi-svc. Meanwhile, the Gaudi version launches the
-service tgi-gaudi-svc, which uses the image ghcr.io/huggingface/tgi-gaudi:1.2.1. Both TGI model services serve the model specified in the LLM_MODEL_ID variable that is exported by you. In the below example we use Intel/neural-chat-7b-v3-3.
+service tgi-gaudi-svc, which uses the image `ghcr.io/huggingface/tgi-gaudi:2.0.5`. Both TGI model services serve the model specified in the LLM_MODEL_ID variable that is exported by you. In the below example we use Intel/neural-chat-7b-v3-3.
 
 [NOTE]
 Refer to [Docker Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker_compose/intel/cpu/xeon/README.md) or
