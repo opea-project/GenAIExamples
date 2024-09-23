@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qna-config
+  namespace: default
+data:
+  EMBEDDING_MODEL_ID: {{ .Values.config.EMBEDDING_MODEL_ID }}
+  EMBEDDING_SERVER_HOST_IP: {{ .Values.config.EMBEDDING_SERVER_HOST_IP }}
+  HUGGINGFACEHUB_API_TOKEN: {{ .Values.config.HUGGINGFACEHUB_API_TOKEN }}
+  INDEX_NAME: {{ .Values.config.INDEX_NAME }}
+  LLM_MODEL_ID: {{ .Values.config.LLM_MODEL_ID }}
+  LLM_SERVER_HOST_IP: {{ .Values.config.LLM_SERVER_HOST_IP }}
+  NODE_SELECTOR: {{ .Values.config.NODE_SELECTOR }}
+  REDIS_URL: {{ .Values.config.REDIS_URL }}
+  RERANK_MODEL_ID: {{ .Values.config.RERANK_MODEL_ID }}
+  RERANK_SERVER_HOST_IP: {{ .Values.config.RERANK_SERVER_HOST_IP }}
+  RETRIEVER_SERVICE_HOST_IP: {{ .Values.config.RETRIEVER_SERVICE_HOST_IP }}
+  TEI_EMBEDDING_ENDPOINT: {{ .Values.config.TEI_EMBEDDING_ENDPOINT }}
+  TEI_ENDPOINT: {{ .Values.config.TEI_ENDPOINT }}
+  TEI_RERANKING_ENDPOINT: {{ .Values.config.TEI_RERANKING_ENDPOINT }}
+  TGI_LLM_ENDPOINT: {{ .Values.config.TGI_LLM_ENDPOINT }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-backend-server-deploy
+  namespace: default
+spec:
+  replicas:  {{ .Values.chatqnaServer.replicaCount }}
+  selector:
+    matchLabels:
+      app: chatqna-backend-server-deploy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: chatqna-backend-server-deploy
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+      image: opea/chatqna-no-wrapper:latest
+      imagePullPolicy: IfNotPresent
+      name: chatqna-backend-server-deploy
+      ports:
+      - containerPort: 8888
+      resources:
+        limits:
+          cpu: 8
+          memory: 8000Mi
+        requests:
+          cpu: 8
+          memory: 8000Mi
+      hostIPC: true
+      nodeSelector:
+        node-type: chatqna-opea
+      serviceAccountName: default
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: chatqna-backend-server-deploy
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway

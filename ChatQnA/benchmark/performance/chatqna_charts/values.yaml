@@ -1,0 +1,116 @@
+config:
+  EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
+  EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
+  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+  INDEX_NAME: rag-redis
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
+  LLM_SERVER_HOST_IP: llm-dependency-svc
+  NODE_SELECTOR: chatqna-opea
+  REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
+  RERANK_MODEL_ID: BAAI/bge-reranker-base
+  RERANK_SERVER_HOST_IP: reranking-dependency-svc
+  RETRIEVER_SERVICE_HOST_IP: retriever-svc
+  TEI_EMBEDDING_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  TEI_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
+  TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
+
+services:
+- name: chatqna-backend-server-svc
+  namespace: default
+  spec:
+    ports:
+    - name: service
+      nodePort: 30888
+      port: 8888
+      targetPort: 8888
+    selector:
+      app: chatqna-backend-server-deploy
+    type: NodePort
+
+
+- name: dataprep-svc
+  namespace: default
+  spec:
+    ports:
+    - name: port1
+      port: 6007
+      targetPort: 6007
+    selector:
+      app: dataprep-deploy
+    type: ClusterIP
+
+
+- name: embedding-dependency-svc
+  namespace: default
+  spec:
+    ports:
+    - name: service
+      port: 6006
+      targetPort: 80
+    selector:
+      app: embedding-dependency-deploy
+    type: ClusterIP
+
+
+- name: llm-dependency-svc
+  namespace: default
+  spec:
+    ports:
+    - name: service
+      port: 9009
+      targetPort: 80
+    selector:
+      app: llm-dependency-deploy
+    type: ClusterIP
+
+
+- name: reranking-dependency-svc
+  namespace: default
+  spec:
+    ports:
+    - name: service
+      port: 8808
+      targetPort: 80
+    selector:
+      app: reranking-dependency-deploy
+    type: ClusterIP
+
+
+- name: retriever-svc
+  namespace: default
+  spec:
+    ports:
+    - name: service
+      port: 7000
+      targetPort: 7000
+    selector:
+      app: retriever-deploy
+    type: ClusterIP
+
+
+- name: vector-db
+  namespace: default
+  spec:
+    ports:
+    - name: vector-db-service
+      port: 6379
+      targetPort: 6379
+    - name: vector-db-insight
+      port: 8001
+      targetPort: 8001
+    selector:
+      app: vector-db
+    type: ClusterIP
+
+
+
+chatqnaServer:
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: "8"
+      memory: "8000Mi"
+  requests:
+      cpu: "8"
+      memory: "8000Mi"

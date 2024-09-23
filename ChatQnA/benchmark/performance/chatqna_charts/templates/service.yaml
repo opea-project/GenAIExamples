@@ -1,0 +1,19 @@
+{{- range $service := .Values.services }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $service.name }}
+  namespace: {{ $service.namespace }}
+spec:
+  ports:
+  {{- range $port := $service.spec.ports }}
+  - name: {{ $port.name }}
+    nodePort: {{ $port.nodePort }}
+    port: {{ $port.port }}
+    targetPort: {{ $port.targetPort }}
+  {{- end }}
+  selector:
+    app: {{ $service.spec.selector.app }}
+  type: {{ $service.spec.type }}
+---
+{{- end }}
