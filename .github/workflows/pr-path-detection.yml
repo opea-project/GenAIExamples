@@ -53,9 +53,12 @@ jobs:
 
       - name: Check the Validity of Hyperlinks
         run: |
+          set -x
           cd ${{github.workspace}}
           fail="FALSE"
           merged_commit=$(git log -1 --format='%H')
+          echo $merged_commit
+          echo "base commit" ${{ github.event.pull_request.base.sha }}
           echo $(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit})
           changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | grep '\.md$'| awk '{print $NF}')"
           if  [ -n "changed_files" ]; then
