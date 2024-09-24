@@ -25,7 +25,7 @@
   >
     <div class="mx-auto flex flex-wrap justify-end items-center w-full">
       <span
-        class="self-center py-2 whitespace-nowrap text-2xl font-semibold text-white ml-4"
+        class="self-center py-2 whitespace-nowrap text-[2rem] font-semibold text-white ml-4"
         data-svelte-h="svelte-1hbktnk">VisualQnA</span
       >
     </div>

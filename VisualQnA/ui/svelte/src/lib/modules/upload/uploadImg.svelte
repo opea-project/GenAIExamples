@@ -103,6 +103,6 @@
 			SVG, PNG, JPG
 		</p>
 	{:else if imageUrl}
-		<img src={imageUrl} alt="Uploaded Image" class="m-2 mx-auto block" />
+		<img src={imageUrl} alt="Uploaded Image" class="m-2 mx-auto block max-h-[15.5rem]" />
 	{/if}
 </Dropzone>

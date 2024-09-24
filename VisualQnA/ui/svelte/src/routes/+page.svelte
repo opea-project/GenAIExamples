@@ -33,7 +33,7 @@
 		scrollToBottom,
 		scrollToTop,
 	} from "$lib/shared/Utils";
-	import { fetchTextStream } from "$lib/network/chat/Network";
+	import { fetchGuardRail, fetchTextStream } from "$lib/network/chat/Network";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
 	import "driver.js/dist/driver.css";
 	import "$lib/assets/layout/css/driver.css";
@@ -42,12 +42,14 @@
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 	import Upload from "$lib/modules/upload/upload.svelte";
 	import ImagePrompt from "$lib/modules/upload/imagePrompt.svelte";
+	import { Toast } from "flowbite-svelte";
+	import { ExclamationCircleSolid, FireOutline } from "flowbite-svelte-icons";
 
 	let query: string = "";
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
-	console.log("chatMessages", chatMessages);
+	let showToast = false;
 
 	onMount(async () => {
 		scrollToDiv = document
@@ -81,62 +83,54 @@
 	}
 
 	const callTextStream = async (query: string) => {
-		const eventSource = await fetchTextStream(
-			query,
-			$stepValueStore,
-			$base64ImageStore
-		);
+		const res = await fetchGuardRail(query, $stepValueStore, $base64ImageStore);
+		const lastSegment = res.text.split("[/INST]").pop().trim();
 
-		eventSource.addEventListener("message", (e: any) => {
-			let Msg = e.data;
-			if (Msg.startsWith("b")) {
-				let trimmedData = Msg.slice(2, -1);
+		if (lastSegment === "unsafe") {
+			loading = false;
 
-				if (/\\x[\dA-Fa-f]{2}/.test(trimmedData)) {
-					trimmedData = decodeEscapedBytes(trimmedData);
-				} else if (/\\u[\dA-Fa-f]{4}/.test(trimmedData)) {
-					trimmedData = decodeUnicode(trimmedData);
-				}
+			showToast = true;
+			setTimeout(() => {
+				showToast = false;
+			}, 3000);
 
-				if (trimmedData !== "</s>") {
-					trimmedData = trimmedData.replace(/\\n/g, "\n");
-				}
-				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-					chatMessages = [
-						...chatMessages,
-						{
-							role: MessageRole.Assistant,
-							type: MessageType.Text,
-							content: trimmedData,
-							time: getCurrentTimeStamp(),
-							imgSrc: null, // Add the imgSrc property here
-						},
-					];
-					console.log("? chatMessages", chatMessages);
-				} else {
-					let content = chatMessages[chatMessages.length - 1].content as string;
-					chatMessages[chatMessages.length - 1].content = content + trimmedData;
-				}
-				scrollToBottom(scrollToDiv);
-			} else if (Msg === "[DONE]") {
-				let startTime = chatMessages[chatMessages.length - 1].time;
+			chatMessages = [
+				...chatMessages,
+				{
+					role: MessageRole.Assistant,
+					type: MessageType.Text,
+					content: "unsafe",
+					time: getCurrentTimeStamp(),
+					imgSrc: null, // Add the imgSrc property here
+				},
+			];
 
+			return;
+		} else {
+			const chatRes = await fetchTextStream(
+				query,
+				$stepValueStore,
+				$base64ImageStore
+			);
+			if (chatRes.text) {
 				loading = false;
-				let totalTime = parseFloat(
-					((getCurrentTimeStamp() - startTime) / 1000).toFixed(2)
-				);
-				if (chatMessages.length - 1 !== -1) {
-					chatMessages[chatMessages.length - 1].time = totalTime;
-				}
+				chatMessages = [
+					...chatMessages,
+					{
+						role: MessageRole.Assistant,
+						type: MessageType.Text,
+						content: chatRes.text,
+						time: getCurrentTimeStamp(),
+						imgSrc: null, // Add the imgSrc property here
+					},
+				];
 				storeMessages();
 			}
-		});
-		eventSource.stream();
+		}
 	};
 
 	const handleTextSubmit = async () => {
 		loading = true;
-		console.log("handleTextSubmit", $base64ImageStore);
 
 		const newMessage = {
 			role: MessageRole.User,
@@ -171,13 +165,26 @@
 
 <Header />
 <div class="h-full gap-5 bg-white sm:flex sm:pb-2 lg:rounded-tl-3xl">
-	<div class="w-1/5 bg-gray-200 p-4">
-		<Upload />
+	<div class="w-1/4 bg-gray-200 p-4 pt-[0.08rem]">
 		<ImagePrompt on:imagePrompt={handleUpdateQuery} />
+		<Upload />
 	</div>
-	<div class="flex-1 bg-gray-100 p-4">
+
+	<div class="flex-1 p-4">
+		{#if showToast}
+			<div class="fixed right-0 top-0 z-50 mr-4 mt-4">
+				<Toast color="red" class="w-[50rem]">
+					<svelte:fragment slot="icon">
+						<ExclamationCircleSolid class="h-5 w-5" />
+						<span class="sr-only">Warning icon</span>
+					</svelte:fragment>
+					The uploaded image/question contains potential security risks.
+				</Toast>
+			</div>
+		{/if}
+
 		<div
-			class="mx-auto flex h-full w-full flex-col bg-white px-10 sm:mt-0 sm:w-[80%]"
+			class="mx-auto flex h-[93%] w-full flex-col bg-white pb-4 sm:mt-0 sm:w-[95%]"
 		>
 			<div
 				class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0"
@@ -185,7 +192,7 @@
 				<div class="relative my-4 flex w-full flex-row justify-center">
 					<div class="relative w-full focus:border-none">
 						<input
-							class="text-md block w-full border-0 border-b-2 border-gray-300 px-1 py-4
+							class="block w-full border-0 border-b-2 border-gray-300 px-1 py-4
 						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
 							type="text"
 							data-testid="chat-input"
@@ -225,8 +232,8 @@
 							><svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 20 20"
-								width="24"
-								height="24"
+								width="20"
+								height="20"
 								class="fill-[#0597ff] group-hover:fill-[#0597ff]"
 								><path
 									d="M12.6 12 10 9.4 7.4 12 6 10.6 8.6 8 6 5.4 7.4 4 10 6.6 12.6 4 14 5.4 11.4 8l2.6 2.6zm7.4 8V2q0-.824-.587-1.412A1.93 1.93 0 0 0 18 0H2Q1.176 0 .588.588A1.93 1.93 0 0 0 0 2v12q0 .825.588 1.412Q1.175 16 2 16h14zm-3.15-6H2V2h16v13.125z"
@@ -240,11 +247,9 @@
 
 			<div class="mx-auto flex h-full w-full flex-col">
 				<!-- Loading text -->
-				{#if loading}
-					<LoadingAnimation />
-				{/if}
+
 				<Scrollbar
-					classLayout="flex flex-col gap-1 mr-4"
+					classLayout="flex flex-col gap-2 mr-4"
 					className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 mr-5"
 				>
 					{#each chatMessages as message, i}
@@ -257,7 +262,9 @@
 						/>
 					{/each}
 				</Scrollbar>
-
+				{#if loading}
+					<LoadingAnimation />
+				{/if}
 			</div>
 			<!-- gallery -->
 		</div>

@@ -13,17 +13,17 @@
 
   let images = [
     {
-      id: 1,
+      id: 0,
       alt: 'Waterview',
       imgurl: waterview,
       prompt: 'What are the things I should be cautious about when I visit here?'
     },
     {
-      id: 0,
+      id: 1,
       alt: 'Extreme Ironing',
       imgurl: extreme_ironing,
       prompt: 'What is unusual about this image?'
-    }
+    },
   ];
 
   let currentIndex = 0;
@@ -37,12 +37,14 @@
   }
 
 
-  async function handleImageClick() {
+  async function handleImageClick() {    
     const imgUrl = images[currentIndex].imgurl;
     const base64Data = await convertImageToBase64(imgUrl);
     const currentPrompt = images[currentIndex].prompt;
-    dispatch("imagePrompt", { content: currentPrompt });
     base64ImageStore.set(base64Data);
+
+    dispatch("imagePrompt", { content: currentPrompt });
+    
   }
 
   async function convertImageToBase64(url) {
