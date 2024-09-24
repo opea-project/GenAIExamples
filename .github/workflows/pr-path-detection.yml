@@ -50,6 +50,8 @@ jobs:
 
       - name: Checkout Repo GenAIExamples
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Check the Validity of Hyperlinks
         run: |
@@ -57,7 +59,7 @@ jobs:
           cd ${{github.workspace}}
           fail="FALSE"
           merged_commit=$(git log -1 --format='%H')
-          changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | grep '\.md$'| awk '{print $NF}')"
+          changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | grep '\.md$' || true | awk '{print $NF}')"
           if  [ -n "changed_files" ]; then
             for changed_file in $changed_files; do
               echo $changed_file
