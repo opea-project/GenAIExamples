@@ -46,33 +46,30 @@ jobs:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
 
-      - name: Get checkout ref
+      - name: Get Checkout Ref
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
           else
             echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
           fi
-          echo "checkout ref ${{ env.CHECKOUT_REF }}"
 
-      - name: Checkout out Repo
+      - name: Checkout out GenAIExamples
         uses: actions/checkout@v4
         with:
           ref: ${{ env.CHECKOUT_REF }}
           fetch-depth: 0
 
-      - name: Clone required Repo
+      - name: Clone Required Repo
         run: |
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
-          if [[ $(grep -c "tei-gaudi:" ${docker_compose_path}) != 0 ]]; then
-              git clone https://github.com/huggingface/tei-gaudi.git
-          fi
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
               git clone https://github.com/vllm-project/vllm.git
+              cd vllm && git rev-parse HEAD && cd ../
           fi
           git clone https://github.com/opea-project/GenAIComps.git
-          cd GenAIComps && git checkout ${{ inputs.opea_branch }} && cd ../
+          cd GenAIComps && git checkout ${{ inputs.opea_branch }} && git rev-parse HEAD && cd ../
 
       - name: Build Image
         if: ${{ fromJSON(inputs.build) }}

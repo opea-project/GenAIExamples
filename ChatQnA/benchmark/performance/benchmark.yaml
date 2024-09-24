@@ -3,6 +3,9 @@
 
 test_suite_config: # Overall configuration settings for the test suite
   examples: ["chatqna"]  # The specific test cases being tested, e.g., chatqna, codegen, codetrans, faqgen, audioqna, visualqna
+  deployment_type: ${DEPLOYMENT_TYPE}  # Default is "k8s", can also be "docker"
+  service_ip: ${SERVICE_IP}  # Leave as None for k8s, specify for Docker
+  service_port: ${SERVICE_PORT}  # Leave as None for k8s, specify for Docker
   concurrent_level: 5  # The concurrency level, adjustable based on requirements
   user_queries: ${USER_QUERIES}  # Number of test requests at each concurrency level
   random_prompt: false  # Use random prompts if true, fixed prompts if false
@@ -41,7 +44,7 @@ test_cases:
       run_test: false
       service_name: "llm-svc"  # Replace with your service name
       parameters:
-        max_new_tokens: 128
+        max_tokens: 128
         temperature: 0.01
         top_k: 10
         top_p: 0.95

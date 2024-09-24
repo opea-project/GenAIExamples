@@ -53,6 +53,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 ### Quick Start: 2.Run Docker Compose
 
 Select the compose.yaml file that matches your hardware.
+
 CPU example:
 
 ```bash
@@ -69,9 +70,13 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-If you want to build docker by yourself, please refer to `built from source`: [Guide](docker_compose/intel/cpu/xeon/README.md).
+In following cases, you could build docker image from source by yourself.
 
-> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
+- Failed to download the docker image.
+
+- If you want to use a specific version of Docker image.
+
+Please refer to the 'Build Docker Images' in [Guide](docker_compose/intel/cpu/xeon/README.md).
 
 ### QuickStart: 3.Consume the ChatQnA Service
 
@@ -235,7 +240,7 @@ Refer to the [Kubernetes Guide](./kubernetes/intel/README.md) for instructions o
 
 Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
 
-Refer to the [ChatQnA helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/chatqna) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
+Refer to the [ChatQnA helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/chatqna/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
 
 ### Deploy ChatQnA on AI PC
 
@@ -245,7 +250,9 @@ Refer to the [AI PC Guide](./docker_compose/intel/cpu/aipc/README.md) for instru
 
 Refer to the [Intel Technology enabling for Openshift readme](https://github.com/intel/intel-technology-enabling-for-openshift/blob/main/workloads/opea/chatqna/README.md) for instructions to deploy ChatQnA prototype on RHOCP with [Red Hat OpenShift AI (RHOAI)](https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai).
 
-## Consume ChatQnA Service
+## Consume ChatQnA Service with RAG
+
+### Check Service Status
 
 Before consuming ChatQnA Service, make sure the TGI/vLLM service is ready (which takes up to 2 minutes to start).
 
@@ -259,6 +266,23 @@ Consume ChatQnA service until you get the TGI response like below.
 ```log
 2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
 ```
+
+### Upload RAG Files (Optional)
+
+To chat with retrieved information, you need to upload a file using `Dataprep` service.
+
+Here is an example of `Nike 2023` pdf.
+
+```bash
+# download pdf file
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+# upload pdf file with dataprep
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./nke-10k-2023.pdf"
+```
+
+### Consume Chat Service
 
 Two ways of consuming ChatQnA Service:
 
@@ -282,7 +306,7 @@ Two ways of consuming ChatQnA Service:
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'

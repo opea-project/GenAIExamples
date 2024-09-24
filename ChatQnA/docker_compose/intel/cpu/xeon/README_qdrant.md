@@ -222,6 +222,9 @@ docker compose -f compose_qdrant.yaml up -d
 
 ### Validate Microservices
 
+Follow the instructions to validate MicroServices.
+For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
+
 1. TEI Embedding Service
 
    ```bash
@@ -304,7 +307,7 @@ docker compose -f compose_qdrant.yaml up -d
    ```bash
    curl http://${host_ip}:6047/v1/chat/completions\
      -X POST \
-     -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
      -H 'Content-Type: application/json'
    ```
 

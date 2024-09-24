@@ -41,9 +41,3 @@ services:
       dockerfile: comps/llms/text-generation/tgi/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-  tei-gaudi:
-    build:
-      context: tei-gaudi
-      dockerfile: Dockerfile-hpu
-    extends: searchqna
-    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}

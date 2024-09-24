@@ -125,15 +125,15 @@ services:
       dockerfile: comps/guardrails/llama_guard/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/guardrails-tgi:${TAG:-latest}
-  tei-gaudi:
-    build:
-      context: tei-gaudi
-      dockerfile: Dockerfile-hpu
-    extends: chatqna
-    image: ${REGISTRY:-opea}/tei-gaudi:${TAG:-latest}
   vllm:
     build:
       context: vllm
       dockerfile: Dockerfile.cpu
     extends: chatqna
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  nginx:
+    build:
+      context: GenAIComps
+      dockerfile: comps/nginx/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

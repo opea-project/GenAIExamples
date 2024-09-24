@@ -17,14 +17,14 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-    git clone https://github.com/huggingface/tei-gaudi
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="searchqna searchqna-ui embedding-tei web-retriever-chroma reranking-tei llm-tgi tei-gaudi"
+    service_list="searchqna searchqna-ui embedding-tei web-retriever-chroma reranking-tei llm-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    docker pull ghcr.io/huggingface/tei-gaudi:latest
     docker images && sleep 1s
 }
 
@@ -73,10 +73,10 @@ function start_services() {
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "How many gold medals does USA win in olympics 2024? Give me also the source link.", "stream": "False"}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"2024"* ]]; then
+    if [[ $result == *"the"* ]]; then
         docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
         docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
         docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log

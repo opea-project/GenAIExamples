@@ -47,9 +47,13 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-If you want to build docker by yourself, please refer to 'Build Docker Images' in below.
+In following cases, you could build docker image from source by yourself.
 
-> Note: The optional docker image **opea/chatqna-without-rerank:latest** has not been published yet, users need to build this docker image from source.
+- Failed to download the docker image.
+
+- If you want to use a specific version of Docker image.
+
+Please refer to 'Build Docker Images' in below.
 
 ## QuickStart: 3.Consume the ChatQnA Service
 
@@ -69,52 +73,25 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-**Certain ports in the EC2 instance need to opened up in the security group, for the microservices to work with the curl commands**
+### Network Port & Security
 
-> See one example below. Please open up these ports in the EC2 instance based on the IP addresses you want to allow
+- Access the ChatQnA UI by web browser
 
-```
-redis-vector-db
-===============
-Port 6379 - Open to 0.0.0.0/0
-Port 8001 - Open to 0.0.0.0/0
+  It supports to access by `80` port. Please confirm the `80` port is opened in the firewall of EC2 instance.
 
-tei_embedding_service
-=====================
-Port 6006 - Open to 0.0.0.0/0
+- Access the microservice by tool or API
 
-embedding
-=========
-Port 6000 - Open to 0.0.0.0/0
+  1. Login to the EC2 instance and access by **local IP address** and port.
 
-retriever
-=========
-Port 7000 - Open to 0.0.0.0/0
+     It's recommended and do nothing of the network port setting.
 
-tei_xeon_service
-================
-Port 8808 - Open to 0.0.0.0/0
+  2. Login to a remote client and access by **public IP address** and port.
 
-reranking
-=========
-Port 8000 - Open to 0.0.0.0/0
+     You need to open the port of the microservice in the security group setting of firewall of EC2 instance setting.
 
-tgi-service or vLLM_service
-===========
-Port 9009 - Open to 0.0.0.0/0
+     For detailed guide, please refer to [Validate Microservices](#validate-microservices).
 
-llm
-===
-Port 9000 - Open to 0.0.0.0/0
-
-chaqna-xeon-backend-server
-==========================
-Port 8888 - Open to 0.0.0.0/0
-
-chaqna-xeon-ui-server
-=====================
-Port 5173 - Open to 0.0.0.0/0
-```
+     Note, it will increase the risk of security, so please confirm before do it.
 
 ## 🚀 Build Docker Images
 
@@ -216,7 +193,14 @@ cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 ```
 
-Then run the command `docker images`, you will have the following 7 Docker Images:
+### 9. Build Nginx Docker Image
+
+```bash
+cd GenAIComps
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following 8 Docker Images:
 
 1. `opea/dataprep-redis:latest`
 2. `opea/embedding-tei:latest`
@@ -225,6 +209,7 @@ Then run the command `docker images`, you will have the following 7 Docker Image
 5. `opea/llm-tgi:latest` or `opea/llm-vllm:latest`
 6. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest`
 7. `opea/chatqna-ui:latest`
+8. `opea/nginx:latest`
 
 ## 🚀 Start Microservices
 
@@ -248,7 +233,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
-   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.2.0 --model-id $model_name
+   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu --model-id $model_name
    ```
 
 2. Offline
@@ -262,62 +247,35 @@ For users in China who are unable to download models directly from Huggingface, 
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.2.0 --model-id /data
+     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu --model-id /data
      ```
 
 ### Setup Environment Variables
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+1. Set the required environment variables:
 
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
+   ```bash
+   # Example: host_ip="192.168.1.1"
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   # Example: NGINX_PORT=80
+   export NGINX_PORT=${your_nginx_port}
+   ```
 
-> Change the External_Public_IP below with the actual IPV4 value
+2. If you are in a proxy environment, also set the proxy-related environment variables:
 
-```
-export host_ip="External_Public_IP"
-```
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   ```
 
-**Export the value of your Huggingface API token to the `your_hf_api_token` environment variable**
+3. Set up other environment variables:
 
-> Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
-
-```
-export your_hf_api_token="Your_Huggingface_API_Token"
-```
-
-**Append the value of the public IP address to the no_proxy list**
-
-```bash
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
-```
-
-```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
-export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
-export vLLM_LLM_ENDPOINT="http://${host_ip}:9009"
-export LLM_SERVICE_PORT=9000
-export REDIS_URL="redis://${host_ip}:6379"
-export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
-```
-
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+   ```bash
+   source ./set_env.sh
+   ```
 
 ### Start all the services Docker Containers
 
@@ -343,6 +301,10 @@ docker compose -f compose_vllm.yaml up -d
 ```
 
 ### Validate Microservices
+
+Note, when verify the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.  
+Follow the instructions to validate MicroServices.
+For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
 
 1. TEI Embedding Service
 
@@ -438,101 +400,124 @@ docker compose -f compose_vllm.yaml up -d
    This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
    ```bash
+   # TGI service
    curl http://${host_ip}:9000/v1/chat/completions\
      -X POST \
-     -d '{"query":"What is Deep Learning?","max_new_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
      -H 'Content-Type: application/json'
    ```
+
+   For parameters in TGI modes, please refer to [HuggingFace InferenceClient API](https://huggingface.co/docs/huggingface_hub/package_reference/inference_client#huggingface_hub.InferenceClient.text_generation) (except we rename "max_new_tokens" to "max_tokens".)
+
+   ```bash
+   # vLLM Service
+   curl http://${host_ip}:9000/v1/chat/completions \
+    -X POST \
+    -d '{"query":"What is Deep Learning?","max_tokens":17,"top_p":1,"temperature":0.7,"frequency_penalty":0,"presence_penalty":0, "streaming":false}' \
+    -H 'Content-Type: application/json'
+   ```
+
+   For parameters in vLLM modes, can refer to [LangChain VLLMOpenAI API](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.vllm.VLLMOpenAI.html)
 
 8. MegaService
 
    ```bash
-   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "messages": "What is the revenue of Nike in 2023?"
-        }'
+    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+          "messages": "What is the revenue of Nike in 2023?"
+          }'
    ```
 
-9. Dataprep Microservice（Optional）
-
-   If you want to update the default knowledge base, you can use the following commands:
-
-   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
-   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
-   Or run this command to get the file on a terminal.
+9. Nginx Service
 
    ```bash
-   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
-
+   curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
+       -H "Content-Type: application/json" \
+       -d '{"messages": "What is the revenue of Nike in 2023?"}'
    ```
 
-   Upload:
+10. Dataprep Microservice（Optional）
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F "files=@./nke-10k-2023.pdf"
-   ```
+If you want to update the default knowledge base, you can use the following commands:
 
-   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
+click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+Or run this command to get the file on a terminal.
 
-   Add Knowledge Base via HTTP Links:
+```bash
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F 'link_list=["https://opea.dev"]'
-   ```
+```
 
-   This command updates a knowledge base by submitting a list of HTTP links for processing.
+Upload:
 
-   Also, you are able to get the file list that you uploaded:
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
+```
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
-        -H "Content-Type: application/json"
-   ```
+This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-   Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
+Add Knowledge Base via HTTP Links:
 
-   ```json
-   [
-     {
-       "name": "nke-10k-2023.pdf",
-       "id": "nke-10k-2023.pdf",
-       "type": "File",
-       "parent": ""
-     },
-     {
-       "name": "https://opea.dev.txt",
-       "id": "https://opea.dev.txt",
-       "type": "File",
-       "parent": ""
-     }
-   ]
-   ```
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
 
-   To delete the file/link you uploaded:
+This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-   The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
+Also, you are able to get the file list that you uploaded:
 
-   ```bash
-   # delete link
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "https://opea.dev.txt"}' \
-        -H "Content-Type: application/json"
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+     -H "Content-Type: application/json"
+```
 
-   # delete file
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "nke-10k-2023.pdf"}' \
-        -H "Content-Type: application/json"
+Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
 
-   # delete all uploaded files and links
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-        -d '{"file_path": "all"}' \
-        -H "Content-Type: application/json"
-   ```
+```json
+[
+  {
+    "name": "nke-10k-2023.pdf",
+    "id": "nke-10k-2023.pdf",
+    "type": "File",
+    "parent": ""
+  },
+  {
+    "name": "https://opea.dev.txt",
+    "id": "https://opea.dev.txt",
+    "type": "File",
+    "parent": ""
+  }
+]
+```
+
+To delete the file/link you uploaded:
+
+The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
+
+```bash
+# delete link
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "https://opea.dev.txt"}' \
+     -H "Content-Type: application/json"
+
+# delete file
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "nke-10k-2023.pdf"}' \
+     -H "Content-Type: application/json"
+
+# delete all uploaded files and links
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+     -d '{"file_path": "all"}' \
+     -H "Content-Type: application/json"
+```
 
 ## 🚀 Launch the UI
+
+### Launch with origin port
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
@@ -543,6 +528,10 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
     ports:
       - "80:5173"
 ```
+
+### Launch with Nginx
+
+If you want to launch the UI using Nginx, open this URL: `http://${host_ip}:${NGINX_PORT}` in your browser to access the frontend.
 
 ## 🚀 Launch the Conversational UI (Optional)
 

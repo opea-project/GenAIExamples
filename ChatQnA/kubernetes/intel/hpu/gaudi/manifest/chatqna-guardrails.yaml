@@ -1,31 +1,4 @@
 ---
-# Source: chatqna/charts/chatqna-ui/templates/configmap.yaml
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: chatqna-chatqna-ui-config
-  labels:
-    helm.sh/chart: chatqna-ui-1.0.0
-    app.kubernetes.io/name: chatqna-ui
-    app.kubernetes.io/instance: chatqna
-    app.kubernetes.io/version: "v1.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  APP_BACKEND_SERVICE_ENDPOINT: "/v1/chatqna"
-  APP_DATA_PREP_SERVICE_URL: "/v1/dataprep"
-  CHAT_BASE_URL: "/v1/chatqna"
-  UPLOAD_FILE_BASE_URL: "/v1/dataprep"
-  GET_FILE: "/v1/dataprep/get_file"
-  DELETE_FILE: "/v1/dataprep/delete_file"
-  BASE_URL: "/v1/chatqna"
-  DOC_BASE_URL: "/v1/chatqna"
-  BASIC_URL: "/v1/chatqna"
-  VITE_CODE_GEN_URL: "/v1/chatqna"
-  VITE_DOC_SUM_URL: "/v1/chatqna"
----
 # Source: chatqna/charts/data-prep/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -285,12 +258,19 @@ data:
         listen       80;
         listen  [::]:80;
 
+        proxy_connect_timeout 600;
+        proxy_send_timeout 600;
+        proxy_read_timeout 600;
+        send_timeout 600;
+
+        client_max_body_size 10G;
+
         location /home {
             alias  /usr/share/nginx/html/index.html;
         }
 
         location / {
-            proxy_pass http://chatqna-chatqna-ui:5174;
+            proxy_pass http://chatqna-chatqna-ui:5173;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -351,7 +331,7 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 5174
+    - port: 5173
       targetPort: ui
       protocol: TCP
       name: ui
@@ -713,12 +693,9 @@ spec:
         {}
       containers:
         - name: chatqna-ui
-          envFrom:
-            - configMapRef:
-                name: chatqna-chatqna-ui-config
           securityContext:
             {}
-          image: "opea/chatqna-conversation-ui:latest"
+          image: "opea/chatqna-ui:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - name: ui
@@ -1500,7 +1477,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/tgi-gaudi:2.0.1"
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.5"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
@@ -1581,7 +1558,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/tgi-gaudi:2.0.1"
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.5"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data

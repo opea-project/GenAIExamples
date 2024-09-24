@@ -10,9 +10,24 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-## 🚀 Build Docker Images
+## 🚀 Prepare Docker Images
 
-First of all, you need to build Docker Images locally and install the python package of it.
+For Docker Images, you have two options to prepare them.
+
+1. Pull the docker images from docker hub.
+
+   - More stable to use.
+   - Will be automatically downloaded when using docker compose command.
+
+2. Build the docker images from source.
+
+   - Contain the latest new features.
+
+   - Need to be manually build.
+
+If you choose to pull docker images form docker hub, skip this section and go to [Start Microservices](#start-microservices) part directly.
+
+Follow the instructions below to build the docker images from source.
 
 ### 1. Build LLM Image
 
@@ -45,7 +60,7 @@ docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy 
 
 ```bash
 cd GenAIComps
-docker build -t opea/translation-nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
@@ -53,7 +68,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 1. `opea/llm-tgi:latest`
 2. `opea/translation:latest`
 3. `opea/translation-ui:latest`
-4. `opea/translation-nginx:latest`
+4. `opea/nginx:latest`
 
 ## 🚀 Start Microservices
 
@@ -99,6 +114,15 @@ Change the `LLM_MODEL_ID` below for your needs.
 
 ```bash
 docker compose up -d
+```
+
+> Note: The docker images will be automatically downloaded from `docker hub`:
+
+```bash
+docker pull opea/llm-tgi:latest
+docker pull opea/translation:latest
+docker pull opea/translation-ui:latest
+docker pull opea/nginx:latest
 ```
 
 ### Validate Microservices

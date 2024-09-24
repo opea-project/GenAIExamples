@@ -39,7 +39,15 @@ spec:
             value: "8"
           - name: PORT
             value: "80"
-        image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+          - name: ENABLE_HPU_GRAPH
+            value: 'true'
+          - name: LIMIT_HPU_GRAPH
+            value: 'true'
+          - name: USE_FLASH_ATTENTION
+            value: 'true'
+          - name: FLASH_ATTENTION_RECOMPUTE
+            value: 'true'
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.5
         imagePullPolicy: IfNotPresent
         securityContext:
           capabilities:
@@ -72,7 +80,7 @@ spec:
       volumes:
       - name: model-volume
         hostPath:
-          path: /home/sdp/cesg
+          path: /mnt/models
           type: Directory
       - name: shm
         emptyDir:

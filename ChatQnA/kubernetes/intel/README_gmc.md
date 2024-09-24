@@ -2,9 +2,9 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline components on Intel Xeon server and Gaudi machines.
 
-The ChatQnA Service leverages a Kubernetes operator called genai-microservices-connector(GMC). GMC supports connecting microservices to create pipelines based on the specification in the pipeline yaml file in addition to allowing the user to dynamically control which model is used in a service such as an LLM or embedder. The underlying pipeline language also supports using external services that may be running in public or private cloud elsewhere.
+The ChatQnA Service leverages a Kubernetes operator called genai-microservices-connector (GMC). GMC supports connecting microservices to create pipelines based on the specification in the pipeline yaml file in addition to allowing the user to dynamically control which model is used in a service such as an LLM or embedder. The underlying pipeline language also supports using external services that may be running in public or private cloud elsewhere.
 
-Install GMC  in your Kubernetes cluster, if you have not already done so, by following the steps in Section "Getting Started" at [GMC Install](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector). Soon as we publish images to Docker Hub, at which point no builds will be required, simplifying install.
+Install GMC  in your Kubernetes cluster, if you have not already done so, by following the steps in Section "Getting Started" at [GMC Install](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector/README.md). Soon as we publish images to Docker Hub, at which point no builds will be required, simplifying install.
 
 
 The ChatQnA application is defined as a Custom Resource (CR) file that the above GMC operator acts  upon. It first checks if the microservices listed in the CR yaml file are running, if not starts them and then proceeds to connect them. When the ChatQnA RAG pipeline is ready, the service endpoint details are returned, letting you use the application. Should you use "kubectl get pods" commands you will see all the component microservices, in particular `embedding`, `retriever`, `rerank`, and `llm`.
@@ -27,8 +27,8 @@ The ChatQnA uses the below prebuilt images if you choose a Xeon deployment
 Should you desire to use the Gaudi accelerator, two alternate images are used for the embedding and llm services.
 For Gaudi:
 
-- tei-embedding-service: opea/tei-gaudi:latest
-- tgi-service: ghcr.io/huggingface/tgi-gaudi:1.2.1
+- tei-embedding-service: ghcr.io/huggingface/tei-gaudi:latest
+- tgi-service: gghcr.io/huggingface/tgi-gaudi:2.0.5
 
 > [NOTE]  
 > Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/hpu/gaudi/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.

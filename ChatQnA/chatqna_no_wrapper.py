@@ -69,10 +69,12 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs = {}
         next_inputs["model"] = "tgi"  # specifically clarify the fake model to make the format unified
         next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
-        next_inputs["max_tokens"] = llm_parameters_dict["max_new_tokens"]
+        next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
         next_inputs["stream"] = inputs["streaming"]
-        next_inputs["frequency_penalty"] = inputs["repetition_penalty"]
+        next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
+        next_inputs["presence_penalty"] = inputs["presence_penalty"]
+        next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
 

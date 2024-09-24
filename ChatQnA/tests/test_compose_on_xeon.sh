@@ -19,10 +19,10 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui chatqna-conversation-ui dataprep-redis embedding-tei retriever-redis reranking-tei llm-tgi"
+    service_list="chatqna chatqna-ui chatqna-conversation-ui dataprep-redis embedding-tei retriever-redis reranking-tei llm-tgi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
@@ -50,6 +50,12 @@ function start_services() {
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get_file"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/delete_file"
+    export FRONTEND_SERVICE_IP=${host_ip}
+    export FRONTEND_SERVICE_PORT=5173
+    export BACKEND_SERVICE_NAME=chatqna
+    export BACKEND_SERVICE_IP=${host_ip}
+    export BACKEND_SERVICE_PORT=8888
+    export NGINX_PORT=80
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
