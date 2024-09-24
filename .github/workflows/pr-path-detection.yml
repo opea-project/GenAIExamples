@@ -55,21 +55,27 @@ jobs:
         run: |
           cd ${{github.workspace}}
           fail="FALSE"
-          url_lines=$(grep -Eo '\]\(http[s]?://[^)]+\)' --include='*.md' -r .)
-          if [ -n "$url_lines" ]; then
-            for url_line in $url_lines; do
-              url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
-              path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
-              response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")
-              if [ "$response" -ne 200 ]; then
-                echo "**********Validation failed, try again**********"
-                response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-                if [ "$response_retry" -eq 200 ]; then
-                  echo "*****Retry successfully*****"
-                else
-                  echo "Invalid link from ${{github.workspace}}/$path: $url"
-                  fail="TRUE"
-                fi
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | grep '\.md$'| awk '{print $NF}')"
+          if  [ -n "changed_files" ]; then
+            for changed_file in $changed_files; do
+              url_lines=$(grep -H -Eo '\]\(http[s]?://[^)]+\)' "$changed_file" | grep -Ev 'GenAIExamples/blob/main')
+              if [ -n "$url_lines" ]; then
+                for url_line in $url_lines; do
+                  url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
+                  path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
+                  response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")
+                  if [ "$response" -ne 200 ]; then
+                    echo "**********Validation failed, try again**********"
+                    response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                    if [ "$response_retry" -eq 200 ]; then
+                      echo "*****Retry successfully*****"
+                    else
+                      echo "Invalid link from ${{github.workspace}}/$path: $url"
+                      fail="TRUE"
+                    fi
+                  fi
+                done
               fi
             done
           fi
@@ -102,48 +108,54 @@ jobs:
             branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
           fi
           link_head="https://github.com/opea-project/GenAIExamples/blob/main"
-          png_lines=$(grep -Eo '\]\([^)]+\)' --include='*.md' -r .|grep -Ev 'http')
-          if [ -n "$png_lines" ]; then
-            for png_line in $png_lines; do
-              refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
-              png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
-              if [[ "${png_path:0:1}" == "/" ]]; then
-                check_path=${{github.workspace}}$png_path
-              elif [[ "${png_path:0:1}" == "#" ]]; then
-                check_path=${{github.workspace}}/$refer_path$png_path
-              else
-                check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
-              fi
-              real_path=$(realpath $check_path)
-              if [ $? -ne 0 ]; then
-                echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
-                fail="TRUE"
-              else
-                url=$link_head$(echo "$real_path" | sed 's|.*/GenAIExamples||')
-                response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
-                if [ "$response" -ne 200 ]; then
-                  echo "**********Validation failed, try again**********"
-                  response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-                  if [ "$response_retry" -eq 200 ]; then
-                    echo "*****Retry successfully*****"
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | grep '\.md$'| awk '{print $NF}')"
+          if  [ -n "changed_files" ]; then
+            for changed_file in $changed_files; do
+              png_lines=$(grep -H -Eo '\]\([^)]+\)' "$changed_file" |grep -Ev 'http')
+              if [ -n "$png_lines" ]; then
+                for png_line in $png_lines; do
+                  refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
+                  png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
+                  if [[ "${png_path:0:1}" == "/" ]]; then
+                    check_path=${{github.workspace}}$png_path
+                  elif [[ "${png_path:0:1}" == "#" ]]; then
+                    check_path=${{github.workspace}}/$refer_path$png_path
                   else
-                    echo "Retry failed. Check branch ${{ github.event.pull_request.head.ref }}"
-                    url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')
-                    response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
+                    check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+                  fi
+                  real_path=$(realpath $check_path)
+                  if [ $? -ne 0 ]; then
+                    echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
+                    fail="TRUE"
+                  else
+                    url=$link_head$(echo "$real_path" | sed 's|.*/GenAIExamples||')
+                    response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
                     if [ "$response" -ne 200 ]; then
-                      echo "**********Validation failed, try again**********"
-                      response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url_dev")
+                      echo "**********Validation failed, status code: $response, try again**********"
+                      response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
                       if [ "$response_retry" -eq 200 ]; then
                         echo "*****Retry successfully*****"
                       else
-                        echo "Invalid path from ${{github.workspace}}/$refer_path: $png_path"
-                        fail="TRUE"
+                        echo "Retry failed. Check branch ${{ github.event.pull_request.head.ref }}"
+                        url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')
+                        response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
+                        if [ "$response" -ne 200 ]; then
+                          echo "**********Validation failed, status code: $response_retry, try again**********"
+                          response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url_dev")
+                          if [ "$response_retry" -eq 200 ]; then
+                            echo "*****Retry successfully*****"
+                          else
+                            echo "Invalid path from ${{github.workspace}}/$refer_path: $png_path status code: $response_retry"
+                            fail="TRUE"
+                          fi
+                        else
+                          echo "Check branch ${{ github.event.pull_request.head.ref }} successfully."
+                        fi
                       fi
-                    else
-                      echo "Check branch ${{ github.event.pull_request.head.ref }} successfully."
                     fi
                   fi
-                fi
+                done
               fi
             done
           fi
