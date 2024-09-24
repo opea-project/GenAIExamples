@@ -137,9 +137,7 @@ jobs:
               if [ -e "$check_path" ]; then
                 real_path=$(realpath $check_path)
                 if [[ "$png_line" == *#* ]]; then
-                  echo "$changed_files"
                   if [ -n "changed_files" ] && echo "$changed_files" | grep -q "^${refer_path}$"; then
-                    echo "Is in diff"
                     url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')$png_path
                     response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
                     if [ "$response" -ne 200 ]; then
@@ -157,7 +155,6 @@ jobs:
                   fi
                 fi
               else
-                echo $png_line
                 echo "${{github.workspace}}/$refer_path:$png_path does not exist"
                 fail="TRUE"
               fi
