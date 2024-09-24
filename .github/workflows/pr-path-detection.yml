@@ -55,7 +55,6 @@ jobs:
 
       - name: Check the Validity of Hyperlinks
         run: |
-          set -x
           cd ${{github.workspace}}
           fail="FALSE"
           merged_commit=$(git log -1 --format='%H')
@@ -83,6 +82,8 @@ jobs:
                 done
               fi
             done
+          else
+            echo "No changed .md file."
           fi
 
           if [[ "$fail" == "TRUE" ]]; then
@@ -92,82 +93,82 @@ jobs:
           fi
         shell: bash
 
-  # check-the-validity-of-relative-path:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Clean up Working Directory
-  #       run: sudo rm -rf ${{github.workspace}}/*
+  check-the-validity-of-relative-path:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
 
-  #     - name: Checkout Repo GenAIExamples
-  #       uses: actions/checkout@v4
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-  #     - name: Checking Relative Path Validity
-  #       run: |
-  #         cd ${{github.workspace}}
-  #         fail="FALSE"
-  #         repo_name=${{ github.event.pull_request.head.repo.full_name }}
-  #         if [ "$(echo "$repo_name"|cut -d'/' -f1)" != "opea-project" ]; then
-  #           owner=$(echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1)
-  #           branch="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
-  #         else
-  #           branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
-  #         fi
-  #         link_head="https://github.com/opea-project/GenAIExamples/blob/main"
-  #         merged_commit=$(git log -1 --format='%H')
-  #         changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | grep '\.md$'| awk '{print $NF}')"
-  #         if  [ -n "changed_files" ]; then
-  #           for changed_file in $changed_files; do
-  #             png_lines=$(grep -H -Eo '\]\([^)]+\)' "$changed_file" |grep -Ev 'http')
-  #             if [ -n "$png_lines" ]; then
-  #               for png_line in $png_lines; do
-  #                 refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
-  #                 png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
-  #                 if [[ "${png_path:0:1}" == "/" ]]; then
-  #                   check_path=${{github.workspace}}$png_path
-  #                 elif [[ "${png_path:0:1}" == "#" ]]; then
-  #                   check_path=${{github.workspace}}/$refer_path$png_path
-  #                 else
-  #                   check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
-  #                 fi
-  #                 real_path=$(realpath $check_path)
-  #                 if [ $? -ne 0 ]; then
-  #                   echo "Path $png_path in file ${{github.workspace}}/$refer_path does not exist"
-  #                   fail="TRUE"
-  #                 else
-  #                   url=$link_head$(echo "$real_path" | sed 's|.*/GenAIExamples||')
-  #                   response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url")
-  #                   if [ "$response" -ne 200 ]; then
-  #                     echo "**********Validation failed, status code: $response, try again**********"
-  #                     response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-  #                     if [ "$response_retry" -eq 200 ]; then
-  #                       echo "*****Retry successfully*****"
-  #                     else
-  #                       echo "Retry failed. Check branch ${{ github.event.pull_request.head.ref }}"
-  #                       url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')
-  #                       response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
-  #                       if [ "$response" -ne 200 ]; then
-  #                         echo "**********Validation failed, status code: $response_retry, try again**********"
-  #                         response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url_dev")
-  #                         if [ "$response_retry" -eq 200 ]; then
-  #                           echo "*****Retry successfully*****"
-  #                         else
-  #                           echo "Invalid path from ${{github.workspace}}/$refer_path: $png_path status code: $response_retry"
-  #                           fail="TRUE"
-  #                         fi
-  #                       else
-  #                         echo "Check branch ${{ github.event.pull_request.head.ref }} successfully."
-  #                       fi
-  #                     fi
-  #                   fi
-  #                 fi
-  #               done
-  #             fi
-  #           done
-  #         fi
+      - name: Checking Relative Path Validity
+        run: |
+          cd ${{github.workspace}}
+          fail="FALSE"
+          repo_name=${{ github.event.pull_request.head.repo.full_name }}
+          if [ "$(echo "$repo_name"|cut -d'/' -f1)" != "opea-project" ]; then
+            owner=$(echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1)
+            branch="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
+          else
+            branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
+          fi
+          link_head="https://github.com/opea-project/GenAIExamples/blob/main"
 
-  #         if [[ "$fail" == "TRUE" ]]; then
-  #           exit 1
-  #         else
-  #           echo "All hyperlinks are valid."
-  #         fi
-  #       shell: bash
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | grep '\.md$' || true | awk '{print $NF}')"
+          png_lines=$(grep -Eo '\]\([^)]+\)' --include='*.md' -r .|grep -Ev 'http')
+          if [ -n "$png_lines" ]; then
+            for png_line in $png_lines; do
+              refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
+              png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
+
+              if [[ "${png_path:0:1}" == "/" ]]; then
+                check_path=${{github.workspace}}$png_path
+              elif [[ "${png_path:0:1}" == "#" ]]; then
+                check_path=${{github.workspace}}/$refer_path$png_path
+              else
+                check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+              fi
+              real_path=$(realpath $check_path)
+              if [ $? -ne 0 ]; then
+                echo "${{github.workspace}}/$refer_path:$png_path does not exist"
+                fail="TRUE"
+              fi
+              if [[ "$png_line" == *#* ]]; then
+                if [ -e "$real_path" ]; then
+                  if [ -n "changed_files" ] && echo "$changed_files" | grep -q "^${real_path}$"; then
+                    url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')
+                    response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
+                    if [ "$response" -ne 200 ]; then
+                      echo "**********Validation failed, try again**********"
+                      response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url_dev")
+                      if [ "$response_retry" -eq 200 ]; then
+                        echo "*****Retry successfully*****"
+                      else
+                        echo "Invalid path from ${{github.workspace}}/$refer_path: $png_path"
+                        fail="TRUE"
+                      fi
+                    fi
+                  fi
+                else
+                  echo "$real_path could not be found."
+                  fail="TRUE"
+                fi
+              else
+                if [ ! -e "$real_path" ]; then
+                  echo "$png_path referenced in file $refer_path could not be found."
+                  fail="TRUE"
+                fi
+              fi
+            done
+          fi
+
+          if [[ "$fail" == "TRUE" ]]; then
+            exit 1
+          else
+            echo "All hyperlinks are valid."
+          fi
+        shell: bash
