@@ -133,7 +133,7 @@ jobs:
               else
                 check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
               fi
-              real_path=$(realpath $check_path)
+              real_path=$(realpath $check_path 2>/dev/null)
               if [ $? -ne 0 ]; then
                 echo "${{github.workspace}}/$refer_path:$png_path does not exist"
                 fail="TRUE"
