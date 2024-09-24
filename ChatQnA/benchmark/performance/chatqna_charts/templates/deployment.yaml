@@ -58,6 +58,15 @@ spec:
           {{- end }}
         {{- end }}
         {{- end }}
+
+        {{- if $deployment.spec.volumeMounts }}
+        volumeMounts:
+        {{- range $volumeMount := $deployment.spec.volumeMounts }}
+          - mountPath: {{ $volumeMount.mountPath }}
+            name: {{ $volumeMount.name }}
+        {{- end }}
+        {{- end }}
+
       hostIPC: true
       nodeSelector:
         node-type: chatqna-opea
@@ -69,5 +78,6 @@ spec:
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: ScheduleAnyway
+
 ---
 {{- end }}

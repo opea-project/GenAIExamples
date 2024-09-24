@@ -15,7 +15,6 @@ config:
   TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
   TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
 
-namespace: default
 
 deployments:
 - name: chatqna-backend-server-deploy
