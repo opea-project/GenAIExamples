@@ -30,8 +30,8 @@ Deployment are based on released docker images by default, check [docker image l
 #### Prerequisite
 
 - For Docker Compose based deployment, you should have docker compose installed. Refer to [docker compose install](https://docs.docker.com/compose/install/).
-- For Kubernetes based deployment, we provide 3 ways from the easiest manifests to powerful [GMC](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector) based deployment.
-  - You should have a kubernetes cluster ready for use. If not, you can refer to [k8s install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install) to deploy one.
+- For Kubernetes based deployment, we provide 3 ways from the easiest manifests to powerful [GMC](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector/README.md) based deployment.
+  - You should have a kubernetes cluster ready for use. If not, you can refer to [k8s install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install/README.md) to deploy one.
   - (Optional) You should have GMC installed to your kubernetes cluster if you want to try with GMC. Refer to [GMC install](https://github.com/opea-project/docs/blob/main/guide/installation/gmc_install/gmc_install.md) for more information.
   - (Optional) You should have Helm (version >= 3.15) installed if you want to deploy with Helm Charts. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
 
@@ -68,4 +68,4 @@ Thank you for being a part of this journey. We can't wait to see what we can ach
 
 - [Code of Conduct](https://github.com/opea-project/docs/tree/main/community/CODE_OF_CONDUCT.md)
 - [Security Policy](https://github.com/opea-project/docs/tree/main/community/SECURITY.md)
-- [Legal Information](/LEGAL_INFORMATION.md)
+- [Legal Information](LEGAL_INFORMATION.md)

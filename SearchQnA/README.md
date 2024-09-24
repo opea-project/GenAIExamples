@@ -32,7 +32,7 @@ Currently we support two ways of deploying SearchQnA services with docker compos
    docker pull opea/searchqna:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker_compose)
+2. Start services using the docker images `built from source`: [Guide](https://github.com/opea-project/GenAIExamples/tree/main/SearchQnA/docker_compose/)
 
 ### Setup Environment Variable
 
@@ -110,7 +110,7 @@ Two ways of consuming SearchQnA Service:
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy=""
