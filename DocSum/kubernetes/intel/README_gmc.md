@@ -7,9 +7,9 @@ Install GMC in your Kubernetes cluster, if you have not already done so, by foll
 
 The DocSum application is defined as a Custom Resource (CR) file that the above GMC operator acts upon. It first checks if the microservices listed in the CR yaml file are running, if not it starts them and then proceeds to connect them. When the DocSum RAG pipeline is ready, the service endpoint details are returned, letting you use the application. Should you use "kubectl get pods" commands you will see all the component microservices, in particular embedding, retriever, rerank, and llm.
 
-The DocSum pipeline uses  prebuilt images. The Xeon version uses the prebuilt image llm-docsum-tgi:latest which internally leverages the
-the image ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu. The service is called tgi-svc. Meanwhile, the Gaudi version launches the
-service tgi-gaudi-svc, which uses the image `ghcr.io/huggingface/tgi-gaudi:2.0.5`. Both TGI model services serve the model specified in the LLM_MODEL_ID variable that is exported by you. In the below example we use Intel/neural-chat-7b-v3-3.
+The DocSum pipeline uses  prebuilt images. The Xeon version uses the prebuilt image `llm-docsum-tgi:latest` which internally leverages the
+the image `ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu`. The service is called tgi-svc. Meanwhile, the Gaudi version launches the
+service tgi-gaudi-svc, which uses the image `ghcr.io/huggingface/tgi-gaudi:2.0.5`. Both TGI model services serve the model specified in the LLM_MODEL_ID variable that is exported by you. In the below example we use `Intel/neural-chat-7b-v3-3`.
 
 [NOTE]
 Refer to [Docker Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/DocSum/docker_compose/intel/cpu/xeon/README.md) or
@@ -17,7 +17,7 @@ Refer to [Docker Xeon README](https://github.com/opea-project/GenAIExamples/blob
 These will be available on Docker Hub soon, simplifying installation.
 
 ## Deploy the RAG pipeline
-This involves deploying the application pipeline custom resource. You can use docsum_xeon.yaml if you have just a Xeon cluster or docsum_gaudi.yaml if you have a Gaudi cluster.
+This involves deploying the application pipeline custom resource. You can use `docsum_xeon.yaml` if you have just a Xeon cluster or `docsum_gaudi.yaml` if you have a Gaudi cluster.
 
 1. Setup Environment variables. These are specific to the user. Skip the proxy settings if you are not operating behind one.
    

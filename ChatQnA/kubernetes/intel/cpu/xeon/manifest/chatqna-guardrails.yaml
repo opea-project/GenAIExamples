@@ -1474,7 +1474,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/text-generation-inference:2.2.0"
+          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
@@ -1554,7 +1554,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/text-generation-inference:2.2.0"
+          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
