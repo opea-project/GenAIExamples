@@ -13,9 +13,47 @@
 // limitations under the License.
 
 import { env } from "$env/dynamic/public";
-import { SSE } from "sse.js";
 
 const BACKEND_BASE_URL = env.BACKEND_BASE_URL;
+const guardrail_BASE_URL = env.GUARDRAIL_BASE_URL;
+
+
+async function fetchFunc(url, init) {
+	try {
+		const response = await fetch(url, init);
+		if (!response.ok) throw response.status;
+
+		return await response.json();
+	} catch (error) {
+		console.error("network error: ", error);
+
+		return undefined;
+	}
+}
+
+
+export async function fetchGuardRail(query: string, stepValueStore: number, base64ImageStore: string) {	
+	let payload = {};
+	let url = "";
+	base64ImageStore = base64ImageStore.replace(/^data:[a-zA-Z]+\/[a-zA-Z]+;base64,/, "");
+
+	payload = {
+		image: base64ImageStore,
+		prompt: query,
+		max_new_tokens: 1,
+		stream: false,
+	};
+
+	url = `${guardrail_BASE_URL}`;
+
+	const init: RequestInit = {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(payload),
+	};
+
+	return fetchFunc(url, init);
+}
 
 export async function fetchTextStream(query: string, stepValueStore: number, base64ImageStore: string) {
 	let payload = {};
@@ -23,30 +61,19 @@ export async function fetchTextStream(query: string, stepValueStore: number, bas
 	base64ImageStore = base64ImageStore.replace(/^data:[a-zA-Z]+\/[a-zA-Z]+;base64,/, "");
 
 	payload = {
-		messages: [
-			{
-				role: "user",
-				content: [
-					{
-						type: "text",
-						text: query,
-					},
-					{
-						type: "image_url",
-						image_url: { url: base64ImageStore },
-					},
-				],
-			},
-		],
-		max_tokens: stepValueStore,
-		stream: true,
+		image: base64ImageStore,
+		prompt: query,
+		max_new_tokens: stepValueStore,
+
 	};
-	console.log("payload", payload);
 
 	url = `${BACKEND_BASE_URL}`;
 
-	return new SSE(url, {
+	const init: RequestInit = {
+		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		payload: JSON.stringify(payload),
-	});
+		body: JSON.stringify(payload),
+	};
+
+	return fetchFunc(url, init);
 }

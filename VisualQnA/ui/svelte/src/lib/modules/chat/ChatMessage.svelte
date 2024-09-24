@@ -17,6 +17,7 @@
 <script lang="ts">
 	import MessageAvatar from "$lib/modules/chat/MessageAvatar.svelte";
 	import type { Message } from "$lib/shared/constant/Interface";
+	import { Alert } from "flowbite-svelte";
 	import MessageTimer from "./MessageTimer.svelte";
 	import { createEventDispatcher } from "svelte";
 
@@ -31,26 +32,42 @@
 	class={msg.role === 0
 		? "flex w-full gap-3"
 		: "flex w-full items-center gap-3"}
-	data-testid={msg.role === 0
-		? "display-answer"
-		: "display-question"}
+	data-testid={msg.role === 0 ? "display-answer" : "display-question"}
 >
 	<div
 		class={msg.role === 0
 			? "flex aspect-square w-[3px]  items-center justify-center rounded bg-[#0597ff] max-sm:hidden"
-			: "flex aspect-square h-10 w-[3px] items-center justify-center rounded bg-[#000] max-sm:hidden"}
+			: "flex aspect-square h-10 w-[3px] items-center justify-center rounded bg-[#acacac] max-sm:hidden mb-4"}
 	>
 		<MessageAvatar role={msg.role} />
 	</div>
-	<div class="group relative flex items-start">
+	<div
+		class={msg.role === 0
+			? "group relative flex items-start border-b-4 border-gray-200 pb-2"
+			: "group relative flex items-start"}
+	>
 		<div class="flex flex-col items-start">
-			<img src={msg.imgSrc} alt="Uploaded Image" class="m-2 max-w-28 max-h-28" />
+			{#if msg.imgSrc}
+				<img
+					src={msg.imgSrc}
+					alt="Uploaded Image"
+					class="max-w-28 m-2 max-h-28"
+				/>
+			{/if}
 
+			{#if msg.content === "unsafe"}
+				<Alert color="red">
+					<span class="font-medium">Danger alert! </span>
+					<span>The uploaded image/question contains potential security risks.</span>
+				</Alert>
+			{:else}
 			<p
-				class="xl:max-w-[65vw] max-w-[60vw] items-start whitespace-pre-line break-keep text-[0.8rem] leading-5 sm:max-w-[50rem]"
+				class="max-w-[60vw] items-start whitespace-pre-line break-keep leading-6 sm:max-w-[50rem] xl:max-w-[65vw]"
 			>
 				{@html msg.content}
 			</p>
+			{/if}
+			
 		</div>
 	</div>
 </div>
