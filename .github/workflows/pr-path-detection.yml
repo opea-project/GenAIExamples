@@ -128,7 +128,8 @@ jobs:
               if [[ "${png_path:0:1}" == "/" ]]; then
                 check_path=${{github.workspace}}$png_path
               elif [[ "${png_path:0:1}" == "#" ]]; then
-                check_path=${{github.workspace}}/$refer_path$png_path
+                check_path=${{github.workspace}}/$refer_path
+                # $png_path
               else
                 check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
               fi
@@ -140,7 +141,7 @@ jobs:
               if [[ "$png_line" == *#* ]]; then
                 if [ -e "$real_path" ]; then
                   if [ -n "changed_files" ] && echo "$changed_files" | grep -q "^${real_path}$"; then
-                    url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')
+                    url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')$png_path
                     response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
                     if [ "$response" -ne 200 ]; then
                       echo "**********Validation failed, try again**********"
