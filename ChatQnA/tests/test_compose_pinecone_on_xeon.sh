@@ -154,7 +154,7 @@ function validate_microservices() {
     #    '{"status":true}' \
     #    "dataprep_del" \
     #    "dataprep-pinecone-server"
-    
+
     # retrieval microservice
     #test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     #validate_services \
