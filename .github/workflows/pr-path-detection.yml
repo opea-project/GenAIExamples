@@ -133,14 +133,13 @@ jobs:
               else
                 check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
               fi
-              real_path=$(realpath $check_path 2>/dev/null)
-              if [ $? -ne 0 ]; then
-                echo "${{github.workspace}}/$refer_path:$png_path does not exist"
-                fail="TRUE"
-              fi
-              if [[ "$png_line" == *#* ]]; then
-                if [ -e "$real_path" ]; then
+
+              if [ -e "$check_path" ]; then
+                real_path=$(realpath $check_path)
+                if [[ "$png_line" == *#* ]]; then
+                  echo "#" $png_line
                   if [ -n "changed_files" ] && echo "$changed_files" | grep -q "^${real_path}$"; then
+                    echo "Is in diff"
                     url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')$png_path
                     response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
                     if [ "$response" -ne 200 ]; then
@@ -153,18 +152,14 @@ jobs:
                         fail="TRUE"
                       fi
                     else
-                     echo "Validation succeed $png_line"
+                      echo "Validation succeed $png_line"
                     fi
                   fi
-                else
-                  echo "$real_path could not be found."
-                  fail="TRUE"
                 fi
               else
-                if [ ! -e "$real_path" ]; then
-                  echo "$png_path referenced in file $refer_path could not be found."
-                  fail="TRUE"
-                fi
+                echo $png_line
+                echo "${{github.workspace}}/$refer_path:$png_path does not exist"
+                fail="TRUE"
               fi
             done
           fi
