@@ -9,12 +9,7 @@ import { getCurrentTimeStamp, uuidv4 } from "../../common/util";
 import { createAsyncThunkWrapper } from "../thunkUtil";
 import client from "../../common/client";
 import { notifications } from "@mantine/notifications";
-import {
-  CHAT_QNA_URL,
-  DATA_PREP_URL,
-  DATA_PREP_GET_URL,
-  DATA_PREP_DELETE_URL,
-} from "../../config";
+import { CHAT_QNA_URL, DATA_PREP_URL, DATA_PREP_GET_URL, DATA_PREP_DELETE_URL } from "../../config";
 
 const initialState: ConversationReducer = {
   conversations: [],
