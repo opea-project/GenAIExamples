@@ -1,4 +1,4 @@
-## ChatQnA Deployment
+# ChatQnA Deployment
 
 This document guides you through deploying ChatQnA pipelines using Helm charts. Helm charts simplify managing Kubernetes applications by packaging configuration and resources.
 
