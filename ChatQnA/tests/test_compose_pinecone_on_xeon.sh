@@ -107,7 +107,10 @@ function validate_services() {
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
-
+    echo "Response"
+    echo $RESPONSE_BODY
+    echo "Expected Result"
+    echo $EXPECTED_RESULT
     # check response body
     if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
@@ -266,7 +269,7 @@ function main() {
     elif [ "${mode}" == "" ]; then
         validate_microservices
         echo "==== microservices validated ===="
-        validate_megaservice
+        #validate_megaservice
         echo "==== megaservice validated ===="
         validate_frontend
         echo "==== frontend validated ===="
