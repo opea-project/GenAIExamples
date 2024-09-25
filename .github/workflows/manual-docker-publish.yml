@@ -11,13 +11,13 @@ on:
         required: true
         type: string
       examples:
-        default: "Translation"
-        description: 'List of examples to publish [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        default: ""
+        description: 'List of examples to publish "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"'
         required: false
         type: string
       images:
-        default: "gmcmanager,gmcrouter"
-        description: 'List of images to publish [gmcmanager,gmcrouter, ...]'
+        default: ""
+        description: 'List of images to publish "gmcmanager,gmcrouter"'
         required: false
         type: string
       tag:
