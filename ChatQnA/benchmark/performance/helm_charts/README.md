@@ -8,7 +8,7 @@ This document guides you through deploying ChatQnA pipelines using Helm charts. 
 
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/kubernetes/intel/hpu/gaudi/helm_charts
+cd GenAIExamples/ChatQnA/benchmark/performance/helm_charts
 
 # Replace <your token> with your actual Hugging Face token and run the following command:
 HUGGINGFACE_TOKEN=<your token>
