@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 {{- range $deployment := .Values.deployments }}
 apiVersion: apps/v1
 kind: Deployment
@@ -22,7 +25,7 @@ spec:
             name: qna-config
         {{- if $deployment.spec.args }}
         args:
-        {{- range $arg := $deployment.spec.args }} 
+        {{- range $arg := $deployment.spec.args }}
           {{- if $arg.name }}
           - {{ $arg.name }}
           {{- end }}
@@ -100,6 +103,6 @@ spec:
       {{- end }}
       {{- end }}
 
-          
+
 ---
 {{- end }}

@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 config:
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
   EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
@@ -254,4 +257,3 @@ services:
       selector:
         app: vector-db
       type: ClusterIP
-
