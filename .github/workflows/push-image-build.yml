@@ -9,7 +9,6 @@ on:
     paths:
       - "**.py"
       - "**Dockerfile"
-  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-on-push
