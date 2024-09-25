@@ -79,5 +79,23 @@ spec:
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: ScheduleAnyway
 
+
+      {{- if $deployment.spec.volumes }}
+      volumes:
+      {{- range $index, $volume := $deployment.spec.volumes }}
+        - name: {{ $volume.name }}
+          {{- if $volume.hostPath }}
+          hostPath:
+            path: {{ $volume.hostPath.path }}
+            type: {{ $volume.hostPath.type }}
+          {{- else if $volume.emptyDir }}
+          emptyDir:
+            medium: {{ $volume.emptyDir.medium }}
+            sizeLimit: {{ $volume.emptyDir.sizeLimit }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+
+          
 ---
 {{- end }}
