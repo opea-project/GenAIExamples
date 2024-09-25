@@ -1,7 +1,7 @@
 config:
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
   EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
-  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+  HUGGINGFACEHUB_API_TOKEN: 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
   INDEX_NAME: rag-redis
   LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
   LLM_SERVER_HOST_IP: llm-dependency-svc
@@ -76,7 +76,7 @@ deployments:
           memory: "20000Mi"
       args:
         - name: "--model-id"
-          value: $(EMBEDDING_MODEL_ID)
+          value: BAAI/bge-base-en-v1.5
         - name: "--auto-truncate"
       volumeMounts:
         - mountPath: /data
@@ -103,7 +103,7 @@ deployments:
           habana.ai/gaudi: 1
       args:
         - name: "--model-id"
-        - value: $(RERANK_MODEL_ID)
+        - value: BAAI/bge-reranker-base
         - name: "--auto-truncate"
       env:
         - name: OMPI_MCA_btl_vader_single_copy_mechanism
@@ -115,7 +115,7 @@ deployments:
         - name: HABANA_VISIBLE_DEVICES
           value: all
         - name: HF_TOKEN
-          value: ${HF_TOKEN}
+          value: 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
         - name: MAX_WARMUP_SEQUENCE_LENGTH
           value: "512"
       volumeMounts:
@@ -145,7 +145,7 @@ deployments:
           habana.ai/gaudi: 1
       args:
         - name: "--model-id"
-          value: $(LLM_MODEL_ID)
+          value: Intel/neural-chat-7b-v3-3
         - name: "--max-input-length"
           value: "1280"
         - name: "--max-total-tokens"
@@ -164,7 +164,7 @@ deployments:
         - name: HABANA_VISIBLE_DEVICES
           value: all
         - name: HF_TOKEN
-          value: ${HF_TOKEN}
+          value: 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
       volumeMounts:
         - mountPath: /data
           name: model-volume

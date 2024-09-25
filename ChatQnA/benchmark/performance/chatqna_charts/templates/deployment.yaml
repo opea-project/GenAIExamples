@@ -22,10 +22,12 @@ spec:
             name: qna-config
         {{- if $deployment.spec.args }}
         args:
-        {{- range $arg := $deployment.spec.args }}
+        {{- range $arg := $deployment.spec.args }} 
+          {{- if $arg.name }}
           - {{ $arg.name }}
+          {{- end }}
           {{- if $arg.value }}
-          - {{ $arg.value }}
+          - "{{ $arg.value }}"
           {{- end }}
         {{- end }}
         {{- end }}
@@ -34,7 +36,7 @@ spec:
         env:
         {{- range $env := $deployment.spec.env }}
           - name: {{ $env.name }}
-            value: {{ $env.value }}
+            value: "{{ $env.value }}"
         {{- end }}
         {{- end }}
 
@@ -46,7 +48,7 @@ spec:
         ports:
         {{- range $port := $deployment.spec.ports }}
           {{- range $port_name, $port_id := $port }}
-          - {{ $port_name }}:{{ $port_id }}
+          - {{ $port_name }}: {{ $port_id }}
           {{- end }}
         {{- end }}
         {{- end }}
