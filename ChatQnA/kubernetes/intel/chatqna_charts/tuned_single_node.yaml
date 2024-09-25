@@ -1,0 +1,259 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+config:
+  EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
+  EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
+  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+  INDEX_NAME: rag-redis
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
+  LLM_SERVER_HOST_IP: llm-dependency-svc
+  NODE_SELECTOR: chatqna-opea
+  REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
+  RERANK_MODEL_ID: BAAI/bge-reranker-base
+  RERANK_SERVER_HOST_IP: reranking-dependency-svc
+  RETRIEVER_SERVICE_HOST_IP: retriever-svc
+  TEI_EMBEDDING_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  TEI_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
+  TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
+
+deployments:
+  - name: chatqna-backend-server-deploy
+    spec:
+      image_name: opea/chatqna-no-wrapper
+      image_tag: latest
+      replicas: 2
+      ports:
+        - containerPort: 8888
+      resources:
+        limits:
+          cpu: "8"
+          memory: "8000Mi"
+        requests:
+          cpu: "8"
+          memory: "8000Mi"
+
+  - name: dataprep-deploy
+    spec:
+      image_name: opea/dataprep-redis
+      image_tag: latest
+      replicas: 1
+      ports:
+        - containerPort: 6007
+
+  - name: vector-db
+    spec:
+      image_name: redis/redis-stack
+      image_tag: 7.2.0-v9
+      replicas: 1
+      ports:
+        - containerPort: 6379
+        - containerPort: 8001
+
+  - name: retriever-deploy
+    spec:
+      image_name: opea/retriever-redis
+      image_tag: latest
+      replicas: 2
+      ports:
+        - containerPort: 7000
+      resources:
+        requests:
+          cpu: "4"
+          memory: "4000Mi"
+
+  - name: embedding-dependency-deploy
+    spec:
+      image_name: ghcr.io/huggingface/text-embeddings-inference
+      image_tag: cpu-1.5
+      replicas: 1
+      ports:
+        - containerPort: 80
+      args:
+        - name: "--model-id"
+          value: $(EMBEDDING_MODEL_ID)
+        - name: "--auto-truncate"
+      resources:
+        limits:
+          cpu: "80"
+          memory: "20000Mi"
+        requests:
+          cpu: "80"
+          memory: "20000Mi"
+      volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+      volumes:
+        - hostPath:
+            path: /mnt/models
+            type: Directory
+          name: model-volume
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+          name: shm
+
+  - name: reranking-dependency-deploy
+    spec:
+      image_name: opea/tei-gaudi
+      image_tag: latest
+      replicas: 1
+      resources:
+        limits:
+          habana.ai/gaudi: 1
+      args:
+        - name: "--model-id"
+        - value: $(RERANK_MODEL_ID)
+        - name: "--auto-truncate"
+      env:
+        - name: OMPI_MCA_btl_vader_single_copy_mechanism
+          value: none
+        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+          value: "true"
+        - name: runtime
+          value: habana
+        - name: HABANA_VISIBLE_DEVICES
+          value: all
+        - name: HF_TOKEN
+          value: ${HF_TOKEN}
+        - name: MAX_WARMUP_SEQUENCE_LENGTH
+          value: "512"
+      volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+      volumes:
+        - hostPath:
+            path: /mnt/models
+            type: Directory
+          name: model-volume
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+          name: shm
+
+  - name: llm-dependency-deploy
+    spec:
+      image_name: ghcr.io/huggingface/tgi-gaudi
+      image_tag: 2.0.4
+      replicas: 7
+      ports:
+        - containerPort: 80
+      resources:
+        limits:
+          habana.ai/gaudi: 1
+      args:
+        - name: "--model-id"
+          value: $(LLM_MODEL_ID)
+        - name: "--max-input-length"
+          value: "1280"
+        - name: "--max-total-tokens"
+          value: "2048"
+        - name: "--max-batch-total-tokens"
+          value: "65536"
+        - name: "--max-batch-prefill-tokens"
+          value: "4096"
+      env:
+        - name: OMPI_MCA_btl_vader_single_copy_mechanism
+          value: none
+        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+          value: "true"
+        - name: runtime
+          value: habana
+        - name: HABANA_VISIBLE_DEVICES
+          value: all
+        - name: HF_TOKEN
+          value: ${HF_TOKEN}
+      volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+      volumes:
+        - hostPath:
+            path: /mnt/models
+            type: Directory
+          name: model-volume
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+          name: shm
+
+services:
+  - name: chatqna-backend-server-svc
+    spec:
+      ports:
+        - name: service
+          nodePort: 30888
+          port: 8888
+          targetPort: 8888
+      selector:
+        app: chatqna-backend-server-deploy
+      type: NodePort
+
+  - name: dataprep-svc
+    spec:
+      ports:
+        - name: port1
+          port: 6007
+          targetPort: 6007
+      selector:
+        app: dataprep-deploy
+      type: ClusterIP
+
+  - name: embedding-dependency-svc
+    spec:
+      ports:
+        - name: service
+          port: 6006
+          targetPort: 80
+      selector:
+        app: embedding-dependency-deploy
+      type: ClusterIP
+
+  - name: llm-dependency-svc
+    spec:
+      ports:
+        - name: service
+          port: 9009
+          targetPort: 80
+      selector:
+        app: llm-dependency-deploy
+      type: ClusterIP
+
+  - name: reranking-dependency-svc
+    spec:
+      ports:
+        - name: service
+          port: 8808
+          targetPort: 80
+      selector:
+        app: reranking-dependency-deploy
+      type: ClusterIP
+
+  - name: retriever-svc
+    spec:
+      ports:
+        - name: service
+          port: 7000
+          targetPort: 7000
+      selector:
+        app: retriever-deploy
+      type: ClusterIP
+
+  - name: vector-db
+    spec:
+      ports:
+        - name: vector-db-service
+          port: 6379
+          targetPort: 6379
+        - name: vector-db-insight
+          port: 8001
+          targetPort: 8001
+      selector:
+        app: vector-db
+      type: ClusterIP
