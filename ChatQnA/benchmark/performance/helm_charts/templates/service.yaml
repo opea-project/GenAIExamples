@@ -1,0 +1,24 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+{{- range $service := .Values.services }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $service.name }}
+  namespace: default
+spec:
+  ports:
+  {{- range $port := $service.spec.ports }}
+    - name: {{ $port.name }}
+    {{- range $port_name, $port_id := $port }}
+      {{- if ne $port_name "name"}}
+      {{ $port_name }}: {{ $port_id }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  selector:
+    app: {{ $service.spec.selector.app }}
+  type: {{ $service.spec.type }}
+---
+{{- end }}
