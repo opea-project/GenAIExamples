@@ -6,7 +6,7 @@ This document guides you through deploying ChatQnA pipelines using Helm charts. 
 ### Preparation
 ```bash
 # on k8s-master node
-cd GenAIExamples/ChatQnA/kubernetes/intel/chatqna_charts
+cd GenAIExamples/ChatQnA/kubernetes/intel/hpu/gaudi/helm_charts
 
 # Replace <your token> with your actual Hugging Face token and run the following command:
 HUGGINGFACE_TOKEN=<your token>
@@ -26,10 +26,10 @@ find . -name '*.yaml' -type f -exec sed -i "s#\$(RERANK_MODEL_ID)#${RERANK_MODEL
 ```bash
 # Deploy a ChatQnA pipeline using the specified YAML configuration.
 # To deploy with different configurations, simply provide a different YAML file.
-helm install chatqna chatqna_charts/ -f chatqna_charts/oob_single_node.yaml
+helm install chatqna helm_charts/ -f helm_charts/oob_single_node.yaml
 
 # Tips: To display rendered manifests according to the given yaml.
-helm template chatqna chatqna_charts/ -f chatqna_charts/oob_single_node.yaml
+helm template chatqna helm_charts/ -f helm_charts/oob_single_node.yaml
 ```
 
 Notes: The provided  [BKC manifests](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark) for single, two, and four node Kubernetes clusters are generated using this tool.
