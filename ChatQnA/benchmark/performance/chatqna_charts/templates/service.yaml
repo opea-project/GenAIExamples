@@ -7,10 +7,12 @@ metadata:
 spec:
   ports:
   {{- range $port := $service.spec.ports }}
-  - name: {{ $port.name }}
-    nodePort: {{ $port.nodePort }}
-    port: {{ $port.port }}
-    targetPort: {{ $port.targetPort }}
+    - name: {{ $port.name }}
+    {{- range $port_name, $port_id := $port }}
+      {{- if ne $port_name "name"}}
+      {{ $port_name }}: {{ $port_id }}
+      {{- end }}
+    {{- end }}
   {{- end }}
   selector:
     app: {{ $service.spec.selector.app }}

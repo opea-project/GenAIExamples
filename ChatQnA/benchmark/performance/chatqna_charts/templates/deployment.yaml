@@ -45,7 +45,9 @@ spec:
         {{- if $deployment.spec.ports }}
         ports:
         {{- range $port := $deployment.spec.ports }}
-          - containerPort: {{ $port.containerPort }}
+          {{- range $port_name, $port_id := $port }}
+          - {{ $port_name }}:{{ $port_id }}
+          {{- end }}
         {{- end }}
         {{- end }}
 
