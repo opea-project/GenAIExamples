@@ -1,0 +1,46 @@
+﻿# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  tgi_service:
+    image: ghcr.io/huggingface/text-generation-inference:2.1.0
+    container_name: tgi-service
+    ports:
+      - "8008:80"
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+    shm_size: 1g
+    command: --model-id ${LLM_MODEL_ID}
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - '5442:5432'
+    volumes:
+      - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
+
+  texttosql_service:
+    image: opea/texttosql:latest
+    container_name: texttosql_service
+    ports:
+      - "9090:8090"
+    environment:
+      - TGI_LLM_ENDPOINT=${TGI_LLM_ENDPOINT}
+
+
+networks:
+  default:
+    driver: bridge

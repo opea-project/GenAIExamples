@@ -1,0 +1,17 @@
+docarray[full]
+fastapi
+langchain==0.2.9
+langchain-huggingface
+langchain_community==0.2.7
+numpy
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+pandas
+prometheus_fastapi_instrumentator
+psycopg2-binary 
+pyarrow
+pydantic
+shortuuid
+sqlalchemy
+uvicorn
