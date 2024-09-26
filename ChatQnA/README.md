@@ -17,6 +17,7 @@ Quick Start Deployment Steps:
 3. Consume the ChatQnA Service.
 
 Note: If you do not have docker installed you can run this script to install docker : bash docker_compose/install_docker.sh
+
 ### Quick Start: 1.Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
