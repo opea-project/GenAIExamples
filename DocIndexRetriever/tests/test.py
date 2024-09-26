@@ -1,10 +1,12 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import requests
 import argparse
 
-def search_knowledge_base(query: str, url:str, request_type="chat_completion") -> str:
+import requests
+
+
+def search_knowledge_base(query: str, url: str, request_type="chat_completion") -> str:
     """Search the knowledge base for a specific query."""
     print(url)
     proxies = {"http": ""}
