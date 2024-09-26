@@ -7,18 +7,18 @@ config:
   RERANK_MODEL_ID: BAAI/bge-reranker-base
   HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 
-podSpec:
+podSpecs:
   - name: chatqna-backend-server-deploy
     spec:
       image_name: opea/chatqna-no-wrapper
       image_tag: latest
-      replicas: 9
+      replicas: 1
       resources:
         limits:
-          cpu: "7"
+          cpu: "8"
           memory: "8000Mi"
         requests:
-          cpu: "7"
+          cpu: "8"
           memory: "8000Mi"
 
   - name: dataprep-deploy

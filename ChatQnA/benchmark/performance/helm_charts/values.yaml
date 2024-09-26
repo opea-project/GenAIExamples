@@ -1,6 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+namespace: default
+
 config:
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
   LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
@@ -10,42 +12,27 @@ config:
 deployments:
   - name: chatqna-backend-server-deploy
     spec:
-      image_name: opea/chatqna-no-wrapper
-      image_tag: latest
-      replicas: 1
       ports:
         - containerPort: 8888
 
   - name: dataprep-deploy
     spec:
-      image_name: opea/dataprep-redis
-      image_tag: latest
-      replicas: 1
       ports:
         - containerPort: 6007
 
   - name: vector-db
     spec:
-      image_name: redis/redis-stack
-      image_tag: 7.2.0-v9
-      replicas: 1
       ports:
         - containerPort: 6379
         - containerPort: 8001
 
   - name: retriever-deploy
     spec:
-      image_name: opea/retriever-redis
-      image_tag: latest
-      replicas: 1
       ports:
         - containerPort: 7000
 
   - name: embedding-dependency-deploy
     spec:
-      image_name: ghcr.io/huggingface/text-embeddings-inference
-      image_tag: cpu-1.5
-      replicas: 1
       ports:
         - containerPort: 80
       args:
@@ -69,12 +56,6 @@ deployments:
 
   - name: reranking-dependency-deploy
     spec:
-      image_name: opea/tei-gaudi
-      image_tag: latest
-      replicas: 1
-      resources:
-        limits:
-          habana.ai/gaudi: 1
       args:
         - name: "--model-id"
         - value: $(RERANK_MODEL_ID)
