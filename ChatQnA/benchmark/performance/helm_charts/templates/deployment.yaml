@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+{{- $global := .Values }}
 {{- range $deployment := .Values.deployments }}
 apiVersion: apps/v1
 kind: Deployment
@@ -56,13 +57,16 @@ spec:
         {{- end }}
         {{- end }}
 
-        {{- if $deployment.spec.resources }}
+
+	{{- range $resource := $global.podSpec }}
+	{{- if and (eq $resource.name $deployment.name) ($resource.spec.resources) }}
         resources:
-        {{- range $resourceType, $resource := $deployment.spec.resources }}
+        {{- range $resourceType, $resource := $resource.spec.resources }}
           {{ $resourceType }}:
           {{- range $limitType, $limit := $resource }}
             {{ $limitType }}: {{ $limit }}
           {{- end }}
+        {{- end }}
         {{- end }}
         {{- end }}
 
