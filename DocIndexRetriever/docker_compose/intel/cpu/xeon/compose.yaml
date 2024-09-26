@@ -45,8 +45,6 @@ services:
   embedding:
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
-    # volumes:
-    #   - $WORKDIR/GenAIComps/comps:/home/user/GenAIComps/comps
     ports:
       - "6000:6000"
     ipc: host
@@ -62,8 +60,6 @@ services:
   retriever:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     container_name: retriever-redis-server
-    # volumes:
-    #   - $WORKDIR/GenAIComps/comps:/home/user/GenAIComps/comps
     depends_on:
       - redis-vector-db
     ports:
@@ -99,12 +95,9 @@ services:
     container_name: reranking-tei-xeon-server
     depends_on:
       - tei-reranking-service
-    # volumes:
-    #   - $WORKDIR/GenAIComps/comps:/home/user/GenAIComps/comps
     ports:
       - "8000:8000"
     ipc: host
-    # entrypoint: python local_reranking.py
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -117,8 +110,6 @@ services:
   doc-index-retriever-server:
     image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
     container_name: doc-index-retriever-server
-    # volumes:
-    #   - $WORKDIR/GenAIComps/comps:/home/user/GenAIComps/comps
     depends_on:
       - redis-vector-db
       - tei-embedding-service
@@ -128,9 +119,9 @@ services:
     ports:
       - "8889:8889"
     environment:
-      # - no_proxy=${no_proxy}
-      # - https_proxy=${https_proxy}
-      # - http_proxy=${http_proxy}
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}

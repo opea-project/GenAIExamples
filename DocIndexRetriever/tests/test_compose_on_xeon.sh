@@ -78,8 +78,10 @@ function validate_megaservice() {
 
     # Curl the Mega Service
     echo "================Testing retriever service: Text Request================"
-    cd $WORKPATH/tests
-    local CONTENT=$(python test.py --host_ip ${ip_address} --request_type text)
+
+    local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
+     "text": "Explain the OPEA project?"
+    }')
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
@@ -93,6 +95,7 @@ function validate_megaservice() {
     fi
 
     echo "================Testing retriever service: ChatCompletion Request================"
+    cd $WORKPATH/tests
     local CONTENT=$(python test.py --host_ip ${ip_address} --request_type chat_completion)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"

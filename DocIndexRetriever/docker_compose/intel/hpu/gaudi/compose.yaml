@@ -101,7 +101,6 @@ services:
     ports:
       - "8000:8000"
     ipc: host
-    entrypoint: python local_reranking.py
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
