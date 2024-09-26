@@ -8,13 +8,15 @@ DocRetriever is the most widely adopted use case for leveraging the different me
 - [docker gaudi version](docker_compose/intel/hpu/gaudi/README.md) => with extra tei_gaudi endpoint, faster
 
 ## We allow users to set retriever/reranker hyperparams via requests
+
 Example usage:
+
 ```python
 url = "http://{host_ip}:{port}/v1/retrievaltool".format(host_ip=host_ip, port=port)
 payload = {
-            "messages": query,
-            "k": 5, #retriever top k
-            "top_n": 2, # reranker top n
-        }
+    "messages": query,
+    "k": 5,  # retriever top k
+    "top_n": 2,  # reranker top n
+}
 response = requests.post(url, json=payload)
 ```
