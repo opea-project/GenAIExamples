@@ -7,7 +7,6 @@ config:
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
   LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
   RERANK_MODEL_ID: BAAI/bge-reranker-base
-  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 
 deployments:
   - name: chatqna-backend-server-deploy

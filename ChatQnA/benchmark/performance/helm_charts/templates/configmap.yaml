@@ -9,7 +9,7 @@ metadata:
 data:
   EMBEDDING_MODEL_ID: {{ .Values.config.EMBEDDING_MODEL_ID }}
   EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
-  HUGGINGFACEHUB_API_TOKEN: {{ .Values.config.HUGGINGFACEHUB_API_TOKEN }}
+  HUGGINGFACEHUB_API_TOKEN: {{ .Values.HUGGINGFACEHUB_API_TOKEN }}
   INDEX_NAME: rag-redis
   LLM_MODEL_ID: {{ .Values.config.LLM_MODEL_ID }}
   LLM_SERVER_HOST_IP: llm-dependency-svc

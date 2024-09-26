@@ -1,11 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-config:
-  EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
-  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
-  RERANK_MODEL_ID: BAAI/bge-reranker-base
-  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+
+HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 
 podSpecs:
   - name: chatqna-backend-server-deploy
