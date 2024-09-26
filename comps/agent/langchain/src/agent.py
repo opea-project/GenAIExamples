@@ -11,12 +11,18 @@ def instantiate_agent(args, strategy="react_langchain", with_memory=False):
         from .strategy.react import ReActAgentwithLanggraph
 
         return ReActAgentwithLanggraph(args, with_memory)
+    elif strategy == "react_llama":
+        print("Initializing ReAct Agent with LLAMA")
+        from .strategy.react import ReActAgentLlama
+
+        return ReActAgentLlama(args, with_memory)
     elif strategy == "plan_execute":
         from .strategy.planexec import PlanExecuteAgentWithLangGraph
 
         return PlanExecuteAgentWithLangGraph(args, with_memory)
 
-    elif strategy == "rag_agent":
+    elif strategy == "rag_agent" or strategy == "rag_agent_llama":
+        print("Initializing RAG Agent")
         from .strategy.ragagent import RAGAgent
 
         return RAGAgent(args, with_memory)

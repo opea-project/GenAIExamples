@@ -34,3 +34,35 @@ RAG_PROMPT = ChatPromptTemplate.from_messages(
         ),
     ]
 )
+
+
+QueryWriterLlamaPrompt = """\
+Given the user question, think step by step.
+If you can answer the question without searching the knowledge base, provide your answer.
+
+If you need to search for information in the knowledge base, provide the search query.
+Decompose a complex question into a set of simple tasks, and issue search queries for each task.
+Here is the history of search queries that you have issued.
+{history}
+Here are the feedback for the documents retrieved with your search queries.
+{feedback}
+
+What is the new query that you should issue to the knowledge base to answer the user question?
+Output the new query in JSON format as below.
+{{"query": "your new query here"}}
+If you plan to issue multiple queries, you must output JSON in multiple lines like the example below.
+{{"query": "your first query here"}}
+{{"query": "your second query here"}}
+
+If you can directly answer the user question, output your answer in JSON format as below.
+{{"answer": "your answer here"}}
+
+User Question: {question}
+You Output:\n
+"""
+
+DOC_GRADER_Llama_PROMPT = """\
+Given the QUERY, determine if the DOCUMENT contains all the information to answer the query.\n
+QUERY: {question} \n
+DOCUMENT:\n{context}\n\n
+Give score 'yes' if the document provides all the information needed to answer the question. Otherwise, give score 'no'. ONLY answer with 'yes' or 'no'. NOTHING ELSE."""

@@ -4,8 +4,8 @@
 from typing import Annotated, Any, Literal, Sequence, TypedDict
 
 from langchain.output_parsers import PydanticOutputParser
-from langchain_core.messages import BaseMessage, HumanMessage, ToolMessage
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.output_parsers.openai_tools import PydanticToolsParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, Field
@@ -17,7 +17,7 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 
 from ..base_agent import BaseAgent
-from .prompt import DOC_GRADER_PROMPT, RAG_PROMPT
+from .prompt import DOC_GRADER_PROMPT, RAG_PROMPT, QueryWriterLlamaPrompt
 
 instruction = "Retrieved document is not sufficient or relevant to answer the query. Reformulate the query to search knowledge base again."
 MAX_RETRY = 3
@@ -61,6 +61,8 @@ class QueryWriter:
 class Retriever:
     @classmethod
     def create(cls, tools_descriptions):
+        for tool in tools_descriptions:
+            print(tool.name)
         return ToolNode(tools_descriptions)
 
 
@@ -132,6 +134,8 @@ class TextGenerator:
         self.rag_chain = prompt | llm_endpoint | StrOutputParser()
 
     def __call__(self, state):
+        from .utils import aggregate_docs
+
         print("---GENERATE---")
         messages = state["messages"]
         question = messages[0].content
@@ -139,13 +143,14 @@ class TextGenerator:
 
         # find the latest retrieved doc
         # which is a ToolMessage
-        for m in state["messages"][::-1]:
-            if isinstance(m, ToolMessage):
-                last_message = m
-                break
+        # for m in state["messages"][::-1]:
+        #     if isinstance(m, ToolMessage):
+        #         last_message = m
+        #         break
+        # docs = last_message.content
 
         question = messages[0].content
-        docs = last_message.content
+        docs = aggregate_docs(messages)
 
         # Run
         response = self.rag_chain.invoke({"context": docs, "question": question, "time": query_time})
@@ -159,8 +164,13 @@ class RAGAgent(BaseAgent):
         super().__init__(args)
 
         # Define Nodes
-        document_grader = DocumentGrader(self.llm_endpoint, args.model)
-        query_writer = QueryWriter(self.llm_endpoint, args.model, self.tools_descriptions)
+
+        if args.strategy == "rag_agent":
+            query_writer = QueryWriter(self.llm_endpoint, args.model, self.tools_descriptions)
+            document_grader = DocumentGrader(self.llm_endpoint, args.model)
+        elif args.strategy == "rag_agent_llama":
+            query_writer = QueryWriterLlama(self.llm_endpoint, args.model, self.tools_descriptions)
+            document_grader = DocumentGraderLlama(self.llm_endpoint, args.model)
         text_generator = TextGenerator(self.llm_endpoint)
         retriever = Retriever.create(self.tools_descriptions)
 
@@ -248,3 +258,119 @@ class RAGAgent(BaseAgent):
             return last_message.content
         except Exception as e:
             return str(e)
+
+
+class QueryWriterLlama:
+    """Temporary workaround to use LLM with TGI-Gaudi.
+
+    Use custom output parser to parse text string from LLM into tool calls.
+    Only support one tool. Does NOT support multiple tools.
+    The tool input variable must be "query".
+    Only validated with llama3.1-70B-instruct.
+    Output of the chain is AIMessage.
+    Streaming=false is required for this chain.
+    """
+
+    def __init__(self, llm_endpoint, model_id, tools):
+        from .utils import QueryWriterLlamaOutputParser
+
+        assert len(tools) == 1, "Only support one tool, passed in {} tools".format(len(tools))
+        output_parser = QueryWriterLlamaOutputParser()
+        prompt = PromptTemplate(
+            template=QueryWriterLlamaPrompt,
+            input_variables=["question", "history", "feedback"],
+        )
+        llm = ChatHuggingFace(llm=llm_endpoint, model_id=model_id)
+        self.tools = tools
+        self.chain = prompt | llm | output_parser
+
+    def __call__(self, state):
+        from .utils import assemble_history, convert_json_to_tool_call
+
+        print("---CALL QueryWriter---")
+        messages = state["messages"]
+
+        question = messages[0].content
+        history = assemble_history(messages)
+        feedback = instruction
+
+        response = self.chain.invoke({"question": question, "history": history, "feedback": feedback})
+        print("Response from query writer llm: ", response)
+
+        ### Code below assumes one tool call in the response ##############
+        # if "query" in response:
+        #     add_kw_tc, tool_call = convert_json_to_tool_call(response, self.tools[0])
+        #     # print("Tool call:\n", tool_call)
+        #     response = AIMessage(content="", additional_kwargs=add_kw_tc, tool_calls=[tool_call])
+        #     # print(response)
+        # else:
+        #     response = AIMessage(content=response["answer"])
+        # We return a list, because this will get added to the existing list
+        # return {"messages": [response], "output": response}
+        ######################################################################
+
+        ############ allow multiple tool calls in one AI message ############
+        tool_calls = []
+        for res in response:
+            if "query" in res:
+                add_kw_tc, tool_call = convert_json_to_tool_call(res, self.tools[0])
+                # print("Tool call:\n", tool_call)
+                tool_calls.append(tool_call)
+
+        if tool_calls:
+            ai_message = AIMessage(content="", additional_kwargs=add_kw_tc, tool_calls=tool_calls)
+        else:
+            ai_message = AIMessage(content=response[0]["answer"])
+
+        return {"messages": [ai_message], "output": ai_message.content}
+
+
+class DocumentGraderLlama:
+    """Determines whether the retrieved documents are relevant to the question.
+
+    Args:
+        state (messages): The current state
+
+    Returns:
+        str: A decision for whether the documents are relevant or not
+    """
+
+    def __init__(self, llm_endpoint, model_id=None):
+        from .prompt import DOC_GRADER_Llama_PROMPT
+
+        # Prompt
+        prompt = PromptTemplate(
+            template=DOC_GRADER_Llama_PROMPT,
+            input_variables=["context", "question"],
+        )
+
+        if isinstance(llm_endpoint, HuggingFaceEndpoint):
+            llm = ChatHuggingFace(llm=llm_endpoint, model_id=model_id)
+        elif isinstance(llm_endpoint, ChatOpenAI):
+            llm = llm_endpoint
+        self.chain = prompt | llm
+
+    def __call__(self, state) -> Literal["generate", "rewrite"]:
+        from .utils import aggregate_docs
+
+        print("---CALL DocumentGrader---")
+        messages = state["messages"]
+
+        question = messages[0].content  # the original query
+        docs = aggregate_docs(messages)
+        print("@@@@ Docs: ", docs)
+
+        scored_result = self.chain.invoke({"question": question, "context": docs})
+
+        score = scored_result.content
+        print("@@@@ Score: ", score)
+
+        # if score.startswith("yes"):
+        if "yes" in score:
+            print("---DECISION: DOCS RELEVANT---")
+            return {"doc_score": "generate"}
+
+        else:
+            print("---DECISION: DOCS NOT RELEVANT---")
+
+            return {"messages": [HumanMessage(content=instruction)], "doc_score": "rewrite"}

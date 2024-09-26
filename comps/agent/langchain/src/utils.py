@@ -147,4 +147,5 @@ def get_args():
         sys_args.streaming = True
     else:
         sys_args.streaming = False
+    print("==========sys_args==========:\n", sys_args)
     return sys_args, unknown_args

@@ -53,6 +53,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest]):
         logger.info(f"args: {args}")
     input.streaming = args.streaming
     config = {"recursion_limit": args.recursion_limit}
+    print("========initiating agent============")
     agent_inst = instantiate_agent(args, args.strategy)
     if logflag:
         logger.info(type(agent_inst))
