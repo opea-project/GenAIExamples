@@ -78,6 +78,7 @@ function validate_megaservice() {
 
     # Curl the Mega Service
     echo "================Testing retriever service: Text Request================"
+    cd $WORKPATH/tests
     local CONTENT=$(python test.py --host_ip ${ip_address} --request_type text)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"
