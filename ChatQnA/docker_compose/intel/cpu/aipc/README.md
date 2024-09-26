@@ -41,29 +41,36 @@ We use [Ollama](https://ollama.com/) as our LLM service for AIPC.
 Please set up Ollama on your PC follow the instructions. This will set the entrypoint needed for the Ollama to suit the ChatQnA examples.
 
 #### 4.1 Set Up Ollama LLM Service
+
 Install Ollama service with one command
 
 curl -fsSL https://ollama.com/install.sh | sh
 
 ##### Set Ollama Service Configuration
+
 Ollama Service Configuration file is /etc/systemd/system/ollama.service. Edit the file to set OLLAMA_HOST environment (Replace **${host_ip}** with your host IPV4).
+
 ```
 Environment="OLLAMA_HOST=${host_ip}:11434"
 ```
 
 ##### Set https_proxy environment for Ollama
+
 if your system access network through proxy, add https_proxy in Ollama Service Configuration file
+
 ```
 Environment="https_proxy="Your_HTTPS_Proxy"
 ```
 
 ##### Restart Ollam services
+
 ```
 $ sudo systemctl daemon-reload
 $ sudo systemctl restart ollama.service
 ```
 
 ##### Pull LLM model
+
 ```
 #export OLLAMA_HOST=http://${host_ip}:11434
 #ollama pull llam3
