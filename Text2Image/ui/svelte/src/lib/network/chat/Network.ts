@@ -17,7 +17,6 @@ import { env } from "$env/dynamic/public";
 const BACKEND_BASE_URL = env.BACKEND_BASE_URL;
 const guardrail_BASE_URL = env.GUARDRAIL_BASE_URL;
 
-
 async function fetchFunc(url, init) {
 	try {
 		const response = await fetch(url, init);
@@ -31,8 +30,7 @@ async function fetchFunc(url, init) {
 	}
 }
 
-
-export async function fetchGuardRail(query: string, stepValueStore: number, base64ImageStore: string) {	
+export async function fetchGuardRail(query: string, stepValueStore: number, base64ImageStore: string) {
 	let payload = {};
 	let url = "";
 
@@ -60,7 +58,6 @@ export async function fetchTextStream(query: string, stepValueStore: number, bas
 		image: base64ImageStore,
 		prompt: query,
 		max_new_tokens: stepValueStore,
-
 	};
 
 	url = `${BACKEND_BASE_URL}`;

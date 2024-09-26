@@ -86,7 +86,7 @@
 	const callTextStream = async (query: string) => {
 		const res = await fetchGuardRail(query, $stepValueStore, $base64ImageStore);
 		console.log('res', res);
-		
+
 
 		const lastSegment = res.text.split("[/INST]").pop().trim();
 
@@ -201,7 +201,7 @@
 			>
 		</div>
 	</div>
-	
+
 	<GenerateImg />
 </div>
 

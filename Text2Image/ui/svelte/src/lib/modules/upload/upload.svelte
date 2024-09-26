@@ -35,4 +35,4 @@
 		<p class="text-xs">Max output tokens: {stepValue}</p>
 	</div>
 
-</div>	
+</div>

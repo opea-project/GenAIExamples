@@ -37,14 +37,14 @@
   }
 
 
-  async function handleImageClick() {    
+  async function handleImageClick() {
     const imgUrl = images[currentIndex].imgurl;
     const base64Data = await convertImageToBase64(imgUrl);
     const currentPrompt = images[currentIndex].prompt;
     base64ImageStore.set(base64Data);
 
     dispatch("imagePrompt", { content: currentPrompt });
-    
+
   }
 
   async function convertImageToBase64(url) {
