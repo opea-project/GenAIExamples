@@ -64,7 +64,7 @@ function validate() {
 
 function validate_megaservice() {
     echo "Testing DataPrep Service"
-    local CONTENT=$(curl -X POST "http://${ip_address}:6007/v1/dataprep" \
+    local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]')
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon")
@@ -78,8 +78,10 @@ function validate_megaservice() {
 
     # Curl the Mega Service
     echo "Testing retriever service"
-    local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-     "text": "Explain the OPEA project?"
+    local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
+     "input": "Explain the OPEA project?",
+     "k": "10",
+     "top_n":"2",
     }')
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"

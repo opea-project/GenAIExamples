@@ -45,6 +45,8 @@ services:
   embedding:
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
+    # volumes:
+    #   - $WORKDIR/GenAIComps/comps:/home/user/GenAIComps/comps
     ports:
       - "6000:6000"
     ipc: host
@@ -60,6 +62,8 @@ services:
   retriever:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     container_name: retriever-redis-server
+    # volumes:
+    #   - $WORKDIR/GenAIComps/comps:/home/user/GenAIComps/comps
     depends_on:
       - redis-vector-db
     ports:
@@ -74,13 +78,33 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
     restart: unless-stopped
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-reranking-server
+    ports:
+      - "8808:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-xeon-server
+    depends_on:
+      - tei-reranking-service
+    # volumes:
+    #   - $WORKDIR/GenAIComps/comps:/home/user/GenAIComps/comps
     ports:
       - "8000:8000"
     ipc: host
-    entrypoint: python local_reranking.py
+    # entrypoint: python local_reranking.py
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -93,6 +117,8 @@ services:
   doc-index-retriever-server:
     image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
     container_name: doc-index-retriever-server
+    # volumes:
+    #   - $WORKDIR/GenAIComps/comps:/home/user/GenAIComps/comps
     depends_on:
       - redis-vector-db
       - tei-embedding-service
@@ -102,9 +128,9 @@ services:
     ports:
       - "8889:8889"
     environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
+      # - no_proxy=${no_proxy}
+      # - https_proxy=${https_proxy}
+      # - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
