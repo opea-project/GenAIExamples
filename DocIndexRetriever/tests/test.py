@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import requests
 import argparse
 
@@ -24,9 +27,9 @@ def search_knowledge_base(query: str, url:str, request_type="chat_completion") -
         context = ""
         for i, doc in enumerate(docs):
             if i == 0:
-                context = str(i)+': '+doc
+                context = str(i) + ": " + doc
             else:
-                context += "\n" + str(i)+': '+doc
+                context += "\n" + str(i) + ": " + doc
         # print(context)
         return context
     elif "text" in response.json():
@@ -43,7 +46,6 @@ def search_knowledge_base(query: str, url:str, request_type="chat_completion") -
         return context
     else:
         return "Error parsing response from the knowledge base."
-    
 
 
 def main():
@@ -61,6 +63,7 @@ def main():
     response = search_knowledge_base("OPEA", url, request_type=args.request_type)
 
     print(response)
+
 
 if __name__ == "__main__":
     main()
