@@ -43,7 +43,7 @@ class PromptId(BaseModel):
     endpoint="/v1/prompt/create",
     host="0.0.0.0",
     input_datatype=PromptCreate,
-    port=6012,
+    port=6018,
 )
 async def create_prompt(prompt: PromptCreate):
     """Creates and stores a prompt in prompt store.
@@ -74,7 +74,7 @@ async def create_prompt(prompt: PromptCreate):
     endpoint="/v1/prompt/get",
     host="0.0.0.0",
     input_datatype=PromptId,
-    port=6012,
+    port=6018,
 )
 async def get_prompt(prompt: PromptId):
     """Retrieves prompt from prompt store based on provided PromptId or user.
@@ -110,7 +110,7 @@ async def get_prompt(prompt: PromptId):
     endpoint="/v1/prompt/delete",
     host="0.0.0.0",
     input_datatype=PromptId,
-    port=6012,
+    port=6018,
 )
 async def delete_prompt(prompt: PromptId):
     """Delete a prompt from prompt store by given PromptId.

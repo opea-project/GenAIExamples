@@ -50,7 +50,7 @@ The Feedback Management microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6016/v1/feedback/create \
+    http://${host_ip}:6016/v1/feedback/create \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -89,7 +89,7 @@ The Feedback Management microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6016/v1/feedback/create \
+    http://${host_ip}:6016/v1/feedback/create \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -127,7 +127,7 @@ The Feedback Management microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6016/v1/feedback/get \
+    http://${host_ip}:6016/v1/feedback/get \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -138,7 +138,7 @@ The Feedback Management microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6016/v1/feedback/get \
+    http://${host_ip}:6016/v1/feedback/get \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -149,7 +149,7 @@ The Feedback Management microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6016/v1/feedback/delete \
+    http://${host_ip}:6016/v1/feedback/delete \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{

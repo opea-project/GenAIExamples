@@ -18,7 +18,7 @@ services:
     image: opea/promptregistry-mongo:latest
     container_name: promptregistry-mongo-server
     ports:
-      - "6012:6012"
+      - "6018:6018"
     ipc: host
     environment:
       http_proxy: ${http_proxy}

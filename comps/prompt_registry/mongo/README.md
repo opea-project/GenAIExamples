@@ -37,7 +37,7 @@ docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=
 - Run Prompt Registry microservice
 
   ```bash
-  docker run -d --name="promptregistry-mongo-server" -p 6012:6012 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MONGO_HOST=${MONGO_HOST} -e MONGO_PORT=${MONGO_PORT} -e DB_NAME=${DB_NAME} -e COLLECTION_NAME=${COLLECTION_NAME} opea/promptregistry-mongo-server:latest
+  docker run -d --name="promptregistry-mongo-server" -p 6018:6018 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MONGO_HOST=${MONGO_HOST} -e MONGO_PORT=${MONGO_PORT} -e DB_NAME=${DB_NAME} -e COLLECTION_NAME=${COLLECTION_NAME} opea/promptregistry-mongo-server:latest
   ```
 
 ---
@@ -50,7 +50,7 @@ The Prompt Registry microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6012/v1/prompt/create \
+    http://${host_ip}:6018/v1/prompt/create \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -62,7 +62,7 @@ The Prompt Registry microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6012/v1/prompt/get \
+    http://${host_ip}:6018/v1/prompt/get \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -73,7 +73,7 @@ The Prompt Registry microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6012/v1/prompt/get \
+    http://${host_ip}:6018/v1/prompt/get \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -84,7 +84,7 @@ The Prompt Registry microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6012/v1/prompt/get \
+    http://${host_ip}:6018/v1/prompt/get \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
@@ -95,7 +95,7 @@ The Prompt Registry microservice exposes the following API endpoints:
 
   ```bash
   curl -X 'POST' \
-    http://{host_ip}:6012/v1/prompt/delete \
+    http://${host_ip}:6018/v1/prompt/delete \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{

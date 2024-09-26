@@ -28,14 +28,14 @@ function build_docker_images() {
 
 function start_service() {
 
-    docker run -d --name="test-comps-promptregistry-mongo-server" -p 6012:6012 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MONGO_HOST=${MONGO_HOST} -e MONGO_PORT=${MONGO_PORT} -e DB_NAME=${DB_NAME} -e COLLECTION_NAME=${COLLECTION_NAME} opea/promptregistry-mongo-server:comps
+    docker run -d --name="test-comps-promptregistry-mongo-server" -p 6018:6018 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MONGO_HOST=${MONGO_HOST} -e MONGO_PORT=${MONGO_PORT} -e DB_NAME=${DB_NAME} -e COLLECTION_NAME=${COLLECTION_NAME} opea/promptregistry-mongo-server:comps
 
     sleep 10s
 }
 
 function validate_microservice() {
     result=$(curl -X 'POST' \
-  http://$ip_address:6012/v1/prompt/create \
+  http://$ip_address:6018/v1/prompt/create \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
