@@ -6,7 +6,7 @@ This document outlines the deployment process for a MultimodalQnA application ut
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
+**Export the value of the public IP address of your Gaudi server to the `host_ip` environment variable**
 
 > Change the External_Public_IP below with the actual IPV4 value
 

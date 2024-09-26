@@ -90,7 +90,7 @@ find . -name '*.yaml' -type f -exec sed -i "s#\$(RERANK_MODEL_ID)#${RERANK_MODEL
 
 ### Benchmark tool preparation
 
-The test uses the [benchmark tool](https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark) to do performance test. We need to set up benchmark tool at the master node of Kubernetes which is k8s-master.
+The test uses the [benchmark tool](https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/README.md) to do performance test. We need to set up benchmark tool at the master node of Kubernetes which is k8s-master.
 
 ```bash
 # on k8s-master node

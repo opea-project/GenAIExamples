@@ -11,36 +11,84 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
+If you are in a proxy environment, set the proxy-related environment variables:
+
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+
 ### 1. Build Embedding Image
 
 ```bash
-docker build --no-cache -t opea/embedding-tei:latest -f comps/embeddings/tei/langchain/Dockerfile .
+docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest -f comps/reranks/tei/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
 ```
 
-### 4. Build LLM Image
+### 4. Set up Ollama Service and Build LLM Image
 
-We use [Ollama](https://ollama.com/) as our LLM service for AIPC. Please pre-download Ollama on your PC.
+We use [Ollama](https://ollama.com/) as our LLM service for AIPC.
+
+Please set up Ollama on your PC follow the instructions. This will set the entrypoint needed for the Ollama to suit the ChatQnA examples.
+
+#### 4.1 Set Up Ollama LLM Service
+
+Install Ollama service with one command
+
+curl -fsSL https://ollama.com/install.sh | sh
+
+##### Set Ollama Service Configuration
+
+Ollama Service Configuration file is /etc/systemd/system/ollama.service. Edit the file to set OLLAMA_HOST environment (Replace **${host_ip}** with your host IPV4).
+
+```
+Environment="OLLAMA_HOST=${host_ip}:11434"
+```
+
+##### Set https_proxy environment for Ollama
+
+if your system access network through proxy, add https_proxy in Ollama Service Configuration file
+
+```
+Environment="https_proxy="Your_HTTPS_Proxy"
+```
+
+##### Restart Ollam services
+
+```
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart ollama.service
+```
+
+##### Pull LLM model
+
+```
+#export OLLAMA_HOST=http://${host_ip}:11434
+#ollama pull llam3
+#ollama lists
+NAME            ID              SIZE    MODIFIED
+llama3:latest   365c0bd3c000    4.7 GB  5 days ago
+```
+
+#### 4.2 Build LLM Image
 
 ```bash
-docker build --no-cache -t opea/llm-ollama:latest -f comps/llms/text-generation/ollama/langchain/Dockerfile .
+docker build --no-cache -t opea/llm-ollama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ollama/langchain/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest -f comps/dataprep/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
 cd ..
 ```
 
@@ -61,7 +109,7 @@ Build frontend Docker image via below command:
 
 ```bash
 cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-ui:latest -f ./docker/Dockerfile .
+docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 cd ../../../..
 ```
 

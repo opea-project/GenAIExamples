@@ -21,7 +21,7 @@ Currently we support two ways of deploying Document Summarization services with 
    docker pull opea/docsum:latest
    ```
 
-2. Start services using the docker images `built from source`: [Guide](./docker_compose)
+2. Start services using the docker images `built from source`: [Guide](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose)
 
 ### Required Models
 
@@ -98,7 +98,7 @@ Refer to [Kubernetes deployment](./kubernetes/intel/README.md)
 
 Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
 
-Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum) for instructions on deploying DocSum into Kubernetes on Xeon & Gaudi.
+Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum/README.md) for instructions on deploying DocSum into Kubernetes on Xeon & Gaudi.
 
 ### Workflow of the deployed Document Summarization Service
 
@@ -143,7 +143,7 @@ Two ways of consuming Document Summarization Service:
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose/intel/cpu/xeon#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy=""
