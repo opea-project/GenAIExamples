@@ -63,7 +63,7 @@ function validate() {
 }
 
 function validate_megaservice() {
-    echo "Testing DataPrep Service"
+    echo "===========Ingest data=================="
     local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]')
@@ -77,12 +77,22 @@ function validate_megaservice() {
     fi
 
     # Curl the Mega Service
-    echo "Testing retriever service"
-    local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-     "input": "Explain the OPEA project?",
-     "k": "10",
-     "top_n":"2",
-    }')
+    echo "================Testing retriever service: Text Request================"
+    local CONTENT=$(python test.py --request_type text)
+    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
+    echo "$EXIT_CODE"
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    echo "return value is $EXIT_CODE"
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs tei-embedding-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        exit 1
+    fi
+
+    echo "================Testing retriever service: ChatCompletion Request================"
+    local CONTENT=$(python test.py --request_type chat_completion)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"

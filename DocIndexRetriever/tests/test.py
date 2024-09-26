@@ -1,16 +1,22 @@
 import requests
 import argparse
 
-def search_knowledge_base(query: str, url:str) -> str:
+def search_knowledge_base(query: str, url:str, request_type="chat_completion") -> str:
     """Search the knowledge base for a specific query."""
     print(url)
     proxies = {"http": ""}
-    payload = {
-        "messages": "",
-        "input": query,
-        "k": 5,
-        "top_n": 2,
-    }
+    if request_type == "chat_completion":
+        print("Sending chat completion request")
+        payload = {
+            "messages": query,
+            "k": 5,
+            "top_n": 2,
+        }
+    else:
+        print("Sending text request")
+        payload = {
+            "text": query,
+        }
     response = requests.post(url, json=payload, proxies=proxies)
     print(response)
     if "documents" in response.json():
@@ -44,6 +50,7 @@ def main():
     parser = argparse.ArgumentParser(description="Index data")
     parser.add_argument("--host_ip", type=str, default="localhost", help="Host IP")
     parser.add_argument("--port", type=int, default=8889, help="Port")
+    parser.add_argument("--request_type", type=str, default="chat_completion", help="Test type")
     args = parser.parse_args()
     print(args)
 
@@ -51,7 +58,7 @@ def main():
     port = args.port
     url = "http://{host_ip}:{port}/v1/retrievaltool".format(host_ip=host_ip, port=port)
 
-    response = search_knowledge_base("OPEA", url)
+    response = search_knowledge_base("OPEA", url, request_type=args.request_type)
 
     print(response)
 
