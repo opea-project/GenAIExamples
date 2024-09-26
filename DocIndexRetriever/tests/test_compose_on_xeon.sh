@@ -77,17 +77,17 @@ function validate_megaservice() {
     fi
 
     # Curl the Mega Service
-    echo "================Testing retriever service: Text Request================"
+    echo "================Testing retriever service: Default params================"
 
     local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-     "text": "Explain the OPEA project?"
+     "messages": "Explain the OPEA project?"
     }')
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
-        docker logs tei-embedding-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs tei-embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
@@ -102,7 +102,7 @@ function validate_megaservice() {
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
-        docker logs tei-embedding-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs tei-embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
