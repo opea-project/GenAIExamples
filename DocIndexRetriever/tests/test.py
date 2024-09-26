@@ -1,7 +1,12 @@
-import requests
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import argparse
 
-def search_knowledge_base(query: str, url:str) -> str:
+import requests
+
+
+def search_knowledge_base(query: str, url: str) -> str:
     """Search the knowledge base for a specific query."""
     print(url)
     proxies = {"http": ""}
@@ -18,9 +23,9 @@ def search_knowledge_base(query: str, url:str) -> str:
         context = ""
         for i, doc in enumerate(docs):
             if i == 0:
-                context = str(i)+': '+doc
+                context = str(i) + ": " + doc
             else:
-                context += "\n" + str(i)+': '+doc
+                context += "\n" + str(i) + ": " + doc
         # print(context)
         return context
     elif "text" in response.json():
@@ -37,7 +42,6 @@ def search_knowledge_base(query: str, url:str) -> str:
         return context
     else:
         return "Error parsing response from the knowledge base."
-    
 
 
 def main():
@@ -54,6 +58,7 @@ def main():
     response = search_knowledge_base("OPEA", url)
 
     print(response)
+
 
 if __name__ == "__main__":
     main()
