@@ -2,7 +2,7 @@
 
 Fine-tuning microservice involves adapting a model to a specific task or dataset to improve its performance on that task, we currently supported instruction tuning for LLMs, finetuning for reranking and embedding models.
 
-## 🚀1. Start Microservice with Python (Optional 1)
+## 🚀1. Start Microservice with Python (Option 1)
 
 ### 1.1 Install Requirements
 
@@ -42,7 +42,7 @@ export HF_TOKEN=${your_huggingface_token}
 python finetuning_service.py
 ```
 
-## 🚀2. Start Microservice with Docker (Optional 2)
+## 🚀2. Start Microservice with Docker (Option 2)
 
 ### 2.1 Setup on CPU
 
