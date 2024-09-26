@@ -319,7 +319,7 @@ services:
     image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}
     container_name: promptregistry-mongo-server
     ports:
-      - "6015:6012"
+      - "6018:6018"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
