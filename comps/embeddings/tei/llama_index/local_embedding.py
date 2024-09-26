@@ -20,10 +20,10 @@ logflag = os.getenv("LOGFLAG", False)
     input_datatype=TextDoc,
     output_datatype=EmbedDoc,
 )
-def embedding(input: TextDoc) -> EmbedDoc:
+async def embedding(input: TextDoc) -> EmbedDoc:
     if logflag:
         logger.info(input)
-    embed_vector = embeddings.get_text_embedding(input.text)
+    embed_vector = await embeddings.aget_query_embedding(input.text)
     res = EmbedDoc(text=input.text, embedding=embed_vector)
     if logflag:
         logger.info(res)

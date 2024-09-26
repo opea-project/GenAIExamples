@@ -29,10 +29,10 @@ logflag = os.getenv("LOGFLAG", False)
     output_datatype=EmbedDoc,
 )
 @opea_telemetry
-def embedding(input: TextDoc) -> EmbedDoc:
+async def embedding(input: TextDoc) -> EmbedDoc:
     if logflag:
         logger.info(input)
-    embed_vector = embeddings.embed_query(input.text)
+    embed_vector = await embeddings.aembed_query(input.text)
     res = EmbedDoc(text=input.text, embedding=embed_vector)
     if logflag:
         logger.info(res)

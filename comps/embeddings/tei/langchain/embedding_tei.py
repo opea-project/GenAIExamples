@@ -36,17 +36,17 @@ logflag = os.getenv("LOGFLAG", False)
     port=6000,
 )
 @register_statistics(names=["opea_service@embedding_tei_langchain"])
-def embedding(
+async def embedding(
     input: Union[TextDoc, EmbeddingRequest, ChatCompletionRequest]
 ) -> Union[EmbedDoc, EmbeddingResponse, ChatCompletionRequest]:
     start = time.time()
     if logflag:
         logger.info(input)
     if isinstance(input, TextDoc):
-        embed_vector = embeddings.embed_query(input.text)
+        embed_vector = await embeddings.aembed_query(input.text)
         res = EmbedDoc(text=input.text, embedding=embed_vector)
     else:
-        embed_vector = embeddings.embed_query(input.input)
+        embed_vector = await embeddings.aembed_query(input.input)
         if input.dimensions is not None:
             embed_vector = embed_vector[: input.dimensions]
 

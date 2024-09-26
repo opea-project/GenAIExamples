@@ -16,8 +16,8 @@ from comps import EmbedDoc768, ServiceType, TextDoc, opea_microservices, opea_te
     output_datatype=EmbedDoc768,
 )
 @opea_telemetry
-def embedding(input: TextDoc) -> EmbedDoc768:
-    embed_vector = embeddings.embed_query(input.text)
+async def embedding(input: TextDoc) -> EmbedDoc768:
+    embed_vector = await embeddings.aembed_query(input.text)
     res = EmbedDoc768(text=input.text, embedding=embed_vector)
     return res
 
