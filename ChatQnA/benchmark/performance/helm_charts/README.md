@@ -29,8 +29,8 @@ Notes: The provided [BKC manifests](https://github.com/opea-project/GenAIExample
 
 There are two yaml configs you can specify.
 
-* customize.yaml
-This file can specify image names, the number of replicas and CPU cores to mange your pods.
+- customize.yaml
+  This file can specify image names, the number of replicas and CPU cores to manage your pods.
 
-* values.yaml
-This file contains the default microservice configurations for ChatQnA. Please review and understand each parameter before making any changes.
+- values.yaml
+  This file contains the default microservice configurations for ChatQnA. Please review and understand each parameter before making any changes.
