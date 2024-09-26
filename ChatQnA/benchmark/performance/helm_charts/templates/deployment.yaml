@@ -11,7 +11,7 @@ metadata:
   name: {{ $deployment.name }}
   namespace: default
 spec:
-  replicas: {{ $deployment.spec.replicas }}
+  replicas: {{ $podSpec.spec.replicas }}
   selector:
     matchLabels:
       app: {{ $deployment.name }}

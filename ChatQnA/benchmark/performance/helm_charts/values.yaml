@@ -90,9 +90,6 @@ deployments:
 
   - name: llm-dependency-deploy
     spec:
-      image_name: ghcr.io/huggingface/tgi-gaudi
-      image_tag: 2.0.4
-      replicas: 7
       ports:
         - containerPort: 80
       resources:
