@@ -19,13 +19,13 @@ def llm_generate(input: TextDoc):
     input_text = input.text
     toxic = toxicity_pipeline(input_text)
     print("done")
-    if toxic[0]["label"] == "toxic":
+    if toxic[0]["label"].lower() == "toxic":
         return TextDoc(text="Violated policies: toxicity, please check your input.", downstream_black_list=[".*"])
     else:
         return TextDoc(text=input_text)
 
 
 if __name__ == "__main__":
-    model = "citizenlab/distilbert-base-multilingual-cased-toxicity"
+    model = "Intel/toxic-prompt-roberta"
     toxicity_pipeline = pipeline("text-classification", model=model, tokenizer=model)
     opea_microservices["opea_service@toxicity_detection"].start()

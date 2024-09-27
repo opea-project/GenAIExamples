@@ -4,11 +4,9 @@
 
 Toxicity Detection Microservice allows AI Application developers to safeguard user input and LLM output from harmful language in a RAG environment. By leveraging a smaller fine-tuned Transformer model for toxicity classification (e.g. DistilledBERT, RoBERTa, etc.), we maintain a lightweight guardrails microservice without significantly sacrificing performance making it readily deployable on both Intel Gaudi and Xeon.
 
+This microservice uses [`Intel/toxic-prompt-roberta`](https://huggingface.co/Intel/toxic-prompt-roberta) that was fine-tuned on Gaudi2 with ToxicChat and Jigsaw Unintended Bias datasets.
+
 Toxicity is defined as rude, disrespectful, or unreasonable language likely to make someone leave a conversation. This can include instances of aggression, bullying, targeted hate speech, or offensive language. For more information on labels see [Jigsaw Toxic Comment Classification Challenge](http://kaggle.com/c/jigsaw-toxic-comment-classification-challenge).
-
-## Future Development
-
-- Add a RoBERTa (125M params) toxicity model fine-tuned on Gaudi2 with ToxicChat and Jigsaw dataset in an optimized serving framework.
 
 ## 🚀1. Start Microservice with Python（Option 1）
 
@@ -65,7 +63,7 @@ curl localhost:9091/v1/toxicity
 Example Output:
 
 ```bash
-"\nI'm sorry, but your query or LLM's response is TOXIC with an score of 0.97 (0-1)!!!\n"
+"Violated policies: toxicity, please check your input."
 ```
 
 **Python Script:**
