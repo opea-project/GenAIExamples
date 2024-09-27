@@ -20,6 +20,7 @@ prometheus-fastapi-instrumentator
 psycopg2-binary
 pymupdf
 pyspark
+pytesseract
 python-docx
 python-multipart
 python-pptx
@@ -28,4 +29,3 @@ shortuuid
 tiktoken
 unstructured[all-docs]==0.15.7
 uvicorn
-

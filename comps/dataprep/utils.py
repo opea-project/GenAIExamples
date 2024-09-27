@@ -16,22 +16,23 @@ import tempfile
 import timeit
 import unicodedata
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Dict, List, Union
 from urllib.parse import urlparse, urlunparse
 
 import cairosvg
+import cv2
 import docx
 import docx2txt
-import easyocr
 import fitz
 import numpy as np
 import pandas as pd
 import pptx
+import pytesseract
 import requests
 import yaml
 from bs4 import BeautifulSoup
-from docx import Document as DDocument
 from langchain import LLMChain, PromptTemplate
 from langchain_community.document_loaders import (
     UnstructuredHTMLLoader,
@@ -40,7 +41,6 @@ from langchain_community.document_loaders import (
     UnstructuredXMLLoader,
 )
 from langchain_community.llms import HuggingFaceEndpoint
-from PIL import Image
 
 from comps import CustomLogger
 
@@ -112,36 +112,40 @@ def get_separators():
     return separators
 
 
-def load_pdf(pdf_path):
-    """Load the pdf file."""
-    doc = fitz.open(pdf_path)
-    reader = easyocr.Reader(["en"], gpu=False)
-    result = ""
-    for i in range(doc.page_count):
-        page = doc.load_page(i)
-        pagetext = page.get_text().strip()
-        if pagetext:
-            if pagetext.endswith("!") or pagetext.endswith("?") or pagetext.endswith("."):
-                result = result + pagetext
-            else:
-                result = result + pagetext + "."
-        if len(doc.get_page_images(i)) > 0:
-            for img in doc.get_page_images(i):
-                if img:
-                    pageimg = ""
-                    xref = img[0]
-                    img_data = doc.extract_image(xref)
-                    img_bytes = img_data["image"]
-                    pil_image = Image.open(io.BytesIO(img_bytes))
-                    img = np.array(pil_image)
-                    img_result = reader.readtext(img, paragraph=True, detail=0)
-                    pageimg = pageimg + ", ".join(img_result).strip()
-                    if pageimg.endswith("!") or pageimg.endswith("?") or pageimg.endswith("."):
-                        pass
-                    else:
-                        pageimg = pageimg + "."
-                result = result + pageimg
+def process_page(doc, idx):
+    page = doc.load_page(idx)
+    pagetext = page.get_text().strip()
+    result = pagetext if pagetext.endswith(("!", "?", ".")) else pagetext + "."
+
+    page_images = doc.get_page_images(idx)
+    if page_images:
+        for img_index, img in enumerate(page_images):
+            xref = img[0]
+            img_data = doc.extract_image(xref)
+            img_bytes = img_data["image"]
+
+            # process images
+            img_array = cv2.imdecode(np.frombuffer(img_bytes, np.uint8), cv2.IMREAD_COLOR)
+            img_result = pytesseract.image_to_string(img_array, lang="eng", config="--psm 6")
+
+            # add results
+            pageimg = img_result.strip()
+            pageimg += "" if pageimg.endswith(("!", "?", ".")) else "."
+            result += pageimg
     return result
+
+
+def load_pdf(pdf_path):
+    doc = fitz.open(pdf_path)
+    results = []
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = [executor.submit(process_page, doc, i) for i in range(doc.page_count)]
+        for future in as_completed(futures):
+            results.append(future.result())
+
+    combined_result = "".join(results)
+    return combined_result
 
 
 def load_html(html_path):

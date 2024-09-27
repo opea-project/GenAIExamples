@@ -20,6 +20,7 @@ Pillow
 prometheus-fastapi-instrumentator
 pymupdf
 pyspark
+pytesseract
 python-docx
 python-pptx
 sentence_transformers

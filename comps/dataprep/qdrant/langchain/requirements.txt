@@ -18,6 +18,7 @@ pandas
 Pillow
 prometheus-fastapi-instrumentator
 pymupdf
+pytesseract
 python-docx
 python-pptx
 qdrant-client

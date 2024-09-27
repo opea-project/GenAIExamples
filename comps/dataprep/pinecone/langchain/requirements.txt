@@ -21,6 +21,7 @@ pinecone-client
 prometheus-fastapi-instrumentator
 pymupdf
 pyspark
+pytesseract
 python-bidi==0.4.2
 python-docx
 python-pptx

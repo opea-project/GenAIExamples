@@ -10,6 +10,7 @@ opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
 prometheus-fastapi-instrumentator
+pytesseract
 python-bidi==0.4.2
 python-multipart
 redis

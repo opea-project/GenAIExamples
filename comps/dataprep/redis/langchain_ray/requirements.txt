@@ -16,6 +16,7 @@ Pillow
 prometheus-fastapi-instrumentator
 pyarrow
 pymupdf
+pytesseract
 python-bidi==0.4.2
 python-docx
 python-multipart
