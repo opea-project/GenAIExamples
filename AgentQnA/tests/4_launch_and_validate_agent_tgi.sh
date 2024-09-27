@@ -74,7 +74,7 @@ function main() {
     echo "==================== Start TGI ===================="
     start_tgi
     echo "==================== TGI started ===================="
-    
+
     echo "==================== Start agent ===================="
     start_agent_and_api_server
     echo "==================== Agent started ===================="
