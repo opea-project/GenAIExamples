@@ -17,6 +17,12 @@ if [ ! -d "$HF_CACHE_DIR" ]; then
 fi
 ls $HF_CACHE_DIR
 
+function start_tgi(){
+    echo "Starting tgi-gaudi server"
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
+    bash launch_tgi_gaudi.sh
+
+}
 
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
@@ -25,6 +31,7 @@ function start_agent_and_api_server() {
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
     bash launch_agent_service_tgi_gaudi.sh
+    sleep 10
 }
 
 function validate() {
@@ -64,6 +71,10 @@ function validate_agent_service() {
 }
 
 function main() {
+    echo "==================== Start TGI ===================="
+    start_tgi
+    echo "==================== TGI started ===================="
+    
     echo "==================== Start agent ===================="
     start_agent_and_api_server
     echo "==================== Agent started ===================="

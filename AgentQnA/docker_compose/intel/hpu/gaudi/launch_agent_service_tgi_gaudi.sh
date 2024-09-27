@@ -15,7 +15,7 @@ export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-70B-Instruct"
 export NUM_SHARDS=4
 export LLM_ENDPOINT_URL="http://${ip_address}:8085"
 export temperature=0.01
-export max_new_tokens=512
+export max_new_tokens=4096
 
 # agent related environment variables
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
@@ -27,17 +27,3 @@ export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
 export CRAG_SERVER=http://${ip_address}:8080
 
 docker compose -f compose.yaml up -d
-
-sleep 5s
-echo "Waiting tgi gaudi ready"
-n=0
-until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
-    docker logs tgi-server &> tgi-gaudi-service.log
-    n=$((n+1))
-    if grep -q Connected tgi-gaudi-service.log; then
-        break
-    fi
-    sleep 5s
-done
-sleep 5s
-echo "Service started successfully"
