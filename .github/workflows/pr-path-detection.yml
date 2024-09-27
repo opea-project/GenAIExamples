@@ -126,12 +126,17 @@ jobs:
               png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
 
               if [[ "${png_path:0:1}" == "/" ]]; then
-                check_path=${{github.workspace}}$png_path
-              elif [[ "${png_path:0:1}" == "#" ]]; then
-                check_path=${{github.workspace}}/$refer_path
-                # $png_path
+                check_path=$png_path
+              elif [[ "$png_path" == *#* ]]; then
+                relative_path=$(echo "$png_path" | cut -d '#' -f1)
+                if [ -n "$relative_path" ]; then
+                  check_path=$(dirname "$refer_path")/$relative_path
+                  png_path=$(echo "$png_path" | awk -F'#' '{print "#" $2}')
+                else
+                  check_path=$refer_path
+                fi
               else
-                check_path=${{github.workspace}}/$(dirname "$refer_path")/$png_path
+                check_path=$(dirname "$refer_path")/$png_path
               fi
 
               if [ -e "$check_path" ]; then
