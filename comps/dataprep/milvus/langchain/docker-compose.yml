@@ -1,7 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3"
+version: '3.5'
+
 services:
   etcd:
     container_name: milvus-etcd
@@ -40,16 +41,16 @@ services:
 
   standalone:
     container_name: milvus-standalone
-    image: milvusdb/milvus:v2.4.6
+    image: milvusdb/milvus:v2.4.9
     command: ["milvus", "run", "standalone"]
     security_opt:
-      - seccomp:unconfined
+    - seccomp:unconfined
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
     volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/milvus.yaml:/milvus/configs/milvus.yaml
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvus:/var/lib/milvus
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/milvus.yaml:/milvus/configs/milvus.yaml
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
       interval: 30s
@@ -63,31 +64,6 @@ services:
       - "etcd"
       - "minio"
 
-  mosec-embedding:
-    image: opea/embedding-mosec-endpoint:latest
-    container_name: embedding-mosec-server
-    ports:
-      - "6009:8000"
-    ipc: host
-    environment:
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-    restart: unless-stopped
-
-  dataprep-milvus:
-    image: opea/dataprep-milvus:latest
-    container_name: dataprep-milvus-server
-    ports:
-      - "6010:6010"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      MOSEC_EMBEDDING_ENDPOINT: ${MOSEC_EMBEDDING_ENDPOINT}
-      MILVUS: ${MILVUS}
-    restart: unless-stopped
-
 networks:
   default:
-    driver: bridge
+    name: milvus
