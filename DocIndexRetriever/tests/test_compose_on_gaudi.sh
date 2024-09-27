@@ -64,7 +64,7 @@ function validate() {
 }
 
 function validate_megaservice() {
-    echo "Testing DataPrep Service"
+    echo "=========Ingest data=================="
     local CONTENT=$(curl -X POST "http://${ip_address}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]')
@@ -78,10 +78,25 @@ function validate_megaservice() {
     fi
 
     # Curl the Mega Service
-    echo "Testing retriever service"
+    echo "==============Testing retriever service: Text Request================="
     local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "text": "Explain the OPEA project?"
     }')
+    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")
+    echo "$EXIT_CODE"
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    echo "return value is $EXIT_CODE"
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs tei-embedding-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        exit 1
+    fi
+
+    echo "==============Testing retriever service: ChatCompletion Request================"
+    cd $WORKPATH/tests
+    local CONTENT=$(python test.py --host_ip ${ip_address} --request_type chat_completion)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
