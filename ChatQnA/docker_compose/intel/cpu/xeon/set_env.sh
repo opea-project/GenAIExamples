@@ -10,6 +10,7 @@ export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
 export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
+export vLLM_LLM_ENDPOINT="http://${host_ip}:9009"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export REDIS_HOST=${host_ip}
