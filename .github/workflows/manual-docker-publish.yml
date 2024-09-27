@@ -7,7 +7,7 @@ on:
     inputs:
       services:
         default: ""
-        description: "List of services to test [agent,asr,chathistory,dataprep,embeddings,guardrails,llms,lvms,nginx,prompt_registry,ragas,reranks,retrievers,tts,vectorstores,web_retrievers]"
+        description: "List of services to test [agent,asr,chathistory,dataprep,embeddings,feedback_management,finetuning,guardrails,intent_detection,knowledgegraphs,llms,lvms,nginx,prompt_registry,ragas,reranks,retrievers,tts,vectorstores,web_retrievers]"
         required: false
         type: string
       images:
@@ -16,13 +16,18 @@ on:
         required: false
         type: string
       tag:
-        default: "v0.9"
+        default: "rc"
         description: "Tag to publish"
         required: true
         type: string
       publish_tags:
-        default: "latest,v0.9"
+        default: "latest,1.x"
         description: "Tag list apply to publish images"
+        required: false
+        type: string
+      mode:
+        default: "CD"
+        description: "Whether the test range is CI or CD"
         required: false
         type: string
 

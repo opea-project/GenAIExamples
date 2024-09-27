@@ -1,4 +1,4 @@
-git+https://github.com/bigcode-project/bigcode-evaluation-harness.git@a1b4a7949a24c8e3ef0d05a01097b2d14ffba56e
-git+https://github.com/opea-project/GenAIEval.git
-lm-eval==0.4.2
+bigcode-eval@git+https://github.com/bigcode-project/bigcode-evaluation-harness.git
+lm-eval==0.4.3
+opea-eval
 pydantic==2.7.2

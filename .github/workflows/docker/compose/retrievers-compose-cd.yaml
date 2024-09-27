@@ -6,7 +6,7 @@ services:
   retriever-pgvector:
     build:
       dockerfile: comps/retrievers/pgvector/langchain/Dockerfile
-    image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever-pgvector:${TAG:-latest}
   retriever-pinecone:
     build:
       dockerfile: comps/retrievers/pinecone/langchain/Dockerfile

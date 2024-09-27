@@ -29,7 +29,7 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 
 USER root
 
-RUN mkdir -p /home/user/comps/dataprep/qdrant/langchain/uploaded_files && chown -R user /home/user/comps/dataprep/neo4j/langchain/uploaded_files
+RUN mkdir -p /home/user/comps/dataprep/neo4j/langchain/uploaded_files && chown -R user /home/user/comps/dataprep/neo4j/langchain/uploaded_files
 
 USER user
 

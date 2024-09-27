@@ -65,6 +65,7 @@ jobs:
           cd ${{ github.workspace }}
           if [[ $(grep -c "vllm-openvino:" ${docker_compose_yml}) != 0 ]]; then
               git clone https://github.com/vllm-project/vllm.git vllm-openvino
+              cd ./vllm-openvino && git checkout v0.6.1 && cd ../
           fi
 
       - name: Build Image

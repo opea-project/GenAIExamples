@@ -7,7 +7,7 @@ on:
     inputs:
       services:
         default: "asr"
-        description: "List of services to test [agent,asr,chathistory,dataprep,embeddings,guardrails,llms,lvms,nginx,prompt_registry,reranks,retrievers,tts,web_retrievers]"
+        description: "List of services to test [agent,asr,chathistory,dataprep,embeddings,feedback_management,finetuning,guardrails,intent_detection,knowledgegraphs,llms,lvms,nginx,prompt_registry,ragas,reranks,retrievers,tts,vectorstores,web_retrievers]"
         required: true
         type: string
       build:
@@ -21,7 +21,7 @@ on:
         required: false
         type: boolean
       tag:
-        default: "comps"
+        default: "rc"
         description: "Tag to apply to images"
         required: true
         type: string
