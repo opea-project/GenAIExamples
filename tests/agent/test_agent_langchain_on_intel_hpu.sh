@@ -8,7 +8,7 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 tgi_port=8085
-tgi_volume=$WORKPATH/data #/data2/cache/hub/Meta-Llama-3.1-70B-Instruct #$HF_CACHE_DIR #
+tgi_volume=$WORKPATH/data
 
 export agent_image="opea/agent-langchain:comps"
 export agent_container_name="test-comps-agent-endpoint"
@@ -39,10 +39,9 @@ function build_docker_images() {
 }
 
 function start_tgi_service() {
-    # redis endpoint
     echo "token is ${HF_TOKEN}"
 
-    #single card
+    #multi cards
     echo "start tgi gaudi service"
     docker run -d --runtime=habana --name "test-comps-tgi-gaudi-service" -p $tgi_port:80 -v $tgi_volume:/data -e HF_TOKEN=$HF_TOKEN -e HABANA_VISIBLE_DEVICES=0,1,2,3 -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.5 --model-id $model --max-input-tokens 4096 --max-total-tokens 8192 --sharded true --num-shard 4
     sleep 5s
@@ -62,7 +61,6 @@ function start_tgi_service() {
 
 function start_react_langchain_agent_service() {
     echo "Starting react_langchain agent microservice"
-    # docker run -d --runtime=runc --name="test-comps-agent-endpoint" -v $WORKPATH/comps/agent/langchain/tools:/home/user/comps/agent/langchain/tools -p 9095:9095 --ipc=host -e port=9095 -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e strategy=react_langchain -e llm_endpoint_url=http://${ip_address}:${tgi_port} -e llm_engine=tgi -e recursion_limit=10 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/agent-langchain:comps
     docker compose -f $WORKPATH/tests/agent/react_langchain.yaml up -d
     sleep 5s
     docker logs test-comps-agent-endpoint
@@ -72,7 +70,6 @@ function start_react_langchain_agent_service() {
 
 function start_react_langgraph_agent_service() {
     echo "Starting react_langgraph agent microservice"
-    # docker run -d --runtime=runc --name="test-comps-agent-endpoint" -v $WORKPATH/comps/agent/langchain/tools:/home/user/comps/agent/langchain/tools -p 9095:9095 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e strategy=react_llama -e llm_endpoint_url=http://${ip_address}:${tgi_port} -e llm_engine=tgi -e recursion_limit=10 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/agent-langchain:comps
     docker compose -f $WORKPATH/tests/agent/reactllama.yaml up -d
     sleep 5s
     docker logs test-comps-agent-endpoint
@@ -90,7 +87,6 @@ function start_react_langgraph_agent_service_openai() {
 
 function start_ragagent_agent_service() {
     echo "Starting rag agent microservice"
-    # docker run -d --runtime=runc --name="test-comps-agent-endpoint" -v $WORKPATH/comps/agent/langchain/tools:/home/user/comps/agent/langchain/tools -p 9095:9095 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e strategy=rag_agent_llama -e llm_endpoint_url=http://${ip_address}:${tgi_port} -e llm_engine=tgi -e recursion_limit=10 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/agent-langchain:comps
     docker compose -f $WORKPATH/tests/agent/ragagent.yaml up -d
     sleep 5s
     docker logs test-comps-agent-endpoint

@@ -7,11 +7,9 @@ import os
 import sys
 
 import yaml
-
-# from pydantic import create_model, Field
-from langchain.pydantic_v1 import BaseModel, Field, create_model
 from langchain.tools import BaseTool, StructuredTool
 from langchain_community.agent_toolkits.load_tools import load_tools
+from pydantic import BaseModel, Field, create_model
 
 
 def generate_request_function(url):

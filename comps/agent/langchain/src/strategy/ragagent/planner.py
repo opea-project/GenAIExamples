@@ -8,13 +8,13 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMe
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.output_parsers.openai_tools import PydanticToolsParser
 from langchain_core.prompts import PromptTemplate
-from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
+from pydantic import BaseModel, Field
 
 from ..base_agent import BaseAgent
 from .prompt import DOC_GRADER_PROMPT, RAG_PROMPT, QueryWriterLlamaPrompt
@@ -366,7 +366,7 @@ class DocumentGraderLlama:
         print("@@@@ Score: ", score)
 
         # if score.startswith("yes"):
-        if "yes" in score:
+        if "yes" in score.lower():
             print("---DECISION: DOCS RELEVANT---")
             return {"doc_score": "generate"}
 
