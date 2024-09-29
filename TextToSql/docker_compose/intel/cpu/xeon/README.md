@@ -1,4 +1,4 @@
-# Build Mega Service of FAQ Generation on Intel Xeon Processor
+# Build Mega Service of Text to Sql Generation on Intel Xeon Processor
 
 This document outlines the deployment process for a Text to SQL Generation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
 
@@ -71,6 +71,13 @@ Note: Please replace with `your_ip` with your external IP address, do not use lo
 
 ### 2.2 Start Microservice Docker Containers
 
+```bash
+cd GenAIExamples/TextToSql/docker_compose/intel/cpu/xeon
+docker compose up -d
+```
+
+Alternatively we can run individual docker services
+
 2.2.1 Start PostgresDB Service
 
 We will use [Chinook](https://github.com/lerocha/chinook-database) sample database as a default to test the Text-to-SQL microservice. Chinook database is a sample database ideal for demos and testing ORM tools targeting single and multiple database servers.
@@ -100,7 +107,7 @@ docker run -d --name="test-texttosql-react-ui-server" --ipc=host -p 5174:80 -e n
 ```
 
 
-### Validate Microservices
+## 🚀 Validate Microservices
 
 3.1 TGI Service
 
@@ -144,8 +151,6 @@ Command to run the test
 ```bash
 npm run test
 ```
-
-
 
 ## 🚀 Launch the React UI
 
