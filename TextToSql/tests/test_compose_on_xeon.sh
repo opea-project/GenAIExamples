@@ -9,6 +9,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address="10.223.24.242"
 tgi_port=8080
 tgi_volume=$WORKPATH/data
+HUGGINGFACEHUB_API_TOKEN=$1
 
 export model="mistralai/Mistral-7B-Instruct-v0.3"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -19,11 +20,14 @@ export POSTGRES_DB=chinook
 function build_docker_images() {
     echo $WORKPATH
     OPEAPATH=$(realpath "$WORKPATH/../..")
-    cd $OPEAPATH
-    # git clone --branch texttosql https://github.com/yogeshmpandey/GenAIComps.git
-    cd GenAIComps
-    echo $PWD
+
+    echo "Building Text to Sql service..."
+    cd $OPEAPATH/GenAIComps
     docker build --no-cache -t opea/texttosql:comps -f comps/texttosql/langchain/Dockerfile .
+
+    cd $OPEAPATH/GenAIExamples/TextToSql/ui
+    docker build --no-cache -t opea/texttosql-react-ui:latest -f docker/Dockerfile.react .
+
 }
 
 function start_service() {
@@ -48,6 +52,10 @@ function start_service() {
         sleep 5s
     done
     sleep 5s
+
+    # Run the UI container
+    docker run -d --name="test-texttosql-react-ui-server" --ipc=host -p 5174:80 -e no_proxy=$no_proxy -e https_proxy=$https_proxy -e http_proxy=$http_proxy opea/texttosql-react-ui:latest
+
 }
 
 function validate_microservice() {
