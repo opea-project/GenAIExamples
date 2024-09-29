@@ -24,7 +24,8 @@ function build_docker_images() {
     echo "Building Text to Sql service..."
     cd $OPEAPATH/GenAIComps
     docker build --no-cache -t opea/texttosql:comps -f comps/texttosql/langchain/Dockerfile .
-
+    
+    echo "Building React UI service..."
     cd $OPEAPATH/GenAIExamples/TextToSql/ui
     docker build --no-cache -t opea/texttosql-react-ui:latest -f docker/Dockerfile.react .
 

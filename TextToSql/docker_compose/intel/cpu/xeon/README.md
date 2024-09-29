@@ -1,0 +1,161 @@
+# Build Mega Service of FAQ Generation on Intel Xeon Processor
+
+This document outlines the deployment process for a Text to SQL Generation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
+
+## 🚀 Apply Intel Xeon Server on AWS
+
+To apply a Intel Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
+
+For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
+
+After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
+
+## 🚀 Build Docker Images
+
+First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
+
+### 1.1 Build Text to SQL service Image
+
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+docker build --no-cache -t opea/texttosql:comps -f comps/texttosql/langchain/Dockerfile .
+
+```
+
+### 1.2 Build react UI Docker Image
+
+Build the frontend Docker image based on react framework via below command:
+
+```bash
+cd GenAIExamples/TextToSql/ui
+docker build --no-cache -t opea/texttosql-react-ui:latest -f docker/Dockerfile.react .
+
+```
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+1. `opea/texttosql:comps`
+2. `opea/texttosql-react-ui:latest`
+
+## 🚀 Start Microservices 
+
+### Required Models
+
+We set default model as "mistralai/Mistral-7B-Instruct-v0.3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
+
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+
+### 2.1 Setup Environment Variables
+
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+
+```bash
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+export no_proxy=${your_no_proxy}
+
+# If you are in a proxy environment, also set the proxy-related environment variables:
+export http_proxy=${your_http_proxy}
+export https_proxy=${your_http_proxy}
+
+# Set other required variables
+export TGI_LLM_ENDPOINT=http://${your_ip}:${TGI_PORT}
+export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=testpwd
+export POSTGRES_DB=chinook
+```
+
+Note: Please replace with `your_ip` with your external IP address, do not use localhost.
+
+### 2.2 Start Microservice Docker Containers
+
+2.2.1 Start PostgresDB Service
+
+We will use [Chinook](https://github.com/lerocha/chinook-database) sample database as a default to test the Text-to-SQL microservice. Chinook database is a sample database ideal for demos and testing ORM tools targeting single and multiple database servers.
+
+```bash
+
+docker run --name test-texttosql-postgres --ipc=host -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=${POSTGRES_DB} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -p 5442:5432 -d -v $WORKPATH/comps/texttosql/langchain/chinook.sql:/docker-entrypoint-initdb.d/chinook.sql postgres:latest
+```
+2.2.2 Start TGI Service
+
+```bash
+
+docker run -d --name="test-texttosql-tgi-endpoint" --ipc=host -p $tgi_port:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model
+```
+
+```bash
+texttosql_port=9090
+unset http_proxy
+
+docker run -d --name="test-texttosql-server" --ipc=host -p ${texttosql_port}:8090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT opea/texttosql:comps
+```
+
+2.2.3 Start React UI service
+
+```bash
+docker run -d --name="test-texttosql-react-ui-server" --ipc=host -p 5174:80 -e no_proxy=$no_proxy -e https_proxy=$https_proxy -e http_proxy=$http_proxy opea/texttosql-react-ui:latest
+```
+
+
+### Validate Microservices
+
+3.1 TGI Service
+
+```bash
+
+export your_ip=$(hostname -I | awk '{print $1}')
+curl http://${your_ip}:${TGI_PORT}/generate \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+    -H 'Content-Type: application/json'
+```
+
+3.2 Postgres Microservice
+
+ Once Text-to-SQL microservice is started, user can use below command
+
+3.2.1 Test the Database connection
+
+```bash
+curl --location http://${your_ip}:9090/v1/postgres/health \
+    --header 'Content-Type: application/json' \
+    --data '{"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${your_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}'
+```
+
+3.2.2 Invoke the microservice.
+
+```bash
+curl http://${your_ip}:9090/v1/texttosql\
+    -X POST \
+    -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${your_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}}' \
+    -H 'Content-Type: application/json'
+```
+3.3 Frontend validation 
+
+We test the API in frontend validation to check if API returns HTTP_STATUS: 200 and validates if API response returns SQL query and output
+
+The test is present in App.test.tsx under react root folder ui/react/
+
+Command to run the test
+
+```bash
+npm run test
+```
+
+
+
+## 🚀 Launch the React UI
+
+Open this URL `http://{your_ip}:5174` in your browser to access the frontend.
+
+![project-screenshot](../../../../assets/img/textToSql_ui_init.png)
+
+Test DB Connection
+  ![project-screenshot](../../../../assets/img/textToSql_ui_successful_db_connection.png)
+
+Create SQL query and output for given NLP question
+  ![project-screenshot](../../../../assets/img/textToSql_ui_succesful_sql_output_generation.png)
+
