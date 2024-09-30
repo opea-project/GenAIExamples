@@ -130,7 +130,6 @@ services:
     depends_on:
       - redis-vector-db
       - tgi-guardrails-service
-      - guardrails
       - tei-embedding-service
       - retriever
       - tei-reranking-service

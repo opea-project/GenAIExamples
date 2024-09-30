@@ -8,7 +8,6 @@ FROM python:3.11-slim
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
     libjemalloc-dev \
-    vim \
     git
 
 RUN useradd -m -s /bin/bash user && \
@@ -30,5 +29,7 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 USER user
 
 WORKDIR /home/user
+
+RUN echo 'ulimit -S -n 999999' >> ~/.bashrc
 
 ENTRYPOINT ["python", "chatqna.py"]
