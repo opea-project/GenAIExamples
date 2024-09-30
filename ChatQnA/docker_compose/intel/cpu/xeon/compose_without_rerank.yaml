@@ -38,20 +38,6 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
-  embedding:
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-    container_name: embedding-tei-server
-    depends_on:
-      - tei-embedding-service
-    ports:
-      - "6000:6000"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-    restart: unless-stopped
   retriever:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     container_name: retriever-redis-server
@@ -85,34 +71,15 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
-  llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-server
-    depends_on:
-      - tgi-service
-    ports:
-      - "9000:9000"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-    restart: unless-stopped
   chaqna-xeon-backend-server:
     image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
       - tei-embedding-service
-      - embedding
       - dataprep-redis-service
       - retriever
       - tgi-service
-      - llm
     ports:
       - "8888:8888"
     environment:

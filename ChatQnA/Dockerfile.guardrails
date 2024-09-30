@@ -31,4 +31,4 @@ WORKDIR /home/user
 
 RUN echo 'ulimit -S -n 999999' >> ~/.bashrc
 
-ENTRYPOINT ["python", "chatqna_guardrails.py"]
+ENTRYPOINT ["python", "chatqna.py", "--with-guardrails"]
