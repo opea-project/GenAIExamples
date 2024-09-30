@@ -51,6 +51,9 @@ If use gated models, you also need to provide [huggingface token](https://huggin
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
+# your_ip should be your external IP address, do not use localhost.
+export your_ip=$(hostname -I | awk '{print $1}')
+
 # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 export no_proxy=${your_no_proxy}
 
@@ -65,20 +68,28 @@ export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=testpwd
 export POSTGRES_DB=chinook
+export texttosql_port=9090
 ```
 
 Note: Please replace with `your_ip` with your external IP address, do not use localhost.
 
 ### 2.2 Start Microservice Docker Containers
 
+There are 2 options to start the microservice
+
+2.2.1 Start the microservice using docker compose
 ```bash
 cd GenAIExamples/TextToSql/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
-Alternatively we can run individual docker services
+2.2.2 Alternatively we can start the microservices by running individual docker services
 
-2.2.1 Start PostgresDB Service
+**NOTE:**  Make sure all the individual docker services are down before starting them. 
+
+Below are the commands to start each of the docker service individually
+
+- Start PostgresDB Service
 
 We will use [Chinook](https://github.com/lerocha/chinook-database) sample database as a default to test the Text-to-SQL microservice. Chinook database is a sample database ideal for demos and testing ORM tools targeting single and multiple database servers.
 
@@ -86,7 +97,7 @@ We will use [Chinook](https://github.com/lerocha/chinook-database) sample databa
 
 docker run --name test-texttosql-postgres --ipc=host -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=${POSTGRES_DB} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -p 5442:5432 -d -v $WORKPATH/comps/texttosql/langchain/chinook.sql:/docker-entrypoint-initdb.d/chinook.sql postgres:latest
 ```
-2.2.2 Start TGI Service
+- Start TGI Service
 
 ```bash
 
@@ -94,13 +105,12 @@ docker run -d --name="test-texttosql-tgi-endpoint" --ipc=host -p $tgi_port:80 -v
 ```
 
 ```bash
-texttosql_port=9090
 unset http_proxy
 
 docker run -d --name="test-texttosql-server" --ipc=host -p ${texttosql_port}:8090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT opea/texttosql:comps
 ```
 
-2.2.3 Start React UI service
+- Start React UI service
 
 ```bash
 docker run -d --name="test-texttosql-react-ui-server" --ipc=host -p 5174:80 -e no_proxy=$no_proxy -e https_proxy=$https_proxy -e http_proxy=$http_proxy opea/texttosql-react-ui:latest
@@ -113,7 +123,6 @@ docker run -d --name="test-texttosql-react-ui-server" --ipc=host -p 5174:80 -e n
 
 ```bash
 
-export your_ip=$(hostname -I | awk '{print $1}')
 curl http://${your_ip}:${TGI_PORT}/generate \
     -X POST \
     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \

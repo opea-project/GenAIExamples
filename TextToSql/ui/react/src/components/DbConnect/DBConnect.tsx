@@ -9,7 +9,7 @@ const DBConnect: React.FC = () => {
   const [formData, setFormData] = useState({
     user: 'postgres',
     database: 'chinook',
-    host: '10.223.24.242',
+    host: '10.223.24.113',
     password: 'testpwd',
     port: '5442',
   });
