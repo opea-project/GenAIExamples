@@ -11,23 +11,23 @@ on:
         required: true
         type: string
       examples:
-        default: "Translation"
-        description: 'List of examples to publish [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        default: ""
+        description: 'List of examples to publish [AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA]'
         required: false
         type: string
       images:
-        default: "gmcmanager,gmcrouter"
-        description: 'List of images to publish [gmcmanager,gmcrouter, ...]'
+        default: ""
+        description: 'List of images to publish [gmcmanager,gmcrouter]'
         required: false
         type: string
       tag:
-        default: "v0.9"
-        description: "Tag to publish"
+        default: "rc"
+        description: "Tag to publish, like [1.0rc]"
         required: true
         type: string
       publish_tags:
-        default: "latest,v0.9"
-        description: 'Tag list apply to publish images'
+        default: "latest,1.x"
+        description: "Tag list apply to publish images, like [latest,1.0]"
         required: false
         type: string
 

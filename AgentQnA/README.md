@@ -103,4 +103,4 @@ curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: app
 
 ## How to register your own tools with agent
 
-You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/langchain#5-customize-agent-strategy).
+You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/langchain/README.md#5-customize-agent-strategy).
