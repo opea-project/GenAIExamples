@@ -37,7 +37,10 @@ function start_services() {
     export INDEX_NAME="rag-qdrant"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
+    export RERANK_SERVER_HOST_IP=${ip_address}
+    export LLM_SERVER_HOST_IP=${ip_address}
     export MEGA_SERVICE_PORT=8912
     export EMBEDDING_SERVER_PORT=6040
     export RETRIEVER_SERVICE_PORT=6045

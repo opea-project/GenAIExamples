@@ -104,14 +104,6 @@ function validate_microservices() {
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
-    # embedding microservice
-    validate_services \
-        "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":\[' \
-        "embedding" \
-        "embedding-tei-server" \
-        '{"text":"What is Deep Learning?"}'
-
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
@@ -131,14 +123,6 @@ function validate_microservices() {
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # rerank microservice
-    validate_services \
-        "${ip_address}:8000/v1/reranking" \
-        "Deep learning is..." \
-        "rerank" \
-        "reranking-tei-xeon-server" \
-        '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}'
-
     # vllm for llm service
     validate_services \
         "${ip_address}:9009/v1/completions" \
@@ -146,15 +130,6 @@ function validate_microservices() {
         "vllm-llm" \
         "vllm-service" \
         '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
-
-    # llm microservice
-    validate_services \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm" \
-        "llm-vllm-server" \
-        '{"query":"What is Deep Learning?"}'
-
 }
 
 function validate_megaservice() {
