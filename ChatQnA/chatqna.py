@@ -313,6 +313,7 @@ class ChatQnAService:
         # self.megaservice.flow_to(llm, guardrail_out)
         self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--without-rerank", action="store_true")
