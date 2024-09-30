@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt && \
     pip install --no-cache-dir langchain_core
 
-COPY ./chatqna_no_wrapper.py /home/user/chatqna_no_wrapper.py
+COPY ./chatqna.py /home/user/chatqna.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
@@ -31,4 +31,4 @@ USER user
 
 WORKDIR /home/user
 
-ENTRYPOINT ["python", "chatqna_no_wrapper.py"]
+ENTRYPOINT ["python", "chatqna.py"]
