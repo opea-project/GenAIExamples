@@ -102,7 +102,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096
   chaqna-gaudi-backend-server:
-    image: ${REGISTRY:-opea}/chatqna-no-wrapper:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-gaudi-backend-server
     depends_on:
       - redis-vector-db

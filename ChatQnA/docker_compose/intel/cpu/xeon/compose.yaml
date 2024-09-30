@@ -88,7 +88,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   chaqna-xeon-backend-server:
-    image: ${REGISTRY:-opea}/chatqna-no-wrapper:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
