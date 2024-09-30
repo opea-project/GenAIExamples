@@ -1,0 +1,5 @@
+#!/bin/bash
+cp checkpoint_utils.py /usr/local/lib/python3.10/dist-packages/optimum/habana/
+cp auto_tp.py /usr/local/lib/python3.10/dist-packages/deepspeed/module_inject/
+cp replace_module.py /usr/local/lib/python3.10/dist-packages/deepspeed/module_inject/
+

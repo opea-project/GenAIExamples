@@ -1,0 +1,13 @@
+datasets
+docarray[full]
+fastapi
+numpy<2
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+prometheus-fastapi-instrumentator
+pydantic==2.9.2
+pydub
+shortuuid
+transformers==4.45.1
+uvicorn

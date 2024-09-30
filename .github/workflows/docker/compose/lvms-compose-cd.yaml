@@ -11,3 +11,15 @@ services:
     build:
       dockerfile: comps/lvms/predictionguard/Dockerfile
     image: ${REGISTRY:-opea}/lvm-predictionguard:${TAG:-latest}
+  lvm-llama-vision:
+    build:
+      dockerfile: comps/lvms/llama-vision/Dockerfile
+    image: ${REGISTRY:-opea}/lvm-llama-vision:${TAG:-latest}
+  lvm-llama-vision-tp:
+    build:
+      dockerfile: comps/lvms/llama-vision/Dockerfile_tp
+    image: ${REGISTRY:-opea}/lvm-llama-vision-tp:${TAG:-latest}
+  lvm-llama-vision-guard:
+    build:
+      dockerfile: comps/lvms/llama-vision/Dockerfile_guard
+    image: ${REGISTRY:-opea}/lvm-llama-vision-guard:${TAG:-latest}

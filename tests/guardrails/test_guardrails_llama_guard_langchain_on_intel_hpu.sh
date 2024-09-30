@@ -10,7 +10,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     echo "Start building docker images for microservice"
     cd $WORKPATH
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.1
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
     docker build --no-cache -t opea/guardrails-tgi:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/langchain/Dockerfile .
     if [ $? -ne 0 ]; then
         echo "opea/guardrails-tgi built fail"
@@ -26,7 +26,7 @@ function start_service() {
     export SAFETY_GUARD_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
     export SAFETY_GUARD_ENDPOINT=http://${ip_address}:5035/v1/chat/completions
 
-    docker run -d --name="test-comps-guardrails-langchain-tgi-server" -p 5035:80 --runtime=habana -e HF_TOKEN=$HF_TOKEN -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy ghcr.io/huggingface/tgi-gaudi:2.0.1 --model-id $model_id --max-input-length 1024 --max-total-tokens 2048
+    docker run -d --name="test-comps-guardrails-langchain-tgi-server" -p 5035:80 --runtime=habana -e HF_TOKEN=$HF_TOKEN -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy ghcr.io/huggingface/tgi-gaudi:2.0.5 --model-id $model_id --max-input-length 1024 --max-total-tokens 2048
     sleep 4m
     docker run -d --name="test-comps-guardrails-langchain-service" -p 5036:9090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e SAFETY_GUARD_MODEL_ID=$SAFETY_GUARD_MODEL_ID -e SAFETY_GUARD_ENDPOINT=$SAFETY_GUARD_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HF_TOKEN opea/guardrails-tgi:comps
     sleep 10s
