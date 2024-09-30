@@ -52,7 +52,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose_no_wrapper.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 500 ]]; do
