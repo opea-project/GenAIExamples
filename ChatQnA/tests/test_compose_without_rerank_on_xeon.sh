@@ -42,8 +42,8 @@ function start_services() {
     export EMBEDDING_SERVER_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVER_HOST_IP=${ip_address}
-    export EMBEDDING_SERVER_PORT=8090
-    export LLM_SERVER_PORT=8005
+    export EMBEDDING_SERVER_PORT=6006
+    export LLM_SERVER_PORT=9009
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get_file"
