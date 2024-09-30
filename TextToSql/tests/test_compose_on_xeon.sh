@@ -16,12 +16,17 @@ export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=testpwd
 export POSTGRES_DB=chinook
+export TEXTTOSQL_PORT=9090
+export TGI_LLM_ENDPOINT="http://${ip_address}:${tgi_port}"
+
 
 function build_docker_images() {
     echo $WORKPATH
     OPEAPATH=$(realpath "$WORKPATH/../..")
 
     echo "Building Text to Sql service..."
+    cd $OPEAPATH
+    git clone https://github.com/opea-project/GenAIComps.git
     cd $OPEAPATH/GenAIComps
     docker build --no-cache -t opea/texttosql:comps -f comps/texttosql/langchain/Dockerfile .
 
@@ -37,10 +42,9 @@ function start_service() {
 
     docker run -d --name="test-texttosql-tgi-endpoint" --ipc=host -p $tgi_port:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model
 
-    export TGI_LLM_ENDPOINT="http://${ip_address}:${tgi_port}"
-    texttosql_port=9090
+    
     unset http_proxy
-    docker run -d --name="test-texttosql-server" --ipc=host -p ${texttosql_port}:8090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT opea/texttosql:comps
+    docker run -d --name="test-texttosql-server" --ipc=host -p $TEXTTOSQL_PORT:8090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT opea/texttosql:comps
 
     # check whether tgi is fully ready
     n=0
@@ -60,9 +64,7 @@ function start_service() {
 }
 
 function validate_microservice() {
-    texttosql_port=9090
-    echo "http://${ip_address}:${texttosql_port}/v1/texttosql"
-    result=$(http_proxy="" curl --connect-timeout 5 --max-time 120000 http://${ip_address}:${texttosql_port}/v1/texttosql\
+    result=$(http_proxy="" curl --connect-timeout 5 --max-time 120000 http://${ip_address}:$TEXTTOSQL_PORT/v1/texttosql\
         -X POST \
         -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${ip_address}'", "port": "5442", "database": "'${POSTGRES_DB}'" }}' \
         -H 'Content-Type: application/json')
