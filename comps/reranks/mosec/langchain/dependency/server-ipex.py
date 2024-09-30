@@ -4,17 +4,16 @@
 import json
 import os
 from os import environ
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import intel_extension_for_pytorch as ipex
 import numpy as np
 import torch
 from mosec import Server, Worker
-from mosec.mixin import TypedMsgPackMixin
 from msgspec import Struct
 from sentence_transformers import CrossEncoder
 from torch.utils.data import DataLoader
-from tqdm.autonotebook import tqdm, trange
+from tqdm.autonotebook import tqdm
 
 DEFAULT_MODEL = "/home/user/bge-reranker-large"
 
