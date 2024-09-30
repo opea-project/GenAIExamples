@@ -90,6 +90,7 @@ services:
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - LOGFLAG=${LOGFLAG}
     ipc: host
     restart: always
   chaqna-xeon-ui-server:

@@ -108,6 +108,7 @@ services:
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
       - RERANK_SERVER_HOST_IP=${RERANK_SERVER_HOST_IP}
       - LLM_SERVER_HOST_IP=${LLM_SERVER_HOST_IP}
+      - LOGFLAG=${LOGFLAG}
     ipc: host
     restart: always
   chaqna-xeon-ui-server:

@@ -152,7 +152,10 @@ export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
+export EMBEDDING_SERVER_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
+export RERANK_SERVER_HOST_IP=${host_ip}
+export LLM_SERVER_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
 
@@ -170,8 +173,10 @@ set REDIS_URL=redis://%host_ip%:6379
 set INDEX_NAME=rag-redis
 set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
 set MEGA_SERVICE_HOST_IP=%host_ip%
-set EMBEDDING_SERVICE_HOST_IP=%host_ip%
+set EMBEDDING_SERVER_HOST_IP=%host_ip%
 set RETRIEVER_SERVICE_HOST_IP=%host_ip%
+set RERANK_SERVER_HOST_IP=%host_ip%
+set LLM_SERVER_HOST_IP=%host_ip%
 set BACKEND_SERVICE_ENDPOINT=http://%host_ip%:8888/v1/chatqna
 set DATAPREP_SERVICE_ENDPOINT=http://%host_ip%:6007/v1/dataprep
 

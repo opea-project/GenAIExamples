@@ -177,8 +177,11 @@ export QDRANT_HOST=${host_ip}
 export QDRANT_PORT=6333
 export INDEX_NAME="rag-qdrant"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export EMBEDDING_SERVER_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
+export RERANK_SERVER_HOST_IP=${host_ip}
+export LLM_SERVER_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep"
 ```

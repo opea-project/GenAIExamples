@@ -38,10 +38,11 @@ function start_services() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_PORT=6044
+    export MEGA_SERVICE_PORT=8912
+    export EMBEDDING_SERVER_PORT=6040
     export RETRIEVER_SERVICE_PORT=6045
-    export RERANK_SERVICE_PORT=6046
-    export LLM_SERVICE_PORT=6047
+    export RERANK_SERVER_PORT=6041
+    export LLM_SERVER_PORT=6042
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8912/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6043/v1/dataprep"
 

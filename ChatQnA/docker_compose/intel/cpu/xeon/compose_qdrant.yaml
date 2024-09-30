@@ -110,6 +110,7 @@ services:
       - RERANK_SERVICE_PORT=${RERANK_SERVICE_PORT}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
       - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
+      - LOGFLAG=${LOGFLAG}
     ipc: host
     restart: always
   chaqna-xeon-ui-server:
