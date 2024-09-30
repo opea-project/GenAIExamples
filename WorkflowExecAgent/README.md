@@ -1,10 +1,10 @@
 # Workflow Executor Agent
 
-## 
+##
 
 ## Setup Guide
 
-Workflow Executor will have a single docker image. 
+Workflow Executor will have a single docker image.
 
 Instructions to setup.
 
@@ -25,7 +25,7 @@ export SDK_BASE_URL=${SDK_BASE_URL}
 export SERVING_TOKEN=${SERVING_TOKEN}
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
-export llm_serving_url= 
+export llm_serving_url=
 ```
 
 Launch service:

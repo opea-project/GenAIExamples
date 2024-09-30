@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 workflow_scheduler:
   description: "Used to start the workflow with a specified id"
   callable_api: tools.py:workflow_scheduler
@@ -7,7 +10,7 @@ workflow_scheduler:
       description: Workflow id
     params:
       type: Dict[str, str]
-      description: Workflow paramaters. Dictionary keys can have whitespace
+      description: Workflow parameters. Dictionary keys can have whitespace
   return_output: workflow_status
 
 workflow_status_checker:

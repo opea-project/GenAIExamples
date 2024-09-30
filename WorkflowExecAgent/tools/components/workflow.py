@@ -1,15 +1,18 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import json
 from typing import Dict
 
 from .component import Component
 
-class Workflow(Component):
-    """
-        Class for handling EasyData workflow operations.
 
-        Attributes:
-            workflow_id: workflow id
-            wf_key: workflow key. Generated and stored when starting a servable workflow.
+class Workflow(Component):
+    """Class for handling EasyData workflow operations.
+
+    Attributes:
+        workflow_id: workflow id
+        wf_key: workflow key. Generated and stored when starting a servable workflow.
     """
 
     def __init__(self, request_handler, workflow_id=None, workflow_key=None):
@@ -19,50 +22,50 @@ class Workflow(Component):
 
     def start(self, params: Dict[str, str]) -> Dict[str, str]:
         """
-            ``POST https://SDK_BASE_URL/serving/servable_workflows/{workflow_id}/start``
+        ``POST https://SDK_BASE_URL/serving/servable_workflows/{workflow_id}/start``
 
-            Starts a workflow with the workflow_id.
+        Starts a workflow with the workflow_id.
 
-            :param string workflow_id: Workflow id to start.
+        :param string workflow_id: Workflow id to start.
 
-            :returns: WorkflowKey
+        :returns: WorkflowKey
 
-            :rtype: dict
+        :rtype: dict
         """
         data = json.dumps({"params": params})
-        endpoint = f'serving/servable_workflows/{self.workflow_id}/start'
+        endpoint = f"serving/servable_workflows/{self.workflow_id}/start"
         wf_key = self._make_request(endpoint, "POST", data)["wf_key"]
         if wf_key:
             return {"message": f"Workflow successfully started. The workflow key is {wf_key}"}
         else:
             return {"message": "Workflow failed to start"}
-        
+
     def get_status(self) -> Dict[str, str]:
         """
-            ``GET https://SDK_BASE_URL/serving/serving_workflows/{workflow_key}/status``
-            
-            Gets the workflow status.
+        ``GET https://SDK_BASE_URL/serving/serving_workflows/{workflow_key}/status``
 
-            :param string workflow_key: Workflow id to retrieve status.
+        Gets the workflow status.
 
-            :returns: Status: Dictionary of presets
+        :param string workflow_key: Workflow id to retrieve status.
 
-            :rtype: json object
+        :returns: Status: Dictionary of presets
+
+        :rtype: json object
         """
-        
-        endpoint = f'serving/serving_workflows/{self.wf_key}/status'
+
+        endpoint = f"serving/serving_workflows/{self.wf_key}/status"
         return self._make_request(endpoint, "GET")
 
     def result(self) -> list[Dict[str, str]]:
         """
-            ``GET https://SDK_BASE_URL/serving/serving_workflows/{workflow_key}/results``
-            
-            Gets the result.
+        ``GET https://SDK_BASE_URL/serving/serving_workflows/{workflow_key}/results``
 
-            :returns: 
+        Gets the result.
 
-            :rtype: json object
+        :returns:
+
+        :rtype: json object
         """
 
-        endpoint = f'serving/serving_workflows/{self.wf_key}/results'
+        endpoint = f"serving/serving_workflows/{self.wf_key}/results"
         return self._make_request(endpoint, "GET")
