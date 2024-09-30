@@ -1,0 +1,29 @@
+workflow_scheduler:
+  description: "Used to start the workflow with a specified id"
+  callable_api: tools.py:workflow_scheduler
+  args_schema:
+    workflow_id:
+      type: int
+      description: Workflow id
+    params:
+      type: Dict[str, str]
+      description: Workflow paramaters. Dictionary keys can have whitespace
+  return_output: workflow_status
+
+workflow_status_checker:
+  description: "Used to check the execution status of the workflow."
+  callable_api: tools.py:workflow_status_checker
+  args_schema:
+    workflow_key:
+      type: int
+      description: Workflow key
+  return_output: workflow_status
+
+workflow_data_retriever:
+  description: "Used to retrieve workflow output data."
+  callable_api: tools.py:workflow_data_retriever
+  args_schema:
+    workflow_key:
+      type: int
+      description: Workflow key
+  return_output: workflow_output_data

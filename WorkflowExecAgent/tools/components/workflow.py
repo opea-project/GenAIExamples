@@ -1,0 +1,68 @@
+import json
+from typing import Dict
+
+from .component import Component
+
+class Workflow(Component):
+    """
+        Class for handling EasyData workflow operations.
+
+        Attributes:
+            workflow_id: workflow id
+            wf_key: workflow key. Generated and stored when starting a servable workflow.
+    """
+
+    def __init__(self, request_handler, workflow_id=None, workflow_key=None):
+        super().__init__(request_handler)
+        self.workflow_id = workflow_id
+        self.wf_key = workflow_key
+
+    def start(self, params: Dict[str, str]) -> Dict[str, str]:
+        """
+            ``POST https://SDK_BASE_URL/serving/servable_workflows/{workflow_id}/start``
+
+            Starts a workflow with the workflow_id.
+
+            :param string workflow_id: Workflow id to start.
+
+            :returns: WorkflowKey
+
+            :rtype: dict
+        """
+        data = json.dumps({"params": params})
+        endpoint = f'serving/servable_workflows/{self.workflow_id}/start'
+        wf_key = self._make_request(endpoint, "POST", data)["wf_key"]
+        if wf_key:
+            return {"message": f"Workflow successfully started. The workflow key is {wf_key}"}
+        else:
+            return {"message": "Workflow failed to start"}
+        
+    def get_status(self) -> Dict[str, str]:
+        """
+            ``GET https://SDK_BASE_URL/serving/serving_workflows/{workflow_key}/status``
+            
+            Gets the workflow status.
+
+            :param string workflow_key: Workflow id to retrieve status.
+
+            :returns: Status: Dictionary of presets
+
+            :rtype: json object
+        """
+        
+        endpoint = f'serving/serving_workflows/{self.wf_key}/status'
+        return self._make_request(endpoint, "GET")
+
+    def result(self) -> list[Dict[str, str]]:
+        """
+            ``GET https://SDK_BASE_URL/serving/serving_workflows/{workflow_key}/results``
+            
+            Gets the result.
+
+            :returns: 
+
+            :rtype: json object
+        """
+
+        endpoint = f'serving/serving_workflows/{self.wf_key}/results'
+        return self._make_request(endpoint, "GET")
