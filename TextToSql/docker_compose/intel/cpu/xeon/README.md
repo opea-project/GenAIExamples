@@ -38,7 +38,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 1. `opea/texttosql:comps`
 2. `opea/texttosql-react-ui:latest`
 
-## 🚀 Start Microservices 
+## 🚀 Start Microservices
 
 ### Required Models
 
@@ -78,6 +78,7 @@ Note: Please replace with `your_ip` with your external IP address, do not use lo
 There are 2 options to start the microservice
 
 2.2.1 Start the microservice using docker compose
+
 ```bash
 cd GenAIExamples/TextToSql/docker_compose/intel/cpu/xeon
 docker compose up -d
@@ -85,7 +86,7 @@ docker compose up -d
 
 2.2.2 Alternatively we can start the microservices by running individual docker services
 
-**NOTE:**  Make sure all the individual docker services are down before starting them. 
+**NOTE:** Make sure all the individual docker services are down before starting them.
 
 Below are the commands to start each of the docker service individually
 
@@ -97,6 +98,7 @@ We will use [Chinook](https://github.com/lerocha/chinook-database) sample databa
 
 docker run --name test-texttosql-postgres --ipc=host -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=${POSTGRES_DB} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -p 5442:5432 -d -v $WORKPATH/comps/texttosql/langchain/chinook.sql:/docker-entrypoint-initdb.d/chinook.sql postgres:latest
 ```
+
 - Start TGI Service
 
 ```bash
@@ -116,7 +118,6 @@ docker run -d --name="test-texttosql-server" --ipc=host -p ${texttosql_port}:809
 docker run -d --name="test-texttosql-react-ui-server" --ipc=host -p 5174:80 -e no_proxy=$no_proxy -e https_proxy=$https_proxy -e http_proxy=$http_proxy opea/texttosql-react-ui:latest
 ```
 
-
 ## 🚀 Validate Microservices
 
 3.1 TGI Service
@@ -131,7 +132,7 @@ curl http://${your_ip}:${TGI_PORT}/generate \
 
 3.2 Postgres Microservice
 
- Once Text-to-SQL microservice is started, user can use below command
+Once Text-to-SQL microservice is started, user can use below command
 
 3.2.1 Test the Database connection
 
@@ -149,7 +150,8 @@ curl http://${your_ip}:9090/v1/texttosql\
     -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${your_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}}' \
     -H 'Content-Type: application/json'
 ```
-3.3 Frontend validation 
+
+3.3 Frontend validation
 
 We test the API in frontend validation to check if API returns HTTP_STATUS: 200 and validates if API response returns SQL query and output
 
@@ -168,8 +170,7 @@ Open this URL `http://{your_ip}:5174` in your browser to access the frontend.
 ![project-screenshot](../../../../assets/img/textToSql_ui_init.png)
 
 Test DB Connection
-  ![project-screenshot](../../../../assets/img/textToSql_ui_successful_db_connection.png)
+![project-screenshot](../../../../assets/img/textToSql_ui_successful_db_connection.png)
 
 Create SQL query and output for given NLP question
-  ![project-screenshot](../../../../assets/img/textToSql_ui_succesful_sql_output_generation.png)
-
+![project-screenshot](../../../../assets/img/textToSql_ui_succesful_sql_output_generation.png)

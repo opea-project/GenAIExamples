@@ -57,7 +57,7 @@ const DBConnect: React.FC = () => {
       } else {
         setDbStatus(null);
         setIsConnected(false);
-        setDbError(api_response.data.message); //response would contain error message incase of failure
+        setDbError(api_response.data.message); //response would contain error message in case of failure
         setSqlStatus(null);
       }
     } catch (err) {
