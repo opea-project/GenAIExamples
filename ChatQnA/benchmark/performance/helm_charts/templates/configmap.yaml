@@ -8,18 +8,18 @@ metadata:
   namespace: default
 data:
   EMBEDDING_MODEL_ID: {{ .Values.config.EMBEDDING_MODEL_ID }}
-  EMBEDDING_SERVER_HOST_IP: {{ .Values.config.EMBEDDING_SERVER_HOST_IP }}
-  HUGGINGFACEHUB_API_TOKEN: {{ .Values.config.HUGGINGFACEHUB_API_TOKEN }}
-  INDEX_NAME: {{ .Values.config.INDEX_NAME }}
+  EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
+  HUGGINGFACEHUB_API_TOKEN: {{ .Values.HUGGINGFACEHUB_API_TOKEN }}
+  INDEX_NAME: rag-redis
   LLM_MODEL_ID: {{ .Values.config.LLM_MODEL_ID }}
-  LLM_SERVER_HOST_IP: {{ .Values.config.LLM_SERVER_HOST_IP }}
-  NODE_SELECTOR: {{ .Values.config.NODE_SELECTOR }}
-  REDIS_URL: {{ .Values.config.REDIS_URL }}
+  LLM_SERVER_HOST_IP: llm-dependency-svc
+  NODE_SELECTOR: chatqna-opea
+  REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
   RERANK_MODEL_ID: {{ .Values.config.RERANK_MODEL_ID }}
-  RERANK_SERVER_HOST_IP: {{ .Values.config.RERANK_SERVER_HOST_IP }}
-  RETRIEVER_SERVICE_HOST_IP: {{ .Values.config.RETRIEVER_SERVICE_HOST_IP }}
-  TEI_EMBEDDING_ENDPOINT: {{ .Values.config.TEI_EMBEDDING_ENDPOINT }}
-  TEI_ENDPOINT: {{ .Values.config.TEI_ENDPOINT }}
-  TEI_RERANKING_ENDPOINT: {{ .Values.config.TEI_RERANKING_ENDPOINT }}
-  TGI_LLM_ENDPOINT: {{ .Values.config.TGI_LLM_ENDPOINT }}
+  RERANK_SERVER_HOST_IP: reranking-dependency-svc
+  RETRIEVER_SERVICE_HOST_IP: retriever-svc
+  TEI_EMBEDDING_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  TEI_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
+  TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
 ---
