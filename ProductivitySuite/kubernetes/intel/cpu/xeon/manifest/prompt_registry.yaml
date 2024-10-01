@@ -28,8 +28,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 6012
-      targetPort: 6012
+    - port: 6018
+      targetPort: 6018
       protocol: TCP
       name: prompt-registry
   selector:
@@ -69,7 +69,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: prompt-registry
-              containerPort: 6012
+              containerPort: 6018
               protocol: TCP
           resources: null
 ---
