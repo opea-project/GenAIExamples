@@ -7,7 +7,7 @@ import { IconFileText } from "@tabler/icons-react";
 import { Notifications } from '@mantine/notifications';
 import DBConnect from "./components/DbConnect/DBConnect";
 
-const title = "Text To SQL";
+const title = "DBQnA";
 const navList: SidebarNavList = [
   { icon: IconFileText, label: title },
 ];

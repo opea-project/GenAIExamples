@@ -26,6 +26,7 @@ function build_docker_images() {
 
     echo "Building Text to Sql service..."
     cd $OPEAPATH
+    rm -rf GenAIComps/
     git clone https://github.com/opea-project/GenAIComps.git
     cd $OPEAPATH/GenAIComps
     docker build --no-cache -t opea/texttosql:comps -f comps/texttosql/langchain/Dockerfile .

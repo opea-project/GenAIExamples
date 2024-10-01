@@ -1,6 +1,6 @@
-# Build Mega Service of Text to Sql Generation on Intel Xeon Processor
+# Build Mega Service of DB QnA which performs Text to Sql Generation on Intel Xeon Processor
 
-This document outlines the deployment process for a Text to SQL Generation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
+This document outlines the deployment process for a Text to SQL Generation application DBQnA, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
 
 ## 🚀 Apply Intel Xeon Server on AWS
 
@@ -54,7 +54,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 # your_ip should be your external IP address, do not use localhost.
 export your_ip=$(hostname -I | awk '{print $1}')
 
-# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+# Example: no_proxy="localhost,127.0.0.1,192.168.1.1"
 export no_proxy=${your_no_proxy}
 
 # If you are in a proxy environment, also set the proxy-related environment variables:
@@ -62,7 +62,9 @@ export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 
 # Set other required variables
-export TGI_LLM_ENDPOINT=http://${your_ip}:${TGI_PORT}
+
+export TGI_PORT=8008
+export TGI_LLM_ENDPOINT=http://${your_ip}:$TGI_PORT
 export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export POSTGRES_USER=postgres
@@ -103,7 +105,7 @@ docker run --name test-texttosql-postgres --ipc=host -e POSTGRES_USER=${POSTGRES
 
 ```bash
 
-docker run -d --name="test-texttosql-tgi-endpoint" --ipc=host -p $tgi_port:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model
+docker run -d --name="test-texttosql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model
 ```
 
 ```bash
@@ -124,7 +126,7 @@ docker run -d --name="test-texttosql-react-ui-server" --ipc=host -p 5174:80 -e n
 
 ```bash
 
-curl http://${your_ip}:${TGI_PORT}/generate \
+curl http://${your_ip}:$TGI_PORT/generate \
     -X POST \
     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
     -H 'Content-Type: application/json'
