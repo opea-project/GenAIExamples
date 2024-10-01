@@ -6,10 +6,10 @@ set -xe
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
-ip_address="10.223.24.242"
+ip_address=$(hostname -I | awk '{print $1}')
 tgi_port=8080
 tgi_volume=$WORKPATH/data
-HUGGINGFACEHUB_API_TOKEN=$1
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
 export model="mistralai/Mistral-7B-Instruct-v0.3"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
