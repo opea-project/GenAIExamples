@@ -12,7 +12,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
 from ...global_var import threads_global_kv
-from ...utils import has_multi_tool_inputs, tool_renderer
+from ...utils import has_multi_tool_inputs, tool_renderer, wrap_chat
 from ..base_agent import BaseAgent
 from .prompt import REACT_SYS_MESSAGE, hwchase17_react_prompt
 
@@ -85,10 +85,7 @@ class ReActAgentwithLanggraph(BaseAgent):
     def __init__(self, args, with_memory=False):
         super().__init__(args)
 
-        if isinstance(self.llm_endpoint, HuggingFaceEndpoint):
-            self.llm = ChatHuggingFace(llm=self.llm_endpoint, model_id=args.model)
-        elif isinstance(self.llm_endpoint, ChatOpenAI):
-            self.llm = self.llm_endpoint
+        self.llm = wrap_chat(self.llm_endpoint, args.model)
 
         tools = self.tools_descriptions
 

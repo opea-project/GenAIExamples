@@ -20,14 +20,14 @@ Agents use LLM for reasoning and planning. We support 2 options of LLM engine:
 1. Open-source LLMs served with TGI-gaudi. To use open-source llms, follow the instructions in [Section 2](#222-start-microservices) below. Note: we recommend using state-of-the-art LLMs, such as llama3.1-70B-instruct, to get higher success rate.
 2. OpenAI LLMs via API calls. To use OpenAI llms, specify `llm_engine=openai` and `export OPENAI_API_KEY=<your-openai-key>`
 
-| Agent type       | `strategy` arg    | Validated LLMs                                                                                 | Notes                                                                                                        |
-| ---------------- | ----------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| ReAct            | `react_langchain` | GPT-4o-mini, [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct) | Only allows tools with one input variable                                                                    |
-| ReAct            | `react_langgraph` | GPT-4o-mini                                                                                    | Currently does not work for open-source LLMs served with TGI-Gaudi                                           |
-| ReAct            | `react_llama`     | [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct)              | Recommended for open-source LLMs served with TGI-Gaudi                                                       |
-| RAG agent        | `rag_agent`       | GPT-4o-mini                                                                                    | Currently does not work for open-source LLMs served with TGI-Gaudi                                           |
-| RAG agent        | `rag_agent_llama` | [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct)              | Recommended for open-source LLMs served with TGI-Gaudi, only allows 1 tool with input variable to be "query" |
-| Plan and execute | `plan_execute`    | GPT-4o-mini                                                                                    |                                                                                                              |
+| Agent type       | `strategy` arg    | Validated LLMs                                                                                                                                                                                       | Notes                                                                                                                                                                                                            |
+| ---------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ReAct            | `react_langchain` | GPT-4o-mini, [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct)                                                                                                       | Only allows tools with one input variable                                                                                                                                                                        |
+| ReAct            | `react_langgraph` | GPT-4o-mini, [Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3)-on-vllm,                                                                                          | Currently does not work for open-source LLMs served with TGI-Gaudi, [Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)-on-vllm is not synced from vllm upstream to gaudi repo yet. |
+| ReAct            | `react_llama`     | [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct)                                                                                                                    | Recommended for open-source LLMs served with TGI-Gaudi                                                                                                                                                           |
+| RAG agent        | `rag_agent`       | GPT-4o-mini                                                                                                                                                                                          | Currently does not work for open-source LLMs served with TGI-Gaudi                                                                                                                                               |
+| RAG agent        | `rag_agent_llama` | [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct)                                                                                                                    | Recommended for open-source LLMs served with TGI-Gaudi, only allows 1 tool with input variable to be "query"                                                                                                     |
+| Plan and execute | `plan_execute`    | GPT-4o-mini, [Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3)-on-vllm, [Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)-on-vllm |                                                                                                                                                                                                                  |
 
 ### 1.3 Tools
 
@@ -44,32 +44,14 @@ Currently we have implemented OpenAI chat completion compatible API for agents. 
 
 ## 🚀2. Start Agent Microservice
 
-### 2.1 Option 1: with Python
-
-#### 2.1.1 Install Requirements
-
-```bash
-cd comps/agent/langchain/
-pip install -r requirements.txt
-```
-
-#### 2.1.2 Start Microservice with Python Script
-
-```bash
-cd comps/agent/langchain/
-python agent.py
-```
-
-### 2.2 Option 2. Start Microservice with Docker
-
-#### 2.2.1 Build Microservices
+#### 2.1 Build Microservices
 
 ```bash
 cd GenAIComps/ # back to GenAIComps/ folder
 docker build -t opea/agent-langchain:latest -f comps/agent/langchain/Dockerfile .
 ```
 
-#### 2.2.2 Start microservices
+#### 2.2.1 Start Agent microservices with TGI
 
 ```bash
 export ip_address=$(hostname -I | awk '{print $1}')
@@ -85,6 +67,34 @@ docker logs comps-tgi-gaudi-service
 
 # Agent
 docker run -d --runtime=runc --name="comps-langchain-agent-endpoint" -v $WORKPATH/comps/agent/langchain/tools:/home/user/comps/agent/langchain/tools -p 9090:9090 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e ip_address=${ip_address} -e strategy=react_langchain -e llm_endpoint_url=http://${ip_address}:8080 -e llm_engine=tgi -e recursion_limit=5 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/agent-langchain:latest
+
+# check status
+docker logs comps-langchain-agent-endpoint
+```
+
+#### 2.2.2 Start Agent microservices with vllm
+
+```bash
+export ip_address=$(hostname -I | awk '{print $1}')
+export model=mistralai/Mistral-7B-Instruct-v0.3
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export vllm_volume=${YOUR_LOCAL_DIR_FOR_MODELS}
+
+# build vLLM image
+git clone https://github.com/HabanaAI/vllm-fork.git
+cd ./vllm-fork; git checkout habana_main; git tag v0.6.2.post1;
+cp ${your_path}/GenAIComps/tests/agent/Dockerfile.hpu ./
+docker build -f Dockerfile.hpu -t opea/vllm:hpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+
+# TGI serving
+docker run -d --runtime=habana --rm --name "comps-vllm-gaudi-service" -p 8080:80 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm:hpu --model ${model} --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs  4096 --max-seq_len-to-capture 8192 --enable-auto-tool-choice --tool-call-parser mistral
+
+# check status
+docker logs comps-vllm-gaudi-service
+
+# Agent
+docker run -d --runtime=runc --name="comps-langchain-agent-endpoint" -v $WORKPATH/comps/agent/langchain/tools:/home/user/comps/agent/langchain/tools -p 9090:9090 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e model=${model} -e ip_address=${ip_address} -e strategy=react_langgraph -e llm_endpoint_url=http://${ip_address}:8080 -e llm_engine=vllm -e recursion_limit=5 -e require_human_feedback=false -e tools=/home/user/comps/agent/langchain/tools/custom_tools.yaml opea/agent-langchain:latest
 
 # check status
 docker logs comps-langchain-agent-endpoint

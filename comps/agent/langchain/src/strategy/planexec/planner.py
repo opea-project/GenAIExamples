@@ -6,10 +6,8 @@ from json import JSONDecodeError
 from typing import Annotated, Any, List, Literal, Sequence, Tuple, TypedDict, Union
 
 from langchain.agents import AgentExecutor, create_react_agent
-from langchain.output_parsers import PydanticOutputParser
 from langchain_core.exceptions import OutputParserException
 from langchain_core.messages import BaseMessage
-from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.output_parsers.openai_tools import PydanticToolsParser
 from langchain_core.outputs import Generation
 from langchain_core.prompts import PromptTemplate
@@ -21,7 +19,7 @@ from langgraph.graph.message import add_messages
 from pydantic import BaseModel, Field
 
 from ...global_var import threads_global_kv
-from ...utils import has_multi_tool_inputs, tool_renderer
+from ...utils import has_multi_tool_inputs, tool_renderer, wrap_chat
 from ..base_agent import BaseAgent
 from .prompt import (
     answer_check_prompt,
@@ -63,11 +61,17 @@ class PlanStepChecker:
         str: A decision for whether we should use this plan or not
     """
 
-    def __init__(self, llm_endpoint, model_id=None):
+    def __init__(self, llm_endpoint, model_id=None, is_vllm=False):
         class grade(BaseModel):
             binary_score: str = Field(description="executable score 'yes' or 'no'")
 
-        llm = ChatHuggingFace(llm=llm_endpoint, model_id=model_id).bind_tools([grade])
+        if is_vllm:
+            llm = wrap_chat(llm_endpoint, model_id).bind_tools(
+                [grade], tool_choice={"function": {"name": grade.__name__}}
+            )
+        else:
+            llm = wrap_chat(llm_endpoint, model_id).bind_tools([grade])
+
         output_parser = PydanticToolsParser(tools=[grade], first_tool_only=True)
         self.chain = plan_check_prompt | llm | output_parser
 
@@ -84,9 +88,13 @@ class PlanStepChecker:
 
 # Define workflow Node
 class Planner:
-    def __init__(self, llm_endpoint, model_id=None, plan_checker=None):
-        # self.llm = planner_prompt | llm_endpoint | PydanticOutputParser(pydantic_object=Plan)
-        llm = ChatHuggingFace(llm=llm_endpoint, model_id=model_id).bind_tools([Plan])
+    def __init__(self, llm_endpoint, model_id=None, plan_checker=None, is_vllm=False):
+        if is_vllm:
+            llm = wrap_chat(llm_endpoint, model_id).bind_tools(
+                [Plan], tool_choice={"function": {"name": Plan.__name__}}
+            )
+        else:
+            llm = wrap_chat(llm_endpoint, model_id).bind_tools([Plan])
         output_parser = PydanticToolsParser(tools=[Plan], first_tool_only=True)
         self.llm = planner_prompt | llm | output_parser
         self.plan_checker = plan_checker
@@ -152,8 +160,13 @@ previous steps and output: {out_state}
 
 
 class AnswerMaker:
-    def __init__(self, llm_endpoint, model_id=None):
-        llm = ChatHuggingFace(llm=llm_endpoint, model_id=model_id).bind_tools([Response])
+    def __init__(self, llm_endpoint, model_id=None, is_vllm=False):
+        if is_vllm:
+            llm = wrap_chat(llm_endpoint, model_id).bind_tools(
+                [Response], tool_choice={"function": {"name": Response.__name__}}
+            )
+        else:
+            llm = wrap_chat(llm_endpoint, model_id).bind_tools([Response])
         output_parser = PydanticToolsParser(tools=[Response], first_tool_only=True)
         self.llm = answer_make_prompt | llm | output_parser
 
@@ -180,11 +193,16 @@ class FinalAnswerChecker:
         str: A decision for whether we should use this plan or not
     """
 
-    def __init__(self, llm_endpoint, model_id=None):
+    def __init__(self, llm_endpoint, model_id=None, is_vllm=False):
         class grade(BaseModel):
             binary_score: str = Field(description="executable score 'yes' or 'no'")
 
-        llm = ChatHuggingFace(llm=llm_endpoint, model_id=model_id).bind_tools([grade])
+        if is_vllm:
+            llm = wrap_chat(llm_endpoint, model_id).bind_tools(
+                [grade], tool_choice={"function": {"name": grade.__name__}}
+            )
+        else:
+            llm = wrap_chat(llm_endpoint, model_id).bind_tools([grade])
         output_parser = PydanticToolsParser(tools=[grade], first_tool_only=True)
         self.chain = answer_check_prompt | llm | output_parser
 
@@ -201,7 +219,7 @@ class FinalAnswerChecker:
 
 class Replanner:
     def __init__(self, llm_endpoint, model_id=None, answer_checker=None):
-        llm = ChatHuggingFace(llm=llm_endpoint, model_id=model_id).bind_tools([Plan])
+        llm = wrap_chat(llm_endpoint, model_id).bind_tools([Plan])
         output_parser = PydanticToolsParser(tools=[Plan], first_tool_only=True)
         self.llm = replanner_prompt | llm | output_parser
         self.answer_checker = answer_checker
@@ -227,11 +245,11 @@ class PlanExecuteAgentWithLangGraph(BaseAgent):
         super().__init__(args)
 
         # Define Node
-        plan_checker = PlanStepChecker(self.llm_endpoint, args.model)
+        plan_checker = PlanStepChecker(self.llm_endpoint, args.model, is_vllm=self.is_vllm)
 
-        plan_step = Planner(self.llm_endpoint, args.model, plan_checker)
+        plan_step = Planner(self.llm_endpoint, args.model, plan_checker, is_vllm=self.is_vllm)
         execute_step = Executor(self.llm_endpoint, args.model, self.tools_descriptions)
-        make_answer = AnswerMaker(self.llm_endpoint, args.model)
+        make_answer = AnswerMaker(self.llm_endpoint, args.model, is_vllm=self.is_vllm)
 
         # Define Graph
         workflow = StateGraph(PlanExecute)
@@ -274,3 +292,16 @@ class PlanExecuteAgentWithLangGraph(BaseAgent):
 
             yield f"data: {repr(event)}\n\n"
         yield "data: [DONE]\n\n"
+
+    async def non_streaming_run(self, query, config):
+        initial_state = self.prepare_initial_state(query)
+        try:
+            async for s in self.app.astream(initial_state, config=config, stream_mode="values"):
+                for k, v in s.items():
+                    print(f"{k}: {v}\n")
+
+            last_message = s["output"]
+            print("******Response: ", last_message)
+            return last_message
+        except Exception as e:
+            return str(e)

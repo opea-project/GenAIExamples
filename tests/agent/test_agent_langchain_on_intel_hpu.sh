@@ -9,6 +9,8 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 tgi_port=8085
 tgi_volume=$WORKPATH/data
+vllm_port=8086
+vllm_volume=$WORKPATH/data
 
 export agent_image="opea/agent-langchain:comps"
 export agent_container_name="test-comps-agent-endpoint"
@@ -38,6 +40,25 @@ function build_docker_images() {
     fi
 }
 
+function build_vllm_docker_images() {
+    echo "Building the vllm docker images"
+    cd $WORKPATH
+    echo $WORKPATH
+    if [ ! -d "./vllm" ]; then
+        git clone https://github.com/HabanaAI/vllm-fork.git
+        cd ./vllm-fork; git checkout habana_main; git tag v0.6.2.post1; cd ..
+        cp $WORKPATH/tests/agent/Dockerfile.hpu ./vllm-fork
+    fi
+    cd ./vllm-fork
+    docker build -f Dockerfile.hpu -t opea/vllm:hpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    if [ $? -ne 0 ]; then
+        echo "opea/vllm:hpu failed"
+        exit 1
+    else
+        echo "opea/vllm:hpu successful"
+    fi
+}
+
 function start_tgi_service() {
     echo "token is ${HF_TOKEN}"
 
@@ -59,6 +80,58 @@ function start_tgi_service() {
     echo "Service started successfully"
 }
 
+function start_vllm_service() {
+    # redis endpoint
+    echo "token is ${HF_TOKEN}"
+
+    #single card
+    echo "start vllm gaudi service"
+    docker run -d --runtime=habana --rm --name "test-comps-vllm-gaudi-service" -p $vllm_port:80 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm:hpu --model ${model} --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs  4096 --max-seq_len-to-capture 8192
+    sleep 5s
+    echo "Waiting vllm gaudi ready"
+    n=0
+    until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+        docker logs test-comps-vllm-gaudi-service &> ${LOG_PATH}/vllm-gaudi-service.log
+        n=$((n+1))
+        if grep -q "Uvicorn running on" ${LOG_PATH}/vllm-gaudi-service.log; then
+            break
+        fi
+        if grep -q "No such container" ${LOG_PATH}/vllm-gaudi-service.log; then
+            echo "container test-comps-vllm-gaudi-service not found"
+            exit 1
+        fi
+        sleep 5s
+    done
+    sleep 5s
+    echo "Service started successfully"
+}
+
+function start_vllm_auto_tool_choice_service() {
+    # redis endpoint
+    echo "token is ${HF_TOKEN}"
+
+    #single card
+    echo "start vllm gaudi service"
+    docker run -d --runtime=habana --rm --name "test-comps-vllm-gaudi-service" -p $vllm_port:80 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm:hpu --model ${model} --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs  4096 --max-seq_len-to-capture 8192 --enable-auto-tool-choice --tool-call-parser ${model_parser}
+    sleep 5s
+    echo "Waiting vllm gaudi ready"
+    n=0
+    until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+        docker logs test-comps-vllm-gaudi-service &> ${LOG_PATH}/vllm-gaudi-service.log
+        n=$((n+1))
+        if grep -q "Uvicorn running on" ${LOG_PATH}/vllm-gaudi-service.log; then
+            break
+        fi
+        if grep -q "No such container" ${LOG_PATH}/vllm-gaudi-service.log; then
+            echo "container test-comps-vllm-gaudi-service not found"
+            exit 1
+        fi
+        sleep 5s
+    done
+    sleep 5s
+    echo "Service started successfully"
+}
+
 function start_react_langchain_agent_service() {
     echo "Starting react_langchain agent microservice"
     docker compose -f $WORKPATH/tests/agent/react_langchain.yaml up -d
@@ -71,6 +144,22 @@ function start_react_langchain_agent_service() {
 function start_react_langgraph_agent_service() {
     echo "Starting react_langgraph agent microservice"
     docker compose -f $WORKPATH/tests/agent/reactllama.yaml up -d
+    sleep 5s
+    docker logs test-comps-agent-endpoint
+    echo "Service started successfully"
+}
+
+function start_react_langgraph_agent_service_vllm() {
+    echo "Starting react_langgraph agent microservice"
+    docker compose -f $WORKPATH/tests/agent/react_vllm.yaml up -d
+    sleep 5s
+    docker logs test-comps-agent-endpoint
+    echo "Service started successfully"
+}
+
+function start_planexec_agent_service_vllm() {
+    echo "Starting planexec agent microservice"
+    docker compose -f $WORKPATH/tests/agent/planexec_vllm.yaml up -d
     sleep 5s
     docker logs test-comps-agent-endpoint
     echo "Service started successfully"
@@ -150,6 +239,13 @@ function stop_tgi_docker() {
     echo "Docker containers stopped successfully"
 }
 
+function stop_vllm_docker() {
+    cid=$(docker ps -aq --filter "name=test-comps-vllm-gaudi-service")
+    echo "Stopping the docker containers "${cid}
+    if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
+    echo "Docker containers stopped successfully"
+}
+
 function stop_agent_docker() {
     cid=$(docker ps -aq --filter "name=test-comps-agent-endpoint")
     echo "Stopping the docker containers "${cid}
@@ -159,14 +255,16 @@ function stop_agent_docker() {
 
 function stop_docker() {
     stop_tgi_docker
+    stop_vllm_docker
     stop_agent_docker
 }
 
 function main() {
-    # stop_agent_docker
+    stop_agent_docker
     stop_docker
     build_docker_images
 
+    # ==================== TGI tests ====================
     start_tgi_service
 
     # test rag agent
@@ -190,6 +288,56 @@ function main() {
     validate_microservice
     validate_assistant_api
     stop_agent_docker
+    echo "============================================="
+
+    stop_tgi_docker
+
+    # ==================== VLLM tests ====================
+    build_vllm_docker_images
+
+    export model=mistralai/Mistral-7B-Instruct-v0.3
+    export LLM_MODEL_ID=${model}
+    export model_parser=mistral
+    export LLM_ENDPOINT_URL="http://${ip_address}:${vllm_port}"
+
+    # test react with vllm
+    start_vllm_auto_tool_choice_service
+    start_react_langgraph_agent_service_vllm
+    echo "===========Testing ReAct VLLM ============="
+    validate_microservice
+    stop_agent_docker
+    stop_vllm_docker
+    echo "============================================="
+
+    # test plan execute with vllm
+    start_vllm_service
+    start_planexec_agent_service_vllm
+    echo "===========Testing Plan Execute VLLM ============="
+    validate_microservice
+    stop_agent_docker
+    stop_vllm_docker
+    echo "============================================="
+
+    export model=meta-llama/Llama-3.1-8B-Instruct
+    export LLM_MODEL_ID=${model}
+    export model_parser=llama3_json
+
+    # test react with vllm - llama3 support has not been synced to vllm-gaudi yet
+    # start_vllm_auto_tool_choice_service
+    # start_react_langgraph_agent_service_vllm
+    # echo "===========Testing ReAct VLLM ============="
+    # validate_microservice
+    # stop_agent_docker
+    # stop_vllm_docker
+    # echo "============================================="
+
+    # test plan execute with vllm
+    start_vllm_service
+    start_planexec_agent_service_vllm
+    echo "===========Testing Plan Execute VLLM ============="
+    validate_microservice
+    stop_agent_docker
+    stop_vllm_docker
     echo "============================================="
 
     stop_docker
