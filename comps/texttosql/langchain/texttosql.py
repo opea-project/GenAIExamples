@@ -9,6 +9,8 @@ from typing import Any, Dict, List, Optional, Sequence, Type, Union
 from langchain.agents import create_react_agent
 from langchain.agents.agent import AgentExecutor, RunnableAgent
 from langchain.agents.agent_types import AgentType
+from langchain.agents.mrkl import prompt as react_prompt
+from langchain.chains.llm import LLMChain
 from langchain_community.agent_toolkits.sql.prompt import SQL_PREFIX, SQL_SUFFIX
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 from langchain_community.tools.sql_database.prompt import QUERY_CHECKER
@@ -157,9 +159,9 @@ class CustomQuerySQLCheckerTool(BaseSQLDatabaseTool, BaseTool):
 
     @root_validator(pre=True)
     def initialize_llm_chain(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if "llm_chain" not in values:
-            from langchain.chains.llm import LLMChain
+        """Initializes the LLM chain if it does not exist in the given values dictionary."""
 
+        if "llm_chain" not in values:
             values["llm_chain"] = LLMChain(
                 llm=values.get("llm"),  # type: ignore[arg-type]
                 prompt=PromptTemplate(template=QUERY_CHECKER, input_variables=["dialect", "query"]),
@@ -195,6 +197,7 @@ class CustomQuerySQLCheckerTool(BaseSQLDatabaseTool, BaseTool):
 
 
 class CustomSQLDatabaseToolkit(SQLDatabaseToolkit):
+    """Provides functionality to manage and manipulate SQL databases in customized way."""
 
     def get_tools(self) -> List[BaseTool]:
         """Get the tools in the toolkit."""
@@ -252,7 +255,7 @@ def custom_create_sql_agent(
     prompt: Optional[BasePromptTemplate] = None,
     **kwargs: Any,
 ) -> AgentExecutor:
-    """"""
+    """Creates a SQL agent with specified parameters."""
 
     tools = toolkit.get_tools()
     if prompt is None:
@@ -273,8 +276,6 @@ def custom_create_sql_agent(
                 tools = [tool for tool in tools if not isinstance(tool, ListSQLDatabaseTool)]
 
     if prompt is None:
-        from langchain.agents.mrkl import prompt as react_prompt
-
         format_instructions = format_instructions or react_prompt.FORMAT_INSTRUCTIONS
         template = "\n\n".join(
             [
@@ -330,7 +331,7 @@ def execute(input, url):
     result = agent_executor.invoke(input)
 
     query = []
-    for log, output in result["intermediate_steps"]:
+    for log, _ in result["intermediate_steps"]:
         if log.tool == "sql_db_query":
             query.append(log.tool_input)
     result["sql"] = query[0].replace("Observation", "")
