@@ -1,4 +1,4 @@
-# DBQnA React
+# DBQnA React Application
 
 ## 📸 Project Screenshots
 

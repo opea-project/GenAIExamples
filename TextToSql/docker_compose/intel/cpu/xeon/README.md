@@ -1,4 +1,4 @@
-# Build Mega Service of DB QnA which performs Text to Sql Generation on Intel Xeon Processor
+# Deploy on Intel Xeon Processor
 
 This document outlines the deployment process for a Text to SQL Generation application DBQnA, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
 
