@@ -86,10 +86,12 @@ function validate_frontend() {
     cd $WORKPATH/ui/react
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-#    conda remove -n ${conda_env_name} --all -y
-    conda create -n ${conda_env_name} python=3.12 -y
+    if conda info --envs | grep -q "$conda_env_name"; then
+        echo "$conda_env_name exist!"
+    else
+        conda create -n ${conda_env_name} python=3.12 -y
+    fi
 
-    conda info --envs
     source activate ${conda_env_name}
     echo "[ TEST INFO ]: --------- conda env activated ---------"
 
