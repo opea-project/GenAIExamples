@@ -9,9 +9,8 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 tgi_port=8008
 tgi_volume=$WORKPATH/data
-HUGGINGFACEHUB_API_TOKEN=$1
 
-export model="mistralai/Mistral-7B-Instruct-v0.3"
+export model="meta-llama/Meta-Llama-3.1-70B-Instruct"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=testpwd
