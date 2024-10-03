@@ -1,14 +1,33 @@
 import axios from 'axios';
 import { TEXT_TO_SQL_URL } from './config';
+import { exec } from 'child_process';
 
 const apiTimeOutInSeconds = 120;
 
-test('testing api', async () => {
+// Helper function to get the host IP
+const getHostIP = () => {
+  return new Promise<string>((resolve, reject) => {
+    exec('hostname -I | awk \'{print $1}\'', (error, stdout, stderr) => {
+      if (error) {
+        reject(`Error fetching IP address: ${error.message}`);
+      } else if (stderr) {
+        reject(`Stderr: ${stderr}`);
+      } else {
+        resolve(stdout.trim());
+      }
+    });
+  });
+};
+
+test('testing api with dynamic host', async () => {
+  // Get the dynamic host IP
+  const host = await getHostIP();
+  console.log(host)
 
   const formData = {
     user: 'postgres',
     database: 'chinook',
-    host: '10.223.24.242',
+    host: host,  // Dynamic IP
     password: 'testpwd',
     port: '5442',
   };
@@ -19,7 +38,7 @@ test('testing api', async () => {
     input_text: question,
     conn_str: formData,
   };
-  
+
   const response = await axios.post(`${TEXT_TO_SQL_URL}/texttosql`, payload);
 
   expect(response.status).toBe(200);
