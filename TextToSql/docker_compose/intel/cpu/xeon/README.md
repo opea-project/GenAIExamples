@@ -169,10 +169,10 @@ npm run test
 
 Open this URL `http://{your_ip}:5174` in your browser to access the frontend.
 
-![project-screenshot](../../../../assets/img/textToSql_ui_init.png)
+![project-screenshot](../../../../assets/img/dbQnA_ui_init.png)
 
 Test DB Connection
-![project-screenshot](../../../../assets/img/textToSql_ui_successful_db_connection.png)
+![project-screenshot](../../../../assets/img/dbQnA_ui_successful_db_connection.png)
 
 Create SQL query and output for given NLP question
-![project-screenshot](../../../../assets/img/textToSql_ui_succesful_sql_output_generation.png)
+![project-screenshot](../../../../assets/img/dbQnA_ui_succesful_sql_output_generation.png)
