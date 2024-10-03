@@ -24,6 +24,10 @@ test('testing api with dynamic host', async () => {
   const host = await getHostIP();
   console.log(host)
 
+  const endpointUrl = `http://${host}:9090/v1/texttosql`;
+  console.log(endpointUrl);
+
+
   const formData = {
     user: 'postgres',
     database: 'chinook',
@@ -39,7 +43,7 @@ test('testing api with dynamic host', async () => {
     conn_str: formData,
   };
 
-  const response = await axios.post(`${TEXT_TO_SQL_URL}/texttosql`, payload);
+  const response = await axios.post(endpointUrl, payload);
 
   expect(response.status).toBe(200);
 
