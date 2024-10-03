@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { TEXT_TO_SQL_URL } from './config';
 import { exec } from 'child_process';
 
 const apiTimeOutInSeconds = 300;
