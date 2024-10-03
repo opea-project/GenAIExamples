@@ -2,7 +2,7 @@ import axios from 'axios';
 import { TEXT_TO_SQL_URL } from './config';
 import { exec } from 'child_process';
 
-const apiTimeOutInSeconds = 120;
+const apiTimeOutInSeconds = 300;
 
 // Helper function to get the host IP
 const getHostIP = () => {
