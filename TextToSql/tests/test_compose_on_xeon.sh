@@ -10,7 +10,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 tgi_port=8008
 tgi_volume=$WORKPATH/data
 
-export model="meta-llama/Meta-Llama-3.1-70B-Instruct"
+export model="meta-llama/Meta-Llama-3-8B-Instruct"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=testpwd
