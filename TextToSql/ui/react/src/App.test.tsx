@@ -35,7 +35,7 @@ test('testing api with dynamic host', async () => {
     port: '5442',
   };
 
-  const question = "Find the number of albums";
+  const question = "Find the total number of invoices.";
 
   const payload = {
     input_text: question,
