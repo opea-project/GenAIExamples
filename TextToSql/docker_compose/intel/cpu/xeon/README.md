@@ -35,8 +35,8 @@ docker build --no-cache -t opea/texttosql-react-ui:latest -f docker/Dockerfile.r
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `opea/texttosql:comps`
-2. `opea/texttosql-react-ui:latest`
+1. `opea/texttosql:latest`
+2. `opea/dbqna-react-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -55,7 +55,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 export your_ip=$(hostname -I | awk '{print $1}')
 
 # Example: no_proxy="localhost,127.0.0.1,192.168.1.1"
-export no_proxy=${your_no_proxy}
+export no_proxy=${your_no_proxy},$your_ip
 
 # If you are in a proxy environment, also set the proxy-related environment variables:
 export http_proxy=${your_http_proxy}
@@ -111,13 +111,13 @@ docker run -d --name="test-texttosql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v
 ```bash
 unset http_proxy
 
-docker run -d --name="test-texttosql-server" --ipc=host -p ${texttosql_port}:8090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT opea/texttosql:comps
+docker run -d --name="test-texttosql-server" --ipc=host -p ${texttosql_port}:8090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT opea/texttosql:latest
 ```
 
 - Start React UI service
 
 ```bash
-docker run -d --name="test-texttosql-react-ui-server" --ipc=host -p 5174:80 -e no_proxy=$no_proxy -e https_proxy=$https_proxy -e http_proxy=$http_proxy opea/texttosql-react-ui:latest
+docker run -d --name="test-dbqna-react-ui-server" --ipc=host -p 5174:80 -e no_proxy=$no_proxy -e https_proxy=$https_proxy -e http_proxy=$http_proxy opea/dbqna-react-ui:latest
 ```
 
 ## 🚀 Validate Microservices

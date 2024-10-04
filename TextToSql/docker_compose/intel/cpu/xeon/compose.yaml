@@ -33,16 +33,16 @@ services:
       - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
 
   texttosql_service:
-    image: opea/texttosql:comps
+    image: opea/texttosql:latest
     container_name: texttosql_service
     ports:
       - "9090:8090"
     environment:
       - TGI_LLM_ENDPOINT=${TGI_LLM_ENDPOINT}
 
-  texttosql-xeon-react-ui-server:
-    image: opea/texttosql-react-ui:latest
-    container_name: texttosql-xeon-react-ui-server
+  dbqna-xeon-react-ui-server:
+    image: opea/dbqna-react-ui:latest
+    container_name: dbqna-xeon-react-ui-server
     depends_on:
       - texttosql_service
     ports:
