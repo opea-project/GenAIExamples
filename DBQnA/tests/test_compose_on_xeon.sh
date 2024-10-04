@@ -111,7 +111,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cid=$(docker ps -aq --filter "name=test-texttosql*")
+    cid=$(docker ps -aq --filter "name=test-*")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 }
 
