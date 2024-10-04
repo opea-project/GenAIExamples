@@ -14,7 +14,7 @@ services:
 
   dbqna-xeon-react-ui:
     build:
-      context: GenAIExamples/TextToSql/ui/docker
+      context: GenAIExamples/DBQnA/ui/docker
       dockerfile: Dockerfile.react
       args:
         http_proxy: ${http_proxy}

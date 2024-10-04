@@ -95,7 +95,7 @@ const DBConnect: React.FC = () => {
   return (
     <div className={styleClasses.dbconnectWrapper}>
       <div className={styleClasses.dbConnectSection}>
-        <Title order={1}>Database Connection</Title>
+        <Title order={1}>DB Connection</Title>
         <form className={styleClasses.form} onSubmit={handleDBConnect}>
           <div className={styleClasses.inputField}>
             <TextInput
@@ -162,9 +162,9 @@ const DBConnect: React.FC = () => {
         {dberror && <Text className={styleClasses.error}>Error: {dberror}</Text>}
       </div>
 
-      {/* Text to SQL Section */}
+      {/* DBQnA Section */}
       <div className={styleClasses.textToSQLSection}>
-        <Title order={1}>Text To SQL</Title>
+        <Title order={1}>DBQnA</Title>
         {isConnected && (
           <form className={styleClasses.form} onSubmit={handleGenerateSQL}>
             <div className={styleClasses.sqlQuerySection}>

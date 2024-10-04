@@ -1,6 +1,6 @@
 # Deploy on Intel Xeon Processor
 
-This document outlines the deployment process for a Text to SQL Generation application DBQnA, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
+This document outlines the deployment process for DBQnA application which helps generating a SQL query and its output given a NLP question, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
 
 ## 🚀 Apply Intel Xeon Server on AWS
 
@@ -28,7 +28,7 @@ docker build --no-cache -t opea/texttosql:comps -f comps/texttosql/langchain/Doc
 Build the frontend Docker image based on react framework via below command:
 
 ```bash
-cd GenAIExamples/TextToSql/ui
+cd GenAIExamples/DBQnA/ui
 docker build --no-cache -t opea/texttosql-react-ui:latest -f docker/Dockerfile.react .
 
 ```
@@ -82,7 +82,7 @@ There are 2 options to start the microservice
 2.2.1 Start the microservice using docker compose
 
 ```bash
-cd GenAIExamples/TextToSql/docker_compose/intel/cpu/xeon
+cd GenAIExamples/DBQnA/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
