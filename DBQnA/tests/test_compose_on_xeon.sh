@@ -46,7 +46,7 @@ function start_service() {
     unset http_proxy
     docker run -d --name="test-texttosql-server" --ipc=host -p $TEXTTOSQL_PORT:8090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT opea/texttosql:latest
 
-    # check whether tgi is fully ready
+    # check whether tgi is fully ready.
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
         docker logs test-texttosql-tgi-endpoint > ${LOG_PATH}/tgi.log
