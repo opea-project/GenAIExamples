@@ -27,7 +27,7 @@ services:
     environment:
       ASR_ENDPOINT: ${ASR_ENDPOINT}
   speecht5-service:
-    image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-demo}
     container_name: speecht5-service
     ports:
       - "7055:7055"
@@ -91,7 +91,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   audioqna-gaudi-backend-server:
-    image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+    image: ${REGISTRY:-opea}/audioqna:${TAG:-demo}
     container_name: audioqna-gaudi-backend-server
     depends_on:
       - asr
