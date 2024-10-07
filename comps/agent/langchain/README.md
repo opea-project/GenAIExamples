@@ -44,7 +44,7 @@ Currently we have implemented OpenAI chat completion compatible API for agents. 
 
 ## 🚀2. Start Agent Microservice
 
-#### 2.1 Build Microservices
+### 2.1 Build Microservices
 
 ```bash
 cd GenAIComps/ # back to GenAIComps/ folder
