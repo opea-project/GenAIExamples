@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  texttosql_service:
+  texttosql-service:
     build:
       context: GenAIComps
       dockerfile: comps/texttosql/langchain/Dockerfile

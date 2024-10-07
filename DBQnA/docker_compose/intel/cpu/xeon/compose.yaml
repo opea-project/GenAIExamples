@@ -4,7 +4,7 @@
 version: "3.8"
 
 services:
-  tgi_service:
+  tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.1.0
     container_name: tgi-service
     ports:
@@ -21,7 +21,7 @@ services:
 
   postgres:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: postgres-container
     restart: always
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -32,9 +32,9 @@ services:
     volumes:
       - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
 
-  texttosql_service:
+  texttosql-service:
     image: opea/texttosql:latest
-    container_name: texttosql_service
+    container_name: texttosql-service
     ports:
       - "9090:8090"
     environment:
@@ -44,7 +44,7 @@ services:
     image: opea/dbqna-react-ui:latest
     container_name: dbqna-xeon-react-ui-server
     depends_on:
-      - texttosql_service
+      - texttosql-service
     ports:
       - "5174:80"
     environment:

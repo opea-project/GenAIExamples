@@ -1,6 +1,6 @@
 # Deploy on Intel Xeon Processor
 
-This document outlines the deployment process for DBQnA application which helps generating a SQL query and its output given a NLP question, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
+This document outlines the deployment process for DBQnA application which helps generating a SQL query and its output given a NLP question, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
 
 ## 🚀 Apply Intel Xeon Server on AWS
 
@@ -55,7 +55,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 export your_ip=$(hostname -I | awk '{print $1}')
 
 # Example: no_proxy="localhost,127.0.0.1,192.168.1.1"
-export no_proxy=${your_no_proxy},$your_ip
+export no_proxy=${your_no_proxy},${your_ip}
 
 # If you are in a proxy environment, also set the proxy-related environment variables:
 export http_proxy=${your_http_proxy}
@@ -64,7 +64,7 @@ export https_proxy=${your_http_proxy}
 # Set other required variables
 
 export TGI_PORT=8008
-export TGI_LLM_ENDPOINT=http://${your_ip}:$TGI_PORT
+export TGI_LLM_ENDPOINT=http://${your_ip}:${TGI_PORT}
 export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export POSTGRES_USER=postgres
@@ -79,14 +79,14 @@ Note: Please replace with `your_ip` with your external IP address, do not use lo
 
 There are 2 options to start the microservice
 
-2.2.1 Start the microservice using docker compose
+#### 2.2.1 Start the microservice using docker compose
 
 ```bash
 cd GenAIExamples/DBQnA/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
-2.2.2 Alternatively we can start the microservices by running individual docker services
+#### 2.2.2 Alternatively we can start the microservices by running individual docker services
 
 **NOTE:** Make sure all the individual docker services are down before starting them.
 
@@ -107,6 +107,7 @@ docker run --name test-texttosql-postgres --ipc=host -e POSTGRES_USER=${POSTGRES
 
 docker run -d --name="test-texttosql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model
 ```
+- Start Text-to-SQL Service
 
 ```bash
 unset http_proxy
@@ -122,7 +123,7 @@ docker run -d --name="test-dbqna-react-ui-server" --ipc=host -p 5174:80 -e no_pr
 
 ## 🚀 Validate Microservices
 
-3.1 TGI Service
+### 3.1 TGI Service
 
 ```bash
 
@@ -132,11 +133,11 @@ curl http://${your_ip}:$TGI_PORT/generate \
     -H 'Content-Type: application/json'
 ```
 
-3.2 Postgres Microservice
+### 3.2 Postgres Microservice
 
 Once Text-to-SQL microservice is started, user can use below command
 
-3.2.1 Test the Database connection
+#### 3.2.1 Test the Database connection
 
 ```bash
 curl --location http://${your_ip}:9090/v1/postgres/health \
@@ -144,7 +145,7 @@ curl --location http://${your_ip}:9090/v1/postgres/health \
     --data '{"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${your_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}'
 ```
 
-3.2.2 Invoke the microservice.
+#### 3.2.2 Invoke the microservice.
 
 ```bash
 curl http://${your_ip}:9090/v1/texttosql\
@@ -153,7 +154,7 @@ curl http://${your_ip}:9090/v1/texttosql\
     -H 'Content-Type: application/json'
 ```
 
-3.3 Frontend validation
+### 3.3 Frontend validation
 
 We test the API in frontend validation to check if API returns HTTP_STATUS: 200 and validates if API response returns SQL query and output
 
