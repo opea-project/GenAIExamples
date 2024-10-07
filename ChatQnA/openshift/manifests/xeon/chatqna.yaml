@@ -1,0 +1,986 @@
+---
+# Source: chatqna/charts/data-prep/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-data-prep
+  labels:
+    helm.sh/chart: data-prep-0.8.0
+    app.kubernetes.io/name: data-prep
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6007
+      targetPort: 6007
+      protocol: TCP
+      name: data-prep
+  selector:
+    app.kubernetes.io/name: data-prep
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/embedding-usvc/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-embedding-usvc
+  labels:
+    helm.sh/chart: embedding-usvc-0.8.0
+    app.kubernetes.io/name: embedding-usvc
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6000
+      targetPort: 6000
+      protocol: TCP
+      name: embedding-usvc
+  selector:
+    app.kubernetes.io/name: embedding-usvc
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/llm-uservice/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.8.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: llm-uservice
+  selector:
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/redis-vector-db/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-redis-vector-db
+  labels:
+    helm.sh/chart: redis-vector-db-0.8.0
+    app.kubernetes.io/name: redis-vector-db
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "7.4.0-v0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+      - port: 6379
+        targetPort: 6379
+        protocol: TCP
+        name: redis-service
+      - port: 8001
+        targetPort: 8001
+        protocol: TCP
+        name: redis-insight
+  selector:
+    app.kubernetes.io/name: redis-vector-db
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/reranking-usvc/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-reranking-usvc
+  labels:
+    helm.sh/chart: reranking-usvc-0.8.0
+    app.kubernetes.io/name: reranking-usvc
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: reranking-usvc
+  selector:
+    app.kubernetes.io/name: reranking-usvc
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/retriever-usvc/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-retriever-usvc
+  labels:
+    helm.sh/chart: retriever-usvc-0.8.0
+    app.kubernetes.io/name: retriever-usvc
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7000
+      targetPort: 7000
+      protocol: TCP
+      name: retriever-usvc
+  selector:
+    app.kubernetes.io/name: retriever-usvc
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/tei/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-tei
+  labels:
+    helm.sh/chart: tei-0.8.0
+    app.kubernetes.io/name: tei
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: tei
+  selector:
+    app.kubernetes.io/name: tei
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/teirerank/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-teirerank
+  labels:
+    helm.sh/chart: teirerank-0.8.0
+    app.kubernetes.io/name: teirerank
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 2082
+      protocol: TCP
+      name: teirerank
+  selector:
+    app.kubernetes.io/name: teirerank
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-tgi
+  labels:
+    helm.sh/chart: tgi-0.8.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 2080
+      protocol: TCP
+      name: tgi
+  selector:
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna
+  labels:
+    helm.sh/chart: chatqna-0.8.0
+    app.kubernetes.io/name: chatqna
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8888
+      targetPort: 8888
+      protocol: TCP
+      name: chatqna
+  selector:
+    app.kubernetes.io/name: chatqna
+    app.kubernetes.io/instance: chatqna
+---
+# Source: chatqna/charts/data-prep/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-data-prep
+  labels:
+    helm.sh/chart: data-prep-0.8.0
+    app.kubernetes.io/name: data-prep
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: data-prep
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: data-prep
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext: {}
+      containers:
+        - name: chatqna
+          env:
+            - name: TEI_ENDPOINT
+              value: "http://chatqna-tei"
+            - name: REDIS_URL
+              value: "redis://chatqna-redis-vector-db:6379"
+            - name: INDEX_NAME
+              value: "rag-redis"
+            - name: HUGGINGFACEHUB_API_TOKEN
+              value: "insert-your-huggingface-token-here"
+            - name: HF_HOME
+              value: "/tmp/.cache/huggingface"
+            - name: LANGCHAIN_TRACING_V2
+              value: "false"
+            - name: LANGCHAIN_API_KEY
+              value: "insert-your-langchain-key-here"
+            - name: LANGCHAIN_PROJECT
+              value: "opea-dataprep-service"
+            - name: http_proxy
+              value: ""
+            - name: https_proxy
+              value: ""
+            - name: no_proxy
+              value: ""
+            - name: PYTHONPATH
+              value: /home/user/.local/lib/python3.11/site-packages:/home/user
+            - name: HOME
+              value: /tmp/home
+          securityContext: {}
+          image: "image-registry.openshift-image-registry.svc:5000/insert-your-namespace-here/dataprep-redis:latest"
+          imagePullPolicy: Always
+          ports:
+            - name: data-prep
+              containerPort: 6007
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/charts/embedding-usvc/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-embedding-usvc
+  labels:
+    helm.sh/chart: embedding-usvc-0.8.0
+    app.kubernetes.io/name: embedding-usvc
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: embedding-usvc
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: embedding-usvc
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: chatqna
+          env:
+            - name: TEI_EMBEDDING_ENDPOINT
+              value: "http://chatqna-tei"
+            - name: LANGCHAIN_TRACING_V2
+              value: "false"
+            - name: LANGCHAIN_API_KEY
+              value: "insert-your-langchain-key-here"
+            - name: LANGCHAIN_PROJECT
+              value: "opea-embedding-service"
+            - name: http_proxy
+              value: ""
+            - name: https_proxy
+              value: ""
+            - name: no_proxy
+              value: ""
+            - name: PYTHONPATH
+              value: /home/user/.local/lib/python3.11/site-packages:/home/user
+            - name: HOME
+              value: /tmp/home
+          securityContext: {}
+          image: "image-registry.openshift-image-registry.svc:5000/insert-your-namespace-here/embedding-tei:latest"
+          imagePullPolicy: Always
+          ports:
+            - name: embedding-usvc
+              containerPort: 6000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/charts/llm-uservice/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-llm-uservice
+  labels:
+    helm.sh/chart: llm-uservice-0.8.0
+    app.kubernetes.io/name: llm-uservice
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llm-uservice
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llm-uservice
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: chatqna
+          env:
+            - name: TGI_LLM_ENDPOINT
+              value: "http://chatqna-tgi"
+            - name: HUGGINGFACEHUB_API_TOKEN
+              value: "insert-your-huggingface-token-here"
+            - name: HF_HOME
+              value: "/tmp/.cache/huggingface"
+            - name: LANGCHAIN_TRACING_V2
+              value: "false"
+            - name: LANGCHAIN_API_KEY
+              value: "insert-your-langchain-key-here"
+            - name: LANGCHAIN_PROJECT
+              value: "opea-llm-uservice"
+            - name: http_proxy
+              value: ""
+            - name: https_proxy
+              value: ""
+            - name: no_proxy
+              value: ""
+            - name: PYTHONPATH
+              value: /home/user/.local/lib/python3.11/site-packages:/home/user
+            - name: HOME
+              value: /tmp/home
+          securityContext: {}
+          image: "image-registry.openshift-image-registry.svc:5000/insert-your-namespace-here/llm-tgi:latest"
+          imagePullPolicy: Always
+          ports:
+            - name: llm-uservice
+              containerPort: 9000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          startupProbe:
+            exec:
+              command:
+              - curl
+              - http://chatqna-tgi
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 120
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/charts/redis-vector-db/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-redis-vector-db
+  labels:
+    helm.sh/chart: redis-vector-db-0.8.0
+    app.kubernetes.io/name: redis-vector-db
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "7.2.0-v9"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis-vector-db
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis-vector-db
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: redis-vector-db
+          securityContext: {}
+          image: "redis/redis-stack:7.4.0-v0"
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /data
+              name: data-volume
+            - mountPath: /redisinsight
+              name: redisinsight-volume
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: redis-service
+              containerPort: 6379
+              protocol: TCP
+            - name: redis-insight
+              containerPort: 8001
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: 6379 # Probe the Redis port
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 120
+          resources:
+            {}
+      volumes:
+        - name: data-volume
+          emptyDir: {}
+        - name: redisinsight-volume
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/charts/reranking-usvc/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-reranking-usvc
+  labels:
+    helm.sh/chart: reranking-usvc-0.8.0
+    app.kubernetes.io/name: reranking-usvc
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: reranking-usvc
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: reranking-usvc
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: chatqna
+          env:
+            - name: TEI_RERANKING_ENDPOINT
+              value: "http://chatqna-teirerank"
+            - name: LANGCHAIN_TRACING_V2
+              value: "false"
+            - name: LANGCHAIN_API_KEY
+              value: "insert-your-langchain-key-here"
+            - name: LANGCHAIN_PROJECT
+              value: "opea-reranking-service"
+            - name: http_proxy
+              value: ""
+            - name: https_proxy
+              value: ""
+            - name: no_proxy
+              value: ""
+            - name: PYTHONPATH
+              value: /home/user/.local/lib/python3.11/site-packages:/home/user
+            - name: HOME
+              value: /tmp/home
+          securityContext: {}
+          image: "image-registry.openshift-image-registry.svc:5000/insert-your-namespace-here/reranking-tei:latest"
+          imagePullPolicy: Always
+          ports:
+            - name: reranking-usvc
+              containerPort: 8000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/charts/retriever-usvc/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-retriever-usvc
+  labels:
+    helm.sh/chart: retriever-usvc-0.8.0
+    app.kubernetes.io/name: retriever-usvc
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: retriever-usvc
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: retriever-usvc
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: chatqna
+          env:
+            - name: TEI_EMBEDDING_ENDPOINT
+              value: "http://chatqna-tei"
+            - name: REDIS_URL
+              value: "redis://chatqna-redis-vector-db:6379"
+            - name: INDEX_NAME
+              value: "rag-redis"
+            - name: EASYOCR_MODULE_PATH
+              value: "/tmp/.EasyOCR"
+            - name: LANGCHAIN_TRACING_V2
+              value: "false"
+            - name: LANGCHAIN_API_KEY
+              value: "insert-your-langchain-key-here"
+            - name: LANGCHAIN_PROJECT
+              value: "opea-retriever-service"
+            - name: HF_HOME
+              value: "/tmp/.cache/huggingface"
+            - name: http_proxy
+              value: ""
+            - name: https_proxy
+              value: ""
+            - name: no_proxy
+              value: ""
+            - name: PYTHONPATH
+              value: /home/user/.local/lib/python3.11/site-packages:/home/user
+            - name: HOME
+              value: /tmp/home
+          securityContext: {}
+          image: "image-registry.openshift-image-registry.svc:5000/insert-your-namespace-here/retriever-redis:latest"
+          imagePullPolicy: Always
+          ports:
+            - name: retriever-usvc
+              containerPort: 7000
+              protocol: TCP
+          startupProbe:
+            exec:
+              command:
+              - curl
+              - http://chatqna-tei
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 120
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /tmp/home
+              name: local-dir
+      volumes:
+        - emptyDir:
+            sizeLimit: 5Gi
+          name: local-dir
+---
+# Source: chatqna/charts/tei/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-tei
+  labels:
+    helm.sh/chart: tei-0.8.0
+    app.kubernetes.io/name: tei
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tei
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tei
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: tei
+          env:
+            - name: TEI_EMBEDDING_ENDPOINT
+              value: "http://chatqna-tei"
+            - name: REDIS_URL
+              value: "redis://chatqna-redis-vector-db:6379"
+            - name: INDEX_NAME
+              value: "rag-redis"
+            - name: EASYOCR_MODULE_PATH
+              value: "/tmp/.EasyOCR"
+            - name: LANGCHAIN_TRACING_V2
+              value: "false"
+            - name: LANGCHAIN_API_KEY
+              value: "insert-your-langchain-key-here"
+            - name: LANGCHAIN_PROJECT
+              value: "opea-retriever-service"
+            - name: HF_HOME
+              value: "/tmp/.cache/huggingface"
+            - name: http_proxy
+              value: ""
+            - name: https_proxy
+              value: ""
+            - name: no_proxy
+              value: ""
+          securityContext: {}
+          image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
+          imagePullPolicy: Always
+          args: ["--port", "8080"]
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+            - mountPath: /dev/shm
+              name: shm
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: http
+              containerPort: 2081
+              protocol: TCP
+          resources:
+            {}
+      volumes:
+        - name: model-volume
+          emptyDir:
+            sizeLimit: 50Gi
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/charts/teirerank/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-teirerank
+  labels:
+    helm.sh/chart: teirerank-0.8.0
+    app.kubernetes.io/name: teirerank
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: teirerank
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: teirerank
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: teirerank
+          env:
+            - name: MODEL_ID
+              value: "BAAI/bge-reranker-base"
+            - name: PORT
+              value: "2082"
+            - name: NUMBA_CACHE_DIR
+              value: "/tmp"
+            - name: TRANSFORMERS_CACHE
+              value: "/tmp/transformers_cache"
+            - name: HF_HOME
+              value: "/tmp/.cache/huggingface"
+            - name: http_proxy
+              value: ""
+            - name: https_proxy
+              value: ""
+            - name: no_proxy
+              value: ""
+          securityContext:
+            {}
+          image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+            - mountPath: /dev/shm
+              name: shm
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: http
+              containerPort: 2082
+              protocol: TCP
+          resources:
+            {}
+      volumes:
+        - name: model-volume
+          emptyDir:
+            sizeLimit: 50Gi
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/charts/tgi/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-tgi
+  labels:
+    helm.sh/chart: tgi-0.8.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tgi
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tgi
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: tgi
+          env:
+            - name: MODEL_ID
+              value: "Intel/neural-chat-7b-v3-3"
+            - name: PORT
+              value: "2080"
+            - name: HUGGING_FACE_HUB_TOKEN
+              value: "insert-your-huggingface-token-here"
+            - name: HF_TOKEN
+              value: "insert-your-huggingface-token-here"
+            - name: MAX_INPUT_TOKENS
+              value: "1024"
+            - name: MAX_TOTAL_TOKENS
+              value: "4096"
+            - name: NUMBA_CACHE_DIR
+              value: "/tmp"
+            - name: TRANSFORMERS_CACHE
+              value: "/tmp/transformers_cache"
+            - name: HF_HOME
+              value: "/tmp/.cache/huggingface"
+            - name: http_proxy
+              value: ""
+            - name: https_proxy
+              value: ""
+            - name: no_proxy
+              value: ""
+          securityContext:
+            {}
+          image: "ghcr.io/huggingface/text-generation-inference:2.2.0"
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: http
+              containerPort: 2080
+              protocol: TCP
+          resources:
+            {}
+      volumes:
+        - name: model-volume
+          emptyDir:
+            sizeLimit: 50Gi
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna
+  labels:
+    helm.sh/chart: chatqna-0.8.0
+    app.kubernetes.io/name: chatqna
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chatqna
+      app.kubernetes.io/instance: chatqna
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chatqna
+        app.kubernetes.io/instance: chatqna
+    spec:
+      securityContext:
+        null
+      containers:
+        - name: chatqna
+          env:
+            - name: LLM_SERVICE_HOST_IP
+              value: chatqna-llm-uservice
+            - name: RERANK_SERVICE_HOST_IP
+              value: chatqna-reranking-usvc
+            - name: RETRIEVER_SERVICE_HOST_IP
+              value: chatqna-retriever-usvc
+            - name: EMBEDDING_SERVICE_HOST_IP
+              value: chatqna-embedding-usvc
+          securityContext:
+            {}
+          image: "image-registry.openshift-image-registry.svc:5000/insert-your-namespace-here/chatqna:latest"
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: chatqna
+              containerPort: 8888
+              protocol: TCP
+          resources:
+            null
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: chatqna/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    io.kompose.service: chatqna
+  name: chatqna
+spec:
+  port:
+    targetPort: 8888
+  to:
+    kind: Service
+    name: chatqna
+    weight: 100
+  wildcardPolicy: None
+
