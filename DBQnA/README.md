@@ -14,5 +14,4 @@ The key feature of DBQnA app is that it converts a user's natural language query
 
 ## 📚 Setup Guide
 
-
 - **[Xeon Guide](./docker_compose/intel/cpu/xeon/README.md)**: Instructions to build Docker images from source and run the application via Docker Compose.
