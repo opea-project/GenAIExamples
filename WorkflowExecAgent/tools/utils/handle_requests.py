@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from functools import wraps
+
 import requests
+
 
 class RequestHandler:
     """Class for handling requests.
@@ -69,7 +71,7 @@ class RequestHandler:
                     error = {"error": f"{response.status_code} {response.reason} {err}"}
                 except Exception as err:
                     error = err
-                    
+
                 return error
 
         return decorated
