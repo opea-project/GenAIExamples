@@ -14,7 +14,9 @@
 /comps/lvms/ sihan.chen@intel.com
 /comps/nginx/ letong.han@intel.com
 /comps/prompt_registry/ hoong.tee.yeoh@intel.com
+/comps/feedback_management/ hoong.tee.yeoh@intel.com
 /comps/chathistory/ yogesh.pandey@intel.com
+/comps/texttosql/ yogesh.pandey@intel.com
 /comps/reranks/ xuhui.ren@intel.com
 /comps/retrievers/ xuhui.ren@intel.com
 /comps/tts/ sihan.chen@intel.com
