@@ -1,0 +1,14 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+# images used by GenAIExamples: text2image,text2image-gaudi
+services:
+  text2image:
+    build:
+      dockerfile: comps/text2image/Dockerfile
+    image: ${REGISTRY:-opea}/text2image:${TAG:-latest}
+  text2image-gaudi:
+    build:
+      dockerfile: comps/text2image/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/text2image-gaudi:${TAG:-latest}

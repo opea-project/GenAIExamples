@@ -1,0 +1,15 @@
+accelerate
+datasets
+diffusers
+docarray[full]
+fastapi
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+prometheus-fastapi-instrumentator
+pydantic==2.7.2
+pydub
+shortuuid
+torch
+transformers
+uvicorn

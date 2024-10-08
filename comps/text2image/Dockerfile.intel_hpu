@@ -1,0 +1,30 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# HABANA environment
+# FROM vault.habana.ai/gaudi-docker/1.16.1/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest as hpu
+FROM opea/habanalabs:1.16.1-pytorch-installer-2.2.2 as hpu
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
+
+COPY comps /home/user/comps
+
+RUN chown -R user /home/user/comps/text2image
+
+RUN rm -rf /etc/ssh/ssh_host*
+USER user
+# Set environment variables
+ENV LANG=en_US.UTF-8
+ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/home/user/optimum-habana
+
+# Install requirements and optimum habana
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /home/user/comps/text2image/requirements.txt && \
+    pip install --no-cache-dir optimum[habana]
+
+WORKDIR /home/user/comps/text2image
+
+RUN echo python text2image.py --device hpu --use_hpu_graphs --bf16 >> run.sh
+
+CMD bash run.sh
