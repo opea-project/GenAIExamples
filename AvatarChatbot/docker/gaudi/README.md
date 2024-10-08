@@ -5,33 +5,73 @@ The AvatarChatbot service can be effortlessly deployed on either Intel Gaudi2 or
 ## 🚀 Megaservice flow
 
 ```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 100
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 42px
+---
 flowchart LR
-    subgraph AvatarChatbot
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef thistle fill:#D8BFD8,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style AvatarChatbot-Megaservice stroke:#000000
+
+    %% Subgraphs %%    
+    subgraph AvatarChatbot-Megaservice["AvatarChatbot Megaservice"]
         direction LR
-        A[User] --> |Input query| B[AvatarChatbot Gateway]
-        B --> |Invoke| Megaservice
-        subgraph Megaservice["AvatarChatbot Megaservice"]
-            direction LR
-            subgraph AudioQnA["AudioQnA"]
-                direction TB
-                C((ASR<br>3001)) -. Post .-> D{{whisper-service<br>7066}}
-                E((LLM<br>3007)) -. Post .-> F{{tgi-service<br>3006}}
-                G((TTS<br>3002)) -. Post .-> H{{speecht5-service<br>7055}}
-            end
-            subgraph AvatarAnimation["Avatar Animation"]
-                direction TB
-                I((AvatarAnime<br>3008)) -. Post .-> J{{animation<br>7860}}
-            end
-            AudioQnA ==> AvatarAnimation
-        end
-        Megaservice --> |Output| K[Response]
+        ASR([ASR<br>3001]):::blue
+        LLM([LLM 'text-generation'<br>3007]):::blue
+        TTS([TTS<br>3002]):::blue
+        animation([Animation<br>3008]):::blue
+    end
+    subgraph UserInterface["User Interface"]
+        direction LR
+        invis1[ ]:::invisible
+        USER1([User Audio Query]):::orchid
+        USER2([User Image/Video Query]):::orchid
+        UI([UI server<br>]):::orchid
+    end
+    subgraph ChatQnA GateWay
+        direction LR
+        invis2[ ]:::invisible
+        GW([AvatarChatbot GateWay<br>]):::orange
+    end
+    subgraph  
+        direction LR
+        X([OPEA Microservice]):::blue
+        Y{{Open Source Service}}:::thistle
+        Z([OPEA Gateway]):::orange
+        Z1([UI]):::orchid
     end
 
-    subgraph Legend
-        direction LR
-        L([Microservice]) ==> M([Microservice])
-        N([Microservice]) -.-> O{{Server API}}
-    end
+    %% Services %%    
+    WHISPER{{Whisper service<br>7066}}:::thistle
+    TGI{{LLM service<br>3006}}:::thistle
+    T5{{Speecht5 service<br>7055}}:::thistle
+    WAV2LIP{{Wav2Lip service<br>3003}}:::thistle
+
+    %% Connections %%
+    direction LR
+    USER1 -->|1| UI
+    UI -->|2| GW
+    GW <==>|3| AvatarChatbot-Megaservice
+    ASR ==>|4| LLM ==>|5| TTS ==>|6| animation
+
+    direction TB
+    ASR <-.->|3'| WHISPER
+    LLM <-.->|4'| TGI
+    TTS <-.->|5'| T5
+    animation <-.->|6'| WAV2LIP
+
+    USER2 -->|1| UI
+    UI <-.->|6'| WAV2LIP
 ```
 
 ## 🚀 Build Docker images
