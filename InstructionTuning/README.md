@@ -1,6 +1,6 @@
 # Instruction Tuning
 
-Instruction tuning is the process of further training LLMs on a dataset consisting of (instruction, output) pairs in a supervised fashion, which bridges the gap between the next-word prediction objective of LLMs and the users' objective of having LLMs adhere to human instructions.
+Instruction tuning is the process of further training LLMs on a dataset consisting of (instruction, output) pairs in a supervised fashion, which bridges the gap between the next-word prediction objective of LLMs and the users' objective of having LLMs adhere to human instructions. This implementation deploys a Ray cluster for the task.
 
 ## Deploy Instruction Tuning Service
 
@@ -37,6 +37,8 @@ curl http://${your_ip}:8015/v1/fine_tuning/jobs \
     "model": "meta-llama/Llama-2-7b-chat-hf"
   }'
 ```
+
+The outputs of the finetune job (adapter_model.safetensors, adapter_config,json... ) are stored in `/home/user/comps/finetuning/output` and other execution logs are stored in `/home/user/ray_results`
 
 ### 3. Manage fine-tuning job
 
