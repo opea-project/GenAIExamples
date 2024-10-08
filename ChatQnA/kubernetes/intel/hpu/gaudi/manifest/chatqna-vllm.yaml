@@ -1275,7 +1275,7 @@ spec:
             capabilities:
               add: ["SYS_NICE"]
           image: "opea/llm-vllm-hpu:latest"
-          command: 
+          command:
             - /bin/bash
             - -c
             - |
@@ -1435,6 +1435,3 @@ spec:
 # Source: chatqna/templates/customMetrics.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
-
-
