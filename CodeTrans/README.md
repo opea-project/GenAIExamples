@@ -6,6 +6,57 @@ The workflow falls into the following architecture:
 
 ![architecture](./assets/img/code_trans_architecture.png)
 
+The CodeTrans example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
+
+```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
+flowchart LR
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style CodeTrans-MegaService stroke:#000000
+
+    %% Subgraphs %%
+    subgraph CodeTrans-MegaService["CodeTrans MegaService "]
+        direction LR
+        LLM([LLM MicroService]):::blue
+    end
+    subgraph UserInterface[" User Interface "]
+        direction LR
+        a([User Input Query]):::orchid
+        UI([UI server<br>]):::orchid
+    end
+
+
+    LLM_gen{{LLM Service <br>}}
+    GW([CodeTrans GateWay<br>]):::orange
+    NG([Nginx MicroService]):::blue
+
+
+    %% Questions interaction
+    direction LR
+    NG <==> UserInterface
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> CodeTrans-MegaService
+
+
+    %% Embedding service flow
+    direction LR
+    LLM <-.-> LLM_gen
+
+```
+
 This Code Translation use case demonstrates Text Generation Inference across multiple platforms. Currently, we provide examples for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html), and we invite contributions from other hardware vendors to expand OPEA ecosystem.
 
 ## Deploy Code Translation Service
