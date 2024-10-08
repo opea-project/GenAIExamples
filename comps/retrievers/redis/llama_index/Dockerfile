@@ -1,7 +1,12 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-FROM ubuntu:22.04
+FROM python:3.11-slim
+
+# Set environment variables
+ENV LANG=en_US.UTF-8
+
+ARG ARCH="cpu"
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     python3-pip \
@@ -17,7 +22,11 @@ COPY comps /home/user/comps
 USER user
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/user/comps/retrievers/redis/llama_index/requirements.txt
+    if [ ${ARCH} = "cpu" ]; then \
+      pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r /home/user/comps/retrievers/redis/llama_index/requirements.txt; \
+    else \
+      pip install --no-cache-dir -r /home/user/comps/retrievers/redis/llama_index/requirements.txt; \
+    fi;
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
