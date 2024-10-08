@@ -14,12 +14,11 @@ MultimodalQnA is implemented on top of [GenAIComps](https://github.com/opea-proj
 ---
 config:
   flowchart:
-    nodeSpacing: 100
+    nodeSpacing: 400
     rankSpacing: 100
     curve: linear
-  theme: base
   themeVariables:
-    fontSize: 42px
+    fontSize: 50px
 ---
 flowchart LR
     %% Colors %%
@@ -35,22 +34,11 @@ flowchart LR
         RET([Retrieval <br>]):::blue
         LVM([LVM <br>]):::blue
     end
-    subgraph User Interface
-        direction TB
+    subgraph UserInterface[" User Interface "]
+        direction LR
         a([User Input Query]):::orchid
         Ingest([Ingest data]):::orchid
         UI([UI server<br>]):::orchid
-    end
-    subgraph MultimodalQnA GateWay
-        direction LR
-        invisible1[ ]:::invisible
-        GW([MultimodalQnA GateWay<br>]):::orange
-    end
-    subgraph .
-        X([OPEA Microservice]):::blue
-        Y{{Open Source Service}}
-        Z([OPEA Gateway]):::orange
-        Z1([UI]):::orchid
     end
 
     TEI_EM{{Embedding service <br>}}
@@ -58,34 +46,33 @@ flowchart LR
     R_RET{{Retriever service <br>}}
     DP([Data Preparation<br>]):::blue
     LVM_gen{{LVM Service <br>}}
+    GW([MultimodalQnA GateWay<br>]):::orange
 
     %% Data Preparation flow
     %% Ingest data flow
     direction LR
-    Ingest[Ingest data] -->|a| UI
-    UI -->|b| DP
-    DP <-.->|c| TEI_EM
+    Ingest[Ingest data] --> UI
+    UI -->DP
+    DP <-.-> TEI_EM
 
     %% Questions interaction
     direction LR
-    a[User Input Query] -->|1| UI
-    UI -->|2| GW
-    GW <==>|3| MultimodalQnA-MegaService
-    EM ==>|4| RET
-    RET ==>|5| LVM
-
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> MultimodalQnA-MegaService
+    EM ==> RET
+    RET ==> LVM
 
     %% Embedding service flow
-    direction TB
-    EM <-.->|3'| TEI_EM
-    RET <-.->|4'| R_RET
-    LVM <-.->|5'| LVM_gen
+    direction LR
+    EM <-.-> TEI_EM
+    RET <-.-> R_RET
+    LVM <-.-> LVM_gen
 
     direction TB
     %% Vector DB interaction
-    R_RET <-.->|d|VDB
-    DP <-.->|e|VDB
-
+    R_RET <-.->VDB
+    DP <-.->VDB
 
 
 
