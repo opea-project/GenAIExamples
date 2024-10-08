@@ -6,7 +6,6 @@ from typing import Dict
 
 from .component import Component
 
-
 class Workflow(Component):
     """Class for handling EasyData workflow operations.
 
@@ -36,10 +35,10 @@ class Workflow(Component):
         endpoint = f"serving/servable_workflows/{self.workflow_id}/start"
         wf_key = self._make_request(endpoint, "POST", data)["wf_key"]
         if wf_key:
-            return {"message": f"Workflow successfully started. The workflow key is {wf_key}"}
+            return f"Workflow successfully started. The workflow key is {wf_key}."
         else:
-            return {"message": "Workflow failed to start"}
-
+            return "Workflow failed to start"
+        
     def get_status(self) -> Dict[str, str]:
         """
         ``GET https://SDK_BASE_URL/serving/serving_workflows/{workflow_key}/status``

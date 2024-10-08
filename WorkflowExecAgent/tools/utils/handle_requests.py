@@ -2,12 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from functools import wraps
-
 import requests
-from logger import get_logger
-
-logger = get_logger(__name__)
-
 
 class RequestHandler:
     """Class for handling requests.
@@ -59,7 +54,7 @@ class RequestHandler:
         def decorated(response=None, *args, **kwargs):
             if response is not None:
                 try:
-                    logger.debug(response)
+                    print(response)
                     return func(response, *args, **kwargs)
 
                 except requests.exceptions.HTTPError as errh:
@@ -73,35 +68,8 @@ class RequestHandler:
                 except requests.exceptions.RequestException as err:
                     error = {"error": f"{response.status_code} {response.reason} {err}"}
                 except Exception as err:
-                    logger.debug(response)
-                    response = response.json()
-                    logger.debug(response)
-                    error_msg = f'{response["inner_code"]} {response["friendly_message"]}'
-                    error = {"status_code": response["status_code"], "error": error_msg}
-
-                return error
-
-            else:
-                try:
-                    return func(*args, **kwargs)
-
-                except requests.exceptions.HTTPError as errh:
-                    error = {"error": f"HTTP Error {errh}"}
-                except requests.exceptions.ConnectionError as errc:
-                    error = {"error": f"Connection Error {errc}"}
-                except requests.exceptions.Timeout as errt:
-                    error = {"error": f"Timeout Error {errt}"}
-                except requests.exceptions.ChunkedEncodingError as errck:
-                    error = {"error": f"Invalid chunk encoding: {str(errck)}"}
-                except requests.exceptions.RequestException as err:
-                    error = {"error": err}
-
-                logger.error(f"{error}")
-
+                    error = err
+                    
                 return error
 
         return decorated
-
-    def _handle_status_logger(self, val_status):
-        if val_status["status"] is False:
-            logger.error(val_status["msg"])

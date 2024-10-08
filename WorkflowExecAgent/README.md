@@ -1,7 +1,5 @@
 # Workflow Executor Agent
 
-##
-
 ## Setup Guide
 
 Workflow Executor will have a single docker image.
@@ -19,13 +17,14 @@ Configure .env file with the following. Replace the variables according to your 
 ```sh
 export ip_address=$(hostname -I | awk '{print $1}')
 export SERVING_PORT=8000
-export LLM_MODEL="mistralai/Mistral-7B-Instruct-v0.3"
+export model="mistralai/Mistral-7B-Instruct-v0.3"
 export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 export SDK_BASE_URL=${SDK_BASE_URL}
 export SERVING_TOKEN=${SERVING_TOKEN}
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
-export llm_serving_url=
+export recursion_limit=${recursion_limit}
+export OPENAI_API_KEY=${OPENAI_API_KEY}
 ```
 
 Launch service:

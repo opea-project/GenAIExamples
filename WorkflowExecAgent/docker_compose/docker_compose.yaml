@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  supervisor:
+  worflowexec-agent:
     image: opea/agent-langchain:latest
-    container_name: supervisor-agent-endpoint
+    container_name: worflowexec-agent-endpoint
     volumes:
       - ${WORKDIR}/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
       - ${TOOLSET_PATH}:/home/user/tools/
@@ -14,7 +14,7 @@ services:
     environment:
       ip_address: ${ip_address}
       strategy: workflow_executor
-      recursion_limit: ${recursion_limit_supervisor}
+      recursion_limit: ${recursion_limit}
       llm_engine: openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       model: ${model}
