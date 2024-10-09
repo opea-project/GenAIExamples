@@ -21,11 +21,7 @@ const getHostIP = () => {
 test('testing api with dynamic host', async () => {
   // Get the dynamic host IP
   const host = await getHostIP();
-  console.log(host)
-
   const endpointUrl = `http://${host}:9090/v1/texttosql`;
-  console.log(endpointUrl);
-
 
   const formData = {
     user: 'postgres',
