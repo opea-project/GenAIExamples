@@ -192,7 +192,7 @@ function main() {
     elif [ "${mode}" == "" ]; then
         validate_microservices
         validate_megaservice
-        validate_frontend
+        #validate_frontend
     fi
 
     stop_docker

@@ -153,7 +153,7 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 - `opea/retriever-redis:latest`
 - `opea/dataprep-redis:latest`
-- `opea/chatqna:latest` or `opea/chatqna-guardrails:latest` or `opea/chatqna-without-rerank:latest`
+- `opea/chatqna:latest`
 - `opea/chatqna-ui:latest`
 - `opea/nginx:latest`
 

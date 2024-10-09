@@ -43,11 +43,11 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVER_HOST_IP=${ip_address}
     export LLM_SERVER_HOST_IP=${ip_address}
-    export GUARDRAIL_SERVER_HOST_IP=${ip_address}
+    export GUARDRAIL_SERVICE_HOST_IP=${ip_address}
     export EMBEDDING_SERVER_PORT=8090
     export RERANK_SERVER_PORT=8808
     export LLM_SERVER_PORT=8008
-    export GUARDRAIL_SERVER_PORT=8088
+    export GUARDRAIL_SERVICE_PORT=9090
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
@@ -149,13 +149,13 @@ function validate_microservices() {
         "tgi-gaudi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
-    # tgi for guardrails service
+    # guardrails microservice
     validate_services \
-        "${ip_address}:8088/generate" \
-        "generated_text" \
-        "tgi-guardrails" \
-        "tgi-guardrails-server" \
-        '{"inputs":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}'
+        "${ip_address}:9090/v1/guardrails" \
+        "Violated policies" \
+        "guardrails" \
+        "guardrails-tgi-gaudi-server" \
+        '{"text":"How do you buy a tiger in the US?"}'
 }
 
 function validate_megaservice() {

@@ -37,8 +37,8 @@ If you don't know the answer to a question, please don't share false information
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
-GUARDRAIL_SERVER_HOST_IP = os.getenv("GUARDRAIL_SERVER_HOST_IP", "0.0.0.0")
-GUARDRAIL_SERVER_PORT = int(os.getenv("GUARDRAIL_SERVER_PORT", 9090))
+GUARDRAIL_SERVICE_HOST_IP = os.getenv("GUARDRAIL_SERVICE_HOST_IP", "0.0.0.0")
+GUARDRAIL_SERVICE_PORT = int(os.getenv("GUARDRAIL_SERVICE_PORT", 9090))
 EMBEDDING_SERVER_HOST_IP = os.getenv("EMBEDDING_SERVER_HOST_IP", "0.0.0.0")
 EMBEDDING_SERVER_PORT = int(os.getenv("EMBEDDING_SERVER_PORT", 6006))
 RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
@@ -71,7 +71,6 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
-
     return inputs
 
 
@@ -258,8 +257,8 @@ class ChatQnAService:
     def add_remote_service_with_guardrails(self):
         guardrail_in = MicroService(
             name="guardrail_in",
-            host=GUARDRAIL_SERVER_HOST_IP,
-            port=GUARDRAIL_SERVER_PORT,
+            host=GUARDRAIL_SERVICE_HOST_IP,
+            port=GUARDRAIL_SERVICE_PORT,
             endpoint="/v1/guardrails",
             use_remote_service=True,
             service_type=ServiceType.GUARDRAIL,
@@ -298,8 +297,8 @@ class ChatQnAService:
         )
         # guardrail_out = MicroService(
         #     name="guardrail_out",
-        #     host=GUARDRAIL_SERVER_HOST_IP,
-        #     port=GUARDRAIL_SERVER_PORT,
+        #     host=GUARDRAIL_SERVICE_HOST_IP,
+        #     port=GUARDRAIL_SERVICE_PORT,
         #     endpoint="/v1/guardrails",
         #     use_remote_service=True,
         #     service_type=ServiceType.GUARDRAIL,
