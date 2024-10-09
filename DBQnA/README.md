@@ -1,4 +1,4 @@
-# Productivity Suite Application
+# DBQnA Application
 
 Experience a revolutionary way to interact with your database using our DBQnA app! Harnessing the power of OPEA microservices, our application seamlessly translates natural language queries into SQL and delivers real-time database results, all designed to optimize workflows and enhance productivity for modern enterprises.
 
