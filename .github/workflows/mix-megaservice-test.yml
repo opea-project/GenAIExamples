@@ -32,6 +32,7 @@ env:
 jobs:
   MegaService:
     runs-on: gaudi
+    timeout-minutes: 10
     steps:
       - name: Clean Up Working Directory
         run: |
