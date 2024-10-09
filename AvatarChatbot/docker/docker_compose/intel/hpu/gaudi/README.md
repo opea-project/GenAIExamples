@@ -38,7 +38,7 @@ flowchart LR
         USER2([User Image/Video Query]):::orchid
         UI([UI server<br>]):::orchid
     end
-    subgraph ChatQnA GateWay
+    subgraph AvatarChatbot GateWay
         direction LR
         invis2[ ]:::invisible
         GW([AvatarChatbot GateWay<br>]):::orange

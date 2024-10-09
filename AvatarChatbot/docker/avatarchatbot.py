@@ -3,6 +3,7 @@
 
 import asyncio
 import os
+import sys
 
 from comps import AvatarChatbotGateway, MicroService, ServiceOrchestrator, ServiceType
 
@@ -16,6 +17,14 @@ TTS_SERVICE_HOST_IP = os.getenv("TTS_SERVICE_HOST_IP", "0.0.0.0")
 TTS_SERVICE_PORT = int(os.getenv("TTS_SERVICE_PORT", 9088))
 ANIMATION_SERVICE_HOST_IP = os.getenv("ANIMATION_SERVICE_HOST_IP", "0.0.0.0")
 ANIMATION_SERVICE_PORT = int(os.getenv("ANIMATION_SERVICE_PORT", 7860))
+
+
+def check_env_vars(env_var_list):
+    for var in env_var_list:
+        if not os.getenv(var):
+            print(f"Error: The environment variable '{var}' is not set.")
+            sys.exit(1) # Exit the program with a non-zero status code
+    print("All environment variables are set.")
 
 
 class AvatarChatbotService:
@@ -65,5 +74,7 @@ class AvatarChatbotService:
 
 
 if __name__ == "__main__":
+    check_env_vars([MEGA_SERVICE_HOST_IP, MEGA_SERVICE_PORT, ASR_SERVICE_HOST_IP, ASR_SERVICE_PORT, LLM_SERVICE_HOST_IP, LLM_SERVICE_PORT, TTS_SERVICE_HOST_IP, TTS_SERVICE_PORT, ANIMATION_SERVICE_HOST_IP, ANIMATION_SERVICE_PORT])
+    
     avatarchatbot = AvatarChatbotService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     avatarchatbot.add_remote_service()
