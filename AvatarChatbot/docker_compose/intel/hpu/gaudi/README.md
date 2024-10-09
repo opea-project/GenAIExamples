@@ -23,7 +23,7 @@ flowchart LR
     classDef invisible fill:transparent,stroke:transparent;
     style AvatarChatbot-Megaservice stroke:#000000
 
-    %% Subgraphs %%    
+    %% Subgraphs %%
     subgraph AvatarChatbot-Megaservice["AvatarChatbot Megaservice"]
         direction LR
         ASR([ASR<br>3001]):::blue
@@ -43,7 +43,7 @@ flowchart LR
         invis2[ ]:::invisible
         GW([AvatarChatbot GateWay<br>]):::orange
     end
-    subgraph  
+    subgraph
         direction LR
         X([OPEA Microservice]):::blue
         Y{{Open Source Service}}:::thistle
@@ -51,7 +51,7 @@ flowchart LR
         Z1([UI]):::orchid
     end
 
-    %% Services %%    
+    %% Services %%
     WHISPER{{Whisper service<br>7066}}:::thistle
     TGI{{LLM service<br>3006}}:::thistle
     T5{{Speecht5 service<br>7055}}:::thistle
