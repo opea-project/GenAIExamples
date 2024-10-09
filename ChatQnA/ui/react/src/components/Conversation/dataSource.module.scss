@@ -1,0 +1,20 @@
+.fileicon {
+  margin-right: auto;
+}
+
+.filename {
+  margin-left: 2px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.icon {
+  margin-left: auto;
+}
+
+.items {
+  margin-top: 3px;
+  display: grid;
+  grid-template-columns: 6% 88% 6%;
+  width: auto;
+}

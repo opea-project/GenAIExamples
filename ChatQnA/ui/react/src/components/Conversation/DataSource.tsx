@@ -1,10 +1,12 @@
 // Copyright (C) 2024 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, Container, Drawer, FileInput, Text, TextInput } from '@mantine/core'
-import { SyntheticEvent, useState } from 'react'
-import { useAppDispatch } from '../../redux/store'
-import { submitDataSourceURL, uploadFile } from '../../redux/Conversation/ConversationSlice'
+import { ActionIcon, Button, Container, Drawer, FileInput, Text, TextInput, Title } from '@mantine/core'
+import { IconFile, IconTrash } from '@tabler/icons-react'
+import { SyntheticEvent, useState, useEffect } from 'react'
+import { useAppDispatch, useAppSelector } from '../../redux/store'
+import { conversationSelector, submitDataSourceURL, uploadFile, getAllFilesInDataSource, deleteInDataSource } from '../../redux/Conversation/ConversationSlice'
+import classes from './dataSource.module.scss'
 
 type Props = {
   opened: boolean
@@ -17,6 +19,8 @@ export default function DataSource({ opened, onClose }: Props) {
   const [isFile, setIsFile] = useState<boolean>(true);
   const [url, setURL] = useState<string>("");
   const dispatch = useAppDispatch()
+  const { filesInDataSource } = useAppSelector(conversationSelector)
+  
   const handleFileUpload = () => {
     if (file)
       dispatch(uploadFile({ file }))
@@ -31,6 +35,15 @@ export default function DataSource({ opened, onClose }: Props) {
     dispatch(submitDataSourceURL({ link_list: url.split(";") }))
   }
 
+  const handleDelete = (file: string) => {
+    dispatch(deleteInDataSource({file}))
+  }
+
+  useEffect(()=>{
+    dispatch(getAllFilesInDataSource({knowledgeBaseId:"default"}))
+  },[])
+
+
   return (
     <Drawer title={title} position="right" opened={opened} onClose={onClose} withOverlay={false}>
       <Text size="sm">
@@ -42,7 +55,7 @@ export default function DataSource({ opened, onClose }: Props) {
         root: { paddingTop: '40px', display:'flex', flexDirection:'column', alignItems:'center' }
       }}>
         <Button.Group styles={{ group:{alignSelf:'center'}}} >
-          <Button variant={isFile ? 'filled' : 'default'} onClick={() => setIsFile(true)}>Upload FIle</Button>
+          <Button variant={isFile ? 'filled' : 'default'} onClick={() => setIsFile(true)}>Upload File</Button>
           <Button variant={!isFile ? 'filled' : 'default'} onClick={() => setIsFile(false)}>Use Link</Button>
         </Button.Group>
       </Container>
@@ -61,10 +74,24 @@ export default function DataSource({ opened, onClose }: Props) {
             </>
           )}
         </div>
-        
+      </Container>
 
-
-
+      <Container styles={{ root: { paddingTop: '40px' } }}>
+        <Title order={3} styles={{ root: { margin: '1px', marginBottom: '10px' } }}>
+          Files
+        </Title>
+        {filesInDataSource.map(file=> {
+          return (
+            <div className={classes.items}>
+              <div className={classes.fileicon}><IconFile /></div>
+              <div className={classes.filename}><Text size="sm" >{decodeURIComponent(file.name)}</Text></div>
+              <div className={classes.icon}>
+                <ActionIcon onClick={()=>handleDelete(file.name)} size={32} variant="default">
+                  <IconTrash />
+                </ActionIcon>
+              </div>
+            </div>
+        )})}
       </Container>
     </Drawer>
   )
