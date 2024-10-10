@@ -147,6 +147,9 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
         next_data["inputs"] = prompt
 
+    else:
+        next_data = data
+
     return next_data
 
 
