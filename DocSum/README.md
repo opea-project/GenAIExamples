@@ -102,25 +102,53 @@ Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree
 
 ### Workflow of the deployed Document Summarization Service
 
-The workflow of the Document Summarization Service, from user's input query to the application's output response, is as follows:
+The DocSum example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
 flowchart LR
-    subgraph DocSum
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style DocSum-MegaService stroke:#000000
+
+    %% Subgraphs %%
+    subgraph DocSum-MegaService["DocSum MegaService "]
         direction LR
-        A[User] <--> |Input query| B[DocSum Gateway]
-        B <--> |Post| Megaservice
-        subgraph Megaservice["Megaservice"]
-            direction TB
-            C([ Microservice : llm-docsum-tgi <br>9000]) -. Post .-> D{{TGI Service<br>8008}}
-        end
-        Megaservice --> |Output| E[Response]
+        LLM([LLM MicroService]):::blue
     end
-    subgraph Legend
-        X([Micsrservice])
-        Y{{Service from industry peers}}
-        Z[Gateway]
+    subgraph UserInterface[" User Interface "]
+        direction LR
+        a([User Input Query]):::orchid
+        UI([UI server<br>]):::orchid
     end
+
+
+    LLM_gen{{LLM Service <br>}}
+    GW([DocSum GateWay<br>]):::orange
+
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> DocSum-MegaService
+
+
+    %% Embedding service flow
+    direction LR
+    LLM <-.-> LLM_gen
+
 ```
 
 ## Consume Document Summarization Service
