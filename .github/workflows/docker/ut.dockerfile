@@ -10,12 +10,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
     aspell \
     aspell-en \
     build-essential \
+    git \
     python3 \
-    python3-pip \
     python3-dev \
     python3-distutils \
-    git \
-    vim \
+    python3-pip \
     wget
 
 RUN ln -sf $(which python3) /usr/bin/python

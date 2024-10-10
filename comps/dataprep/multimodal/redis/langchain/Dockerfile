@@ -9,11 +9,10 @@ ARG ARCH="cpu"
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     build-essential \
+    default-jre \
     libgl1-mesa-glx \
     libjemalloc-dev \
-    default-jre \
-    wget \
-    vim
+    wget
 
 # Install ffmpeg static build
 RUN cd /root && wget https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz && \
@@ -34,4 +33,3 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 WORKDIR /home/user/comps/dataprep/multimodal/redis/langchain
 
 ENTRYPOINT ["python", "prepare_videodoc_redis.py"]
-
