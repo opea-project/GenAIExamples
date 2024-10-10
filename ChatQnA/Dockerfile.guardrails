@@ -19,9 +19,10 @@ RUN git clone https://github.com/opea-project/GenAIComps.git
 
 WORKDIR /home/user/GenAIComps
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
+    pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt && \
+    pip install --no-cache-dir langchain_core
 
-COPY ./chatqna_guardrails.py /home/user/chatqna_guardrails.py
+COPY ./chatqna.py /home/user/chatqna.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
@@ -31,4 +32,4 @@ WORKDIR /home/user
 
 RUN echo 'ulimit -S -n 999999' >> ~/.bashrc
 
-ENTRYPOINT ["python", "chatqna_guardrails.py"]
+ENTRYPOINT ["python", "chatqna.py", "--with-guardrails"]

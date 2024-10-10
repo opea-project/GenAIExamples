@@ -29,7 +29,7 @@ metadata:
   name: chatqna-backend-server-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 8
   selector:
     matchLabels:
       app: chatqna-backend-server-deploy
@@ -49,6 +49,13 @@ spec:
         name: chatqna-backend-server-deploy
         ports:
         - containerPort: 8888
+        resources:
+          limits:
+            cpu: 8
+            memory: 8000Mi
+          requests:
+            cpu: 8
+            memory: 8000Mi
       hostIPC: true
       nodeSelector:
         node-type: chatqna-opea
@@ -134,7 +141,7 @@ metadata:
   name: embedding-dependency-deploy
   namespace: default
 spec:
-  replicas: 4
+  replicas: 8
   selector:
     matchLabels:
       app: embedding-dependency-deploy
@@ -158,6 +165,13 @@ spec:
         name: embedding-dependency-deploy
         ports:
         - containerPort: 80
+        resources:
+          limits:
+            cpu: 76
+            memory: 20000Mi
+          requests:
+            cpu: 76
+            memory: 20000Mi
         volumeMounts:
         - mountPath: /data
           name: model-volume
@@ -204,7 +218,7 @@ metadata:
   name: llm-dependency-deploy
   namespace: default
 spec:
-  replicas: 31
+  replicas: 63
   selector:
     matchLabels:
       app: llm-dependency-deploy
@@ -220,8 +234,12 @@ spec:
         - --model-id
         - $(LLM_MODEL_ID)
         - --max-input-length
-        - '2048'
+        - '1280'
         - --max-total-tokens
+        - '2048'
+        - --max-batch-total-tokens
+        - '65536'
+        - --max-batch-prefill-tokens
         - '4096'
         env:
         - name: OMPI_MCA_btl_vader_single_copy_mechanism
@@ -327,7 +345,7 @@ spec:
         envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/tei-gaudi:latest
+        image: ghcr.io/huggingface/tei-gaudi:latest
         imagePullPolicy: IfNotPresent
         name: reranking-dependency-deploy
         ports:
@@ -381,7 +399,7 @@ metadata:
   name: retriever-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 8
   selector:
     matchLabels:
       app: retriever-deploy
@@ -401,6 +419,10 @@ spec:
         name: retriever-deploy
         ports:
         - containerPort: 7000
+        resources:
+          requests:
+            cpu: 4
+            memory: 4000Mi
       hostIPC: true
       nodeSelector:
         node-type: chatqna-opea

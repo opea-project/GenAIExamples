@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-without-rerank chatqna-ui chatqna-conversation-ui dataprep-redis embedding-tei retriever-redis llm-tgi"
+    service_list="chatqna-without-rerank chatqna-ui chatqna-conversation-ui dataprep-redis retriever-redis"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
@@ -34,15 +34,16 @@ function start_services() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:9009"
     export REDIS_URL="redis://${ip_address}:6379"
     export REDIS_HOST=${ip_address}
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
+    export LLM_SERVER_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_PORT=6006
+    export LLM_SERVER_PORT=9009
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get_file"
@@ -116,14 +117,6 @@ function validate_microservices() {
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
-    # embedding microservice
-    validate_service \
-        "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":[' \
-        "embedding-microservice" \
-        "embedding-tei-server" \
-        '{"text":"What is Deep Learning?"}'
-
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # test /v1/dataprep upload file
@@ -171,15 +164,6 @@ function validate_microservices() {
         "tgi-llm" \
         "tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
-    # llm microservice
-    validate_service \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm-microservice" \
-        "llm-tgi-server" \
-        '{"query":"What is Deep Learning?"}'
-
 }
 
 function validate_megaservice() {

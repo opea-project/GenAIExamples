@@ -70,38 +70,20 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 1. Build Embedding Image
-
-```bash
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
-```
-
-### 2. Build Retriever Image
+### 1. Build Retriever Image
 
 ```bash
 docker build --no-cache -t opea/retriever-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/qdrant/haystack/Dockerfile .
 ```
 
-### 3. Build Rerank Image
-
-```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .`
-```
-
-### 4. Build LLM Image
-
-```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
-```
-
-### 5. Build Dataprep Image
+### 2. Build Dataprep Image
 
 ```bash
 docker build --no-cache -t opea/dataprep-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/langchain/Dockerfile .
 cd ..
 ```
 
-### 6. Build MegaService Docker Image
+### 3. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
 
@@ -112,7 +94,7 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 cd ../../..
 ```
 
-### 7. Build UI Docker Image
+### 4. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -122,7 +104,7 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 cd ../../../..
 ```
 
-### 8. Build Conversational React UI Docker Image (Optional)
+### 5. Build Conversational React UI Docker Image (Optional)
 
 Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
 
@@ -136,15 +118,12 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 cd ../../../..
 ```
 
-Then run the command `docker images`, you will have the following 7 Docker Images:
+Then run the command `docker images`, you will have the following 4 Docker Images:
 
 1. `opea/dataprep-qdrant:latest`
-2. `opea/embedding-tei:latest`
-3. `opea/retriever-qdrant:latest`
-4. `opea/reranking-tei:latest`
-5. `opea/llm-tgi:latest`
-6. `opea/chatqna:latest`
-7. `opea/chatqna-ui:latest`
+2. `opea/retriever-qdrant:latest`
+3. `opea/chatqna:latest`
+4. `opea/chatqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -194,17 +173,15 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6040"
-export TEI_RERANKING_ENDPOINT="http://${host_ip}:6041"
-export TGI_LLM_ENDPOINT="http://${host_ip}:6042"
 export QDRANT_HOST=${host_ip}
 export QDRANT_PORT=6333
 export INDEX_NAME="rag-qdrant"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export EMBEDDING_SERVER_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
+export RERANK_SERVER_HOST_IP=${host_ip}
+export LLM_SERVER_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep"
 ```
@@ -234,16 +211,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -H 'Content-Type: application/json'
    ```
 
-2. Embedding Microservice
-
-   ```bash
-   curl http://${host_ip}:6044/v1/embeddings\
-     -X POST \
-     -d '{"text":"hello"}' \
-     -H 'Content-Type: application/json'
-   ```
-
-3. Retriever Microservice
+2. Retriever Microservice
 
    To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
    is determined by the embedding model.
@@ -259,7 +227,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
      -H 'Content-Type: application/json'
    ```
 
-4. TEI Reranking Service
+3. TEI Reranking Service
 
    ```bash
    curl http://${host_ip}:6041/rerank \
@@ -268,16 +236,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -H 'Content-Type: application/json'
    ```
 
-5. Reranking Microservice
-
-   ```bash
-   curl http://${host_ip}:6046/v1/reranking\
-     -X POST \
-     -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-     -H 'Content-Type: application/json'
-   ```
-
-6. TGI Service
+4. TGI Service
 
    In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
 
@@ -302,16 +261,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
      -H 'Content-Type: application/json'
    ```
 
-7. LLM Microservice
-
-   ```bash
-   curl http://${host_ip}:6047/v1/chat/completions\
-     -X POST \
-     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-     -H 'Content-Type: application/json'
-   ```
-
-8. MegaService
+5. MegaService
 
    ```bash
    curl http://${host_ip}:8912/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -319,7 +269,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
         }'
    ```
 
-9. Dataprep Microservice（Optional）
+6. Dataprep Microservice（Optional）
 
    If you want to update the default knowledge base, you can use the following commands:
 
