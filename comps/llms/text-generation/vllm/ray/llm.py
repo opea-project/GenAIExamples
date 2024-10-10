@@ -30,7 +30,7 @@ logflag = os.getenv("LOGFLAG", False)
     host="0.0.0.0",
     port=9000,
 )
-def llm_generate(input: LLMParamsDoc):
+async def llm_generate(input: LLMParamsDoc):
     if logflag:
         logger.info(input)
     llm_endpoint = os.getenv("vLLM_RAY_ENDPOINT", "http://localhost:8006")
@@ -50,9 +50,9 @@ def llm_generate(input: LLMParamsDoc):
 
     if input.streaming:
 
-        def stream_generator():
+        async def stream_generator():
             chat_response = ""
-            for text in llm.stream(input.query):
+            for text in llm.astream(input.query):
                 text = text.content
                 chat_response += text
                 chunk_repr = repr(text.encode("utf-8"))
@@ -63,7 +63,7 @@ def llm_generate(input: LLMParamsDoc):
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     else:
-        response = llm.invoke(input.query)
+        response = await llm.ainvoke(input.query)
         response = response.content
         if logflag:
             logger.info(response)

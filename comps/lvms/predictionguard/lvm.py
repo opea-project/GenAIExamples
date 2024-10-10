@@ -28,7 +28,7 @@ class LVMDoc(BaseDoc):
     output_datatype=TextDoc,
 )
 @register_statistics(names=["opea_service@lvm_predictionguard"])
-async def lvm(request: LVMDoc) -> TextDoc:
+def lvm(request: LVMDoc) -> TextDoc:
     start = time.time()
 
     # make a request to the Prediction Guard API using the LlaVa model

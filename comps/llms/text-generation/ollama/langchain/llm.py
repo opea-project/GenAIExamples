@@ -19,7 +19,7 @@ logflag = os.getenv("LOGFLAG", False)
     host="0.0.0.0",
     port=9000,
 )
-def llm_generate(input: LLMParamsDoc):
+async def llm_generate(input: LLMParamsDoc):
     if logflag:
         logger.info(input)
     ollama = Ollama(
@@ -48,7 +48,7 @@ def llm_generate(input: LLMParamsDoc):
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     else:
-        response = ollama.invoke(input.query)
+        response = await ollama.ainvoke(input.query)
         if logflag:
             logger.info(response)
         return GeneratedDoc(text=response, prompt=input.query)

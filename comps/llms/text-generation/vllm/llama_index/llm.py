@@ -39,7 +39,7 @@ def post_process_text(text: str):
     host="0.0.0.0",
     port=9000,
 )
-def llm_generate(input: LLMParamsDoc):
+async def llm_generate(input: LLMParamsDoc):
     if logflag:
         logger.info(input)
     llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8008")
@@ -56,8 +56,8 @@ def llm_generate(input: LLMParamsDoc):
 
     if input.streaming:
 
-        def stream_generator():
-            for text in llm.stream_complete(input.query):
+        async def stream_generator():
+            async for text in llm.astream_complete(input.query):
                 output = text.text
                 yield f"data: {output}\n\n"
             if logflag:
@@ -66,7 +66,7 @@ def llm_generate(input: LLMParamsDoc):
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     else:
-        response = llm.complete(input.query).text
+        response = await llm.acomplete(input.query).text
         if logflag:
             logger.info(response)
         return GeneratedDoc(text=response, prompt=input.query)

@@ -57,11 +57,11 @@ class MosecEmbeddings(OpenAIEmbeddings):
     output_datatype=EmbedDoc,
 )
 @register_statistics(names=["opea_service@embedding_mosec"])
-def embedding(input: TextDoc) -> EmbedDoc:
+async def embedding(input: TextDoc) -> EmbedDoc:
     if logflag:
         logger.info(input)
     start = time.time()
-    embed_vector = embeddings.embed_query(input.text)
+    embed_vector = await embeddings.aembed_query(input.text)
     res = EmbedDoc(text=input.text, embedding=embed_vector)
     statistics_dict["opea_service@embedding_mosec"].append_latency(time.time() - start, None)
     if logflag:

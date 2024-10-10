@@ -34,11 +34,11 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
     port=PORT,
 )
 @register_statistics(names=["opea_service@retriever_pgvector"])
-def retrieve(input: EmbedDoc) -> SearchedDoc:
+async def retrieve(input: EmbedDoc) -> SearchedDoc:
     if logflag:
         logger.info(input)
     start = time.time()
-    search_res = vector_db.similarity_search_by_vector(embedding=input.embedding)
+    search_res = await vector_db.asimilarity_search_by_vector(embedding=input.embedding)
     searched_docs = []
     for r in search_res:
         searched_docs.append(TextDoc(text=r.page_content))

@@ -63,7 +63,7 @@ def dump_docs(docs):
     port=7077,
 )
 @register_statistics(names=["opea_service@web_retriever_chroma", "opea_service@search"])
-def web_retrieve(input: EmbedDoc) -> SearchedDoc:
+async def web_retrieve(input: EmbedDoc) -> SearchedDoc:
     if logflag:
         logger.info(input)
     start = time.time()
@@ -92,7 +92,7 @@ def web_retrieve(input: EmbedDoc) -> SearchedDoc:
     dump_docs(unique_documents)
 
     # Do the retrieval
-    search_res = vector_db.similarity_search_by_vector(embedding=embedding)
+    search_res = await vector_db.asimilarity_search_by_vector(embedding=embedding)
 
     searched_docs = []
 

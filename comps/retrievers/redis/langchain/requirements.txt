@@ -2,6 +2,7 @@ docarray[full]
 easyocr
 fastapi
 langchain_community
+langchain_huggingface
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk

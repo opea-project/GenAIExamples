@@ -38,7 +38,7 @@ def post_process_text(text: str):
     host="0.0.0.0",
     port=9000,
 )
-def llm_generate(input: LLMParamsDoc):
+async def llm_generate(input: LLMParamsDoc):
     llm_endpoint = os.getenv("RAY_Serve_ENDPOINT", "http://localhost:8080")
     llm_model = os.getenv("LLM_MODEL", "Llama-2-7b-chat-hf")
     if "/" in llm_model:
@@ -73,7 +73,7 @@ def llm_generate(input: LLMParamsDoc):
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     else:
-        response = llm.invoke(input.query)
+        response = await llm.ainvoke(input.query)
         response = response.content
         return GeneratedDoc(text=response, prompt=input.query)
 
