@@ -55,6 +55,7 @@ jobs:
 
       - name: Check the Validity of Hyperlinks
         run: |
+          set -x
           cd ${{github.workspace}}
           fail="FALSE"
           merged_commit=$(git log -1 --format='%H')
