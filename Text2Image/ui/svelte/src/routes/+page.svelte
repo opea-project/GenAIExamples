@@ -16,7 +16,7 @@
 
 <script lang="ts">
 	import "driver.js/dist/driver.css";
-	import "$lib/assets/layout/css/driver.css";	
+	import "$lib/assets/layout/css/driver.css";
 	import { imgList } from "$lib/shared/stores/common/Store";
 	import Header from "$lib/shared/components/header/header.svelte";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
@@ -66,11 +66,11 @@
 		};
 		loading = true;
 		imgList.set([]);
-		
+
 		await fetchImgList(query, imgNum).then((res) => {
 			imgList.set(res.images)
 			console.log('imgList', $imgList);
-			
+
 			loading = false;
 		});
 	};

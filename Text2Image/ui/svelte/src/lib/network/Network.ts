@@ -20,7 +20,7 @@ export async function fetchImgList(query: string, img_num: number) {
 	const url = `${BACKEND_BASE_URL}`;
 	const data = {
 		prompt: query,
-		num_images_per_prompt: img_num
+		num_images_per_prompt: img_num,
 	};
 	const init: RequestInit = {
 		method: "POST",

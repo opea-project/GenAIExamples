@@ -11,7 +11,6 @@ test.beforeEach(async ({ page }) => {
 // Constants definition
 const CHAT_ITEMS = ["An astronaut riding a green horse"];
 
-
 // Helper function: Enter message to chat
 async function enterMessageToChat(page: Page, message: string) {
 	await page.getByTestId("img-input").click();
@@ -23,7 +22,6 @@ async function enterMessageToChat(page: Page, message: string) {
 	// await page.waitForSelector('[data-testid="display-img"]', { timeout: 600000 });
 }
 
-
 // Test description: New Chat
 test.describe("New Image", () => {
 	// Test: Enter message to generate new images
@@ -31,4 +29,3 @@ test.describe("New Image", () => {
 		await enterMessageToChat(page, CHAT_ITEMS[0]);
 	});
 });
-
