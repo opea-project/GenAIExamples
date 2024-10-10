@@ -12,7 +12,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HABANA_VISIBLE_DEVICES: all
+
+      HABANA_VISIBLE_DEVICES: 0
       OMPI_MCA_btl_vader_single_copy_mechanism: none
     runtime: habana
     cap_add:
@@ -24,6 +25,7 @@ services:
     ports:
       - "3001:9099"
     ipc: host
+    runtime: runc
     environment:
       ASR_ENDPOINT: ${ASR_ENDPOINT}
   speecht5-service:
@@ -36,7 +38,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HABANA_VISIBLE_DEVICES: all
+
+      HABANA_VISIBLE_DEVICES: 1
       OMPI_MCA_btl_vader_single_copy_mechanism: none
     runtime: habana
     cap_add:
@@ -47,6 +50,7 @@ services:
     container_name: tts-service
     ports:
       - "3002:9088"
+    runtime: runc
     ipc: host
     environment:
       TTS_ENDPOINT: ${TTS_ENDPOINT}
@@ -64,7 +68,8 @@ services:
       HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-      HABANA_VISIBLE_DEVICES: all
+
+      HABANA_VISIBLE_DEVICES: 2
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       ENABLE_HPU_GRAPH: true
       LIMIT_HPU_GRAPH: true
@@ -78,6 +83,7 @@ services:
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-gaudi-server
+    runtime: runc
     depends_on:
       - tgi-service
     ports:
@@ -111,6 +117,7 @@ services:
       - TTS_SERVICE_HOST_IP=${TTS_SERVICE_HOST_IP}
       - TTS_SERVICE_PORT=${TTS_SERVICE_PORT}
     ipc: host
+    runtime: runc
     restart: always
 
 networks:
