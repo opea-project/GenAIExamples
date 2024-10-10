@@ -18,6 +18,55 @@ The workflow falls into the following architecture:
 
 ![architecture](./assets/img/codegen_architecture.png)
 
+The CodeGen example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
+
+```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
+flowchart LR
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style CodeGen-MegaService stroke:#000000
+
+    %% Subgraphs %%
+    subgraph CodeGen-MegaService["CodeGen MegaService "]
+        direction LR
+        LLM([LLM MicroService]):::blue
+    end
+    subgraph UserInterface[" User Interface "]
+        direction LR
+        a([User Input Query]):::orchid
+        UI([UI server<br>]):::orchid
+    end
+
+
+    LLM_gen{{LLM Service <br>}}
+    GW([CodeGen GateWay<br>]):::orange
+
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> CodeGen-MegaService
+
+
+    %% Embedding service flow
+    direction LR
+    LLM <-.-> LLM_gen
+
+```
+
 ## Deploy CodeGen Service
 
 The CodeGen service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
