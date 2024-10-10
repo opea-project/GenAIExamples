@@ -25,7 +25,7 @@ function build_docker_images() {
 
 function start_service() {
     export no_proxy="localhost,127.0.0.1,"${ip_address}
-    docker run -d --name="text2image-server" -p $text2image_service_port:$text2image_service_port --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e MODEL=$MODEL -e no_proxy=$no_proxy ${IMAGE_REPO}/text2image:${IMAGE_TAG}
+    docker run -d --name="text2image-gaudi-server" -p $text2image_service_port:$text2image_service_port --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e HF_TOKEN=$HF_TOKEN -e MODEL=$MODEL ${IMAGE_REPO}/text2image-gaudi:${IMAGE_TAG}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
     sleep 30s
@@ -106,7 +106,7 @@ function main() {
     echo "==== microservices validated ===="
     validate_frontend
     echo "==== frontend validated ===="
-    
+
     stop_docker
     echo y | docker system prune
 
