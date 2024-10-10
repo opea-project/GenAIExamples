@@ -49,7 +49,7 @@ services:
     container_name: visualqna-gaudi-backend-server
     depends_on:
       - llava-tgi-service
-      - lvm-tgi    
+      - lvm-tgi
     ports:
       - "8888:8888"
     environment:
