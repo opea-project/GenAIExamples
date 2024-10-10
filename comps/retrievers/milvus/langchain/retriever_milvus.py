@@ -8,14 +8,14 @@ from typing import List, Optional
 
 from config import (
     COLLECTION_NAME,
-    EMBED_ENDPOINT,
-    EMBED_MODEL,
+    LOCAL_EMBEDDING_MODEL,
     MILVUS_HOST,
     MILVUS_PORT,
-    MODEL_ID,
     MOSEC_EMBEDDING_ENDPOINT,
+    MOSEC_EMBEDDING_MODEL,
+    TEI_EMBEDDING_ENDPOINT,
 )
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings, OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings, OpenAIEmbeddings
 from langchain_milvus.vectorstores import Milvus
 
 from comps import (
@@ -106,11 +106,19 @@ async def retrieve(input: EmbedDoc) -> SearchedDoc:
 if __name__ == "__main__":
     # Create vectorstore
     if MOSEC_EMBEDDING_ENDPOINT:
+        # create embeddings using Mosec endpoint service
+        if logflag:
+            logger.info(f"[ retriever_milvus ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT}")
+        embeddings = MosecEmbeddings(model=MOSEC_EMBEDDING_MODEL)
+    elif TEI_EMBEDDING_ENDPOINT:
         # create embeddings using TEI endpoint service
-        # embeddings = HuggingFaceHubEmbeddings(model=EMBED_ENDPOINT)
-        embeddings = MosecEmbeddings(model=MODEL_ID)
+        if logflag:
+            logger.info(f"[ retriever_milvus ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
+        embeddings = HuggingFaceHubEmbeddings(model=TEI_EMBEDDING_ENDPOINT)
     else:
         # create embeddings using local embedding model
-        embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
+        if logflag:
+            logger.info(f"[ retriever_milvus ] LOCAL_EMBEDDING_MODEL:{LOCAL_EMBEDDING_MODEL}")
+        embeddings = HuggingFaceBgeEmbeddings(model_name=LOCAL_EMBEDDING_MODEL)
 
     opea_microservices["opea_service@retriever_milvus"].start()

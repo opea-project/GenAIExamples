@@ -11,7 +11,8 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
     build-essential \
     default-jre \
     libgl1-mesa-glx \
-    libjemalloc-dev
+    libjemalloc-dev \
+    tesseract-ocr
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \

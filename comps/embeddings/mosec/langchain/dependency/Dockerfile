@@ -19,7 +19,7 @@ RUN pip3 install llmspec mosec
 
 RUN cd /home/user/ && export HF_ENDPOINT=https://hf-mirror.com && huggingface-cli download --resume-download BAAI/bge-large-zh-v1.5 --local-dir /home/user/bge-large-zh-v1.5
 USER user
-ENV EMB_MODEL="/home/user/bge-large-zh-v1.5/"
+ENV MOSEC_EMBEDDING_MODEL="/home/user/bge-large-zh-v1.5/"
 
 WORKDIR /home/user/comps/embeddings/mosec/langchain/dependency
 

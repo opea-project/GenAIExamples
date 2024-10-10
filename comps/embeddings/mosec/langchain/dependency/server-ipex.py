@@ -18,7 +18,7 @@ DEFAULT_MODEL = "/home/user/bge-large-zh-v1.5/"
 
 class Embedding(Worker):
     def __init__(self):
-        self.model_name = os.environ.get("EMB_MODEL", DEFAULT_MODEL)
+        self.model_name = os.environ.get("MOSEC_EMBEDDING_MODEL", DEFAULT_MODEL)
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_name)
         self.model = transformers.AutoModel.from_pretrained(self.model_name)
         self.device = torch.cuda.current_device() if torch.cuda.is_available() else "cpu"

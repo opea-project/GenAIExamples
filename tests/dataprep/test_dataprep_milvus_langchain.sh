@@ -46,8 +46,8 @@ function start_service() {
 
     # start dataprep service
     MOSEC_EMBEDDING_ENDPOINT="http://${ip_address}:${mosec_embedding_port}"
-    MILVUS=${ip_address}
-    docker run -d --name="test-comps-dataprep-milvus-server" -p ${dataprep_service_port}:6010 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MOSEC_EMBEDDING_ENDPOINT=${MOSEC_EMBEDDING_ENDPOINT} -e MILVUS=${MILVUS} -e LOGFLAG=true --ipc=host opea/dataprep-milvus:comps
+    MILVUS_HOST=${ip_address}
+    docker run -d --name="test-comps-dataprep-milvus-server" -p ${dataprep_service_port}:6010 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MOSEC_EMBEDDING_ENDPOINT=${MOSEC_EMBEDDING_ENDPOINT} -e MILVUS_HOST=${MILVUS_HOST} -e LOGFLAG=true --ipc=host opea/dataprep-milvus:comps
     sleep 1m
 }
 

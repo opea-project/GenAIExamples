@@ -9,12 +9,12 @@ from typing import List, Optional, Union
 
 from config import (
     COLLECTION_NAME,
+    LOCAL_EMBEDDING_MODEL,
     MILVUS_HOST,
     MILVUS_PORT,
     MOSEC_EMBEDDING_ENDPOINT,
     MOSEC_EMBEDDING_MODEL,
     TEI_EMBEDDING_ENDPOINT,
-    TEI_EMBEDDING_MODEL,
 )
 from fastapi import Body, File, Form, HTTPException, UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -73,7 +73,7 @@ class MosecEmbeddings(OpenAIEmbeddings):
         return [e if e is not None else empty_embedding() for e in batched_embeddings]
 
 
-def ingest_chunks_to_milvus(file_name: str, chunks: List, embedder):
+def ingest_chunks_to_milvus(file_name: str, chunks: List):
     if logflag:
         logger.info(f"[ ingest chunks ] file name: {file_name}")
 
@@ -94,7 +94,7 @@ def ingest_chunks_to_milvus(file_name: str, chunks: List, embedder):
         try:
             _ = Milvus.from_documents(
                 batch_docs,
-                embedder,
+                embeddings,
                 collection_name=COLLECTION_NAME,
                 connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT},
                 partition_key_field=partition_field_name,
@@ -110,7 +110,7 @@ def ingest_chunks_to_milvus(file_name: str, chunks: List, embedder):
     return True
 
 
-def ingest_data_to_milvus(doc_path: DocPath, embedder):
+def ingest_data_to_milvus(doc_path: DocPath):
     """Ingest document to Milvus."""
     path = doc_path.path
     file_name = path.split("/")[-1]
@@ -151,7 +151,7 @@ def ingest_data_to_milvus(doc_path: DocPath, embedder):
     if logflag:
         logger.info(f"[ ingest data ] Done preprocessing. Created {len(chunks)} chunks of the original file.")
 
-    return ingest_chunks_to_milvus(file_name, chunks, embedder)
+    return ingest_chunks_to_milvus(file_name, chunks)
 
 
 def search_by_file(collection, file_name):
@@ -210,28 +210,9 @@ async def ingest_documents(
     if files and link_list:
         raise HTTPException(status_code=400, detail="Provide either a file or a string list, not both.")
 
-    # Create vectorstore
-    if MOSEC_EMBEDDING_ENDPOINT:
-        # create embeddings using MOSEC endpoint service
-        if logflag:
-            logger.info(
-                f"[ upload ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT}, MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}"
-            )
-        embedder = MosecEmbeddings(model=MOSEC_EMBEDDING_MODEL)
-    elif TEI_EMBEDDING_ENDPOINT:
-        # create embeddings using TEI endpoint service
-        if logflag:
-            logger.info(f"[ upload ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
-        embedder = HuggingFaceHubEmbeddings(model=TEI_EMBEDDING_ENDPOINT)
-    else:
-        # create embeddings using local embedding model
-        if logflag:
-            logger.info(f"[ upload ] Local TEI_EMBEDDING_MODEL:{TEI_EMBEDDING_MODEL}")
-        embedder = HuggingFaceBgeEmbeddings(model_name=TEI_EMBEDDING_MODEL)
-
     # define Milvus obj
     my_milvus = Milvus(
-        embedding_function=embedder,
+        embedding_function=embeddings,
         collection_name=COLLECTION_NAME,
         connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT},
         index_params=index_params,
@@ -274,7 +255,6 @@ async def ingest_documents(
                     process_table=process_table,
                     table_strategy=table_strategy,
                 ),
-                embedder,
             )
             uploaded_files.append(save_path)
             if logflag:
@@ -294,7 +274,6 @@ async def ingest_documents(
         #                 process_table=process_table,
         #                 table_strategy=table_strategy,
         #             ),
-        #             embedder
         #         )
 
         # try:
@@ -352,7 +331,6 @@ async def ingest_documents(
                     process_table=process_table,
                     table_strategy=table_strategy,
                 ),
-                embedder,
             )
         if logflag:
             logger.info(f"[ upload ] Successfully saved link list {link_list}")
@@ -368,28 +346,9 @@ async def rag_get_file_structure():
     if logflag:
         logger.info("[ get ] start to get file structure")
 
-    # Create vectorstore
-    if MOSEC_EMBEDDING_ENDPOINT:
-        # create embeddings using MOSEC endpoint service
-        if logflag:
-            logger.info(
-                f"[ get ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT}, MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}"
-            )
-        embedder = MosecEmbeddings(model=MOSEC_EMBEDDING_MODEL)
-    elif TEI_EMBEDDING_ENDPOINT:
-        # create embeddings using TEI endpoint service
-        if logflag:
-            logger.info(f"[ get ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
-        embedder = HuggingFaceHubEmbeddings(model=TEI_EMBEDDING_ENDPOINT)
-    else:
-        # create embeddings using local embedding model
-        if logflag:
-            logger.info(f"[ get ] Local TEI_EMBEDDING_MODEL:{TEI_EMBEDDING_MODEL}")
-        embedder = HuggingFaceBgeEmbeddings(model_name=TEI_EMBEDDING_MODEL)
-
     # define Milvus obj
     my_milvus = Milvus(
-        embedding_function=embedder,
+        embedding_function=embeddings,
         collection_name=COLLECTION_NAME,
         connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT},
         index_params=index_params,
@@ -445,28 +404,9 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
     if logflag:
         logger.info(file_path)
 
-    # Create vectorstore
-    if MOSEC_EMBEDDING_ENDPOINT:
-        # create embeddings using MOSEC endpoint service
-        if logflag:
-            logger.info(
-                f"[ delete ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT}, MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}"
-            )
-        embedder = MosecEmbeddings(model=MOSEC_EMBEDDING_MODEL)
-    elif TEI_EMBEDDING_ENDPOINT:
-        # create embeddings using TEI endpoint service
-        if logflag:
-            logger.info(f"[ delete ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
-        embedder = HuggingFaceHubEmbeddings(model=TEI_EMBEDDING_ENDPOINT)
-    else:
-        # create embeddings using local embedding model
-        if logflag:
-            logger.info(f"[ delete ] Local TEI_EMBEDDING_MODEL:{TEI_EMBEDDING_MODEL}")
-        embedder = HuggingFaceBgeEmbeddings(model_name=TEI_EMBEDDING_MODEL)
-
     # define Milvus obj
     my_milvus = Milvus(
-        embedding_function=embedder,
+        embedding_function=embeddings,
         collection_name=COLLECTION_NAME,
         connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT},
         index_params=index_params,
@@ -532,5 +472,24 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
 
 if __name__ == "__main__":
     create_upload_folder(upload_folder)
+
+    # Create vectorstore
+    if MOSEC_EMBEDDING_ENDPOINT:
+        # create embeddings using MOSEC endpoint service
+        if logflag:
+            logger.info(
+                f"[ prepare_doc_milvus ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT}, MOSEC_EMBEDDING_MODEL:{MOSEC_EMBEDDING_MODEL}"
+            )
+        embeddings = MosecEmbeddings(model=MOSEC_EMBEDDING_MODEL)
+    elif TEI_EMBEDDING_ENDPOINT:
+        # create embeddings using TEI endpoint service
+        if logflag:
+            logger.info(f"[ prepare_doc_milvus ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")
+        embeddings = HuggingFaceHubEmbeddings(model=TEI_EMBEDDING_ENDPOINT)
+    else:
+        # create embeddings using local embedding model
+        if logflag:
+            logger.info(f"[ prepare_doc_milvus ] LOCAL_EMBEDDING_MODEL:{LOCAL_EMBEDDING_MODEL}")
+        embeddings = HuggingFaceBgeEmbeddings(model_name=LOCAL_EMBEDDING_MODEL)
 
     opea_microservices["opea_service@prepare_doc_milvus"].start()

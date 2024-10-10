@@ -20,7 +20,7 @@ RUN pip3 install llmspec mosec
 
 RUN cd /home/user/ && export HF_ENDPOINT=https://hf-mirror.com && huggingface-cli download --resume-download BAAI/bge-reranker-base --local-dir /home/user/bge-reranker-large
 USER user
-ENV EMB_MODEL="/home/user/bge-reranker-large/"
+ENV MOSEC_EMBEDDING_MODEL="/home/user/bge-reranker-large/"
 
 WORKDIR /home/user/comps/reranks/mosec/langchain/dependency
 

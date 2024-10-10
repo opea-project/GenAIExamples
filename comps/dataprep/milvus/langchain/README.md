@@ -21,7 +21,7 @@ Please refer to this [readme](../../../vectorstores/milvus/README.md).
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export MILVUS=${your_milvus_host_ip}
+export MILVUS_HOST=${your_milvus_host_ip}
 export MILVUS_PORT=19530
 export COLLECTION_NAME=${your_collection_name}
 export MOSEC_EMBEDDING_ENDPOINT=${your_embedding_endpoint}
@@ -47,7 +47,7 @@ Setup environment variables:
 
 ```bash
 export MOSEC_EMBEDDING_ENDPOINT="http://localhost:$your_port"
-export MILVUS=${your_host_ip}
+export MILVUS_HOST=${your_host_ip}
 ```
 
 ### 1.5 Start Document Preparation Microservice for Milvus with Python Script
@@ -78,19 +78,24 @@ docker build -t opea/dataprep-milvus:latest --build-arg https_proxy=$https_proxy
 
 ```bash
 export MOSEC_EMBEDDING_ENDPOINT="http://localhost:$your_port"
-export MILVUS=${your_host_ip}
+export MILVUS_HOST=${your_host_ip}
 ```
 
 ### 2.3 Run Docker with CLI (Option A)
 
 ```bash
-docker run -d --name="dataprep-milvus-server" -p 6010:6010 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MOSEC_EMBEDDING_ENDPOINT=${MOSEC_EMBEDDING_ENDPOINT} -e MILVUS=${MILVUS} opea/dataprep-milvus:latest
+docker run -d --name="dataprep-milvus-server" -p 6010:6010 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MOSEC_EMBEDDING_ENDPOINT=${MOSEC_EMBEDDING_ENDPOINT} -e MILVUS_HOST=${MILVUS_HOST} opea/dataprep-milvus:latest
 ```
 
 ### 2.4 Run with Docker Compose (Option B)
 
 ```bash
-cd docker
+mkdir model
+cd model
+git clone https://huggingface.co/BAAI/bge-base-en-v1.5
+cd ../
+# Update `host_ip` and  `HUGGINGFACEHUB_API_TOKEN` in set_env.sh
+. set_env.sh
 docker compose -f docker-compose-dataprep-milvus.yaml up -d
 ```
 
