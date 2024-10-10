@@ -17,6 +17,16 @@ GenAIExamples are designed to give developers an easy entry into generative AI, 
 
 [GenAIEval](https://github.com/opea-project/GenAIEval) measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
 
+## Use Cases
+| Scenario           | Use Case          | |
+| ------------------ | ---------------------------------------------------------------------- |--|
+| <b>Question Answering<b/> | [ChatQnA](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA)  ⭐⭐⭐⭐⭐<br/>&emsp;&emsp;Chatbot with Retrieval Augmented Generation (RAG). <br/><br/> [VisualQnA](https://github.com/opea-project/GenAIExamples/tree/main/VisualQnA)  ⭐⭐⭐⭐⭐<br/>&emsp;&emsp;Visual Question-answering.  | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
+| <b>Content Summarization<b/> | [DocSum](https://github.com/opea-project/GenAIExamples/tree/main/DocSum)  <br/>&emsp;&emsp;Document Summarization Application | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
+| <b>FAQ Generation<b/> | [FaqGen](https://github.com/opea-project/GenAIExamples/tree/main/FaqGen) <br/>&emsp;&emsp;Frequently asked questions (FAQs) generation from your documents, legal texts, customer queries etc. | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
+| <b>Code Generation<b/> | [CodeGen](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen)<br/>&emsp;&emsp;Gen-AI Powered Code Generator | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
+| <b>Information Retrieval<b/> | [DocIndexRetriever](https://github.com/opea-project/GenAIExamples/tree/main/DocIndexRetriever)<br/>&emsp;&emsp;Document Retrieval with Retrieval Augmented Generation (RAG) | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
+| <b>Fine-tuning<b/> | [InstructionTuning](https://github.com/opea-project/GenAIExamples/tree/main/InstructionTuning)<br/>&emsp;&emsp;Application of Instruction Tuning. | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
+
 ## Getting Started
 
 GenAIExamples offers flexible deployment options that cater to different user needs, enabling efficient use and deployment in various environments. Here’s a brief overview of the three primary methods: Python startup, Docker Compose, and Kubernetes.
