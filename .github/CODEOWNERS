@@ -1,14 +1,13 @@
 # Code owners will review PRs within their respective folders. 
 # Typically, ownership is organized at the second-level subdirectory under the homepage
-/*/ liang1.lv@intel.com
-/comps/agent/ xuhui.ren@intel.com
+/comps/agent/ kaokao.lv@intel.com
 /comps/finetuning/ xinyu.ye@intel.com
 /comps/guardrails/ liang1.lv@intel.com
 /comps/asr/ sihan.chen@intel.com
 /comps/intent_detection/ liang1.lv@intel.com
 /comps/cores/ liang1.lv@intel.com
 /comps/dataprep/ xinyu.ye@intel.com
-/comps/embeddings/ xuhui.ren@intel.com
+/comps/embeddings/ kaokao.lv@intel.com
 /comps/guardrails/ letong.han@intel.com
 /comps/llms/ liang1.lv@intel.com
 /comps/lvms/ sihan.chen@intel.com
@@ -17,9 +16,11 @@
 /comps/feedback_management/ hoong.tee.yeoh@intel.com
 /comps/chathistory/ yogesh.pandey@intel.com
 /comps/texttosql/ yogesh.pandey@intel.com
-/comps/reranks/ xuhui.ren@intel.com
-/comps/retrievers/ xuhui.ren@intel.com
+/comps/text2image/ xinyu.ye@intel.com
+/comps/reranks/ kaokao.lv@intel.com
+/comps/retrievers/ kaokao.lv@intel.com
 /comps/tts/ sihan.chen@intel.com
-/comps/ragas/ xuhui.ren@intel.com
+/comps/ragas/ kaokao.lv@intel.com
 /comps/vectorstores/ xinyu.ye@intel.com
 /comps/web_retrievers/ sihan.chen@intel.com
+/*/ liang1.lv@intel.com
