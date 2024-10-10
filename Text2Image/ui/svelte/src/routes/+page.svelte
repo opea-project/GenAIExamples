@@ -15,194 +15,138 @@
 -->
 
 <script lang="ts">
-	export let data;
-	import {
-		base64ImageStore,
-		stepValueStore,
-	} from "$lib/shared/stores/common/Store";
-	import { onMount } from "svelte";
-	import Header from "$lib/shared/components/header/header.svelte";
-	import {
-		LOCAL_STORAGE_KEY,
-		MessageRole,
-		MessageType,
-		type Message,
-	} from "$lib/shared/constant/Interface";
-	import {
-		getCurrentTimeStamp,
-		scrollToBottom,
-		scrollToTop,
-	} from "$lib/shared/Utils";
-	import { fetchGuardRail, fetchTextStream } from "$lib/network/chat/Network";
-	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
 	import "driver.js/dist/driver.css";
-	import "$lib/assets/layout/css/driver.css";
-	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
-	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
-	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
-	import Upload from "$lib/modules/upload/upload.svelte";
-	import ImagePrompt from "$lib/modules/upload/imagePrompt.svelte";
-	import { Toast } from "flowbite-svelte";
-	import { ExclamationCircleSolid, FireOutline } from "flowbite-svelte-icons";
+	import "$lib/assets/layout/css/driver.css";	
+	import { imgList } from "$lib/shared/stores/common/Store";
+	import Header from "$lib/shared/components/header/header.svelte";
+	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
 	import GenerateImg from "$lib/modules/imageList/GenerateImg.svelte";
+	import { fetchImgList } from "$lib/network/Network";
 
 	let query: string = "";
 	let loading: boolean = false;
-	let scrollToDiv: HTMLDivElement;
-	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
-	let showToast = false;
+	let notNumber: boolean = false;
+	let inputHint: boolean = false;
+	let imgNum = 1;
+	let numButtons = [1, 2, 4];
+	let selectedButton = 1;
+	let genImgNum: number;
 
-	onMount(async () => {
-		scrollToDiv = document
-			.querySelector(".chat-scrollbar")
-			?.querySelector(".svlr-viewport")!;
-	});
+	const selectButton = (button: number) => {
+		selectedButton = button;
+		imgNum = selectedButton;
+		notNumber = false; // Reset notNumber when selecting a button
+	};
 
-	function handleTop() {
-		scrollToTop(scrollToDiv);
-	}
+	const selectInput = () => {
+		selectedButton = 0;
+		notNumber = false;
+		verifyNum();
+	};
 
-	function storeMessages() {
-		localStorage.setItem(
-			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
-			JSON.stringify(chatMessages)
-		);
-	}
+	const updateInputHint = () => {
+		if (query) {
+			inputHint = false;
+		}
+	};
 
-	function decodeEscapedBytes(str: string): string {
-		const byteArray = str
-			.split("\\x")
-			.slice(1)
-			.map((byte) => parseInt(byte, 16));
-		return new TextDecoder("utf-8").decode(new Uint8Array(byteArray));
-	}
-
-	function decodeUnicode(str: string): string {
-		return str.replace(/\\u[\dA-Fa-f]{4}/g, (match) => {
-			return String.fromCharCode(parseInt(match.replace(/\\u/g, ""), 16));
-		});
-	}
-
-	const callTextStream = async (query: string) => {
-		const res = await fetchGuardRail(query, $stepValueStore, $base64ImageStore);
-		console.log('res', res);
-		
-
-		const lastSegment = res.text.split("[/INST]").pop().trim();
-
-		if (lastSegment === "unsafe") {
-			loading = false;
-
-			showToast = true;
-			setTimeout(() => {
-				showToast = false;
-			}, 3000);
-
-			chatMessages = [
-				...chatMessages,
-				{
-					role: MessageRole.Assistant,
-					type: MessageType.Text,
-					content: "unsafe",
-					time: getCurrentTimeStamp(),
-					imgSrc: null, // Add the imgSrc property here
-				},
-			];
-
-			return;
+	const verifyNum = () => {
+		if (/^\d+$/.test(genImgNum) && genImgNum > 0) {
+			imgNum = genImgNum;
+			notNumber = false;
 		} else {
-			const chatRes = await fetchTextStream(
-				query,
-				$stepValueStore,
-				$base64ImageStore
-			);
-			if (chatRes.text) {
-				loading = false;
-				chatMessages = [
-					...chatMessages,
-					{
-						role: MessageRole.Assistant,
-						type: MessageType.Text,
-						content: chatRes.text,
-						time: getCurrentTimeStamp(),
-						imgSrc: null, // Add the imgSrc property here
-					},
-				];
-				storeMessages();
-			}
+			notNumber = true;
 		}
 	};
 
-	const handleTextSubmit = async () => {
-		loading = true;
-
-		const newMessage = {
-			role: MessageRole.User,
-			type: MessageType.Text,
-			content: query,
-			imgSrc: $base64ImageStore,
-			time: 0,
+	const generateImages = async () => {
+		if (!query) {
+			inputHint = true;
+			return;
 		};
-		chatMessages = [...chatMessages, newMessage];
-		scrollToBottom(scrollToDiv);
-		storeMessages();
-		query = "";
-
-		await callTextStream(newMessage.content);
-
-		scrollToBottom(scrollToDiv);
-		storeMessages();
+		loading = true;
+		imgList.set([]);
+		
+		await fetchImgList(query, imgNum).then((res) => {
+			imgList.set(res.images)
+			console.log('imgList', $imgList);
+			
+			loading = false;
+		});
 	};
 
-	function handelClearHistory() {
-		localStorage.removeItem(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY);
-		chatMessages = [];
-	}
-
-	function handleUpdateQuery(event) {
-		if (event.detail && event.detail.content) {
-			query = event.detail.content;
-			handleTextSubmit();
-		}
-	}
+	$: genImgNum && verifyNum();
+	$: query && updateInputHint();
 </script>
 
-<div class="bg-gray-200 w-full h-full">
+<div class="h-full w-full bg-gray-200">
 	<Header />
-
-	<div class="bg-white mt-[2%] mx-auto h-[85%] w-[90%] rounded-3xl p-8">
+	<div class="mx-auto mt-[2%] h-[85%] w-[90%] rounded-3xl bg-white p-8">
 		<p class="text-3xl">AI Image Generator</p>
-		<div class="relative w-full my-6">
-			<span class="absolute p-2 text-xs text-gray">Description prompt</span>
+		<div class="relative my-6 w-full">
+			<span class="absolute p-2 text-xs text-gray-500">Description prompt</span>
 			<input
-				class="block w-full border-gray-300 px-2 py-10 text-gray-900  rounded-xl"
+				class="block w-full rounded-xl border-gray-300 px-2 py-10 text-gray-900"
 				type="text"
-				data-testid="chat-input"
+				data-testid="img-input"
 				placeholder="What do you want to see?"
 				disabled={loading}
 				maxlength="1200"
 				bind:value={query}
-				on:keydown={(event) => {
-					if (event.key === "Enter" && !event.shiftKey && query) {
-						event.preventDefault();
-						handleTextSubmit();
-					}
-				}}
 			/>
-			<button
-				on:click={() => {
-					if (query) {
-						handleTextSubmit();
-					}
-				}}
-				type="submit"
-				class="absolute bottom-2.5 end-2.5 px-4 py-2 text-sm font-medium text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-				><PaperAirplane /></button
-			>
+			{#if inputHint}
+				<p class="absolute -bottom-[1rem] mt-2 text-xs text-red-600">
+					Please input the details you want to describe!
+				</p>
+			{/if}
 		</div>
+		<div class="relative flex flex-row items-center justify-end gap-3">
+			<span class="text-[0.8rem] text-gray-700">Number of images:</span>
+			{#each numButtons as button}
+				<button
+					class="rounded-xl border px-6 py-1
+					{selectedButton === button
+						? 'border-2 border-[#1c64f2] outline-[#1c64f2] ring-2'
+						: 'border-gray-600'}"
+					on:click={() => selectButton(button)}
+				>
+					{button}
+				</button>
+			{/each}
+
+			<input
+				type="text"
+				class="
+				{selectedButton === 0
+					? 'border-2 border-[#1c64f2] outline-[#1c64f2] ring-2'
+					: 'border-gray-800'}
+				focus:ring-none h-[2.1rem] w-[3.6rem] rounded-xl pl-2 text-center focus:outline-none"
+				placeholder="?"
+				on:focus={selectInput}
+				bind:value={genImgNum}
+			/>
+			{#if notNumber}
+				<p
+					class="absolute -bottom-[1rem] right-[10rem] mt-2 text-xs text-red-600"
+				>
+					Enter a number greater than 0!
+				</p>
+			{/if}
+			<button
+				on:click={generateImages}
+				type="submit"
+				data-testid="img-gen"
+				class="ml-12 bg-blue-600 px-8 py-3 text-base font-medium text-white hover:bg-blue-700 focus:ring-blue-800"
+			>
+				Generate ({imgNum})
+			</button>
+		</div>
+		{#if loading}
+			<LoadingAnimation />
+		{:else if $imgList.length !== 0}
+			<GenerateImg />
+		{/if}
 	</div>
-	
-	<GenerateImg />
 </div>
 
 <style>
@@ -212,9 +156,6 @@
 
 	.row {
 		scrollbar-width: none;
-	}
-
-	.row {
 		-ms-overflow-style: none;
 	}
 </style>
