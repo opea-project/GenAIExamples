@@ -23,7 +23,7 @@ COPY comps /home/user/comps
 
 RUN cd /home/user/comps/lvms/llama-vision/ && \
     pip install --no-cache-dir -r requirements.txt  && \
-    pip install --upgrade Pillow
+    pip install --no-cache-dir --upgrade Pillow
 
 ENV PYTHONPATH=/root:/home/user
 

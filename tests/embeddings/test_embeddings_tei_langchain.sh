@@ -69,7 +69,7 @@ function main() {
     start_service
 
     validate_microservice
-    pip install openai
+    pip install -no-cache-dir openai
     validate_microservice_with_openai
 
     stop_docker

@@ -80,7 +80,7 @@ function main() {
     stop_docker
     build_docker_images
 
-    pip install openai
+    pip install --no-cache-dir openai
 
     llm_models=(
     Intel/neural-chat-7b-v3-3

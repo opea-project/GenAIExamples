@@ -12,7 +12,7 @@ COPY comps /home/comps
 
 RUN apt-get update && apt-get install python3-opencv -y && \
     pip install --no-cache-dir --upgrade pip && \
-    if [ ${ARCH} = "cpu" ]; then pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
+    if [ ${ARCH} = "cpu" ]; then pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
     pip install --no-cache-dir -r /home/comps/image2video/dependency/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home

@@ -11,7 +11,8 @@ ARG ARCH="cpu"
 COPY comps /home/comps
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    if [ ${ARCH} = "cpu" ]; then pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
+    if [ ${ARCH} = "cpu" ]; then \
+      pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
     pip install --no-cache-dir -r /home/comps/text2image/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home
