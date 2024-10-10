@@ -384,6 +384,7 @@ And then run the benchmark tool by:
 
 ```bash
 cd GenAIEval/evals/benchmark
+pip install -r ../../requirements.txt
 python benchmark.py
 ```
 
