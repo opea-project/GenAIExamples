@@ -19,8 +19,6 @@ RUN pip install --no-cache-dir -v git+https://github.com/HabanaAI/vllm-fork.git@
 
 RUN pip install --no-cache-dir setuptools
 
-ENV no_proxy=localhost,127.0.0.1
-
 ENV PT_HPU_LAZY_ACC_PAR_MODE=0
 
 ENV PT_HPU_ENABLE_LAZY_COLLECTIVES=true

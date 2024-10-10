@@ -32,11 +32,6 @@ ENV HUGGINGFACEHUB_API_TOKEN=dummy
 
 ENV USECLIP 0
 
-ENV no_proxy=localhost,127.0.0.1
-
-ENV http_proxy=""
-ENV https_proxy=""
-
 WORKDIR /home/user/comps/retrievers/vdms/langchain
 
 ENTRYPOINT ["python", "retriever_vdms.py"]

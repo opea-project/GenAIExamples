@@ -19,7 +19,6 @@ RUN pip install --no-cache-dir "ray>=2.10" "ray[serve,tune]>=2.10"
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     service ssh restart
 
-ENV no_proxy=localhost,127.0.0.1
 ENV PYTHONPATH=$PYTHONPATH:/root:/home/user/vllm/ray
 
 # Required by DeepSpeed
