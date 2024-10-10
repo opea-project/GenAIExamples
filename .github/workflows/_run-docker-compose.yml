@@ -49,23 +49,20 @@ jobs:
         id: test-case-matrix
         run: |
           set -x
-          run_matrix="{\"include\":["
+          run_matrix=$(jq -n '{include: []}')
           service_l=$(echo ${{ inputs.service }} | tr '[:upper:]' '[:lower:]')
           cd ${{ github.workspace }}/tests
-          # test_cases=$(find . -type f -name "test_${service_l}*.sh" -print | jq -R '.' | jq -sc '.')
           test_cases=$(find . -type f -name "test_${service_l}*.sh")
           for script in $test_cases; do
             echo $script
             if echo "$script" | grep -q "on"; then
               hardware=$(echo $script | cut -d'/' -f3 | cut -d'.' -f1 | awk -F'on_' '{print $2}')
-              run_matrix="${run_matrix}{\"test_case\":\"${script}\",\"hardware\":\"${hardware}\"},"
             else
-              run_matrix="${run_matrix}{\"test_case\":\"${script}\",\"hardware\":\"intel_cpu\"},"
+              hardware="intel_cpu"
             fi
+            run_matrix=$(echo $run_matrix | jq --arg script "$script" --arg hardware "$hardware" '.include += [{"test_case": $script, "hardware": $hardware}]')
           done
-          run_matrix=$(echo "$run_matrix" | sed 's/,$//')
-          run_matrix=$run_matrix"]}"
-          echo "run_matrix=${run_matrix}"
+          run_matrix=$(echo $run_matrix | jq -c .)
           echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
 
   run-test:
