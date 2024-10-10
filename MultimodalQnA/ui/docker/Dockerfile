@@ -9,11 +9,10 @@ ARG ARCH="cpu"
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     build-essential \
+    default-jre \
     libgl1-mesa-glx \
     libjemalloc-dev \
-    default-jre \
-    wget \
-    vim
+    wget
 
 # Install ffmpeg static build
 WORKDIR /root
@@ -32,4 +31,3 @@ pip install --no-cache-dir -r /home/user/gradio/requirements.txt
 
 WORKDIR /home/user/gradio
 ENTRYPOINT ["python", "multimodalqna_ui_gradio.py"]
-# ENTRYPOINT ["/usr/bin/sleep", "infinity"]
