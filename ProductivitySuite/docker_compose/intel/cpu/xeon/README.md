@@ -168,8 +168,8 @@ export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/creat
 export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
 export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delete"
 export CHAT_HISTORY_GET_ENDPOINT="http://${host_ip}:6012/v1/chathistory/get"
-export PROMPT_SERVICE_GET_ENDPOINT="http://${host_ip}:6015/v1/prompt/get"
-export PROMPT_SERVICE_CREATE_ENDPOINT="http://${host_ip}:6015/v1/prompt/create"
+export PROMPT_SERVICE_GET_ENDPOINT="http://${host_ip}:6018/v1/prompt/get"
+export PROMPT_SERVICE_CREATE_ENDPOINT="http://${host_ip}:6018/v1/prompt/create"
 export KEYCLOAK_SERVICE_ENDPOINT="http://${host_ip}:8080"
 export LLM_SERVICE_HOST_PORT_FAQGEN=9002
 export LLM_SERVICE_HOST_PORT_CODEGEN=9001
@@ -393,7 +393,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     curl -X 'POST' \
-      http://{host_ip}:6015/v1/prompt/create \
+      http://{host_ip}:6018/v1/prompt/create \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -405,14 +405,14 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     curl -X 'POST' \
-      http://{host_ip}:6015/v1/prompt/get \
+      http://{host_ip}:6018/v1/prompt/get \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
       "user": "test"}'
 
     curl -X 'POST' \
-      http://{host_ip}:6015/v1/prompt/get \
+      http://{host_ip}:6018/v1/prompt/get \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -423,7 +423,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     curl -X 'POST' \
-      http://{host_ip}:6015/v1/prompt/delete \
+      http://{host_ip}:6018/v1/prompt/delete \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{

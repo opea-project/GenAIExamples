@@ -64,8 +64,8 @@ function start_services() {
     export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
     export CHAT_HISTORY_DELETE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/delete"
     export CHAT_HISTORY_GET_ENDPOINT="http://${ip_address}:6012/v1/chathistory/get"
-    export PROMPT_SERVICE_GET_ENDPOINT="http://${ip_address}:6015/v1/prompt/get"
-    export PROMPT_SERVICE_CREATE_ENDPOINT="http://${ip_address}:6015/v1/prompt/create"
+    export PROMPT_SERVICE_GET_ENDPOINT="http://${ip_address}:6018/v1/prompt/get"
+    export PROMPT_SERVICE_CREATE_ENDPOINT="http://${ip_address}:6018/v1/prompt/create"
     export KEYCLOAK_SERVICE_ENDPOINT="http://${ip_address}:8080"
     export MONGO_HOST=${ip_address}
     export MONGO_PORT=27017
@@ -275,7 +275,7 @@ function validate_microservices() {
         fi
 
         result=$(curl -X 'POST' \
-    http://$ip_address:6015/v1/prompt/create \
+    http://$ip_address:6018/v1/prompt/create \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
