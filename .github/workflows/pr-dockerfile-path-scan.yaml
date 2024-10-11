@@ -181,7 +181,7 @@ jobs:
           if  [ -n "$changed_files" ]; then
             for changed_file in $changed_files; do
               echo $changed_file
-              url_lines=$(grep -H -Eo '\]\(http[s]?://[^)]+\)' "$changed_file" | grep -Ev 'GenAIComps/blob/main')
+              url_lines=$(grep -H -Eo '\]\(http[s]?://[^)]+\)' "$changed_file" | grep -Ev 'GenAIComps/blob/main') || true
               if [ -n "$url_lines" ]; then
                 for url_line in $url_lines; do
                   url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
