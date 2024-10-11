@@ -158,6 +158,13 @@ export RERANK_SERVER_HOST_IP=${host_ip}
 export LLM_SERVER_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
+export FRONTEND_SERVICE_IP=${host_ip}
+export FRONTEND_SERVICE_PORT=5173
+export BACKEND_SERVICE_NAME=chatqna
+export BACKEND_SERVICE_IP=${host_ip}
+export BACKEND_SERVICE_PORT=8888
 
 export OLLAMA_ENDPOINT=http://${host_ip}:11434
 export OLLAMA_MODEL="llama3"
@@ -179,6 +186,13 @@ set RERANK_SERVER_HOST_IP=%host_ip%
 set LLM_SERVER_HOST_IP=%host_ip%
 set BACKEND_SERVICE_ENDPOINT=http://%host_ip%:8888/v1/chatqna
 set DATAPREP_SERVICE_ENDPOINT=http://%host_ip%:6007/v1/dataprep
+set DATAPREP_GET_FILE_ENDPOINT="http://%host_ip%:6007/v1/dataprep/get_file"
+set DATAPREP_DELETE_FILE_ENDPOINT="http://%host_ip%:6007/v1/dataprep/delete_file"
+set FRONTEND_SERVICE_IP=%host_ip%
+set FRONTEND_SERVICE_PORT=5173
+set BACKEND_SERVICE_NAME=chatqna
+set BACKEND_SERVICE_IP=%host_ip%
+set BACKEND_SERVICE_PORT=8888
 
 set OLLAMA_ENDPOINT=http://host.docker.internal:11434
 set OLLAMA_MODEL="llama3"

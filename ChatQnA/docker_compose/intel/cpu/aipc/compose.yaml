@@ -51,6 +51,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -123,6 +124,8 @@ services:
       - http_proxy=${http_proxy}
       - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
       - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
+      - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
+      - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
     ipc: host
     restart: always
 
