@@ -11,7 +11,9 @@ Please follow the instructions to set up Ollama on your PC. This will set the en
 ### Set Up Ollama LLM Service
 
 #### Install Ollama Service
+
 Install Ollama service with one command:
+
 ```
 curl -fsSL https://ollama.com/install.sh | sh
 ```
@@ -41,10 +43,13 @@ $ sudo systemctl restart ollama.service
 ```
 
 #### Check the service started
+
 ```
 netstat -tuln | grep  11434
 ```
+
 The output are:
+
 ```
 tcp        0      0 10.132.x.y:11434      0.0.0.0:*               LISTEN
 ```
@@ -52,25 +57,32 @@ tcp        0      0 10.132.x.y:11434      0.0.0.0:*               LISTEN
 #### Pull Ollama LLM model
 
 Run the command to download LLM models. The <host_ip> is the one set in [Ollama Service Configuration](#Set-Ollama-Service-Configuration)
+
 ```
 export host_ip=<host_ip>
 export OLLAMA_HOST=http://${host_ip}:11434
 ollama pull llama3
 ```
+
 After downloaded the models, you can list the models by `ollama list`.
 
 The output should be similar to the following:
+
 ```
 NAME            ID              SIZE    MODIFIED
 llama3:latest   365c0bd3c000    4.7 GB  5 days ago
 ```
 
 ### Consume Ollama LLM Service
+
 Access ollama service to verify that the ollama is functioning correctly.
-   ```bash
-   curl http://${host_ip}:11434/api/generate -d '{"model": "llama3", "prompt":"What is Deep Learning?"}'
-   ```
+
+```bash
+curl http://${host_ip}:11434/api/generate -d '{"model": "llama3", "prompt":"What is Deep Learning?"}'
+```
+
 The outputs are similar to these:
+
 ```
 {"model":"llama3","created_at":"2024-10-11T07:58:38.949268562Z","response":"Deep","done":false}
 {"model":"llama3","created_at":"2024-10-11T07:58:39.017625351Z","response":" learning","done":false}
@@ -245,12 +257,14 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 ### Start all the services Docker Containers
 
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
+
 ```bash
 cd ~/OPEA/GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc/
 docker compose up -d
 ```
 
 Let ollama service runs (if you have started ollama service in [Prerequisites](#Prerequisites), skip this step)
+
 ```bash
 # e.g. ollama run llama3
 OLLAMA_HOST=${host_ip}:11434 ollama run $OLLAMA_MODEL
@@ -315,39 +329,43 @@ For details on how to verify the correctness of the response, refer to [how-to-v
         }'
    ```
 
-7.  Upload RAG Files through Dataprep Microservice (Optional)
+7. Upload RAG Files through Dataprep Microservice (Optional)
 
-    To chat with retrieved information, you need to upload a file using Dataprep service.
+   To chat with retrieved information, you need to upload a file using Dataprep service.
 
-    Here is an example of Nike 2023 pdf file.
+   Here is an example of Nike 2023 pdf file.
 
-   ```bash
-   # download pdf file
-   wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+```bash
+# download pdf file
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
 
-   # upload pdf file with dataprep
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F "files=@./nke-10k-2023.pdf"
-   ```
+# upload pdf file with dataprep
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
+```
 
 This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
 Alternatively, you can add knowledge base via HTTP Links:
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F 'link_list=["https://opea.dev"]'
-   ```
-   This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-   To check the uploaded files, you are able to get the file list that uploaded:
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
-        -H "Content-Type: application/json"
-   ```
-   the output is:
-   `[{"name":"nke-10k-2023.pdf","id":"nke-10k-2023.pdf","type":"File","parent":""}]`
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
+
+This command updates a knowledge base by submitting a list of HTTP links for processing.
+
+To check the uploaded files, you are able to get the file list that uploaded:
+
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+     -H "Content-Type: application/json"
+```
+
+the output is:
+`[{"name":"nke-10k-2023.pdf","id":"nke-10k-2023.pdf","type":"File","parent":""}]`
 
 ## 🚀 Launch the UI
 
