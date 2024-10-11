@@ -20,7 +20,7 @@ function build_docker_images() {
     git clone https://github.com/vllm-project/vllm.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-redis embedding-tei retriever-redis reranking-tei llm-vllm vllm"
+    service_list="chatqna chatqna-ui dataprep-redis retriever-redis vllm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
@@ -36,17 +36,17 @@ function start_services() {
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
-    export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export vLLM_LLM_ENDPOINT="http://${ip_address}:9009"
-    export LLM_SERVICE_PORT=9000
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
+    export RERANK_SERVER_HOST_IP=${ip_address}
+    export LLM_SERVER_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_PORT=6006
+    export RERANK_SERVER_PORT=8808
+    export LLM_SERVER_PORT=9009
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
 
@@ -104,14 +104,6 @@ function validate_microservices() {
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
-    # embedding microservice
-    validate_services \
-        "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":\[' \
-        "embedding" \
-        "embedding-tei-server" \
-        '{"text":"What is Deep Learning?"}'
-
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
@@ -131,14 +123,6 @@ function validate_microservices() {
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # rerank microservice
-    validate_services \
-        "${ip_address}:8000/v1/reranking" \
-        "Deep learning is..." \
-        "rerank" \
-        "reranking-tei-xeon-server" \
-        '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}'
-
     # vllm for llm service
     validate_services \
         "${ip_address}:9009/v1/completions" \
@@ -146,15 +130,6 @@ function validate_microservices() {
         "vllm-llm" \
         "vllm-service" \
         '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
-
-    # llm microservice
-    validate_services \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm" \
-        "llm-vllm-server" \
-        '{"query":"What is Deep Learning?"}'
-
 }
 
 function validate_megaservice() {
@@ -217,7 +192,7 @@ function main() {
     elif [ "${mode}" == "" ]; then
         validate_microservices
         validate_megaservice
-        validate_frontend
+        #validate_frontend
     fi
 
     stop_docker

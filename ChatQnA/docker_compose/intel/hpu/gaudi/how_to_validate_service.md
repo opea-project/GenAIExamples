@@ -26,14 +26,6 @@ The warning messages point out the veriabls are **NOT** set.
 
 ```
 ubuntu@gaudi-vm:~/GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi$ docker compose -f ./compose.yaml up -d
-WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
-WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
-WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
-WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
-WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
-WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
-WARN[0000] The "LANGCHAIN_API_KEY" variable is not set. Defaulting to a blank string.
-WARN[0000] The "LANGCHAIN_TRACING_V2" variable is not set. Defaulting to a blank string.
 WARN[0000] /home/ubuntu/GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/compose.yaml: `version` is obsolete
 ```
 
@@ -172,24 +164,7 @@ This test the embedding service. It sends "What is Deep Learning?" to the embedd
 
 **Note**: The vector dimension are decided by the embedding model and the output value is dependent on model and input data.
 
-### 2 Embedding Microservice
-
-```
-curl http://${host_ip}:6000/v1/embeddings\
-  -X POST \
-  -d '{"text":"What is Deep Learning?"}' \
-  -H 'Content-Type: application/json'
-```
-
-This test the embedding microservice. In this test, it sends out `What is Deep Learning?` to embedding.
-Embedding microservice get input data, call embedding service to embedding data.
-Embedding server are with NO state, but microservice keep the state. There is `id` in the output of `Embedding Microservice`.
-
-```
-{"id":"e8c85e588a235a4bc4747a23b3a71d8f","text":"What is Deep Learning?","embedding":[0.00030903306,-0.06356524,0.0025720573,-0.012404448,0.050649878, ...,   0.02776986,-0.0246678,0.03999176,0.037477136,-0.006806653,0.02261455,-0.04570737,-0.033122733,0.022785513,0.0160026,-0.021343587,-0.029969815,-0.0049176104]}
-```
-
-### 3 Retriever Microservice
+### 2 Retriever Microservice
 
 To consume the retriever microservice, you need to generate a mock embedding vector by Python script.
 The length of embedding vector is determined by the embedding model.
@@ -212,7 +187,7 @@ The output is retrieved text that relevant to the input data:
 
 ```
 
-### 4 TEI Reranking Service
+### 3 TEI Reranking Service
 
 Reranking service
 
@@ -228,24 +203,7 @@ Output is:
 
 It scores the input
 
-### 5 Reranking Microservice
-
-```
-curl http://${host_ip}:8000/v1/reranking\
-  -X POST \
-  -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-  -H 'Content-Type: application/json'
-```
-
-Here is the output:
-
-```
-{"id":"e1eb0e44f56059fc01aa0334b1dac313","query":"Human: Answer the question based only on the following context:\n    Deep learning is...\n    Question: What is Deep Learning?","max_new_tokens":1024,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}
-```
-
-You may notice reranking microservice are with state ('ID' and other meta data), while reranking service are not.
-
-### 6 TGI Service
+### 4 TGI Service
 
 ```
 curl http://${host_ip}:8008/generate \
@@ -277,56 +235,7 @@ and the log shows model warm up, please wait for a while and try it later.
 2024-06-05T05:45:27.867833811Z 2024-06-05T05:45:27.867759Z  INFO text_generation_router: router/src/main.rs:221: Warming up model
 ```
 
-### 7 LLM Microservice
-
-```
-curl http://${host_ip}:9000/v1/chat/completions\
-  -X POST \
-  -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-  -H 'Content-Type: application/json'
-```
-
-You will get generated text from LLM:
-
-```
-data: b'\n'
-
-data: b'\n'
-
-data: b'Deep'
-
-data: b' learning'
-
-data: b' is'
-
-data: b' a'
-
-data: b' subset'
-
-data: b' of'
-
-data: b' machine'
-
-data: b' learning'
-
-data: b' that'
-
-data: b' uses'
-
-data: b' algorithms'
-
-data: b' to'
-
-data: b' learn'
-
-data: b' from'
-
-data: b' data'
-
-data: [DONE]
-```
-
-### 8 MegaService
+### 5 MegaService
 
 ```
 curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{

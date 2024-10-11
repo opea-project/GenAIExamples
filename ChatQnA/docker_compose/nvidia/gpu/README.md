@@ -77,37 +77,19 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-### 2. Build Embedding Image
-
-```bash
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
-```
-
-### 3. Build Retriever Image
+### 2. Build Retriever Image
 
 ```bash
 docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
-### 4. Build Rerank Image
-
-```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
-```
-
-### 5. Build LLM Image
-
-```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
-```
-
-### 6. Build Dataprep Image
+### 3. Build Dataprep Image
 
 ```bash
 docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
 ```
 
-### 7. Build MegaService Docker Image
+### 4. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
 
@@ -118,7 +100,7 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 cd ../../..
 ```
 
-### 8. Build UI Docker Image
+### 5. Build UI Docker Image
 
 Construct the frontend Docker image using the command below:
 
@@ -128,7 +110,7 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 cd ../../../..
 ```
 
-### 9. Build React UI Docker Image (Optional)
+### 6. Build React UI Docker Image (Optional)
 
 Construct the frontend Docker image using the command below:
 
@@ -138,23 +120,20 @@ docker build --no-cache -t opea/chatqna-react-ui:latest --build-arg https_proxy=
 cd ../../../..
 ```
 
-### 10. Build Nginx Docker Image
+### 7. Build Nginx Docker Image
 
 ```bash
 cd GenAIComps
 docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 8 Docker Images:
+Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `opea/embedding-tei:latest`
-2. `opea/retriever-redis:latest`
-3. `opea/reranking-tei:latest`
-4. `opea/llm-tgi:latest`
-5. `opea/dataprep-redis:latest`
-6. `opea/chatqna:latest`
-7. `opea/chatqna-ui:latest` or `opea/chatqna-react-ui:latest`
-8. `opea/nginx:latest`
+1. `opea/retriever-redis:latest`
+2. `opea/dataprep-redis:latest`
+3. `opea/chatqna:latest`
+4. `opea/chatqna-ui:latest` or `opea/chatqna-react-ui:latest`
+5. `opea/nginx:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -215,16 +194,7 @@ docker compose up -d
        -H 'Content-Type: application/json'
    ```
 
-2. Embedding Microservice
-
-   ```bash
-   curl http://${host_ip}:6000/v1/embeddings \
-     -X POST \
-     -d '{"text":"hello"}' \
-     -H 'Content-Type: application/json'
-   ```
-
-3. Retriever Microservice
+2. Retriever Microservice
 
    To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
    is determined by the embedding model.
@@ -240,7 +210,7 @@ docker compose up -d
      -H 'Content-Type: application/json'
    ```
 
-4. TEI Reranking Service
+3. TEI Reranking Service
 
    ```bash
    curl http://${host_ip}:8808/rerank \
@@ -249,16 +219,7 @@ docker compose up -d
        -H 'Content-Type: application/json'
    ```
 
-5. Reranking Microservice
-
-   ```bash
-   curl http://${host_ip}:8000/v1/reranking \
-     -X POST \
-     -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-     -H 'Content-Type: application/json'
-   ```
-
-6. TGI Service
+4. TGI Service
 
    In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
 
@@ -283,16 +244,7 @@ docker compose up -d
      -H 'Content-Type: application/json'
    ```
 
-7. LLM Microservice
-
-   ```bash
-   curl http://${host_ip}:9000/v1/chat/completions \
-     -X POST \
-     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-     -H 'Content-Type: application/json'
-   ```
-
-8. MegaService
+5. MegaService
 
    ```bash
    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -300,7 +252,7 @@ docker compose up -d
         }'
    ```
 
-9. Nginx Service
+6. Nginx Service
 
    ```bash
    curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
@@ -308,7 +260,7 @@ docker compose up -d
        -d '{"messages": "What is the revenue of Nike in 2023?"}'
    ```
 
-10. Dataprep Microservice（Optional）
+7. Dataprep Microservice（Optional）
 
 If you want to update the default knowledge base, you can use the following commands:
 

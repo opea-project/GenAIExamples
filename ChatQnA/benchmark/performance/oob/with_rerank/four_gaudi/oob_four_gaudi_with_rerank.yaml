@@ -134,7 +134,7 @@ metadata:
   name: embedding-dependency-deploy
   namespace: default
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: embedding-dependency-deploy
@@ -204,7 +204,7 @@ metadata:
   name: llm-dependency-deploy
   namespace: default
 spec:
-  replicas: 7
+  replicas: 31
   selector:
     matchLabels:
       app: llm-dependency-deploy
@@ -327,7 +327,7 @@ spec:
         envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/tei-gaudi:latest
+        image: ghcr.io/huggingface/tei-gaudi:latest
         imagePullPolicy: IfNotPresent
         name: reranking-dependency-deploy
         ports:
