@@ -1,0 +1,35 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  tgi_gaudi_service:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.1
+    container_name: tgi-service
+    ports:
+      - "8088:80"
+    volumes:
+      - "./data:/data"
+    environment:
+      HF_TOKEN: ${HF_TOKEN}
+    shm_size: 1g
+    command: --model-id ${LLM_MODEL_ID} --max-input-tokens 1024 --max-total-tokens 2048
+  guardrails:
+    image: opea/guardrails-tgi:latest
+    container_name: guardrails-tgi-gaudi-server
+    ports:
+      - "9090:9090"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      SAFETY_GUARD_ENDPOINT: ${SAFETY_GUARD_ENDPOINT}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

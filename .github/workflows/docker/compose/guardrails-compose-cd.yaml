@@ -14,6 +14,10 @@ services:
     build:
       dockerfile: comps/guardrails/toxicity_detection/Dockerfile
     image: ${REGISTRY:-opea}/guardrails-toxicity-detection:${TAG:-latest}
+  guardrails-wildguard:
+    build:
+      dockerfile: comps/guardrails/wildguard/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/guardrails-wildguard:${TAG:-latest}
   guardrails-pii-detection-predictionguard:
     build:
       dockerfile: comps/guardrails/pii_detection/predictionguard/Dockerfile
