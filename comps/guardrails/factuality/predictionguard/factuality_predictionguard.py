@@ -4,7 +4,6 @@
 
 import time
 
-from docarray import BaseDoc
 from predictionguard import PredictionGuard
 
 from comps import (

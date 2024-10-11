@@ -4,7 +4,6 @@
 import json
 import uuid
 
-import numpy as np
 from huggingface_hub import ChatCompletionOutputFunctionDefinition, ChatCompletionOutputToolCall
 from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.messages.tool import ToolCall

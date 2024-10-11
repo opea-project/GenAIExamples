@@ -1,14 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from collections import OrderedDict
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import torch
 import torch.nn.functional as F
 from torch import nn
-from torchvision import transforms
-from torchvision.transforms import CenterCrop, Compose, Normalize, Resize, ToTensor
 from transformers import BridgeTowerModel, BridgeTowerPreTrainedModel
 from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.models.bridgetower.modeling_bridgetower import (

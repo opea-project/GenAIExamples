@@ -25,7 +25,6 @@ from langchain_community.document_loaders import (
     UnstructuredXMLLoader,
 )
 from PIL import Image
-from utils import timeout
 
 
 def load_pdf(pdf_path):

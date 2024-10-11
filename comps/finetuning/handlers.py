@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Dict
 
 from fastapi import BackgroundTasks, File, Form, HTTPException, UploadFile
-from pydantic_yaml import parse_yaml_raw_as, to_yaml_file
+from pydantic_yaml import to_yaml_file
 from ray.job_submission import JobSubmissionClient
 
 from comps import CustomLogger
@@ -21,7 +21,6 @@ from comps.cores.proto.api_protocol import (
     FineTuningJobCheckpoint,
     FineTuningJobIDRequest,
     FineTuningJobList,
-    FineTuningJobsRequest,
     UploadFileRequest,
 )
 from comps.finetuning.finetune_config import FinetuneConfig, FineTuningParams

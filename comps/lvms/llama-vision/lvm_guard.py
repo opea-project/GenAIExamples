@@ -9,11 +9,10 @@ from enum import Enum
 from io import BytesIO
 from typing import Union
 
-import habana_frameworks.torch as htorch
 import requests
 import torch
 from PIL import Image
-from prompt_format_utils import LlamaGuardVersion, build_default_prompt, create_conversation
+from prompt_format_utils import build_default_prompt, create_conversation
 from transformers import AutoModelForVision2Seq, AutoProcessor
 
 from comps import (
@@ -42,7 +41,6 @@ def initialize():
     global model, processor, initialized
     with initialization_lock:
         if not initialized:
-            import habana_frameworks.torch.hpu as torch_hpu
 
             model_id = os.getenv("LLAMA_VISION_GUARD_MODEL_ID", "meta-llama/Llama-Guard-3-11B-Vision")
             huggingface_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")

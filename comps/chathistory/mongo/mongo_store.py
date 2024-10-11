@@ -1,10 +1,8 @@
 ﻿# Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import json
 
 import bson.errors as BsonError
-from bson import json_util
 from bson.objectid import ObjectId
 from config import COLLECTION_NAME
 from mongo_conn import MongoClient

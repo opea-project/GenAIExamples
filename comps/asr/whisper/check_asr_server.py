@@ -6,7 +6,6 @@ import json
 import os
 import urllib.request
 import uuid
-from io import BytesIO
 
 import requests
 

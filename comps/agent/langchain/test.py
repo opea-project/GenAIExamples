@@ -5,11 +5,10 @@ import argparse
 import json
 import os
 import traceback
-from time import sleep
 
 import pandas as pd
 import requests
-from src.utils import format_date, get_args
+from src.utils import get_args
 
 
 def test_agent_local(args):

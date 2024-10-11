@@ -4,9 +4,7 @@
 
 import json
 import time
-from typing import List, Optional
 
-from docarray import BaseDoc
 from predictionguard import PredictionGuard
 
 from comps import (

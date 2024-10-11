@@ -1,17 +1,15 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import base64
 import os
 from typing import List, Union
 
 import intel_extension_for_pytorch as ipex
-import numpy as np
 import torch  # type: ignore
 import torch.nn.functional as F  # type: ignore
 import transformers  # type: ignore
 from llmspec import EmbeddingData, EmbeddingRequest, EmbeddingResponse, TokenUsage
-from mosec import ClientError, Runtime, Server, Worker
+from mosec import Runtime, Server, Worker
 
 DEFAULT_MODEL = "/home/user/bge-large-zh-v1.5/"
 

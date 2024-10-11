@@ -1,19 +1,15 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import os
-import time
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
-import torch
 import torchvision.transforms as T
 from decord import VideoReader, cpu
 from langchain.pydantic_v1 import BaseModel, root_validator
 from langchain_community.vectorstores import VDMS
 from langchain_community.vectorstores.vdms import VDMS_Client
 from langchain_core.embeddings import Embeddings
-from PIL import Image
 
 toPIL = T.ToPILImage()
 

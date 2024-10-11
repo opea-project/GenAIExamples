@@ -22,7 +22,7 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
-from comps.cores.proto.api_protocol import ChatCompletionRequest, ChatCompletionResponse, ChatCompletionStreamResponse
+from comps.cores.proto.api_protocol import ChatCompletionRequest
 
 logger = CustomLogger("llm_tgi")
 logflag = os.getenv("LOGFLAG", False)

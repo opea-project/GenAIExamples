@@ -12,7 +12,7 @@ import requests
 import torch
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse, Response, StreamingResponse
+from fastapi.responses import JSONResponse, Response
 from transformers import pipeline
 
 model_name_or_path = None

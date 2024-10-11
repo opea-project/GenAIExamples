@@ -5,7 +5,7 @@ import json
 import uuid
 
 from huggingface_hub import ChatCompletionOutputFunctionDefinition, ChatCompletionOutputToolCall
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.messages.tool import ToolCall
 from langchain_core.output_parsers import BaseOutputParser
 

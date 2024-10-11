@@ -11,7 +11,6 @@ from vdms_config import DEBUG, DISTANCE_STRATEGY, EMBED_MODEL, INDEX_NAME, SEARC
 
 from comps import (
     EmbedDoc,
-    SearchedDoc,
     SearchedMultimodalDoc,
     ServiceType,
     TextDoc,

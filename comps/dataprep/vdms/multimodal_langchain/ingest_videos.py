@@ -7,7 +7,7 @@ import shutil
 import time
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Type, Union
+from typing import List
 
 from fastapi import File, HTTPException, UploadFile
 from fastapi.responses import FileResponse

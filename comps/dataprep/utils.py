@@ -4,7 +4,6 @@
 import base64
 import errno
 import functools
-import io
 import json
 import multiprocessing
 import os

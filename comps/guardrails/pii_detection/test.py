@@ -10,7 +10,6 @@ from utils import Timer
 
 
 def test_html(ip_addr="localhost", batch_size=20, strategy=None):
-    import pandas as pd
 
     proxies = {"http": ""}
     url = f"http://{ip_addr}:6357/v1/piidetect"

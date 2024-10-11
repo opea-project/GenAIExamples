@@ -4,8 +4,6 @@
 import datetime
 import json
 import os
-import random
-import time as t
 
 import cv2
 import yaml

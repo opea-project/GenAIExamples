@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-from typing import List
 
 from .detect.emails_detection import detect_email
 from .detect.ip_detection import detect_ip

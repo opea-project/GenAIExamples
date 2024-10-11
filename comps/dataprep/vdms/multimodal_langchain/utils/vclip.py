@@ -1,16 +1,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import argparse
-import json
-import os
-import sys
 
-import numpy as np
 import torch
 import torchvision.transforms as T
-import yaml
-from decord import VideoReader, cpu
 from transformers import AutoProcessor, AutoTokenizer, CLIPModel
 
 toPIL = T.ToPILImage()

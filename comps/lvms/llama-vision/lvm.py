@@ -8,7 +8,6 @@ import time
 from io import BytesIO
 from typing import Union
 
-import habana_frameworks.torch as htorch
 import requests
 import torch
 from PIL import Image
@@ -35,7 +34,6 @@ def initialize():
     global model, processor, initialized
     with initialization_lock:
         if not initialized:
-            import habana_frameworks.torch.hpu as torch_hpu
 
             model_id = os.getenv("LLAMA_VISION_MODEL_ID", "meta-llama/Llama-3.2-11B-Vision-Instruct")
             huggingface_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")

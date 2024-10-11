@@ -6,9 +6,9 @@ import os
 from typing import List, Optional, Union
 
 from config import COLLECTION_NAME, DISTANCE_STRATEGY, EMBED_MODEL, SEARCH_ENGINE, VDMS_HOST, VDMS_PORT
-from fastapi import Body, File, Form, HTTPException, UploadFile
+from fastapi import File, Form, HTTPException, UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceEmbeddings, HuggingFaceHubEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.vectorstores.vdms import VDMS, VDMS_Client
 from langchain_text_splitters import HTMLHeaderTextSplitter
 

@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
 DOC_GRADER_PROMPT = """\
 Given the QUERY, determine if a relevant answer can be derived from the DOCUMENT.\n

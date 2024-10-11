@@ -9,7 +9,6 @@ import sys
 # __serve_example_begin__
 from typing import Dict, List, Optional
 
-import torch
 from fastapi import FastAPI
 from huggingface_hub import login
 from ray import serve

@@ -4,25 +4,12 @@
 import os
 
 from datasets import Dataset
-from langchain_community.embeddings import (
-    HuggingFaceBgeEmbeddings,
-    HuggingFaceEmbeddings,
-    HuggingFaceHubEmbeddings,
-    HuggingFaceInstructEmbeddings,
-)
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
 from ragas import evaluate
 from ragas.metrics import answer_relevancy, context_precision, context_recall, faithfulness
 
-from comps import (
-    CustomLogger,
-    GeneratedDoc,
-    RAGASParams,
-    RAGASScores,
-    ServiceType,
-    opea_microservices,
-    register_microservice,
-)
+from comps import CustomLogger, RAGASParams, RAGASScores, ServiceType, opea_microservices, register_microservice
 
 logger = CustomLogger("ragas_tgi_llm")
 logflag = os.getenv("LOGFLAG", False)

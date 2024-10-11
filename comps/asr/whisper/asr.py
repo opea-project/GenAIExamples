@@ -5,7 +5,6 @@ import json
 import os
 import time
 
-import numpy as np
 import requests
 
 from comps import CustomLogger

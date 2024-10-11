@@ -1,7 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import json
 import os
 import pathlib
 import sys
@@ -28,7 +27,6 @@ from comps.cores.proto.api_protocol import (
     CreateThreadsRequest,
     MessageContent,
     MessageObject,
-    RunObject,
     ThreadObject,
 )
 

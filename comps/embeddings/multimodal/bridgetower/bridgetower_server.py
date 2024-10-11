@@ -8,7 +8,6 @@ import os
 import uuid
 from functools import partial
 from io import BytesIO
-from typing import List
 
 import PIL
 import PIL.Image

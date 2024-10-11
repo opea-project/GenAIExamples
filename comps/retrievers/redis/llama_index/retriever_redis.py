@@ -5,7 +5,7 @@ import os
 
 from llama_index.core.vector_stores.types import VectorStoreQuery
 from llama_index.vector_stores.redis import RedisVectorStore
-from redis_config import INDEX_NAME, REDIS_URL
+from redis_config import REDIS_URL
 
 from comps import CustomLogger, EmbedDoc, SearchedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
 

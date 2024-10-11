@@ -3,7 +3,6 @@
 
 import json
 import os
-import uuid
 from pathlib import Path
 from typing import List, Optional, Union
 
@@ -22,7 +21,6 @@ from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFace
 from langchain_core.documents import Document
 from langchain_milvus.vectorstores import Milvus
 from langchain_text_splitters import HTMLHeaderTextSplitter
-from pyspark import SparkConf, SparkContext
 
 from comps import CustomLogger, DocPath, opea_microservices, register_microservice
 from comps.dataprep.utils import (
@@ -30,7 +28,6 @@ from comps.dataprep.utils import (
     decode_filename,
     document_loader,
     encode_filename,
-    get_file_structure,
     get_separators,
     get_tables_result,
     parse_html,

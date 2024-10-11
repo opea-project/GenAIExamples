@@ -3,7 +3,6 @@
 
 import os
 import shutil
-import subprocess
 import time
 import uuid
 from pathlib import Path
@@ -14,7 +13,6 @@ from fastapi import File, HTTPException, UploadFile
 from langchain_community.utilities.redis import _array_to_buffer
 from langchain_community.vectorstores import Redis
 from langchain_community.vectorstores.redis.base import _generate_field_schema, _prepare_metadata
-from langchain_community.vectorstores.redis.schema import read_schema
 from langchain_core.embeddings import Embeddings
 from langchain_core.utils import get_from_dict_or_env
 from multimodal_utils import (
