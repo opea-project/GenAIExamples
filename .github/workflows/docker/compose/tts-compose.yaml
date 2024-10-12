@@ -16,3 +16,7 @@ services:
     build:
       dockerfile: comps/tts/speecht5/dependency/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
+  gpt-sovits:
+    build:
+      dockerfile: comps/tts/gpt-sovits/Dockerfile
+    image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}
