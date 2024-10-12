@@ -201,25 +201,8 @@ export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
-export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVER_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVER_HOST_IP=${host_ip}
-export LLM_SERVER_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
-export FRONTEND_SERVICE_IP=${host_ip}
-export FRONTEND_SERVICE_PORT=5173
-export BACKEND_SERVICE_NAME=chatqna
-export BACKEND_SERVICE_IP=${host_ip}
-export BACKEND_SERVICE_PORT=8888
-
 export OLLAMA_ENDPOINT=http://${host_ip}:11434
 export OLLAMA_MODEL="llama3"
 ```
@@ -229,25 +212,8 @@ export OLLAMA_MODEL="llama3"
 ```bash
 set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 set RERANK_MODEL_ID=BAAI/bge-reranker-base
-set TEI_EMBEDDING_ENDPOINT=http://%host_ip%:6006
-set REDIS_URL=redis://%host_ip%:6379
 set INDEX_NAME=rag-redis
 set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
-set MEGA_SERVICE_HOST_IP=%host_ip%
-set EMBEDDING_SERVER_HOST_IP=%host_ip%
-set RETRIEVER_SERVICE_HOST_IP=%host_ip%
-set RERANK_SERVER_HOST_IP=%host_ip%
-set LLM_SERVER_HOST_IP=%host_ip%
-set BACKEND_SERVICE_ENDPOINT=http://%host_ip%:8888/v1/chatqna
-set DATAPREP_SERVICE_ENDPOINT=http://%host_ip%:6007/v1/dataprep
-set DATAPREP_GET_FILE_ENDPOINT="http://%host_ip%:6007/v1/dataprep/get_file"
-set DATAPREP_DELETE_FILE_ENDPOINT="http://%host_ip%:6007/v1/dataprep/delete_file"
-set FRONTEND_SERVICE_IP=%host_ip%
-set FRONTEND_SERVICE_PORT=5173
-set BACKEND_SERVICE_NAME=chatqna
-set BACKEND_SERVICE_IP=%host_ip%
-set BACKEND_SERVICE_PORT=8888
-
 set OLLAMA_ENDPOINT=http://host.docker.internal:11434
 set OLLAMA_MODEL="llama3"
 ```
