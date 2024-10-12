@@ -2,11 +2,111 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AIPC. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
 
+## Prerequisites
+
+We use [Ollama](https://ollama.com/) as our LLM service for AIPC.
+
+Please follow the instructions to set up Ollama on your PC. This will set the entrypoint needed for the Ollama to suit the ChatQnA examples.
+
+### Set Up Ollama LLM Service
+
+#### Install Ollama Service
+
+Install Ollama service with one command:
+
+```
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+#### Set Ollama Service Configuration
+
+Ollama Service Configuration file is /etc/systemd/system/ollama.service. Edit the file to set OLLAMA_HOST environment.
+Replace **<host_ip>** with your host IPV4 (please use external public IP). For example the host_ip is 10.132.x.y, then `Environment="OLLAMA_HOST=10.132.x.y:11434"'.
+
+```
+Environment="OLLAMA_HOST=host_ip:11434"
+```
+
+#### Set https_proxy environment for Ollama
+
+If your system access network through proxy, add https_proxy in Ollama Service Configuration file
+
+```
+Environment="https_proxy=Your_HTTPS_Proxy"
+```
+
+#### Restart Ollama services
+
+```
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart ollama.service
+```
+
+#### Check the service started
+
+```
+netstat -tuln | grep  11434
+```
+
+The output are:
+
+```
+tcp        0      0 10.132.x.y:11434      0.0.0.0:*               LISTEN
+```
+
+#### Pull Ollama LLM model
+
+Run the command to download LLM models. The <host_ip> is the one set in [Ollama Service Configuration](#Set-Ollama-Service-Configuration)
+
+```
+export host_ip=<host_ip>
+export OLLAMA_HOST=http://${host_ip}:11434
+ollama pull llama3
+```
+
+After downloaded the models, you can list the models by `ollama list`.
+
+The output should be similar to the following:
+
+```
+NAME            ID              SIZE    MODIFIED
+llama3:latest   365c0bd3c000    4.7 GB  5 days ago
+```
+
+### Consume Ollama LLM Service
+
+Access ollama service to verify that the ollama is functioning correctly.
+
+```bash
+curl http://${host_ip}:11434/api/generate -d '{"model": "llama3", "prompt":"What is Deep Learning?"}'
+```
+
+The outputs are similar to these:
+
+```
+{"model":"llama3","created_at":"2024-10-11T07:58:38.949268562Z","response":"Deep","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.017625351Z","response":" learning","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.102848076Z","response":" is","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.171037991Z","response":" a","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.243757952Z","response":" subset","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.328708084Z","response":" of","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.413844974Z","response":" machine","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.486239329Z","response":" learning","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.555960842Z","response":" that","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.642418238Z","response":" involves","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.714137478Z","response":" the","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.798776679Z","response":" use","done":false}
+{"model":"llama3","created_at":"2024-10-11T07:58:39.883747938Z","response":" of","done":false}
+...
+```
+
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
 ```bash
+mkdir ~/OPEA -p
+cd ~/OPEA
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
@@ -22,52 +122,7 @@ export https_proxy="Your_HTTPs_Proxy"
 docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
-### 2. Set up Ollama Service and Build LLM Image
-
-We use [Ollama](https://ollama.com/) as our LLM service for AIPC.
-
-Please set up Ollama on your PC follow the instructions. This will set the entrypoint needed for the Ollama to suit the ChatQnA examples.
-
-#### 2.1 Set Up Ollama LLM Service
-
-Install Ollama service with one command
-
-curl -fsSL https://ollama.com/install.sh | sh
-
-##### Set Ollama Service Configuration
-
-Ollama Service Configuration file is /etc/systemd/system/ollama.service. Edit the file to set OLLAMA_HOST environment (Replace **${host_ip}** with your host IPV4).
-
-```
-Environment="OLLAMA_HOST=${host_ip}:11434"
-```
-
-##### Set https_proxy environment for Ollama
-
-if your system access network through proxy, add https_proxy in Ollama Service Configuration file
-
-```
-Environment="https_proxy="Your_HTTPS_Proxy"
-```
-
-##### Restart Ollam services
-
-```
-$ sudo systemctl daemon-reload
-$ sudo systemctl restart ollama.service
-```
-
-##### Pull LLM model
-
-```
-#export OLLAMA_HOST=http://${host_ip}:11434
-#ollama pull llam3
-#ollama lists
-NAME            ID              SIZE    MODIFIED
-llama3:latest   365c0bd3c000    4.7 GB  5 days ago
-```
-
-#### 2.2 Build LLM Image
+### 2 Build LLM Image
 
 ```bash
 docker build --no-cache -t opea/llm-ollama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ollama/langchain/Dockerfile .
@@ -85,10 +140,10 @@ cd ..
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
 
 ```bash
+cd ~/OPEA
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA
-docker build --no-cache -t opea/chatqna:latest -f Dockerfile .
-cd ../../..
+docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f Dockerfile .
 ```
 
 ### 5. Build UI Docker Image
@@ -96,9 +151,8 @@ cd ../../..
 Build frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/ChatQnA/ui
+cd ~/OPEA/GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../..
 ```
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
@@ -205,10 +259,13 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
 ```bash
-cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc/
+cd ~/OPEA/GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc/
 docker compose up -d
+```
 
-# let ollama service runs
+Let ollama service runs (if you have started ollama service in [Prerequisites](#Prerequisites), skip this step)
+
+```bash
 # e.g. ollama run llama3
 OLLAMA_HOST=${host_ip}:11434 ollama run $OLLAMA_MODEL
 # for windows
@@ -272,29 +329,43 @@ For details on how to verify the correctness of the response, refer to [how-to-v
         }'
    ```
 
-7. Dataprep Microservice（Optional）
+7. Upload RAG Files through Dataprep Microservice (Optional)
 
-   If you want to update the default knowledge base, you can use the following commands:
+   To chat with retrieved information, you need to upload a file using Dataprep service.
 
-   Update Knowledge Base via Local File Upload:
+   Here is an example of Nike 2023 pdf file.
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F "files=@./nke-10k-2023.pdf"
-   ```
+```bash
+# download pdf file
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
 
-   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+# upload pdf file with dataprep
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F "files=@./nke-10k-2023.pdf"
+```
 
-   Add Knowledge Base via HTTP Links:
+This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-   ```bash
-   curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-        -H "Content-Type: multipart/form-data" \
-        -F 'link_list=["https://opea.dev"]'
-   ```
+Alternatively, you can add knowledge base via HTTP Links:
 
-   This command updates a knowledge base by submitting a list of HTTP links for processing.
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+     -H "Content-Type: multipart/form-data" \
+     -F 'link_list=["https://opea.dev"]'
+```
+
+This command updates a knowledge base by submitting a list of HTTP links for processing.
+
+To check the uploaded files, you are able to get the file list that uploaded:
+
+```bash
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+     -H "Content-Type: application/json"
+```
+
+the output is:
+`[{"name":"nke-10k-2023.pdf","id":"nke-10k-2023.pdf","type":"File","parent":""}]`
 
 ## 🚀 Launch the UI
 
