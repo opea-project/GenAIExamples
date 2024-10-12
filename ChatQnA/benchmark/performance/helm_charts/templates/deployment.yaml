@@ -1,14 +1,17 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+{{- $global := .Values }}
 {{- range $deployment := .Values.deployments }}
+{{- range $podSpec := $global.podSpecs }}
+{{- if eq $podSpec.name $deployment.name }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $deployment.name }}
   namespace: default
 spec:
-  replicas: {{ $deployment.spec.replicas }}
+  replicas: {{ $podSpec.spec.replicas }}
   selector:
     matchLabels:
       app: {{ $deployment.name }}
@@ -43,9 +46,9 @@ spec:
         {{- end }}
         {{- end }}
 
-        image: {{ $deployment.spec.image_name }}:{{ $deployment.spec.image_tag }}
+        image: {{ $podSpec.spec.image_name }}:{{ $podSpec.spec.image_tag }}
         imagePullPolicy: IfNotPresent
-        name: {{ $deployment.name }}
+        name: {{ $podSpec.name }}
 
         {{- if $deployment.spec.ports }}
         ports:
@@ -56,9 +59,10 @@ spec:
         {{- end }}
         {{- end }}
 
-        {{- if $deployment.spec.resources }}
+
+        {{- if $podSpec.spec.resources }}
         resources:
-        {{- range $resourceType, $resource := $deployment.spec.resources }}
+        {{- range $resourceType, $resource := $podSpec.spec.resources }}
           {{ $resourceType }}:
           {{- range $limitType, $limit := $resource }}
             {{ $limitType }}: {{ $limit }}
@@ -103,6 +107,7 @@ spec:
       {{- end }}
       {{- end }}
 
-
 ---
+{{- end }}
+{{- end }}
 {{- end }}

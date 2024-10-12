@@ -77,13 +77,30 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-reranking-gaudi-server
+    ports:
+      - "8808:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-gaudi-server
+    depends_on:
+      - tei-reranking-service
     ports:
       - "8000:8000"
     ipc: host
-    entrypoint: python local_reranking.py
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
