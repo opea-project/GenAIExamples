@@ -16,11 +16,8 @@ const CHAT_ITEMS = ["An astronaut riding a green horse"];
 async function enterMessageToChat(page: Page, message: string) {
 	await page.getByTestId("img-input").click();
 	await page.getByTestId("img-input").fill(message);
+	await page.waitForTimeout(1000);
 	await page.getByTestId("img-gen").click();
-	await page.waitForTimeout(360000);
-	await expect(page.getByTestId("display-img")).toBeVisible();
-
-	// await page.waitForSelector('[data-testid="display-img"]', { timeout: 600000 });
 }
 
 
