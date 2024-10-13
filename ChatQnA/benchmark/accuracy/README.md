@@ -34,7 +34,7 @@ pip install -e .
 [MultiHop-RAG](https://arxiv.org/pdf/2401.15391): a QA dataset to evaluate retrieval and reasoning across documents with metadata in the RAG pipelines. It contains 2556 queries, with evidence for each query distributed across 2 to 4 documents. The queries also involve document metadata, reflecting complex scenarios commonly found in real-world RAG applications.
 
 ### Launch Service of RAG System
-Please refer to this [guide](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/README.md) to launch the service of RAG system.
+Please refer to this [guide](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/README.md) to launch the service of `ChatQnA`.
 
 ### Launch Service of LLM-as-a-Judge
 
@@ -59,12 +59,12 @@ git clone https://github.com/yixuantt/MultiHop-RAG.git
 
 Use below command to run the evaluation, please note that for the first run, argument `--ingest_docs` should be added in the command to ingest the documents into the vector database, while for the subsequent run, this argument should be omitted. Set `--retrieval_metrics` to get retrieval related metrics (MRR@10/MAP@10/Hits@10/Hits@4). Set `--ragas_metrics` and `--llm_endpoint` to get end-to-end rag pipeline metrics (faithfulness/answer_relevancy/...), which are judged by LLMs. We set `--limits` is 100 as default, which means only 100 examples are evaluated by llm-as-judge as it is very time consuming.
 
-If you are using docker compose to deploy RAG system, you can simply run the evaluation as following:
+If you are using docker compose to deploy `ChatQnA` system, you can simply run the evaluation as following:
 ```bash
 python eval_multihop.py --docs_path MultiHop-RAG/dataset/corpus.json  --dataset_path MultiHop-RAG/dataset/MultiHopRAG.json --ingest_docs --retrieval_metrics --ragas_metrics --llm_endpoint http://{llm_as_judge_ip}:{llm_as_judge_port}/generate
 ```
 
-If you are using Kubernetes manifest/helm to deploy RAG system, you must specify more arguments as following:
+If you are using Kubernetes manifest/helm to deploy `ChatQnA` system, you must specify more arguments as following:
 ```bash
 python eval_multihop.py --docs_path MultiHop-RAG/dataset/corpus.json  --dataset_path MultiHop-RAG/dataset/MultiHopRAG.json --ingest_docs --retrieval_metrics --ragas_metrics --llm_endpoint http://{llm_as_judge_ip}:{llm_as_judge_port}/generate --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --tei_embedding_endpoint http://{your_tei_embedding_ip}:{your_tei_embedding_port} --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
 ```
@@ -110,23 +110,21 @@ python process_crud_dataset.py
 ```
 
 ### Launch Service of RAG System
-Please refer to this [guide](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/README.md) to launch the service of RAG system. For Chinese dataset, you should replace the English emebdding and llm model with Chinese, for example, `EMBEDDING_MODEL_ID="BAAI/bge-base-zh-v1.5"` and `LLM_MODEL_ID=Qwen/Qwen2-7B-Instruct`.
+Please refer to this [guide](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/README.md) to launch the service of `ChatQnA` system. For Chinese dataset, you should replace the English emebdding and llm model with Chinese, for example, `EMBEDDING_MODEL_ID="BAAI/bge-base-zh-v1.5"` and `LLM_MODEL_ID=Qwen/Qwen2-7B-Instruct`.
 
 ### Evaluation
 Use below command to run the evaluation, please note that for the first run, argument `--ingest_docs` should be added in the command to ingest the documents into the vector database, while for the subsequent run, this argument should be omitted.
 
-If you are using docker compose to deploy RAG system, you can simply run the evaluation as following:
+If you are using docker compose to deploy `ChatQnA` system, you can simply run the evaluation as following:
 ```bash
-cd examples
 python eval_crud.py --dataset_path ./data/split_merged.json --docs_path ./data/80000_docs --ingest_docs
 
 # if you want to get ragas metrics
 python eval_crud.py --dataset_path ./data/split_merged.json --docs_path ./data/80000_docs  --contain_original_data --llm_endpoint "http://{llm_as_judge_ip}:{llm_as_judge_port}"  --ragas_metrics
 ```
 
-If you are using Kubernetes manifest/helm to deploy RAG system, you must specify more arguments as following:
+If you are using Kubernetes manifest/helm to deploy `ChatQnA` system, you must specify more arguments as following:
 ```bash
-cd examples
 python eval_crud.py --dataset_path ./data/split_merged.json --docs_path ./data/80000_docs --ingest_docs --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
 ```
 
