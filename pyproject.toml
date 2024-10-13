@@ -43,7 +43,6 @@ exclude = [
     "dist",
     "node_modules",
     "site-packages",
-    "venv",
 ]
 
 # Same as Black.
