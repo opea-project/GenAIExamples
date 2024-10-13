@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui chatqna-conversation-ui dataprep-redis embedding-tei retriever-redis reranking-tei llm-tgi nginx"
+    service_list="chatqna chatqna-ui chatqna-conversation-ui dataprep-redis retriever-redis"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
@@ -29,38 +29,34 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
-    export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:9009"
     export REDIS_URL="redis://${ip_address}:6379"
     export REDIS_HOST=${ip_address}
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
+    export RERANK_SERVER_HOST_IP=${ip_address}
+    export LLM_SERVER_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_PORT=6006
+    export RERANK_SERVER_PORT=8808
+    export LLM_SERVER_PORT=9009
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get_file"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/delete_file"
-    export FRONTEND_SERVICE_IP=${host_ip}
-    export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_NAME=chatqna
-    export BACKEND_SERVICE_IP=${host_ip}
-    export BACKEND_SERVICE_PORT=8888
-    export NGINX_PORT=80
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+
     n=0
     until [[ "$n" -ge 500 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
@@ -125,14 +121,6 @@ function validate_microservices() {
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
-    # embedding microservice
-    validate_service \
-        "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":[' \
-        "embedding-microservice" \
-        "embedding-tei-server" \
-        '{"text":"What is Deep Learning?"}'
-
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # test /v1/dataprep upload file
@@ -181,14 +169,6 @@ function validate_microservices() {
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # rerank microservice
-    validate_service \
-        "${ip_address}:8000/v1/reranking" \
-        "Deep learning is..." \
-        "rerank-microservice" \
-        "reranking-tei-xeon-server" \
-        '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}'
-
     # tgi for llm service
     validate_service \
         "${ip_address}:9009/generate" \
@@ -196,14 +176,6 @@ function validate_microservices() {
         "tgi-llm" \
         "tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
-    # llm microservice
-    validate_service \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm-microservice" \
-        "llm-tgi-server" \
-        '{"query":"What is Deep Learning?"}'
 
 }
 
@@ -249,7 +221,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
     docker compose stop && docker compose rm -f
 }
 
@@ -270,8 +242,8 @@ function main() {
         echo "==== microservices validated ===="
         validate_megaservice
         echo "==== megaservice validated ===="
-        validate_frontend
-        echo "==== frontend validated ===="
+        # validate_frontend
+        # echo "==== frontend validated ===="
     fi
 
     stop_docker

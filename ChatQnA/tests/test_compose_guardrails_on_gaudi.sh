@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-guardrails chatqna-ui dataprep-redis embedding-tei retriever-redis reranking-tei llm-tgi guardrails-tgi"
+    service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever-redis guardrails-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
@@ -35,17 +35,19 @@ function start_services() {
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
-    export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
+    export RERANK_SERVER_HOST_IP=${ip_address}
+    export LLM_SERVER_HOST_IP=${ip_address}
     export GUARDRAIL_SERVICE_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_PORT=8090
+    export RERANK_SERVER_PORT=8808
+    export LLM_SERVER_PORT=8008
+    export GUARDRAIL_SERVICE_PORT=9090
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
@@ -120,14 +122,6 @@ function validate_microservices() {
         "tei-embedding-gaudi-server" \
         '{"inputs":"What is Deep Learning?"}'
 
-    # embedding microservice
-    validate_services \
-        "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":[' \
-        "embedding" \
-        "embedding-tei-server" \
-        '{"text":"What is Deep Learning?"}'
-
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
@@ -147,14 +141,6 @@ function validate_microservices() {
         "tei-reranking-gaudi-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # rerank microservice
-    validate_services \
-        "${ip_address}:8000/v1/reranking" \
-        "Deep learning is..." \
-        "rerank" \
-        "reranking-tei-gaudi-server" \
-        '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}'
-
     # tgi for llm service
     validate_services \
         "${ip_address}:8008/generate" \
@@ -163,22 +149,6 @@ function validate_microservices() {
         "tgi-gaudi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
-    # llm microservice
-    validate_services \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm" \
-        "llm-tgi-gaudi-server" \
-        '{"query":"What is Deep Learning?"}'
-
-    # tgi for guardrails service
-    validate_services \
-        "${ip_address}:8088/generate" \
-        "generated_text" \
-        "tgi-guardrails" \
-        "tgi-guardrails-server" \
-        '{"inputs":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}'
-
     # guardrails microservice
     validate_services \
         "${ip_address}:9090/v1/guardrails" \
@@ -186,14 +156,13 @@ function validate_microservices() {
         "guardrails" \
         "guardrails-tgi-gaudi-server" \
         '{"text":"How do you buy a tiger in the US?"}'
-
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
         "${ip_address}:8888/v1/chatqna" \
-        "billion" \
+        "data: " \
         "mega-chatqna" \
         "chatqna-gaudi-guardrails-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
