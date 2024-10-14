@@ -17,6 +17,7 @@ services:
       - "./data:/data"
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+
   llm:
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
     container_name: llm-docsum-server
@@ -32,8 +33,43 @@ services:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
+
+  whisper-service:
+    # image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    image: opea/whisper:latest
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+
+  asr:
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+    # image: opea/asr
+    container_name: asr-service
+    ports:
+      - "9099:9099"
+    ipc: host
+    environment:
+      ASR_ENDPOINT: ${ASR_ENDPOINT}
+
+  # v2a:
+  #   image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
+  #   # image: opea/dataprep-docsum-video2audio-microservice:latest
+  #   container_name: v2a-service
+  #   ports:
+  #     - "7078:7078"
+  #   ipc: host
+  #   environment:
+  #     V2A_ENDPOINT: ${V2A_ENDPOINT}
+
   docsum-xeon-backend-server:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+    # image: opea/docsum-xeon-backend-server:latest
     container_name: docsum-xeon-backend-server
     depends_on:
       - tgi-service
@@ -48,6 +84,7 @@ services:
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
+
   docsum-xeon-ui-server:
     image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
     container_name: docsum-xeon-ui-server

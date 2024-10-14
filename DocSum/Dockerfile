@@ -22,6 +22,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
 
 COPY ./docsum.py /home/user/docsum.py
+COPY ./test_check_backend_server.py /home/user/test_check_backend_server.py
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
 
