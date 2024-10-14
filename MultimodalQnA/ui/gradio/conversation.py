@@ -30,6 +30,7 @@ class Conversation:
     base64_frame: str = None
     skip_next: bool = False
     split_video: str = None
+    image: str = None
 
     def _template_caption(self):
         out = ""
@@ -137,6 +138,7 @@ class Conversation:
             "caption": self.caption,
             "base64_frame": self.base64_frame,
             "split_video": self.split_video,
+            "image": self.image,
         }
 
 
@@ -152,4 +154,5 @@ multimodalqna_conv = Conversation(
     time_of_frame_ms=None,
     base64_frame=None,
     split_video=None,
+    image=None,
 )
