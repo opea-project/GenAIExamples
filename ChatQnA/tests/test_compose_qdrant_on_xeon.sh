@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-qdrant embedding-tei retriever-qdrant reranking-tei llm-tgi"
+    service_list="chatqna chatqna-ui dataprep-qdrant retriever-qdrant"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
@@ -32,21 +32,20 @@ function start_services() {
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6040"
-    export TEI_RERANKING_ENDPOINT="http://${ip_address}:6041"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:6042"
     export QDRANT_HOST=${ip_address}
     export QDRANT_PORT=6333
     export INDEX_NAME="rag-qdrant"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
+    export EMBEDDING_SERVER_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_PORT=6044
+    export RERANK_SERVER_HOST_IP=${ip_address}
+    export LLM_SERVER_HOST_IP=${ip_address}
+    export MEGA_SERVICE_PORT=8912
+    export EMBEDDING_SERVER_PORT=6040
     export RETRIEVER_SERVICE_PORT=6045
-    export RERANK_SERVICE_PORT=6046
-    export LLM_SERVICE_PORT=6047
+    export RERANK_SERVER_PORT=6041
+    export LLM_SERVER_PORT=6042
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8912/v1/chatqna"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6043/v1/dataprep"
 
@@ -114,14 +113,6 @@ function validate_microservices() {
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
-    # embedding microservice
-    validate_services \
-        "${ip_address}:6044/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":[' \
-        "embedding" \
-        "embedding-tei-server" \
-        '{"text":"What is Deep Learning?"}'
-
     # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_services \
@@ -154,14 +145,6 @@ function validate_microservices() {
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # rerank microservice
-    validate_services \
-        "${ip_address}:6046/v1/reranking" \
-        "Deep learning is..." \
-        "rerank" \
-        "reranking-tei-xeon-server" \
-        '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}'
-
     # tgi for llm service
     validate_services \
         "${ip_address}:6042/generate" \
@@ -169,15 +152,6 @@ function validate_microservices() {
         "tgi-llm" \
         "tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
-    # llm microservice
-    validate_services \
-        "${ip_address}:6047/v1/chat/completions" \
-        "data: " \
-        "llm" \
-        "llm-tgi-server" \
-        '{"query":"Deep Learning"}'
-
 }
 
 function validate_megaservice() {
