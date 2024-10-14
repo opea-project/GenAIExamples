@@ -1,6 +1,13 @@
-# Reranking Microservice
+# Reranking Microservice with fastRAG
 
-The Reranking Microservice, fueled by reranking models, stands as a straightforward yet immensely potent tool for semantic search. When provided with a query and a collection of documents, reranking swiftly indexes the documents based on their semantic relevance to the query, arranging them from most to least pertinent. This microservice significantly enhances overall accuracy. In a text retrieval system, either a dense embedding model or a sparse lexical search index is often employed to retrieve relevant text documents based on the input. However, a reranking model can further refine this process by rearranging potential candidates into a final, optimized order.
+`fastRAG` is a research framework for efficient and optimized retrieval augmented generative pipelines, incorporating state-of-the-art LLMs and Information Retrieval.
+
+Please refer to [Official fastRAG repo](https://github.com/IntelLabs/fastRAG/tree/main)
+for more information.
+
+This README provides set-up instructions and comprehensive details regarding the reranking microservice via fastRAG.
+
+---
 
 ## 🚀1. Start Microservice with Python (Option 1)
 
@@ -28,6 +35,8 @@ export EMBED_MODEL="Intel/bge-small-en-v1.5-rag-int8-static"
 python local_reranking.py
 ```
 
+---
+
 ## 🚀2. Start Microservice with Docker (Option 2)
 
 ### 2.1 Setup Environment Variables
@@ -49,21 +58,25 @@ docker build -t opea/reranking-fastrag:latest --build-arg https_proxy=$https_pro
 docker run -d --name="reranking-fastrag-server" -p 8000:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e EMBED_MODEL=$EMBED_MODEL opea/reranking-fastrag:latest
 ```
 
-## 🚀3. Consume Reranking Service
+---
 
-### 3.1 Check Service Status
+## ✅ 3. Invoke Reranking Microservice
 
-```bash
-curl http://localhost:8000/v1/health_check \
-  -X GET \
-  -H 'Content-Type: application/json'
-```
+The Reranking microservice exposes following API endpoints:
 
-### 3.2 Consume Reranking Service
+- Check Service Status
 
-```bash
-curl http://localhost:8000/v1/reranking \
-  -X POST \
-  -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-  -H 'Content-Type: application/json'
-```
+  ```bash
+  curl http://localhost:8000/v1/health_check \
+    -X GET \
+    -H 'Content-Type: application/json'
+  ```
+
+- Execute reranking process by providing query and documents
+
+  ```bash
+  curl http://localhost:8000/v1/reranking \
+    -X POST \
+    -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
+    -H 'Content-Type: application/json'
+  ```

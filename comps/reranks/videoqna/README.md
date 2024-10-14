@@ -1,8 +1,14 @@
-# Rerank Microservice
+# Rerank Microservice with VideoQnA
 
-This is a Docker-based microservice that do result rerank for VideoQnA use case. Local rerank is used rather than rerank model.
+This README provides set-up instructions and comprehensive details regarding the reranking microservice with VideoQnA.
+This microservice is designed that do result rerank for VideoQnA use case. Local rerank is used rather than rerank model.
 
-For the `VideoQnA` usecase, during the data preparation phase, frames are extracted from videos and stored in a vector database. To identify the most relevant video, we count the occurrences of each video source among the retrieved data with rerank function `get_top_doc`. This sorts the video as a descending list of names, ranked by their degree of match with the query. Then we could send the `top_n` videos to the downstream LVM.
+For the `VideoQnA` usecase, during the data preparation phase, frames are extracted from videos and stored in a vector database.
+To identify the most relevant video, we count the occurrences of each video source among the retrieved data with rerank function `get_top_doc`.
+This sorts the video as a descending list of names, ranked by their degree of match with the query.
+Then we could send the `top_n` videos to the downstream LVM.
+
+---
 
 ## 🚀1. Start Microservice with Docker
 
@@ -23,14 +29,21 @@ until docker logs reranking-videoqna-server 2>&1 | grep -q "Uvicorn running on";
 done
 ```
 
-Available configuration by environment variable:
+### 1.3 Configuration available by setting environment variable
+
+Configuration that available by setting environment variable:
 
 - CHUNK_DURATION: target chunk duration, should be aligned with VideoQnA dataprep. Default 10s.
 
-## ✅ 2. Test
+---
+
+## ✅ 2. Invoke Reranking Microservice
+
+The Reranking microservice exposes following API endpoints:
 
 ```bash
 export ip_address=$(hostname -I | awk '{print $1}')
+
 curl -X 'POST' \
 "http://${ip_address}:8000/v1/reranking" \
 -H 'accept: application/json' \
@@ -45,15 +58,14 @@ curl -X 'POST' \
       {"other_key": "value", "video":"top_video_name", "timestamp":"20"}
   ]
 }'
+
+# Expected output result:
+# {"id":"random number","video_url":"http://0.0.0.0:6005/top_video_name","chunk_start":20.0,"chunk_duration":10.0,"prompt":"this is the query","max_new_tokens":512}
 ```
 
-The result should be:
+---
 
-```bash
-{"id":"random number","video_url":"http://0.0.0.0:6005/top_video_name","chunk_start":20.0,"chunk_duration":10.0,"prompt":"this is the query","max_new_tokens":512}
-```
-
-## ♻️ 3. Clean
+## ♻️ 3. Cleaning the Container
 
 ```bash
 # remove the container

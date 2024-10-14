@@ -1,6 +1,11 @@
-# Reranking Microservice
+# Reranking Microservice via TEI
 
-The Reranking Microservice, fueled by reranking models, stands as a straightforward yet immensely potent tool for semantic search. When provided with a query and a collection of documents, reranking swiftly indexes the documents based on their semantic relevance to the query, arranging them from most to least pertinent. This microservice significantly enhances overall accuracy. In a text retrieval system, either a dense embedding model or a sparse lexical search index is often employed to retrieve relevant text documents based on the input. However, a reranking model can further refine this process by rearranging potential candidates into a final, optimized order.
+`Text Embeddings Inference (TEI)` is a comprehensive toolkit designed for efficient deployment and serving of open source text embeddings models.
+It enable us to host our own reranker endpoint seamlessly.
+
+This README provides set-up instructions and comprehensive details regarding the reranking microservice via TEI.
+
+---
 
 ## 🚀1. Start Microservice with Python (Option 1)
 
@@ -17,7 +22,8 @@ pip install -r requirements.txt
 ```bash
 export HF_TOKEN=${your_hf_api_token}
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-volume=$PWD/data
+export volume=$PWD/data
+
 docker run -d -p 6060:80 -v $volume:/data -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $RERANK_MODEL_ID --hf-api-token $HF_TOKEN
 ```
 
@@ -34,8 +40,11 @@ curl 127.0.0.1:6060/rerank \
 
 ```bash
 export TEI_RERANKING_ENDPOINT="http://${your_ip}:6060"
+
 python reranking_tei_xeon.py
 ```
+
+---
 
 ## 🚀2. Start Microservice with Docker (Option 2)
 
@@ -74,30 +83,34 @@ docker run -d --name="reranking-tei-server" -p 8000:8000 --ipc=host -e http_prox
 docker compose -f docker_compose_reranking.yaml up -d
 ```
 
-## 🚀3. Consume Reranking Service
+---
 
-### 3.1 Check Service Status
+## ✅3. Invoke Reranking Microservice
 
-```bash
-curl http://localhost:8000/v1/health_check \
-  -X GET \
-  -H 'Content-Type: application/json'
-```
+The Reranking microservice exposes following API endpoints:
 
-### 3.2 Consume Reranking Service
+- Check Service Status
 
-```bash
-curl http://localhost:8000/v1/reranking \
-  -X POST \
-  -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-  -H 'Content-Type: application/json'
-```
+  ```bash
+  curl http://localhost:8000/v1/health_check \
+    -X GET \
+    -H 'Content-Type: application/json'
+  ```
 
-You can add the parameter `top_n` to specify the return number of the reranker model, default value is 1.
+- Execute reranking process by providing query and documents
 
-```bash
-curl http://localhost:8000/v1/reranking \
-  -X POST \
-  -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}], "top_n":2}' \
-  -H 'Content-Type: application/json'
-```
+  ```bash
+  curl http://localhost:8000/v1/reranking \
+    -X POST \
+    -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
+    -H 'Content-Type: application/json'
+  ```
+
+  - You can add the parameter `top_n` to specify the return number of the reranker model, default value is 1.
+
+  ```bash
+  curl http://localhost:8000/v1/reranking \
+    -X POST \
+    -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}], "top_n":2}' \
+    -H 'Content-Type: application/json'
+  ```
