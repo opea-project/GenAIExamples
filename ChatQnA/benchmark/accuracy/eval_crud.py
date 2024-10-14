@@ -8,11 +8,10 @@ import argparse
 import json
 import os
 
-from tqdm import tqdm
-
 from evals.evaluation.rag_eval import Evaluator
 from evals.evaluation.rag_eval.template import CRUDTemplate
 from evals.metrics.ragas import RagasMetric
+from tqdm import tqdm
 
 
 class CRUD_Evaluator(Evaluator):

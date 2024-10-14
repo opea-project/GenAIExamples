@@ -8,11 +8,10 @@ import json
 import os
 
 import requests
-from tqdm import tqdm
-
 from evals.evaluation.rag_eval import Evaluator
 from evals.metrics.ragas import RagasMetric
 from evals.metrics.retrieval import RetrievalBaseMetric
+from tqdm import tqdm
 
 
 class MultiHop_Evaluator(Evaluator):

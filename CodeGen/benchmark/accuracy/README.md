@@ -42,7 +42,6 @@ export CODEGEN_MODEL=your_model
 bash run_acc.sh $CODEGEN_MODEL $CODEGEN_ENDPOINT
 ```
 
-
 **_Note:_** Currently, our framework is designed to execute tasks in full. To ensure the accuracy of results, we advise against using the 'limit' or 'limit_start' parameters to restrict the number of test samples.
 
 ### accuracy Result
