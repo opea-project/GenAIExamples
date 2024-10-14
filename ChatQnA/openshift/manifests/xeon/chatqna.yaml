@@ -983,4 +983,3 @@ spec:
     name: chatqna
     weight: 100
   wildcardPolicy: None
-
