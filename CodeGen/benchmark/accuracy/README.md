@@ -1,4 +1,4 @@
-# CodeGen accuracy Evaluation
+# CodeGen Accuracy
 
 ## Evaluation Framework
 
@@ -13,7 +13,7 @@ Please refer to [CodeGen Examples](https://github.com/opea-project/GenAIExamples
 Use `curl` command to test codegen service and ensure that it has started properly
 
 ```bash
-export CODEGEN_ENDPOINT = "http://${your_ip}:7778/v1/codegen"
+export CODEGEN_ENDPOINT="http://${your_ip}:7778/v1/codegen"
 curl $CODEGEN_ENDPOINT \
     -H "Content-Type: application/json" \
     -d '{"messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
@@ -24,7 +24,7 @@ curl $CODEGEN_ENDPOINT \
 
 For evaluating the models on coding tasks or specifically coding LLMs, we follow the [bigcode-evaluation-harness](https://github.com/bigcode-project/bigcode-evaluation-harness) and provide the command line usage and function call usage. [HumanEval](https://huggingface.co/datasets/openai_humaneval), [HumanEval+](https://huggingface.co/datasets/evalplus/humanevalplus), [InstructHumanEval](https://huggingface.co/datasets/codeparrot/instructhumaneval), [APPS](https://huggingface.co/datasets/codeparrot/apps), [MBPP](https://huggingface.co/datasets/mbpp), [MBPP+](https://huggingface.co/datasets/evalplus/mbppplus), and [DS-1000](https://github.com/HKUNLP/DS-1000/) for both completion (left-to-right) and insertion (FIM) mode are available.
 
-#### command line usage
+#### Environment
 
 ```shell
 git clone https://github.com/opea-project/GenAIEval
@@ -32,15 +32,14 @@ cd GenAIEval
 pip install -r requirements.txt
 pip install -e .
 
-cd evals/evaluation/bigcode_evaluation_harness/examples
-python main.py --model Qwen/CodeQwen1.5-7B-Chat \
-  --tasks humaneval \
-  --codegen_url $CODEGEN_ENDPOINT \
-  --max_length_generation 2048 \
-  --batch_size 1  \
-  --save_generations \
-  --save_references \
-  --allow_code_execution
+```
+
+#### Evaluation
+
+```
+export CODEGEN_ENDPOINT="http://${your_ip}:7778/v1/codegen"
+export CODEGEN_MODEL=your_model
+bash run_acc.sh $CODEGEN_MODEL $CODEGEN_ENDPOINT
 ```
 
 **_Note:_** Currently, our framework is designed to execute tasks in full. To ensure the accuracy of results, we advise against using the 'limit' or 'limit_start' parameters to restrict the number of test samples.

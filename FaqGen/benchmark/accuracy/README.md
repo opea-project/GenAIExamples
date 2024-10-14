@@ -1,4 +1,4 @@
-# FaqGen Evaluation
+# FaqGen Accuracy
 
 ## Dataset
 
