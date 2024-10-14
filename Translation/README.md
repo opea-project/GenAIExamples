@@ -45,8 +45,9 @@ flowchart LR
 
     %% Questions interaction
     direction LR
-    NG <==> UserInterface
     a[User Input Query] --> UI
+    a[User Input Query] --> |Need Proxy Server|NG
+    NG --> UI
     UI --> GW
     GW <==> Translation-MegaService
 
