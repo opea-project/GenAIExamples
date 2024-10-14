@@ -1,7 +1,8 @@
 
-python main.py --model Qwen/CodeQwen1.5-7B-Chat \
+
+python main.py --model $1 \
   --tasks humaneval \
-  --codegen_url $CODEGEN_ENDPOINT \
+  --codegen_url $2 \
   --max_length_generation 2048 \
   --batch_size 1  \
   --save_generations \

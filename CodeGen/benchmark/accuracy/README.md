@@ -13,7 +13,7 @@ Please refer to [CodeGen Examples](https://github.com/opea-project/GenAIExamples
 Use `curl` command to test codegen service and ensure that it has started properly
 
 ```bash
-export CODEGEN_ENDPOINT = "http://${your_ip}:7778/v1/codegen"
+export CODEGEN_ENDPOINT="http://${your_ip}:7778/v1/codegen"
 curl $CODEGEN_ENDPOINT \
     -H "Content-Type: application/json" \
     -d '{"messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
@@ -37,7 +37,9 @@ pip install -e .
 #### Evaluation
 
 ```
-bash run_acc.sh
+export CODEGEN_ENDPOINT="http://${your_ip}:7778/v1/codegen"
+export CODEGEN_MODEL=your_model
+bash run_acc.sh $CODEGEN_MODEL $CODEGEN_ENDPOINT
 ```
 
 
