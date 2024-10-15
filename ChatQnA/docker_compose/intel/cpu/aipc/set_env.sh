@@ -17,4 +17,4 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export INDEX_NAME="rag-redis"
 export OLLAMA_ENDPOINT=http://${host_ip}:11434
-export OLLAMA_MODEL="llama3"
+export OLLAMA_MODEL="llama3.2"

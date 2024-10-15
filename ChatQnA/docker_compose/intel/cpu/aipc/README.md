@@ -61,7 +61,7 @@ Run the command to download LLM models. The <host_ip> is the one set in [Ollama 
 ```
 export host_ip=<host_ip>
 export OLLAMA_HOST=http://${host_ip}:11434
-ollama pull llama3
+ollama pull llama3.2
 ```
 
 After downloaded the models, you can list the models by `ollama list`.
@@ -69,8 +69,8 @@ After downloaded the models, you can list the models by `ollama list`.
 The output should be similar to the following:
 
 ```
-NAME            ID              SIZE    MODIFIED
-llama3:latest   365c0bd3c000    4.7 GB  5 days ago
+NAME            ID                SIZE      MODIFIED
+llama3.2:latest   a80c4f17acd5    2.0 GB    2 minutes ago
 ```
 
 ### Consume Ollama LLM Service
@@ -78,25 +78,25 @@ llama3:latest   365c0bd3c000    4.7 GB  5 days ago
 Access ollama service to verify that the ollama is functioning correctly.
 
 ```bash
-curl http://${host_ip}:11434/api/generate -d '{"model": "llama3", "prompt":"What is Deep Learning?"}'
+curl http://${host_ip}:11434/api/generate -d '{"model": "llama3.2", "prompt":"What is Deep Learning?"}'
 ```
 
 The outputs are similar to these:
 
 ```
-{"model":"llama3","created_at":"2024-10-11T07:58:38.949268562Z","response":"Deep","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.017625351Z","response":" learning","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.102848076Z","response":" is","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.171037991Z","response":" a","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.243757952Z","response":" subset","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.328708084Z","response":" of","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.413844974Z","response":" machine","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.486239329Z","response":" learning","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.555960842Z","response":" that","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.642418238Z","response":" involves","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.714137478Z","response":" the","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.798776679Z","response":" use","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.883747938Z","response":" of","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.098813868Z","response":"Deep","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.124514468Z","response":" learning","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.149754216Z","response":" is","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.180420784Z","response":" a","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.229185873Z","response":" subset","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.263956118Z","response":" of","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.289097354Z","response":" machine","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.316838918Z","response":" learning","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.342309506Z","response":" that","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.367221264Z","response":" involves","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.39205893Z","response":" the","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.417933974Z","response":" use","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.443110388Z","response":" of","done":false}
 ...
 ```
 
@@ -204,7 +204,7 @@ export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export OLLAMA_ENDPOINT=http://${host_ip}:11434
-export OLLAMA_MODEL="llama3"
+export OLLAMA_MODEL="llama3.2"
 ```
 
 - Windows PC
@@ -215,7 +215,7 @@ set RERANK_MODEL_ID=BAAI/bge-reranker-base
 set INDEX_NAME=rag-redis
 set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
 set OLLAMA_ENDPOINT=http://host.docker.internal:11434
-set OLLAMA_MODEL="llama3"
+set OLLAMA_MODEL="llama3.2"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -227,15 +227,6 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 ```bash
 cd ~/OPEA/GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc/
 docker compose up -d
-```
-
-Let ollama service runs (if you have started ollama service in [Prerequisites](#Prerequisites), skip this step)
-
-```bash
-# e.g. ollama run llama3
-OLLAMA_HOST=${host_ip}:11434 ollama run $OLLAMA_MODEL
-# for windows
-# ollama run %OLLAMA_MODEL%
 ```
 
 ### Validate Microservices
@@ -275,7 +266,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 4. Ollama Service
 
    ```bash
-   curl http://${host_ip}:11434/api/generate -d '{"model": "llama3", "prompt":"What is Deep Learning?"}'
+   curl http://${host_ip}:11434/api/generate -d '{"model": "llama3.2", "prompt":"What is Deep Learning?"}'
    ```
 
 5. LLM Microservice
@@ -291,7 +282,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
    ```bash
    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "messages": "What is the revenue of Nike in 2023?", "model": "'"${OLLAMA_MODEL}"'"
+        "messages": "What is the revenue of Nike in 2023?"
         }'
    ```
 

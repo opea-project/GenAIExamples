@@ -125,10 +125,10 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
-      - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
-      - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
-      - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
+      - CHAT_BASE_URL=http://chaqna-aipc-backend-server:8888/v1/chatqna
+      - UPLOAD_FILE_BASE_URL=http://dataprep-redis-service:6007/v1/dataprep
+      - GET_FILE=http://dataprep-redis-service:6007/v1/dataprep/get_file
+      - DELETE_FILE=http://dataprep-redis-service:6007/v1/dataprep/delete_file
     ipc: host
     restart: always
 
