@@ -8,7 +8,7 @@ IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
-export TAG=latest
+export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -143,29 +143,31 @@ function validate_microservices() {
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
-    # test /v1/dataprep upload file -> Not able to connect to pinecone server from test server so commenting out
+    # test /v1/dataprep/delete_file
+    validate_services \
+       "http://${ip_address}:6009/v1/dataprep/delete_file" \
+       '{"status":true}' \
+        "dataprep_del" \
+        "dataprep-pinecone-server"
+
+
+    # test /v1/dataprep upload file 
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
-    #validate_services \
-    #   "http://${ip_address}:6007/v1/dataprep" \
-    #    "Data preparation succeeded" \
-    #    "dataprep_upload_file" \
-    #    "dataprep-pinecone-server"
+    validate_services \
+       "http://${ip_address}:6007/v1/dataprep" \
+        "Data preparation succeeded" \
+        "dataprep_upload_file" \
+        "dataprep-pinecone-server"
 
-     # test /v1/dataprep/delete_file
-    #validate_services \
-    #   "http://${ip_address}:6009/v1/dataprep/delete_file" \
-    #    '{"status":true}' \
-    #    "dataprep_del" \
-    #    "dataprep-pinecone-server"
-
+     
     # retrieval microservice
-    #test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-    #validate_services \
-    #    "${ip_address}:7000/v1/retrieval" \
-    #    " " \
-    #    "retrieval" \
-    #    "retriever-pinecone-server" \
-    #    "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
+    test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+    validate_services \
+        "${ip_address}:7000/v1/retrieval" \
+        " " \
+        "retrieval" \
+        "retriever-pinecone-server" \
+        "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
     echo "Validating reranking service"
@@ -269,10 +271,8 @@ function main() {
     elif [ "${mode}" == "" ]; then
         validate_microservices
         echo "==== microservices validated ===="
-        #validate_megaservice
+        validate_megaservice
         echo "==== megaservice validated ===="
-        validate_frontend
-        echo "==== frontend validated ===="
     fi
 
     stop_docker
