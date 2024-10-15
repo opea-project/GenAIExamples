@@ -151,7 +151,7 @@ function validate_microservices() {
         "dataprep-pinecone-server"
 
 
-    # test /v1/dataprep upload file 
+    # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_services \
        "http://${ip_address}:6007/v1/dataprep" \
@@ -159,7 +159,7 @@ function validate_microservices() {
         "dataprep_upload_file" \
         "dataprep-pinecone-server"
 
-     
+
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_services \
