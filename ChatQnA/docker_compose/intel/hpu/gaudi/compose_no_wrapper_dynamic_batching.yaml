@@ -87,7 +87,7 @@ services:
       - redis-vector-db
       - retriever
       - tgi-service
-      - embedding-reranking-server
+      - embedding-reranking-service
     ports:
       - "8888:8888"
     environment:
