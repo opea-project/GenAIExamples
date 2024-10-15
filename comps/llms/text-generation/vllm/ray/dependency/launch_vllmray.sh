@@ -30,7 +30,7 @@ fi
 docker run -d --rm \
     --name="vllm-ray-service" \
     --runtime=habana \
-    -v $PWD/data:/data \
+    -v $DATA_DIR:/data \
     -e HABANA_VISIBLE_DEVICES=all \
     -e OMPI_MCA_btl_vader_single_copy_mechanism=none \
     --cap-add=sys_nice \
@@ -38,6 +38,6 @@ docker run -d --rm \
     -p $port_number:8000 \
     -e HTTPS_PROXY=$https_proxy \
     -e HTTP_PROXY=$https_proxy \
-    -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN \
+    -e HF_TOKEN=$HF_TOKEN \
     opea/vllm_ray:habana \
     /bin/bash -c "ray start --head && python vllm_ray_openai.py --port_number 8000 --model_id_or_path $model_name --tensor_parallel_size $parallel_number --enforce_eager $enforce_eager"

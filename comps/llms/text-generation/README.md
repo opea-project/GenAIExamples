@@ -27,6 +27,10 @@ git clone https://github.com/opea-project/GenAIComps.git
 export OPEA_GENAICOMPS_ROOT=$(pwd)/GenAIComps
 ```
 
+## Prerequisites
+
+You must create a user account with [HuggingFace] and obtain permission to use the gated LLM models by adhering to the guidelines provided on the respective model's webpage. The environment variables `LLM_MODEL` would be the HuggingFace model id and the `HF_TOKEN` is your HuggugFace account's "User Access Token".
+
 ## 🚀1. Start Microservice with Python (Option 1)
 
 To start the LLM microservice, you need to install python packages first.
@@ -34,119 +38,195 @@ To start the LLM microservice, you need to install python packages first.
 ### 1.1 Install Requirements
 
 ```bash
+# Install opea-comps
 pip install opea-comps
-pip install -r ${OPEA_GENAICOMPS_ROOT}/comps/llms/requirements.txt
 
-# Install requirements of your choice of microservice in the text-generation folder (tgi, vllm, vllm-ray, etc.)
-export MICROSERVICE_DIR=your_chosen_microservice
+# Install requirements from comps/llms
+cd ${OPEA_GENAICOMPS_ROOT}/comps/llms
 
-pip install -r ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/${MICROSERVICE_DIR}/requirements.txt
-```
-
-Set an environment variable `your_ip` to the IP address of the machine where you would like to consume the microservice.
-
-```bash
-# For example, this command would set the IP address of your currently logged-in machine.
-export your_ip=$(hostname -I | awk '{print $1}')
+pip install -r requirements.txt
 ```
 
 ### 1.2 Start LLM Service with Python Script
 
 #### 1.2.1 Start the TGI Service
 
+Install the requirements for TGI Service
+
 ```bash
-export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
-python ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/tgi/llm.py
-python ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/tgi/llm.py
+cd ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/tgi
+
+pip install -r requirements.txt
+```
+
+Execute the docker run command to initiate the backend, along with the Python script that launches the microservice.
+
+```bash
+export TGI_HOST_IP=$(hostname -I | awk '{print $1}')  # This sets IP of the current machine
+export LLM_MODEL=${your_hf_llm_model}
+export DATA_DIR=$HOME/data  # Location to download the model
+export HF_TOKEN=${your_hf_api_token}
+
+# Initiate the backend
+docker run -d \
+  -p 8008:80 \
+  -e HF_TOKEN=${HF_TOKEN} \
+  -v ${DATA_DIR}:/data \
+  --name tgi_service \
+  --shm-size 1g \
+  ghcr.io/huggingface/text-generation-inference:1.4 \
+  --model-id ${LLM_MODEL}
+
+# Start the microservice with an endpoint as the above docker run command
+export TGI_LLM_ENDPOINT="http://${TGI_HOST_IP}:8008"
+
+python llm.py
 ```
 
 #### 1.2.2 Start the vLLM Service
 
+Install the requirements for vLLM Service
+
 ```bash
-export vLLM_LLM_ENDPOINT="http://${your_ip}:8008"
-python ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/llm.py
-python ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/llm.py
+cd ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/langchain
+
+pip install -r requirements.txt
 ```
 
-#### 1.2.3 Start the Ray Service
+Execute the docker run command to initiate the backend, along with the Python script that launches the microservice.
 
 ```bash
-export RAY_Serve_ENDPOINT="http://${your_ip}:8008"
-python ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/ray_serve/llm.py
-python ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/ray_serve/llm.py
-```
-
-## 🚀2. Start Microservice with Docker (Option 2)
-
-You can use either a published docker image or build your own docker image with the respective microservice Dockerfile of your choice. You must create a user account with [HuggingFace] and obtain permission to use the restricted LLM models by adhering to the guidelines provided on the respective model's webpage.
-
-### 2.1 Start LLM Service with published image
-
-#### 2.1.1 Start TGI Service
-
-```bash
-export HF_LLM_MODEL=${your_hf_llm_model}
+export vLLM_HOST_IP=$(hostname -I | awk '{print $1}')  # This sets IP of the current machine
+export LLM_MODEL=${your_hf_llm_model}
+export DATA_DIR=$HOME/data  # Location to download the model
 export HF_TOKEN=${your_hf_api_token}
 
-docker run \
-  -p 8008:80 \
-  -e HF_TOKEN=${HF_TOKEN} \
-  -v ./data:/data \
-  --name tgi_service \
-  --shm-size 1g \
-  ghcr.io/huggingface/text-generation-inference:1.4 \
-  --model-id ${HF_LLM_MODEL}
-```
+# Build the image first as opea/vllm:cpu
+bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/langchain/dependency/build_docker_vllm.sh cpu
 
-#### 2.1.2 Start vLLM Service
-
-```bash
-# Use the script to build the docker image as opea/vllm:cpu
-bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/build_docker_vllm.sh cpu
-
-export HF_LLM_MODEL=${your_hf_llm_model}
-export HF_TOKEN=${your_hf_api_token}
-
-docker run -it \
+# Initiate the backend
+docker run -d -it \
   --name vllm_service \
   -p 8008:80 \
   -e HF_TOKEN=${HF_TOKEN} \
   -e VLLM_CPU_KVCACHE_SPACE=40 \
-  -v ./data:/data \
+  -v ${DATA_DIR}:/data \
   opea/vllm:cpu \
-  --model ${HF_LLM_MODEL}
+  --model ${LLM_MODEL} \
   --port 80
+
+# Start the microservice with an endpoint as the above docker run command
+export vLLM_ENDPOINT="http://${vLLM_HOST_IP}:8008"
+
+python llm.py
 ```
 
-#### 2.1.3 Start Ray Service
+#### 1.2.3 Start the Ray Service
+
+Install the requirements for Ray Service
 
 ```bash
-export HF_LLM_MODEL=${your_hf_llm_model}
-export HF_CHAT_PROCESSOR=${your_hf_chatprocessor}
-export HF_TOKEN=${your_hf_api_token}
-export TRUST_REMOTE_CODE=True
+cd ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/ray
 
-docker run -it \
+pip install -r requirements.txt
+```
+
+Execute the docker run command to initiate the backend, along with the Python script that launches the microservice.
+
+```bash
+export vLLM_RAY_HOST_IP=$(hostname -I | awk '{print $1}')  # This sets IP of the current machine
+export LLM_MODEL=${your_hf_llm_model}
+export DATA_DIR=$HOME/data  # Location to download the model
+export HF_TOKEN=${your_hf_api_token}
+
+# Build the image first as opea/vllm:cpu
+bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/ray/dependency/build_docker_vllmray.sh
+
+# Initiate the backend
+docker run \
+  --name="vllm-ray-service" \
   --runtime=habana \
-  --name ray_serve_service \
+  -v $DATA_DIR:/data \
+  -e HABANA_VISIBLE_DEVICES=all \
   -e OMPI_MCA_btl_vader_single_copy_mechanism=none \
   --cap-add=sys_nice \
   --ipc=host \
-  -p 8008:80 \
+  -p 8006:8000 \
   -e HF_TOKEN=$HF_TOKEN \
-  -e TRUST_REMOTE_CODE=$TRUST_REMOTE_CODE \
-  opea/llm-ray:latest \
+  opea/vllm_ray:habana \
   /bin/bash -c " \
     ray start --head && \
-    python api_server_openai.py \
-      --port_number 80 \
-      --model_id_or_path ${HF_LLM_MODEL} \
-      --chat_processor ${HF_CHAT_PROCESSOR}"
+    python vllm_ray_openai.py \
+    --port_number 8000 \
+    --model_id_or_path $LLM_MODEL \
+    --tensor_parallel_size 2 \
+    --enforce_eager False"
+
+# Start the microservice with an endpoint as the above docker run command
+export vLLM_RAY_ENDPOINT="http://${vLLM_RAY_HOST_IP}:8006"
+
+python llm.py
 ```
 
-### 2.2 Start LLM Service with image built from source
+## 🚀2. Start Microservice with Docker (Option 2)
 
-If you start an LLM microservice with docker, the `docker_compose_llm.yaml` file will automatically start a TGI/vLLM service with docker.
+In order to start the microservices with docker, you need to build the docker images first for the microservice.
+
+### 2.1 Build Docker Image
+
+#### 2.1.1 TGI
+
+```bash
+# Build the microservice docker
+cd ${OPEA_GENAICOMPS_ROOT}
+
+docker build \
+  --build-arg https_proxy=$https_proxy \
+  --build-arg http_proxy=$http_proxy \
+  -t opea/llm-tgi:latest \
+  -f comps/llms/text-generation/tgi/Dockerfile .
+```
+
+#### 2.1.2 vLLM
+
+```bash
+# Build vllm docker
+bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/langchain/dependency/build_docker_vllm.sh hpu
+
+# Build the microservice docker
+cd ${OPEA_GENAICOMPS_ROOT}
+
+docker build \
+  --build-arg https_proxy=$https_proxy \
+  --build-arg http_proxy=$http_proxy \
+  -t opea/llm-vllm:latest \
+  -f comps/llms/text-generation/vllm/langchain/Dockerfile .
+```
+
+#### 2.1.3 Ray
+
+```bash
+# Build the Ray Serve docker
+bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/ray/dependency/build_docker_vllmray.sh
+
+# Build the microservice docker
+cd ${OPEA_GENAICOMPS_ROOT}
+
+docker build \
+  --build-arg https_proxy=$https_proxy \
+  --build-arg http_proxy=$http_proxy \
+  -t opea/llm-vllm-ray:latest \
+  -f comps/llms/text-generation/vllm/ray/Dockerfile .
+```
+
+### 2.2 Start LLM Service with the built image
+
+To start a docker container, you have two options:
+
+- A. Run Docker with CLI
+- B. Run Docker with Docker Compose
+
+You can choose one as needed. If you start an LLM microservice with docker compose, the `docker_compose_llm.yaml` file will automatically start both endpoint and the microservice docker.
 
 #### 2.2.1 Setup Environment Variables
 
@@ -155,7 +235,8 @@ In order to start TGI and LLM services, you need to setup the following environm
 ```bash
 export HF_TOKEN=${your_hf_api_token}
 export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
-export LLM_MODEL_ID=${your_hf_llm_model}
+export LLM_MODEL=${your_hf_llm_model}
+export DATA_DIR=$HOME/data
 ```
 
 In order to start vLLM and LLM services, you need to setup the following environment variables first.
@@ -163,7 +244,7 @@ In order to start vLLM and LLM services, you need to setup the following environ
 ```bash
 export HF_TOKEN=${your_hf_api_token}
 export vLLM_LLM_ENDPOINT="http://${your_ip}:8008"
-export LLM_MODEL_ID=${your_hf_llm_model}
+export LLM_MODEL=${your_hf_llm_model}
 ```
 
 In order to start Ray serve and LLM services, you need to setup the following environment variables first.
@@ -175,70 +256,24 @@ export LLM_MODEL=${your_hf_llm_model}
 export CHAT_PROCESSOR="ChatModelLlama"
 ```
 
-### 2.2 Build Docker Image
-
-#### 2.2.1 TGI
-
-```bash
-cd ${OPEA_GENAICOMPS_ROOT}
-
-docker build \
-  -t opea/llm-tgi:latest \
-  --build-arg https_proxy=$https_proxy \
-  --build-arg http_proxy=$http_proxy \
-  -f comps/llms/text-generation/tgi/Dockerfile .
-```
-
-#### 2.2.2 vLLM
-
-Build vllm docker.
-
-```bash
-bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/langchain/dependency/build_docker_vllm.sh
-```
-
-Build microservice docker.
-
-```bash
-cd ${OPEA_GENAICOMPS_ROOT}
-
-docker build \
-  -t opea/llm-vllm:latest \
-  --build-arg https_proxy=$https_proxy \
-  --build-arg http_proxy=$http_proxy \
-  -f comps/llms/text-generation/vllm/langchain/Dockerfile .
-```
-
-#### 2.2.3 Ray Serve
-
-Build Ray Serve docker.
-
-```bash
-bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/ray/dependency/build_docker_vllmray.sh
-```
-
-Build microservice docker.
-
-```bash
-cd ${OPEA_GENAICOMPS_ROOT}
-
-docker build \
-  -t opea/llm-ray:latest \
-  --build-arg https_proxy=$https_proxy \
-  --build-arg http_proxy=$http_proxy \
-  -f comps/llms/text-generation/vllm/ray/Dockerfile .
-```
-
-To start a docker container, you have two options:
-
-- A. Run Docker with CLI
-- B. Run Docker with Docker Compose
-
-You can choose one as needed.
-
 ### 2.3 Run Docker with CLI (Option A)
 
 #### 2.3.1 TGI
+
+Start TGI endpoint.
+
+```bash
+docker run -d \
+  -p 8008:80 \
+  -e HF_TOKEN=${HF_TOKEN} \
+  -v ${DATA_DIR}:/data \
+  --name tgi_service \
+  --shm-size 1g \
+  ghcr.io/huggingface/text-generation-inference:1.4 \
+  --model-id ${LLM_MODEL}
+```
+
+Start TGI microservice
 
 ```bash
 docker run -d \
@@ -272,7 +307,7 @@ docker run \
   -e no_proxy=${no_proxy} \
   -e vLLM_LLM_ENDPOINT=$vLLM_LLM_ENDPOINT \
   -e HF_TOKEN=$HF_TOKEN \
-  -e LLM_MODEL_ID=$LLM_MODEL_ID \
+  -e LLM_MODEL=$LLM_MODEL \
   opea/llm-vllm:latest
 ```
 
@@ -365,10 +400,10 @@ curl http://${your_ip}:8008/v1/chat/completions \
   "model": ${your_hf_llm_model},
   "messages": [
         {"role": "assistant", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What is Deep Learning?"},
+        {"role": "user", "content": "What is Deep Learning?"}
     ],
   "max_tokens": 32,
-  "stream": True
+  "stream": true
   }'
 ```
 

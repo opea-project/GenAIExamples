@@ -35,4 +35,6 @@ else
     git clone https://github.com/vllm-project/vllm.git
     cd ./vllm/
     docker build -f Dockerfile.cpu -t opea/vllm:cpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    cd ..
+    rm -rf vllm
 fi
