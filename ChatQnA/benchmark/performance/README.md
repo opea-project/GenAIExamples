@@ -176,7 +176,7 @@ curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
 
 ###### 3.2 Run Benchmark Test
 
-Before the benchmark, we can configure the default number of user queries and test output directory by:
+Before the benchmark, we can configure the number of test queries and test output directory by:
 
 ```bash
 export USER_QUERIES="[640, 640, 640, 640]"
@@ -188,6 +188,8 @@ And then run the benchmark by:
 ```bash
 bash benchmark.sh -n 1
 ```
+
+The argument `-n` refers to the number of test nodes. Note that neccessary dependencies will be automatically installed when running benchmark for the first time.
 
 ##### 4. Data collection
 
@@ -224,7 +226,7 @@ kubectl apply -f .
 
 ##### 3. Run tests
 
-Before the benchmark, we can configure the default number of user queries and test output directory by:
+Before the benchmark, we can configure the number of test queries and test output directory by:
 
 ```bash
 export USER_QUERIES="[1280, 1280, 1280, 1280]"
@@ -236,6 +238,8 @@ And then run the benchmark by:
 ```bash
 bash benchmark.sh -n 2
 ```
+
+The argument `-n` refers to the number of test nodes. Note that neccessary dependencies will be automatically installed when running benchmark for the first time.
 
 ##### 4. Data collection
 
@@ -271,7 +275,7 @@ kubectl apply -f .
 
 ##### 3. Run tests
 
-Before the benchmark, we can configure the default number of user queries and test output directory by:
+Before the benchmark, we can configure the number of test queries and test output directory by:
 
 ```bash
 export USER_QUERIES="[2560, 2560, 2560, 2560]"
@@ -283,6 +287,8 @@ And then run the benchmark by:
 ```bash
 bash benchmark.sh -n 4
 ```
+
+The argument `-n` refers to the number of test nodes. Note that neccessary dependencies will be automatically installed when running benchmark for the first time.
 
 ##### 4. Data collection
 
@@ -342,7 +348,7 @@ Refer to the [NVIDIA GPU Guide](../../docker_compose/nvidia/gpu/README.md) for m
 
 ### Run tests
 
-Before the benchmark, we can configure the default number of user queries and test output directory by:
+Before the benchmark, we can configure the number of test queries and test output directory by:
 
 ```bash
 export USER_QUERIES="[640, 640, 640, 640]"
@@ -354,6 +360,8 @@ And then run the benchmark by:
 ```bash
 bash benchmark.sh -d docker -i <service-ip> -p <service-port>
 ```
+
+The argument `-i` and `-p` refer to the deployed ChatQnA service IP and port, respectively. Note that neccessary dependencies will be automatically installed when running benchmark for the first time.
 
 ### Data collection
 

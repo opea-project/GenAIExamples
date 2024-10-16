@@ -49,6 +49,10 @@ if [[ "$deployment_type" == "docker" && -z "$service_ip" ]]; then
     usage
 fi
 
+if [[ "$deployment_type" == "k8s" && ( -n "$service_ip" || -n "$service_port" ) ]]; then
+    echo "Warning: service_ip and service_port are ignored for k8s deployment_type" 1>&2
+fi
+
 function main() {
     if [[ ! -d ${benchmark_tool_path} ]]; then
         echo "Benchmark tool not found, setting up..."
