@@ -144,11 +144,11 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - FRONTEND_SERVICE_IP=${FRONTEND_SERVICE_IP}
-      - FRONTEND_SERVICE_PORT=${FRONTEND_SERVICE_PORT}
-      - BACKEND_SERVICE_NAME=${BACKEND_SERVICE_NAME}
-      - BACKEND_SERVICE_IP=${BACKEND_SERVICE_IP}
-      - BACKEND_SERVICE_PORT=${BACKEND_SERVICE_PORT}
+      - FRONTEND_SERVICE_IP=chaqna-xeon-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=chaqna
+      - BACKEND_SERVICE_IP=chaqna-xeon-backend-server
+      - BACKEND_SERVICE_PORT=8888
     ipc: host
     restart: always
 
