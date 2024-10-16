@@ -6,7 +6,7 @@ HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 podSpecs:
   - name: chatqna-backend-server-deploy
     spec:
-      image_name: opea/chatqna-no-wrapper
+      image_name: opea/chatqna
       image_tag: latest
       replicas: 2
       resources:
