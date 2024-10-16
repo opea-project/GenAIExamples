@@ -38,7 +38,7 @@ function start_services() {
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:9009"
-    export PINECONE_API_KEY=${PINECONE_KEY}
+    export PINECONE_API_KEY=${PINECONE_KEY_LANGCHAIN_TEST}
     export PINECONE_INDEX_NAME="langchain-test"
     export INDEX_NAME="langchain-test"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
