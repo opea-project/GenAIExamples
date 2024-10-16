@@ -88,7 +88,6 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
 
-
     return inputs
 
 
