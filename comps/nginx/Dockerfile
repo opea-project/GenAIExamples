@@ -13,6 +13,8 @@ ENV FRONTEND_SERVICE_PORT=5173
 ENV BACKEND_SERVICE_NAME=chatqna
 ENV BACKEND_SERVICE_IP=localhost
 ENV BACKEND_SERVICE_PORT=8888
+ENV DATAPREP_SERVICE_IP=localhost
+ENV DATAPREP_SERVICE_PORT=6007
 
 COPY comps/nginx/start-nginx.sh /usr/local/bin/start-nginx.sh
 RUN chmod +x /usr/local/bin/start-nginx.sh

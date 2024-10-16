@@ -23,6 +23,8 @@ export FRONTEND_SERVICE_PORT=5173
 export BACKEND_SERVICE_NAME=chatqna
 export BACKEND_SERVICE_IP=${your_backend_service_ip}
 export BACKEND_SERVICE_PORT=8888
+export DATAPREP_SERVICE_IP=${your_dataprep_service_ip}
+export DATAPREP_SERVICE_PORT=6007
 export NGINX_PORT=${your_nginx_port}
 ```
 
@@ -53,6 +55,8 @@ docker run -d --name opea-nginx -p ${NGINX_PORT}:80 \
 	-e BACKEND_SERVICE_NAME=${BACKEND_SERVICE_NAME} \
     -e BACKEND_SERVICE_IP=${BACKEND_SERVICE_IP} \
     -e BACKEND_SERVICE_PORT=${BACKEND_SERVICE_PORT} \
+    -e DATAPREP_SERVICE_IP=${DATAPREP_SERVICE_IP} \
+    -e DATAPREP_SERVICE_PORT=${DATAPREP_SERVICE_PORT} \
     opea/nginx:latest
 ```
 
