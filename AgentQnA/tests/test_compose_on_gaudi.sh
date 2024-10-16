@@ -19,7 +19,6 @@ function stop_crag() {
 
 function stop_agent_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi/
-    # docker compose -f compose.yaml down
     container_list=$(cat compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
@@ -28,11 +27,21 @@ function stop_agent_docker() {
     done
 }
 
+function stop_tgi(){
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
+    container_list=$(cat tgi_gaudi.yaml | grep container_name | cut -d':' -f2)
+    for container_name in $container_list; do
+        cid=$(docker ps -aq --filter "name=$container_name")
+        echo "Stopping container $container_name"
+        if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
+    done
+
+}
+
 function stop_retrieval_tool() {
     echo "Stopping Retrieval tool"
     local RETRIEVAL_TOOL_PATH=$WORKPATH/../DocIndexRetriever
     cd $RETRIEVAL_TOOL_PATH/docker_compose/intel/cpu/xeon/
-    # docker compose -f compose.yaml down
     container_list=$(cat compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
@@ -43,6 +52,7 @@ function stop_retrieval_tool() {
 echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
 stop_crag
+stop_tgi
 stop_agent_docker
 stop_retrieval_tool
 
@@ -69,5 +79,7 @@ stop_crag
 stop_agent_docker
 stop_retrieval_tool
 echo "=================== #5 Agent and API server stopped===================="
+
+echo y | docker system prune
 
 echo "ALL DONE!"
