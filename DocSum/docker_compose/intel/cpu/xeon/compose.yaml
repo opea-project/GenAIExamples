@@ -47,15 +47,25 @@ services:
       https_proxy: ${https_proxy}
     restart: unless-stopped
 
-  asr:
-    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
-    # image: opea/asr
-    container_name: asr-service
+  a2t:
+    # image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+    image: opea/a2t:latest
+    container_name: a2t-service
     ports:
       - "9099:9099"
     ipc: host
     environment:
-      ASR_ENDPOINT: ${ASR_ENDPOINT}
+      A2T_ENDPOINT: ${A2T_ENDPOINT}
+
+  # asr:
+  #   image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+  #   # image: opea/asr
+  #   container_name: asr-service
+  #   ports:
+  #     - "9099:9099"
+  #   ipc: host
+  #   environment:
+  #     ASR_ENDPOINT: ${ASR_ENDPOINT}
 
   # v2a:
   #   image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
