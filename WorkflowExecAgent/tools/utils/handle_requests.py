@@ -56,7 +56,6 @@ class RequestHandler:
         def decorated(response=None, *args, **kwargs):
             if response is not None:
                 try:
-                    print(response)
                     return func(response, *args, **kwargs)
 
                 except requests.exceptions.HTTPError as errh:

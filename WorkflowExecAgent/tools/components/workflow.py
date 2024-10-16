@@ -4,8 +4,7 @@
 import json
 from typing import Dict
 
-from .component import Component
-
+from tools.components.component import Component
 
 class Workflow(Component):
     """Class for handling EasyData workflow operations.
@@ -24,19 +23,20 @@ class Workflow(Component):
         """
         ``POST https://SDK_BASE_URL/serving/servable_workflows/{workflow_id}/start``
 
-        Starts a workflow with the workflow_id.
+        Starts a workflow instance with the workflow_id and parameters provided.
+        Returns a workflow key used to track the workflow instance.
 
-        :param string workflow_id: Workflow id to start.
+        :param dict params: Workflow parameters used to start workflow.
 
         :returns: WorkflowKey
 
-        :rtype: dict
+        :rtype: string
         """
         data = json.dumps({"params": params})
         endpoint = f"serving/servable_workflows/{self.workflow_id}/start"
-        wf_key = self._make_request(endpoint, "POST", data)["wf_key"]
-        if wf_key:
-            return f"Workflow successfully started. The workflow key is {wf_key}."
+        self.wf_key = self._make_request(endpoint, "POST", data)["wf_key"]
+        if self.wf_key:
+            return f"Workflow successfully started. The workflow key is {self.wf_key}."
         else:
             return "Workflow failed to start"
 
@@ -46,11 +46,9 @@ class Workflow(Component):
 
         Gets the workflow status.
 
-        :param string workflow_key: Workflow id to retrieve status.
+        :returns: WorkflowStatus
 
-        :returns: Status: Dictionary of presets
-
-        :rtype: json object
+        :rtype: string
         """
 
         endpoint = f"serving/serving_workflows/{self.wf_key}/status"
@@ -60,11 +58,11 @@ class Workflow(Component):
         """
         ``GET https://SDK_BASE_URL/serving/serving_workflows/{workflow_key}/results``
 
-        Gets the result.
+        Gets the workflow output result.
 
-        :returns:
+        :returns: WorkflowOutputData
 
-        :rtype: json object
+        :rtype: string
         """
 
         endpoint = f"serving/serving_workflows/{self.wf_key}/results"

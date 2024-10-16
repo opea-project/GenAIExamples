@@ -4,7 +4,7 @@
 services:
   worflowexec-agent:
     image: opea/agent-langchain:latest
-    container_name: worflowexec-agent-endpoint
+    container_name: workflowexec-agent-endpoint
     volumes:
       - ${WORKDIR}/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
       - ${TOOLSET_PATH}:/home/user/tools/
@@ -13,10 +13,10 @@ services:
     ipc: host
     environment:
       ip_address: ${ip_address}
-      strategy: workflow_executor
+      strategy: react_langgraph
       recursion_limit: ${recursion_limit}
-      llm_engine: openai
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      llm_engine: ${llm_engine}
+      llm_endpoint_url: ${llm_endpoint_url}
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
