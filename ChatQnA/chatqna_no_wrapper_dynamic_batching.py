@@ -36,20 +36,8 @@ If you don't know the answer to a question, please don't share false information
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
-# EMBEDDING_SERVICE_HOST_IP = os.getenv("EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
-# EMBEDDING_SERVICE_PORT = int(os.getenv("EMBEDDING_SERVICE_PORT", 6000))
-# RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
-# RETRIEVER_SERVICE_PORT = int(os.getenv("RETRIEVER_SERVICE_PORT", 7000))
-# RERANK_SERVICE_HOST_IP = os.getenv("RERANK_SERVICE_HOST_IP", "0.0.0.0")
-# RERANK_SERVICE_PORT = int(os.getenv("RERANK_SERVICE_PORT", 8000))
-# LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
-# LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
-# EMBEDDING_SERVER_HOST_IP = os.getenv("EMBEDDING_SERVER_HOST_IP", "0.0.0.0")
-# EMBEDDING_SERVER_PORT = int(os.getenv("EMBEDDING_SERVER_PORT", 6006))
 RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
 RETRIEVER_SERVICE_PORT = int(os.getenv("RETRIEVER_SERVICE_PORT", 7000))
-# RERANK_SERVER_HOST_IP = os.getenv("RERANK_SERVER_HOST_IP", "0.0.0.0")
-# RERANK_SERVER_PORT = int(os.getenv("RERANK_SERVER_PORT", 8808))
 # Embed/Rerank use the same host:ip, diff routers
 EMBEDDING_RERANK_SERVICE_HOST_IP = os.getenv("EMBEDDING_RERANK_SERVICE_HOST_IP", "0.0.0.0")
 EMBEDDING_RERANK_SERVICE_PORT = os.getenv("EMBEDDING_RERANK_SERVICE_PORT", 6001)
@@ -66,11 +54,33 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         retriever_parameters = kwargs.get("retriever_parameters", None)
         if retriever_parameters:
             inputs.update(retriever_parameters.dict())
+    elif self.services[cur_node].service_type == ServiceType.RERANK:
+        reranker_parameters = kwargs.get("reranker_parameters", None)
+        top_n = reranker_parameters.top_n if reranker_parameters else 1
+        inputs["top_n"] = top_n
     elif self.services[cur_node].service_type == ServiceType.LLM:
+        prompt = inputs["query"]
+        docs: list[str] = inputs["documents"]
+        chat_template = llm_parameters_dict["chat_template"]
+        if chat_template:
+            prompt_template = PromptTemplate.from_template(chat_template)
+            input_variables = prompt_template.input_variables
+            if sorted(input_variables) == ["context", "question"]:
+                prompt = prompt_template.format(question=prompt, context="\n".join(docs))
+            elif input_variables == ["question"]:
+                prompt = prompt_template.format(question=prompt)
+            else:
+                print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
+                prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
+        else:
+            prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
+
+        # inputs: LLMParamsDoc
+        # {'id': 'd52f75f7bd602526073d933dab541a8c', 'model': None, 'query': 'What is the revenue of Nike in 2023?', 'max_tokens': 1024, 'max_new_tokens': 1024, 'top_k': 10, 'top_p': 0.95, 'typical_p': 0.95, 'temperature': 0.01, 'frequency_penalty': 0.0, 'presence_penalty': 0.0, 'repetition_penalty': 1.0, 'streaming': True, 'chat_template': None, 'documents': []}
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
         next_inputs["model"] = "tgi"  # specifically clarify the fake model to make the format unified
-        next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
+        next_inputs["messages"] = [{"role": "user", "content": prompt}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_new_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
         next_inputs["stream"] = inputs["streaming"]
@@ -78,88 +88,8 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
 
+
     return inputs
-
-
-def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
-    next_data = {}
-    # if self.services[cur_node].service_type == ServiceType.EMBEDDING:
-    #     assert isinstance(data, list)
-    #     next_data = {"text": inputs["inputs"], "embedding": data[0]}
-    if self.services[cur_node].service_type == ServiceType.RETRIEVER:
-        # TODO align outputs!!
-        next_data = data
-        # docs = [doc["text"] for doc in data["retrieved_docs"]]
-
-        # with_rerank = runtime_graph.downstream(cur_node)[0].startswith("rerank")
-        # if with_rerank and docs:
-        #     # forward to rerank
-        #     # prepare inputs for rerank
-        #     next_data["query"] = data["initial_query"]
-        #     next_data["texts"] = [doc["text"] for doc in data["retrieved_docs"]]
-        # else:
-        #     # forward to llm
-        #     if not docs:
-        #         # delete the rerank from retriever -> rerank -> llm
-        #         for ds in reversed(runtime_graph.downstream(cur_node)):
-        #             for nds in runtime_graph.downstream(ds):
-        #                 runtime_graph.add_edge(cur_node, nds)
-        #             runtime_graph.delete_node_if_exists(ds)
-
-        #     # handle template
-        #     # if user provides template, then format the prompt with it
-        #     # otherwise, use the default template
-        #     prompt = data["initial_query"]
-        #     chat_template = llm_parameters_dict["chat_template"]
-        #     if chat_template:
-        #         prompt_template = PromptTemplate.from_template(chat_template)
-        #         input_variables = prompt_template.input_variables
-        #         if sorted(input_variables) == ["context", "question"]:
-        #             prompt = prompt_template.format(question=data["initial_query"], context="\n".join(docs))
-        #         elif input_variables == ["question"]:
-        #             prompt = prompt_template.format(question=data["initial_query"])
-        #         else:
-        #             print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
-        #             prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
-        #     else:
-        #         prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
-
-        #     next_data["inputs"] = prompt
-
-    elif self.services[cur_node].service_type == ServiceType.RERANK:
-        # TODO align outputs!!
-        next_data = data
-    #     # rerank the inputs with the scores
-    #     reranker_parameters = kwargs.get("reranker_parameters", None)
-    #     top_n = reranker_parameters.top_n if reranker_parameters else 1
-    #     docs = inputs["texts"]
-    #     reranked_docs = []
-    #     for best_response in data[:top_n]:
-    #         reranked_docs.append(docs[best_response["index"]])
-
-    #     # handle template
-    #     # if user provides template, then format the prompt with it
-    #     # otherwise, use the default template
-    #     prompt = inputs["query"]
-    #     chat_template = llm_parameters_dict["chat_template"]
-    #     if chat_template:
-    #         prompt_template = PromptTemplate.from_template(chat_template)
-    #         input_variables = prompt_template.input_variables
-    #         if sorted(input_variables) == ["context", "question"]:
-    #             prompt = prompt_template.format(question=prompt, context="\n".join(docs))
-    #         elif input_variables == ["question"]:
-    #             prompt = prompt_template.format(question=prompt)
-    #         else:
-    #             print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
-    #             prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
-    #     else:
-    #         prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
-
-    #     next_data["inputs"] = prompt
-    else:
-        next_data = data
-
-    return next_data
 
 
 def align_generator(self, gen, **kwargs):
@@ -186,7 +116,7 @@ class ChatQnAService:
         self.host = host
         self.port = port
         ServiceOrchestrator.align_inputs = align_inputs
-        ServiceOrchestrator.align_outputs = align_outputs
+        # ServiceOrchestrator.align_outputs = align_outputs
         ServiceOrchestrator.align_generator = align_generator
         self.megaservice = ServiceOrchestrator()
 

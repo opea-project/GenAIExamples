@@ -21,7 +21,8 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
-      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      # TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      EMBED_MODEL: ${EMBED_MODEL}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   embedding-reranking-service:
     image: ${REGISTRY:-opea}/embedding-reranking-local:${TAG:-latest}
