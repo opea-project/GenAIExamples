@@ -6,7 +6,7 @@ test_suite_config: # Overall configuration settings for the test suite
   deployment_type: ${DEPLOYMENT_TYPE}  # Default is "k8s", can also be "docker"
   service_ip: ${SERVICE_IP}  # Leave as None for k8s, specify for Docker
   service_port: ${SERVICE_PORT}  # Leave as None for k8s, specify for Docker
-  warm_ups: 0  # Number of test requests for warm-up
+  warm_ups: ${WARMUP}  # Number of test requests for warm-up
   run_time: 60m  # The max total run time for the test suite
   seed:  # The seed for all RNGs
   user_queries: ${USER_QUERIES}  # Number of test requests at each concurrency level

@@ -76,6 +76,8 @@ function run_benchmark() {
         export USER_QUERIES="[${user_query}, ${user_query}, ${user_query}, ${user_query}]"
         echo "USER_QUERIES not configured, setting to: ${USER_QUERIES}."
     fi
+    export WARMUP=$(echo $USER_QUERIES | sed -e 's/[][]//g' -e 's/,.*//')
+    if [[ -z $WARMUP ]]; then export WARMUP=0; fi
     if [[ -z $TEST_OUTPUT_DIR ]]; then
         if [[ $DEPLOYMENT_TYPE == "k8s" ]]; then
             export TEST_OUTPUT_DIR="${benchmark_tool_path}/evals/benchmark/benchmark_output/node_${node_number}"
