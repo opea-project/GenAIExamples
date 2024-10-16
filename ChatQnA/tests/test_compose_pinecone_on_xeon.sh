@@ -28,18 +28,6 @@ function build_docker_images() {
     docker images && sleep 1s
 }
 
-function build_pinecone_docker_images() {
-    echo "In pinecone build"
-    cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git
-
-    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="dataprep-pinecone retriever-pinecone"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
-
-    docker images && sleep 1s
-}
-
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
@@ -258,8 +246,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
-    build_pinecone_docker_images
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)

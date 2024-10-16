@@ -6,7 +6,7 @@ version: "3.8"
 
 services:
   dataprep-pinecone-service:
-    image: opea/dataprep-pinecone:latest
+    image: ${REGISTRY:-opea}/dataprep-pinecone:${TAG:-latest}
     container_name: dataprep-pinecone-server
     depends_on:
       - tei-embedding-service
@@ -37,7 +37,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
-    image: opea/embedding-tei:latest
+    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
     depends_on:
       - tei-embedding-service
@@ -54,7 +54,7 @@ services:
       LANGCHAIN_PROJECT: "opea-embedding-service"
     restart: unless-stopped
   retriever:
-    image: opea/retriever-pinecone:latest
+    image: ${REGISTRY:-opea}/retriever-pinecone:${TAG:-latest}
     container_name: retriever-pinecone-server
     ports:
       - "7000:7000"
@@ -86,7 +86,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
-    image: opea/reranking-tei:latest
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-xeon-server
     depends_on:
       - tei-reranking-service
@@ -122,7 +122,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-tgi:latest
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
     depends_on:
       - tgi-service
@@ -142,7 +142,7 @@ services:
       LANGCHAIN_PROJECT: "opea-llm-service"
     restart: unless-stopped
   chaqna-xeon-backend-server:
-    image: opea/chatqna:latest
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
       - tei-embedding-service
@@ -166,7 +166,7 @@ services:
     ipc: host
     restart: always
   chaqna-xeon-ui-server:
-    image: opea/chatqna-ui:latest
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     container_name: chatqna-xeon-ui-server
     depends_on:
       - chaqna-xeon-backend-server
@@ -183,7 +183,7 @@ services:
     ipc: host
     restart: always
   chaqna-xeon-conversation-ui-server:
-    image: opea/chatqna-conversation-ui:latest
+    image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}
     container_name: chatqna-xeon-conversation-ui-server
     environment:
       - no_proxy=${no_proxy}
