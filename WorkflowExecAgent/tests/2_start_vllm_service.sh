@@ -32,7 +32,7 @@ function build_vllm_docker_image() {
 
 function start_vllm_service() {
     echo "start vllm service"
-    docker run -d -p ${vllm_port}:8083 --rm --network=host --name test-comps-vllm-service -v ~/.cache/huggingface:/root/.cache/huggingface -v ${WORKPATH}/tests/tool_chat_template_mistral_custom.jinja:/root/tool_chat_template_mistral_custom.jinja -e HF_TOKEN=$HF_TOKEN -e http_proxy=$http_proxy -e https_proxy=$https_proxy -it vllm-cpu-env --model ${model} --port 8083 --chat-template /root/tool_chat_template_mistral_custom.jinja --enable-auto-tool-choice  --tool-call-parser mistral  
+    docker run -d -p ${vllm_port}:8083 --rm --network=host --name test-comps-vllm-service -v ~/.cache/huggingface:/root/.cache/huggingface -v ${WORKPATH}/tests/tool_chat_template_mistral_custom.jinja:/root/tool_chat_template_mistral_custom.jinja -e HF_TOKEN=$HF_TOKEN -e http_proxy=$http_proxy -e https_proxy=$https_proxy -it vllm-cpu-env --model ${model} --port 8083 --chat-template /root/tool_chat_template_mistral_custom.jinja --enable-auto-tool-choice  --tool-call-parser mistral
     echo ${LOG_PATH}/vllm-service.log
     sleep 5s
     echo "Waiting vllm ready"

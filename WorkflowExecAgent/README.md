@@ -6,7 +6,7 @@ GenAI Workflow Executor Example showcases the capability to handle data/AI workf
 
 ### Workflow Executor
 
-This example demonstrates a single React-LangGraph with a `Workflow Executor` tool to ingest a user prompt to execute workflows and return an agent reasoning response based on the workflow output data. 
+This example demonstrates a single React-LangGraph with a `Workflow Executor` tool to ingest a user prompt to execute workflows and return an agent reasoning response based on the workflow output data.
 
 First the LLM extracts the relevant information from the user query based on the schema of the tool in `tools/tools.yaml`. Then the agent sends this `AgentState` to the `Workflow Executor` tool.
 
@@ -30,9 +30,9 @@ As an example, here we have a Churn Prediction use-case workflow as the serving 
 
 ![image](https://github.com/user-attachments/assets/c067f8b3-86cf-4abc-a8bd-51a98de8172d)
 
-The workflow contains 2 paths which can be seen in the workflow illustrated, the top path and bottom path. 
+The workflow contains 2 paths which can be seen in the workflow illustrated, the top path and bottom path.
 
-1. Top path - The training path which ends at the random forest classifier node is the training path. The data is cleaned through a series of nodes and used to train a random forest model for prediction. 
+1. Top path - The training path which ends at the random forest classifier node is the training path. The data is cleaned through a series of nodes and used to train a random forest model for prediction.
 
 2. Bottom path - The inference path where trained random forest model is used for inferencing based on input parameter.
 
@@ -59,11 +59,7 @@ curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: app
 The user has to provide a `workflow_id` and workflow `params` in the query. `workflow_id` a unique id used for serving the workflow to the microservice. Notice that the `query` string includes all the workflow `params` which the user has defined in the workflow. The LLM will extract these parameters into a dictionary format for the workflow `Serving Parameters` as shown below:
 
 ```python
-params = {
-    "gender": "Female", 
-    "tenure": 55, 
-    "MonthlyAvgCharges": 103.7
-}
+params = {"gender": "Female", "tenure": 55, "MonthlyAvgCharges": 103.7}
 ```
 
 These parameters will be passed into the `Workflow Executor` tool to start the workflow execution of specified `workflow_id`. Thus, everything will be handled via the microservice.

@@ -6,6 +6,7 @@ import os
 from tools.components.workflow import Workflow
 from tools.utils.handle_requests import RequestHandler
 
+
 class EasyDataSDK:
     def __init__(self):
         self.request_handler = RequestHandler(os.environ["SDK_BASE_URL"], os.environ["SERVING_TOKEN"])

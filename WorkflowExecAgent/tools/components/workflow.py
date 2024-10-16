@@ -6,6 +6,7 @@ from typing import Dict
 
 from tools.components.component import Component
 
+
 class Workflow(Component):
     """Class for handling EasyData workflow operations.
 

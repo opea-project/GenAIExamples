@@ -1,8 +1,10 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from tools.sdk import EasyDataSDK
 import time
+
+from tools.sdk import EasyDataSDK
+
 
 def workflow_executor(params, workflow_id: int) -> dict:
     sdk = EasyDataSDK()
@@ -10,12 +12,12 @@ def workflow_executor(params, workflow_id: int) -> dict:
 
     start_workflow = workflow.start(params)
     print(start_workflow)
-    
+
     def check_workflow():
         workflow_status = workflow.get_status()["workflow_status"]
-        if workflow_status=="finished":
+        if workflow_status == "finished":
             message = "Workflow finished."
-        elif workflow_status=="initializing" or workflow_status=="running":
+        elif workflow_status == "initializing" or workflow_status == "running":
             message = "Workflow execution is still in progress."
         else:
             message = "Workflow has failed."

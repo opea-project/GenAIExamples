@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 function stop_agent_and_api_server() {
     echo "Stopping Agent services"
     docker rm --force $(docker ps -a -q --filter="name=workflowexec-agent-endpoint")
