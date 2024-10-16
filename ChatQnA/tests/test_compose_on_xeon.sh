@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui chatqna-conversation-ui dataprep-redis retriever-redis"
+    service_list="chatqna chatqna-ui chatqna-conversation-ui dataprep-redis retriever-redis nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
@@ -242,8 +242,8 @@ function main() {
         echo "==== microservices validated ===="
         validate_megaservice
         echo "==== megaservice validated ===="
-        # validate_frontend
-        # echo "==== frontend validated ===="
+        validate_frontend
+        echo "==== frontend validated ===="
     fi
 
     stop_docker
