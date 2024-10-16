@@ -189,7 +189,7 @@ And then run the benchmark by:
 bash benchmark.sh -n 1
 ```
 
-The argument `-n` refers to the number of test nodes. Note that neccessary dependencies will be automatically installed when running benchmark for the first time.
+The argument `-n` refers to the number of test nodes. Note that necessary dependencies will be automatically installed when running benchmark for the first time.
 
 ##### 4. Data collection
 
@@ -239,7 +239,7 @@ And then run the benchmark by:
 bash benchmark.sh -n 2
 ```
 
-The argument `-n` refers to the number of test nodes. Note that neccessary dependencies will be automatically installed when running benchmark for the first time.
+The argument `-n` refers to the number of test nodes. Note that necessary dependencies will be automatically installed when running benchmark for the first time.
 
 ##### 4. Data collection
 
@@ -288,7 +288,7 @@ And then run the benchmark by:
 bash benchmark.sh -n 4
 ```
 
-The argument `-n` refers to the number of test nodes. Note that neccessary dependencies will be automatically installed when running benchmark for the first time.
+The argument `-n` refers to the number of test nodes. Note that necessary dependencies will be automatically installed when running benchmark for the first time.
 
 ##### 4. Data collection
 
@@ -361,7 +361,7 @@ And then run the benchmark by:
 bash benchmark.sh -d docker -i <service-ip> -p <service-port>
 ```
 
-The argument `-i` and `-p` refer to the deployed ChatQnA service IP and port, respectively. Note that neccessary dependencies will be automatically installed when running benchmark for the first time.
+The argument `-i` and `-p` refer to the deployed ChatQnA service IP and port, respectively. Note that necessary dependencies will be automatically installed when running benchmark for the first time.
 
 ### Data collection
 
