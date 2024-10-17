@@ -20,11 +20,6 @@ on:
         description: "Tag to apply to images, default is latest"
         required: false
         type: string
-      context:
-        default: "CI"
-        description: "CI or CD"
-        required: false
-        type: string
 
 jobs:
   manifest-test:
@@ -51,7 +46,7 @@ jobs:
 
       - name: Set variables
         run: |
-          echo "IMAGE_REPO=$OPEA_IMAGE_REPO" >> $GITHUB_ENV
+          echo "IMAGE_REPO=${OPEA_IMAGE_REPO}opea" >> $GITHUB_ENV
           echo "IMAGE_TAG=${{ inputs.tag }}" >> $GITHUB_ENV
           lower_example=$(echo "${{ inputs.example }}" | tr '[:upper:]' '[:lower:]')
           echo "NAMESPACE=$lower_example-$(tr -dc a-z0-9 </dev/urandom | head -c 16)" >> $GITHUB_ENV
@@ -60,7 +55,6 @@ jobs:
           echo "continue_test=true" >> $GITHUB_ENV
           echo "should_cleanup=false" >> $GITHUB_ENV
           echo "skip_validate=true" >> $GITHUB_ENV
-          echo "CONTEXT=${{ inputs.context }}" >> $GITHUB_ENV
           echo "NAMESPACE=$NAMESPACE"
 
       - name: Kubectl install

@@ -6,7 +6,7 @@ set -xe
 USER_ID=$(whoami)
 LOG_PATH=/home/$(whoami)/logs
 MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
-IMAGE_REPO=${IMAGE_REPO:-}
+IMAGE_REPO=${IMAGE_REPO:-opea}
 IMAGE_TAG=${IMAGE_TAG:-latest}
 
 ROLLOUT_TIMEOUT_SECONDS="1800s"
@@ -15,15 +15,10 @@ KUBECTL_TIMEOUT_SECONDS="60s"
 function init_chatqna() {
     # replace the mount dir "path: /mnt/opea-models" with "path: $CHART_MOUNT"
     find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/opea-models#path: $MOUNT_DIR#g" {} \;
-    if [ $CONTEXT == "CI" ]; then
-        # replace megaservice image tag
-        find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/chatqna:latest#image: \"opea/chatqna:${IMAGE_TAG}#g" {} \;
-    else
-        # replace microservice image tag
-        find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/\(.*\):latest#image: \"opea/\1:${IMAGE_TAG}#g" {} \;
-    fi
-    # replace the repository "image: opea/*" with "image: $IMAGE_REPO/opea/"
-    find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}opea/#g" {} \;
+    # replace microservice image tag
+    find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/\(.*\):latest#image: \"opea/\1:${IMAGE_TAG}#g" {} \;
+    # replace the repository "image: opea/*" with "image: $IMAGE_REPO/"
+    find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}/#g" {} \;
     # set huggingface token
     find . -name '*.yaml' -type f -exec sed -i "s#insert-your-huggingface-token-here#$(cat /home/$USER_ID/.cache/huggingface/token)#g" {} \;
 }
