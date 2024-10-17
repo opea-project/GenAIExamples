@@ -1,0 +1,71 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+
+podSpecs:
+  - name: chatqna-backend-server-deploy
+    spec:
+      image_name: opea/chatqna
+      image_tag: latest
+      replicas: 2
+      resources:
+        limits:
+          cpu: "8"
+          memory: "8000Mi"
+        requests:
+          cpu: "8"
+          memory: "8000Mi"
+
+  - name: embedding-dependency-deploy
+    spec:
+      image_name: ghcr.io/huggingface/text-embeddings-inference
+      image_tag: cpu-1.5
+      replicas: 1
+      resources:
+        limits:
+          cpu: "80"
+          memory: "20000Mi"
+        requests:
+          cpu: "80"
+          memory: "20000Mi"
+
+  - name: reranking-dependency-deploy
+    spec:
+      image_name: opea/tei-gaudi
+      image_tag: latest
+      replicas: 1
+      resources:
+        limits:
+          habana.ai/gaudi: 1
+
+  - name: llm-dependency-deploy
+    spec:
+      image_name: ghcr.io/huggingface/tgi-gaudi
+      image_tag: 2.0.4
+      replicas: 7
+      resources:
+        limits:
+          habana.ai/gaudi: 1
+
+  - name: dataprep-deploy
+    spec:
+      image_name: opea/dataprep-redis
+      image_tag: latest
+      replicas: 1
+
+  - name: vector-db
+    spec:
+      image_name: redis/redis-stack
+      image_tag: 7.2.0-v9
+      replicas: 1
+
+  - name: retriever-deploy
+    spec:
+      image_name: opea/retriever-redis
+      image_tag: latest
+      replicas: 2
+      resources:
+        requests:
+          cpu: "4"
+          memory: "4000Mi"

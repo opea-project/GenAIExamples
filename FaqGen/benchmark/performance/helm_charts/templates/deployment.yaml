@@ -1,0 +1,113 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+{{- $global := .Values }}
+{{- range $deployment := .Values.deployments }}
+{{- range $podSpec := $global.podSpecs }}
+{{- if eq $podSpec.name $deployment.name }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $deployment.name }}
+  namespace: default
+spec:
+  replicas: {{ $podSpec.spec.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $deployment.name }}
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+      labels:
+        app: {{ $deployment.name }}
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: qna-config
+        {{- if $deployment.spec.args }}
+        args:
+        {{- range $arg := $deployment.spec.args }}
+          {{- if $arg.name }}
+          - {{ $arg.name }}
+          {{- end }}
+          {{- if $arg.value }}
+          - "{{ $arg.value }}"
+          {{- end }}
+        {{- end }}
+        {{- end }}
+
+        {{- if $deployment.spec.env }}
+        env:
+        {{- range $env := $deployment.spec.env }}
+          - name: {{ $env.name }}
+            value: "{{ $env.value }}"
+        {{- end }}
+        {{- end }}
+
+        image: {{ $podSpec.spec.image_name }}:{{ $podSpec.spec.image_tag }}
+        imagePullPolicy: IfNotPresent
+        name: {{ $podSpec.name }}
+
+        {{- if $deployment.spec.ports }}
+        ports:
+        {{- range $port := $deployment.spec.ports }}
+          {{- range $port_name, $port_id := $port }}
+          - {{ $port_name }}: {{ $port_id }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+
+
+        {{- if $podSpec.spec.resources }}
+        resources:
+        {{- range $resourceType, $resource := $podSpec.spec.resources }}
+          {{ $resourceType }}:
+          {{- range $limitType, $limit := $resource }}
+            {{ $limitType }}: {{ $limit }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+
+        {{- if $deployment.spec.volumeMounts }}
+        volumeMounts:
+        {{- range $volumeMount := $deployment.spec.volumeMounts }}
+          - mountPath: {{ $volumeMount.mountPath }}
+            name: {{ $volumeMount.name }}
+        {{- end }}
+        {{- end }}
+
+      hostIPC: true
+      nodeSelector:
+        node-type: chatqna-opea
+      serviceAccountName: default
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: {{ $deployment.name }}
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+
+
+      {{- if $deployment.spec.volumes }}
+      volumes:
+      {{- range $index, $volume := $deployment.spec.volumes }}
+        - name: {{ $volume.name }}
+          {{- if $volume.hostPath }}
+          hostPath:
+            path: {{ $volume.hostPath.path }}
+            type: {{ $volume.hostPath.type }}
+          {{- else if $volume.emptyDir }}
+          emptyDir:
+            medium: {{ $volume.emptyDir.medium }}
+            sizeLimit: {{ $volume.emptyDir.sizeLimit }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+
+---
+{{- end }}
+{{- end }}
+{{- end }}
