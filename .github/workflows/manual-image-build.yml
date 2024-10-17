@@ -44,7 +44,7 @@ jobs:
           echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
   image-build:
-    needs: job1
+    needs: get-test-matrix
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
@@ -54,4 +54,6 @@ jobs:
       node: ${{ matrix.node }}
       example: ${{ inputs.example }}
       services: ${{ inputs.services }}
+      tag: ${{ inputs.tag }}
+      opea_branch: ${{ inputs.opea_branch }}
     secrets: inherit
