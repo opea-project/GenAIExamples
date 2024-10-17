@@ -4,31 +4,47 @@
 HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 
 podSpecs:
-  - name: faq-mega-server-deploy
+  - name: audioqna-backend-server-deploy
     spec:
-      image_name: opea/chatqna
+      image_name: opea/audioqna
       image_tag: latest
-      replicas: 2
+      replicas: 1
+      
+  - name: asr-deploy
+    spec:
+      image_name: opea/asr
+      image_tag: latest
+      replicas: 1
+      
+  - name: whisper-deploy
+    spec:
+      image_name: opea/whisper-gaudi
+      image_tag: latest
+      replicas: 1
       resources:
         limits:
-          cpu: "8"
-          memory: "8000Mi"
-        requests:
-          cpu: "8"
-          memory: "8000Mi"
-
-
-  - name: faq-tgi-deploy
+          habana.ai/gaudi: 1
+      
+  - name: tts-deploy
     spec:
-      image_name: ghcr.io/huggingface/tgi-gaudi
-      image_tag: 2.0.5
-      replicas: 7
+      image_name: opea/tts
+      image_tag: latest
+      replicas: 1
+      
+  - name: speecht5-deploy
+    spec:
+      image_name: opea/speecht5-gaudi
+      image_tag: latest
+      replicas: 1
       resources:
         limits:
           habana.ai/gaudi: 1
 
-  - name: faq-micro-deploy
+  - name: llm-dependency-deploy
     spec:
-      image_name: opea/llm-faqgen-tgi
-      image_tag: latest
+      image_name: ghcr.io/huggingface/tgi-gaudi
+      image_tag: 2.0.5
       replicas: 1
+      resources:
+        limits:
+          habana.ai/gaudi: 1
