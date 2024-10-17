@@ -60,8 +60,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      SAFETY_GUARD_MODEL_ID: ${SAFETY_GUARD_MODEL_ID}
-      SAFETY_GUARD_ENDPOINT: ${SAFETY_GUARD_ENDPOINT}
+      SAFETY_GUARD_MODEL_ID: ${GURADRAILS_MODEL_ID}
+      SAFETY_GUARD_ENDPOINT: http://tgi-guardrails-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   tei-embedding-service:
