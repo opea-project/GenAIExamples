@@ -4,26 +4,35 @@
 import os
 
 from fastapi.responses import StreamingResponse
-from langchain.chains.summarize import load_summarize_chain
-from langchain.docstore.document import Document
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_huggingface import HuggingFaceEndpoint
+from huggingface_hub import AsyncInferenceClient
+from langchain.prompts import PromptTemplate
 
 from comps import CustomLogger, GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
 
 logger = CustomLogger("llm_docsum")
 logflag = os.getenv("LOGFLAG", False)
 
+llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
+llm = AsyncInferenceClient(
+    model=llm_endpoint,
+    timeout=600,
+)
 
-def post_process_text(text: str):
-    if text == " ":
-        return "data: @#$\n\n"
-    if text == "\n":
-        return "data: <br/>\n\n"
-    if text.isspace():
-        return None
-    new_text = text.replace(" ", "@#$")
-    return f"data: {new_text}\n\n"
+templ_en = """Write a concise summary of the following:
+
+
+"{text}"
+
+
+CONCISE SUMMARY:"""
+
+templ_zh = """请简要概括以下内容:
+
+
+"{text}"
+
+
+概况:"""
 
 
 @register_microservice(
@@ -37,46 +46,51 @@ async def llm_generate(input: LLMParamsDoc):
     if logflag:
         logger.info(input)
 
-    llm = HuggingFaceEndpoint(
-        endpoint_url=llm_endpoint,
+    if input.language in ["en", "auto"]:
+        templ = templ_en
+    elif input.language in ["zh"]:
+        templ = templ_zh
+    else:
+        raise NotImplementedError('Please specify the input language in "en", "zh", "auto"')
+
+    prompt_template = PromptTemplate.from_template(templ)
+    prompt = prompt_template.format(text=input.query)
+
+    if logflag:
+        logger.info("After prompting:")
+        logger.info(prompt)
+
+    text_generation = await llm.text_generation(
+        prompt=prompt,
+        stream=input.streaming,
         max_new_tokens=input.max_tokens,
+        repetition_penalty=input.repetition_penalty,
+        temperature=input.temperature,
         top_k=input.top_k,
         top_p=input.top_p,
         typical_p=input.typical_p,
-        temperature=input.temperature,
-        repetition_penalty=input.repetition_penalty,
-        streaming=input.streaming,
     )
-    llm_chain = load_summarize_chain(llm=llm, chain_type="map_reduce")
-    texts = text_splitter.split_text(input.query)
-
-    # Create multiple documents
-    docs = [Document(page_content=t) for t in texts]
 
     if input.streaming:
 
         async def stream_generator():
-            from langserve.serialization import WellKnownLCSerializer
-
-            _serializer = WellKnownLCSerializer()
-            async for chunk in llm_chain.astream_log(docs):
-                data = _serializer.dumps({"ops": chunk.ops}).decode("utf-8")
+            chat_response = ""
+            async for text in text_generation:
+                chat_response += text
+                chunk_repr = repr(text.encode("utf-8"))
                 if logflag:
-                    logger.info(f"[docsum - text_summarize] data: {data}")
-                yield f"data: {data}\n\n"
+                    logger.info(f"[ docsum - text_summarize ] chunk:{chunk_repr}")
+                yield f"data: {chunk_repr}\n\n"
+            if logflag:
+                logger.info(f"[ docsum - text_summarize ] stream response: {chat_response}")
             yield "data: [DONE]\n\n"
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     else:
-        response = await llm_chain.ainvoke(docs)
-        response = response["output_text"]
         if logflag:
-            logger.info(response)
-        return GeneratedDoc(text=response, prompt=input.query)
+            logger.info(text_generation)
+        return GeneratedDoc(text=text_generation, prompt=input.query)
 
 
 if __name__ == "__main__":
-    llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
-    # Split text
-    text_splitter = CharacterTextSplitter()
     opea_microservices["opea_service@llm_docsum"].start()

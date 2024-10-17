@@ -92,12 +92,18 @@ curl http://${your_ip}:9000/v1/health_check\
 # Enable streaming to receive a streaming response. By default, this is set to True.
 curl http://${your_ip}:9000/v1/chat/docsum \
   -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "max_tokens":32, "language":"en"}' \
   -H 'Content-Type: application/json'
 
 # Disable streaming to receive a non-streaming response.
 curl http://${your_ip}:9000/v1/chat/docsum \
   -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "streaming":false}' \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "max_tokens":32, "language":"en", "streaming":false}' \
+  -H 'Content-Type: application/json'
+
+# Use Chinese mode. By default, language is set to "en"
+curl http://${your_ip}:9000/v1/chat/docsum \
+  -X POST \
+  -d '{"query":"2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。", "max_tokens":32, "language":"zh", "streaming":false}' \
   -H 'Content-Type: application/json'
 ```
