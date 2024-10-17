@@ -136,14 +136,14 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             prompt_template = PromptTemplate.from_template(chat_template)
             input_variables = prompt_template.input_variables
             if sorted(input_variables) == ["context", "question"]:
-                prompt = prompt_template.format(question=prompt, context="\n".join(docs))
+                prompt = prompt_template.format(question=prompt, context="\n".join(reranked_docs))
             elif input_variables == ["question"]:
                 prompt = prompt_template.format(question=prompt)
             else:
                 print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
-                prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
+                prompt = ChatTemplate.generate_rag_prompt(prompt, reranked_docs)
         else:
-            prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
+            prompt = ChatTemplate.generate_rag_prompt(prompt, reranked_docs)
 
         next_data["inputs"] = prompt
 
