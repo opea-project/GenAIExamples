@@ -11,4 +11,6 @@ data:
   LLM_MODEL_ID: {{ .Values.config.LLM_MODEL_ID }}
   NODE_SELECTOR: faq-opea
   TGI_LLM_ENDPOINT: http://faq-tgi-svc.default.svc.cluster.local:8010
+  LLM_SERVICE_HOST_IP: faq-micro-svc
+  MEGA_SERVICE_HOST_IP: faq-mega-server-svc  
 ---
