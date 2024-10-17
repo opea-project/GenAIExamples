@@ -44,7 +44,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: qna-config
-        image: opea/chatqna-no-wrapper-without-rerank:latest
+        image: opea/chatqna-without-rerank:latest
         imagePullPolicy: IfNotPresent
         name: chatqna-backend-server-deploy
         ports:
