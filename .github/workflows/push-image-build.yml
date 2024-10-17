@@ -23,12 +23,10 @@ jobs:
   image-build:
     needs: job1
     strategy:
-      matrix:
-        example: ${{ fromJSON(needs.job1.outputs.run_matrix).include.*.example }}
-        node: ["gaudi","xeon"]
+      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
       fail-fast: false
     uses: ./.github/workflows/_example-workflow.yml
     with:
-      node: ${{ matrix.node }}
+      node: ${{ matrix.hardware }}
       example: ${{ matrix.example }}
     secrets: inherit
