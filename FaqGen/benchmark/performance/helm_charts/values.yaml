@@ -18,10 +18,7 @@ deployments:
     spec:
       ports:
         - containerPort: 9000
-      env:
-      - name: TGI_LLM_ENDPOINT
-        value: "http://faq-tgi-svc.default.svc.cluster.local:8010"
-
+  
   - name: faq-tgi-deploy
     spec:
       ports:
