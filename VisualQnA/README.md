@@ -13,6 +13,60 @@ General architecture of VQA shows below:
 
 ![VQA](./assets/img/vqa.png)
 
+The VisualQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
+
+```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
+flowchart LR
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style VisualQnA-MegaService stroke:#000000
+
+    %% Subgraphs %%
+    subgraph VisualQnA-MegaService["VisualQnA MegaService "]
+        direction LR
+        LVM([LVM MicroService]):::blue
+    end
+    subgraph UserInterface[" User Interface "]
+        direction LR
+        a([User Input Query]):::orchid
+        Ingest([Ingest data]):::orchid
+        UI([UI server<br>]):::orchid
+    end
+
+
+    LVM_gen{{LVM Service <br>}}
+    GW([VisualQnA GateWay<br>]):::orange
+    NG([Nginx MicroService]):::blue
+
+
+    %% Questions interaction
+    direction LR
+    Ingest[Ingest data] --> UI
+    a[User Input Query] --> |Need Proxy Server|NG
+    a[User Input Query] --> UI
+    NG --> UI
+    UI --> GW
+    GW <==> VisualQnA-MegaService
+
+
+    %% Embedding service flow
+    direction LR
+    LVM <-.-> LVM_gen
+
+```
+
 This example guides you through how to deploy a [LLaVA-NeXT](https://github.com/LLaVA-VL/LLaVA-NeXT) (Open Large Multimodal Models) model on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html). We invite contributions from other hardware vendors to expand the OPEA ecosystem.
 
 ![llava screenshot](./assets/img/llava_screenshot1.png)
