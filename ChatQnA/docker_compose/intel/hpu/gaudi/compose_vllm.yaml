@@ -43,7 +43,7 @@ services:
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       MAX_WARMUP_SEQUENCE_LENGTH: 512
-    command: --model-id ${EMBEDDING_MODEL_ID}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   retriever:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     container_name: retriever-redis-server

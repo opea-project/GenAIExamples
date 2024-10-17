@@ -144,7 +144,7 @@ services:
       - BACKEND_SERVICE_NAME=chatqna
       - BACKEND_SERVICE_IP=chatqna-xeon-backend-server
       - BACKEND_SERVICE_PORT=8888
-      - DATAPREP_SERVICE_IP=dataprep-redis-service
+      - DATAPREP_SERVICE_IP=dataprep-qdrant-service
       - DATAPREP_SERVICE_PORT=6007
     ipc: host
     restart: always
