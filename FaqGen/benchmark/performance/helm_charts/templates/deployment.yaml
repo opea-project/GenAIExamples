@@ -25,7 +25,7 @@ spec:
       containers:
       - envFrom:
         - configMapRef:
-            name: qna-config
+            name: faq-config
         {{- if $deployment.spec.args }}
         args:
         {{- range $arg := $deployment.spec.args }}
@@ -80,7 +80,7 @@ spec:
 
       hostIPC: true
       nodeSelector:
-        node-type: chatqna-opea
+        node-type: faq-opea
       serviceAccountName: default
       topologySpreadConstraints:
       - labelSelector:
