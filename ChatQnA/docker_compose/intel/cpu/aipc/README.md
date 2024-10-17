@@ -61,7 +61,7 @@ Run the command to download LLM models. The <host_ip> is the one set in [Ollama 
 ```
 export host_ip=<host_ip>
 export OLLAMA_HOST=http://${host_ip}:11434
-ollama pull llama3
+ollama pull llama3.2
 ```
 
 After downloaded the models, you can list the models by `ollama list`.
@@ -69,8 +69,8 @@ After downloaded the models, you can list the models by `ollama list`.
 The output should be similar to the following:
 
 ```
-NAME            ID              SIZE    MODIFIED
-llama3:latest   365c0bd3c000    4.7 GB  5 days ago
+NAME            ID                SIZE      MODIFIED
+llama3.2:latest   a80c4f17acd5    2.0 GB    2 minutes ago
 ```
 
 ### Consume Ollama LLM Service
@@ -78,25 +78,25 @@ llama3:latest   365c0bd3c000    4.7 GB  5 days ago
 Access ollama service to verify that the ollama is functioning correctly.
 
 ```bash
-curl http://${host_ip}:11434/api/generate -d '{"model": "llama3", "prompt":"What is Deep Learning?"}'
+curl http://${host_ip}:11434/api/generate -d '{"model": "llama3.2", "prompt":"What is Deep Learning?"}'
 ```
 
 The outputs are similar to these:
 
 ```
-{"model":"llama3","created_at":"2024-10-11T07:58:38.949268562Z","response":"Deep","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.017625351Z","response":" learning","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.102848076Z","response":" is","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.171037991Z","response":" a","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.243757952Z","response":" subset","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.328708084Z","response":" of","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.413844974Z","response":" machine","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.486239329Z","response":" learning","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.555960842Z","response":" that","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.642418238Z","response":" involves","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.714137478Z","response":" the","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.798776679Z","response":" use","done":false}
-{"model":"llama3","created_at":"2024-10-11T07:58:39.883747938Z","response":" of","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.098813868Z","response":"Deep","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.124514468Z","response":" learning","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.149754216Z","response":" is","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.180420784Z","response":" a","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.229185873Z","response":" subset","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.263956118Z","response":" of","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.289097354Z","response":" machine","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.316838918Z","response":" learning","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.342309506Z","response":" that","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.367221264Z","response":" involves","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.39205893Z","response":" the","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.417933974Z","response":" use","done":false}
+{"model":"llama3.2","created_at":"2024-10-12T12:55:28.443110388Z","response":" of","done":false}
 ...
 ```
 
@@ -155,13 +155,21 @@ cd ~/OPEA/GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 5 Docker Images:
+### 6. Build Nginx Docker Image
+
+```bash
+cd GenAIComps
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following 6 Docker Images:
 
 1. `opea/dataprep-redis:latest`
 2. `opea/retriever-redis:latest`
 3. `opea/llm-ollama:latest`
 4. `opea/chatqna:latest`
 5. `opea/chatqna-ui:latest`
+6. `opea/nginx:latest`
 
 ## 🚀 Start Microservices
 
@@ -201,27 +209,10 @@ export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
-export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVER_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVER_HOST_IP=${host_ip}
-export LLM_SERVER_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_file"
-export FRONTEND_SERVICE_IP=${host_ip}
-export FRONTEND_SERVICE_PORT=5173
-export BACKEND_SERVICE_NAME=chatqna
-export BACKEND_SERVICE_IP=${host_ip}
-export BACKEND_SERVICE_PORT=8888
-
 export OLLAMA_ENDPOINT=http://${host_ip}:11434
-export OLLAMA_MODEL="llama3"
+export OLLAMA_MODEL="llama3.2"
 ```
 
 - Windows PC
@@ -229,27 +220,10 @@ export OLLAMA_MODEL="llama3"
 ```bash
 set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 set RERANK_MODEL_ID=BAAI/bge-reranker-base
-set TEI_EMBEDDING_ENDPOINT=http://%host_ip%:6006
-set REDIS_URL=redis://%host_ip%:6379
 set INDEX_NAME=rag-redis
 set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
-set MEGA_SERVICE_HOST_IP=%host_ip%
-set EMBEDDING_SERVER_HOST_IP=%host_ip%
-set RETRIEVER_SERVICE_HOST_IP=%host_ip%
-set RERANK_SERVER_HOST_IP=%host_ip%
-set LLM_SERVER_HOST_IP=%host_ip%
-set BACKEND_SERVICE_ENDPOINT=http://%host_ip%:8888/v1/chatqna
-set DATAPREP_SERVICE_ENDPOINT=http://%host_ip%:6007/v1/dataprep
-set DATAPREP_GET_FILE_ENDPOINT="http://%host_ip%:6007/v1/dataprep/get_file"
-set DATAPREP_DELETE_FILE_ENDPOINT="http://%host_ip%:6007/v1/dataprep/delete_file"
-set FRONTEND_SERVICE_IP=%host_ip%
-set FRONTEND_SERVICE_PORT=5173
-set BACKEND_SERVICE_NAME=chatqna
-set BACKEND_SERVICE_IP=%host_ip%
-set BACKEND_SERVICE_PORT=8888
-
 set OLLAMA_ENDPOINT=http://host.docker.internal:11434
-set OLLAMA_MODEL="llama3"
+set OLLAMA_MODEL="llama3.2"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -261,15 +235,6 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 ```bash
 cd ~/OPEA/GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc/
 docker compose up -d
-```
-
-Let ollama service runs (if you have started ollama service in [Prerequisites](#Prerequisites), skip this step)
-
-```bash
-# e.g. ollama run llama3
-OLLAMA_HOST=${host_ip}:11434 ollama run $OLLAMA_MODEL
-# for windows
-# ollama run %OLLAMA_MODEL%
 ```
 
 ### Validate Microservices
@@ -309,7 +274,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 4. Ollama Service
 
    ```bash
-   curl http://${host_ip}:11434/api/generate -d '{"model": "llama3", "prompt":"What is Deep Learning?"}'
+   curl http://${host_ip}:11434/api/generate -d '{"model": "llama3.2", "prompt":"What is Deep Learning?"}'
    ```
 
 5. LLM Microservice
@@ -325,7 +290,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
    ```bash
    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "messages": "What is the revenue of Nike in 2023?", "model": "'"${OLLAMA_MODEL}"'"
+        "messages": "What is the revenue of Nike in 2023?"
         }'
    ```
 

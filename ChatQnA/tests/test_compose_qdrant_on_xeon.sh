@@ -31,23 +31,8 @@ function start_services() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6040"
-    export QDRANT_HOST=${ip_address}
-    export QDRANT_PORT=6333
     export INDEX_NAME="rag-qdrant"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVER_HOST_IP=${ip_address}
-    export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVER_HOST_IP=${ip_address}
-    export LLM_SERVER_HOST_IP=${ip_address}
-    export MEGA_SERVICE_PORT=8912
-    export EMBEDDING_SERVER_PORT=6040
-    export RETRIEVER_SERVICE_PORT=6045
-    export RERANK_SERVER_PORT=6041
-    export LLM_SERVER_PORT=6042
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8912/v1/chatqna"
-    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6043/v1/dataprep"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

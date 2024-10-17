@@ -32,22 +32,8 @@ function start_services() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
-    export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVER_HOST_IP=${ip_address}
-    export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVER_HOST_IP=${ip_address}
-    export LLM_SERVER_HOST_IP=${ip_address}
-    export EMBEDDING_SERVER_PORT=8090
-    export RERANK_SERVER_PORT=8808
-    export LLM_SERVER_PORT=8007
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/chatqna"
-    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
-
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
