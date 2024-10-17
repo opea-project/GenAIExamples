@@ -5,6 +5,8 @@ namespace: default
 
 config:
   LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+  CONFIG_MAP_NAME: faq-config
+  NODE_SELECTOR: faq-opea
 
 deployments:
   - name: faq-mega-server-deploy
