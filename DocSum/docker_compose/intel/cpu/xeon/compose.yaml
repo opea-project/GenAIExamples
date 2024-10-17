@@ -56,26 +56,27 @@ services:
     ipc: host
     environment:
       A2T_ENDPOINT: ${A2T_ENDPOINT}
+ 
+  v2a:
+    # image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
+    image: opea/v2a:latest
+    container_name: v2a-service
+    ports:
+      - "7078:7078"
+    ipc: host
+    environment:
+      V2A_ENDPOINT: ${V2A_ENDPOINT}
 
-  # asr:
-  #   image: ${REGISTRY:-opea}/asr:${TAG:-latest}
-  #   # image: opea/asr
-  #   container_name: asr-service
-  #   ports:
-  #     - "9099:9099"
-  #   ipc: host
-  #   environment:
-  #     ASR_ENDPOINT: ${ASR_ENDPOINT}
-
-  # v2a:
-  #   image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
-  #   # image: opea/dataprep-docsum-video2audio-microservice:latest
-  #   container_name: v2a-service
-  #   ports:
-  #     - "7078:7078"
-  #   ipc: host
-  #   environment:
-  #     V2A_ENDPOINT: ${V2A_ENDPOINT}
+  data-service:
+    # image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
+    image: opea/docsum_data:latest
+    container_name: docsum-data
+    ports:
+      - "7079:7079"
+    ipc: host
+    environment:
+      V2A_ENDPOINT: ${V2A_ENDPOINT}
+      A2T_ENDPOINT: ${A2T_ENDPOINT}
 
   docsum-xeon-backend-server:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
