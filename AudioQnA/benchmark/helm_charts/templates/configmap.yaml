@@ -11,6 +11,15 @@ data:
   LLM_MODEL_ID: {{ .Values.config.LLM_MODEL_ID }}
   NODE_SELECTOR: {{ .Values.config.NODE_SELECTOR }}
   TGI_LLM_ENDPOINT: http://faq-tgi-svc.default.svc.cluster.local:8010
-  LLM_SERVICE_HOST_IP: faq-micro-svc
-  MEGA_SERVICE_HOST_IP: faq-mega-server-svc  
+
+  ASR_ENDPOINT: http://whisper-svc.default.svc.cluster.local:7066
+  TTS_ENDPOINT: http://speecht5-svc.default.svc.cluster.local:7055
+  TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:3006
+  MEGA_SERVICE_HOST_IP: audioqna-backend-server-svc
+  ASR_SERVICE_HOST_IP: asr-svc
+  ASR_SERVICE_PORT: "3001"
+  LLM_SERVICE_HOST_IP: llm-svc
+  LLM_SERVICE_PORT: "3007"
+  TTS_SERVICE_HOST_IP: tts-svc
+  TTS_SERVICE_PORT: "3002"
 ---
