@@ -37,8 +37,6 @@ function start_services() {
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
-
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 

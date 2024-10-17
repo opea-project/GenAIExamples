@@ -155,13 +155,21 @@ cd ~/OPEA/GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 5 Docker Images:
+### 6. Build Nginx Docker Image
+
+```bash
+cd GenAIComps
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following 6 Docker Images:
 
 1. `opea/dataprep-redis:latest`
 2. `opea/retriever-redis:latest`
 3. `opea/llm-ollama:latest`
 4. `opea/chatqna:latest`
 5. `opea/chatqna-ui:latest`
+6. `opea/nginx:latest`
 
 ## 🚀 Start Microservices
 
