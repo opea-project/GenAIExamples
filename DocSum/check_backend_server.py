@@ -9,26 +9,14 @@ import requests
 
 # Get the root folder of the current script
 root_folder = os.path.dirname(os.path.abspath(__file__))
+endpoint = "http://localhost:8888/v1/docsum"
 
-def video_to_audio(path_to_video):
-    """
-    Convert a video file to an audio file in base64 format by sending a request to the server.
+def summarize_text():
+        
+    text_cont = "and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are ."
     
-    Args:
-        path_to_video (str): Path to the video file.
-    
-    Returns:
-        str: Base64 encoded audio file.
-    """
-    file_name = os.path.join(root_folder, path_to_video)
-
-    # Read the video file and encode it in base64
-    with open(file_name, "rb") as f:
-        video_base64_str = base64.b64encode(f.read()).decode("utf-8")
-
     # Define the endpoint and payload
-    endpoint = "http://localhost:8888/v1/video2audio"
-    inputs = {"byte_str": video_base64_str}
+    inputs = {"messages": text_cont}
     
     # Send the POST request to the server
     response = requests.post(url=endpoint, data=json.dumps(inputs), proxies={"http": None})
@@ -36,10 +24,15 @@ def video_to_audio(path_to_video):
     # Check if the request was successful
     response.raise_for_status()
     
-    # Extract the base64 encoded audio from the response
-    audio_base64 = response.json()['byte_str']
     
-    return audio_base64
+    import ast 
+    temp = ast.literal_eval( 
+        [i.split('data: ')[1] for i in response.text.split('\n\n') if "/logs/LLMChain/final_output" in i][0] 
+    )['ops']
+    
+    response = [i['value'] for i in temp if i['path'] == "/logs/LLMChain/final_output"][0]
+    
+    print(response)
 
 def read_config():
     """
@@ -78,13 +71,18 @@ if __name__ == "__main__":
     # Read the configuration parameters
     args = read_config()
     
+    summarize_text()
+
     # Extract audio from video
-    audio_base64 = video_to_audio(args.path_to_video)
+    # audio_base64 = video_to_audio(args.path_to_video)
     
-    # Save the extracted audio to a file
-    with open(args.path_to_audio, "wb") as f:
-        f.write(base64.b64decode(audio_base64))
+    
+    
+    
+    # # Save the extracted audio to a file
+    # with open(args.path_to_audio, "wb") as f:
+    #     f.write(base64.b64decode(audio_base64))
         
-    print("========= Audio file saved as ======")
-    print(args.path_to_audio)
-    print("====================================")
+    # print("========= Audio file saved as ======")
+    # print(args.path_to_audio)
+    # print("====================================")
