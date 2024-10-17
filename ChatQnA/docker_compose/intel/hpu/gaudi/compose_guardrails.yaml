@@ -159,8 +159,8 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - MEGA_SERVICE_HOST_IP=guardrails
-      - GUARDRAIL_SERVICE_HOST_IP=${GUARDRAIL_SERVICE_HOST_IP}
+      - MEGA_SERVICE_HOST_IP=chatqna-gaudi-backend-server
+      - GUARDRAIL_SERVICE_HOST_IP=guardrails
       - GUARDRAIL_SERVICE_PORT=${GUARDRAIL_SERVICE_PORT:-9090}
       - EMBEDDING_SERVER_HOST_IP=tei-embedding-service
       - EMBEDDING_SERVER_PORT=${EMBEDDING_SERVER_PORT:-80}
