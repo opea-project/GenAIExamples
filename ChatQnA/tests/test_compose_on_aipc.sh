@@ -33,8 +33,9 @@ function start_services() {
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export INDEX_NAME="rag-redis"
+    export OLLAMA_ENDPOINT=http://${ip_address}:11434
+    export OLLAMA_MODEL="llama3.2"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
     # Start Docker Containers
@@ -73,7 +74,9 @@ function validate_service() {
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
-    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+    if [ "$DOCKER_NAME" -ne "ollama" ]; then
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+    fi
 
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
@@ -152,13 +155,13 @@ function validate_microservices() {
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # tgi for llm service
+    # ollama for llm service
     validate_service \
-        "${ip_address}:9009/generate" \
+        "${ip_address}:11434/generate" \
         "generated_text" \
-        "tgi-llm" \
-        "tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+        "ollama" \
+        "ollama" \
+        '{"model": "llama3.2", "prompt":"What is Deep Learning?", "options": {"num_predict":17} }'
 
 }
 
