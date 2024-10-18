@@ -29,7 +29,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/aipc
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -171,7 +171,7 @@ function validate_megaservice() {
         "${ip_address}:8888/v1/chatqna" \
         "data: " \
         "chatqna-megaservice" \
-        "chatqna-xeon-backend-server" \
+        "chatqna-aipc-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
@@ -207,7 +207,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    cd $WORKPATH/docker_compose/intel/cpu/aipc
     docker compose stop && docker compose rm -f
 }
 
