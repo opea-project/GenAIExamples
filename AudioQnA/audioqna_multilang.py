@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
-import os
 import base64
+import os
 
 from comps import AudioQnAGateway, MicroService, ServiceOrchestrator, ServiceType
 
@@ -31,7 +31,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs["messages"] = [{"role": "user", "content": inputs["asr_result"]}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
-        next_inputs["stream"] = inputs["streaming"] # False as default
+        next_inputs["stream"] = inputs["streaming"]  # False as default
         next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
         # next_inputs["presence_penalty"] = inputs["presence_penalty"]
         # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
@@ -44,9 +44,10 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         inputs = next_inputs
     return inputs
 
+
 def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.TTS:
-        audio_base64 = base64.b64encode(data).decode('utf-8')
+        audio_base64 = base64.b64encode(data).decode("utf-8")
         return {"byte_str": audio_base64}
     return data
 
