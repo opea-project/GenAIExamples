@@ -34,7 +34,7 @@ function start_services() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export INDEX_NAME="rag-redis"
-    export OLLAMA_ENDPOINT=http://${ip_address}:11434
+    export OLLAMA_HOST=${ip_address}
     export OLLAMA_MODEL="llama3.2"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
