@@ -21,16 +21,16 @@ def summarize():
     # file_name = '/localdisk/mcetin/GenAIComps/comps/dataprep/docsum/data/test_video_10s.wav'
     
     # file_name = 'comps/dataprep/docsum/data/test_video_60s.wav'
-    file_name = 'comps/dataprep/docsum/data/test_full.wav'
-    test_audio_base64_str = get_base64_str(file_name)
-    inputs = {"type": "audio", "messages": test_audio_base64_str} 
+    # file_name = 'comps/dataprep/docsum/data/test_full.wav'
+    # test_audio_base64_str = get_base64_str(file_name)
+    # inputs = {"type": "audio", "messages": test_audio_base64_str} 
     
     # # file_name = 'comps/dataprep/docsum/data/test_video_60s.wav'
-    # file_name = 'comps/dataprep/docsum/data/test_full.mp4'
-    # test_audio_base64_str = get_base64_str(file_name)
-    # inputs = {"type": "video", "messages": test_audio_base64_str} 
+    file_name = 'comps/dataprep/docsum/data/test_full.mp4'
+    test_audio_base64_str = get_base64_str(file_name)
+    inputs = {"type": "video", "messages": test_audio_base64_str} 
     
-    # inputs = {"type": "text", "messages": " THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are ."} 
+    inputs = {"type": "text", "messages": " THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are ."} 
 
     response = requests.post(url=endpoint, data=json.dumps(inputs), proxies={"http": None})
 

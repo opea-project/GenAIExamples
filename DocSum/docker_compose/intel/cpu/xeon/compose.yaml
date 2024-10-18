@@ -79,12 +79,15 @@ services:
       A2T_ENDPOINT: ${A2T_ENDPOINT}
 
   docsum-xeon-backend-server:
-    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
-    # image: opea/docsum-xeon-backend-server:latest
+    # image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+    image: opea/docsum:latest
     container_name: docsum-xeon-backend-server
     depends_on:
       - tgi-service
       - llm
+      - data-service
+      - v2a
+      - a2t
     ports:
       - "8888:8888"
     environment:
@@ -92,6 +95,7 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
