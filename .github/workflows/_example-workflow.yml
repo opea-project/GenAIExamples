@@ -12,6 +12,10 @@ on:
       example:
         required: true
         type: string
+      services:
+        default: ""
+        required: false
+        type: string
       tag:
         default: "latest"
         required: false
@@ -77,6 +81,7 @@ jobs:
         with:
           work_dir: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
+          service_list: ${{ inputs.services }}
           registry: ${OPEA_IMAGE_REPO}opea
           tag: ${{ inputs.tag }}
 
@@ -105,7 +110,6 @@ jobs:
       example: ${{ inputs.example }}
       hardware: ${{ inputs.node }}
       tag: ${{ inputs.tag }}
-      context: "CD"
     secrets: inherit
 
 ####################################################################################################
