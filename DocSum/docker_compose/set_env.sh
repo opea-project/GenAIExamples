@@ -27,7 +27,7 @@ export A2T_SERVICE_HOST_IP=${host_ip}
 export A2T_SERVICE_PORT=9099 
 
 export DATA_SERVICE_HOST_IP=${host_ip}
-export DATA_SERVICE_PORT=7078 
+export DATA_SERVICE_PORT=7079 
 
 
 
