@@ -17,8 +17,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
@@ -27,6 +25,8 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy", chatqna-gaudi-ui-server, chatqna-gaudi-backend-server, dataprep-redis-service, tei-embedding-service, retriever, tei-reranking-service, tgi-service, vllm_service,vllm-ray-service,guardrails
    ```
 
 3. Set up other environment variables:
@@ -222,7 +222,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="External_Public_IP", chatqna-gaudi-ui-server, chatqna-gaudi-backend-server, dataprep-redis-service, tei-embedding-service, retriever, tei-reranking-service, tgi-service, vllm_service,vllm-ray-service,guardrails
+   export no_proxy="Your_No_Proxy", chatqna-gaudi-ui-server, chatqna-gaudi-backend-server, dataprep-redis-service, tei-embedding-service, retriever, tei-reranking-service, tgi-service, vllm_service,vllm-ray-service,guardrails
    ```
 
 3. Set up other environment variables:
