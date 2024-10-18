@@ -18,13 +18,20 @@ export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 
-# export ASR_ENDPOINT=http://$host_ip:7066
-# export ASR_SERVICE_HOST_IP=${host_ip}
-# export ASR_SERVICE_PORT=9099 # 3001
 
 export V2A_SERVICE_HOST_IP=${host_ip}
 export V2A_ENDPOINT=http://$host_ip:7078
 
 export A2T_ENDPOINT=http://$host_ip:7066
 export A2T_SERVICE_HOST_IP=${host_ip}
-export A2T_SERVICE_PORT=9099 # 3001
+export A2T_SERVICE_PORT=9099 
+
+export DATA_SERVICE_HOST_IP=${host_ip}
+export DATA_SERVICE_PORT=7078 
+
+
+
+
+# export ASR_ENDPOINT=http://$host_ip:7066
+# export ASR_SERVICE_HOST_IP=${host_ip}
+# export ASR_SERVICE_PORT=9099 # 3001
