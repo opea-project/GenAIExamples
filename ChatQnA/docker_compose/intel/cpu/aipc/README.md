@@ -192,7 +192,7 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 **Append the value of the public IP address to the no_proxy list if you are in a proxy environment**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP", chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service
+export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service
 ```
 
 - Linux PC
