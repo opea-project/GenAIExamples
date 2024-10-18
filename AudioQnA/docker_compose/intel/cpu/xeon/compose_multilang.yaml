@@ -1,0 +1,64 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+    command: --language "zh"
+  gpt-sovits-service:
+    image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}
+    container_name: gpt-sovits-service
+    ports:
+      - "9880:9880"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    container_name: tgi-service
+    ports:
+      - "3006:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+  audioqna-xeon-backend-server:
+    image: ${REGISTRY:-opea}/audioqna-multilang:${TAG:-latest}
+    container_name: audioqna-xeon-backend-server
+    ports:
+      - "3008:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVER_HOST_IP=${LLM_SERVER_HOST_IP}
+      - LLM_SERVER_PORT=${LLM_SERVER_PORT}
+      - LLM_MODEL_ID=${LLM_MODEL_ID}
+      - WHISPER_SERVER_HOST_IP=${WHISPER_SERVER_HOST_IP}
+      - WHISPER_SERVER_PORT=${WHISPER_SERVER_PORT}
+      - GPT_SOVITS_SERVER_HOST_IP=${GPT_SOVITS_SERVER_HOST_IP}
+      - GPT_SOVITS_SERVER_PORT=${GPT_SOVITS_SERVER_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

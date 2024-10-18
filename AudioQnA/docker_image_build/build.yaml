@@ -53,3 +53,9 @@ services:
       dockerfile: comps/tts/speecht5/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/tts:${TAG:-latest}
+  gpt-sovits:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/gpt-sovits/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}
