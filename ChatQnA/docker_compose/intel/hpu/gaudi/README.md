@@ -211,8 +211,6 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
@@ -223,6 +221,8 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="External_Public_IP", chatqna-gaudi-ui-server, chatqna-gaudi-backend-server, dataprep-redis-service, tei-embedding-service, retriever, tei-reranking-service, tgi-service, vllm_service,vllm-ray-service,guardrails
    ```
 
 3. Set up other environment variables:

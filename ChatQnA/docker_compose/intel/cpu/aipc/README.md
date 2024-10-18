@@ -189,10 +189,10 @@ For Linux users, please run `hostname -I | awk '{print $1}'`. For Windows users,
 export your_hf_api_token="Your_Huggingface_API_Token"
 ```
 
-**Append the value of the public IP address to the no_proxy list**
+**Append the value of the public IP address to the no_proxy list  if you are in a proxy environment**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
+export your_no_proxy=${your_no_proxy},"External_Public_IP", chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service
 ```
 
 - Linux PC
@@ -205,7 +205,7 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export OLLAMA_ENDPOINT=http://${host_ip}:11434
+export OLLAMA_HOST=host_ip
 export OLLAMA_MODEL="llama3.2"
 ```
 
@@ -216,7 +216,7 @@ set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 set RERANK_MODEL_ID=BAAI/bge-reranker-base
 set INDEX_NAME=rag-redis
 set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
-set OLLAMA_ENDPOINT=http://host.docker.internal:11434
+set OLLAMA_HOST=host.docker.internal
 set OLLAMA_MODEL="llama3.2"
 ```
 
