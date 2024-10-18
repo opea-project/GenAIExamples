@@ -2,7 +2,8 @@
 
 The AvatarChatbot service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
-## 🚀 Megaservice flow
+## AI Avatar Workflow
+The AI Avatar example is implemented using both megaservices and the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different megaservices and microservices for this example.
 
 ```mermaid
 ---
@@ -23,13 +24,13 @@ flowchart LR
     classDef invisible fill:transparent,stroke:transparent;
     style AvatarChatbot-Megaservice stroke:#000000
 
-    %% Subgraphs %%
+    %% Subgraphs %%    
     subgraph AvatarChatbot-Megaservice["AvatarChatbot Megaservice"]
         direction LR
-        ASR([ASR<br>3001]):::blue
-        LLM([LLM 'text-generation'<br>3007]):::blue
-        TTS([TTS<br>3002]):::blue
-        animation([Animation<br>3008]):::blue
+        ASR([ASR Microservice]):::blue
+        LLM([LLM Microservice]):::blue
+        TTS([TTS Microservice]):::blue
+        animation([Animation Microservice]):::blue
     end
     subgraph UserInterface["User Interface"]
         direction LR
@@ -38,12 +39,8 @@ flowchart LR
         USER2([User Image/Video Query]):::orchid
         UI([UI server<br>]):::orchid
     end
-    subgraph AvatarChatbot GateWay
-        direction LR
-        invis2[ ]:::invisible
-        GW([AvatarChatbot GateWay<br>]):::orange
-    end
-    subgraph
+    GW([AvatarChatbot GateWay<br>]):::orange
+    subgraph  
         direction LR
         X([OPEA Microservice]):::blue
         Y{{Open Source Service}}:::thistle
@@ -51,11 +48,11 @@ flowchart LR
         Z1([UI]):::orchid
     end
 
-    %% Services %%
-    WHISPER{{Whisper service<br>7066}}:::thistle
-    TGI{{LLM service<br>3006}}:::thistle
-    T5{{Speecht5 service<br>7055}}:::thistle
-    WAV2LIP{{Wav2Lip service<br>3003}}:::thistle
+    %% Services %%    
+    WHISPER{{Whisper service}}:::thistle
+    TGI{{LLM service}}:::thistle
+    T5{{Speecht5 service}}:::thistle
+    WAV2LIP{{Wav2Lip service}}:::thistle
 
     %% Connections %%
     direction LR
