@@ -88,22 +88,9 @@ find . -name '*.yaml' -type f -exec sed -i "s#\$(EMBEDDING_MODEL_ID)#${EMBEDDING
 find . -name '*.yaml' -type f -exec sed -i "s#\$(RERANK_MODEL_ID)#${RERANK_MODEL_ID}#g" {} \;
 ```
 
-### Benchmark tool preparation
-
-The test uses the [benchmark tool](https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/README.md) to do performance test. We need to set up benchmark tool at the master node of Kubernetes which is k8s-master.
-
-```bash
-# on k8s-master node
-git clone https://github.com/opea-project/GenAIEval.git
-cd GenAIEval
-python3 -m venv stress_venv
-source stress_venv/bin/activate
-pip install -r requirements.txt
-```
-
 ### Test Configurations
 
-Workload configuration:
+By default, the workload and benchmark configuration is as below:
 
 | Key      | Value   |
 | -------- | ------- |
@@ -189,23 +176,20 @@ curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
 
 ###### 3.2 Run Benchmark Test
 
-We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.deployment_type`, `test_suite_config.service_ip`, `test_suite_config.service_port`, `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+Before the benchmark, we can configure the number of test queries and test output directory by:
 
 ```bash
-export DEPLOYMENT_TYPE="k8s"
-export SERVICE_IP = None
-export SERVICE_PORT = None
 export USER_QUERIES="[640, 640, 640, 640]"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_1"
-envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
 
-And then run the benchmark tool by:
+And then run the benchmark by:
 
 ```bash
-cd GenAIEval/evals/benchmark
-python benchmark.py
+bash benchmark.sh -n 1
 ```
+
+The argument `-n` refers to the number of test nodes. Note that necessary dependencies will be automatically installed when running benchmark for the first time.
 
 ##### 4. Data collection
 
@@ -242,22 +226,20 @@ kubectl apply -f .
 
 ##### 3. Run tests
 
-We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.deployment_type`, `test_suite_config.service_ip`, `test_suite_config.service_port`, `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
-
-````bash
-export DEPLOYMENT_TYPE="k8s"
-export SERVICE_IP = None
-export SERVICE_PORT = None
-export USER_QUERIES="[1280, 1280, 1280, 1280]"
-export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_2"
-envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
-
-And then run the benchmark tool by:
+Before the benchmark, we can configure the number of test queries and test output directory by:
 
 ```bash
-cd GenAIEval/evals/benchmark
-python benchmark.py
-````
+export USER_QUERIES="[1280, 1280, 1280, 1280]"
+export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_2"
+```
+
+And then run the benchmark by:
+
+```bash
+bash benchmark.sh -n 2
+```
+
+The argument `-n` refers to the number of test nodes. Note that necessary dependencies will be automatically installed when running benchmark for the first time.
 
 ##### 4. Data collection
 
@@ -293,23 +275,20 @@ kubectl apply -f .
 
 ##### 3. Run tests
 
-We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.deployment_type`, `test_suite_config.service_ip`, `test_suite_config.service_port`, `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+Before the benchmark, we can configure the number of test queries and test output directory by:
 
 ```bash
-export DEPLOYMENT_TYPE="k8s"
-export SERVICE_IP = None
-export SERVICE_PORT = None
 export USER_QUERIES="[2560, 2560, 2560, 2560]"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/node_4"
-envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
 
-And then run the benchmark tool by:
+And then run the benchmark by:
 
 ```bash
-cd GenAIEval/evals/benchmark
-python benchmark.py
+bash benchmark.sh -n 4
 ```
+
+The argument `-n` refers to the number of test nodes. Note that necessary dependencies will be automatically installed when running benchmark for the first time.
 
 ##### 4. Data collection
 
@@ -369,24 +348,20 @@ Refer to the [NVIDIA GPU Guide](../../docker_compose/nvidia/gpu/README.md) for m
 
 ### Run tests
 
-We copy the configuration file [benchmark.yaml](./benchmark.yaml) to `GenAIEval/evals/benchmark/benchmark.yaml` and config `test_suite_config.deployment_type`, `test_suite_config.service_ip`, `test_suite_config.service_port`, `test_suite_config.user_queries` and `test_suite_config.test_output_dir`.
+Before the benchmark, we can configure the number of test queries and test output directory by:
 
 ```bash
-export DEPLOYMENT_TYPE="docker"
-export SERVICE_IP = "ChatQnA Service IP"
-export SERVICE_PORT = "ChatQnA Service Port"
 export USER_QUERIES="[640, 640, 640, 640]"
 export TEST_OUTPUT_DIR="/home/sdp/benchmark_output/docker"
-envsubst < ./benchmark.yaml > GenAIEval/evals/benchmark/benchmark.yaml
 ```
 
-And then run the benchmark tool by:
+And then run the benchmark by:
 
 ```bash
-cd GenAIEval/evals/benchmark
-pip install -r ../../requirements.txt
-python benchmark.py
+bash benchmark.sh -d docker -i <service-ip> -p <service-port>
 ```
+
+The argument `-i` and `-p` refer to the deployed ChatQnA service IP and port, respectively. Note that necessary dependencies will be automatically installed when running benchmark for the first time.
 
 ### Data collection
 
