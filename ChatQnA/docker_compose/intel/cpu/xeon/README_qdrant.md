@@ -118,12 +118,20 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 cd ../../../..
 ```
 
-Then run the command `docker images`, you will have the following 4 Docker Images:
+### 6. Build Nginx Docker Image
+
+```bash
+cd GenAIComps
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `opea/dataprep-qdrant:latest`
 2. `opea/retriever-qdrant:latest`
 3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest`
+5. `opea/nginx:latest`
 
 ## 🚀 Start Microservices
 
@@ -172,18 +180,7 @@ export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6040"
-export QDRANT_HOST=${host_ip}
-export QDRANT_PORT=6333
 export INDEX_NAME="rag-qdrant"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export EMBEDDING_SERVER_HOST_IP=${host_ip}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVER_HOST_IP=${host_ip}
-export LLM_SERVER_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
