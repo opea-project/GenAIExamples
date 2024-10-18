@@ -5,6 +5,73 @@
 This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to the worker agent and other tools to gather information and come up with answers. The worker agent uses the retrieval tool to generate answers to the queries posted by the supervisor agent. Other tools used by the supervisor agent may include APIs to interface knowledge graphs, SQL databases, external knowledge bases, etc.
 ![Architecture Overview](assets/agent_qna_arch.png)
 
+The AgentQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
+
+```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
+flowchart LR
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+
+    %% Subgraphs %%
+    subgraph DocIndexRetriever-MegaService["DocIndexRetriever MegaService "]
+        direction LR
+        EM([Embedding MicroService]):::blue
+        RET([Retrieval MicroService]):::blue
+        RER([Rerank MicroService]):::blue
+    end
+    subgraph UserInput[" User Input "]
+        direction LR
+        a([User Input Query]):::orchid
+        Ingest([Ingest data]):::orchid
+    end
+    AG_REACT([Agent MicroService - react]):::blue
+    AG_RAG([Agent MicroService - rag]):::blue
+    LLM_gen{{LLM Service <br>}}
+    DP([Data Preparation MicroService]):::blue
+    TEI_RER{{Reranking service<br>}}
+    TEI_EM{{Embedding service <br>}}
+    VDB{{Vector DB<br><br>}}
+    R_RET{{Retriever service <br>}}
+
+
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] --> AG_REACT
+    AG_REACT --> AG_RAG
+    AG_RAG --> DocIndexRetriever-MegaService
+    EM ==> RET
+    RET ==> RER
+    Ingest[Ingest data] --> DP
+
+    %% Embedding service flow
+    direction LR
+    AG_RAG <-.-> LLM_gen
+    AG_REACT <-.-> LLM_gen
+    EM <-.-> TEI_EM
+    RET <-.-> R_RET
+    RER <-.-> TEI_RER
+
+    direction TB
+    %% Vector DB interaction
+    R_RET <-.-> VDB
+    DP <-.-> VDB
+
+
+```
+
 ### Why Agent for question answering?
 
 1. Improve relevancy of retrieved context.
