@@ -158,9 +158,15 @@ Two ways of consuming Document Summarization Service:
 1. Use cURL command on terminal
 
    ```bash
+   #Use English mode (default).
    curl http://${host_ip}:8888/v1/docsum \
        -H "Content-Type: application/json" \
-       -d '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+       -d '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32, "language":"en", "stream":false}'
+
+   #Use Chinese mode.
+   curl http://${host_ip}:8888/v1/docsum \
+       -H "Content-Type: application/json" \
+       -d '{"messages": "2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。","max_tokens":32, "language":"zh", "stream":false}'
    ```
 
 2. Access via frontend
