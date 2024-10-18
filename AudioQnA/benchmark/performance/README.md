@@ -29,7 +29,7 @@ Results will be displayed in the terminal and saved as CSV file named `1_stats.c
 
 ## Getting Started
 
-We recommend using Kubernetes to deploy the AudioQnA service, as it offers benefits such as load balancing and improved scalability. However, you can also deploy the service using Docker if that better suits your needs. 
+We recommend using Kubernetes to deploy the AudioQnA service, as it offers benefits such as load balancing and improved scalability. However, you can also deploy the service using Docker if that better suits your needs.
 
 ### Prerequisites
 
@@ -70,7 +70,7 @@ And then run the benchmark by:
 bash benchmark.sh -n <node_count>
 ```
 
-The argument `-n` refers to the number of test nodes. 
+The argument `-n` refers to the number of test nodes.
 
 ##### 4. Data collection
 
