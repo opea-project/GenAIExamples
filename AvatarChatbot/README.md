@@ -3,6 +3,7 @@
 The AvatarChatbot service can be effortlessly deployed on either Intel Gaudi2 or Intel XEON Scalable Processors.
 
 ## AI Avatar Workflow
+
 The AI Avatar example is implemented using both megaservices and the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different megaservices and microservices for this example.
 
 ```mermaid
@@ -24,7 +25,7 @@ flowchart LR
     classDef invisible fill:transparent,stroke:transparent;
     style AvatarChatbot-Megaservice stroke:#000000
 
-    %% Subgraphs %%    
+    %% Subgraphs %%
     subgraph AvatarChatbot-Megaservice["AvatarChatbot Megaservice"]
         direction LR
         ASR([ASR Microservice]):::blue
@@ -40,7 +41,7 @@ flowchart LR
         UI([UI server<br>]):::orchid
     end
     GW([AvatarChatbot GateWay<br>]):::orange
-    subgraph  
+    subgraph
         direction LR
         X([OPEA Microservice]):::blue
         Y{{Open Source Service}}:::thistle
@@ -48,7 +49,7 @@ flowchart LR
         Z1([UI]):::orchid
     end
 
-    %% Services %%    
+    %% Services %%
     WHISPER{{Whisper service}}:::thistle
     TGI{{LLM service}}:::thistle
     T5{{Speecht5 service}}:::thistle
