@@ -84,7 +84,7 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${LLM_MODEL_ID}
-  chaqna-xeon-backend-server:
+  chatqna-xeon-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
@@ -110,11 +110,11 @@ services:
       - LOGFLAG=${LOGFLAG}
     ipc: host
     restart: always
-  chaqna-xeon-ui-server:
+  chatqna-xeon-ui-server:
     image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     container_name: chatqna-xeon-ui-server
     depends_on:
-      - chaqna-xeon-backend-server
+      - chatqna-xeon-backend-server
     ports:
       - "5173:5173"
     environment:
@@ -127,7 +127,7 @@ services:
       - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
     ipc: host
     restart: always
-chatqna-xeon-nginx-server:
+  chatqna-xeon-nginx-server:
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
     container_name: chatqna-xeon-nginx-server
     depends_on:
