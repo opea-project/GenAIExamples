@@ -1,0 +1,28 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  text2image:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: GenAIComps
+      dockerfile: comps/text2image/Dockerfile
+    image: ${REGISTRY:-opea}/text2image:${TAG:-latest}
+  text2image-gaudi:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: GenAIComps
+      dockerfile: comps/text2image/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/text2image-gaudi:${TAG:-latest}
+  text2image-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: text2image
+    image: ${REGISTRY:-opea}/text2image-ui:${TAG:-latest}
