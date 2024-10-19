@@ -92,6 +92,7 @@ export ANIMATION_SERVICE_PORT=3008
 ```
 
 - Xeon CPU
+
 ```bash
 export DEVICE="cpu"
 export WAV2LIP_PORT=7860

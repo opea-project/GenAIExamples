@@ -71,4 +71,4 @@ services:
       dockerfile: comps/animation/wav2lip/Dockerfile
     extends: avatarchatbot
     image: ${REGISTRY:-opea}/animation:${TAG:-latest}
-  
+
