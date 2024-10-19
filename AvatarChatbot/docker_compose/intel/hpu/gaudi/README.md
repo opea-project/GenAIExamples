@@ -182,7 +182,7 @@ If the megaservice is running properly, you should see the following output:
 "/outputs/result.mp4"
 ```
 
-The output file will be saved in `${PWD}/assets/outputs`, as that folder is mapped to `/outputs` inside the wav2lip-service Docker container.
+The output file will be saved in the current working directory, as `${PWD}` is mapped to `/outputs` inside the wav2lip-service Docker container.
 
 ## Gradio UI
 

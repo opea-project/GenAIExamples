@@ -100,7 +100,7 @@ services:
       - "7860:7860"
     ipc: host
     volumes:
-      - ${PWD}/assets/outputs:/outputs
+      - ${PWD}:/outputs
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
