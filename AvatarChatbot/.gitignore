@@ -1,0 +1,4 @@
+*.safetensors
+*.bin
+*.model
+docker_compose/intel/hpu/gaudi/data

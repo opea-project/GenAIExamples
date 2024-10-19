@@ -111,7 +111,7 @@ export FPS=10
 
 ```bash
 cd GenAIExamples/AvatarChatbot/docker_compose/intel/hpu/gaudi/
-docker compose up -d
+docker compose -f compose.yaml up -d
 ```
 
 ## 🚀 Test MicroServices
@@ -154,7 +154,7 @@ curl http://${host_ip}:3002/v1/audio/speech \
   -H 'Content-Type: application/json'
 
 # animation microservice
-curl http://${ip_address}:9066/v1/animation \
+curl http://${ip_address}:3008/v1/animation \
   -X POST \
   -d @../../../../assets/audio/sample_question.json \
   -H "Content-Type: application/json"
@@ -166,7 +166,7 @@ curl http://${ip_address}:9066/v1/animation \
 ```bash
 curl http://${host_ip}:3009/v1/avatarchatbot \
   -X POST \
-  -d @../../../../assets/audio/sample_whoareyou.json \
+  -d @../../../../assets/audio/sample_question.json \
   -H 'Content-Type: application/json'
 ```
 

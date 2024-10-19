@@ -121,7 +121,7 @@ services:
       - SYS_NICE
     restart: unless-stopped
   animation:
-    image: ${REGISTRY:-opea}/opea/animation:${TAG:-latest}
+    image: ${REGISTRY:-opea}/animation:${TAG:-latest}
     container_name: animation-gaudi-server
     ports:
       - "3008:9066"
@@ -139,7 +139,7 @@ services:
       - SYS_NICE
     restart: unless-stopped
   avatarchatbot-gaudi-backend-server:
-    image: ${REGISTRY:-opea}/opea/avatarchatbot:${TAG:-latest}
+    image: ${REGISTRY:-opea}/avatarchatbot:${TAG:-latest}
     container_name: avatarchatbot-gaudi-backend-server
     depends_on:
       - asr
