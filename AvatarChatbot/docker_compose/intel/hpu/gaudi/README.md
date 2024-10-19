@@ -76,7 +76,7 @@ export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
 
 export ASR_ENDPOINT=http://$host_ip:7066
 export TTS_ENDPOINT=http://$host_ip:7055
-export ANIMATION_ENDPOINT=http://$host_ip:9066
+export WAV2LIP_ENDPOINT=http://$host_ip:7860
 
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export ASR_SERVICE_HOST_IP=${host_ip}
@@ -88,7 +88,7 @@ export MEGA_SERVICE_PORT=3009
 export ASR_SERVICE_PORT=3001
 export TTS_SERVICE_PORT=3002
 export LLM_SERVICE_PORT=3007
-export ANIMATION_SERVICE_PORT=3008
+export ANIMATION_SERVICE_PORT=9066
 ```
 
 ```bash
@@ -97,11 +97,11 @@ export WAV2LIP_PORT=7860
 export ANIMATION_PORT=9066
 export INFERENCE_MODE='wav2lip+gfpgan'
 export CHECKPOINT_PATH='/usr/local/lib/python3.10/dist-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
-export FACE="comps/animation/wav2lip/assets/img/avatar1.jpg"
+export FACE="assets/img/avatar5.png"
 # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
 export AUDIO='None'
 export FACESIZE=96
-export OUTFILE="comps/animation/wav2lip/assets/outputs/result.mp4"
+export OUTFILE="/outputs/result.mp4"
 export GFPGAN_MODEL_VERSION=1.4 # latest version, can roll back to v1.3 if needed
 export UPSCALE_FACTOR=1
 export FPS=10
@@ -154,9 +154,10 @@ curl http://${host_ip}:3002/v1/audio/speech \
   -H 'Content-Type: application/json'
 
 # animation microservice
-curl http://${ip_address}:3008/v1/animation \
+cd ../../../..
+curl http://${host_ip}:9066/v1/animation \
   -X POST \
-  -d @../../../../assets/audio/sample_question.json \
+  -d @assets/audio/sample_question.json \
   -H "Content-Type: application/json"
 
 ```
@@ -166,7 +167,7 @@ curl http://${ip_address}:3008/v1/animation \
 ```bash
 curl http://${host_ip}:3009/v1/avatarchatbot \
   -X POST \
-  -d @../../../../assets/audio/sample_question.json \
+  -d @assets/audio/sample_question.json \
   -H 'Content-Type: application/json'
 ```
 
@@ -176,7 +177,7 @@ If the megaservice is running properly, you should see the following output:
 "/outputs/result.mp4"
 ```
 
-The output file will be saved in the current directory, because `${PWD}` is mapped to `/outputs` inside the avatarchatbot-backend-service Docker container.
+The output file will be saved in `${PWD}/assets/outputs`, as that folder is mapped to `/outputs` inside the wav2lip-service Docker container.
 
 ## Gradio UI
 
