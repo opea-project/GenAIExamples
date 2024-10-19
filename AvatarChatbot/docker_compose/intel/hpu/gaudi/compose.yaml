@@ -126,7 +126,7 @@ services:
     image: ${REGISTRY:-opea}/animation:${TAG:-latest}
     container_name: animation-gaudi-server
     ports:
-      - "9066:9066"
+      - "3008:9066"
     ipc: host
     environment:
       no_proxy: ${no_proxy}

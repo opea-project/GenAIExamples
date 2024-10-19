@@ -84,17 +84,16 @@ export TTS_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export ANIMATION_SERVICE_HOST_IP=${host_ip}
 
-export MEGA_SERVICE_PORT=3009
+export MEGA_SERVICE_PORT=8888
 export ASR_SERVICE_PORT=3001
 export TTS_SERVICE_PORT=3002
 export LLM_SERVICE_PORT=3007
-export ANIMATION_SERVICE_PORT=9066
+export ANIMATION_SERVICE_PORT=3008
 ```
 
 ```bash
 export DEVICE="hpu"
 export WAV2LIP_PORT=7860
-export ANIMATION_PORT=9066
 export INFERENCE_MODE='wav2lip+gfpgan'
 export CHECKPOINT_PATH='/usr/local/lib/python3.10/dist-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
 export FACE="assets/img/avatar5.png"
@@ -153,9 +152,15 @@ curl http://${host_ip}:3002/v1/audio/speech \
   -d '{"text": "Who are you?"}' \
   -H 'Content-Type: application/json'
 
-# animation microservice
+# wav2lip service
 cd ../../../..
-curl http://${host_ip}:9066/v1/animation \
+curl http://${host_ip}:7860/v1/wav2lip \
+  -X POST \
+  -d @assets/audio/sample_minecraft.json \
+  -H 'Content-Type: application/json'
+
+# animation microservice
+curl http://${host_ip}:3008/v1/animation \
   -X POST \
   -d @assets/audio/sample_question.json \
   -H "Content-Type: application/json"
@@ -167,7 +172,7 @@ curl http://${host_ip}:9066/v1/animation \
 ```bash
 curl http://${host_ip}:3009/v1/avatarchatbot \
   -X POST \
-  -d @assets/audio/sample_question.json \
+  -d @assets/audio/sample_whoareyou.json \
   -H 'Content-Type: application/json'
 ```
 
@@ -181,7 +186,7 @@ The output file will be saved in `${PWD}/assets/outputs`, as that folder is mapp
 
 ## Gradio UI
 
-Follow the instructions in [Set the environment variables](#set-the-environment-variables) to set the environment variables. Follow [Start the MegaService](#start-the-megaservice) to start the MegaService. Then run the following command to start the Gradio UI:
+Follow the instructions in [Build Mega Service of AudioQnA on Gaudi](https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker_compose/intel/hpu/gaudi/README.md) to build necessary Docker images and start the AudioQnA MegaService with the endpoint `http://localhost:3008/v1/audioqna`. Then run the following command to start the Gradio UI:
 
 ```bash
 cd GenAIExamples/AvatarChatbot/docker/ui/gradio

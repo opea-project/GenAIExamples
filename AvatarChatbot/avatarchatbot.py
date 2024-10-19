@@ -21,7 +21,7 @@ ANIMATION_SERVICE_PORT = int(os.getenv("ANIMATION_SERVICE_PORT", 9066))
 
 def check_env_vars(env_var_list):
     for var in env_var_list:
-        if not os.getenv(var):
+        if os.getenv(var) is None:
             print(f"Error: The environment variable '{var}' is not set.")
             sys.exit(1)  # Exit the program with a non-zero status code
     print("All environment variables are set.")
@@ -76,16 +76,16 @@ class AvatarChatbotService:
 if __name__ == "__main__":
     check_env_vars(
         [
-            MEGA_SERVICE_HOST_IP,
-            MEGA_SERVICE_PORT,
-            ASR_SERVICE_HOST_IP,
-            ASR_SERVICE_PORT,
-            LLM_SERVICE_HOST_IP,
-            LLM_SERVICE_PORT,
-            TTS_SERVICE_HOST_IP,
-            TTS_SERVICE_PORT,
-            ANIMATION_SERVICE_HOST_IP,
-            ANIMATION_SERVICE_PORT,
+            "MEGA_SERVICE_HOST_IP",
+            "MEGA_SERVICE_PORT",
+            "ASR_SERVICE_HOST_IP",
+            "ASR_SERVICE_PORT",
+            "LLM_SERVICE_HOST_IP",
+            "LLM_SERVICE_PORT",
+            "TTS_SERVICE_HOST_IP",
+            "TTS_SERVICE_PORT",
+            "ANIMATION_SERVICE_HOST_IP",
+            "ANIMATION_SERVICE_PORT",
         ]
     )
 
