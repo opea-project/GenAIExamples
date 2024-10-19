@@ -1,6 +1,6 @@
-# Build Mega Service of AvatarChatbot on Gaudi
+# Build Mega Service of AvatarChatbot on Xeon
 
-This document outlines the deployment process for a AvatarChatbot application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server.
+This document outlines the deployment process for a AvatarChatbot application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server.
 
 ## 🚀 Build Docker images
 
@@ -14,7 +14,7 @@ cd GenAIComps
 ### 2. Build ASR Image
 
 ```bash
-docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile.intel_hpu .
+docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
 
 
 docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile .
@@ -29,7 +29,7 @@ docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_pr
 ### 4. Build TTS Image
 
 ```bash
-docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/dependency/Dockerfile.intel_hpu .
+docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/dependency/Dockerfile .
 
 docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile .
 ```
@@ -37,7 +37,7 @@ docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg
 ### 5. Build Animation Image
 
 ```bash
-docker build -t opea/wav2lip-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/wav2lip/dependency/Dockerfile.intel_hpu .
+docker build -t opea/wav2lip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/wav2lip/dependency/Dockerfile .
 
 docker build -t opea/animation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/wav2lip/Dockerfile .
 ```
@@ -54,12 +54,12 @@ docker build --no-cache -t opea/avatarchatbot:latest --build-arg https_proxy=$ht
 
 Then run the command `docker images`, you will have following images ready:
 
-1. `opea/whisper-gaudi:latest`
+1. `opea/whisper:latest`
 2. `opea/asr:latest`
 3. `opea/llm-tgi:latest`
-4. `opea/speecht5-gaudi:latest`
+4. `opea/speecht5:latest`
 5. `opea/tts:latest`
-6. `opea/wav2lip-gaudi:latest`
+6. `opea/wav2lip:latest`
 7. `opea/animation:latest`
 8. `opea/avatarchatbot:latest`
 
@@ -91,12 +91,12 @@ export LLM_SERVICE_PORT=3007
 export ANIMATION_SERVICE_PORT=3008
 ```
 
-- Gaudi2 HPU
+- Xeon CPU
 ```bash
-export DEVICE="hpu"
+export DEVICE="cpu"
 export WAV2LIP_PORT=7860
 export INFERENCE_MODE='wav2lip+gfpgan'
-export CHECKPOINT_PATH='/usr/local/lib/python3.10/dist-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
+export CHECKPOINT_PATH='/usr/local/lib/python3.11/site-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
 export FACE="assets/img/avatar5.png"
 # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
 export AUDIO='None'
@@ -110,7 +110,7 @@ export FPS=10
 ## 🚀 Start the MegaService
 
 ```bash
-cd GenAIExamples/AvatarChatbot/docker_compose/intel/hpu/gaudi/
+cd GenAIExamples/AvatarChatbot/docker_compose/intel/cpu/xeon/
 docker compose -f compose.yaml up -d
 ```
 
@@ -194,8 +194,6 @@ cd GenAIExamples/AvatarChatbot/docker/ui/gradio
 python3 app_gradio_demo.py
 ```
 
-The UI can be viewed at http://${host_ip}:7861
-
 ## Troubleshooting
 
 ```bash
@@ -204,5 +202,5 @@ export IMAGE_REPO="opea"
 export IMAGE_TAG="latest"
 export HUGGINGFACEHUB_API_TOKEN=<your_hf_token>
 
-test_avatarchatbot_on_gaudi.sh
+test_avatarchatbot_on_xeon.sh
 ```

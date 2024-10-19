@@ -68,3 +68,38 @@ flowchart LR
     USER2 -->|1| UI
     UI <-.->|6'| WAV2LIP
 ```
+
+## Deploy AvatarChatbot Service
+
+The AvatarChatbot service can be deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
+
+### Deploy AvatarChatbot on Gaudi
+
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instructions on deploying AvatarChatbot on Gaudi.
+
+### Deploy AvatarChatbot on Xeon
+
+Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for instructions on deploying AvatarChatbot on Xeon.
+
+## Supported Models
+
+### ASR
+
+The default model is [openai/whisper-small](https://huggingface.co/openai/whisper-small). It also supports all models in the Whisper family, such as `openai/whisper-large-v3`, `openai/whisper-medium`, `openai/whisper-base`, `openai/whisper-tiny`, etc.
+
+To replace the model, please edit the `compose.yaml` and add the `command` line to pass the name of the model you want to use:
+
+```yaml
+services:
+  whisper-service:
+    ...
+    command: --model_name_or_path openai/whisper-tiny
+```
+
+### TTS
+
+The default model is [microsoft/SpeechT5](https://huggingface.co/microsoft/speecht5_tts). We currently do not support replacing the model. More models under the commercial license will be added in the future.
+
+### Animation
+
+The default model is [Rudrabha/Wav2Lip](https://github.com/Rudrabha/Wav2Lip) and [TencentARC/GFPGAN](https://github.com/TencentARC/GFPGAN). We currently do not support replacing the model. More models under the commercial license such as [OpenTalker/SadTalker](https://github.com/OpenTalker/SadTalker) will be added in the future.
