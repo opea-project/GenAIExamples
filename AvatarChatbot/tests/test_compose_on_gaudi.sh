@@ -85,8 +85,7 @@ function start_services() {
         docker logs llm-tgi-gaudi-server > $LOG_PATH/llm_tgi_gaudi_server_start.log
         docker logs asr-service > $LOG_PATH/asr_service_start.log
 
-        if grep -q Connected $LOG_PATH/llm_tgi_gaudi_server_start.log && \
-            grep -q "initialized" $LOG_PATH/asr_service_start.log && \
+        if grep -q Connected $LOG_PATH/llm_tgi_gaudi_server_start.log && grep -q "initialized" $LOG_PATH/asr_service_start.log; then
             break
         fi
        sleep 1m
