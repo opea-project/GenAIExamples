@@ -42,7 +42,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
-    export HUGGINGFACEHUB_API_TOKEN=<your_hf_token>
+    export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
     export host_ip=$(hostname -I | awk '{print $1}')
 
     export TGI_LLM_ENDPOINT=http://$host_ip:3006
