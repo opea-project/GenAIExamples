@@ -17,7 +17,6 @@ config:
     fontSize: 42px
 ---
 flowchart LR
-    %% Colors %%
     classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef thistle fill:#D8BFD8,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
@@ -25,7 +24,6 @@ flowchart LR
     classDef invisible fill:transparent,stroke:transparent;
     style AvatarChatbot-Megaservice stroke:#000000
 
-    %% Subgraphs %%
     subgraph AvatarChatbot-Megaservice["AvatarChatbot Megaservice"]
         direction LR
         ASR([ASR Microservice]):::blue
@@ -41,7 +39,7 @@ flowchart LR
         UI([UI server<br>]):::orchid
     end
     GW([AvatarChatbot GateWay<br>]):::orange
-    subgraph
+    subgraph  
         direction LR
         X([OPEA Microservice]):::blue
         Y{{Open Source Service}}:::thistle
@@ -49,7 +47,6 @@ flowchart LR
         Z1([UI]):::orchid
     end
 
-    %% Services %%
     WHISPER{{Whisper service}}:::thistle
     TGI{{LLM service}}:::thistle
     T5{{Speecht5 service}}:::thistle
