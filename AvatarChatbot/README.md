@@ -71,5 +71,3 @@ flowchart LR
     USER2 -->|1| UI
     UI <-.->|6'| WAV2LIP
 ```
-
-

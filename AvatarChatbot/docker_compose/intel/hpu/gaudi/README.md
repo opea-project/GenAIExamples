@@ -157,7 +157,7 @@ curl http://${host_ip}:3002/v1/audio/speech \
 curl http://${ip_address}:9066/v1/animation \
   -X POST \
   -d @../../../../assets/audio/sample_question.json \
-  -H "Content-Type: application/json" 
+  -H "Content-Type: application/json"
 
 ```
 
