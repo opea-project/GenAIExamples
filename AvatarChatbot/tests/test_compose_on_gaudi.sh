@@ -44,41 +44,41 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker/gaudi
 
-    export ip_address=$(hostname -I | awk '{print $1}')
     export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
+    export host_ip=$(hostname -I | awk '{print $1}')
 
-    export TGI_LLM_ENDPOINT=http://$ip_address:3006
+    export TGI_LLM_ENDPOINT=http://$host_ip:3006
     export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-    export ASR_ENDPOINT=http://$ip_address:7066
-    export TTS_ENDPOINT=http://$ip_address:7055
-    export ANIMATION_ENDPOINT=http://$ip_address:3008
 
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export ASR_SERVICE_HOST_IP=${ip_address}
-    export TTS_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export ANIMATION_SERVICE_HOST_IP=${ip_address}
+    export ASR_ENDPOINT=http://$host_ip:7066
+    export TTS_ENDPOINT=http://$host_ip:7055
+    export ANIMATION_ENDPOINT=http://$host_ip:9066
 
-    export MEGA_SERVICE_PORT=8888
+    export MEGA_SERVICE_HOST_IP=${host_ip}
+    export ASR_SERVICE_HOST_IP=${host_ip}
+    export TTS_SERVICE_HOST_IP=${host_ip}
+    export LLM_SERVICE_HOST_IP=${host_ip}
+    export ANIMATION_SERVICE_HOST_IP=${host_ip}
+
+    export MEGA_SERVICE_PORT=3009
     export ASR_SERVICE_PORT=3001
     export TTS_SERVICE_PORT=3002
     export LLM_SERVICE_PORT=3007
     export ANIMATION_SERVICE_PORT=3008
 
-    export ANIMATION_PORT=7860
-    # export INFERENCE_MODE='wav2clip+gfpgan'
-    export INFERENCE_MODE='wav2clip_only'
-    export CHECKPOINT_PATH='src/Wav2Lip/checkpoints/wav2lip_gan.pth'
-    export FACE='assets/avatar1.jpg'
-    # export AUDIO='assets/eg3_ref.wav' # audio file path is optional, will use base64str as input if is 'None'
+    export DEVICE="hpu"
+    export WAV2LIP_PORT=7860
+    export ANIMATION_PORT=9066
+    export INFERENCE_MODE='wav2lip+gfpgan'
+    export CHECKPOINT_PATH='/usr/local/lib/python3.10/dist-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
+    export FACE="comps/animation/wav2lip/assets/img/avatar1.jpg"
+    # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
     export AUDIO='None'
     export FACESIZE=96
-    export OUTFILE='/outputs/result.mp4'
-    export GFPGAN_MODEL_VERSION=1.3
+    export OUTFILE="comps/animation/wav2lip/assets/outputs/result.mp4"
+    export GFPGAN_MODEL_VERSION=1.4 # latest version, can roll back to v1.3 if needed
     export UPSCALE_FACTOR=1
     export FPS=10
-
-    # sed -i "s/backend_address/$ip_address/g" $WORKPATH/docker/ui/svelte/.env
 
     if [[ "$IMAGE_REPO" != "" ]]; then
         # Replace the container name with a test-specific name
@@ -134,28 +134,7 @@ function validate_megaservice() {
 }
 
 #function validate_frontend() {
-#    cd $WORKPATH/docker/ui/svelte
-#    local conda_env_name="OPEA_e2e"
-#    export PATH=${HOME}/miniforge3/bin/:$PATH
-##    conda remove -n ${conda_env_name} --all -y
-##    conda create -n ${conda_env_name} python=3.12 -y
-#    source activate ${conda_env_name}
-#
-#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-#
-##    conda install -c conda-forge nodejs -y
-#    npm install && npm ci && npx playwright install --with-deps
-#    node -v && npm -v && pip list
-#
-#    exit_status=0
-#    npx playwright test || exit_status=$?
-#
-#    if [ $exit_status -ne 0 ]; then
-#        echo "[TEST INFO]: ---------frontend test failed---------"
-#        exit $exit_status
-#    else
-#        echo "[TEST INFO]: ---------frontend test passed---------"
-#    fi
+
 #}
 
 function stop_docker() {
@@ -168,13 +147,13 @@ function main() {
     stop_docker
     if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
     start_services
-
-    # validate_microservices
+    validate_microservices
     validate_megaservice
     # validate_frontend
 
     stop_docker
-    echo y | docker system prune
+    echo y | docker builder prune --all
+    echo y | docker image prune
 
 }
 
