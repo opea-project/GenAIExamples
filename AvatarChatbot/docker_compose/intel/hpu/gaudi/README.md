@@ -92,6 +92,7 @@ export ANIMATION_SERVICE_PORT=3008
 ```
 
 - Xeon CPU
+
 ```bash
 export DEVICE="cpu"
 export WAV2LIP_PORT=7860
@@ -108,6 +109,7 @@ export FPS=10
 ```
 
 - Gaudi2 HPU
+
 ```bash
 export DEVICE="hpu"
 export WAV2LIP_PORT=7860
