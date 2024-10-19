@@ -39,7 +39,7 @@ flowchart LR
         UI([UI server<br>]):::orchid
     end
     GW([AvatarChatbot GateWay<br>]):::orange
-    subgraph  
+    subgraph
         direction LR
         X([OPEA Microservice]):::blue
         Y{{Open Source Service}}:::thistle
