@@ -92,6 +92,7 @@ export ANIMATION_SERVICE_PORT=3008
 ```
 
 - Gaudi2 HPU
+
 ```bash
 export DEVICE="hpu"
 export WAV2LIP_PORT=7860
