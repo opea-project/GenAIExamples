@@ -94,8 +94,8 @@ def resize_image(image_pil, size=(720, 720)):
 
 def resize_video(video_path, save_path, size=(720, 1280)):
     """Resize the video to the specified size."""
-    command_resize_video = f"ffmpeg -y -i {video_path} -vf scale={size[0]}:{size[1]} {save_path}"
-    subprocess.run(command_resize_video, shell=True)
+    # command_resize_video = f"ffmpeg -y -i {video_path} -vf scale={size[0]}:{size[1]} {save_path}"
+    # subprocess.run(command_resize_video, shell=True)
 
 
 # %% Wav2Lip functions
@@ -133,8 +133,8 @@ async def gen_video(image, audio, model_choice):
 
     # 2. Run inference.sh bash script to perform Wav2Lip+GFPGAN inference
     # Output video is saved at the path 'OUTFILE'
-    command_wav2lip_gfpgan = "bash inference_vars.sh"
-    subprocess.run(command_wav2lip_gfpgan, shell=True)
+    # command_wav2lip_gfpgan = "bash inference_vars.sh"
+    # subprocess.run(command_wav2lip_gfpgan, shell=True)
 
     outfile = os.environ.get("OUTFILE")
     if os.path.exists(outfile):
