@@ -6,13 +6,7 @@ import json
 import os
 import re
 
-from comps import (
-    Gateway,
-    MicroService,
-    ServiceOrchestrator,
-    ServiceType,
-    MegaServiceEndpoint,
-)
+from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -21,7 +15,6 @@ from comps.cores.proto.api_protocol import (
     UsageInfo,
 )
 from comps.cores.proto.docarray import LLMParams, RerankerParms, RetrieverParms
-
 from langchain_core.prompts import PromptTemplate
 
 
@@ -195,12 +188,13 @@ class ChatQnAService(Gateway):
         ServiceOrchestrator.align_outputs = align_outputs
         ServiceOrchestrator.align_generator = align_generator
 
-        super().__init__(megaservice=ServiceOrchestrator(),
+        super().__init__(
+            megaservice=ServiceOrchestrator(),
             host=self.host,
             port=self.port,
             endpoint=str(MegaServiceEndpoint.CHAT_QNA),
-            input_datatype=ChatCompletionRequest, 
-            output_datatype=ChatCompletionResponse
+            input_datatype=ChatCompletionRequest,
+            output_datatype=ChatCompletionResponse,
         )
 
     def add_remote_service(self):
@@ -382,6 +376,7 @@ class ChatQnAService(Gateway):
             )
         )
         return ChatCompletionResponse(model="chatqna", choices=choices, usage=usage)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
