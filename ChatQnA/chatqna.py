@@ -5,6 +5,8 @@ import argparse
 import json
 import os
 import re
+from fastapi import Request
+from fastapi.responses import StreamingResponse
 
 from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
 from comps.cores.proto.api_protocol import (
