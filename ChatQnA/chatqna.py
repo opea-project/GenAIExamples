@@ -5,8 +5,6 @@ import argparse
 import json
 import os
 import re
-from fastapi import Request
-from fastapi.responses import StreamingResponse
 
 from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
 from comps.cores.proto.api_protocol import (
@@ -17,6 +15,8 @@ from comps.cores.proto.api_protocol import (
     UsageInfo,
 )
 from comps.cores.proto.docarray import LLMParams, RerankerParms, RetrieverParms
+from fastapi import Request
+from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 
 
