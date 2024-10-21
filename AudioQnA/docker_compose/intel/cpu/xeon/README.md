@@ -127,6 +127,10 @@ curl http://${host_ip}:3002/v1/audio/speech \
 
 ## 🚀 Test MegaService
 
+Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the
+base64 string to the megaservice endpoint. The megaservice will return a spoken response as a base64 string. To listen
+to the response, decode the base64 string and save it as a .wav file.
+
 ```bash
 curl http://${host_ip}:3008/v1/audioqna \
   -X POST \
