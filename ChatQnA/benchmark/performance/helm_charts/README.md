@@ -20,7 +20,7 @@ HUGGINGFACEHUB_API_TOKEN: hf_xxxxx
 ```bash
 # Deploy a ChatQnA pipeline using the specified YAML configuration.
 # To deploy with different configurations, simply provide a different YAML file.
-helm install chatqna helm_charts/ -f customize.yaml
+helm install chatqna ../helm_charts/ -f customize.yaml
 ```
 
 Notes: The provided [BKC manifests](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/benchmark) for single, two, and four node Kubernetes clusters are generated using this tool.
