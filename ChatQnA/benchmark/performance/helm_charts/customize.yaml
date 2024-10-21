@@ -1,8 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-
 podSpecs:
   - name: chatqna-backend-server-deploy
     replicas: 2

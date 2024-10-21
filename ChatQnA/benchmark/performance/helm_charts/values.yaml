@@ -9,6 +9,7 @@ config:
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
   LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
   RERANK_MODEL_ID: BAAI/bge-reranker-base
+  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 
 microservices:
   - name: chatqna-backend-server-deploy
@@ -76,8 +77,6 @@ microservices:
         value: habana
       - name: HABANA_VISIBLE_DEVICES
         value: all
-      - name: HF_TOKEN
-        value: ${HF_TOKEN}
       - name: MAX_WARMUP_SEQUENCE_LENGTH
         value: "512"
     volumeMounts:
@@ -119,8 +118,6 @@ microservices:
         value: habana
       - name: HABANA_VISIBLE_DEVICES
         value: all
-      - name: HF_TOKEN
-        value: ${HF_TOKEN}
     volumeMounts:
       - mountPath: /data
         name: model-volume
