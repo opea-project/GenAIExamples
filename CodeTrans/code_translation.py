@@ -15,7 +15,6 @@ from comps.cores.proto.api_protocol import (
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
-
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 7777))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
