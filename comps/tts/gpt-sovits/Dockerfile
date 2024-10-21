@@ -8,8 +8,12 @@ RUN useradd -m -s /bin/bash user && \
 
 # Install system dependencies
 RUN apt-get update && \
-    apt-get install -y ffmpeg git-lfs git wget vim build-essential && \
+    apt-get install -y ffmpeg git-lfs git wget vim build-essential numactl && \
+    apt-get install -y libomp-dev google-perftools && \
     pip install --upgrade pip
+
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libiomp5.so:/usr/lib/x86_64-linux-gnu/libtcmalloc.so.4
+ENV MALLOC_CONF="oversize_threshold:1,background_thread:true,metadata_thp:auto,dirty_decay_ms:9000000000,muzzy_decay_ms:9000000000"
 
 # Clone source repo
 RUN git clone https://github.com/RVC-Boss/GPT-SoVITS.git
