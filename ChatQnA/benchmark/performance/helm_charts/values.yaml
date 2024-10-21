@@ -19,31 +19,31 @@ deployments:
         - containerPort: 8888
 
   - name: dataprep-deploy
+    image: opea/dataprep-redis:latest
+    replicas: 1
     spec:
-      image: opea/dataprep-redis:latest
-      replicas: 1
       ports:
         - containerPort: 6007
 
   - name: vector-db
+    image: redis/redis-stack:7.2.0-v9
+    replicas: 1
     spec:
-      image: redis/redis-stack:7.2.0-v9
-      replicas: 1
       ports:
         - containerPort: 6379
         - containerPort: 8001
 
   - name: retriever-deploy
+    image: opea/retriever-redis:latest
+    replicas: 1
     spec:
-      image: opea/retriever-redis:latest
-      replicas: 1
       ports:
         - containerPort: 7000
 
   - name: embedding-dependency-deploy
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    replicas: 1
     spec:
-      image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-      replicas: 1
       ports:
         - containerPort: 80
       args:
@@ -66,9 +66,9 @@ deployments:
           name: shm
 
   - name: reranking-dependency-deploy
+    image: opea/tei-gaudi:latest
+    replicas: 1
     spec:
-      image: opea/tei-gaudi:latest
-      replicas: 1
       args:
         - name: "--model-id"
         - value: $(RERANK_MODEL_ID)
@@ -102,9 +102,9 @@ deployments:
           name: shm
 
   - name: llm-dependency-deploy
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.4
+    replicas: 1
     spec:
-      image: ghcr.io/huggingface/tgi-gaudi:2.0.4
-      replicas: 1
       ports:
         - containerPort: 80
       resources:
