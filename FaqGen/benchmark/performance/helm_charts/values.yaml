@@ -6,7 +6,7 @@ namespace: default
 config:
   LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
   CONFIG_MAP_NAME: faq-config
-  NODE_SELECTOR: faq-opea
+  NODE_SELECTOR: opea
   HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 
 microservices:

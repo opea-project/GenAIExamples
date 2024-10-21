@@ -5,7 +5,7 @@ namespace: default
 
 config:
   CONFIG_MAP_NAME: chatqna-config
-  NODE_SELECTOR: chatqna-opea
+  NODE_SELECTOR: opea
   EMBEDDING_MODEL_ID: BAAI/bge-base-en-v1.5
   LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
   RERANK_MODEL_ID: BAAI/bge-reranker-base

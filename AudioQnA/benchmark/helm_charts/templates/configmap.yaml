@@ -7,7 +7,7 @@ metadata:
   name: {{ .Values.config.CONFIG_MAP_NAME }}
   namespace: default
 data:
-  HUGGINGFACEHUB_API_TOKEN: {{ .Values.HUGGINGFACEHUB_API_TOKEN }}
+  HUGGINGFACEHUB_API_TOKEN: {{ .Values.config.HUGGINGFACEHUB_API_TOKEN }}
   LLM_MODEL_ID: {{ .Values.config.LLM_MODEL_ID }}
   NODE_SELECTOR: {{ .Values.config.NODE_SELECTOR }}
   TGI_LLM_ENDPOINT: http://faq-tgi-svc.default.svc.cluster.local:8010

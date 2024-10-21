@@ -6,7 +6,7 @@ namespace: default
 config:
   LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
   CONFIG_MAP_NAME: audio-qna-config
-  NODE_SELECTOR: audioqna-opea
+  NODE_SELECTOR: opea
   ASR_ENDPOINT: http://whisper-svc.default.svc.cluster.local:7066
   TTS_ENDPOINT: http://speecht5-svc.default.svc.cluster.local:7055
   TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:3006
@@ -17,101 +17,115 @@ config:
   LLM_SERVICE_PORT: "3007"
   TTS_SERVICE_HOST_IP: tts-svc
   TTS_SERVICE_PORT: "3002"
+  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 
-deployments:
+microservices:
   - name: audioqna-backend-server-deploy
-    spec:
-      ports:
-        - containerPort: 8888
+    image: opea/audioqna:latest
+    replicas: 1
+    ports:
+      - containerPort: 8888
 
   - name: asr-deploy
-    spec:
-      ports:
-        - containerPort: 9099
+    image: opea/asr:latest
+    replicas: 1
+    ports:
+      - containerPort: 9099
 
   - name: whisper-deploy
-    spec:
-      ports:
-        - containerPort: 7066
-      env:
-        - name: OMPI_MCA_btl_vader_single_copy_mechanism
-          value: none
-        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
-          value: 'true'
-        - name: runtime
-          value: habana
-        - name: HABANA_VISIBLE_DEVICES
-          value: all
+    image: opea/whisper-gaudi:latest
+    replicas: 1
+    ports:
+      - containerPort: 7066
+    env:
+      - name: OMPI_MCA_btl_vader_single_copy_mechanism
+        value: none
+      - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+        value: 'true'
+      - name: runtime
+        value: habana
+      - name: HABANA_VISIBLE_DEVICES
+        value: all
+    resources:
+      limits:
+        habana.ai/gaudi: 1
 
   - name: tts-deploy
-    spec:
-      ports:
-        - containerPort: 9088
-
-  - name: llm-deploy
-    spec:
-      ports:
-        - containerPort: 9000
+    image: opea/tts:latest
+    replicas: 1
+    ports:
+      - containerPort: 9088
 
   - name: speecht5-deploy
-    spec:
-      ports:
-        - containerPort: 7055
-      env:
-        - name: OMPI_MCA_btl_vader_single_copy_mechanism
-          value: none
-        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
-          value: 'true'
-        - name: runtime
-          value: habana
-        - name: HABANA_VISIBLE_DEVICES
-          value: all
+    image: opea/speecht5-gaudi:latest
+    replicas: 1
+    ports:
+      - containerPort: 7055
+    env:
+      - name: OMPI_MCA_btl_vader_single_copy_mechanism
+        value: none
+      - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+        value: 'true'
+      - name: runtime
+        value: habana
+      - name: HABANA_VISIBLE_DEVICES
+        value: all
+    resources:
+      limits:
+        habana.ai/gaudi: 1
 
+  - name: llm-deploy
+    image: opea/llm-tgi:latest
+    replicas: 1
+    ports:
+      - containerPort: 9000
+      
   - name: llm-dependency-deploy
-    spec:
-      ports:
-        - containerPort: 80
-      resources:
-        limits:
-          habana.ai/gaudi: 1
-      args:
-        - name: "--model-id"
-          value: $(LLM_MODEL_ID)
-        - name: "--max-input-length"
-          value: "2048"
-        - name: "--max-total-tokens"
-          value: "4096"
-      env:
-        - name: OMPI_MCA_btl_vader_single_copy_mechanism
-          value: none
-        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
-          value: "true"
-        - name: runtime
-          value: habana
-        - name: HABANA_VISIBLE_DEVICES
-          value: all
-        - name: ENABLE_HPU_GRAPH
-          value: 'true'
-        - name: LIMIT_HPU_GRAPH
-          value: 'true'
-        - name: USE_FLASH_ATTENTION
-          value: 'true'
-        - name: FLASH_ATTENTION_RECOMPUTE
-          value: 'true'
-      volumeMounts:
-        - mountPath: /data
-          name: model-volume
-        - mountPath: /dev/shm
-          name: shm
-      volumes:
-        - hostPath:
-            path: /mnt/models
-            type: Directory
-          name: model-volume
-        - emptyDir:
-            medium: Memory
-            sizeLimit: 1Gi
-          name: shm
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+    replicas: 1
+    ports:
+      - containerPort: 80
+    resources:
+      limits:
+        habana.ai/gaudi: 1
+    args:
+      - name: "--model-id"
+        value: $(LLM_MODEL_ID)
+      - name: "--max-input-length"
+        value: "2048"
+      - name: "--max-total-tokens"
+        value: "4096"
+    env:
+      - name: OMPI_MCA_btl_vader_single_copy_mechanism
+        value: none
+      - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+        value: "true"
+      - name: runtime
+        value: habana
+      - name: HABANA_VISIBLE_DEVICES
+        value: all
+      - name: ENABLE_HPU_GRAPH
+        value: 'true'
+      - name: LIMIT_HPU_GRAPH
+        value: 'true'
+      - name: USE_FLASH_ATTENTION
+        value: 'true'
+      - name: FLASH_ATTENTION_RECOMPUTE
+        value: 'true'
+    volumeMounts:
+      - mountPath: /data
+        name: model-volume
+      - mountPath: /dev/shm
+        name: shm
+    volumes:
+      - hostPath:
+          path: /mnt/models
+          type: Directory
+        name: model-volume
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+        name: shm
 
 services:
   - name: asr-svc
