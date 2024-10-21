@@ -36,6 +36,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       PORT: ${EMBEDDER_PORT}
+    entrypoint: ["python", "bridgetower_server.py", "--device", "hpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
     restart: unless-stopped
   embedding-multimodal:
     image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
