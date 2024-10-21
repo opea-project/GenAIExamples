@@ -79,7 +79,7 @@ microservices:
     replicas: 1
     ports:
       - containerPort: 9000
-      
+
   - name: llm-dependency-deploy
     image: ghcr.io/huggingface/tgi-gaudi:2.0.5
     replicas: 1
@@ -178,7 +178,7 @@ services:
         app: llm-dependency-deploy
       type: ClusterIP
 
-    - name: llm-svc
+  - name: llm-svc
     spec:
       ports:
         - name: service
