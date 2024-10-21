@@ -10,7 +10,7 @@ config:
   LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
   RERANK_MODEL_ID: BAAI/bge-reranker-base
 
-deployments:
+microservices:
   - name: chatqna-backend-server-deploy
     image: opea/chatqna:latest
     replicas: 1
