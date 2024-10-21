@@ -1,0 +1,42 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+podSpecs:
+  - name: chatqna-backend-server-deploy
+    replicas: 2
+    resources:
+      limits:
+        cpu: "16"
+        memory: "8000Mi"
+      requests:
+        cpu: "16"
+        memory: "8000Mi"
+
+  - name: embedding-dependency-deploy
+    replicas: 1
+    resources:
+      limits:
+        cpu: "80"
+        memory: "20000Mi"
+      requests:
+        cpu: "80"
+        memory: "20000Mi"
+
+  - name: llm-dependency-deploy
+    replicas: 8
+    resources:
+      limits:
+        habana.ai/gaudi: 1
+
+  - name: dataprep-deploy
+    replicas: 1
+
+  - name: vector-db
+    replicas: 1
+
+  - name: retriever-deploy
+    replicas: 2
+    resources:
+      requests:
+        cpu: "16"
+        memory: "4000Mi"
