@@ -13,7 +13,7 @@ import uvicorn
 from conversation import multimodalqna_conv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from utils import build_logger, moderation_msg, server_error_msg, split_video
+from utils import build_logger, make_temp_image, moderation_msg, server_error_msg, split_video
 
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
 
@@ -138,14 +138,11 @@ def http_bot(state, request: gr.Request):
                     state.split_video = splited_video_path
                 elif file_ext in ['.jpg', '.jpeg', '.png', '.gif']:
                     try:
-                        output_image_path = os.path.join("./public/images")
-                        Path(output_image_path).mkdir(parents=True, exist_ok=True)
-                        output_image = os.path.join(output_image_path, 'image_tmp.{}'.format(file_ext))
-                        shutil.copy(state.video_file, output_image)
+                        output_image_path = make_temp_image(state.video_file, file_ext)
                     except:
                         print(f"image {state.video_file} does not exist in UI host!")
-                        output_image = None
-                    state.image = output_image
+                        output_image_path = None
+                    state.image = output_image_path
                 
         else:
             raise requests.exceptions.RequestException
@@ -192,9 +189,9 @@ def ingest_video_gen_transcript(filepath, request: gr.Request):
         yield (gr.Textbox(visible=True, value="Video ingestion is done. Saving your uploaded video..."))
         time.sleep(2)
         fn_no_ext = Path(dest).stem
-        if "video_id_maps" in response and fn_no_ext in response["video_id_maps"]:
-            new_dst = os.path.join(static_dir, response["video_id_maps"][fn_no_ext])
-            print(response["video_id_maps"][fn_no_ext])
+        if "file_id_maps" in response and fn_no_ext in response["file_id_maps"]:
+            new_dst = os.path.join(static_dir, response["file_id_maps"][fn_no_ext])
+            print(response["file_id_maps"][fn_no_ext])
             os.rename(dest, new_dst)
             yield (
                 gr.Textbox(
@@ -236,7 +233,7 @@ def ingest_video_gen_caption(filepath, request: gr.Request):
     files = {
         "files": open(dest, "rb"),
     }
-    response = requests.post(dataprep_gen_captiono_addr, headers=headers, files=files)
+    response = requests.post(dataprep_gen_caption_addr, headers=headers, files=files)
     print(response.status_code)
     if response.status_code == 200:
         response = response.json()
@@ -244,9 +241,9 @@ def ingest_video_gen_caption(filepath, request: gr.Request):
         yield (gr.Textbox(visible=True, value="Video ingestion is done. Saving your uploaded video..."))
         time.sleep(2)
         fn_no_ext = Path(dest).stem
-        if "video_id_maps" in response and fn_no_ext in response["video_id_maps"]:
-            new_dst = os.path.join(static_dir, response["video_id_maps"][fn_no_ext])
-            print(response["video_id_maps"][fn_no_ext])
+        if "file_id_maps" in response and fn_no_ext in response["file_id_maps"]:
+            new_dst = os.path.join(static_dir, response["file_id_maps"][fn_no_ext])
+            print(response["file_id_maps"][fn_no_ext])
             os.rename(dest, new_dst)
             yield (
                 gr.Textbox(
@@ -288,7 +285,7 @@ def ingest_image_gen_caption(filepath, request: gr.Request):
     files = {
         "files": open(dest, "rb"),
     }
-    response = requests.post(dataprep_img_gen_caption_addr, headers=headers, files=files)
+    response = requests.post(dataprep_gen_caption_addr, headers=headers, files=files)
     print(response.status_code)
     if response.status_code == 200:
         response = response.json()
@@ -296,9 +293,9 @@ def ingest_image_gen_caption(filepath, request: gr.Request):
         yield (gr.Textbox(visible=True, value="Image ingestion is done. Saving your uploaded image..."))
         time.sleep(2)
         fn_no_ext = Path(dest).stem
-        if "image_id_maps" in response and fn_no_ext in response["image_id_maps"]:
-            new_dst = os.path.join(static_dir, response["image_id_maps"][fn_no_ext])
-            print(response["image_id_maps"][fn_no_ext])
+        if "file_id_maps" in response and fn_no_ext in response["file_id_maps"]:
+            new_dst = os.path.join(static_dir, response["file_id_maps"][fn_no_ext])
+            print(response["file_id_maps"][fn_no_ext])
             os.rename(dest, new_dst)
             yield (
                 gr.Textbox(
@@ -472,18 +469,13 @@ if __name__ == "__main__":
     dataprep_gen_caption_endpoint = os.getenv(
         "DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_captions"
     )
-    dataprep_img_gen_caption_endpoint = os.getenv(
-        "DATAPREP_IMAGE_GEN_CAPTION_SERVICE_ENDPOINT", "http://localhost:6007/v1/image_generate_captions"
-    )
     args = parser.parse_args()
     logger.info(f"args: {args}")
     global gateway_addr
     gateway_addr = backend_service_endpoint
     global dataprep_gen_transcript_addr
     dataprep_gen_transcript_addr = dataprep_gen_transcript_endpoint
-    global dataprep_gen_captiono_addr
-    dataprep_gen_captiono_addr = dataprep_gen_caption_endpoint
-    global dataprep_img_gen_caption_addr
-    dataprep_img_gen_caption_addr = dataprep_img_gen_caption_endpoint
+    global dataprep_gen_caption_addr
+    dataprep_gen_caption_addr = dataprep_gen_caption_endpoint
 
     uvicorn.run(app, host=args.host, port=args.port)
