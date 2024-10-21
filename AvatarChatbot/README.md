@@ -71,7 +71,7 @@ flowchart LR
 
 ## Deploy AvatarChatbot Service
 
-The AvatarChatbot service can be deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
+The AvatarChatbot service can be deployed on either Intel Gaudi2 AI Accelerator or Intel Xeon Scalable Processor.
 
 ### Deploy AvatarChatbot on Gaudi
 
