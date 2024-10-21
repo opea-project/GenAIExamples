@@ -6,13 +6,7 @@ import os
 
 from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
 from comps.cores.proto.api_protocol import ChatCompletionRequest, EmbeddingRequest
-from comps.cores.proto.docarray import (
-    LLMParamsDoc,
-    RerankedDoc,
-    RerankerParms,
-    RetrieverParms,
-    TextDoc,
-)
+from comps.cores.proto.docarray import LLMParamsDoc, RerankedDoc, RerankerParms, RetrieverParms, TextDoc
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 

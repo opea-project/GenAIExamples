@@ -5,13 +5,9 @@ import asyncio
 import os
 
 from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
-from comps.cores.proto.api_protocol import (
-    AudioChatCompletionRequest,
-    ChatCompletionResponse,
-)
+from comps.cores.proto.api_protocol import AudioChatCompletionRequest, ChatCompletionResponse
 from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
-
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
