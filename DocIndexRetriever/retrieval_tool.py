@@ -3,6 +3,7 @@
 
 import asyncio
 import os
+from typing import Union
 
 from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
 from comps.cores.proto.api_protocol import ChatCompletionRequest, EmbeddingRequest

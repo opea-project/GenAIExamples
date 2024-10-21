@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-
+import base64
 from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
@@ -12,8 +12,12 @@ from comps.cores.proto.api_protocol import (
     UsageInfo,
 )
 from comps.cores.proto.docarray import LLMParams
+import requests
 from fastapi import Request
 from fastapi.responses import StreamingResponse
+from PIL import Image
+from io import BytesIO
+
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
