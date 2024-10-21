@@ -25,7 +25,7 @@ spec:
       containers:
       - envFrom:
         - configMapRef:
-            name: qna-config
+            name: {{ $global.config.CONFIG_MAP_NAME }}
         {{- if $deployment.spec.args }}
         args:
         {{- range $arg := $deployment.spec.args }}
@@ -80,7 +80,7 @@ spec:
 
       hostIPC: true
       nodeSelector:
-        node-type: chatqna-opea
+        node-type: {{ $global.config.NODE_SELECTOR }}
       serviceAccountName: default
       topologySpreadConstraints:
       - labelSelector:
