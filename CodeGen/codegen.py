@@ -26,12 +26,11 @@ class CodeGenService(Gateway):
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
-        self.megaservice = ServiceOrchestrator()
         super().__init__(
             megaservice=ServiceOrchestrator(),
             host=self.host,
             port=self.port,
-            endpoint=str(MegaServiceEndpoint.CHAT_QNA),
+            endpoint=str(MegaServiceEndpoint.CODE_GEN),
             input_datatype=ChatCompletionRequest,
             output_datatype=ChatCompletionResponse,
         )
