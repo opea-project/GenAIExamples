@@ -137,5 +137,5 @@ to the response, decode the base64 string and save it as a .wav file.
 curl http://${host_ip}:3008/v1/audioqna \
   -X POST \
   -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' \
-  -H 'Content-Type: application/json'
+  -H 'Content-Type: application/json' | sed 's/^"//;s/"$//' | base64 -d > output.wav
 ```
