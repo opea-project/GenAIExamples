@@ -2,33 +2,38 @@
 # SPDX-License-Identifier: Apache-2.0
 
 {{- $global := .Values }}
-{{- range $deployment := .Values.deployments }}
-{{- range $podSpec := $global.podSpecs }}
-{{- if eq $podSpec.name $deployment.name }}
+{{- range $microservice := .Values.microservices }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $deployment.name }}
+  name: {{ $microservice.name }}
   namespace: default
 spec:
-  replicas: {{ $podSpec.spec.replicas }}
+  {{- $replicas := $microservice.replicas }}
+  {{- range $podSpec := $global.podSpecs }}
+    {{- if eq $podSpec.name $microservice.name }}
+      {{- $replicas = $podSpec.replicas | default $microservice.replicas }}
+    {{- end }}
+  {{- end }}
+  replicas: {{ $replicas }}
+
   selector:
     matchLabels:
-      app: {{ $deployment.name }}
+      app: {{ $microservice.name }}
   template:
     metadata:
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: 'true'
       labels:
-        app: {{ $deployment.name }}
+        app: {{ $microservice.name }}
     spec:
       containers:
       - envFrom:
         - configMapRef:
             name: {{ $global.config.CONFIG_MAP_NAME }}
-        {{- if $deployment.spec.args }}
+        {{- if $microservice.args }}
         args:
-        {{- range $arg := $deployment.spec.args }}
+        {{- range $arg := $microservice.args }}
           {{- if $arg.name }}
           - {{ $arg.name }}
           {{- end }}
@@ -38,31 +43,39 @@ spec:
         {{- end }}
         {{- end }}
 
-        {{- if $deployment.spec.env }}
+        {{- if $microservice.env }}
         env:
-        {{- range $env := $deployment.spec.env }}
+        {{- range $env := $microservice.env }}
           - name: {{ $env.name }}
             value: "{{ $env.value }}"
         {{- end }}
         {{- end }}
 
-        image: {{ $podSpec.spec.image_name }}:{{ $podSpec.spec.image_tag }}
+        image: {{ $microservice.image }}
         imagePullPolicy: IfNotPresent
-        name: {{ $podSpec.name }}
+        name: {{ $microservice.name }}
 
-        {{- if $deployment.spec.ports }}
+        {{- if $microservice.ports }}
         ports:
-        {{- range $port := $deployment.spec.ports }}
+        {{- range $port := $microservice.ports }}
           {{- range $port_name, $port_id := $port }}
           - {{ $port_name }}: {{ $port_id }}
           {{- end }}
         {{- end }}
         {{- end }}
 
+        {{- $resources := $microservice.resources }}
+        {{- range $podSpec := $global.podSpecs }}
+          {{- if eq $podSpec.name $microservice.name }}
+            {{- if $podSpec.resources }}
+              {{- $resources = $podSpec.resources }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
 
-        {{- if $podSpec.spec.resources }}
+        {{- if $resources }}
         resources:
-        {{- range $resourceType, $resource := $podSpec.spec.resources }}
+        {{- range $resourceType, $resource := $resources }}
           {{ $resourceType }}:
           {{- range $limitType, $limit := $resource }}
             {{ $limitType }}: {{ $limit }}
@@ -70,9 +83,9 @@ spec:
         {{- end }}
         {{- end }}
 
-        {{- if $deployment.spec.volumeMounts }}
+        {{- if $microservice.volumeMounts }}
         volumeMounts:
-        {{- range $volumeMount := $deployment.spec.volumeMounts }}
+        {{- range $volumeMount := $microservice.volumeMounts }}
           - mountPath: {{ $volumeMount.mountPath }}
             name: {{ $volumeMount.name }}
         {{- end }}
@@ -85,15 +98,15 @@ spec:
       topologySpreadConstraints:
       - labelSelector:
           matchLabels:
-            app: {{ $deployment.name }}
+            app: {{ $microservice.name }}
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: ScheduleAnyway
 
 
-      {{- if $deployment.spec.volumes }}
+      {{- if $microservice.volumes }}
       volumes:
-      {{- range $index, $volume := $deployment.spec.volumes }}
+      {{- range $index, $volume := $microservice.volumes }}
         - name: {{ $volume.name }}
           {{- if $volume.hostPath }}
           hostPath:
@@ -108,6 +121,4 @@ spec:
       {{- end }}
 
 ---
-{{- end }}
-{{- end }}
 {{- end }}
