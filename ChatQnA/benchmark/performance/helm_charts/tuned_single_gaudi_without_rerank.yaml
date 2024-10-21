@@ -6,10 +6,10 @@ podSpecs:
     replicas: 2
     resources:
       limits:
-        cpu: "8"
+        cpu: "16"
         memory: "8000Mi"
       requests:
-        cpu: "8"
+        cpu: "16"
         memory: "8000Mi"
 
   - name: embedding-dependency-deploy
@@ -22,14 +22,8 @@ podSpecs:
         cpu: "80"
         memory: "20000Mi"
 
-  - name: reranking-dependency-deploy
-    replicas: 1
-    resources:
-      limits:
-        habana.ai/gaudi: 1
-
   - name: llm-dependency-deploy
-    replicas: 7
+    replicas: 8
     resources:
       limits:
         habana.ai/gaudi: 1
@@ -44,5 +38,5 @@ podSpecs:
     replicas: 2
     resources:
       requests:
-        cpu: "4"
+        cpu: "16"
         memory: "4000Mi"

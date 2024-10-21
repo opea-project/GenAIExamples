@@ -6,10 +6,10 @@ podSpecs:
     replicas: 2
     resources:
       limits:
-        cpu: "8"
+        cpu: "16"
         memory: "8000Mi"
       requests:
-        cpu: "8"
+        cpu: "16"
         memory: "8000Mi"
 
   - name: embedding-dependency-deploy
@@ -44,5 +44,5 @@ podSpecs:
     replicas: 2
     resources:
       requests:
-        cpu: "4"
+        cpu: "16"
         memory: "4000Mi"

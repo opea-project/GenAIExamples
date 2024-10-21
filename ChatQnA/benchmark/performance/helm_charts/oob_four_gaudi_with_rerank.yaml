@@ -1,0 +1,24 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+podSpecs:
+  - name: chatqna-backend-server-deploy
+    replicas: 4
+
+  - name: embedding-dependency-deploy
+    replicas: 4
+
+  - name: reranking-dependency-deploy
+    replicas: 1
+
+  - name: llm-dependency-deploy
+    replicas: 63
+
+  - name: dataprep-deploy
+    replicas: 1
+
+  - name: vector-db
+    replicas: 1
+
+  - name: retriever-deploy
+    replicas: 4

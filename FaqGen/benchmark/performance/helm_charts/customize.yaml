@@ -1,0 +1,23 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+podSpecs:
+  - name: faq-mega-server-deploy
+    replicas: 2
+    resources:
+      limits:
+        cpu: "8"
+        memory: "8000Mi"
+      requests:
+        cpu: "8"
+        memory: "8000Mi"
+
+
+  - name: faq-tgi-deploy
+    replicas: 7
+    resources:
+      limits:
+        habana.ai/gaudi: 1
+
+  - name: faq-micro-deploy
+    replicas: 1

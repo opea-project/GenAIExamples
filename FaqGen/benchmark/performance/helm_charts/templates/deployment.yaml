@@ -51,14 +51,7 @@ spec:
         {{- end }}
         {{- end }}
 
-        {{- $image := $microservice.image }}
-        {{- range $podSpec := $global.podSpecs }}
-          {{- if eq $podSpec.name $microservice.name }}
-            {{- $image = $podSpec.image | default $microservice.image }}
-          {{- end }}
-        {{- end }}
-        image: {{ $image }}
-
+        image: {{ $microservice.image }}
         imagePullPolicy: IfNotPresent
         name: {{ $microservice.name }}
 
