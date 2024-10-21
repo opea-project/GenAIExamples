@@ -12,7 +12,7 @@ spec:
   {{- $replicas := $deployment.replicas }}
   {{- range $podSpec := $global.podSpecs }}
     {{- if eq $podSpec.name $deployment.name }}
-      {{- $replicas = $podSpec.spec.replicas | default $deployment.replicas }}
+      {{- $replicas = $podSpec.replicas | default $deployment.replicas }}
     {{- end }}
   {{- end }}
   replicas: {{ $replicas }}
@@ -31,9 +31,9 @@ spec:
       - envFrom:
         - configMapRef:
             name: {{ $global.config.CONFIG_MAP_NAME }}
-        {{- if $deployment.spec.args }}
+        {{- if $deployment.args }}
         args:
-        {{- range $arg := $deployment.spec.args }}
+        {{- range $arg := $deployment.args }}
           {{- if $arg.name }}
           - {{ $arg.name }}
           {{- end }}
@@ -43,9 +43,9 @@ spec:
         {{- end }}
         {{- end }}
 
-        {{- if $deployment.spec.env }}
+        {{- if $deployment.env }}
         env:
-        {{- range $env := $deployment.spec.env }}
+        {{- range $env := $deployment.env }}
           - name: {{ $env.name }}
             value: "{{ $env.value }}"
         {{- end }}
@@ -55,20 +55,20 @@ spec:
         imagePullPolicy: IfNotPresent
         name: {{ $deployment.name }}
 
-        {{- if $deployment.spec.ports }}
+        {{- if $deployment.ports }}
         ports:
-        {{- range $port := $deployment.spec.ports }}
+        {{- range $port := $deployment.ports }}
           {{- range $port_name, $port_id := $port }}
           - {{ $port_name }}: {{ $port_id }}
           {{- end }}
         {{- end }}
         {{- end }}
 
-        {{- $resources := $deployment.spec.resources }}
+        {{- $resources := $deployment.resources }}
         {{- range $podSpec := $global.podSpecs }}
           {{- if eq $podSpec.name $deployment.name }}
-            {{- if $podSpec.spec.resources }}
-              {{- $resources = $podSpec.spec.resources }}
+            {{- if $podSpec.resources }}
+              {{- $resources = $podSpec.resources }}
             {{- end }}
           {{- end }}
         {{- end }}
@@ -83,9 +83,9 @@ spec:
         {{- end }}
         {{- end }}
 
-        {{- if $deployment.spec.volumeMounts }}
+        {{- if $deployment.volumeMounts }}
         volumeMounts:
-        {{- range $volumeMount := $deployment.spec.volumeMounts }}
+        {{- range $volumeMount := $deployment.volumeMounts }}
           - mountPath: {{ $volumeMount.mountPath }}
             name: {{ $volumeMount.name }}
         {{- end }}
@@ -104,9 +104,9 @@ spec:
         whenUnsatisfiable: ScheduleAnyway
 
 
-      {{- if $deployment.spec.volumes }}
+      {{- if $deployment.volumes }}
       volumes:
-      {{- range $index, $volume := $deployment.spec.volumes }}
+      {{- range $index, $volume := $deployment.volumes }}
         - name: {{ $volume.name }}
           {{- if $volume.hostPath }}
           hostPath:

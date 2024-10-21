@@ -5,53 +5,46 @@ HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 
 podSpecs:
   - name: chatqna-backend-server-deploy
-    spec:
-      replicas: 2
-      resources:
-        limits:
-          cpu: "8"
-          memory: "8000Mi"
-        requests:
-          cpu: "8"
-          memory: "8000Mi"
+    replicas: 2
+    resources:
+      limits:
+        cpu: "8"
+        memory: "8000Mi"
+      requests:
+        cpu: "8"
+        memory: "8000Mi"
 
   - name: embedding-dependency-deploy
-    spec:
-      replicas: 1
-      resources:
-        limits:
-          cpu: "80"
-          memory: "20000Mi"
-        requests:
-          cpu: "80"
-          memory: "20000Mi"
+    replicas: 1
+    resources:
+      limits:
+        cpu: "80"
+        memory: "20000Mi"
+      requests:
+        cpu: "80"
+        memory: "20000Mi"
 
   - name: reranking-dependency-deploy
-    spec:
-      replicas: 1
-      resources:
-        limits:
-          habana.ai/gaudi: 1
+    replicas: 1
+    resources:
+      limits:
+        habana.ai/gaudi: 1
 
   - name: llm-dependency-deploy
-    spec:
-      replicas: 7890
-      resources:
-        limits:
-          habana.ai/gaudi: 1
+    replicas: 7
+    resources:
+      limits:
+        habana.ai/gaudi: 1
 
   - name: dataprep-deploy
-    spec:
-      replicas: 1
+    replicas: 1
 
   - name: vector-db
-    spec:
-      replicas: 1
+    replicas: 1
 
   - name: retriever-deploy
-    spec:
-      replicas: 2
-      resources:
-        requests:
-          cpu: "4"
-          memory: "4000Mi"
+    replicas: 2
+    resources:
+      requests:
+        cpu: "4"
+        memory: "4000Mi"
