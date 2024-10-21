@@ -17,25 +17,16 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 
 function build_docker_images() {
-    cd $WORKPATH
-    git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
+    cd $WORKPATH/docker_image_build
+    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
-    docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
-    docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile .
-    docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
-    docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/dependency/Dockerfile .
-    docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile .
-    docker build -t opea/wav2lip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/wav2lip/dependency/Dockerfile .
-    docker build -t opea/animation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/wav2lip/Dockerfile .
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="avatarchatbot whisper asr llm-tgi speecht5 tts wav2lip animation"
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    cd ..
-    git clone https://github.com/opea-project/GenAIExamples.git
-    cd GenAIExamples/AvatarChatbot/
-
-    docker build --no-cache -t opea/avatarchatbot:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-
-    docker images
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    
+    docker images && sleep 1s
 }
 
 
