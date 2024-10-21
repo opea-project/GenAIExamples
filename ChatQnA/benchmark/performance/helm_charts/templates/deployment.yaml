@@ -3,15 +3,20 @@
 
 {{- $global := .Values }}
 {{- range $deployment := .Values.deployments }}
-{{- range $podSpec := $global.podSpecs }}
-{{- if eq $podSpec.name $deployment.name }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $deployment.name }}
   namespace: default
 spec:
-  replicas: {{ with $podSpec.spec.replicas }}{{ . }}{{ else }}{{ $deployment.replicas }}{{ end }}
+  {{- $replicas := $deployment.replicas }}
+  {{- range $podSpec := $global.podSpecs }}
+    {{- if eq $podSpec.name $deployment.name }}
+      {{- $replicas = $podSpec.spec.replicas | default $deployment.replicas }}
+    {{- end }}
+  {{- end }}
+  replicas: {{ $replicas }}
+
   selector:
     matchLabels:
       app: {{ $deployment.name }}
@@ -48,7 +53,7 @@ spec:
 
         image: {{ $deployment.image }}
         imagePullPolicy: IfNotPresent
-        name: {{ $podSpec.name }}
+        name: {{ $deployment.name }}
 
         {{- if $deployment.spec.ports }}
         ports:
@@ -59,10 +64,18 @@ spec:
         {{- end }}
         {{- end }}
 
+        {{- $resources := $deployment.spec.resources }}
+        {{- range $podSpec := $global.podSpecs }}
+          {{- if eq $podSpec.name $deployment.name }}
+            {{- if $podSpec.spec.resources }}
+              {{- $resources = $podSpec.spec.resources }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
 
-        {{- if $podSpec.spec.resources }}
+        {{- if $resources }}
         resources:
-        {{- range $resourceType, $resource := $podSpec.spec.resources }}
+        {{- range $resourceType, $resource := $resources }}
           {{ $resourceType }}:
           {{- range $limitType, $limit := $resource }}
             {{ $limitType }}: {{ $limit }}
@@ -108,6 +121,4 @@ spec:
       {{- end }}
 
 ---
-{{- end }}
-{{- end }}
 {{- end }}

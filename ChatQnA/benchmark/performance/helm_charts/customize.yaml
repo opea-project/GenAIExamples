@@ -35,7 +35,7 @@ podSpecs:
 
   - name: llm-dependency-deploy
     spec:
-      replicas: 7
+      replicas: 7890
       resources:
         limits:
           habana.ai/gaudi: 1
