@@ -23,7 +23,7 @@ deployments:
     spec:
       ports:
         - containerPort: 8888
-        
+
   - name: asr-deploy
     spec:
       ports:
@@ -173,7 +173,7 @@ services:
       selector:
         app: llm-deploy
       type: ClusterIP
-      
+
   - name: audioqna-backend-server-svc
     spec:
       ports:

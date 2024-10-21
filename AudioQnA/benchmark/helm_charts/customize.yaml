@@ -9,13 +9,13 @@ podSpecs:
       image_name: opea/audioqna
       image_tag: latest
       replicas: 1
-      
+
   - name: asr-deploy
     spec:
       image_name: opea/asr
       image_tag: latest
       replicas: 1
-      
+
   - name: whisper-deploy
     spec:
       image_name: opea/whisper-gaudi
@@ -24,13 +24,13 @@ podSpecs:
       resources:
         limits:
           habana.ai/gaudi: 1
-      
+
   - name: tts-deploy
     spec:
       image_name: opea/tts
       image_tag: latest
       replicas: 1
-      
+
   - name: speecht5-deploy
     spec:
       image_name: opea/speecht5-gaudi

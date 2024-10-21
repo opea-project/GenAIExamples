@@ -18,7 +18,7 @@ deployments:
     spec:
       ports:
         - containerPort: 9000
-  
+
   - name: faq-tgi-deploy
     spec:
       ports:

@@ -12,5 +12,5 @@ data:
   NODE_SELECTOR: {{ .Values.config.NODE_SELECTOR }}
   TGI_LLM_ENDPOINT: http://faq-tgi-svc.default.svc.cluster.local:8010
   LLM_SERVICE_HOST_IP: faq-micro-svc
-  MEGA_SERVICE_HOST_IP: faq-mega-server-svc  
+  MEGA_SERVICE_HOST_IP: faq-mega-server-svc
 ---
