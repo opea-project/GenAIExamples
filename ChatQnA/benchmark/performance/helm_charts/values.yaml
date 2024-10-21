@@ -12,28 +12,38 @@ config:
 
 deployments:
   - name: chatqna-backend-server-deploy
+    image: opea/chatqna:latest
+    replicas: 1
     spec:
       ports:
         - containerPort: 8888
 
   - name: dataprep-deploy
     spec:
+      image: opea/dataprep-redis:latest
+      replicas: 1
       ports:
         - containerPort: 6007
 
   - name: vector-db
     spec:
+      image: redis/redis-stack:7.2.0-v9
+      replicas: 1
       ports:
         - containerPort: 6379
         - containerPort: 8001
 
   - name: retriever-deploy
     spec:
+      image: opea/retriever-redis:latest
+      replicas: 1
       ports:
         - containerPort: 7000
 
   - name: embedding-dependency-deploy
     spec:
+      image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+      replicas: 1
       ports:
         - containerPort: 80
       args:
@@ -57,6 +67,8 @@ deployments:
 
   - name: reranking-dependency-deploy
     spec:
+      image: opea/tei-gaudi:latest
+      replicas: 1
       args:
         - name: "--model-id"
         - value: $(RERANK_MODEL_ID)
@@ -91,6 +103,8 @@ deployments:
 
   - name: llm-dependency-deploy
     spec:
+      image: ghcr.io/huggingface/tgi-gaudi:2.0.4
+      replicas: 1
       ports:
         - containerPort: 80
       resources:

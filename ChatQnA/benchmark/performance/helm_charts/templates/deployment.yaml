@@ -11,7 +11,7 @@ metadata:
   name: {{ $deployment.name }}
   namespace: default
 spec:
-  replicas: {{ $podSpec.spec.replicas }}
+  replicas: {{ with $podSpec.spec.replicas }}{{ . }}{{ else }}{{ $deployment.spec.replicas }}{{ end }}
   selector:
     matchLabels:
       app: {{ $deployment.name }}
@@ -46,7 +46,7 @@ spec:
         {{- end }}
         {{- end }}
 
-        image: {{ $podSpec.spec.image_name }}:{{ $podSpec.spec.image_tag }}
+        image: {{ $deployment.spec.image }}
         imagePullPolicy: IfNotPresent
         name: {{ $podSpec.name }}
 

@@ -6,8 +6,6 @@ HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 podSpecs:
   - name: chatqna-backend-server-deploy
     spec:
-      image_name: opea/chatqna
-      image_tag: latest
       replicas: 2
       resources:
         limits:
@@ -19,8 +17,6 @@ podSpecs:
 
   - name: embedding-dependency-deploy
     spec:
-      image_name: ghcr.io/huggingface/text-embeddings-inference
-      image_tag: cpu-1.5
       replicas: 1
       resources:
         limits:
@@ -32,8 +28,6 @@ podSpecs:
 
   - name: reranking-dependency-deploy
     spec:
-      image_name: opea/tei-gaudi
-      image_tag: latest
       replicas: 1
       resources:
         limits:
@@ -41,8 +35,6 @@ podSpecs:
 
   - name: llm-dependency-deploy
     spec:
-      image_name: ghcr.io/huggingface/tgi-gaudi
-      image_tag: 2.0.4
       replicas: 7
       resources:
         limits:
@@ -50,20 +42,14 @@ podSpecs:
 
   - name: dataprep-deploy
     spec:
-      image_name: opea/dataprep-redis
-      image_tag: latest
       replicas: 1
 
   - name: vector-db
     spec:
-      image_name: redis/redis-stack
-      image_tag: 7.2.0-v9
       replicas: 1
 
   - name: retriever-deploy
     spec:
-      image_name: opea/retriever-redis
-      image_tag: latest
       replicas: 2
       resources:
         requests:
