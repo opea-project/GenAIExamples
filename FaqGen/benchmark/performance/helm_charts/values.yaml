@@ -1,0 +1,98 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+namespace: default
+
+config:
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+  CONFIG_MAP_NAME: faq-config
+  NODE_SELECTOR: faq-opea
+
+deployments:
+  - name: faq-mega-server-deploy
+    spec:
+      ports:
+        - containerPort: 7777
+
+  - name: faq-micro-deploy
+    spec:
+      ports:
+        - containerPort: 9000
+
+  - name: faq-tgi-deploy
+    spec:
+      ports:
+        - containerPort: 80
+      resources:
+        limits:
+          habana.ai/gaudi: 1
+      args:
+        - name: "--model-id"
+          value: $(LLM_MODEL_ID)
+        - name: "--max-input-length"
+          value: "2048"
+        - name: "--max-total-tokens"
+          value: "4096"
+      env:
+        - name: OMPI_MCA_btl_vader_single_copy_mechanism
+          value: none
+        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+          value: "true"
+        - name: runtime
+          value: habana
+        - name: HABANA_VISIBLE_DEVICES
+          value: all
+        - name: ENABLE_HPU_GRAPH
+          value: 'true'
+        - name: LIMIT_HPU_GRAPH
+          value: 'true'
+        - name: USE_FLASH_ATTENTION
+          value: 'true'
+        - name: FLASH_ATTENTION_RECOMPUTE
+          value: 'true'
+      volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+      volumes:
+        - hostPath:
+            path: /mnt/models
+            type: Directory
+          name: model-volume
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+          name: shm
+
+services:
+  - name: faq-micro-svc
+    spec:
+      ports:
+        - name: service
+          port: 9003
+          targetPort: 9000
+      selector:
+        app: faq-micro-deploy
+      type: ClusterIP
+
+  - name: faq-tgi-svc
+    spec:
+      ports:
+        - name: service
+          port: 8010
+          targetPort: 80
+      selector:
+        app: faq-tgi-deploy
+      type: ClusterIP
+
+  - name: faq-mega-server-svc
+    spec:
+      ports:
+        - name: service
+          port: 7779
+          targetPort: 7777
+          nodePort: 30779
+      selector:
+        app: faq-mega-server-deploy
+      type: NodePort

@@ -1,0 +1,50 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+
+podSpecs:
+  - name: audioqna-backend-server-deploy
+    spec:
+      image_name: opea/audioqna
+      image_tag: latest
+      replicas: 1
+
+  - name: asr-deploy
+    spec:
+      image_name: opea/asr
+      image_tag: latest
+      replicas: 1
+
+  - name: whisper-deploy
+    spec:
+      image_name: opea/whisper-gaudi
+      image_tag: latest
+      replicas: 1
+      resources:
+        limits:
+          habana.ai/gaudi: 1
+
+  - name: tts-deploy
+    spec:
+      image_name: opea/tts
+      image_tag: latest
+      replicas: 1
+
+  - name: speecht5-deploy
+    spec:
+      image_name: opea/speecht5-gaudi
+      image_tag: latest
+      replicas: 1
+      resources:
+        limits:
+          habana.ai/gaudi: 1
+
+  - name: llm-dependency-deploy
+    spec:
+      image_name: ghcr.io/huggingface/tgi-gaudi
+      image_tag: 2.0.5
+      replicas: 1
+      resources:
+        limits:
+          habana.ai/gaudi: 1

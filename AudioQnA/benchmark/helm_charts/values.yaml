@@ -1,0 +1,186 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+namespace: default
+
+config:
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
+  CONFIG_MAP_NAME: audio-qna-config
+  NODE_SELECTOR: audioqna-opea
+  ASR_ENDPOINT: http://whisper-svc.default.svc.cluster.local:7066
+  TTS_ENDPOINT: http://speecht5-svc.default.svc.cluster.local:7055
+  TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:3006
+  MEGA_SERVICE_HOST_IP: audioqna-backend-server-svc
+  ASR_SERVICE_HOST_IP: asr-svc
+  ASR_SERVICE_PORT: "3001"
+  LLM_SERVICE_HOST_IP: llm-svc
+  LLM_SERVICE_PORT: "3007"
+  TTS_SERVICE_HOST_IP: tts-svc
+  TTS_SERVICE_PORT: "3002"
+
+deployments:
+  - name: audioqna-backend-server-deploy
+    spec:
+      ports:
+        - containerPort: 8888
+
+  - name: asr-deploy
+    spec:
+      ports:
+        - containerPort: 9099
+
+  - name: whisper-deploy
+    spec:
+      ports:
+        - containerPort: 7066
+      env:
+        - name: OMPI_MCA_btl_vader_single_copy_mechanism
+          value: none
+        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+          value: 'true'
+        - name: runtime
+          value: habana
+        - name: HABANA_VISIBLE_DEVICES
+          value: all
+
+  - name: tts-deploy
+    spec:
+      ports:
+        - containerPort: 9088
+
+  - name: llm-deploy
+    spec:
+      ports:
+        - containerPort: 9000
+
+  - name: speecht5-deploy
+    spec:
+      ports:
+        - containerPort: 7055
+      env:
+        - name: OMPI_MCA_btl_vader_single_copy_mechanism
+          value: none
+        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+          value: 'true'
+        - name: runtime
+          value: habana
+        - name: HABANA_VISIBLE_DEVICES
+          value: all
+
+  - name: llm-dependency-deploy
+    spec:
+      ports:
+        - containerPort: 80
+      resources:
+        limits:
+          habana.ai/gaudi: 1
+      args:
+        - name: "--model-id"
+          value: $(LLM_MODEL_ID)
+        - name: "--max-input-length"
+          value: "2048"
+        - name: "--max-total-tokens"
+          value: "4096"
+      env:
+        - name: OMPI_MCA_btl_vader_single_copy_mechanism
+          value: none
+        - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+          value: "true"
+        - name: runtime
+          value: habana
+        - name: HABANA_VISIBLE_DEVICES
+          value: all
+        - name: ENABLE_HPU_GRAPH
+          value: 'true'
+        - name: LIMIT_HPU_GRAPH
+          value: 'true'
+        - name: USE_FLASH_ATTENTION
+          value: 'true'
+        - name: FLASH_ATTENTION_RECOMPUTE
+          value: 'true'
+      volumeMounts:
+        - mountPath: /data
+          name: model-volume
+        - mountPath: /dev/shm
+          name: shm
+      volumes:
+        - hostPath:
+            path: /mnt/models
+            type: Directory
+          name: model-volume
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+          name: shm
+
+services:
+  - name: asr-svc
+    spec:
+      ports:
+        - name: service
+          port: 3001
+          targetPort: 9099
+      selector:
+        app: asr-deploy
+      type: ClusterIP
+
+  - name: whisper-svc
+    spec:
+      ports:
+        - name: service
+          port: 7066
+          targetPort: 7066
+      selector:
+        app: whisper-deploy
+      type: ClusterIP
+
+  - name: tts-svc
+    spec:
+      ports:
+        - name: service
+          port: 3002
+          targetPort: 9088
+      selector:
+        app: tts-deploy
+      type: ClusterIP
+
+  - name: speecht5-svc
+    spec:
+      ports:
+        - name: service
+          port: 7055
+          targetPort: 7055
+      selector:
+        app: speecht5-deploy
+      type: ClusterIP
+
+  - name: llm-dependency-svc
+    spec:
+      ports:
+        - name: service
+          port: 3006
+          targetPort: 80
+      selector:
+        app: llm-dependency-deploy
+      type: ClusterIP
+
+    - name: llm-svc
+    spec:
+      ports:
+        - name: service
+          port: 3007
+          targetPort: 9000
+      selector:
+        app: llm-deploy
+      type: ClusterIP
+
+  - name: audioqna-backend-server-svc
+    spec:
+      ports:
+        - name: service
+          port: 3088
+          targetPort: 8888
+          nodePort: 30666
+      selector:
+        app: audioqna-backend-server-deploy
+      type: NodePort
