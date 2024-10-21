@@ -1,0 +1,70 @@
+# Use a base image
+# FROM python:3.11-slim
+FROM vault.habana.ai/gaudi-docker/1.16.2/ubuntu22.04/habanalabs/pytorch-installer-2.2.2:latest AS hpu
+
+# Set environment variables
+ENV LANG=en_US.UTF-8
+ENV PYTHONPATH=/usr/local/lib/python3.10/dist-packages:/home:/home/user:/usr/lib/habanalabs/:/optimum-habana
+ENV PYTHON=/usr/bin/python3.10
+
+# Install dependencies
+RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    yasm \
+    build-essential \
+    pkg-config \
+    libx264-dev
+RUN apt-get install -y nasm
+RUN rm -rf /var/lib/apt/lists/*
+
+# Install GenAIComps
+RUN mkdir -p /home/user/comps
+COPY comps /home/user/comps
+COPY comps/animation/wav2lip/dependency/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Install ffmpeg with x264 software codec
+RUN git clone https://github.com/FFmpeg/FFmpeg.git /home/user/comps/animation/FFmpeg
+WORKDIR /home/user/comps/animation/FFmpeg
+RUN ./configure --enable-gpl --enable-libx264 && \
+    make -j$(nproc-1) && \
+    make install && \
+    hash -r
+RUN chmod +x $(which ffmpeg)
+
+# Upgrade pip
+RUN python3 -m pip install --upgrade pip
+
+# Install Wav2Lip from pip
+RUN pip install --no-deps Wav2Lipy
+RUN rm /usr/local/lib/python3.10/dist-packages/Wav2Lip/__init__.py && touch /usr/local/lib/python3.10/dist-packages/Wav2Lip/__init__.py
+ENV PYTHONPATH="$PYTHONPATH:/usr/local/lib/python3.10/dist-packages/Wav2Lip"
+
+# Install GFPGAN from pip
+RUN pip install --no-deps gfpgan
+RUN touch /usr/local/lib/python3.10/dist-packages/gfpgan/__init__.py
+ENV PYTHONPATH="$PYTHONPATH:/usr/local/lib/python3.10/dist-packages/gfpgan"
+
+# Download pre-trained models
+WORKDIR /usr/local/lib/python3.10/dist-packages
+RUN chmod +x /home/user/comps/animation/wav2lip/dependency/download_ckpts.sh
+RUN /home/user/comps/animation/wav2lip/dependency/download_ckpts.sh
+
+# Install pip dependencies
+RUN pip install -r /home/user/comps/animation/wav2lip/requirements.txt
+
+# Custom patches
+# Modify the degradations.py file to import rgb_to_grayscale from torchvision.transforms.functional
+RUN sed -i 's/from torchvision.transforms.functional_tensor import rgb_to_grayscale/from torchvision.transforms.functional import rgb_to_grayscale/' /usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py
+
+# Modify the core.py file to include 'hpu' in the device check
+RUN sed -i "s/if 'cpu' not in device and 'cuda' not in device:/if 'cpu' not in device and 'cuda' not in device and 'hpu' not in device:/" /usr/local/lib/python3.10/dist-packages/Wav2Lip/face_detection/detection/core.py
+
+# To be compatible with librosa==0.10.2, instead of librosa==0.7.0 because the co-dependency numba==0.48 cannot be pip installed
+RUN sed -i 's/hp.sample_rate, hp.n_fft/sr=hp.sample_rate, n_fft=hp.n_fft/' /usr/local/lib/python3.10/dist-packages/Wav2Lip/audio.py
+
+# Set the working directory
+WORKDIR /home/user/comps/animation/wav2lip
+
+# Define the command to run when the container starts
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENV DEVICE="hpu"
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

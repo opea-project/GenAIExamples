@@ -1,0 +1,18 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# this file should be run in the root of the repo
+# images used by GenAIExamples: animation, wav2lip, wav2lip-gaudi
+services:
+  animation:
+    build:
+      dockerfile: comps/animation/wav2lip/Dockerfile
+    image: ${REGISTRY:-opea}/animation:${TAG:-latest}
+  wav2lip:
+    build:
+      dockerfile: comps/animation/wav2lip/dependency/Dockerfile
+    image: ${REGISTRY:-opea}/wav2lip:${TAG:-latest}
+  wav2lip-gaudi:
+    build:
+      dockerfile: comps/animation/wav2lip/dependency/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/wav2lip-gaudi:${TAG:-latest}
