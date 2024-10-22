@@ -116,7 +116,7 @@ services:
         no_proxy: ${no_proxy}
       context: GenAIComps
       dockerfile: comps/dataprep/neo4j/llama_index/Dockerfile
-    image: ${REGISTRY:-opea}/dataprep-neo4j:${TAG:-latest}  
+    image: ${REGISTRY:-opea}/dataprep-neo4j:${TAG:-latest}
   # guardrails-tgi:
   #   build:
   #     context: GenAIComps

@@ -6,7 +6,7 @@ import json
 import os
 import re
 
-from comps import ChatQnAGateway, MicroService, ServiceOrchestrator, ServiceType, GraphragGateway
+from comps import ChatQnAGateway, GraphragGateway, MicroService, ServiceOrchestrator, ServiceType
 from langchain_core.prompts import PromptTemplate
 
 
@@ -184,7 +184,7 @@ class GraphRAGService:
         self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
-        
+
         embedding = MicroService(
             name="embedding",
             host=EMBEDDING_SERVER_HOST_IP,

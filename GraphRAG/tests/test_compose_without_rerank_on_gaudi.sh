@@ -108,7 +108,7 @@ function validate_microservices() {
         "200 OK" \
         "neo4j-apoc" \
         "neo4j-apoc" \
-        "" 
+        ""
 
     # tei for embedding service
     validate_service \
