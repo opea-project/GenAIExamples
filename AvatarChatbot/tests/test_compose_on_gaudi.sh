@@ -129,7 +129,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "" ]]; then build_docker_images; fi
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
     validate_microservices
     validate_megaservice
