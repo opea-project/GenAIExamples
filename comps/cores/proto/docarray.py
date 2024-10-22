@@ -291,6 +291,12 @@ class SDInputs(BaseDoc):
     num_images_per_prompt: int = 1
 
 
+class SDImg2ImgInputs(BaseDoc):
+    image: str
+    prompt: str = ""
+    num_images_per_prompt: int = 1
+
+
 class SDOutputs(BaseDoc):
     images: list
 
