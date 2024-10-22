@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-export HUGGINGFACEHUB_API_TOKEN="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"
+export HUGGINGFACEHUB_API_TOKEN=""
 export host_ip=$(hostname -I | awk '{print $1}')
 export ip_address=$(hostname -I | awk '{print $1}')
 export no_proxy="${no_proxy},${host_ip}"
