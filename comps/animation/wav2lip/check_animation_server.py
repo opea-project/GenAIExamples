@@ -11,7 +11,7 @@ endpoint = f"http://{ip_address}:9066/v1/animation"
 outfile = os.environ.get("OUTFILE")
 
 # Read the JSON file
-with open("assets/audio/sample_question.json", "r") as file:
+with open("comps/animation/wav2lip/assets/audio/sample_question.json", "r") as file:
     data = json.load(file)
 
 response = requests.post(url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None})

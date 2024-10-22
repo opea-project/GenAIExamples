@@ -42,11 +42,11 @@ export WAV2LIP_PORT=7860
 export ANIMATION_PORT=9066
 export INFERENCE_MODE='wav2lip+gfpgan'
 export CHECKPOINT_PATH='/usr/local/lib/python3.11/site-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
-export FACE="comps/animation/wav2lip/assets/img/avatar1.jpg"
+export FACE="assets/img/avatar1.jpg"
 # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
 export AUDIO='None'
 export FACESIZE=96
-export OUTFILE="comps/animation/wav2lip/assets/outputs/result.mp4"
+export OUTFILE="assets/outputs/result.mp4"
 export GFPGAN_MODEL_VERSION=1.4 # latest version, can roll back to v1.3 if needed
 export UPSCALE_FACTOR=1
 export FPS=10
@@ -61,11 +61,11 @@ export WAV2LIP_PORT=7860
 export ANIMATION_PORT=9066
 export INFERENCE_MODE='wav2lip+gfpgan'
 export CHECKPOINT_PATH='/usr/local/lib/python3.10/dist-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
-export FACE="comps/animation/wav2lip/assets/img/avatar1.jpg"
+export FACE="assets/img/avatar1.jpg"
 # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
 export AUDIO='None'
 export FACESIZE=96
-export OUTFILE="comps/animation/wav2lip/assets/outputs/result.mp4"
+export OUTFILE="assets/outputs/result.mp4"
 export GFPGAN_MODEL_VERSION=1.4 # latest version, can roll back to v1.3 if needed
 export UPSCALE_FACTOR=1
 export FPS=10
@@ -78,13 +78,13 @@ export FPS=10
 - Xeon CPU
 
 ```bash
-docker run --privileged -d --name "wav2lip-service" -p 7860:7860 --ipc=host -w /home/user/comps/animation/wav2lip -e PYTHON=/usr/bin/python3.11 -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip:latest
+docker run --privileged -d --name "wav2lip-service" -p 7860:7860 --ipc=host -w /home/user/comps/animation/wav2lip -e PYTHON=/usr/bin/python3.11 -v $(pwd)/comps/animation/wav2lip/assets:/home/user/comps/animation/wav2lip/assets -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip:latest
 ```
 
 - Gaudi2 HPU
 
 ```bash
-docker run --privileged -d --name "wav2lip-gaudi-service" -p 7860:7860 --runtime=habana --cap-add=sys_nice --net=host --ipc=host -w /home/user/comps/animation/wav2lip -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PYTHON=/usr/bin/python3.10 -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip-gaudi:latest
+docker run --privileged -d --name "wav2lip-gaudi-service" -p 7860:7860 --runtime=habana --cap-add=sys_nice --net=host --ipc=host -w /home/user/comps/animation/wav2lip -v $(pwd)/comps/animation/wav2lip/assets:/home/user/comps/animation/wav2lip/assets -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PYTHON=/usr/bin/python3.10 -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip-gaudi:latest
 ```
 
 ## 2.2 Run Animation Microservice
@@ -100,8 +100,8 @@ Once microservice starts, user can use below script to validate the running micr
 ## 3.1 Validate Wav2Lip service
 
 ```bash
-cd GenAIComps/comps/animation/wav2lip
-python3 dependency/check_wav2lip_server.py
+cd GenAIComps
+python3 comps/animation/wav2lip/dependency/check_wav2lip_server.py
 ```
 
 ## 3.2 Validate Animation service
@@ -115,14 +115,14 @@ curl http://${ip_address}:9066/v1/animation -X POST -H "Content-Type: applicatio
 or
 
 ```bash
-cd GenAIComps/comps/animation/wav2lip
-python3 check_animation_server.py
+cd GenAIComps
+python3 comps/animation/wav2lip/dependency/check_animation_server.py
 ```
 
 The expected output is a message similar to the following:
 
 ```bash
-{'wav2lip_result': '.../GenAIComps/comps/animation/wav2lip/assets/outputs/result.mp4'}
+{'wav2lip_result': '....../GenAIComps/comps/animation/wav2lip/assets/outputs/result.mp4'}
 ```
 
 Please find "comps/animation/wav2lip/assets/outputs/result.mp4" as a reference generated video.

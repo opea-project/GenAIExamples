@@ -51,8 +51,6 @@ ENV PYTHONPATH="$PYTHONPATH:/usr/local/lib/python3.11/site-packages/gfpgan"
 
 # Download pre-trained models
 WORKDIR /usr/local/lib/python3.11/site-packages
-RUN chmod +x /home/user/comps/animation/wav2lip/dependency/download_ckpts.sh
-RUN /home/user/comps/animation/wav2lip/dependency/download_ckpts.sh
 
 # Install pip dependencies
 RUN pip install -r /home/user/comps/animation/wav2lip/requirements.txt
