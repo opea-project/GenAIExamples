@@ -203,9 +203,9 @@ The [AudioQnA](./AudioQnA/README.md) example demonstrates the integration of Gen
 |----------------------------------------|-------------------------------------------------------------------------------------------------|-------------------------------------------|------|----------------------------|
 | [LangChain](https://www.langchain.com) | [mistralai/Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) | [PostgresDB](https://www.postgresql.org/) | Xeon | Natural language SQL agent |
 
-### Text2Image
+<!-- ### Text2Image
 
 [Text2Image](./Text2Image/README.md) generates image based on your provided text.
 | Framework                              | LDM                                                                                                    | HW          | Description |
 |----------------------------------------|--------------------------------------------------------------------------------------------------------|-------------|-------------|
-| [LangChain](https://www.langchain.com) | [stabilityai/stable-diffusion](https://huggingface.co/stabilityai/stable-diffusion-3-medium-diffusers) | Xeon/Gaudi2 | Text2Image  |
+| [LangChain](https://www.langchain.com) | [stabilityai/stable-diffusion](https://huggingface.co/stabilityai/stable-diffusion-3-medium-diffusers) | Xeon/Gaudi2 | Text2Image  | -->
