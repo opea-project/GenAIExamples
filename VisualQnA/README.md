@@ -76,8 +76,6 @@ cd GenAIExamples/VisualQnA/docker_compose/intel/hpu/gaudi/
 docker compose up -d
 ```
 
-> Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
-
 ### Deploy VisualQnA on Xeon
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.

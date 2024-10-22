@@ -97,6 +97,11 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+```
+
 ### 1. Build Retriever Image
 
 ```bash

@@ -132,8 +132,6 @@ cd GenAIExamples/CodeGen/docker_compose/intel/hpu/gaudi
 docker compose up -d
 ```
 
-> Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
-
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 #### Deploy CodeGen on Xeon
