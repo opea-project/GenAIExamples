@@ -50,18 +50,11 @@ LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
-    print("inputs in align input:\n", inputs)
-    print("retriever ip:", RERANK_SERVER_HOST_IP)
-    print("retriever port:", RETRIEVER_SERVICE_PORT)
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         inputs["inputs"] = inputs["text"]
         del inputs["text"]
     elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
-        print("make no changes for retriever inputs")
-        # prepare the retriever params
-        # retriever_parameters = kwargs.get("retriever_parameters", None)
-        # if retriever_parameters:
-        #     inputs.update(retriever_parameters.dict())
+        print("make no changes for retriever inputs. AlreadyCheckCompletionRequest")
     elif self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
@@ -87,6 +80,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         assert isinstance(data, list)
         next_data = {"text": inputs["inputs"], "embedding": data[0]}
     elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
+        print(data)
 
         docs = [doc["text"] for doc in data["retrieved_docs"]]
 
@@ -104,25 +98,24 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
                     for nds in runtime_graph.downstream(ds):
                         runtime_graph.add_edge(cur_node, nds)
                     runtime_graph.delete_node_if_exists(ds)
-
             # handle template
             # if user provides template, then format the prompt with it
             # otherwise, use the default template
-            prompt = data["initial_query"]
+            prompt = inputs.messages[0]["content"]
             chat_template = llm_parameters_dict["chat_template"]
             if chat_template:
                 prompt_template = PromptTemplate.from_template(chat_template)
                 input_variables = prompt_template.input_variables
                 if sorted(input_variables) == ["context", "question"]:
-                    prompt = prompt_template.format(question=data["initial_query"], context="\n".join(docs))
+                    prompt = prompt_template.format(question=prompt, context="\n".join(docs))
                 elif input_variables == ["question"]:
-                    prompt = prompt_template.format(question=data["initial_query"])
+                    prompt = prompt_template.format(question=prompt)
                 else:
                     print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
-                    prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
+                    prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
             else:
                 print("no rerank no chat template")
-                prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
+                prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
 
             next_data["inputs"] = prompt
 
@@ -262,7 +255,6 @@ class GraphRAGService:
             service_type=ServiceType.LLM,
         )
         self.megaservice.add(retriever).add(llm)
-        #self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, llm)
         self.gateway = GraphragGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
@@ -332,6 +324,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     chatqna = GraphRAGService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    print(RETRIEVER_SERVICE_PORT)
     if args.without_rerank:
         chatqna.add_remote_service_without_rerank()
     elif args.with_guardrails:
