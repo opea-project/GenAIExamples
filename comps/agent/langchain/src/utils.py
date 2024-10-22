@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+import importlib
 
 from .config import env_config
 
@@ -122,6 +123,23 @@ def has_multi_tool_inputs(tools):
     return ret
 
 
+def load_python_prompt(file_dir_path: str):
+    print(file_dir_path)
+    spec = importlib.util.spec_from_file_location("custom_prompt", file_dir_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def adapt_custom_prompt(local_vars, custom_prompt):
+    # list attributes of module
+    if custom_prompt is not None:
+        custom_prompt_list = [k for k in dir(custom_prompt) if k[:2] != "__"]
+        for k in custom_prompt_list:
+            v = getattr(custom_prompt, k)
+            local_vars[k] = v
+
+
 def get_args():
     parser = argparse.ArgumentParser()
     # llm args
@@ -144,6 +162,7 @@ def get_args():
     parser.add_argument("--temperature", type=float, default=0.01)
     parser.add_argument("--repetition_penalty", type=float, default=1.03)
     parser.add_argument("--return_full_text", type=bool, default=False)
+    parser.add_argument("--custom_prompt", type=str, default=None)
 
     sys_args, unknown_args = parser.parse_known_args()
     # print("env_config: ", env_config)

@@ -236,8 +236,8 @@ class Replanner:
 
 
 class PlanExecuteAgentWithLangGraph(BaseAgent):
-    def __init__(self, args, with_memory=False):
-        super().__init__(args)
+    def __init__(self, args, with_memory=False, **kwargs):
+        super().__init__(args, local_vars=globals(), **kwargs)
 
         # Define Node
         plan_checker = PlanStepChecker(self.llm_endpoint, args.model, is_vllm=self.is_vllm)

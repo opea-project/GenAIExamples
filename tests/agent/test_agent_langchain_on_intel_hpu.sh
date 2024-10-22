@@ -12,6 +12,8 @@ tgi_volume=$WORKPATH/data
 vllm_port=8086
 vllm_volume=$WORKPATH/data
 
+export WORKPATH=$WORKPATH
+
 export agent_image="opea/agent-langchain:comps"
 export agent_container_name="test-comps-agent-endpoint"
 
@@ -46,8 +48,6 @@ function build_vllm_docker_images() {
     echo $WORKPATH
     if [ ! -d "./vllm" ]; then
         git clone https://github.com/HabanaAI/vllm-fork.git
-        cd ./vllm-fork; git checkout habana_main; git tag v0.6.2.post1; cd ..
-        cp $WORKPATH/tests/agent/Dockerfile.hpu ./vllm-fork
     fi
     cd ./vllm-fork
     docker build -f Dockerfile.hpu -t opea/vllm:hpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy

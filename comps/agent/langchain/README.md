@@ -83,8 +83,7 @@ export vllm_volume=${YOUR_LOCAL_DIR_FOR_MODELS}
 
 # build vLLM image
 git clone https://github.com/HabanaAI/vllm-fork.git
-cd ./vllm-fork; git checkout habana_main; git tag v0.6.2.post1;
-cp ${your_path}/GenAIComps/tests/agent/Dockerfile.hpu ./
+cd ./vllm-fork
 docker build -f Dockerfile.hpu -t opea/vllm:hpu --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
 
 # TGI serving

@@ -159,8 +159,8 @@ class TextGenerator:
 
 
 class RAGAgent(BaseAgent):
-    def __init__(self, args, with_memory=False):
-        super().__init__(args)
+    def __init__(self, args, with_memory=False, **kwargs):
+        super().__init__(args, local_vars=globals(), **kwargs)
 
         # Define Nodes
 

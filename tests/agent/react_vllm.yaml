@@ -7,6 +7,7 @@ services:
     container_name: test-comps-agent-endpoint
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
+      #- ${WORKPATH}/comps/agent:/home/user/comps/agent
     ports:
       - "9095:9095"
     ipc: host
@@ -28,3 +29,4 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       port: 9095
+      custom_prompt: /home/user/tools/custom_prompt.py

@@ -60,3 +60,6 @@ if os.environ.get("repetition_penalty") is not None:
 
 if os.environ.get("return_full_text") is not None:
     env_config += ["--return_full_text", os.environ["return_full_text"]]
+
+if os.environ.get("custom_prompt") is not None:
+    env_config += ["--custom_prompt", os.environ["custom_prompt"]]

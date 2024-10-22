@@ -17,8 +17,8 @@ from .prompt import REACT_SYS_MESSAGE, hwchase17_react_prompt
 
 
 class ReActAgentwithLangchain(BaseAgent):
-    def __init__(self, args, with_memory=False):
-        super().__init__(args)
+    def __init__(self, args, with_memory=False, **kwargs):
+        super().__init__(args, local_vars=globals(), **kwargs)
         prompt = hwchase17_react_prompt
         if has_multi_tool_inputs(self.tools_descriptions):
             raise ValueError("Only supports single input tools when using strategy == react_langchain")
@@ -81,12 +81,13 @@ class ReActAgentwithLangchain(BaseAgent):
 
 
 class ReActAgentwithLanggraph(BaseAgent):
-    def __init__(self, args, with_memory=False):
-        super().__init__(args)
+    def __init__(self, args, with_memory=False, **kwargs):
+        super().__init__(args, local_vars=globals(), **kwargs)
 
         self.llm = wrap_chat(self.llm_endpoint, args.model)
 
         tools = self.tools_descriptions
+        print("REACT_SYS_MESSAGE: ", REACT_SYS_MESSAGE)
 
         if with_memory:
             self.app = create_react_agent(
@@ -207,8 +208,8 @@ class ReActAgentNodeLlama:
 
 
 class ReActAgentLlama(BaseAgent):
-    def __init__(self, args, with_memory=False):
-        super().__init__(args)
+    def __init__(self, args, with_memory=False, **kwargs):
+        super().__init__(args, local_vars=globals(), **kwargs)
         agent = ReActAgentNodeLlama(
             llm_endpoint=self.llm_endpoint, model_id=args.model, tools=self.tools_descriptions, args=args
         )
