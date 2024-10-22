@@ -84,15 +84,6 @@ function start_services() {
        sleep 5s
        n=$((n+1))
     done
-    n=0
-    until [[ "$n" -ge 100 ]]; do
-       docker logs whisper-service > $LOG_PATH/whisper_service_start.log
-       if grep -q "Uvicorn" $LOG_PATH/whisper_service_start.log; then
-           break
-       fi
-       sleep 5s
-       n=$((n+1))
-    done
 
     echo "All services are up and running"
     sleep 5s
