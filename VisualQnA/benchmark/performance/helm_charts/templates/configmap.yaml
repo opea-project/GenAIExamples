@@ -11,7 +11,6 @@ data:
   LLM_MODEL_ID: {{ .Values.config.LLM_MODEL_ID }}
   NODE_SELECTOR: {{ .Values.config.NODE_SELECTOR }}
 
-  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
   CONFIG_MAP_NAME: visualqna-config
   NODE_SELECTOR: opea
   HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}

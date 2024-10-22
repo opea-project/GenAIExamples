@@ -63,17 +63,17 @@ services:
         app: visualqna-lvm-uservice
       type: ClusterIP
 
-  - name: visualqna-tgi
+  - name: visualqna-tgi-service
     spec:
       ports:
         - name: service
           port: 80
           targetPort: 8399
       selector:
-        app: lvm-uservice
+        app: visualqna-tgi
       type: ClusterIP
 
-  - name: visualqna
+  - name: visualqna-service
     spec:
       ports:
         - name: service
