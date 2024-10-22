@@ -78,10 +78,10 @@ function start_services() {
     n=0
     until [[ "$n" -ge 500 ]]; do
         # check tgi and whisper services
-        docker logs llm-tgi-server > $LOG_PATH/llm_tgi_server_start.log
+        docker logs tgi-service > $LOG_PATH/tgi_service_start.log
         docker logs asr-service > $LOG_PATH/asr_service_start.log
 
-        if grep -q Connected $LOG_PATH/llm_tgi_server_start.log && grep -q "initialized" $LOG_PATH/asr_service_start.log; then
+        if grep -q Connected $LOG_PATH/tgi_service_start.log && grep -q "initialized" $LOG_PATH/asr_service_start.log; then
             break
         fi
        sleep 1m
@@ -103,7 +103,7 @@ function validate_megaservice() {
         docker logs asr-service > $LOG_PATH/asr-service.log
         docker logs speecht5-service > $LOG_PATH/speecht5-service.log
         docker logs tts-service > $LOG_PATH/tts-service.log
-        docker logs tgi-server > $LOG_PATH/tgi-server.log
+        docker logs tgi-service > $LOG_PATH/tgi-service.log
         docker logs llm-tgi-server > $LOG_PATH/llm-tgi-server.log
         docker logs wav2lip-service > $LOG_PATH/wav2lip-service.log
         docker logs animation-server > $LOG_PATH/animation-server.log
