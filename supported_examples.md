@@ -105,8 +105,8 @@ This document introduces the supported examples of GenAIExamples. The supported 
 
 [VisualQnA](./VisualQnA/README.md) is an example of chatbot for question and answering based on the images.
 
-| LVM                                                                                           | HW     | Description |
-| --------------------------------------------------------------------------------------------- | ------ | ----------- |
+| LVM                                                                                           | HW          | Description |
+| --------------------------------------------------------------------------------------------- | ----------- | ----------- |
 | [llava-hf/llava-v1.6-mistral-7b-hf](https://huggingface.co/llava-hf/llava-v1.6-mistral-7b-hf) | Xeon/Gaudi2 | Chatbot     |
 
 ### VideoQnA
@@ -126,8 +126,8 @@ By default, the embedding and LVM models are set to a default value as listed be
 
 By default, the base model is set to a default value as listed below:
 
-| Service           | Base Model                                                                | HW   | Description                     |
-| ----------------- | ------------------------------------------------------------------------- | ---- | ------------------------------- |
+| Service           | Base Model                                                                | HW          | Description                     |
+| ----------------- | ------------------------------------------------------------------------- | ----------- | ------------------------------- |
 | Rerank Finetuning | [BAAI/bge-reranker-large](https://huggingface.co/BAAI/bge-reranker-large) | Xeon/Gaudi2 | Rerank model finetuning service |
 
 ### InstructionTuning
@@ -136,8 +136,8 @@ The [Instruction Tuning](./InstructionTuning/README.md) example is designed to f
 
 By default, the base model is set to a default value as listed below:
 
-| Service           | Base Model                                                                            | HW         | Description                          |
-| ----------------- | ------------------------------------------------------------------------------------- | ---------- | ------------------------------------ |
+| Service           | Base Model                                                                            | HW          | Description                          |
+| ----------------- | ------------------------------------------------------------------------------------- | ----------- | ------------------------------------ |
 | InstructionTuning | [meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) | Xeon/Gaudi2 | LLM model Instruction Tuning service |
 
 ### DocIndexRetriever
@@ -187,9 +187,9 @@ The [AudioQnA](./AudioQnA/README.md) example demonstrates the integration of Gen
 ### MultimodalQnA
 
 [MultimodalQnA](./MultimodalQnA/README.md) addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos.
-| Framework                              | Embedding                                                                                                         | LVM                                                                                           | Vector Database            | HW     | Description        |
+| Framework | Embedding | LVM | Vector Database | HW | Description |
 |----------------------------------------|-------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|----------------------------|--------|--------------------|
-| [LangChain](https://www.langchain.com) | [BridgeTower/bridgetower-large](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) | [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf)                   | [Redis](https://redis.io/) | Xeon   | Multimodal chatbot |
+| [LangChain](https://www.langchain.com) | [BridgeTower/bridgetower-large](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) | [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf) | [Redis](https://redis.io/) | Xeon | Multimodal chatbot |
 | [LangChain](https://www.langchain.com) | [BridgeTower/bridgetower-large](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) | [llava-hf/llava-v1.6-vicuna-13b-hf](https://huggingface.co/llava-hf/llava-v1.6-vicuna-13b-hf) | [Redis](https://redis.io/) | Gaudi2 | Multimodal chatbot |
 
 ### ProductivitySuite
@@ -199,7 +199,7 @@ The [AudioQnA](./AudioQnA/README.md) example demonstrates the integration of Gen
 ### DBQnA
 
 [DBQnA](./DBQnA/README.md) converts your natural language query into an SQL query, automatically executes the generated query on the database and delivers real-time query results.
-| Framework                              | LLM                                                                                             | Database                                  | HW   | Description                |
+| Framework | LLM | Database | HW | Description |
 |----------------------------------------|-------------------------------------------------------------------------------------------------|-------------------------------------------|------|----------------------------|
 | [LangChain](https://www.langchain.com) | [mistralai/Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) | [PostgresDB](https://www.postgresql.org/) | Xeon | Natural language SQL agent |
 
