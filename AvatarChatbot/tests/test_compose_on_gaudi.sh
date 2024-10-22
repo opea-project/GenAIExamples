@@ -64,7 +64,7 @@ function start_services() {
     export WAV2LIP_PORT=7860
     export INFERENCE_MODE='wav2lip+gfpgan'
     export CHECKPOINT_PATH='/usr/local/lib/python3.10/dist-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
-    export FACE="assets/img/avatar5.png"
+    export FACE="assets/img/avatar1.jpg"
     # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
     export AUDIO='None'
     export FACESIZE=96
@@ -75,16 +75,6 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d
-    n=0
-    until [[ "$n" -ge 100 ]]; do
-       docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
-       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
-           break
-       fi
-       sleep 5s
-       n=$((n+1))
-    done
-
     n=0
     until [[ "$n" -ge 100 ]]; do
        docker logs whisper-service > $LOG_PATH/whisper_service_start.log
