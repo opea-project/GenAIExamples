@@ -75,6 +75,7 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d
+    
     n=0
         until [[ "$n" -ge 100 ]]; do
        docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
