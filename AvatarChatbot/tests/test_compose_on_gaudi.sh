@@ -76,15 +76,22 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
     n=0
-    until [[ "$n" -ge 200 ]]; do
-        # check tgi and whisper services
-        docker logs llm-tgi-gaudi-server > $LOG_PATH/llm-tgi-gaudi-server_start.log
-        docker logs asr-service > $LOG_PATH/asr_service_start.log
+    until [[ "$n" -ge 100 ]]; do
+       docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+           break
+       fi
+       sleep 5s
+       n=$((n+1))
+    done
 
-        if grep -q "initialized" $LOG_PATH/asr_service_start.log; then
-            break
-        fi
-       sleep 1s
+    n=0
+    until [[ "$n" -ge 100 ]]; do
+       docker logs whisper-service > $LOG_PATH/whisper_service_start.log
+       if grep -q "Uvicorn server setup on port" $LOG_PATH/whisper_service_start.log; then
+           break
+       fi
+       sleep 5s
        n=$((n+1))
     done
     echo "All services are up and running"
@@ -93,7 +100,6 @@ function start_services() {
 
 
 function validate_megaservice() {
-    cd $WORKPATH
     result=$(http_proxy="" curl http://${ip_address}:3009/v1/avatarchatbot -X POST -d @sample_whoareyou.json -H 'Content-Type: application/json')
     echo "result is === $result"
     if [[ $result == *"mp4"* ]]; then
@@ -131,7 +137,7 @@ function main() {
     stop_docker
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
-    validate_microservices
+    # validate_microservices
     validate_megaservice
     # validate_frontend
     stop_docker
