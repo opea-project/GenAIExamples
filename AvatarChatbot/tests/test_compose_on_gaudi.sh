@@ -100,7 +100,8 @@ function start_services() {
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3009/v1/avatarchatbot -X POST -d @sample_whoareyou.json -H 'Content-Type: application/json')
+    cd $WORKPATH
+    result=$(http_proxy="" curl http://${ip_address}:3009/v1/avatarchatbot -X POST -d @assets/audio/sample_whoareyou.json -H 'Content-Type: application/json')
     echo "result is === $result"
     if [[ $result == *"mp4"* ]]; then
         echo "Result correct."
