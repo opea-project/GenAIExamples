@@ -18,14 +18,20 @@ GenAIExamples are designed to give developers an easy entry into generative AI, 
 [GenAIEval](https://github.com/opea-project/GenAIEval) measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
 
 ## Use Cases
-| Scenario           | Use Case          | |
-| ------------------ | ---------------------------------------------------------------------- |--|
-| <b>Question Answering<b/> | [ChatQnA](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA)  ⭐⭐⭐⭐⭐<br/>&emsp;&emsp;Chatbot with Retrieval Augmented Generation (RAG). <br/><br/> [VisualQnA](https://github.com/opea-project/GenAIExamples/tree/main/VisualQnA)  ⭐⭐⭐⭐⭐<br/>&emsp;&emsp;Visual Question-answering.  | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
-| <b>Content Summarization<b/> | [DocSum](https://github.com/opea-project/GenAIExamples/tree/main/DocSum)  <br/>&emsp;&emsp;Document Summarization Application | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
-| <b>FAQ Generation<b/> | [FaqGen](https://github.com/opea-project/GenAIExamples/tree/main/FaqGen) <br/>&emsp;&emsp;Frequently asked questions (FAQs) generation from your documents, legal texts, customer queries etc. | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
-| <b>Code Generation<b/> | [CodeGen](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen)<br/>&emsp;&emsp;Gen-AI Powered Code Generator | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
-| <b>Information Retrieval<b/> | [DocIndexRetriever](https://github.com/opea-project/GenAIExamples/tree/main/DocIndexRetriever)<br/>&emsp;&emsp;Document Retrieval with Retrieval Augmented Generation (RAG) | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
-| <b>Fine-tuning<b/> | [InstructionTuning](https://github.com/opea-project/GenAIExamples/tree/main/InstructionTuning)<br/>&emsp;&emsp;Application of Instruction Tuning. | [More >](https://github.com/opea-project/GenAIExamples?tab=readme-ov-file#deploy-examples) |
+
+Below are some highlighted GenAI use cases across various application scenarios:
+
+| Scenario           | Use Case          |
+| ------------------ | ---------------------------------------------------------------------- |
+| <b>Question Answering<b/> | [ChatQnA](ChatQnA) ✨: Chatbot with Retrieval Augmented Generation (RAG). <br/> [VisualQnA](VisualQnA) ✨: Visual Question-answering.  |
+| <b>Image Generation<b/> | [Text2Image](Text2Image) ✨: Text-to-image generation. |
+| <b>Content Summarization<b/> | [DocSum](DocSum): Document Summarization Application. |
+| <b>FAQ Generation<b/> | [FaqGen](FaqGen): Frequently asked questions (FAQs) generation from your documents, legal texts, customer queries etc. |
+| <b>Code Generation<b/> | [CodeGen](CodeGen): Gen-AI Powered Code Generator. |
+| <b>Information Retrieval<b/> | [DocIndexRetriever](DocIndexRetriever): Document Retrieval with Retrieval Augmented Generation (RAG). |
+| <b>Fine-tuning<b/> | [InstructionTuning](InstructionTuning): Application of Instruction Tuning. |
+
+For the full list of the available use cases and their supported deployment type, please refer [here](#deploy-examples).
 
 ## Getting Started
 
@@ -59,6 +65,14 @@ Deployment are based on released docker images by default, check [docker image l
 | AudioQnA          | [Xeon Instructions](AudioQnA/docker_compose/intel/cpu/xeon/README.md)          | [Gaudi Instructions](AudioQnA/docker_compose/intel/hpu/gaudi/README.md)    | [AudioQnA with Manifests](AudioQnA/kubernetes/intel/README.md)                   | Not Supported                                                                                                      | [AudioQnA with GMC](AudioQnA/kubernetes/intel/README_gmc.md)       |
 | VisualQnA         | [Xeon Instructions](VisualQnA/docker_compose/intel/cpu/xeon/README.md)         | [Gaudi Instructions](VisualQnA/docker_compose/intel/hpu/gaudi/README.md)   | [VisualQnA with Manifests](VisualQnA/kubernetes/intel/README.md)                 | Not Supported                                                                                                      | [VisualQnA with GMC](VisualQnA/kubernetes/intel/README_gmc.md)     |
 | ProductivitySuite | [Xeon Instructions](ProductivitySuite/docker_compose/intel/cpu/xeon/README.md) | Not Supported                                                              | [ProductivitySuite with Manifests](ProductivitySuite/kubernetes/intel/README.md) | Not Supported                                                                                                      | Not Supported                                                      |
+| AgentQnA          | [Xeon Instructions](AgentQnA/docker_compose/intel/cpu/xeon)                     | [Gaudi Instructions](AgentQnA/docker_compose/intel/hpu/gaudi)                                       | Not Supported                                                                    | Not Supported                                                                                                      | Not Supported                                                      |
+| DocIndexRetriever | [Xeon Instructions](DocIndexRetriever/docker_compose/intel/cpu/xeon/README.md ) | [Gaudi Instructions](DocIndexRetriever/docker_compose/intel/hpu/gaudi/README.md)                    | Not Supported                                                                    | Not Supported                                                                                                      | Not Supported                                                      |
+| InstructionTuning | [Xeon Instructions](InstructionTuning/docker_compose/intel/cpu/xeon/README.md)  | [Gaudi Instructions](InstructionTuning/docker_compose/intel/hpu/gaudi/README.md)                    | Not Supported                                                                    | Not Supported                                                                                                      | Not Supported                                                      |
+| RerankFinetuning  | [Xeon Instructions](RerankFinetuning/docker_compose/intel/cpu/xeon/README.md)   | [Gaudi Instructions](RerankFinetuning/docker_compose/intel/hpu/gaudi/README.md )                    | Not Supported                                                                    | Not Supported                                                                                                      | Not Supported                                                      |
+| VideoQnA          | [Xeon Instructions](VideoQnA/docker_compose/intel/cpu/xeon/README.md)           | Not Supported                                                                                       | Not Supported                                                                    | Not Supported                                                                                                      | Not Supported                                                      |
+| MultimodalQnA     | [Xeon Instructions](MultimodalQnA/docker_compose/intel/cpu/xeon/README.md)      | [Gaudi Instructions](MultimodalQnA/docker_compose/intel/hpu/gaudi/README.md )    | Not Supported                                                                    | Not Supported                                                                                                      | Not Supported                                                      |
+| DBQnA             | [Xeon Instructions](DBQnA/docker_compose/intel/cpu/xeon/README.md)              | Not Supported                                                                    | Not Supported                                                                    | Not Supported                                                                                                      | Not Supported                                                      |
+<!-- | Text2Image        | [Xeon Instructions](Text2Image/docker_compose/intel/cpu/xeon/README.md)         | [Gaudi Instructions](Text2Image/docker_compose/intel/hpu/gaudi/README.md )       | Not Supported                                                                    | Not Supported                                                                                                      | Not Supported                                                      |   | -->
 
 ## Supported Examples
 
