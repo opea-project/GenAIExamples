@@ -76,7 +76,7 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
     n=0
-    until [[ "$n" -ge 5 ]]; do
+    until [[ "$n" -ge 4 ]]; do
        docker logs whisper-service > $LOG_PATH/whisper_service_start.log
        if grep -q "200 OK" $LOG_PATH/whisper_service_start.log; then
            break
