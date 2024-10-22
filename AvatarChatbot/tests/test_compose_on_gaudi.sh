@@ -76,7 +76,7 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
     n=0
-    until [[ "$n" -ge 500 ]]; do
+    until [[ "$n" -ge 200 ]]; do
         # check tgi and whisper services
         docker logs llm-tgi-gaudi-server > $LOG_PATH/llm-tgi-gaudi-server_start.log
         docker logs asr-service > $LOG_PATH/asr_service_start.log

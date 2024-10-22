@@ -76,7 +76,7 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
     n=0
-    until [[ "$n" -ge 500 ]]; do
+    until [[ "$n" -ge 200 ]]; do
         # check tgi and whisper services
         docker logs llm-tgi-server > $LOG_PATH/llm-tgi-server_start.log
         docker logs asr-service > $LOG_PATH/asr_service_start.log
@@ -84,7 +84,7 @@ function start_services() {
         if grep -q "initialized" $LOG_PATH/asr_service_start.log; then
             break
         fi
-       sleep 1m
+       sleep 1s
        n=$((n+1))
     done
     echo "All services are up and running"
