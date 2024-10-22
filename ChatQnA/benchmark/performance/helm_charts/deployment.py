@@ -68,12 +68,12 @@ def generate_yaml(num_nodes, mode="oob", with_rerank="True"):
     tgi_params = [
         {
             "name": "llm-dependency-deploy",
-            "args": {
-                "--max-input-length": 1280,
-                "--max-total-tokens": 2048,
-                "--max-batch-total-tokens": 35536,
-                "--max-batch-prefill-tokens": 4096,
-            },
+            "args": [
+                {"name": "--max-input-length", "values": 1280},
+                {"name": "--max-total-tokens", "value": 2048},
+                {"name": "--max-batch-total-tokens", "value": 35536},
+                {"name": "--max-batch-prefill-tokens", "value": 4096},
+            ],
         },
     ]
 
