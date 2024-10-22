@@ -38,15 +38,16 @@ If you don't know the answer to a question, please don't share false information
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 GUARDRAIL_SERVICE_HOST_IP = os.getenv("GUARDRAIL_SERVICE_HOST_IP", "0.0.0.0")
-GUARDRAIL_SERVICE_PORT = int(os.getenv("GUARDRAIL_SERVICE_PORT", 9090))
+GUARDRAIL_SERVICE_PORT = int(os.getenv("GUARDRAIL_SERVICE_PORT", 80))
 EMBEDDING_SERVER_HOST_IP = os.getenv("EMBEDDING_SERVER_HOST_IP", "0.0.0.0")
-EMBEDDING_SERVER_PORT = int(os.getenv("EMBEDDING_SERVER_PORT", 6006))
+EMBEDDING_SERVER_PORT = int(os.getenv("EMBEDDING_SERVER_PORT", 80))
 RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
 RETRIEVER_SERVICE_PORT = int(os.getenv("RETRIEVER_SERVICE_PORT", 7000))
 RERANK_SERVER_HOST_IP = os.getenv("RERANK_SERVER_HOST_IP", "0.0.0.0")
-RERANK_SERVER_PORT = int(os.getenv("RERANK_SERVER_PORT", 8808))
+RERANK_SERVER_PORT = int(os.getenv("RERANK_SERVER_PORT", 80))
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
-LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 9009))
+LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
+LLM_MODEL = os.getenv("LLM_MODEL", "Intel/neural-chat-7b-v3-3")
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -61,14 +62,14 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
     elif self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
-        next_inputs["model"] = "tgi"  # specifically clarify the fake model to make the format unified
+        next_inputs["model"] = LLM_MODEL
         next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
         next_inputs["stream"] = inputs["streaming"]
         next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
-        next_inputs["presence_penalty"] = inputs["presence_penalty"]
-        next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
+        # next_inputs["presence_penalty"] = inputs["presence_penalty"]
+        # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
     return inputs
@@ -136,14 +137,14 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             prompt_template = PromptTemplate.from_template(chat_template)
             input_variables = prompt_template.input_variables
             if sorted(input_variables) == ["context", "question"]:
-                prompt = prompt_template.format(question=prompt, context="\n".join(docs))
+                prompt = prompt_template.format(question=prompt, context="\n".join(reranked_docs))
             elif input_variables == ["question"]:
                 prompt = prompt_template.format(question=prompt)
             else:
                 print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
-                prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
+                prompt = ChatTemplate.generate_rag_prompt(prompt, reranked_docs)
         else:
-            prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
+            prompt = ChatTemplate.generate_rag_prompt(prompt, reranked_docs)
 
         next_data["inputs"] = prompt
 
