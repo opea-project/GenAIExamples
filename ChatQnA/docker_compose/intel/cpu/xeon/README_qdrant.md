@@ -167,10 +167,10 @@ export host_ip="External_Public_IP"
 export your_hf_api_token="Your_Huggingface_API_Token"
 ```
 
-**Append the value of the public IP address to the no_proxy list**
+**Append the value of the public IP address to the no_proxy list if you are in a proxy environment**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
+export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-qdrant-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
 ```
 
 ```bash
