@@ -70,6 +70,11 @@ curl http://${host_ip}:8888/v1/chatqna \
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+```
+
 ### 1. Build Retriever Image
 
 ```bash
