@@ -84,7 +84,7 @@ function start_services() {
        sleep 5s
        n=$((n+1))
     done
-    
+
     echo "All services are up and running"
     sleep 5s
 }
