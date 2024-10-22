@@ -24,4 +24,3 @@ HUGGINGFACEHUB_API_TOKEN: hf_xxxxx
 # --workflow choices=["with_rerank", "without_rerank"]
 python deployment.py --workflow=with_rerank --mode=tuned --num_nodes=1
 ```
-
