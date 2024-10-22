@@ -78,10 +78,10 @@ function start_services() {
     n=0
     until [[ "$n" -ge 500 ]]; do
         # check tgi and whisper services
-        docker logs tgi-service > $LOG_PATH/tgi_service_start.log
+        docker logs llm-tgi-server > $LOG_PATH/llm-tgi-server_start.log
         docker logs asr-service > $LOG_PATH/asr_service_start.log
 
-        if grep -q running $LOG_PATH/tgi_service_start.log && grep -q "initialized" $LOG_PATH/asr_service_start.log; then
+        if grep -q running $LOG_PATH/llm-tgi-server_start.log && grep -q "initialized" $LOG_PATH/asr_service_start.log; then
             break
         fi
        sleep 1m
