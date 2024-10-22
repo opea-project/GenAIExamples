@@ -76,14 +76,25 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
     n=0
-    until [[ "$n" -ge 100 ]]; do
-       docker logs whisper-service > $LOG_PATH/whisper_service_start.log
-       if grep -q "200 OK" $LOG_PATH/whisper_service_start.log; then
+        until [[ "$n" -ge 100 ]]; do
+       docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
            break
        fi
        sleep 5s
        n=$((n+1))
     done
+
+    n=0
+    until [[ "$n" -ge 100 ]]; do
+       docker logs whisper-service > $LOG_PATH/whisper_service_start.log
+       if grep -q "Uvicorn" $LOG_PATH/whisper_service_start.log; then
+           break
+       fi
+       sleep 5s
+       n=$((n+1))
+    done
+
     echo "All services are up and running"
     sleep 5s
 }
