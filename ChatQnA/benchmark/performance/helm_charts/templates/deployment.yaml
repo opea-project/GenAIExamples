@@ -31,9 +31,17 @@ spec:
       - envFrom:
         - configMapRef:
             name: {{ $global.config.CONFIG_MAP_NAME }}
+
+        {{- $args := $microservice.args }}
+        {{- range $podSpec := $global.podSpecs }}
+          {{- if eq $podSpec.name $microservice.name }}
+            {{- $args = $podSpec.args | default $microservice.args }}
+          {{- end }}
+        {{- end }}
+
         {{- if $microservice.args }}
         args:
-        {{- range $arg := $microservice.args }}
+        {{- range $arg := $args }}
           {{- if $arg.name }}
           - {{ $arg.name }}
           {{- end }}

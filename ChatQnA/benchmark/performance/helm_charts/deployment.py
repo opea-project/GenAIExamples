@@ -26,7 +26,7 @@ def generate_yaml(num_nodes, mode="oob", with_rerank="True"):
     if num_nodes == 1:
         replicas = [
             {"name": "chatqna-backend-server-deploy", "replicas": 2},
-            {"name": "embedding-dependency-deploy", "replicas": 2},
+            {"name": "embedding-dependency-deploy", "replicas": 1},
             {"name": "reranking-dependency-deploy", "replicas": 1} if with_rerank else None,
             {"name": "llm-dependency-deploy", "replicas": 7 if with_rerank else 8},
             {"name": "dataprep-deploy", "replicas": 1},
@@ -69,6 +69,7 @@ def generate_yaml(num_nodes, mode="oob", with_rerank="True"):
         {
             "name": "llm-dependency-deploy",
             "args": [
+                {"name": "--model-id", "value": '$(LLM_MODEL_ID)'},
                 {"name": "--max-input-length", "value": 1280},
                 {"name": "--max-total-tokens", "value": 2048},
                 {"name": "--max-batch-total-tokens", "value": 35536},
