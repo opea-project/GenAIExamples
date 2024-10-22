@@ -84,7 +84,7 @@ function start_services() {
         if grep -q "initialized" $LOG_PATH/asr_service_start.log; then
             break
         fi
-       sleep 1m
+       sleep 1s
        n=$((n+1))
     done
     echo "All services are up and running"
