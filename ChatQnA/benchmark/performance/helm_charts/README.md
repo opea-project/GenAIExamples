@@ -18,7 +18,10 @@ HUGGINGFACEHUB_API_TOKEN: hf_xxxxx
 ### Deployment
 
 ```bash
-# Deploy a ChatQnA pipeline using the specified YAML configuration.
-# To deploy with different configurations, simply provide a different YAML file.
+# Options:
+# --num_nodes choices=[1, 2, 4, 8]
+# --mode choices=["tuned", "oob"]
+# --workflow choices=["with_rerank", "without_rerank"]
 python deployment.py --workflow=with_rerank --mode=tuned --num_nodes=1
 ```
+

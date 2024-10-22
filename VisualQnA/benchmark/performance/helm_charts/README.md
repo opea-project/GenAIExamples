@@ -21,3 +21,5 @@ HUGGINGFACEHUB_API_TOKEN: hf_xxxxx
 # Deploy the pipeline
 helm install {example_name} .
 ```
+
+Note: Currently we only support the HPU version, because only HPU values.yaml is provided here.
