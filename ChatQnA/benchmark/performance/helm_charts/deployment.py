@@ -69,7 +69,7 @@ def generate_yaml(num_nodes, mode="oob", with_rerank="True"):
         {
             "name": "llm-dependency-deploy",
             "args": [
-                {"name": "--max-input-length", "values": 1280},
+                {"name": "--max-input-length", "value": 1280},
                 {"name": "--max-total-tokens", "value": 2048},
                 {"name": "--max-batch-total-tokens", "value": 35536},
                 {"name": "--max-batch-prefill-tokens", "value": 4096},
