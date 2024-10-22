@@ -64,6 +64,9 @@ microservices:
   - name: reranking-dependency-deploy
     image: opea/tei-gaudi:latest
     replicas: 1
+    resources:
+      limits:
+        habana.ai/gaudi: 1
     args:
       - name: "--model-id"
       - value: $(RERANK_MODEL_ID)
