@@ -19,7 +19,7 @@ USER user
 COPY comps /home/user/comps
 COPY requirements.txt /home/user/
 
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir -r /home/user/comps/feedback_management/mongo/requirements.txt && \
     pip install --no-cache-dir -r /home/user/requirements.txt
 

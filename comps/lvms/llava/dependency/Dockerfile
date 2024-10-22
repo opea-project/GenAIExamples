@@ -12,7 +12,7 @@ ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/optimum-habana
 
 COPY comps /home/user/comps
 
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir -r /home/user/comps/lvms/llava/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user

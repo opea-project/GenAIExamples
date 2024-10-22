@@ -8,7 +8,7 @@ ENV LANG=en_US.UTF-8
 
 COPY comps /home/comps
 
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir -r /home/comps/lvms/video-llama/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home

@@ -1,21 +1,22 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-From ubuntu:22.04
+FROM python:3.11-slim
+
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 ENV GLIBC_TUNABLES glibc.cpu.x86_shstk=permissive
-RUN apt update && apt install -y python3 python3-pip 
 
 COPY comps /home/user/comps
 
-RUN pip3 install torch==2.2.2 torchvision --index-url https://download.pytorch.org/whl/cpu 
-RUN pip3 install intel-extension-for-pytorch==2.2.0
-RUN pip3 install transformers
-RUN pip3 install llmspec mosec
+RUN pip install --no-cache-dir --upgrade pip setuptools
+RUN pip install --no-cache-dir torch==2.2.2 torchvision --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir intel-extension-for-pytorch==2.2.0
+RUN pip install --no-cache-dir transformers llmspec mosec
 
 RUN cd /home/user/ && export HF_ENDPOINT=https://hf-mirror.com && huggingface-cli download --resume-download BAAI/bge-large-zh-v1.5 --local-dir /home/user/bge-large-zh-v1.5
 USER user

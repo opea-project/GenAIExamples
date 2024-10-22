@@ -19,7 +19,7 @@ COPY --chown=user:user comps /home/user/comps
 
 USER user
 
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir -r /home/user/comps/asr/whisper/requirements.txt && \
     if [ "${ARCH}" = "cpu" ]; then \
         pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu ; \

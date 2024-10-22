@@ -13,7 +13,7 @@ ARG ARCH=cpu
 
 COPY comps /home/user/comps
 
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
     if [ "${ARCH}" = "cpu" ]; then \
         pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu ; \
         pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r /home/user/comps/asr/whisper/requirements.txt ; \
