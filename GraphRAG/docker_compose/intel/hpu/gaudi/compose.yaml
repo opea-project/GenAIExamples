@@ -120,7 +120,7 @@ services:
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   graphrag-gaudi-backend-server:
-    image: ${REGISTRY:-opea}/graphrag-without-rerank:${TAG:-latest}
+    image: ${REGISTRY:-opea}/graphrag:${TAG:-latest}
     container_name: graphrag-gaudi-backend-server
     depends_on:
       - neo4j-apoc

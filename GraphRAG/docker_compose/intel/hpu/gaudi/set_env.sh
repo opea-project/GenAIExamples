@@ -8,7 +8,7 @@
 
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export OPENAI_EMBEDDING_MODEL="text-embedding-3-small"
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export OPENAI_LLM_MODEL="gpt-4o"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TGI_LLM_ENDPOINT="http://${host_ip}:6005"

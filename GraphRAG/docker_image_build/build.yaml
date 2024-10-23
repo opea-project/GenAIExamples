@@ -2,55 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  # chatqna:
-  #   build:
-  #     args:
-  #       http_proxy: ${http_proxy}
-  #       https_proxy: ${https_proxy}
-  #       no_proxy: ${no_proxy}
-  #     context: ../
-  #     dockerfile: ./Dockerfile
-  #   image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
-  # chatqna-guardrails:
-  #   build:
-  #     context: ../
-  #     dockerfile: ./Dockerfile.guardrails
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/chatqna-guardrails:${TAG:-latest}
-  # chatqna-without-rerank:
-  #   build:
-  #     context: ../
-  #     dockerfile: ./Dockerfile.without_rerank
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
-  graphrag-without-rerank:
+  graphrag:
     build:
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: ../
-      dockerfile: ./Dockerfile.without_rerank
-    #extends: chatqna
-    image: ${REGISTRY:-opea}/graphrag-without-rerank:${TAG:-latest}
-  # chatqna-ui:
-  #   build:
-  #     context: ../ui
-  #     dockerfile: ./docker/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
-  # chatqna-conversation-ui:
-  #   build:
-  #     context: ../ui
-  #     dockerfile: ./docker/Dockerfile.react
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}
-  # embedding-tei:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/embeddings/tei/langchain/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/graphrag:${TAG:-latest}
   retriever-neo4j:
     build:
       args:
@@ -60,54 +20,6 @@ services:
       context: GenAIComps
       dockerfile: comps/retrievers/neo4j/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/retriever-neo4j:${TAG:-latest}
-  # llm-tgi:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/llms/text-generation/tgi/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-  # llm-ollama:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/llms/text-generation/ollama/langchain/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
-  # llm-vllm:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/llms/text-generation/vllm/langchain/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
-  # llm-vllm-hpu:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/llms/text-generation/vllm/langchain/dependency/Dockerfile.intel_hpu
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/llm-vllm-hpu:${TAG:-latest}
-  # llm-vllm-ray:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/llms/text-generation/vllm/ray/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/llm-vllm-ray:${TAG:-latest}
-  # llm-vllm-ray-hpu:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/llms/text-generation/vllm/ray/dependency/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/llm-vllm-ray-hpu:${TAG:-latest}
-  # dataprep-redis:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/dataprep/redis/langchain/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
-  # dataprep-qdrant:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/dataprep/qdrant/langchain/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
   dataprep-neo4j:
     build:
       args:
@@ -117,19 +29,7 @@ services:
       context: GenAIComps
       dockerfile: comps/dataprep/neo4j/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-neo4j:${TAG:-latest}
-  # guardrails-tgi:
-  #   build:
-  #     context: GenAIComps
-  #     dockerfile: comps/guardrails/llama_guard/langchain/Dockerfile
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/guardrails-tgi:${TAG:-latest}
-  # vllm:
-  #   build:
-  #     context: vllm
-  #     dockerfile: Dockerfile.cpu
-  #   extends: chatqna
-  #   image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
-  nginx:
+  chatqna-gaudi-nginx-server:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -137,5 +37,13 @@ services:
         no_proxy: ${no_proxy}
       context: GenAIComps
       dockerfile: comps/nginx/Dockerfile
-#    extends: chatqna
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+  chatqna-gaudi-ui-server:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}

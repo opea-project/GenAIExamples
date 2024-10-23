@@ -21,8 +21,7 @@ function build_docker_images() {
     git clone https://github.com/rbrugaro/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"graphRAG_LI"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    #service_list="chatqna-without-rerank chatqna-ui dataprep-redis retriever-redis nginx"
-    service_list="graphrag-without-rerank dataprep-neo4j retriever-neo4j chatqna-gaudi-ui-server chatqna-gaudi-nginx-server"
+    service_list="graphrag dataprep-neo4j retriever-neo4j chatqna-gaudi-ui-server chatqna-gaudi-nginx-server"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
@@ -35,12 +34,11 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    #export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     #this will need to be updated with the set_env variables and how about the required from private????
 
     # Start Docker Containers
-    docker compose -f compose_without_rerank.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -65,10 +63,6 @@ function validate_service() {
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"neo4j-apoc"* ]]; then
          HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" "$URL")
-    # elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
-    #     HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
-    # elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
-    #     HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "all"}' -H 'Content-Type: application/json' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
@@ -186,7 +180,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose  -f compose_without_rerank.yaml stop && docker compose -f compose_without_rerank.yaml rm -f
+    docker compose  -f compose.yaml stop && docker compose -f compose.yaml rm -f
 }
 
 function main() {

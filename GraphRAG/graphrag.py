@@ -6,7 +6,7 @@ import json
 import os
 import re
 
-from comps import ChatQnAGateway, GraphragGateway, MicroService, ServiceOrchestrator, ServiceType
+from comps import GraphragGateway, MicroService, ServiceOrchestrator, ServiceType
 from langchain_core.prompts import PromptTemplate
 
 
@@ -37,23 +37,14 @@ If you don't know the answer to a question, please don't share false information
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
-GUARDRAIL_SERVICE_HOST_IP = os.getenv("GUARDRAIL_SERVICE_HOST_IP", "0.0.0.0")
-GUARDRAIL_SERVICE_PORT = int(os.getenv("GUARDRAIL_SERVICE_PORT", 80))
-EMBEDDING_SERVER_HOST_IP = os.getenv("EMBEDDING_SERVER_HOST_IP", "0.0.0.0")
-EMBEDDING_SERVER_PORT = int(os.getenv("EMBEDDING_SERVER_PORT", 80))
 RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
 RETRIEVER_SERVICE_PORT = int(os.getenv("RETRIEVER_SERVICE_PORT", 7000))
-RERANK_SERVER_HOST_IP = os.getenv("RERANK_SERVER_HOST_IP", "0.0.0.0")
-RERANK_SERVER_PORT = int(os.getenv("RERANK_SERVER_PORT", 80))
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
-    if self.services[cur_node].service_type == ServiceType.EMBEDDING:
-        inputs["inputs"] = inputs["text"]
-        del inputs["text"]
-    elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
+    if self.services[cur_node].service_type == ServiceType.RETRIEVER:
         print("make no changes for retriever inputs. AlreadyCheckCompletionRequest")
     elif self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
@@ -73,81 +64,29 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
 
 
 def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
-    print("data type in align output:\n", type(data))
-    print("data in align output:\n", data)
     next_data = {}
-    if self.services[cur_node].service_type == ServiceType.EMBEDDING:
-        assert isinstance(data, list)
-        next_data = {"text": inputs["inputs"], "embedding": data[0]}
-    elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
-        print(data)
-
+    if self.services[cur_node].service_type == ServiceType.RETRIEVER:
         docs = [doc["text"] for doc in data["retrieved_docs"]]
-
-        with_rerank = runtime_graph.downstream(cur_node)[0].startswith("rerank")
-        if with_rerank and docs:
-            # forward to rerank
-            # prepare inputs for rerank
-            next_data["query"] = data["initial_query"]
-            next_data["texts"] = [doc["text"] for doc in data["retrieved_docs"]]
-        else:
-            # forward to llm
-            if not docs and with_rerank:
-                # delete the rerank from retriever -> rerank -> llm
-                for ds in reversed(runtime_graph.downstream(cur_node)):
-                    for nds in runtime_graph.downstream(ds):
-                        runtime_graph.add_edge(cur_node, nds)
-                    runtime_graph.delete_node_if_exists(ds)
-            # handle template
-            # if user provides template, then format the prompt with it
-            # otherwise, use the default template
-            prompt = inputs.messages[0]["content"]
-            chat_template = llm_parameters_dict["chat_template"]
-            if chat_template:
-                prompt_template = PromptTemplate.from_template(chat_template)
-                input_variables = prompt_template.input_variables
-                if sorted(input_variables) == ["context", "question"]:
-                    prompt = prompt_template.format(question=prompt, context="\n".join(docs))
-                elif input_variables == ["question"]:
-                    prompt = prompt_template.format(question=prompt)
-                else:
-                    print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
-                    prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
-            else:
-                print("no rerank no chat template")
-                prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
-
-            next_data["inputs"] = prompt
-
-    elif self.services[cur_node].service_type == ServiceType.RERANK:
-        # rerank the inputs with the scores
-        reranker_parameters = kwargs.get("reranker_parameters", None)
-        top_n = reranker_parameters.top_n if reranker_parameters else 1
-        docs = inputs["texts"]
-        reranked_docs = []
-        for best_response in data[:top_n]:
-            reranked_docs.append(docs[best_response["index"]])
-
         # handle template
         # if user provides template, then format the prompt with it
         # otherwise, use the default template
-        prompt = inputs["query"]
+        prompt = inputs.messages[0]["content"]
         chat_template = llm_parameters_dict["chat_template"]
         if chat_template:
             prompt_template = PromptTemplate.from_template(chat_template)
             input_variables = prompt_template.input_variables
             if sorted(input_variables) == ["context", "question"]:
-                prompt = prompt_template.format(question=prompt, context="\n".join(reranked_docs))
+                prompt = prompt_template.format(question=prompt, context="\n".join(docs))
             elif input_variables == ["question"]:
                 prompt = prompt_template.format(question=prompt)
             else:
                 print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
-                prompt = ChatTemplate.generate_rag_prompt(prompt, reranked_docs)
+                prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
         else:
-            prompt = ChatTemplate.generate_rag_prompt(prompt, reranked_docs)
+            print("no rerank no chat template")
+            prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
 
         next_data["inputs"] = prompt
-
     else:
         next_data = data
 
@@ -185,58 +124,6 @@ class GraphRAGService:
 
     def add_remote_service(self):
 
-        embedding = MicroService(
-            name="embedding",
-            host=EMBEDDING_SERVER_HOST_IP,
-            port=EMBEDDING_SERVER_PORT,
-            endpoint="/embed",
-            use_remote_service=True,
-            service_type=ServiceType.EMBEDDING,
-        )
-
-        retriever = MicroService(
-            name="retriever",
-            host=RETRIEVER_SERVICE_HOST_IP,
-            port=RETRIEVER_SERVICE_PORT,
-            endpoint="/v1/retrieval",
-            use_remote_service=True,
-            service_type=ServiceType.RETRIEVER,
-        )
-
-        rerank = MicroService(
-            name="rerank",
-            host=RERANK_SERVER_HOST_IP,
-            port=RERANK_SERVER_PORT,
-            endpoint="/rerank",
-            use_remote_service=True,
-            service_type=ServiceType.RERANK,
-        )
-
-        llm = MicroService(
-            name="llm",
-            host=LLM_SERVER_HOST_IP,
-            port=LLM_SERVER_PORT,
-            endpoint="/v1/chat/completions",
-            use_remote_service=True,
-            service_type=ServiceType.LLM,
-        )
-        self.megaservice.add(embedding).add(retriever).add(rerank).add(llm)
-        self.megaservice.flow_to(embedding, retriever)
-        self.megaservice.flow_to(retriever, rerank)
-        self.megaservice.flow_to(rerank, llm)
-        self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
-
-    def add_remote_service_without_rerank(self):
-
-        # embedding = MicroService(
-        #     name="embedding",
-        #     host=EMBEDDING_SERVER_HOST_IP,
-        #     port=EMBEDDING_SERVER_PORT,
-        #     endpoint="/embed",
-        #     use_remote_service=True,
-        #     service_type=ServiceType.EMBEDDING,
-        # )
-
         retriever = MicroService(
             name="retriever",
             host=RETRIEVER_SERVICE_HOST_IP,
@@ -258,76 +145,8 @@ class GraphRAGService:
         self.megaservice.flow_to(retriever, llm)
         self.gateway = GraphragGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
-    def add_remote_service_with_guardrails(self):
-        guardrail_in = MicroService(
-            name="guardrail_in",
-            host=GUARDRAIL_SERVICE_HOST_IP,
-            port=GUARDRAIL_SERVICE_PORT,
-            endpoint="/v1/guardrails",
-            use_remote_service=True,
-            service_type=ServiceType.GUARDRAIL,
-        )
-        embedding = MicroService(
-            name="embedding",
-            host=EMBEDDING_SERVER_HOST_IP,
-            port=EMBEDDING_SERVER_PORT,
-            endpoint="/embed",
-            use_remote_service=True,
-            service_type=ServiceType.EMBEDDING,
-        )
-        retriever = MicroService(
-            name="retriever",
-            host=RETRIEVER_SERVICE_HOST_IP,
-            port=RETRIEVER_SERVICE_PORT,
-            endpoint="/v1/retrieval",
-            use_remote_service=True,
-            service_type=ServiceType.RETRIEVER,
-        )
-        rerank = MicroService(
-            name="rerank",
-            host=RERANK_SERVER_HOST_IP,
-            port=RERANK_SERVER_PORT,
-            endpoint="/rerank",
-            use_remote_service=True,
-            service_type=ServiceType.RERANK,
-        )
-        llm = MicroService(
-            name="llm",
-            host=LLM_SERVER_HOST_IP,
-            port=LLM_SERVER_PORT,
-            endpoint="/v1/chat/completions",
-            use_remote_service=True,
-            service_type=ServiceType.LLM,
-        )
-        # guardrail_out = MicroService(
-        #     name="guardrail_out",
-        #     host=GUARDRAIL_SERVICE_HOST_IP,
-        #     port=GUARDRAIL_SERVICE_PORT,
-        #     endpoint="/v1/guardrails",
-        #     use_remote_service=True,
-        #     service_type=ServiceType.GUARDRAIL,
-        # )
-        # self.megaservice.add(guardrail_in).add(embedding).add(retriever).add(rerank).add(llm).add(guardrail_out)
-        self.megaservice.add(guardrail_in).add(embedding).add(retriever).add(rerank).add(llm)
-        self.megaservice.flow_to(guardrail_in, embedding)
-        self.megaservice.flow_to(embedding, retriever)
-        self.megaservice.flow_to(retriever, rerank)
-        self.megaservice.flow_to(rerank, llm)
-        # self.megaservice.flow_to(llm, guardrail_out)
-        self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
-
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--without-rerank", action="store_true")
-    parser.add_argument("--with-guardrails", action="store_true")
+    graphrag = GraphRAGService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    graphrag.add_remote_service()
 
-    args = parser.parse_args()
-    chatqna = GraphRAGService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
-    print(RETRIEVER_SERVICE_PORT)
-    if args.without_rerank:
-        chatqna.add_remote_service_without_rerank()
-    elif args.with_guardrails:
-        chatqna.add_remote_service_with_guardrails()
-    else:
-        chatqna.add_remote_service()

@@ -33,4 +33,4 @@ WORKDIR /home/user
 
 RUN echo 'ulimit -S -n 999999' >> ~/.bashrc
 
-ENTRYPOINT ["python", "graphrag.py", "--without-rerank"]
+ENTRYPOINT ["python", "graphrag.py"]
