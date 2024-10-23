@@ -28,3 +28,4 @@ services:
       port: 9090
       SDK_BASE_URL: ${SDK_BASE_URL}
       SERVING_TOKEN: ${SERVING_TOKEN}
+      custom_prompt: /home/user/tools/custom_prompt.py

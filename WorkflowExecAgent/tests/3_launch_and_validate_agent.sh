@@ -5,16 +5,17 @@
 set -e
 
 WORKPATH=$(dirname "$PWD")
-workflow_id=${workflow_id}
+workflow_id=9794
 vllm_port=${vllm_port}
+[[ -z "$vllm_port" ]] && vllm_port=8084
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export SDK_BASE_URL=${SDK_BASE_URL}
 export SERVING_TOKEN=${SERVING_TOKEN}
-export HF_TOKEN=${HF_TOKEN}
+export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export llm_engine=vllm
 export ip_address=$(hostname -I | awk '{print $1}')
-export llm_endpoint_url=${ip_address}:${vllm_port}
+export llm_endpoint_url=http://${ip_address}:${vllm_port}
 export model=mistralai/Mistral-7B-Instruct-v0.3
 export recursion_limit=25
 export temperature=0
@@ -23,8 +24,8 @@ export TOOLSET_PATH=$WORKDIR/GenAIExamples/WorkflowExecAgent/tools/
 
 function start_agent_and_api_server() {
     echo "Starting Agent services"
-    cd $WORKDIR/GenAIExamples/WorkflowExecAgent/docker_compose
-    WORKDIR=$WORKPATH/docker_image_build/ docker compose -f docker_compose.yaml up -d
+    cd $WORKDIR/GenAIExamples/WorkflowExecAgent/docker_compose/intel/cpu/xeon
+    WORKDIR=$WORKPATH/docker_image_build/ docker compose -f compose_vllm.yaml up -d
     echo "Waiting agent service ready"
     sleep 5s
 }
