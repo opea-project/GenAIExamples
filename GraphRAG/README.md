@@ -131,7 +131,7 @@ flowchart LR
     direction LR
     Ingest[Ingest data] --> UI
     UI --> DP
-    
+
     #interactions buried inside the DP and RET microservice implementations
     DP <-.-> EM
     DP <-.-> LLM
