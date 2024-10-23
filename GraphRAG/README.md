@@ -1,12 +1,12 @@
 # ChatQnA Application
 
-While naive RAG works well in fetching precise information it fails on global questions directed at an entire text corpus, such as "What are the main themes in the dataset?". 
+While naive RAG works well in fetching precise information it fails on global questions directed at an entire text corpus, such as "What are the main themes in the dataset?".
 GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Approach to Query-Focused Summarization". The key elements are:
+
 - Uses LLM to derive an entity knowledge graph from the source documents
-- Uses hierarchichal leiden algorithm to identify communities of closely-related entities and summaries are extracted for each community
+- Uses hierarchical leiden algorithm to identify communities of closely-related entities and summaries are extracted for each community
 - For an input query the relevant communities are identified and partial answers are generated from each of the community summaries (query-focused summarization (QFS))
 - There is a final generation stage that responds to the query based on the intermediate community answers.
-
 
 ## Deploy ChatQnA Service
 
@@ -26,23 +26,23 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 1. Set the required private environment variables:
 
-    ```bash
-    export host_ip=${your_hostname IP} #local IP, i.e "192.168.1.1"
-    export NEO4J_URI=${your_neo4j_url}
-    export NEO4J_USERNAME=${your_neo4j_username}
-    export NEO4J_PASSWORD=${your_neo4j_password}
-    export PYTHONPATH=${path_to_comps}
-    export OPENAI_KEY=${your_openai_api_key} #optional, when not provided will use smaller models TGI/TEI
-    export HUGGINGFACEHUB_API_TOKEN=${your_hf_token} #needed for TGI/TEI models
-    ```
+   ```bash
+   export host_ip=${your_hostname IP} #local IP, i.e "192.168.1.1"
+   export NEO4J_URI=${your_neo4j_url}
+   export NEO4J_USERNAME=${your_neo4j_username}
+   export NEO4J_PASSWORD=${your_neo4j_password}
+   export PYTHONPATH=${path_to_comps}
+   export OPENAI_KEY=${your_openai_api_key} #optional, when not provided will use smaller models TGI/TEI
+   export HUGGINGFACEHUB_API_TOKEN=${your_hf_token} #needed for TGI/TEI models
+   ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
 
-    ```bash
-    export http_proxy="Your_HTTP_Proxy"
-    export https_proxy="Your_HTTPs_Proxy"
-    export no_proxy=$no_proxy,${host_ip} #important to add {host_ip} for containers communication
-    ```
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   export no_proxy=$no_proxy,${host_ip} #important to add {host_ip} for containers communication
+   ```
 
 3. Set up other environment variables:
 
@@ -53,7 +53,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 ### Quick Start: 2.Run Docker Compose
 
-If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](docker_compose/intel/cpu/xeon/README.md). [test_compose.sh](tests/test_compose.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD. 
+If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](docker_compose/intel/cpu/xeon/README.md). [test_compose.sh](tests/test_compose.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD.
 
 Docker compose will start 8 services: ![8 servicesi in GraphRAG](assets/8microservices.png)
 
@@ -81,7 +81,7 @@ curl -X POST "http://${host_ip}:6004/v1/dataprep" \
 curl http://${host_ip}:8888/v1/graphrag \
     -H "Content-Type: application/json"  \
     -d '{
-        "model": "gpt-4o-mini","messages": [{"role": "user","content": "What is the revenue of Nike in 2023?     
+        "model": "gpt-4o-mini","messages": [{"role": "user","content": "What is the revenue of Nike in 2023?
     "}]}'
 ```
 
@@ -156,7 +156,6 @@ flowchart LR
 
 > **Note**: The Dataprep and Retriever microservices use the LLM Microservice and Embedding Microservice in their implementation. For example, Dataprep uses LLM to extract entities and relationships from text to build graph and Retriever uses LLM to summarize communities (these are clusters of similar entities and their properties). Those endpoint interactions with respective prompts are buried in the microservice implementation thus not managed by the megaservice orchestrator scheduler and not exposed in the megaservice.
 
-
 This GraphRAG use case performs RAG using Llama-index, Neo4J Graph Property Store and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
@@ -170,17 +169,16 @@ Gaudi default compose.yaml
 
 ### Models Selection
 
-GraphRAG quality dependents heavily on the ability to extract a high quality graph. We highly recommend using the best model availableto you. Table below shows default models specified in the codebase when OPENAI_API_KEY is available and for local inference w TEI/TGI. The local models are small since those will be used in CI/CD but  users should improve upon these by changing the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh`.
+GraphRAG quality dependents heavily on the ability to extract a high quality graph. We highly recommend using the best model availableto you. Table below shows default models specified in the codebase when OPENAI_API_KEY is available and for local inference w TEI/TGI. The local models are small since those will be used in CI/CD but users should improve upon these by changing the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh`.
 
-Working on a table comparison of various model sizes vs. naive RAG with a dataset that reflects well the benefits of GraphRAG. Stay tunned!
+Working on a table comparison of various model sizes vs. naive RAG with a dataset that reflects well the benefits of GraphRAG. Stay tuned!
 
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Embedding | "text-embedding-3-small"     |
-| LLM       | gpt-4o |
+| Service   | Model                                 |
+| --------- | ------------------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5                 |
+| Embedding | "text-embedding-3-small"              |
+| LLM       | gpt-4o                                |
 | LLM       | "meta-llama/Meta-Llama-3-8B-Instruct" |
-
 
 ## Consume GraphRAG Service with RAG
 
@@ -189,15 +187,14 @@ Working on a table comparison of various model sizes vs. naive RAG with a datase
 Before consuming GraphRAG Service, make sure each microservice is ready by checking the docker logs of each microservice. [test_compose.sh](tests/test_compose.sh) can be a good resource as it shows how CI/CD validated each microservices based on returned HTTP status and response body.
 
 ```bash
-docker logs container_name 
+docker logs container_name
 ```
-
 
 ### Upload RAG Files
 
 To chat with retrieved information, you need to upload a file using `Dataprep` service.
 
-Here is an example of `Nike 2023` pdf. 
+Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
@@ -218,7 +215,7 @@ Two ways of consuming ChatQnA Service:
 curl http://${host_ip}:8888/v1/graphrag \
     -H "Content-Type: application/json"  \
     -d '{
-        "model": "gpt-4o-mini","messages": [{"role": "user","content": "Who is John Brady and has he had any confrontations?     
+        "model": "gpt-4o-mini","messages": [{"role": "user","content": "Who is John Brady and has he had any confrontations?
     "}]}'
 ```
 
