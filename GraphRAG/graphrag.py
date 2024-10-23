@@ -149,4 +149,3 @@ class GraphRAGService:
 if __name__ == "__main__":
     graphrag = GraphRAGService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     graphrag.add_remote_service()
-
