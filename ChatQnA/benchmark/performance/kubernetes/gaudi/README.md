@@ -156,4 +156,3 @@ To benchmark the deployed `opea/chatqna`, refer to the [GenAIEval](https://githu
 ```bash
 python benchmark.py
 ```
-
