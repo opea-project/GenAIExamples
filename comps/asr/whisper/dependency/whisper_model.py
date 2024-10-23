@@ -9,7 +9,6 @@ import numpy as np
 import torch
 from datasets import Audio, Dataset
 from pydub import AudioSegment
-from transformers import WhisperForConditionalGeneration, WhisperProcessor
 
 
 class WhisperModel:
@@ -21,6 +20,7 @@ class WhisperModel:
             from optimum.habana.transformers.modeling_utils import adapt_transformers_to_gaudi
 
             adapt_transformers_to_gaudi()
+        from transformers import WhisperForConditionalGeneration, WhisperProcessor
 
         self.device = device
         asr_model_name_or_path = os.environ.get("ASR_MODEL_PATH", model_name_or_path)
@@ -104,6 +104,7 @@ class WhisperModel:
                 )
             ),
             language=self.language,
+            return_timestamps=True,
         )
 
     def audio2text(self, audio_path):
@@ -166,6 +167,7 @@ class WhisperModel:
                 )
             ),
             language=self.language,
+            return_timestamps=True,
         )
         # pylint: disable=E1101
         result = self.processor.tokenizer.batch_decode(predicted_ids, skip_special_tokens=True, normalize=True)[0]
