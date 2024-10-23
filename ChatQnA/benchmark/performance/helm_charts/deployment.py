@@ -59,7 +59,7 @@ def generate_yaml(num_nodes, mode="oob", with_rerank="True"):
             else None
         ),
         {"name": "llm-dependency-deploy", "resources": {"limits": {"habana.ai/gaudi": 1}}},
-        {"name": "retriever-deploy", "resources": {"requests": {"cpu": "16", "memory": "8000Mi"}}},
+        {"name": "retriever-deploy", "resources": {"requests": {"cpu": "8", "memory": "8000Mi"}}},
     ]
 
     replicas = [replica for replica in replicas if replica]
@@ -72,7 +72,7 @@ def generate_yaml(num_nodes, mode="oob", with_rerank="True"):
                 {"name": "--model-id", "value": "$(LLM_MODEL_ID)"},
                 {"name": "--max-input-length", "value": 1280},
                 {"name": "--max-total-tokens", "value": 2048},
-                {"name": "--max-batch-total-tokens", "value": 35536},
+                {"name": "--max-batch-total-tokens", "value": 65536},
                 {"name": "--max-batch-prefill-tokens", "value": 4096},
             ],
         },
