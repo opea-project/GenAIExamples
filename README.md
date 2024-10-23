@@ -37,14 +37,14 @@ Deployment are based on released docker images by default, check [docker image l
   - (Optional) You should have Helm (version >= 3.15) installed if you want to deploy with Helm Charts. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
   - Based on different deployment model, you may choose different hardware platforms or cloud instances. Here are some reference platforms
 
-    | Use Case | Deployment model | Reference Configuration                                       | Hardware access/instances                                                    |
+    | Use Case | Deployment model | Reference Configuration                                      | Hardware access/instances                                                    |
     | -------- | ---------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
     | Xeon     | Single node      | 16 vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04            | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
     | Gaudi    | Single node      | Gaudi Card, 16vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04 | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
     | Xeon     | Single node      | 16 vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04            | AWS Cloud/m7i-flex.4xlarge                                                   |
-    |  |
+    |          |
     | Xeon     | Single node      | 16 vCPUs, 512 GB disk 80 GB RAM, and Ubuntu 24.04            | IBM Cloud/xlarge                                                             |
-    |  |
+    |          |
 
 #### Deploy Examples
 
