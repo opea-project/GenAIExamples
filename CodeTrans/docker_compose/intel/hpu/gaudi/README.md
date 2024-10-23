@@ -49,8 +49,8 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 By default, the LLM model is set to a default value as listed below:
 
-| Service | Model                         |
-| ------- | ----------------------------- |
+| Service | Model                              |
+| ------- | ---------------------------------- |
 | LLM     | mistralai/Mistral-7B-Instruct-v0.3 |
 
 Change the `LLM_MODEL_ID` below for your needs.
