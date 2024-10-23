@@ -42,8 +42,8 @@ export MEGA_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
 export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
-export DATAPREP_GET_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
-export DATAPREP_DELETE_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_videos"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_files"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -129,6 +129,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 ### Required Models
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
+
 
 | Service              | Model                                       |
 | -------------------- | ------------------------------------------- |
@@ -251,12 +252,12 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     -X POST -F "files=@./${video_fn}"
 ```
 
-Also, you are able to get the list of all videos that you uploaded:
+Also, you are able to get the list of all files that you uploaded:
 
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
-    ${DATAPREP_GET_VIDEO_ENDPOINT}
+    ${DATAPREP_GET_FILE_ENDPOINT}
 ```
 
 Then you will get the response python-style LIST like this. Notice the name of each uploaded video e.g., `videoname.mp4` will become `videoname_uuid.mp4` where `uuid` is a unique ID for each uploaded video. The same video that are uploaded twice will have different `uuid`.
@@ -268,12 +269,12 @@ Then you will get the response python-style LIST like this. Notice the name of e
 ]
 ```
 
-To delete all uploaded videos along with data indexed with `$INDEX_NAME` in REDIS.
+To delete all uploaded files along with data indexed with `$INDEX_NAME` in REDIS.
 
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
-    ${DATAPREP_DELETE_VIDEO_ENDPOINT}
+    ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
 7. MegaService

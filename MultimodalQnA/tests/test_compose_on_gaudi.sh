@@ -49,8 +49,8 @@ function setup_env() {
     export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
     export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
     export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
-    export DATAPREP_GET_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
-    export DATAPREP_DELETE_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_videos"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_files"
 }
 
 function start_services() {
@@ -163,7 +163,7 @@ function validate_microservices() {
 
     echo "Validating get file"
     validate_service \
-        "${DATAPREP_GET_VIDEO_ENDPOINT}" \
+        "${DATAPREP_GET_FILE_ENDPOINT}" \
         '.mp4' \
         "dataprep_get" \
         "dataprep-multimodal-redis"
@@ -224,9 +224,9 @@ function validate_megaservice() {
 }
 
 function validate_delete {
-    echo "Validate data prep delete videos"
+    echo "Validate data prep delete files"
     validate_service \
-        "${DATAPREP_DELETE_VIDEO_ENDPOINT}" \
+        "${DATAPREP_DELETE_FILE_ENDPOINT}" \
         '{"status":true}' \
         "dataprep_del" \
         "dataprep-multimodal-redis"
