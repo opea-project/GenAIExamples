@@ -10,7 +10,7 @@ on:
     paths:
       - "**/Dockerfile**"
       - "**.py"
-      - "**/kubernetes/**/manifests/**"
+      - "**/kubernetes/**/manifest/**"
       - "**/tests/test_manifest**"
       - "!**.md"
       - "!**.txt"
