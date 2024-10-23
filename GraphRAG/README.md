@@ -125,7 +125,7 @@ flowchart LR
     GDB{{Graph DB<br><br>}}
     DP([Data Preparation MicroService]):::blue
     GW([GraphRAG GateWay<br>]):::orange
-    
+
 
     %% Data Preparation flow
     %% Ingest data flow
@@ -138,7 +138,7 @@ flowchart LR
     DP <-.-> LLM
     RET <-.-> EM
     RET <-.-> LLM
-   
+
 
     %% Questions interaction
     direction LR
