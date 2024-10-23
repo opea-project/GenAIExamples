@@ -8,15 +8,8 @@ GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Ap
 - For an input query the relevant communities are identified and partial answers are generated from each of the community summaries (query-focused summarization (QFS))
 - There is a final generation stage that responds to the query based on the intermediate community answers.
 
-<<<<<<< Updated upstream
-
-## Deploy ChatQnA Service
-
-=======
 
 ## Deploy GraphRAG Service
-
-> > > > > > > Stashed changes
 
 The GraphRAG service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors.
 
@@ -248,5 +241,5 @@ curl http://${host_ip}:8888/v1/graphrag \
 
 OPEA microservice deployment can easily be monitored through Grafana dashboards in conjunction with Prometheus data collection. Follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to setup Prometheus and Grafana servers and import dashboards to monitor the OPEA service.
 
-![chatqna dashboards](./assets/img/chatqna_dashboards.png)
-![tgi dashboard](./assets/img/tgi_dashboard.png)
+![chatqna dashboards](../ChatQnA/assets/img/chatqna_dashboards.png)
+![tgi dashboard](../ChatQnA//assets/img/tgi_dashboard.png)
