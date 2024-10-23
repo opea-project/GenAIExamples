@@ -1,4 +1,4 @@
-# ChatQnA Application
+# GraphRAG Application
 
 While naive RAG works well in fetching precise information it fails on global questions directed at an entire text corpus, such as "What are the main themes in the dataset?".
 GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Approach to Query-Focused Summarization". The key elements are:
@@ -8,21 +8,26 @@ GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Ap
 - For an input query the relevant communities are identified and partial answers are generated from each of the community summaries (query-focused summarization (QFS))
 - There is a final generation stage that responds to the query based on the intermediate community answers.
 
+<<<<<<< Updated upstream
 ## Deploy ChatQnA Service
+=======
 
-The ChatQnA service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors.
+## Deploy GraphRAG Service
+>>>>>>> Stashed changes
+
+The GraphRAG service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors.
 
 Quick Start Deployment Steps:
 
 1. Set up the environment variables.
 2. Run Docker Compose.
-3. Consume the ChatQnA Service.
+3. Consume the GraphRAG Service.
 
 Note: If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`
 
 ### Quick Start: 1.Setup Environment Variable
 
-To set up environment variables for deploying ChatQnA services, follow these steps:
+To set up environment variables for deploying GraphRAG services, follow these steps:
 
 1. Set the required private environment variables:
 
@@ -87,10 +92,7 @@ curl http://${host_ip}:8888/v1/graphrag \
 
 ## Architecture and Deploy details
 
-GraphQnA architecture shows below:
-![architecture](./assets/img/chatqna_architecture.png)
-
-The ChatQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
+The GraphRAG example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
 ---
@@ -157,7 +159,7 @@ flowchart LR
 > **Note**: The Dataprep and Retriever microservices use the LLM Microservice and Embedding Microservice in their implementation. For example, Dataprep uses LLM to extract entities and relationships from text to build graph and Retriever uses LLM to summarize communities (these are clusters of similar entities and their properties). Those endpoint interactions with respective prompts are buried in the microservice implementation thus not managed by the megaservice orchestrator scheduler and not exposed in the megaservice.
 
 This GraphRAG use case performs RAG using Llama-index, Neo4J Graph Property Store and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
-In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
+In the below, we provide a table that describes for each microservice component in the GraphRAG architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
 Gaudi default compose.yaml
 | MicroService | Open Source Project | HW | Port | Endpoint |
@@ -207,7 +209,7 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep" \
 
 ### Consume GraphRAG Service
 
-Two ways of consuming ChatQnA Service:
+Two ways of consuming GraphRAG Service:
 
 1. Use cURL command on terminal
 
