@@ -11,6 +11,7 @@ from typing import Dict, List
 import aiohttp
 import requests
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 
 from ..proto.docarray import LLMParams
 from .constants import ServiceType
@@ -44,7 +45,7 @@ class ServiceOrchestrator(DAG):
             logger.error(e)
             return False
 
-    async def schedule(self, initial_inputs: Dict, llm_parameters: LLMParams = LLMParams(), **kwargs):
+    async def schedule(self, initial_inputs: Dict | BaseModel, llm_parameters: LLMParams = LLMParams(), **kwargs):
         result_dict = {}
         runtime_graph = DAG()
         runtime_graph.graph = copy.deepcopy(self.graph)
@@ -201,7 +202,13 @@ class ServiceOrchestrator(DAG):
         else:
             if LOGFLAG:
                 logger.info(inputs)
-            async with session.post(endpoint, json=inputs) as response:
+            if not isinstance(inputs, dict):
+                input_data = inputs.dict()
+                # remove null
+                input_data = {k: v for k, v in input_data.items() if v is not None}
+            else:
+                input_data = inputs
+            async with session.post(endpoint, json=input_data) as response:
                 if response.content_type == "audio/wav":
                     audio_data = await response.read()
                     data = self.align_outputs(
