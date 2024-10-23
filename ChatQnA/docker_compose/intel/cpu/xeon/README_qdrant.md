@@ -111,7 +111,7 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
 ```bash
-cd GenAIExamples/ChatQnA//ui
+cd GenAIExamples/ChatQnA/ui
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep"
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
@@ -167,10 +167,10 @@ export host_ip="External_Public_IP"
 export your_hf_api_token="Your_Huggingface_API_Token"
 ```
 
-**Append the value of the public IP address to the no_proxy list**
+**Append the value of the public IP address to the no_proxy list if you are in a proxy environment**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
+export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-qdrant-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
 ```
 
 ```bash
