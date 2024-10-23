@@ -157,7 +157,7 @@ data:
   MAX_TOTAL_TOKENS: "2048"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   NUM_SHARD: "8"
-  SHARDED: "true" 
+  SHARDED: "true"
   LLM_MODEL_ID: "meta-llama/Meta-Llama-3.1-70B-Instruct"
 ----
 
@@ -1063,7 +1063,7 @@ spec:
             runAsNonRoot: true
             runAsUser: 1000
             seccompProfile:
-              type: RuntimeDefault          
+              type: RuntimeDefault
         - args:
           - --model-id
           - $(LLM_MODEL_ID)
@@ -1084,7 +1084,7 @@ spec:
           - --max-waiting-tokens
           - '7'
           - --max-concurrent-requests
-          - '512'           
+          - '512'
           env:
           - name: OMPI_MCA_btl_vader_single_copy_mechanism
             value: none
@@ -1153,11 +1153,11 @@ spec:
             limits:
               habana.ai/gaudi: 8
               cpu: 40
-              memory: 400Gi              
+              memory: 400Gi
             requests:
               habana.ai/gaudi: 8
               cpu: 40
-              memory: 400Gi              
+              memory: 400Gi
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
