@@ -8,7 +8,6 @@ GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Ap
 - For an input query the relevant communities are identified and partial answers are generated from each of the community summaries (query-focused summarization (QFS))
 - There is a final generation stage that responds to the query based on the intermediate community answers.
 
-
 ## Deploy GraphRAG Service
 
 The GraphRAG service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors.
