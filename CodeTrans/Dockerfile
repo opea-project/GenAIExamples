@@ -18,7 +18,7 @@ WORKDIR /home/user/
 RUN git clone https://github.com/opea-project/GenAIComps.git
 
 WORKDIR /home/user/GenAIComps
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
 
 COPY ./code_translation.py /home/user/code_translation.py
