@@ -121,19 +121,23 @@ flowchart LR
     end
 
 
-
     GDB{{Graph DB<br><br>}}
-    R_RET{{Retriever service <br>}}
     DP([Data Preparation MicroService]):::blue
-    LLM_gen{{LLM Service <br>}}
     GW([GraphRAG GateWay<br>]):::orange
+    EM([Embedding MicroService]):::blue
 
     %% Data Preparation flow
     %% Ingest data flow
     direction LR
     Ingest[Ingest data] --> UI
     UI --> DP
+    
+    #interactions buried inside the DP and RET microservice implementations
     DP <-.-> EM
+    DP <-.-> LLM
+    RET <-.-> EM
+    RE <-.-> LLM
+
 
 
     %% Questions interaction
@@ -146,8 +150,13 @@ flowchart LR
 
     direction TB
     %% Graph DB interaction
-    R_RET <-.->|d|GDB
+    RET <-.->|d|GDB
     DP <-.->|d|GDB
+
+    linkStyle 2 stroke:#00FF00,stroke-width:2px;  # DP -.-> EM
+    linkStyle 3 stroke:#00FF00,stroke-width:2px;  # DP -.-> LLM
+    linkStyle 4 stroke:#00FF00,stroke-width:2px;  # RET -.-> EM
+    linkStyle 5 stroke:#00FF00,stroke-width:2px;  # RET -.-> LLM
 
 ```
 
