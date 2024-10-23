@@ -65,7 +65,7 @@ This document introduces the supported examples of GenAIExamples. The supported 
 
 | Framework                                                                      | LLM                                                                             | Serving                                                         | HW          | Description |
 | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ----------- |
-| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Copilot     |
+| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Copilot     |
 
 ### CodeTrans
 
