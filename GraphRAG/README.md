@@ -9,11 +9,14 @@ GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Ap
 - There is a final generation stage that responds to the query based on the intermediate community answers.
 
 <<<<<<< Updated upstream
+
 ## Deploy ChatQnA Service
+
 =======
 
 ## Deploy GraphRAG Service
->>>>>>> Stashed changes
+
+> > > > > > > Stashed changes
 
 The GraphRAG service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors.
 
