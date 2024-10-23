@@ -72,6 +72,21 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
+  ollama-service:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    entrypoint: ["bash", "-c"]
+    command: ["ollama serve & sleep 10 && ollama run ${OLLAMA_MODEL} & wait"]
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+
   chatqna-aipc-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-aipc-backend-server
@@ -133,6 +148,9 @@ services:
       - DATAPREP_SERVICE_PORT=6007
     ipc: host
     restart: always
+
+volumes:
+  ollama:
 
 networks:
   default:
