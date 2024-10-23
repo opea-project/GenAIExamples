@@ -63,8 +63,8 @@ This document introduces the supported examples of GenAIExamples. The supported 
 
 [CodeGen](./CodeGen/README.md) is an example of copilot designed for code generation in Visual Studio Code.
 
-| Framework                                                                      | LLM                                                                             | Serving                                                         | HW          | Description |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ----------- |
+| Framework                                                                      | LLM                                                                                     | Serving                                                         | HW          | Description |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ----------- |
 | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Copilot     |
 
 ### CodeTrans
