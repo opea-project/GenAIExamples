@@ -112,6 +112,7 @@ flowchart LR
         direction LR
         RET([Retrieval MicroService]):::blue
         LLM([LLM MicroService]):::blue
+        EM([Embedding MicroService]):::blue
     end
     subgraph UserInterface[" User Interface "]
         direction LR
@@ -124,7 +125,7 @@ flowchart LR
     GDB{{Graph DB<br><br>}}
     DP([Data Preparation MicroService]):::blue
     GW([GraphRAG GateWay<br>]):::orange
-    EM([Embedding MicroService]):::blue
+    
 
     %% Data Preparation flow
     %% Ingest data flow
@@ -136,9 +137,8 @@ flowchart LR
     DP <-.-> EM
     DP <-.-> LLM
     RET <-.-> EM
-    RE <-.-> LLM
-
-
+    RET <-.-> LLM
+   
 
     %% Questions interaction
     direction LR
@@ -150,17 +150,18 @@ flowchart LR
 
     direction TB
     %% Graph DB interaction
-    RET <-.->|d|GDB
-    DP <-.->|d|GDB
+    RET <-.-> |d|GDB
+    DP <-.-> |d|GDB
 
-    linkStyle 2 stroke:#00FF00,stroke-width:2px;  # DP -.-> EM
-    linkStyle 3 stroke:#00FF00,stroke-width:2px;  # DP -.-> LLM
-    linkStyle 4 stroke:#00FF00,stroke-width:2px;  # RET -.-> EM
-    linkStyle 5 stroke:#00FF00,stroke-width:2px;  # RET -.-> LLM
+    linkStyle 2 stroke:#000000,stroke-width:2px;
+    linkStyle 3 stroke:#000000,stroke-width:2px;
+    linkStyle 4 stroke:#000000,stroke-width:2px;
+    linkStyle 5 stroke:#000000,stroke-width:2px;
+
 
 ```
 
-> **Note**: The Dataprep and Retriever microservices use the LLM Microservice and Embedding Microservice in their implementation. For example, Dataprep uses LLM to extract entities and relationships from text to build graph and Retriever uses LLM to summarize communities (these are clusters of similar entities and their properties). Those endpoint interactions with respective prompts are buried in the microservice implementation thus not managed by the megaservice orchestrator scheduler and not exposed in the megaservice.
+> **Note**: The Dataprep and Retriever microservices use the LLM Microservice and Embedding Microservice in their implementation. For example, Dataprep uses LLM to extract entities and relationships from text to build graph and Retriever uses LLM to summarize communities (these are clusters of similar entities and their properties). Those endpoint interactions with the corresponding prompt templates are buried in the microservice implementation thus not managed by the megaservice orchestrator scheduler and not exposed in the megaservice. Shown as thin black lines in diagram.
 
 This GraphRAG use case performs RAG using Llama-index, Neo4J Graph Property Store and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
 In the below, we provide a table that describes for each microservice component in the GraphRAG architecture, the default configuration of the open source project, hardware, port, and endpoint.
