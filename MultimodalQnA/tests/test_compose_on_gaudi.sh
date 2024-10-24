@@ -166,10 +166,17 @@ function validate_microservices() {
         "dataprep-multimodal-redis-caption" \
         "dataprep-multimodal-redis"
 
-    echo "Validating get file"
+    echo "Validating get file returns mp4"
     validate_service \
         "${DATAPREP_GET_VIDEO_ENDPOINT}" \
         '.mp4' \
+        "dataprep_get" \
+        "dataprep-multimodal-redis"
+
+    echo "Validating get file returns png"
+    validate_service \
+        "${DATAPREP_GET_VIDEO_ENDPOINT}" \
+        '.png' \
         "dataprep_get" \
         "dataprep-multimodal-redis"
 
@@ -237,6 +244,13 @@ function validate_delete {
         "dataprep-multimodal-redis"
 }
 
+function delete_data() {
+    cd $LOG_PATH
+    echo "Deleting image and video"
+    rm -rf ${image_fn}
+    rm -rf ${video_fn}
+}
+
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose -f compose.yaml stop && docker compose -f compose.yaml rm -f
@@ -261,6 +275,7 @@ function main() {
     validate_delete
     echo "==== delete validated ===="
 
+    delete_data
     stop_docker
     echo y | docker system prune
 
