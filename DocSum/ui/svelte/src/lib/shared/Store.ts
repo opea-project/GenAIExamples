@@ -20,5 +20,4 @@ export let loading = writable(false);
 
 export const uploadFile = writable<Blob | null>(null);
 
-export let uploadFilesName = writable('');
-
+export let uploadFilesName = writable("");

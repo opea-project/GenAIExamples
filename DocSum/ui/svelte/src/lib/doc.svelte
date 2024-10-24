@@ -32,7 +32,7 @@
   let formModal = false;
   let currentIdx = 1;
 
-  function togglePanel(index: number) {    
+  function togglePanel(index: number) {
     if (activePanel === index) {
       return;
     } else {
@@ -45,10 +45,10 @@
       } else {
         activePanel = currentIdx;
       }
-    }    
+    }
   }
 
-  function panelExchange() {        
+  function panelExchange() {
     if (currentIdx === 1) {
       kb_id.set("");
       dispatch("clearMsg", { status: true });
@@ -60,7 +60,7 @@
     formModal = false;
   }
 
-  function generateSummary() {    
+  function generateSummary() {
     if ($kb_id === "" && message === "") {
       addNotification({
         text: "Please upload content first",

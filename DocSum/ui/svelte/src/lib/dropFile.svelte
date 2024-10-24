@@ -30,7 +30,7 @@
     if (file.size > 2048) {
       displayHint = true;
       setTimeout(() => {
-        displayHint = false; 
+        displayHint = false;
       }, 3000);
       return; // Exit the function if the file is too large
     }
