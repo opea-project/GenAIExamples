@@ -320,7 +320,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs tgi-service | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
