@@ -262,19 +262,32 @@ class CodeTransGateway(Gateway):
         language_to = data["language_to"]
         source_code = data["source_code"]
         prompt_template = """
-            ### System: Please translate the following {language_from} codes into {language_to} codes.
+            ### System: Please translate the following {language_from} codes into {language_to} codes. Don't output any other content except translated codes.
 
-            ### Original codes:
-            '''{language_from}
+            ### Original {language_from} codes:
+            '''
 
             {source_code}
 
             '''
 
-            ### Translated codes:
+            ### Translated {language_to} codes:
+
         """
         prompt = prompt_template.format(language_from=language_from, language_to=language_to, source_code=source_code)
-        result_dict, runtime_graph = await self.megaservice.schedule(initial_inputs={"query": prompt})
+
+        parameters = LLMParams(
+            max_tokens=data.get("max_tokens", 1024),
+            top_k=data.get("top_k", 10),
+            top_p=data.get("top_p", 0.95),
+            temperature=data.get("temperature", 0.01),
+            repetition_penalty=data.get("repetition_penalty", 1.03),
+            streaming=data.get("stream", True),
+        )
+
+        result_dict, runtime_graph = await self.megaservice.schedule(
+            initial_inputs={"query": prompt}, llm_parameters=parameters
+        )
         for node, response in result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
             if (
