@@ -222,7 +222,7 @@ class CodeGenGateway(Gateway):
             temperature=chat_request.temperature if chat_request.temperature else 0.01,
             frequency_penalty=chat_request.frequency_penalty if chat_request.frequency_penalty else 0.0,
             presence_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 0.0,
-            repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
+            repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.2,
             streaming=stream_opt,
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
