@@ -53,7 +53,7 @@ To set up environment variables for deploying GraphRAG services, follow these st
 
 ### Quick Start: 2.Run Docker Compose
 
-If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](docker_compose/intel/cpu/xeon/README.md). [test_compose.sh](tests/test_compose.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD.
+If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](../ChatQnA/docker_compose/intel/cpu/xeon/README.md). [test_compose.sh](tests/test_compose.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD.
 
 Docker compose will start 8 services: ![8 servicesi in GraphRAG](assets/8microservices.png)
 
