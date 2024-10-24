@@ -119,6 +119,8 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
           PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
           example: ${{ inputs.example }}
