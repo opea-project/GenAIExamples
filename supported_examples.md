@@ -206,13 +206,13 @@ The [AudioQnA](./AudioQnA/README.md) example demonstrates the integration of Gen
 ### Text2Image
 
 [Text2Image](./Text2Image/README.md) generates image based on your provided text.
-| Framework                              | LDM                                                                                                    | HW          | Description |
+| Framework | LDM | HW | Description |
 |----------------------------------------|--------------------------------------------------------------------------------------------------------|-------------|-------------|
-| [LangChain](https://www.langchain.com) | [stabilityai/stable-diffusion](https://huggingface.co/stabilityai/stable-diffusion-3-medium-diffusers) | Xeon/Gaudi2 | Text2Image  |
+| [LangChain](https://www.langchain.com) | [stabilityai/stable-diffusion](https://huggingface.co/stabilityai/stable-diffusion-3-medium-diffusers) | Xeon/Gaudi2 | Text2Image |
 
-### AvatarChatbot 
+### AvatarChatbot
 
 [AvatarChatbot](./AvatarChatbot/README.md) example is a chatbot with a visual character that provides users dynamic, engaging interactions, by leveraging multiple generative AI components including LLM, ASR (Audio-Speech-Recognition), and TTS (Text-To-Speech).
-| LLM                                                                           | ASR                                                                 | TTS                                                                 | Animation                                                                                                              | HW          | Description                |   |
+| LLM | ASR | TTS | Animation | HW | Description | |
 |-------------------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|-------------|----------------------------|---|
-| [Intel/neural-chat-7b-v3-3](https://huggingface.co/Intel/neural-chat-7b-v3-3) | [openai/whisper-small](https://huggingface.co/openai/whisper-small) | [microsoft/SpeechT5](https://huggingface.co/microsoft/speecht5_tts) | [Rudrabha/Wav2Lip](https://github.com/Rudrabha/Wav2Lip) <br> [TencentARC/GFPGAN](https://github.com/TencentARC/GFPGAN) | Xeon/Gaudi2 | Interactive chatbot Avatar |   |
+| [Intel/neural-chat-7b-v3-3](https://huggingface.co/Intel/neural-chat-7b-v3-3) | [openai/whisper-small](https://huggingface.co/openai/whisper-small) | [microsoft/SpeechT5](https://huggingface.co/microsoft/speecht5_tts) | [Rudrabha/Wav2Lip](https://github.com/Rudrabha/Wav2Lip) <br> [TencentARC/GFPGAN](https://github.com/TencentARC/GFPGAN) | Xeon/Gaudi2 | Interactive chatbot Avatar | |
