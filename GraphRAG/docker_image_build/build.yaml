@@ -11,7 +11,7 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/graphrag:${TAG:-latest}
-  retriever-neo4j:
+  retriever-neo4j-llamaindex:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -19,8 +19,8 @@ services:
         no_proxy: ${no_proxy}
       context: GenAIComps
       dockerfile: comps/retrievers/neo4j/llama_index/Dockerfile
-    image: ${REGISTRY:-opea}/retriever-neo4j:${TAG:-latest}
-  dataprep-neo4j:
+    image: ${REGISTRY:-opea}/retriever-neo4j-llamaindex:${TAG:-latest}
+  dataprep-neo4j-llamaindex:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -28,7 +28,7 @@ services:
         no_proxy: ${no_proxy}
       context: GenAIComps
       dockerfile: comps/dataprep/neo4j/llama_index/Dockerfile
-    image: ${REGISTRY:-opea}/dataprep-neo4j:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-neo4j-llamaindex:${TAG:-latest}
   chatqna-gaudi-nginx-server:
     build:
       args:

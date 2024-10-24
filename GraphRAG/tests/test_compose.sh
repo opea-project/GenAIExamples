@@ -21,7 +21,7 @@ function build_docker_images() {
     git clone https://github.com/rbrugaro/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"graphRAG_LI"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="graphrag dataprep-neo4j retriever-neo4j chatqna-gaudi-ui-server chatqna-gaudi-nginx-server"
+    service_list="graphrag dataprep-neo4j-llamaindex retriever-neo4j-llamaindex chatqna-gaudi-ui-server chatqna-gaudi-nginx-server"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
