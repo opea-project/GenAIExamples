@@ -64,7 +64,7 @@ metadata:
     app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
 data:
-  MODEL_ID: "HuggingFaceH4/mistral-7b-grok"
+  MODEL_ID: "mistralai/Mistral-7B-Instruct-v0.3"
   PORT: "2080"
   HF_TOKEN: "insert-your-huggingface-token-here"
   http_proxy: ""
