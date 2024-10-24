@@ -14,6 +14,7 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
+export image_fn="apple.png"
 export video_fn="WeAreGoingOnBullrun.mp4"
 
 function build_docker_images() {
@@ -63,7 +64,8 @@ function start_services() {
 
 function prepare_data() {
     cd $LOG_PATH
-    echo "Downloading video"
+    echo "Downloading image and video"
+    wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
 
     sleep 30s
@@ -76,9 +78,12 @@ function validate_service() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    if [[ $SERVICE_NAME == *"dataprep-multimodal-redis"* ]]; then
+    if [[ $SERVICE_NAME == *"dataprep-multimodal-redis-transcript"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${video_fn}" -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-caption"* ]]; then
+         cd $LOG_PATH
+         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
@@ -151,20 +156,27 @@ function validate_microservices() {
     validate_service \
         "${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}" \
         "Data preparation succeeded" \
-        "dataprep-multimodal-redis" \
+        "dataprep-multimodal-redis-transcript" \
         "dataprep-multimodal-redis"
 
-    echo "Data Prep with Generating Transcript"
+    echo "Data Prep with Generating Caption"
     validate_service \
         "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
         "Data preparation succeeded" \
-        "dataprep-multimodal-redis" \
+        "dataprep-multimodal-redis-caption" \
         "dataprep-multimodal-redis"
 
-    echo "Validating get file"
+    echo "Validating get file returns mp4"
     validate_service \
         "${DATAPREP_GET_FILE_ENDPOINT}" \
         '.mp4' \
+        "dataprep_get" \
+        "dataprep-multimodal-redis"
+
+    echo "Validating get file returns png"
+    validate_service \
+        "${DATAPREP_GET_VIDEO_ENDPOINT}" \
+        '.png' \
         "dataprep_get" \
         "dataprep-multimodal-redis"
 
@@ -232,6 +244,13 @@ function validate_delete {
         "dataprep-multimodal-redis"
 }
 
+function delete_data() {
+    cd $LOG_PATH
+    echo "Deleting image and video"
+    rm -rf ${image_fn}
+    rm -rf ${video_fn}
+}
+
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose -f compose.yaml stop && docker compose -f compose.yaml rm -f
@@ -256,6 +275,7 @@ function main() {
     validate_delete
     echo "==== delete validated ===="
 
+    delete_data
     stop_docker
     echo y | docker system prune
 

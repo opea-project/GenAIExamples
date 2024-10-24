@@ -5,6 +5,7 @@ import base64
 import logging
 import logging.handlers
 import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -116,6 +117,18 @@ def maintain_aspect_ratio_resize(image, width=None, height=None, inter=cv2.INTER
 
     # Return the resized image
     return cv2.resize(image, dim, interpolation=inter)
+
+
+def make_temp_image(
+    image_name,
+    file_ext,
+    output_image_path: str = "./public/images",
+    output_image_name: str = "image_tmp",
+):
+    Path(output_image_path).mkdir(parents=True, exist_ok=True)
+    output_image = os.path.join(output_image_path, '{}.{}'.format(output_image_name, file_ext))
+    shutil.copy(image_name, output_image)
+    return output_image
 
 
 # function to split video at a timestamp
