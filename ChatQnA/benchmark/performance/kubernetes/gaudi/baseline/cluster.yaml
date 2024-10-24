@@ -1,0 +1,15 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:
+  replicaCount: 7           # Number of pod instances to deploy (default is 1 if not specified)
+  #evenly_distributed: true  # Distribute instances evenly across hardware nodes
+  #affinity:                 # Use affinity to target multiple nodes
+  #  nodeAffinity:
+  #    requiredDuringSchedulingIgnoredDuringExecution:
+  #      nodeSelectorTerms:
+  #        - matchExpressions:
+  #            - key: kubernetes.io/hostname
+  #              operator: In
+  #              values:
+  #                - node1

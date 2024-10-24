@@ -1,0 +1,45 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:                        # Chart-defined service name
+  extraCmdArgs:
+    - --max-input-length
+    - '1280'
+    - --max-total-tokens
+    - '2048'
+    - --max-batch-total-tokens
+    - '65536'
+    - --max-batch-prefill-tokens
+    - '4096'
+  image:
+    tag: "2.0.5"
+  replicaCount: 7            # Number of pod instances to deploy (default is 1 if not specified)
+  #evenly_distributed: true  # Distribute instances evenly across hardware nodes
+  #affinity:                 # Use affinity to target multiple nodes
+  #  nodeAffinity:
+  #    requiredDuringSchedulingIgnoredDuringExecution:
+  #      nodeSelectorTerms:
+  #        - matchExpressions:
+  #            - key: kubernetes.io/hostname
+  #              operator: In
+  #              values:
+  #                - node1
+
+chatqna:
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: 8
+      memory: 8000Mi
+    requests:
+      cpu: 8
+      memory: 8000Mi
+
+retriever-usvc:
+  resources:
+    limits:
+      cpu: 4
+      memory: 4000Mi
+    requests:
+      cpu: 4
+      memory: 4000Mi
