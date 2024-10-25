@@ -83,7 +83,6 @@ services:
     command: ["ollama serve & sleep 10 && ollama run ${OLLAMA_MODEL} & wait"]
     environment:
       no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       OLLAMA_MODEL: ${OLLAMA_MODEL}
 
