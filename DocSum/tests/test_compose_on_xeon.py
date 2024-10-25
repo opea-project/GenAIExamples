@@ -44,12 +44,8 @@ def read_response(response):
     Returns:
         str: The parsed response content.
     """
-    temp = ast.literal_eval(
-        [i.split('data: ')[1] for i in response.text.split('\n\n') if "/logs/LLMChain/final_output" in i][0]
-    )['ops']
     
-    response = [i['value'] for i in temp if i['path'] == "/logs/LLMChain/final_output"][0]
-    return response
+    return response.text.replace("'\n\ndata: b'", "").replace("data: b' ", "").replace("</s>'\n\ndata: [DONE]\n\n","")
 
 def input_data_for_test(document_type):
     """
@@ -69,7 +65,8 @@ def input_data_for_test(document_type):
     elif document_type == "audio":
         input_data = get_base64_str(os.path.join(root_folder, 'data/test_audio_30s.wav'))
     elif document_type == "video":
-        input_data = get_base64_str(os.path.join(root_folder, 'data/test_video_30s.mp4'))
+        # input_data = get_base64_str(os.path.join(root_folder, 'data/test_video_30s.mp4'))
+        input_data = get_base64_str(os.path.join(root_folder, 'data/test_full.mp4'))
     else:
         raise ValueError("Invalid document type")
     
@@ -231,6 +228,8 @@ def test_e2e_megaservice(document_type='video'):
     response = post_request(endpoint, inputs)
     
     validate_response(response, "E2E Megaservice")
+    
+    print(read_response(response))
 
 if __name__ == "__main__":
     # Run the tests and print the results
