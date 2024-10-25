@@ -8,18 +8,18 @@ metadata:
   namespace: default
 data:
   EMBEDDING_MODEL_ID: {{ .Values.config.EMBEDDING_MODEL_ID }}
-  EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
   HUGGINGFACEHUB_API_TOKEN: {{ .Values.config.HUGGINGFACEHUB_API_TOKEN }}
-  INDEX_NAME: rag-redis
-  LLM_MODEL_ID: {{ .Values.config.LLM_MODEL_ID }}
-  LLM_SERVER_HOST_IP: llm-dependency-svc
   NODE_SELECTOR: {{ .Values.config.NODE_SELECTOR }}
-  REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
   RERANK_MODEL_ID: {{ .Values.config.RERANK_MODEL_ID }}
+  LLM_MODEL_ID: {{ .Values.config.LLM_MODEL_ID }}
+  REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
   RERANK_SERVER_HOST_IP: reranking-dependency-svc
   RETRIEVER_SERVICE_HOST_IP: retriever-svc
-  TEI_EMBEDDING_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  LLM_SERVER_HOST_IP: llm-dependency-svc
+  INDEX_NAME: rag-redis
+  EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
   TEI_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
-  TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
-  TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
+  LLM_SERVER_PORT: 9009
+  RERANK_SERVER_PORT: 8808
+  EMBEDDING_SERVER_PORT: 6006
 ---

@@ -11,6 +11,17 @@ config:
   RERANK_MODEL_ID: BAAI/bge-reranker-base
   HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
 
+  REDIS_URL: redis://vector-db.default.svc.cluster.local:6379
+  RERANK_SERVER_HOST_IP: reranking-dependency-svc
+  RETRIEVER_SERVICE_HOST_IP: retriever-svc
+  LLM_SERVER_HOST_IP: llm-dependency-svc
+  INDEX_NAME: rag-redis
+  EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
+  TEI_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
+  LLM_SERVER_PORT: 9009
+  RERANK_SERVER_PORT: 8808
+  EMBEDDING_SERVER_PORT: 6006
+
 microservices:
   - name: chatqna-backend-server-deploy
     image: opea/chatqna:latest
