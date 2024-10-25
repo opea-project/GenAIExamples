@@ -11,6 +11,7 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
+WORKPATH=/home/rbrugaro/GenAIExamples/GraphRAG
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
@@ -33,7 +34,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     #this will need to be updated with the set_env variables and how about the required from private????
 
@@ -198,7 +199,7 @@ function main() {
     elif [ "${mode}" == "" ]; then
         validate_microservices
         validate_megaservice
-        #validate_frontend
+        validate_frontend
     fi
 
     stop_docker
