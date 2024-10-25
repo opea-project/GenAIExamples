@@ -1,6 +1,3 @@
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 import base64
 import json
 import os
@@ -23,18 +20,19 @@ def get_base64_str(file_name):
     with open(file_name, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
 
-def post_request(endpoint, inputs):
+def post_request(endpoint, inputs, headers=None):
     """
     Send a POST request to the specified endpoint.
 
     Args:
         endpoint (str): The URL of the endpoint.
         inputs (dict): The data to be sent in the request.
+        headers (dict, optional): The headers to be sent in the request.
 
     Returns:
         requests.Response: The response from the server.
     """
-    return requests.post(url=endpoint, data=json.dumps(inputs), proxies={"http": None})
+    return requests.post(url=endpoint, data=json.dumps(inputs), proxies={"http": None}, headers=headers)
 
 def read_response(response):
     """
@@ -77,6 +75,21 @@ def input_data_for_test(document_type):
     
     return input_data
 
+def validate_response(response, service_name):
+    """
+    Validate the response from the server.
+
+    Args:
+        response (requests.Response): The response from the server.
+        service_name (str): The name of the service being tested.
+
+    Raises:
+        AssertionError: If the response status code is not 200.
+    """
+    assert response.status_code == 200, f"{service_name} service failed to get response from the server. Status code: {response.status_code}"
+    print(f">>> {service_name} service Test Passed ... ")
+    print()
+
 def test_whisper_service():
     """
     Test the Whisper service.
@@ -91,11 +104,7 @@ def test_whisper_service():
     
     response = post_request(endpoint, inputs)
     
-    assert response.status_code == 200, f"Whisper service failed to get response from the server. Status code: {response.status_code}"
-    
-    # If the response status code is 200, print "Test passed"
-    print(">>> Whisper service Test Passed ... ")
-    print()
+    validate_response(response, "Whisper")
 
 def test_audio2text():
     """
@@ -111,11 +120,7 @@ def test_audio2text():
     
     response = post_request(endpoint, inputs)
     
-    assert response.status_code == 200, f"Audio2Text service failed to get response from the server. Status code: {response.status_code}"
-    
-    # If the response status code is 200, print "Test passed"
-    print(">>> Audio2Text service Test Passed ... ")
-    print()
+    validate_response(response, "Audio2Text")
 
 def test_video2text():
     """
@@ -131,11 +136,7 @@ def test_video2text():
     
     response = post_request(endpoint, inputs)
     
-    assert response.status_code == 200, f"Video2Text service failed to get response from the server. Status code: {response.status_code}"
-    
-    # If the response status code is 200, print "Test passed"
-    print(">>> Video2Text service Test Passed ... ")
-    print()
+    validate_response(response, "Video2Text")
 
 def test_docsum_data():
     """
@@ -151,11 +152,67 @@ def test_docsum_data():
         
         response = post_request(endpoint, inputs)
         
-        assert response.status_code == 200, f"{document_type} service failed to get response from the server. Status code: {response.status_code}"
+        validate_response(response, f"Docsum Data ({document_type})")
+
+def test_tgi_service():
+    """
+    Test the TGI service.
+
+    Raises:
+        AssertionError: If the service does not return a 200 status code.
+    """
+    print("Running test: tgi-service service")
+    
+    endpoint = "http://localhost:8008/generate"
+    
+    # Define the JSON payload
+    inputs = {
+        "inputs": "What is Deep Learning?",
+        "parameters": {
+            "max_new_tokens": 17,
+            "do_sample": True
+        }
+    }
+
+    # Define the headers
+    headers = {
+        "Content-Type": "application/json"
+    }
         
-        # If the response status code is 200, print "Test passed"
-        print(f">>> Docsum Data service test for {document_type} data type passed ... ")
-    print()
+    # Send the POST request
+    response = post_request(endpoint, inputs, headers=headers)
+    
+    validate_response(response, "tgi-service")
+
+def test_llm_service():
+    """
+    Test the LLM service.
+
+    Raises:
+        AssertionError: If the service does not return a 200 status code.
+    """
+    print("Running test: llm-service service")
+    
+    endpoint = "http://localhost:9000/v1/chat/docsum"
+    
+    # Define the JSON payload
+    inputs = {
+        "query": input_data_for_test('text'),
+        "parameters": {
+            "max_new_tokens": 17,
+            "do_sample": True
+        }
+    }
+
+    # Define the headers
+    headers = {
+        "Content-Type": "application/json"
+    }
+        
+    # Send the POST request
+    response = post_request(endpoint, inputs, headers=headers)
+    
+    validate_response(response, "llm-service")
 
 def test_e2e_megaservice(document_type='video'):
     """
@@ -173,15 +230,13 @@ def test_e2e_megaservice(document_type='video'):
     
     response = post_request(endpoint, inputs)
     
-    assert response.status_code == 200, f"E2E Megaservice failed to get response from the server. Status code: {response.status_code}"
-    
-    # If the response status code is 200, print "Test passed"
-    print(">>> E2E Megaservice Test Passed ... ")
-    print()
+    validate_response(response, "E2E Megaservice")
 
 if __name__ == "__main__":
     # Run the tests and print the results
     try:
+        test_tgi_service()
+        test_llm_service()        
         test_whisper_service()
         test_audio2text()
         test_video2text()
@@ -189,3 +244,5 @@ if __name__ == "__main__":
         test_e2e_megaservice()
     except AssertionError as e:
         print(f"Test failed: {e}")
+        
+        

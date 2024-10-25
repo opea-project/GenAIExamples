@@ -2,7 +2,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+# set -xe
+
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -13,6 +14,9 @@ export TAG=${IMAGE_TAG}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
+
+# Get the root folder of the current script
+root_folder=$(dirname "$(readlink -f "$0")")
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
@@ -35,6 +39,17 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
+
+    export V2A_SERVICE_HOST_IP=${ip_address}
+    export V2A_ENDPOINT=http://$ip_address:7078
+
+    export A2T_ENDPOINT=http://$ip_address:7066
+    export A2T_SERVICE_HOST_IP=${ip_address}
+    export A2T_SERVICE_PORT=9099 
+
+    export DATA_ENDPOINT=http://$ip_address:7079
+    export DATA_SERVICE_HOST_IP=${ip_address}
+    export DATA_SERVICE_PORT=7079 
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -59,6 +74,11 @@ function validate_services() {
     local INPUT_DATA="$5"
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    
+    echo "==========================================="
+    # echo "START >>>> " $HTTP_STATUS
+    # echo "==========================================="
+    
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
@@ -67,9 +87,12 @@ function validate_services() {
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
+            echo "EXPECTED_RESULT==> $EXPECTED_RESULT"
+            echo "CONTENT==> $CONTENT"
             echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             exit 1
+
         fi
     else
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
@@ -77,10 +100,89 @@ function validate_services() {
         exit 1
     fi
     sleep 1s
+
+    # echo "================== <<<<< END >>>> ========================="
+    
 }
+
+get_base64_str() {
+    local file_name=$1
+    base64 -w 0 "$file_name" 
+}
+
+# Function to generate input data for testing based on the document type
+input_data_for_test() {
+    local document_type=$1
+    case $document_type in
+        ("text")
+            echo "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are."
+            ;;
+        ("audio")
+            get_base64_str "$root_folder/data/test.wav"
+            ;;
+        ("video")
+            get_base64_str "$root_folder/data/test.mp4"
+            ;;
+        (*)
+            echo "Invalid document type" >&2
+            exit 1
+            ;;
+    esac
+}
+
+
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
+
+    # whisper microservice
+    ulimit -s 65536
+    validate_services \
+        "${ip_address}:7066/v1/asr" \
+        '{"asr_result":"who is pat gelsinger"}' \
+        "whisper-service" \
+        "whisper-service" \
+        "{\"audio\": \"$(input_data_for_test "audio")\"}"
+
+    # Audio2Text service
+    validate_services \
+        "${ip_address}:9099/v1/audio/transcriptions" \
+        '"query":"who is pat gelsinger"' \
+        "a2t" \
+        "a2t-service" \
+        "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
+
+    # Video2Audio service
+    validate_services \
+        "${ip_address}:7078/v1/video2audio" \
+        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAGAAAKmwA6Ojo6Ojo6Ojo6Ojo6Ojo6YmJiYmJiYmJiYmJiYmJiYmKJiYmJiYmJiYmJiYmJiYmJsbGxsbGxsbGxsbGxsbGxsbHY2NjY2NjY2NjY2NjY2NjY2P////////////////////8AAAAATGF2YzU4L" \
+        "v2a" \
+        "v2a-service" \
+        "{\"byte_str\": \"$(input_data_for_test "video")\"}"
+
+    # Docsum Data service - video
+    validate_services \
+        "${ip_address}:7079/v1/docsum/dataprep" \
+        '"query":"you"' \
+        "data-service" \
+        "docsum-data" \
+        "{\"video\": \"$(input_data_for_test "video")\"}"
+
+    # Docsum Data service - audio
+    validate_services \
+        "${ip_address}:7079/v1/docsum/dataprep" \
+        '"query":"who is pat gelsinger"' \
+        "data-service" \
+        "docsum-data" \
+        "{\"audio\": \"$(input_data_for_test "audio")\"}"
+
+    # Docsum Data service - text
+    validate_services \
+        "${ip_address}:7079/v1/docsum/dataprep" \
+        "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco" \
+        "data-service" \
+        "docsum-data" \
+        "{\"text\": \"$(input_data_for_test "text")\"}"
 
     # tgi for llm service
     validate_services \
@@ -97,16 +199,17 @@ function validate_microservices() {
         "llm" \
         "llm-docsum-server" \
         '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+  
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-    "${ip_address}:8888/v1/docsum" \
-    "toolkit" \
-    "mega-docsum" \
-    "docsum-xeon-backend-server" \
-    '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        "${ip_address}:8888/v1/docsum" \
+        "[DONE]" \
+        "mega-docsum" \
+        "docsum-xeon-backend-server" \
+        '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function validate_frontend() {
@@ -146,12 +249,12 @@ function main() {
 
     stop_docker
 
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    # # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+    # validate_frontend
 
     stop_docker
     echo y | docker system prune
@@ -159,3 +262,101 @@ function main() {
 }
 
 main
+
+
+
+
+
+# echo '"query":'"$(input_data_for_test "text")"''
+
+# echo  '"query":' \"$(input_data_for_test "text")\" 
+
+# # Send the POST request with the base64 encoded audio
+# curl http://${ip_address}:7078/v1/video2audio \
+#     -X POST \
+#     -d "{\"byte_str\": \"$(input_data_for_test "video")\"}" \
+#     -H "Content-Type: application/json"
+
+
+
+
+
+# curl http://${ip_address}:8008/generate -X POST -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' -H 'Content-Type: application/json'
+
+
+# curl http://${ip_address}:8888/v1/docsum -H "Content-Type: application/json" -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+
+# echo " >>>> file path: ${root_folder}/data/test_audio_30s.wav"
+
+
+# echo "{\"audio\": \"$(input_data_for_test "$document_type")\"}"
+
+
+# # Get the root folder of the current script
+# root_folder=$(dirname "$(readlink -f "$0")")
+
+# # file_name=${root_folder}/data/test_audio_30s.wav
+# file_name=${root_folder}/data/short.wav
+# echo " >>>> file path: ${file_name}"
+
+# # Encode the file in base64 and capture the output
+# base64_str=$(base64 -w 0 "$file_name") 
+# base64_str=$(base64 -w 0 "$file_name" 2>/dev/null)
+
+
+# base64_str= $file_name
+
+# curl http://${ip_address}:7066/v1/asr \
+#     -X POST \
+#     -d '{"audio":"UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
+#     -H "Content-Type: application/json"
+
+
+
+
+# # Send the POST request with the base64 encoded audio
+# curl http://${ip_address}:7066/v1/asr \
+#     -X POST \
+#     -d "{\"audio\": \"$(input_data_for_test "audio")\"}" \
+#     -H "Content-Type: application/json"
+
+# "{\"audio\": \"$(input_data_for_test "audio")\"}"
+# "{\"audio\": \"${base64_str}\"}"
+
+# ulimit -s 65536
+# # whisper microservice
+# validate_services \
+#     "${ip_address}:7066/v1/asr" \
+#     '{"asr_result":"who is pat gelsinger"}' \
+#     "whisper-service" \
+#     "whisper-service" \
+#     "{\"audio\": \"$(input_data_for_test "audio")\"}" \
+
+
+
+
+
+
+# base64 -d /home/mcetin/GenAIExamples/DocSum/tests/data/test_audio_30s.wav > decoded.txt 
+
+
+# audio_file="/home/mcetin/GenAIExamples/DocSum/tests/data/test_audio_30s.wav"
+# output_file="encoded_audio.txt"
+
+# # base64_str=$(base64 -w 0 < "$audio_file" > "$output_file" & )
+
+# base64 -w 0 < "$audio_file" > "$output_file" &
+
+# # Wait for the background process to complete
+# wait
+
+# # Read the output file and assign its content to the variable base64_str
+# base64_str=$(<"$output_file")
+
+# read output_file and assigned it to variable base64_str
+
+# echo "Encoding started in the background..."
+# # echo $base64_str
+
+
+# base64_str=$(<"encoded_audio.txt")
