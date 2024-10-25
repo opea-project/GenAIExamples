@@ -45,7 +45,7 @@ def read_response(response):
         str: The parsed response content.
     """
     
-    return response.text.replace("'\n\ndata: b'", "").replace("data: b' ", "").replace("</s>'\n\ndata: [DONE]\n\n","")
+    return response.text.replace("'\n\ndata: b'", "").replace("data: b' ", "").replace("</s>'\n\ndata: [DONE]\n\n","").replace("\n\ndata: b", "").replace("'\n\n", "").replace("'\n", "").replace('''\'"''' ,"")
 
 def input_data_for_test(document_type):
     """
