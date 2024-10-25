@@ -394,24 +394,25 @@ class DocSumGateway(Gateway):
 
         return file_content
 
-    async def handle_request(self, request: Request, files: List[UploadFile] = File(...)):
+    async def handle_request(self, request: Request, files: List[UploadFile] = File(default=None)):
         data = await request.form()
         stream_opt = data.get("stream", True)
         chat_request = ChatCompletionRequest.parse_obj(data)
         file_summaries = []
-        for file in files:
-            file_path = f"/tmp/{file.filename}"
+        if files:
+            for file in files:
+                file_path = f"/tmp/{file.filename}"
 
-            import aiofiles
+                import aiofiles
 
-            async with aiofiles.open(file_path, "wb") as f:
-                await f.write(await file.read())
-            docs = self.read_text_from_file(file, file_path)
-            os.remove(file_path)
-            if isinstance(docs, list):
-                file_summaries.extend(docs)
-            else:
-                file_summaries.append(docs)
+                async with aiofiles.open(file_path, "wb") as f:
+                    await f.write(await file.read())
+                docs = self.read_text_from_file(file, file_path)
+                os.remove(file_path)
+                if isinstance(docs, list):
+                    file_summaries.extend(docs)
+                else:
+                    file_summaries.append(docs)
 
         if file_summaries:
             prompt = self._handle_message(chat_request.messages) + "\n".join(file_summaries)
