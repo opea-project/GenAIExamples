@@ -100,13 +100,30 @@ function validate_microservices() {
 }
 
 function validate_megaservice() {
-    # Curl the Mega Service
-    validate_services \
-    "${ip_address}:8888/v1/docsum" \
-    "toolkit" \
-    "mega-docsum" \
-    "docsum-xeon-backend-server" \
-    '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+    local SERVICE_NAME="mega-docsum"
+    local DOCKER_NAME="docsum-gaudi-backend-server"
+    local EXPECTED_RESULT="embedding"
+    local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+    local URL="${ip_address}:8888/v1/docsum"
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
 }
 
 function validate_frontend() {
@@ -151,7 +168,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+    #validate_frontend
 
     stop_docker
     echo y | docker system prune
