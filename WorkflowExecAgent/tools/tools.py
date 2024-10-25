@@ -10,6 +10,7 @@ def workflow_executor(params, workflow_id: int) -> dict:
     sdk = EasyDataSDK()
     workflow = sdk.create_workflow(workflow_id)
 
+    params = {key: str(val) for key, val in params.items()}
     start_workflow = workflow.start(params)
     print(start_workflow)
 

@@ -19,8 +19,9 @@ function build_vllm_docker_image() {
     if [ ! -d "./vllm" ]; then
         git clone https://github.com/vllm-project/vllm.git
         cd ./vllm; git checkout tags/v0.6.0
+    else
+        cd ./vllm
     fi
-    cd ./vllm
     docker build -f Dockerfile.cpu -t vllm-cpu-env --shm-size=100g .
     if [ $? -ne 0 ]; then
         echo "opea/vllm:cpu failed"

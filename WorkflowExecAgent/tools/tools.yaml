@@ -9,6 +9,6 @@ workflow_executor:
       type: int
       description: Workflow id
     params:
-      type: dict[str, str]
+      type: dict
       description: Workflow parameters.
   return_output: workflow_data
