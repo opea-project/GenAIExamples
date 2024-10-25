@@ -330,15 +330,21 @@ def ingest_image_with_text(filepath, text, request: gr.Request):
     basename = os.path.basename(verified_filepath)
     dest = os.path.join(static_dir, basename)
     shutil.copy(verified_filepath, dest)
-    print("Done copying uploaded file to static folder!")
+    text_basename = "{}.txt".format(os.path.splitext(basename)[0])
+    text_dest = os.path.join(static_dir, text_basename)
+    with open(text_dest, "a") as file:
+        file.write(text)
+    print("Done copying uploaded files to static folder!")
     headers = {
         # 'Content-Type': 'multipart/form-data'
     }
-    files = {
-        "files": open(dest, "rb"),
-    }
+    files = [
+        ('files', (basename, open(dest, "rb"))),
+        ('files', (text_basename, open(text_dest, "rb")))
+    ]
     response = requests.post(dataprep_ingest_addr, headers=headers, files=files)
     print(response.status_code)
+    os.remove(text_dest)
     if response.status_code == 200:
         response = response.json()
         print(response)
@@ -426,9 +432,9 @@ with gr.Blocks() as upload_image:
             text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
         image_upload_cap.upload(ingest_image_gen_caption, [image_upload_cap], [text_upload_result])
         image_upload_cap.clear(clear_uploaded_video, [], [text_upload_result])
-        image_upload_text.upload(ingest_image_with_text, [image_upload_text], [text_upload_result])
+        image_upload_text.upload(ingest_image_with_text, [image_upload_text, custom_caption], [text_upload_result])
         image_upload_text.clear(clear_uploaded_video, [], [text_upload_result])
-        text_options_radio.change(select_upload_type, [text_options_radio, custom_caption], [image_upload_cap, image_upload_text])
+        text_options_radio.change(select_upload_type, [text_options_radio], [image_upload_cap, image_upload_text])
 
 with gr.Blocks() as upload_audio:
     gr.Markdown("# Ingest Your Own Audio Using Generated Transcripts")
