@@ -3,7 +3,6 @@
 
 import asyncio
 import base64
-import docker
 import io
 import os
 import shutil
@@ -11,6 +10,7 @@ import subprocess
 import time
 
 import aiohttp
+import docker
 import ffmpeg
 import gradio as gr
 import numpy as np
@@ -18,12 +18,12 @@ import soundfile as sf
 from PIL import Image
 
 
-#%% Docker Management
+# %% Docker Management
 def update_env_var_in_container(container_name, env_var, new_value):
     return
 
 
-#%% AudioQnA functions
+# %% AudioQnA functions
 def preprocess_audio(audio):
     """The audio data is a 16-bit integer array with values ranging from -32768 to 32767 and the shape of the audio data array is (samples,)"""
     sr, y = audio
@@ -35,7 +35,7 @@ def preprocess_audio(audio):
     # Save to memory
     buf = io.BytesIO()
     sf.write(buf, y, sr, format="WAV")
-    buf.seek(0) # Reset the buffer position to the beginning
+    buf.seek(0)  # Reset the buffer position to the beginning
 
     # Encode the WAV file to base64 string
     base64_bytes = base64.b64encode(buf.read())
@@ -59,13 +59,13 @@ async def transcribe(audio_input, face_input, model_choice):
 
     # Send the audio to the AvatarChatbot backend server endpoint
     initial_inputs = {"audio": base64bytestr, "max_tokens": 64}
-    
+
     # TO-DO: update wav2lip-service with the chosen face_input
     # update_env_var_in_container("wav2lip-service", "DEVICE", "new_device_value")
 
     async with aiohttp.ClientSession() as session:
         async with session.post(ai_chatbot_url, json=initial_inputs) as response:
-            
+
             # Check the response status code
             if response.status == 200:
                 # response_json = await response.json()
@@ -80,7 +80,7 @@ async def transcribe(audio_input, face_input, model_choice):
                 # chat_history += f"AI: {chat_ai}"
                 # chat_history = chat_history.replace("OPEX", "OPEA")
                 # return (sampling_rate, audio_int16)  # handle the response
-                
+
                 result = await response.text()
                 return "docker_compose/intel/hpu/gaudi/result.mp4"
             else:
@@ -94,13 +94,13 @@ def resize_image(image_pil, size=(720, 720)):
 
 def resize_video(video_path, save_path, size=(720, 1280)):
     """Resize the video to the specified size, and save to the save path."""
-    ffmpeg.input(video_path).output(save_path, vf=f'scale={size[0]}:{size[1]}').overwrite_output().run()
+    ffmpeg.input(video_path).output(save_path, vf=f"scale={size[0]}:{size[1]}").overwrite_output().run()
 
 
 # %% AI Avatar demo function
 async def aiavatar_demo(audio_input, face_input, model_choice):
-    """Input: mic/preloaded audio, avatar file path; 
-       Output: ai video"""
+    """Input: mic/preloaded audio, avatar file path;
+    Output: ai video"""
     # Wait for response from AvatarChatbot backend
     output_video = await transcribe(audio_input, face_input, model_choice)  # output video path
 
@@ -163,6 +163,7 @@ if __name__ == "__main__":
             os.makedirs("inputs")
         if not os.path.exists("outputs"):
             os.makedirs("outputs")
+
         def initial_process(audio_input, face_input, model_choice):
             global count
             start_time = time.time()
@@ -188,7 +189,6 @@ if __name__ == "__main__":
                 audio_filepath_gradio = f"inputs/audio_{audio_index:d}.wav"
                 shutil.copyfile(audio_filepaths[audio_index], audio_filepath_gradio)
                 return audio_filepath_gradio
-
 
         # UI Components
         # Title & Introduction
@@ -272,14 +272,12 @@ if __name__ == "__main__":
 
         submit_button = gr.Button("Submit")
 
-
         # Outputs
         gr.Markdown("<hr>")  # Divider
         with gr.Row():
             with gr.Column():
                 video_output = gr.Video(label="Your AI Avatar video: ", format="mp4", width=1280, height=720)
                 video_time_text = gr.Textbox(label="Video processing time", value="0.0 seconds")
-
 
         # Technical details
         gr.Markdown("<hr>")  # Divider
@@ -325,13 +323,10 @@ if __name__ == "__main__":
                     """
         )
 
-
         # State transitions
         for i in range(len(image_pils)):
             image_click_buttons[i].click(
-                update_selected_image_state, 
-                inputs=[gr.Number(value=i, visible=False)], 
-                outputs=[face_input]
+                update_selected_image_state, inputs=[gr.Number(value=i, visible=False)], outputs=[face_input]
             )
         for i in range(len(video_paths)):
             video_click_buttons[i].click(
