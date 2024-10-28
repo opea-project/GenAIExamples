@@ -65,8 +65,7 @@ def input_data_for_test(document_type):
     elif document_type == "audio":
         input_data = get_base64_str(os.path.join(root_folder, 'data/test_audio_30s.wav'))
     elif document_type == "video":
-        # input_data = get_base64_str(os.path.join(root_folder, 'data/test_video_30s.mp4'))
-        input_data = get_base64_str(os.path.join(root_folder, 'data/test_full.mp4'))
+        input_data = get_base64_str(os.path.join(root_folder, 'data/test_video_30s.mp4'))
     else:
         raise ValueError("Invalid document type")
     
