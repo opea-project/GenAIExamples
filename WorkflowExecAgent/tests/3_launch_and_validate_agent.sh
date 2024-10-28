@@ -5,7 +5,7 @@
 set -e
 
 WORKPATH=$(dirname "$PWD")
-workflow_id=9794
+workflow_id=9809
 vllm_port=${vllm_port}
 [[ -z "$vllm_port" ]] && vllm_port=8084
 export WORKDIR=$WORKPATH/../../
