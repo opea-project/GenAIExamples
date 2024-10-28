@@ -1,0 +1,55 @@
+services:
+  neo4j:
+    image: neo4j:5
+    ports:
+      - 7687:7687
+      - 7474:7474
+    volumes:
+      - $PWD/neo4j/data:/data
+    environment:
+      - NEO4J_AUTH=${NEO4J_USERNAME-neo4j}/${NEO4J_PASSWORD-pleaseletmein}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_db_tx__log_rotation_retention__policy=false
+    healthcheck:
+        test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:7474 || exit 1"]
+        interval: 5s
+        timeout: 3s
+        retries: 5
+    networks:
+      - net
+  api:
+    build:
+      context: ./api
+    env_file: .env
+    # environment:
+    #   - NEO4J_URI=${NEO4J_URI-neo4j://neo4j:7687}
+    #   - NEO4J_PASSWORD=${NEO4J_PASSWORD-pleaseletmein}
+    #   - NEO4J_USERNAME=${NEO4J_USERNAME-neo4j}
+    #   - OPENAI_API_KEY=${OPENAI_API_KEY-}
+    networks:
+      - net
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    x-develop:
+      watch:
+        - action: rebuild
+          path: ./api
+    ports:
+      - 8080:8080
+  ui:
+    build:
+      context: ./ui
+    networks:
+      - net
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    x-develop:
+      watch:
+        - action: rebuild
+          path: ./ui
+    ports:
+      - 8501:8501
+networks:
+  net:

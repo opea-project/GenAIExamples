@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "edgar-api"
+version = "0.1.0"
+description = ""
+authors = ["Andreas Kollegger <andreas.kollegger@neo4j.com>"]
+readme = "README.md"
+packages = [
+    { include = "app" },
+]
+
+[tool.poetry.dependencies]
+python = "~3.12"
+uvicorn = "^0.23.2"
+langserve = {extras = ["server"], version = ">=0.0.30"}
+neo4j-semantic-layer = {path = "packages/neo4j-semantic-layer", develop = true}
+python-dotenv = "^1.0.1"
+pydantic = "^2.9.2"
+langchain = "^0.3.4"
+langchain-openai = "^0.2.3"
+pyyaml = "^6.0.2"
+langchain-community = "^0.3.3"
+
+
+[tool.poetry.group.dev.dependencies]
+langchain-cli = ">=0.0.15"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

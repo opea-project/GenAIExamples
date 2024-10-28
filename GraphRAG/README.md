@@ -90,7 +90,12 @@ flowchart LR
 - v1.0 or later: agents use open-source llm backend.
 - v1.1 or later: add safeguards
 
-## Getting started
+## Getting started - standalone
+
+For rapid prototyping, the `standalone` directory contains a monolithic front-end/back-end example
+and some exploratory python notebooks.
+
+## Getting started - microservices
 
 1. Build agent docker image </br>
    First, clone the opea GenAIComps repo
