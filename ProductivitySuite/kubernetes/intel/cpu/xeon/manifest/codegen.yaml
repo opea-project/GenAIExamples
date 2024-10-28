@@ -39,7 +39,7 @@ metadata:
     app.kubernetes.io/version: "1.4"
     app.kubernetes.io/managed-by: Helm
 data:
-  MODEL_ID: "Qwen/Qwen2.5-Coder-7B-Instruct"
+  MODEL_ID: "meta-llama/CodeLlama-7b-hf"
   PORT: "2080"
   HUGGING_FACE_HUB_TOKEN: "insert-your-huggingface-token-here"
   HF_TOKEN: "insert-your-huggingface-token-here"
