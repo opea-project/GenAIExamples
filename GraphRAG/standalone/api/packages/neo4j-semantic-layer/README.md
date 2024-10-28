@@ -1,6 +1,6 @@
 # neo4j-semantic-layer for SEC Edgar
 
-The semantic layer equips the agent with a suite of robust tools, allowing it to interact with the graph databas based on the user's intent.
+The semantic layer equips the agent with a suite of robust tools, allowing it to interact with the graph database based on the user's intent.
 
 ## Tools
 
@@ -21,4 +21,3 @@ NEO4J_URI=<YOUR_NEO4J_URI>
 NEO4J_USERNAME=<YOUR_NEO4J_USERNAME>
 NEO4J_PASSWORD=<YOUR_NEO4J_PASSWORD>
 ```
-

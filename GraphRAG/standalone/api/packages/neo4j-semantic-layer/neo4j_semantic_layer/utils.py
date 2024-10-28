@@ -1,32 +1,31 @@
-import os
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
+import os
 from typing import Dict, List
 
 from langchain_community.graphs import Neo4jGraph
 
-NEO4J_URI = os.getenv('NEO4J_URI')
-NEO4J_USERNAME = os.getenv('NEO4J_USERNAME')
-NEO4J_PASSWORD = os.getenv('NEO4J_PASSWORD')
-NEO4J_DATABASE = os.getenv('NEO4J_DATABASE')
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+NEO4J_URI = os.getenv("NEO4J_URI")
+NEO4J_USERNAME = os.getenv("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+NEO4J_DATABASE = os.getenv("NEO4J_DATABASE")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 print(f"Connect to Neo4j: {NEO4J_USERNAME}@{NEO4J_URI}/{NEO4J_DATABASE}")
 
 # graph = Neo4jGraph()
-graph = Neo4jGraph(
-    url=NEO4J_URI, username=NEO4J_USERNAME, password=NEO4J_PASSWORD, database=NEO4J_DATABASE
-)
+graph = Neo4jGraph(url=NEO4J_URI, username=NEO4J_USERNAME, password=NEO4J_PASSWORD, database=NEO4J_DATABASE)
+
 
 def get_user_id() -> int:
-    """
-    Placeholder for a function that would normally retrieve
-    a user's ID
-    """
+    """Placeholder for a function that would normally retrieve
+    a user's ID."""
     return 1
 
 
 def remove_lucene_chars(text: str) -> str:
-    """Remove Lucene special characters"""
+    """Remove Lucene special characters."""
     special_chars = [
         "+",
         "-",
@@ -54,14 +53,13 @@ def remove_lucene_chars(text: str) -> str:
 
 
 def generate_full_text_query(input: str) -> str:
-    """
-    Generate a full-text search query for a given input string.
+    """Generate a full-text search query for a given input string.
 
     This function constructs a query string suitable for a full-text search.
     It processes the input string by splitting it into words and appending a
     similarity threshold (~0.8) to each word, then combines them using the AND
     operator. Useful for mapping movies and people from user questions
-    to database values, and allows for some misspelings.
+    to database values, and allows for some misspellings.
     """
     full_text_query = ""
     words = [el for el in remove_lucene_chars(input).split() if el]
@@ -80,8 +78,7 @@ RETURN coalesce(node.name, node.title) AS candidate,
 
 
 def get_candidates(input: str, type: str, limit: int = 3) -> List[Dict[str, str]]:
-    """
-    Retrieve a list of candidate entities from database based on the input string.
+    """Retrieve a list of candidate entities from database based on the input string.
 
     This function queries the Neo4j database using a full-text search. It takes the
     input string, generates a full-text query, and executes this query against the
@@ -90,7 +87,5 @@ def get_candidates(input: str, type: str, limit: int = 3) -> List[Dict[str, str]
     (or title) and label (either 'Person' or 'Movie').
     """
     ft_query = generate_full_text_query(input)
-    candidates = graph.query(
-        candidate_query, {"fulltextQuery": ft_query, "index": type, "limit": limit}
-    )
+    candidates = graph.query(candidate_query, {"fulltextQuery": ft_query, "index": type, "limit": limit})
     return candidates

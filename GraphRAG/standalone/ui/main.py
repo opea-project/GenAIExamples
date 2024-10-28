@@ -1,10 +1,12 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+import asyncio
 from typing import List, Optional, Tuple
 
 import streamlit as st
 from langserve import RemoteRunnable
 from streamlit.logger import get_logger
-import asyncio
-
 
 logger = get_logger(__name__)
 
@@ -44,15 +46,11 @@ if st.session_state["generated"]:
             st.markdown(st.session_state["generated"][i])
 
 
-async def get_agent_response(
-    input: str, stream_handler: StreamHandler, chat_history: Optional[List[Tuple]] = []
-):
+async def get_agent_response(input: str, stream_handler: StreamHandler, chat_history: Optional[List[Tuple]] = []):
     url = "http://localhost:8000/edgar-agent/"
     st.session_state["generated"].append("")
     remote_runnable = RemoteRunnable(url)
-    async for chunk in remote_runnable.astream_log(
-        {"input": input, "chat_history": chat_history}
-    ):
+    async for chunk in remote_runnable.astream_log({"input": input, "chat_history": chat_history}):
         log_entry = chunk.ops[0]
         value = log_entry.get("value")
         if isinstance(value, dict) and isinstance(value.get("steps"), list):
@@ -70,9 +68,7 @@ def generate_history():
         # Add the last three exchanges
         size = len(st.session_state["generated"])
         for i in range(max(size - 3, 0), size):
-            context.append(
-                (st.session_state["user_input"][i], st.session_state["generated"][i])
-            )
+            context.append((st.session_state["user_input"][i], st.session_state["generated"][i]))
     return context
 
 

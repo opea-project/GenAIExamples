@@ -1,18 +1,20 @@
-from langchain.prompts.prompt import PromptTemplate
-from langchain.chains import GraphCypherQAChain
-from langchain_community.graphs import Neo4jGraph
-from langchain.tools import Tool
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
+from langchain.chains import GraphCypherQAChain
+from langchain.prompts.prompt import PromptTemplate
+from langchain.tools import Tool
+from langchain_community.graphs import Neo4jGraph
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(model="gpt-4o-mini")
 
 import os
 
-NEO4J_URI = os.getenv('NEO4J_URI')
-NEO4J_USERNAME = os.getenv('NEO4J_USERNAME')
-NEO4J_PASSWORD = os.getenv('NEO4J_PASSWORD')
-NEO4J_DATABASE = os.getenv('NEO4J_DATABASE') or 'neo4j'
+NEO4J_URI = os.getenv("NEO4J_URI")
+NEO4J_USERNAME = os.getenv("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+NEO4J_DATABASE = os.getenv("NEO4J_DATABASE") or "neo4j"
 
 CYPHER_GENERATION_TEMPLATE = """Task:Generate Cypher statement to query a graph database.
 Instructions:
@@ -44,39 +46,31 @@ RETURN com.companyName
 
 # Which investment firms are near Palo Aalto Networks?
   CALL db.index.fulltext.queryNodes(
-         "fullTextCompanyNames", 
+         "fullTextCompanyNames",
          "Palo Aalto Networks"
          ) YIELD node, score
   WITH node as com
   MATCH (com)-[:LOCATED_AT]->(comAddress:Address),
     (mgr:Manager)-[:LOCATED_AT]->(mgrAddress:Address)
     WHERE point.distance(comAddress.location, mgrAddress.location) < 20 * 1000
-  RETURN mgr, 
+  RETURN mgr,
     toInteger(point.distance(comAddress.location, mgrAddress.location) / 1000) as distanceKm
     ORDER BY distanceKm ASC
     LIMIT 10
-  
+
 The question is:
 {question}"""
 
-CYPHER_GENERATION_PROMPT = PromptTemplate(
-    input_variables=["schema", "question"], template=CYPHER_GENERATION_TEMPLATE
-)
+CYPHER_GENERATION_PROMPT = PromptTemplate(input_variables=["schema", "question"], template=CYPHER_GENERATION_TEMPLATE)
 
-kg = Neo4jGraph(
-    url=NEO4J_URI, username=NEO4J_USERNAME, password=NEO4J_PASSWORD, database=NEO4J_DATABASE
-)
+kg = Neo4jGraph(url=NEO4J_URI, username=NEO4J_USERNAME, password=NEO4J_PASSWORD, database=NEO4J_DATABASE)
 cypher_chain = GraphCypherQAChain.from_llm(
-    llm,
-    graph=kg,
-    verbose=True,
-    cypher_prompt=CYPHER_GENERATION_PROMPT,
-    allow_dangerous_requests=True
+    llm, graph=kg, verbose=True, cypher_prompt=CYPHER_GENERATION_PROMPT, allow_dangerous_requests=True
 )
 
 cypher_tool = Tool.from_function(
     name="GraphCypherQAChain",
     description="Use Cypher to generate information about companies and investors",
     func=cypher_chain.run,
-    return_direct=True
+    return_direct=True,
 )

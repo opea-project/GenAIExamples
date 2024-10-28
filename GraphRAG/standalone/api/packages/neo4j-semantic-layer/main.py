@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 from neo4j_semantic_layer import agent_executor
 
 if __name__ == "__main__":
@@ -12,6 +15,4 @@ if __name__ == "__main__":
         )
     ]
     print(agent_executor.invoke({"input": original_query}))
-    print(
-        agent_executor.invoke({"input": followup_query, "chat_history": chat_history})
-    )
+    print(agent_executor.invoke({"input": followup_query, "chat_history": chat_history}))

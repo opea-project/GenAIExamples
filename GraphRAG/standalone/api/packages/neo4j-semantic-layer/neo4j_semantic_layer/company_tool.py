@@ -1,33 +1,36 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 
-from langchain_core.tools import create_retriever_tool
 from langchain_community.vectorstores import Neo4jVector
+from langchain_core.tools import create_retriever_tool
 from langchain_openai import OpenAIEmbeddings
 
-NEO4J_URI = os.getenv('NEO4J_URI')
-NEO4J_USERNAME = os.getenv('NEO4J_USERNAME')
-NEO4J_PASSWORD = os.getenv('NEO4J_PASSWORD')
-NEO4J_DATABASE = os.getenv('NEO4J_DATABASE') or 'neo4j'
+NEO4J_URI = os.getenv("NEO4J_URI")
+NEO4J_USERNAME = os.getenv("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+NEO4J_DATABASE = os.getenv("NEO4J_DATABASE") or "neo4j"
 
 
 company_info_cypher = """
 MATCH (node)-[:PART_OF]->(f:Form),
     (f)<-[:FILED]-(com:Company),
     (com)<-[owns:OWNS_STOCK_IN]-(mgr:Manager)
-WITH node, score, mgr, owns, com 
+WITH node, score, mgr, owns, com
     ORDER BY owns.shares DESC LIMIT 10
 WITH collect (
-    mgr.name + 
-    " owns " + owns.shares + " of " + com.name + 
-    " at a value of $" + apoc.number.format(owns.value) + "." 
+    mgr.name +
+    " owns " + owns.shares + " of " + com.name +
+    " at a value of $" + apoc.number.format(owns.value) + "."
 ) AS investment_statements, com, node, score
-RETURN 
+RETURN
     "Investors in " + com.name + " include...\n" +
-    apoc.text.join(investment_statements, "\n") + 
-    "\n" + 
+    apoc.text.join(investment_statements, "\n") +
+    "\n" +
     "Information about " + com.name + " that is relevant to the user question...\n" + node.text AS text,
     score,
-    { 
+    {
       source: node.source
     } as metadata
 """

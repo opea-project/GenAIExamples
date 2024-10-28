@@ -269,8 +269,8 @@ files = [
 six = ">=1.12.0"
 
 [package.extras]
-astroid = ["astroid (>=1,<2)", "astroid (>=2,<4)"]
-test = ["astroid (>=1,<2)", "astroid (>=2,<4)", "pytest"]
+asteroid = ["asteroid (>=1,<2)", "asteroid (>=2,<4)"]
+test = ["asteroid (>=1,<2)", "asteroid (>=2,<4)", "pytest"]
 
 [[package]]
 name = "async-lru"
