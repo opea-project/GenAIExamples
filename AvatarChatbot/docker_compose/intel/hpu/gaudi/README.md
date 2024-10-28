@@ -200,7 +200,7 @@ python3 ui/gradio/app_gradio_demo_avatarchatbot.py
 ```
 
 The UI can be viewed at http://${host_ip}:7861  
-<img src="../../../../assets/img/UI.png" alt="UI Example" width="70%">   
+<img src="../../../../assets/img/UI.png" alt="UI Example" width="60%">   
 In the current version, you need to determine the avatar figure image/video and the DL model before starting AvatarChatbot backend service and running the UI.
 
 
