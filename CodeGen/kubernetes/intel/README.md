@@ -14,7 +14,7 @@
 ```
 cd GenAIExamples/CodeGen/kubernetes/intel/cpu/xeon/manifests
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
-export MODEL_ID="meta-llama/CodeLlama-7b-hf"
+export MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" codegen.yaml
 sed -i "s/meta-llama\/CodeLlama-7b-hf/${MODEL_ID}/g" codegen.yaml
 kubectl apply -f codegen.yaml
