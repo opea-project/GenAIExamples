@@ -19,7 +19,7 @@ data:
   INDEX_NAME: rag-redis
   EMBEDDING_SERVER_HOST_IP: embedding-dependency-svc
   TEI_ENDPOINT: http://embedding-dependency-svc.default.svc.cluster.local:6006
-  LLM_SERVER_PORT: 9009
-  RERANK_SERVER_PORT: 8808
-  EMBEDDING_SERVER_PORT: 6006
+  LLM_SERVER_PORT: "9009"
+  RERANK_SERVER_PORT: "8808"
+  EMBEDDING_SERVER_PORT: "6006"
 ---
