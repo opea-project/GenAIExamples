@@ -29,6 +29,6 @@ spec:
         internalService:
           serviceName: tgi-gaudi-svc
           config:
-            MODEL_ID: HuggingFaceH4/mistral-7b-grok
+            MODEL_ID: mistralai/Mistral-7B-Instruct-v0.3
             endpoint: /generate
           isDownstreamService: true
