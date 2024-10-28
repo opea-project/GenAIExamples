@@ -91,6 +91,7 @@ jobs:
             else
               echo "Validate ${{ inputs.example }} failure!!!"
               .github/workflows/scripts/k8s-utils.sh dump_all_pod_logs $NAMESPACE
+              exit 1
             fi
           fi
 
