@@ -187,15 +187,21 @@ If the megaservice is running properly, you should see the following output:
 The output file will be saved in the current working directory, as `${PWD}` is mapped to `/outputs` inside the wav2lip-service Docker container.
 
 ## Gradio UI
-
-Follow the instructions in [Build Mega Service of AudioQnA on Gaudi](https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker_compose/intel/hpu/gaudi/README.md) to build necessary Docker images and start the AudioQnA MegaService with the endpoint `http://localhost:3008/v1/audioqna`. Then run the following command to start the Gradio UI:
-
 ```bash
-cd GenAIExamples/AvatarChatbot/docker/ui/gradio
-python3 app_gradio_demo.py
+pip install gradio==3.48.0 soundfile 
+sudo apt update
+sudo apt install -y yasm pkg-config libx264-dev nasm
+cd $WORKPATH
+git clone https://github.com/FFmpeg/FFmpeg.git
+cd FFmpeg
+sudo ./configure --enable-gpl --enable-libx264 && sudo make -j$(nproc-1) && sudo make install && hash -r
+cd $WORKPATH/GenAIExamples/AvatarChatbot
+python3 ui/gradio/app_gradio_demo_avatarchatbot.py
 ```
 
-The UI can be viewed at http://${host_ip}:7861
+The UI can be viewed at http://${host_ip}:7861  
+In the current version, you need to determine the avatar figure image/video and the DL model before starting AvatarChatbot backend service and running the UI.
+
 
 ## Troubleshooting
 

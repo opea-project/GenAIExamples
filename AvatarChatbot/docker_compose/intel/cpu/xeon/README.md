@@ -192,7 +192,7 @@ Follow the instructions in [Build Mega Service of AudioQnA on Gaudi](https://git
 
 ```bash
 cd GenAIExamples/AvatarChatbot/docker/ui/gradio
-python3 app_gradio_demo.py
+python3 app_gradio_demo_avatarchatbot.py
 ```
 
 ## Troubleshooting
