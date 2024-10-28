@@ -162,26 +162,26 @@ function validate_microservices() {
 
     # Docsum Data service - video
     validate_services \
-        "${ip_address}:7079/v1/docsum/dataprep" \
+        "${ip_address}:7079/v1/multimedia2text" \
         '"query":"you"' \
-        "data-service" \
-        "docsum-data" \
+        "multimedia2text-service" \
+        "multimedia2text" \
         "{\"video\": \"$(input_data_for_test "video")\"}"
 
     # Docsum Data service - audio
     validate_services \
-        "${ip_address}:7079/v1/docsum/dataprep" \
+        "${ip_address}:7079/v1/multimedia2text" \
         '"query":"who is pat gelsinger"' \
-        "data-service" \
-        "docsum-data" \
+        "multimedia2text-service" \
+        "multimedia2text" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
 
     # Docsum Data service - text
     validate_services \
-        "${ip_address}:7079/v1/docsum/dataprep" \
+        "${ip_address}:7079/v1/multimedia2text" \
         "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco" \
-        "data-service" \
-        "docsum-data" \
+        "multimedia2text-service" \
+        "multimedia2text" \
         "{\"text\": \"$(input_data_for_test "text")\"}"
 
     # tgi for llm service

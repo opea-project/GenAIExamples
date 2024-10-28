@@ -24,10 +24,10 @@ class DocSumService:
     def add_remote_service(self):
         
         data = MicroService(
-            name="data",
+            name="multimedia2text",
             host=DATA_SERVICE_HOST_IP,
             port=DATA_SERVICE_PORT,
-            endpoint="/v1/docsum/dataprep",
+            endpoint="/v1/multimedia2text",
             use_remote_service=True,
             service_type=ServiceType.DATAPREP,
         )

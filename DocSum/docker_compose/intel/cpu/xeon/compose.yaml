@@ -67,10 +67,10 @@ services:
     environment:
       V2A_ENDPOINT: ${V2A_ENDPOINT}
 
-  data-service:
+  multimedia2text-service:
     # image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
-    image: opea/docsum_data:latest
-    container_name: docsum-data
+    image: opea/multimedia2text:latest
+    container_name: multimedia2text
     ports:
       - "7079:7079"
     ipc: host
@@ -85,7 +85,7 @@ services:
     depends_on:
       - tgi-service
       - llm
-      - data-service
+      - multimedia2text-service
       - v2a
       - a2t
     ports:

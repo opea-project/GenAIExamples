@@ -134,21 +134,21 @@ def test_video2text():
     
     validate_response(response, "Video2Text")
 
-def test_docsum_data():
+def test_multimedia2text_data():
     """
-    Test the Docsum Data service for different document types.
+    Test the multimedia2text service for different document types.
 
     Raises:
         AssertionError: If the service does not return a 200 status code.
     """
-    print(f"Running test: Docsum Data service")
+    print(f"Running test: multimedia2text service")
     for document_type in ['text', 'audio', 'video']:
-        endpoint = "http://localhost:7079/v1/docsum/dataprep"
+        endpoint = "http://localhost:7079/v1/multimedia2text"
         inputs = {document_type: input_data_for_test(document_type)}
         
         response = post_request(endpoint, inputs)
         
-        validate_response(response, f"Docsum Data ({document_type})")
+        validate_response(response, f"multimedia2text Data ({document_type})")
 
 def test_tgi_service():
     """
@@ -228,7 +228,7 @@ def test_e2e_megaservice(document_type='video'):
     
     validate_response(response, "E2E Megaservice")
     
-    print(read_response(response))
+    # print(read_response(response))
 
 if __name__ == "__main__":
     # Run the tests and print the results
@@ -238,7 +238,7 @@ if __name__ == "__main__":
         test_whisper_service()
         test_audio2text()
         test_video2text()
-        test_docsum_data()
+        test_multimedia2text_data()
         test_e2e_megaservice()
     except AssertionError as e:
         print(f"Test failed: {e}")
