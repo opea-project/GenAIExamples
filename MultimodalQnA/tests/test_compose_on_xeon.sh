@@ -16,6 +16,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 export image_fn="apple.png"
 export video_fn="WeAreGoingOnBullrun.mp4"
+export caption_fn="apple.txt"
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
@@ -46,6 +47,7 @@ function setup_env() {
     export LVM_SERVICE_HOST_IP=${host_ip}
     export MEGA_SERVICE_HOST_IP=${host_ip}
     export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/ingest_with_text"
     export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
     export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
     export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
@@ -66,9 +68,11 @@ function prepare_data() {
     echo "Downloading image and video"
     wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
+    echo "Writing caption file"
+    echo "This is an apple."  > ${caption_fn}
     sleep 1m
-
 }
+
 function validate_service() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
@@ -82,6 +86,9 @@ function validate_service() {
     elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-caption"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-ingest"* ]]; then
+        cd $LOG_PATH
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -F "files=@./apple.txt" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
@@ -150,18 +157,25 @@ function validate_microservices() {
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # test data prep
-    echo "Data Prep with Generating Transcript"
+    echo "Data Prep with Generating Transcript for Video"
     validate_service \
         "${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}" \
         "Data preparation succeeded" \
         "dataprep-multimodal-redis-transcript" \
         "dataprep-multimodal-redis"
 
-    echo "Data Prep with Generating Caption"
+    echo "Data Prep with Generating Caption for Image"
     validate_service \
         "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
         "Data preparation succeeded" \
         "dataprep-multimodal-redis-caption" \
+        "dataprep-multimodal-redis"
+
+    echo "Data Prep with Image & Caption Ingestion"
+    validate_service \
+        "${DATAPREP_INGEST_SERVICE_ENDPOINT}" \
+        "Data preparation succeeded" \
+        "dataprep-multimodal-redis-ingest" \
         "dataprep-multimodal-redis"
 
     echo "Validating get file returns mp4"
@@ -173,7 +187,7 @@ function validate_microservices() {
 
     echo "Validating get file returns png"
     validate_service \
-        "${DATAPREP_GET_VIDEO_ENDPOINT}" \
+        "${DATAPREP_GET_FILE_ENDPOINT}" \
         '.png' \
         "dataprep_get" \
         "dataprep-multimodal-redis"
@@ -244,9 +258,10 @@ function validate_delete {
 
 function delete_data() {
     cd $LOG_PATH
-    echo "Deleting image and video"
+    echo "Deleting image, video, and caption"
     rm -rf ${image_fn}
     rm -rf ${video_fn}
+    rm -rf ${caption_fn}
 }
 
 function stop_docker() {
