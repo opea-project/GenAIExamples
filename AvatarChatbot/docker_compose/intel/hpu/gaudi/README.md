@@ -187,8 +187,9 @@ If the megaservice is running properly, you should see the following output:
 The output file will be saved in the current working directory, as `${PWD}` is mapped to `/outputs` inside the wav2lip-service Docker container.
 
 ## Gradio UI
+
 ```bash
-pip install gradio==3.48.0 soundfile 
+pip install gradio==3.48.0 soundfile
 sudo apt update
 sudo apt install -y yasm pkg-config libx264-dev nasm
 cd $WORKPATH
@@ -200,9 +201,8 @@ python3 ui/gradio/app_gradio_demo_avatarchatbot.py
 ```
 
 The UI can be viewed at http://${host_ip}:7861  
-<img src="../../../../assets/img/UI.png" alt="UI Example" width="70%">   
+<img src="../../../../assets/img/UI.png" alt="UI Example" width="70%">  
 In the current version, you need to determine the avatar figure image/video and the DL model before starting AvatarChatbot backend service and running the UI.
-
 
 ## Troubleshooting
 
