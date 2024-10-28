@@ -1,0 +1,17 @@
+{
+    "item1": ">Item\u00a01.\n\u200b\nBusiness\n\u200b\n3\n\u200b",
+    "item1a": ">Item\u00a01A.\n\u200b\nRisk Factors\n\u200b\n23\n\u200b",
+    "item7": ">Item\u00a07.\n\u200b\nManagement\u2019s Discussion and Analysis of Financial Condition and Results of Operations\n\u200b\n58\n\u200b",
+    "item7a": ">Item\u00a07A.\n\u200b\nQuantitative and Qualitative Disclosures About Market Risk\n\u200b\n72\n\u200b",
+    "cik": "1368622",
+    "cusip6": "008073",
+    "cusip": [
+        "008073108",
+        "008073908",
+        "008073958"
+    ],
+    "names": [
+        "AEROVIRONMENT INC"
+    ],
+    "source": "https://www.sec.gov/Archives/edgar/data/1368622/000155837023011469/0001558370-23-011469-index.htm"
+}

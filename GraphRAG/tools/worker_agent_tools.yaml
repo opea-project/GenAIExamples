@@ -1,0 +1,11 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+search_knowledge_base:
+  description: Search knowledge base for a given query. Returns text related to the query.
+  callable_api: worker_agent_tools.py:search_knowledge_base
+  args_schema:
+    query:
+      type: str
+      description: query
+  return_output: retrieved_data

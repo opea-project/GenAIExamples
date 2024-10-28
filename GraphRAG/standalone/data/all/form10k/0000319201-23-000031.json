@@ -1,0 +1,17 @@
+{
+    "item1": ">Item 1.\nBusiness\n1",
+    "item1a": ">Item 1A.\nRisk Factors\n14",
+    "item7": ">Item\u00a07.\nManagement\u2019s Discussion and Analysis of Financial Condition and Results of Operations\n35",
+    "item7a": ">Item\u00a07A.\nQuantitative and Qualitative Disclosures About Market Risk\n53",
+    "cik": "319201",
+    "cusip6": "482480",
+    "cusip": [
+        "482480900",
+        "482480100",
+        "482480950"
+    ],
+    "names": [
+        "KLA CORP"
+    ],
+    "source": "https://www.sec.gov/Archives/edgar/data/319201/000031920123000031/0000319201-23-000031-index.htm"
+}
