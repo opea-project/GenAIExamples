@@ -2,104 +2,6 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AIPC. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
 
-## Prerequisites
-
-We use [Ollama](https://ollama.com/) as our LLM service for AIPC.
-
-Please follow the instructions to set up Ollama on your PC. This will set the entrypoint needed for the Ollama to suit the ChatQnA examples.
-
-### Set Up Ollama LLM Service
-
-#### Install Ollama Service
-
-Install Ollama service with one command:
-
-```
-curl -fsSL https://ollama.com/install.sh | sh
-```
-
-#### Set Ollama Service Configuration
-
-Ollama Service Configuration file is /etc/systemd/system/ollama.service. Edit the file to set OLLAMA_HOST environment.
-Replace **<host_ip>** with your host IPV4 (please use external public IP). For example the host_ip is 10.132.x.y, then `Environment="OLLAMA_HOST=10.132.x.y:11434"'.
-
-```
-Environment="OLLAMA_HOST=host_ip:11434"
-```
-
-#### Set https_proxy environment for Ollama
-
-If your system access network through proxy, add https_proxy in Ollama Service Configuration file
-
-```
-Environment="https_proxy=Your_HTTPS_Proxy"
-```
-
-#### Restart Ollama services
-
-```
-$ sudo systemctl daemon-reload
-$ sudo systemctl restart ollama.service
-```
-
-#### Check the service started
-
-```
-netstat -tuln | grep  11434
-```
-
-The output are:
-
-```
-tcp        0      0 10.132.x.y:11434      0.0.0.0:*               LISTEN
-```
-
-#### Pull Ollama LLM model
-
-Run the command to download LLM models. The <host_ip> is the one set in [Ollama Service Configuration](#Set-Ollama-Service-Configuration)
-
-```
-export host_ip=<host_ip>
-export OLLAMA_HOST=http://${host_ip}:11434
-ollama pull llama3.2
-```
-
-After downloaded the models, you can list the models by `ollama list`.
-
-The output should be similar to the following:
-
-```
-NAME            ID                SIZE      MODIFIED
-llama3.2:latest   a80c4f17acd5    2.0 GB    2 minutes ago
-```
-
-### Consume Ollama LLM Service
-
-Access ollama service to verify that the ollama is functioning correctly.
-
-```bash
-curl http://${host_ip}:11434/api/generate -d '{"model": "llama3.2", "prompt":"What is Deep Learning?"}'
-```
-
-The outputs are similar to these:
-
-```
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.098813868Z","response":"Deep","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.124514468Z","response":" learning","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.149754216Z","response":" is","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.180420784Z","response":" a","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.229185873Z","response":" subset","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.263956118Z","response":" of","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.289097354Z","response":" machine","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.316838918Z","response":" learning","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.342309506Z","response":" that","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.367221264Z","response":" involves","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.39205893Z","response":" the","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.417933974Z","response":" use","done":false}
-{"model":"llama3.2","created_at":"2024-10-12T12:55:28.443110388Z","response":" of","done":false}
-...
-```
-
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
@@ -122,20 +24,14 @@ export https_proxy="Your_HTTPs_Proxy"
 docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
-### 2 Build LLM Image
-
-```bash
-docker build --no-cache -t opea/llm-ollama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ollama/langchain/Dockerfile .
-```
-
-### 3. Build Dataprep Image
+### 2. Build Dataprep Image
 
 ```bash
 docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
 cd ..
 ```
 
-### 4. Build MegaService Docker Image
+### 3. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
 
@@ -146,7 +42,7 @@ cd GenAIExamples/ChatQnA
 docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f Dockerfile .
 ```
 
-### 5. Build UI Docker Image
+### 4. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -155,7 +51,7 @@ cd ~/OPEA/GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-### 6. Build Nginx Docker Image
+### 5. Build Nginx Docker Image
 
 ```bash
 cd GenAIComps
@@ -166,10 +62,9 @@ Then run the command `docker images`, you will have the following 6 Docker Image
 
 1. `opea/dataprep-redis:latest`
 2. `opea/retriever-redis:latest`
-3. `opea/llm-ollama:latest`
-4. `opea/chatqna:latest`
-5. `opea/chatqna-ui:latest`
-6. `opea/nginx:latest`
+3. `opea/chatqna:latest`
+4. `opea/chatqna-ui:latest`
+5. `opea/nginx:latest`
 
 ## 🚀 Start Microservices
 
@@ -195,10 +90,10 @@ For Linux users, please run `hostname -I | awk '{print $1}'`. For Windows users,
 export your_hf_api_token="Your_Huggingface_API_Token"
 ```
 
-**Append the value of the public IP address to the no_proxy list**
+**Append the value of the public IP address to the no_proxy list if you are in a proxy environment**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
+export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service
 ```
 
 - Linux PC
@@ -211,7 +106,7 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export OLLAMA_ENDPOINT=http://${host_ip}:11434
+export OLLAMA_HOST=${host_ip}
 export OLLAMA_MODEL="llama3.2"
 ```
 
@@ -222,7 +117,7 @@ set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 set RERANK_MODEL_ID=BAAI/bge-reranker-base
 set INDEX_NAME=rag-redis
 set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
-set OLLAMA_ENDPOINT=http://host.docker.internal:11434
+set OLLAMA_HOST=host.docker.internal
 set OLLAMA_MODEL="llama3.2"
 ```
 
@@ -277,16 +172,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
    curl http://${host_ip}:11434/api/generate -d '{"model": "llama3.2", "prompt":"What is Deep Learning?"}'
    ```
 
-5. LLM Microservice
-
-   ```bash
-   curl http://${host_ip}:9000/v1/chat/completions\
-     -X POST \
-     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-     -H 'Content-Type: application/json'
-   ```
-
-6. MegaService
+5. MegaService
 
    ```bash
    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -294,7 +180,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
         }'
    ```
 
-7. Upload RAG Files through Dataprep Microservice (Optional)
+6. Upload RAG Files through Dataprep Microservice (Optional)
 
    To chat with retrieved information, you need to upload a file using Dataprep service.
 
@@ -334,4 +220,4 @@ the output is:
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173.
+To access the frontend, open the following URL in your browser: http://{host_ip}:80.
