@@ -115,7 +115,7 @@ class RetrievalToolService(Gateway):
         response = result_dict[last_node]
         return response
 
-    def start():
+    def start(self):
         super().__init__(
             megaservice=self.megaservice,
             host=self.host,
