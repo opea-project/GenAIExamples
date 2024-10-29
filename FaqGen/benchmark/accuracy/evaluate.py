@@ -35,7 +35,7 @@ for i in range(number):
     contexts.append([inputs_faq])
 
 embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-base-en-v1.5")
-metrics_faq = ["answer_relevancy", "faithfulness", "context_utilization", "reference_free_rubrics_score"]
+metrics_faq = ["answer_relevancy", "faithfulness", "context_utilization", "rubrics_score_without_reference"]
 metric = RagasMetric(threshold=0.5, model=llm_endpoint, embeddings=embeddings, metrics=metrics_faq)
 
 test_case = {"question": question, "answer": answer, "ground_truth": ground_truth, "contexts": contexts}
