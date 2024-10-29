@@ -1,0 +1,205 @@
+---
+# Source: chatqna/charts/tgi/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chatqna-tgi-llamab-config
+  labels:
+    helm.sh/chart: tgi-1.0.0
+    app.kubernetes.io/name: tgi
+    app.kubernetes.io/instance: chatqna
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  PORT: "2080"
+  HF_TOKEN: "<your-hf-token>"
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  HABANA_LOGS: "/tmp/habana_logs"
+  NUMBA_CACHE_DIR: "/tmp"
+  HF_HOME: "/tmp/.cache/huggingface"
+  MAX_INPUT_LENGTH: "1024"
+  MAX_TOTAL_TOKENS: "2048"
+  TRANSFORMERS_CACHE: "/tmp/transformers_cache"
+  NUM_SHARD: "8"
+  SHARDED: "true"
+  LLM_MODEL_ID: "meta-llama/Meta-Llama-3.1-70B-Instruct"
+---
+
+# Source: chatqna/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatqna-tgi-llamab
+  labels:
+    helm.sh/chart: tgi-1.0.0
+    app.kubernetes.io/name: tgillama70b
+    app.kubernetes.io/instance: tgillama70b
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 2080
+      protocol: TCP
+      name: tgillama70b
+  selector:
+    app.kubernetes.io/name: tgillama70b
+    app.kubernetes.io/instance: tgillama70b
+---
+# Source: chatqna/charts/tgi/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatqna-tgi-llamab
+  labels:
+    helm.sh/chart: tgi-1.0.0
+    app.kubernetes.io/name: tgillama70b
+    app.kubernetes.io/instance: tgillama70b
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tgillama70b
+      app.kubernetes.io/instance: tgillama70b
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tgillama70b
+        app.kubernetes.io/instance: tgillama70b
+    spec:
+      securityContext:
+        {}
+      hostIPC: true
+      containers:
+        - name: tgi
+          envFrom:
+            - configMapRef:
+                name: chatqna-tgi-llamab-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - SYS_NICE
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+            runAsUser: 0
+            seccompProfile:
+              type: RuntimeDefault
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.5"
+          args:
+            - --model-id
+            - $(LLM_MODEL_ID)
+            - --sharded
+            - 'true'
+            - --num-shard
+            - $(NUM_SHARD)
+            - --max-input-length
+            - '1024'
+            - --max-total-tokens
+            - '2048'
+            - --max-batch-prefill-tokens
+            - '4096'
+            - --max-batch-total-tokens
+            - '524288'
+            - --waiting-served-ratio
+            - '1.2'
+            - --max-waiting-tokens
+            - '7'
+            - --max-concurrent-requests
+            - '512'
+          env:
+            - name: OMPI_MCA_btl_vader_single_copy_mechanism
+              value: none
+            - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+              value: 'true'
+            - name: runtime
+              value: habana
+            - name: HABANA_VISIBLE_DEVICES
+              value: all
+            - name: HF_TOKEN
+              value: '<your-hf-token>'
+            - name: MAX_WARMUP_SEQUENCE_LENGTH
+              value: '512'
+            - name: MAX_TOTAL_TOKENS
+              value: '2048'
+            - name: BATCH_BUCKET_SIZE
+              value: '256'
+            - name: PREFILL_BATCH_BUCKET_SIZE
+              value: '4'
+            - name: PAD_SEQUENCE_TO_MULTIPLE_OF
+              value: '64'
+            - name: ENABLE_HPU_GRAPH
+              value: 'true'
+            - name: LIMIT_HPU_GRAPH
+              value: 'true'
+            - name: USE_FLASH_ATTENTION
+              value: 'true'
+            - name: FLASH_ATTENTION_RECOMPUTE
+              value: 'true'
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /data
+              name: model-volume
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: http
+              containerPort: 2080
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 60
+            initialDelaySeconds: 1800
+            periodSeconds: 30
+            tcpSocket:
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 1800
+            periodSeconds: 30
+            tcpSocket:
+              port: http
+          startupProbe:
+            failureThreshold: 300
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          resources:
+            limits:
+              habana.ai/gaudi: 8
+              cpu: 80
+              memory: 600Gi
+            requests:
+              habana.ai/gaudi: 8
+              cpu: 80
+              memory: 600Gi
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: instance
+                operator: In
+                values:
+                - gaudiworker
+      volumes:
+        - name: model-volume
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
