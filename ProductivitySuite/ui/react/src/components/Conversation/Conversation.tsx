@@ -4,8 +4,8 @@
 import { KeyboardEventHandler, SyntheticEvent, useEffect, useRef, useState } from 'react'
 import styleClasses from "./conversation.module.scss"
 import { ActionIcon, Group, Textarea, Title, Tooltip, rem } from '@mantine/core'
-import { IconArrowDown, IconArrowRight, IconArrowUp, IconMessagePlus } from '@tabler/icons-react'
-import { conversationSelector, doConversation, getAllConversations, newConversation, setSystemPrompt } from '../../redux/Conversation/ConversationSlice'
+import { IconArrowDown, IconArrowRight, IconMessagePlus, IconPencil } from '@tabler/icons-react'
+import { conversationSelector, doConversation, getAllConversations, newConversation, setSystemPrompt} from '../../redux/Conversation/ConversationSlice'
 import { ConversationMessage } from '../Message/conversationMessage'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
 import { Message, MessageRole } from '../../redux/Conversation/Conversation'
@@ -21,7 +21,7 @@ type ConversationProps = {
 
 const Conversation = ({ title }: ConversationProps) => {
   const [prompt, setPrompt] = useState<string>("")
-  const [updateSystemPrompt, setUpdateSystemPrompt] = useState(false)
+  const [updateSystemPrompt, setUpdateSystemPrompt] = useState(true)
 
   const dispatch = useAppDispatch();
   const promptInputRef = useRef<HTMLTextAreaElement>(null)
@@ -53,8 +53,11 @@ const Conversation = ({ title }: ConversationProps) => {
     //     return { role: message.role, content: message.content }
     //   })
     // }
-
-    messages = [systemPromptObject, ...(selectedConversationHistory)]
+    if(selectedConversationHistory.length==0){
+      messages = [systemPromptObject, ...(selectedConversationHistory)]
+    }else{
+      messages = [...(selectedConversationHistory)]
+    }
 
     doConversation({
       conversationId: selectedConversationId,
@@ -111,7 +114,7 @@ const Conversation = ({ title }: ConversationProps) => {
     <div className={styleClasses.conversationWrapper}>
       <ConversationSideBar title={title} />
       <div className={styleClasses.conversationContent}>
-        <div className={styleClasses.conversationContentMessages} style={updateSystemPrompt ? { gridTemplateRows: `60px 1fr 160px` } : {} }>
+        <div className={styleClasses.conversationContentMessages} style={updateSystemPrompt ? { gridTemplateRows: `60px 1fr 180px` } : {} }>
           <div className={styleClasses.conversationTitle}>
             <Title order={3} className={styleClasses.title}>{selectedConversation?.first_query || ""} </Title>
             <span className={styleClasses.spacer}></span>
@@ -151,6 +154,7 @@ const Conversation = ({ title }: ConversationProps) => {
 
           <div className={styleClasses.conversationActions}>
             <Textarea
+              label="System Prompt"
               style={{
                 display: updateSystemPrompt ? 'block' : 'none',
                 marginBottom: '10px',
@@ -166,7 +170,7 @@ const Conversation = ({ title }: ConversationProps) => {
               <Tooltip label="update system prompt">
                 <ActionIcon onClick={() => setUpdateSystemPrompt((prev) => !prev)} size={32} radius="xl" variant="filled">
                   {updateSystemPrompt ? (<IconArrowDown style={{ width: rem(18), height: rem(18) }} stroke={1.5} />) :
-                    (<IconArrowUp style={{ width: rem(18), height: rem(18) }} stroke={1.5} />)}
+                    (<IconPencil style={{ width: rem(18), height: rem(18) }} stroke={1.5} />)}
                 </ActionIcon>
               </Tooltip>
               
