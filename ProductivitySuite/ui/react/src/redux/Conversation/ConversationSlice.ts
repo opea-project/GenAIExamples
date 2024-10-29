@@ -240,7 +240,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
   const body = {
     messages: [...messages, userPromptWithoutTime],
     model,
-    max_new_tokens: token,
+    max_tokens: token,
     temperature: temperature,
   };
 
