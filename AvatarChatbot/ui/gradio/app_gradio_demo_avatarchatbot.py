@@ -122,17 +122,17 @@ if __name__ == "__main__":
     chat_history = ""
 
     # Prepare 3 image paths and 3 video paths
-    image_pils = [
-        Image.open(os.path.join("assets/img/woman1.png")),
-        Image.open(os.path.join("assets/img/man1.png")),
-        Image.open(os.path.join("assets/img/woman2.png")),
-    ]
+    # image_pils = [
+    #     Image.open(os.path.join("assets/img/woman1.png")),
+    #     Image.open(os.path.join("assets/img/man1.png")),
+    #     Image.open(os.path.join("assets/img/woman2.png")),
+    # ]
 
-    video_paths = [
-        os.path.join("assets/video/man1.mp4"),
-        os.path.join("assets/video/woman2.mp4"),
-        os.path.join("assets/video/man4.mp4"),
-    ]
+    # video_paths = [
+    #     os.path.join("assets/video/man1.mp4"),
+    #     os.path.join("assets/video/woman2.mp4"),
+    #     os.path.join("assets/video/man4.mp4"),
+    # ]
 
     def image_to_base64(image_path):
         with open(image_path, "rb") as image_file:
@@ -143,14 +143,14 @@ if __name__ == "__main__":
     gaudi_base64 = image_to_base64("assets/img/gaudi.png")
 
     # List of prerecorded WAV files containing audio questions
-    audio_filepaths = [
-        "assets/audio/intel2.wav",
-        "assets/audio/intel4.wav",
-    ]
-    audio_questions = [
-        "1. What's the objective of the Open Platform for Enterprise AI? How is it helpful to enterprises building AI solutions?",
-        "2. What kinds of Intel AI tools are available to accelerate AI workloads?",
-    ]
+    # audio_filepaths = [
+    #     "assets/audio/intel2.wav",
+    #     "assets/audio/intel4.wav",
+    # ]
+    # audio_questions = [
+    #     "1. What's the objective of the Open Platform for Enterprise AI? How is it helpful to enterprises building AI solutions?",
+    #     "2. What kinds of Intel AI tools are available to accelerate AI workloads?",
+    # ]
 
     # Demo frontend
     demo = gr.Blocks()
