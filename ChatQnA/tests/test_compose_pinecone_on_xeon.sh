@@ -16,13 +16,13 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git
+    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep-pinecone retriever-pinecone nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
@@ -34,7 +34,7 @@ function start_services() {
     export no_proxy=${no_proxy},${ip_address}
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export PINECONE_API_KEY=${PINECONE_KEY_LANGCHAIN_TEST}
     export PINECONE_INDEX_NAME="langchain-test"
     export INDEX_NAME="langchain-test"
@@ -44,7 +44,7 @@ function start_services() {
     docker compose -f compose_pinecone.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 200 ]]; do
+    until [[ "$n" -ge 500 ]]; do
         docker logs tgi-service > tgi_service_start.log
         if grep -q Connected tgi_service_start.log; then
             break
