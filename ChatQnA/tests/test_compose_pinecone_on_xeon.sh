@@ -73,7 +73,7 @@ function validate_services() {
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
     docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-    
+
 
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
