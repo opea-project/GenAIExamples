@@ -44,8 +44,36 @@ def read_response(response):
     Returns:
         str: The parsed response content.
     """
-    
-    return response.text.replace("'\n\ndata: b'", "").replace("data: b' ", "").replace("</s>'\n\ndata: [DONE]\n\n","").replace("\n\ndata: b", "").replace("'\n\n", "").replace("'\n", "").replace('''\'"''' ,"")
+    try:
+        # Check if the specific log path is in the response text
+        if "/logs/LLMChain/final_output" in response.text:
+            # Extract the relevant part of the response
+            temp = ast.literal_eval(
+                [i.split("data: ")[1] for i in response.text.split("\n\n") if "/logs/LLMChain/final_output" in i][0]
+            )["ops"]
+
+            # Find the final output value
+            final_output = [i["value"] for i in temp if i["path"] == "/logs/LLMChain/final_output"][0]
+            return final_output["text"]
+        else:
+            # Perform string replacements to clean the response text
+            cleaned_text = response.text
+            replacements = [
+                ("'\n\ndata: b'", ""),
+                ("data: b' ", ""),
+                ("</s>'\n\ndata: [DONE]\n\n", ""),
+                ("\n\ndata: b", ""),
+                ("'\n\n", ""),
+                ("'\n", ""),
+                ('''\'"''', "")
+            ]
+            for old, new in replacements:
+                cleaned_text = cleaned_text.replace(old, new)
+            return cleaned_text
+    except (IndexError, KeyError, ValueError) as e:
+        # Handle potential errors during parsing
+        print(f"Error parsing response: {e}")
+        return response.text
 
 def input_data_for_test(document_type):
     """
@@ -65,7 +93,8 @@ def input_data_for_test(document_type):
     elif document_type == "audio":
         input_data = get_base64_str(os.path.join(root_folder, 'data/test_audio_30s.wav'))
     elif document_type == "video":
-        input_data = get_base64_str(os.path.join(root_folder, 'data/test_video_30s.mp4'))
+        # input_data = get_base64_str(os.path.join(root_folder, 'data/test_video_30s.mp4'))
+        input_data = get_base64_str(os.path.join(root_folder, 'data/test_full.mp4'))
     else:
         raise ValueError("Invalid document type")
     
@@ -228,7 +257,7 @@ def test_e2e_megaservice(document_type='video'):
     
     validate_response(response, "E2E Megaservice")
     
-    # print(read_response(response))
+    print(read_response(response))
 
 if __name__ == "__main__":
     # Run the tests and print the results
@@ -242,5 +271,3 @@ if __name__ == "__main__":
         test_e2e_megaservice()
     except AssertionError as e:
         print(f"Test failed: {e}")
-        
-        
