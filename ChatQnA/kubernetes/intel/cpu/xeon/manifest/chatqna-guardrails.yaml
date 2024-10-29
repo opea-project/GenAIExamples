@@ -1260,6 +1260,8 @@ spec:
               value: chatqna-tei
             - name: GUARDRAIL_SERVICE_HOST_IP
               value: chatqna-guardrails-usvc
+            - name: GUARDRAIL_SERVICE_PORT
+              value: "9090"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
