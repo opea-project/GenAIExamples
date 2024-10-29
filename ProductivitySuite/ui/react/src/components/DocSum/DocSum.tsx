@@ -83,17 +83,11 @@ const DocSum = () => {
         onmessage(msg) {
             if (msg?.data != "[DONE]") {
                 try {
-                    const res = JSON.parse(msg.data)
-                    const logs = res.ops;
-                    logs.forEach((log: { op: string; path: string; value: string }) => {
-                        if (log.op === "add") {
-                            if (
-                                log.value !== "</s>" && log.path.endsWith("/streamed_output/-") && log.path.length > "/streamed_output/-".length
-                            ) {
-                               setResponse(prev=>prev+log.value);
-                            }
-                        }
-                    });
+                    const match = msg.data.match(/b'([^']*)'/);
+                    if (match && match[1] != "</s>") {
+                        const extractedText = match[1];
+                        setResponse(prev => (prev + extractedText.replace("<|eot_id|>", "").replace(/\\n/g, "\n")));
+                    }
                 } catch (e) {
                     console.log("something wrong in msg", e);
                     throw e;

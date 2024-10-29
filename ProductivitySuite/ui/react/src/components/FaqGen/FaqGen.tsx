@@ -90,7 +90,7 @@ const FaqGen = () => {
                             if (
                                 log.value !== "</s>" && log.path.endsWith("/streamed_output/-") && log.path.length > "/streamed_output/-".length
                             ) {
-                               setResponse(prev=>prev+log.value);
+                                setResponse(prev => prev + log.value.replace("<|eot_id|>", "").replace(/\\n/g, "\n"));
                             }
                         }
                     });

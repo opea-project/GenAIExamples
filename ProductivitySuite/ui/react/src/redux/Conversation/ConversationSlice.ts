@@ -271,7 +271,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
             const match = msg.data.match(/b'([^']*)'/);
             if (match && match[1] != "</s>") {
               const extractedText = match[1];
-              result += extractedText;
+              result += extractedText.replace("<|eot_id|>","").replace(/\\n/g, "\n");
               store.dispatch(setOnGoingResult(result));
             }
           } catch (e) {
