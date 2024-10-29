@@ -97,7 +97,7 @@ const CodeGen = () => {
             <div className={styleClasses.codeGenContent}>
                 <div className={styleClasses.codeGenContentMessages}>
                     <div className={styleClasses.codeGenTitle}>
-                        <Title order={3}>CodeGen</Title>
+                        <Title order={3}>Code Generator</Title>
                     </div>
 
                     <div className={styleClasses.historyContainer} ref={scrollViewport}>

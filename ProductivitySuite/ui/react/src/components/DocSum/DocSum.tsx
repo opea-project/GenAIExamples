@@ -106,7 +106,7 @@ const DocSum = () => {
             <div className={styleClasses.docSumContent}>
                 <div className={styleClasses.docSumContentMessages}>
                     <div className={styleClasses.docSumTitle}>
-                        <Title order={3}>Doc Summary</Title>
+                        <Title order={3}>Content Summarizer</Title>
                     </div>
                     <div>
                         <Text size="lg" >Please upload file or paste content for summarization.</Text>
