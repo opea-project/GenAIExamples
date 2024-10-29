@@ -18,6 +18,7 @@ import {
   CHAT_HISTORY_GET,
   CHAT_HISTORY_DELETE,
 } from "../../config";
+import { Model } from './Conversation';
 
 const initialState: ConversationReducer = {
   conversations: [],
@@ -25,6 +26,7 @@ const initialState: ConversationReducer = {
   selectedConversationHistory: [],
   onGoingResult: "",
   filesInDataSource: [],
+  models: [],
   model: "Intel/neural-chat-7b-v3-3",
   systemPrompt: "You are helpful assistant",
   minToken: 100,
@@ -68,6 +70,18 @@ export const ConversationSlice = createSlice({
     setSystemPrompt: (state, action: PayloadAction<string>) => {
       state.systemPrompt = action.payload;
     },
+    setModel: (state, action: PayloadAction<string>) => {
+      state.model = action.payload;
+    },
+    setMinToken: (state, action: PayloadAction<number>) => {
+      state.minToken = action.payload;
+    },
+    setMaxToken: (state, action: PayloadAction<number>) => {
+      state.maxToken = action.payload;
+    },
+    setModels: (state, action: PayloadAction<Model []>) => {
+      state.models = action.payload;
+    }
   },
   extraReducers(builder) {
     builder.addCase(uploadFile.fulfilled, () => {
@@ -231,7 +245,9 @@ export const deleteConversation = createAsyncThunkWrapper(
 
 export const doConversation = (conversationRequest: ConversationRequest) => {
   const { conversationId, userPrompt, messages, model, token, temperature } = conversationRequest;
-  store.dispatch(addMessageToMessages(messages[0]));
+  if(messages.length==1){
+    store.dispatch(addMessageToMessages(messages[0]));
+  }
   store.dispatch(addMessageToMessages(userPrompt));
   const userPromptWithoutTime = {
     role: userPrompt.role,
@@ -321,6 +337,10 @@ export const {
   setTemperature,
   setToken,
   setSystemPrompt,
+  setModel,
+  setMinToken,
+  setMaxToken,
+  setModels
 } = ConversationSlice.actions;
 export const conversationSelector = (state: RootState) => state.conversationReducer;
 export default ConversationSlice.reducer;

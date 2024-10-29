@@ -30,6 +30,13 @@ type file = {
   name: string;
 };
 
+export type Model = {
+  model_name: string;
+  displayName: string;
+  minToken: number,
+  maxToken:number
+}
+
 export interface ConversationReducer {
   selectedConversationId: string;
   conversations: Conversation[];
@@ -37,6 +44,7 @@ export interface ConversationReducer {
   onGoingResult: string;
   filesInDataSource: file[];
   systemPrompt: string;
+  models: Model[];
   model: string;
   minToken: number;
   maxToken: number;
