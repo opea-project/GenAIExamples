@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,7 +19,7 @@ spec:
     spec:
       initContainers:
         - name: copy-ui-to-workdir
-          image: "insert-your-image-codegen-ui" 
+          image: "insert-your-image-codegen-ui"
           command:
             - /bin/bash
             - -c

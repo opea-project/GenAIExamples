@@ -175,8 +175,8 @@ spec:
           startupProbe:
             exec:
               command:
-                - python 
-                - -c 
+                - python
+                - -c
                 - 'import requests; req = requests.get("http://codegen-tgi:8080/info"); print(req)'
             initialDelaySeconds: 5
             periodSeconds: 5
