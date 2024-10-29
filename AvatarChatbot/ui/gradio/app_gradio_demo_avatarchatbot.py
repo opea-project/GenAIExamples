@@ -260,7 +260,7 @@ if __name__ == "__main__":
             #     with gr.Row():
             #         for i in range(len(image_pils)):
             #             image_click_buttons.append(gr.Button(f"Use Image {i+1}"))
-                        
+
             #     # Display 3 videos and buttons
             #     with gr.Row():
             #         for i, video_path in enumerate(video_paths):
