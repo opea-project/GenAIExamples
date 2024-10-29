@@ -8,6 +8,7 @@ GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Ap
 - For an input query the relevant communities are identified and partial answers are generated from each of the community summaries (query-focused summarization (QFS))
 - There is a final generation stage that responds to the query based on the intermediate community answers.
 
+
 ## Deploy GraphRAG Service
 
 The GraphRAG service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors.
@@ -19,6 +20,7 @@ Quick Start Deployment Steps:
 3. Consume the GraphRAG Service.
 
 Note: If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`
+
 
 ### Quick Start: 1.Setup Environment Variable
 
@@ -51,6 +53,7 @@ To set up environment variables for deploying GraphRAG services, follow these st
    source ./docker_compose/intel/hpu/gaudi/set_env.sh
    ```
 
+
 ### Quick Start: 2.Run Docker Compose
 
 If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](../ChatQnA/docker_compose/intel/cpu/xeon/README.md). [test_compose.sh](tests/test_compose.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD.
@@ -61,6 +64,7 @@ Docker compose will start 8 services: ![8 servicesi in GraphRAG](assets/8microse
 cd GraphRAG/docker_compose/intel/hpu/gaudi
 docker compose -f compose.yaml up -d
 ```
+
 
 ### QuickStart: 3.Upload RAG Files and Consume the GraphRAG Service
 
@@ -84,6 +88,7 @@ curl http://${host_ip}:8888/v1/graphrag \
         "model": "gpt-4o-mini","messages": [{"role": "user","content": "What is the revenue of Nike in 2023?
     "}]}'
 ```
+
 
 ## Architecture and Deploy details
 
@@ -174,9 +179,10 @@ Gaudi default compose.yaml
 | LLM | Llama-index, TGI | Gaudi | 6005 | /v1/chat/completions |
 | Dataprep | Neo4j, LlamaIndex | Xeon | 6004 | /v1/dataprep |
 
+
 ### Models Selection
 
-GraphRAG quality dependents heavily on the ability to extract a high quality graph. We highly recommend using the best model availableto you. Table below shows default models specified in the codebase when OPENAI_API_KEY is available and for local inference w TEI/TGI. The local models are small since those will be used in CI/CD but users should improve upon these by changing the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh`.
+GraphRAG quality dependents heavily on the ability to extract a high quality graph. We highly recommend using the best model available to you. Table below shows default models specified in the codebase when OPENAI_API_KEY is available and for local inference w TEI/TGI. The local models are small since those will be used in CI/CD but users should improve upon these by changing the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh`.
 
 Working on a table comparison of various model sizes vs. naive RAG with a dataset that reflects well the benefits of GraphRAG. Stay tuned!
 
@@ -187,6 +193,7 @@ Working on a table comparison of various model sizes vs. naive RAG with a datase
 | LLM       | gpt-4o                                |
 | LLM       | "meta-llama/Meta-Llama-3-8B-Instruct" |
 
+
 ## Consume GraphRAG Service with RAG
 
 ### Check Service Status
@@ -196,6 +203,7 @@ Before consuming GraphRAG Service, make sure each microservice is ready by check
 ```bash
 docker logs container_name
 ```
+
 
 ### Upload RAG Files
 
@@ -211,6 +219,7 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep" \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./nke-10k-2023.pdf"
 ```
+
 
 ### Consume GraphRAG Service
 
@@ -234,6 +243,7 @@ curl http://${host_ip}:8888/v1/graphrag \
 
    If you choose conversational UI, use this URL: `http://{host_ip}:5174`
 
+
 ## Troubleshooting
 
 1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
@@ -245,6 +255,7 @@ curl http://${host_ip}:8888/v1/graphrag \
 2. (Docker only) If all microservices work well, check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `compose.yaml`.
 
 3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
+
 
 ## Monitoring OPEA Service with Prometheus and Grafana dashboard
 

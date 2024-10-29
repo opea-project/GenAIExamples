@@ -123,7 +123,6 @@ class GraphRAGService:
         self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
-
         retriever = MicroService(
             name="retriever",
             host=RETRIEVER_SERVICE_HOST_IP,

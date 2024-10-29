@@ -7,7 +7,7 @@
 sudo apt-get -y update
 
 # Install prerequisites
-sudo apt-get -y install ca-certificates curl
+sudo apt-get -y install ca-certificates curl --no-install-recommends --fix-missing
 
 # Create the directory for the Docker GPG key
 sudo install -m 0755 -d /etc/apt/keyrings
@@ -26,7 +26,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.
 sudo apt-get -y update
 
 # Install Docker packages
-sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin --no-install-recommends --fix-missing
 
 # add existing user
 sudo usermod -aG docker $USER

@@ -36,7 +36,6 @@ function start_services() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    #this will need to be updated with the set_env variables and how about the required from private????
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -91,7 +90,7 @@ function validate_service() {
         fi
     fi
 
-    sleep 1s
+    sleep 5s
 }
 
 function validate_microservices() {
