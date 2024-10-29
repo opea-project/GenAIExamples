@@ -232,13 +232,13 @@ if __name__ == "__main__":
         with gr.Row():
             with gr.Column(scale=1):
                 audio_input = gr.Audio(sources=None, format="wav", label="🎤 or 📤 for your Input audio!")
-                audio_choice = gr.Dropdown(
-                    choices=audio_questions,
-                    label="Choose an audio question",
-                    value=None,  # default value
-                )
+                # audio_choice = gr.Dropdown(
+                #     choices=audio_questions,
+                #     label="Choose an audio question",
+                #     value=None,  # default value
+                # )
                 # Update audio_input when a selection is made from the dropdown
-                audio_choice.change(fn=update_audio_input, inputs=audio_choice, outputs=audio_input)
+                # audio_choice.change(fn=update_audio_input, inputs=audio_choice, outputs=audio_input)
 
                 face_input = gr.File(
                     file_count="single",
@@ -249,26 +249,27 @@ if __name__ == "__main__":
                     choices=["wav2lip", "wav2lip+GAN", "wav2lip+GFPGAN"],
                     label="Choose a DL model",
                 )
-            with gr.Column(scale=2):
-                # Display 3 images and buttons
-                with gr.Row():
-                    for i, image_pil in enumerate(image_pils):
-                        image_pil = resize_image(image_pil)
-                        save_path = f"inputs/face_{int(i)}.png"
-                        image_pil.save(save_path, "PNG")
-                        image_clicks.append(gr.Image(type="filepath", value=save_path, label=f"Avatar {int(i)+1}"))
-                with gr.Row():
-                    for i in range(len(image_pils)):
-                        image_click_buttons.append(gr.Button(f"Use Image {i+1}"))
-                # Display 3 videos and buttons
-                with gr.Row():
-                    for i, video_path in enumerate(video_paths):
-                        save_path = f"inputs/video_{int(i)}.mp4"
-                        resize_video(video_path, save_path)
-                        video_clicks.append(gr.Video(value=save_path, label=f"Video {int(i)+1}"))
-                with gr.Row():
-                    for i in range(len(video_paths)):
-                        video_click_buttons.append(gr.Button(f"Use Video {int(i)+1}"))
+            # with gr.Column(scale=2):
+            #     # Display 3 images and buttons
+            #     with gr.Row():
+            #         for i, image_pil in enumerate(image_pils):
+            #             image_pil = resize_image(image_pil)
+            #             save_path = f"inputs/face_{int(i)}.png"
+            #             image_pil.save(save_path, "PNG")
+            #             image_clicks.append(gr.Image(type="filepath", value=save_path, label=f"Avatar {int(i)+1}"))
+            #     with gr.Row():
+            #         for i in range(len(image_pils)):
+            #             image_click_buttons.append(gr.Button(f"Use Image {i+1}"))
+                        
+            #     # Display 3 videos and buttons
+            #     with gr.Row():
+            #         for i, video_path in enumerate(video_paths):
+            #             save_path = f"inputs/video_{int(i)}.mp4"
+            #             resize_video(video_path, save_path)
+            #             video_clicks.append(gr.Video(value=save_path, label=f"Video {int(i)+1}"))
+            #     with gr.Row():
+            #         for i in range(len(video_paths)):
+            #             video_click_buttons.append(gr.Button(f"Use Video {int(i)+1}"))
 
         submit_button = gr.Button("Submit")
 
@@ -324,16 +325,16 @@ if __name__ == "__main__":
         )
 
         # State transitions
-        for i in range(len(image_pils)):
-            image_click_buttons[i].click(
-                update_selected_image_state, inputs=[gr.Number(value=i, visible=False)], outputs=[face_input]
-            )
-        for i in range(len(video_paths)):
-            video_click_buttons[i].click(
-                update_selected_image_state,
-                inputs=[gr.Number(value=i + len(image_pils), visible=False)],
-                outputs=[face_input],
-            )
+        # for i in range(len(image_pils)):
+        #     image_click_buttons[i].click(
+        #         update_selected_image_state, inputs=[gr.Number(value=i, visible=False)], outputs=[face_input]
+        #     )
+        # for i in range(len(video_paths)):
+        #     video_click_buttons[i].click(
+        #         update_selected_image_state,
+        #         inputs=[gr.Number(value=i + len(image_pils), visible=False)],
+        #         outputs=[face_input],
+        #     )
         submit_button.click(
             initial_process,
             inputs=[audio_input, face_input, model_choice],
