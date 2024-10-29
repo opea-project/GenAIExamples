@@ -16,6 +16,17 @@ const DocSum = () => {
     const [value, setValue] = useState<string>('');
     const [fileContent, setFileContent] = useState<string>('');
     const [response, setResponse] = useState<string>('');
+
+    let messagesEnd:HTMLDivElement;
+
+    const scrollToView = () => {
+        if (messagesEnd) {
+            messagesEnd.scrollTop = messagesEnd.scrollHeight;
+        }
+    };
+    useEffect(()=>{
+        scrollToView()
+    },[response])
     
     useEffect(() => {
         if(isFile){
@@ -139,7 +150,10 @@ const DocSum = () => {
                         <Button loading={isGenerating} loaderProps={{ type: 'dots' }} onClick={handleSubmit}>Generate Summary</Button>
                     </div>
                     {response && (
-                        <div className={styleClasses.docSumResult}>
+                        <div className={styleClasses.docSumResult} ref={(el) => {
+                            if(el)
+                                messagesEnd = el;
+                        }}>
                             <Markdown content={response} />
                         </div>
                     )}
