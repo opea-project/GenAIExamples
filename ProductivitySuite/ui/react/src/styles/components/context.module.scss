@@ -15,7 +15,7 @@
     "settings";
 
   grid-template-columns: auto;
-  grid-template-rows: 70px 1fr 175px;
+  grid-template-rows: 70px 1fr 240px;
 
   .contextTitle {
     grid-area: title;
@@ -30,6 +30,7 @@
     width: 100%;
     height: 60px;
     border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-7));
+    font-size: 1.3vw !important;
   }
 
   .contextList {
