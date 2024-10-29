@@ -231,7 +231,7 @@ if __name__ == "__main__":
         video_click_buttons = []
         with gr.Row():
             with gr.Column(scale=1):
-                audio_input = gr.Audio(sources=None, format="wav", label="🎤 or 📤 for your Input audio!")
+                audio_input = gr.Audio(sources=['upload', 'microphone'], format="wav", label="🎤 or 📤 for your Input audio!")
                 # audio_choice = gr.Dropdown(
                 #     choices=audio_questions,
                 #     label="Choose an audio question",
