@@ -14,6 +14,7 @@ services:
       context: https://github.com/opea-project/GenAIComps.git
       dockerfile: comps/dataprep/redis/langchain/Dockerfile
       args:
+        http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
     container_name: dataprep-redis-server
     depends_on:
@@ -49,6 +50,7 @@ services:
       context: https://github.com/opea-project/GenAIComps.git
       dockerfile: comps/retrievers/redis/langchain/Dockerfile
       args:
+        http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
     container_name: retriever-redis-server
     depends_on:
@@ -147,6 +149,7 @@ services:
       context: https://github.com/opea-project/GenAIComps.git
       dockerfile: comps/nginx/Dockerfile
       args:
+        http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
     container_name: chatqna-aipc-nginx-server
     depends_on:
