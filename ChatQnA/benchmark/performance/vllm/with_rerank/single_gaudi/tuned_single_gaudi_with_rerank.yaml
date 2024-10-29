@@ -19,9 +19,9 @@ data:
   TEI_RERANKING_ENDPOINT: http://reranking-dependency-svc.default.svc.cluster.local:8808
   TGI_LLM_ENDPOINT: http://llm-dependency-svc.default.svc.cluster.local:9009
 
-  LLM_SERVER_PORT: 9009
-  RERANK_SERVER_PORT: 8808
-  EMBEDDING_SERVER_PORT: 6006
+  LLM_SERVER_PORT: '9009'
+  RERANK_SERVER_PORT: '8808'
+  EMBEDDING_SERVER_PORT: '6006'
 
 kind: ConfigMap
 metadata:
