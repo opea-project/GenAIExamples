@@ -189,13 +189,16 @@ The output file will be saved in the current working directory, as `${PWD}` is m
 ## Gradio UI
 
 ```bash
-pip install gradio==3.48.0 soundfile
 sudo apt update
 sudo apt install -y yasm pkg-config libx264-dev nasm
 cd $WORKPATH
 git clone https://github.com/FFmpeg/FFmpeg.git
 cd FFmpeg
 sudo ./configure --enable-gpl --enable-libx264 && sudo make -j$(nproc-1) && sudo make install && hash -r
+pip install gradio==4.38.1 soundfile
+```
+
+```bash
 cd $WORKPATH/GenAIExamples/AvatarChatbot
 python3 ui/gradio/app_gradio_demo_avatarchatbot.py
 ```

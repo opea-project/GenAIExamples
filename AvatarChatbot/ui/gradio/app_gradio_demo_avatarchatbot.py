@@ -174,21 +174,21 @@ if __name__ == "__main__":
             end_time = time.time()
             return video_file, f"The entire application took {(end_time - start_time):.1f} seconds"
 
-        def update_selected_image_state(image_index):
-            image_index = int(image_index)
-            selected_image_state.value = image_index
-            # change image_input here
-            if image_index < len(image_pils):
-                return f"inputs/face_{image_index}.png"
-            else:
-                return f"inputs/video_{image_index - len(image_pils)}.mp4"
+        # def update_selected_image_state(image_index):
+        #     image_index = int(image_index)
+        #     selected_image_state.value = image_index
+        #     # change image_input here
+        #     if image_index < len(image_pils):
+        #         return f"inputs/face_{image_index}.png"
+        #     else:
+        #         return f"inputs/video_{image_index - len(image_pils)}.mp4"
 
-        def update_audio_input(audio_choice):
-            if audio_choice:
-                audio_index = int(audio_choice.split(".")[0]) - 1
-                audio_filepath_gradio = f"inputs/audio_{audio_index:d}.wav"
-                shutil.copyfile(audio_filepaths[audio_index], audio_filepath_gradio)
-                return audio_filepath_gradio
+        # def update_audio_input(audio_choice):
+        #     if audio_choice:
+        #         audio_index = int(audio_choice.split(".")[0]) - 1
+        #         audio_filepath_gradio = f"inputs/audio_{audio_index:d}.wav"
+        #         shutil.copyfile(audio_filepaths[audio_index], audio_filepath_gradio)
+        #         return audio_filepath_gradio
 
         # UI Components
         # Title & Introduction
