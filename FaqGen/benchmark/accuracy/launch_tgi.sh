@@ -11,7 +11,6 @@ docker run -it --rm \
     -p $port_number:80 \
     -v $volume:/data \
     --runtime=habana \
-    --restart always \
     -e HUGGING_FACE_HUB_TOKEN=$HUGGING_FACE_HUB_TOKEN \
     -e HABANA_VISIBLE_DEVICES=all \
     -e OMPI_MCA_btl_vader_single_copy_mechanism=none \
