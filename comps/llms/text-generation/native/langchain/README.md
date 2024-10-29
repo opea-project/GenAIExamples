@@ -12,6 +12,7 @@ In order to start Native LLM service, you need to setup the following environmen
 
 ```bash
 export LLM_NATIVE_MODEL="Qwen/Qwen2-7B-Instruct"
+export HUGGINGFACEHUB_API_TOKEN="your_huggingface_token"
 ```
 
 ### 1.2 Build Docker Image
