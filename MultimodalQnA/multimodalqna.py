@@ -34,15 +34,7 @@ class MultimodalQnAService(Gateway):
         self.host = host
         self.port = port
         self.lvm_megaservice = ServiceOrchestrator()
-
-        super().__init__(
-            megaservice=ServiceOrchestrator(),
-            host=self.host,
-            port=self.port,
-            endpoint=str(MegaServiceEndpoint.MULTIMODAL_QNA),
-            input_datatype=ChatCompletionRequest,
-            output_datatype=ChatCompletionResponse,
-        )
+        self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
         mm_embedding = MicroService(
@@ -240,7 +232,18 @@ class MultimodalQnAService(Gateway):
         )
         return ChatCompletionResponse(model="multimodalqna", choices=choices, usage=usage)
 
+    def start(self):
+        super().__init__(
+            megaservice=self.megaservice,
+            host=self.host,
+            port=self.port,
+            endpoint=str(MegaServiceEndpoint.MULTIMODAL_QNA),
+            input_datatype=ChatCompletionRequest,
+            output_datatype=ChatCompletionResponse,
+        )
+
 
 if __name__ == "__main__":
     mmragwithvideos = MultimodalQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     mmragwithvideos.add_remote_service()
+    mmragwithvideos.start()

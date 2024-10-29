@@ -25,14 +25,7 @@ class CodeTransService(Gateway):
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
-        super().__init__(
-            megaservice=ServiceOrchestrator(),
-            host=self.host,
-            port=self.port,
-            endpoint=str(MegaServiceEndpoint.CODE_TRANS),
-            input_datatype=ChatCompletionRequest,
-            output_datatype=ChatCompletionResponse,
-        )
+        self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
         llm = MicroService(
@@ -84,7 +77,18 @@ class CodeTransService(Gateway):
         )
         return ChatCompletionResponse(model="codetrans", choices=choices, usage=usage)
 
+    def start(self):
+        super().__init__(
+            megaservice=self.megaservice,
+            host=self.host,
+            port=self.port,
+            endpoint=str(MegaServiceEndpoint.CODE_TRANS),
+            input_datatype=ChatCompletionRequest,
+            output_datatype=ChatCompletionResponse,
+        )
+
 
 if __name__ == "__main__":
     service_ochestrator = CodeTransService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     service_ochestrator.add_remote_service()
+    service_ochestrator.start()

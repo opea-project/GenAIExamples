@@ -25,15 +25,7 @@ class VisualQnAService(Gateway):
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
-
-        super().__init__(
-            megaservice=ServiceOrchestrator(),
-            host=self.host,
-            port=self.port,
-            endpoint=str(MegaServiceEndpoint.VISUAL_QNA),
-            input_datatype=ChatCompletionRequest,
-            output_datatype=ChatCompletionResponse,
-        )
+        self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
         llm = MicroService(
@@ -85,7 +77,18 @@ class VisualQnAService(Gateway):
         )
         return ChatCompletionResponse(model="visualqna", choices=choices, usage=usage)
 
+    def start(self):
+        super().__init__(
+            megaservice=self.megaservice,
+            host=self.host,
+            port=self.port,
+            endpoint=str(MegaServiceEndpoint.VISUAL_QNA),
+            input_datatype=ChatCompletionRequest,
+            output_datatype=ChatCompletionResponse,
+        )
+
 
 if __name__ == "__main__":
     visualqna = VisualQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
     visualqna.add_remote_service()
+    visualqna.start()

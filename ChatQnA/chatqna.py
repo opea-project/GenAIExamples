@@ -191,14 +191,7 @@ class ChatQnAService(Gateway):
         ServiceOrchestrator.align_outputs = align_outputs
         ServiceOrchestrator.align_generator = align_generator
 
-        super().__init__(
-            megaservice=ServiceOrchestrator(),
-            host=self.host,
-            port=self.port,
-            endpoint=str(MegaServiceEndpoint.CHAT_QNA),
-            input_datatype=ChatCompletionRequest,
-            output_datatype=ChatCompletionResponse,
-        )
+        self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
 
@@ -380,6 +373,17 @@ class ChatQnAService(Gateway):
         )
         return ChatCompletionResponse(model="chatqna", choices=choices, usage=usage)
 
+    def start(self):
+
+        super().__init__(
+            megaservice=self.megaservice,
+            host=self.host,
+            port=self.port,
+            endpoint=str(MegaServiceEndpoint.CHAT_QNA),
+            input_datatype=ChatCompletionRequest,
+            output_datatype=ChatCompletionResponse,
+        )
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -396,4 +400,4 @@ if __name__ == "__main__":
     else:
         chatqna.add_remote_service()
 
-    # chatqna.start()
+    chatqna.start()
