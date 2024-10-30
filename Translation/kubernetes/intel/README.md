@@ -11,7 +11,7 @@
 ## Deploy On Xeon
 
 ```
-cd GenAIExamples/Translation/kubernetes/intel/cpu/xeon/manifests
+cd GenAIExamples/Translation/kubernetes/intel/cpu/xeon/manifest
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" translation.yaml
 kubectl apply -f translation.yaml
@@ -20,7 +20,7 @@ kubectl apply -f translation.yaml
 ## Deploy On Gaudi
 
 ```
-cd GenAIExamples/Translation/kubernetes/intel/hpu/gaudi/manifests
+cd GenAIExamples/Translation/kubernetes/intel/hpu/gaudi/manifest
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
 sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" translation.yaml
 kubectl apply -f translation.yaml
