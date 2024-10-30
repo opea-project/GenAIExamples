@@ -127,15 +127,17 @@ function stop_docker() {
 
 
 function main() {
-
     stop_docker
+    echo y | docker builder prune --all
+    echo y | docker image prune
+
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
     # validate_microservices
     validate_megaservice
     # validate_frontend
-    stop_docker
 
+    stop_docker
     echo y | docker builder prune --all
     echo y | docker image prune
 

@@ -96,9 +96,9 @@ export ANIMATION_SERVICE_PORT=3008
 ```bash
 export DEVICE="hpu"
 export WAV2LIP_PORT=7860
-export INFERENCE_MODE='wav2lip+gfpgan'
+export INFERENCE_MODE='wav2lip_only'
 export CHECKPOINT_PATH='/usr/local/lib/python3.10/dist-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
-export FACE="assets/img/avatar5.png"
+export FACE="assets/img/avatar1.jpg"
 # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
 export AUDIO='None'
 export FACESIZE=96
@@ -188,14 +188,25 @@ The output file will be saved in the current working directory, as `${PWD}` is m
 
 ## Gradio UI
 
-Follow the instructions in [Build Mega Service of AudioQnA on Gaudi](https://github.com/opea-project/GenAIExamples/blob/main/AudioQnA/docker_compose/intel/hpu/gaudi/README.md) to build necessary Docker images and start the AudioQnA MegaService with the endpoint `http://localhost:3008/v1/audioqna`. Then run the following command to start the Gradio UI:
-
 ```bash
-cd GenAIExamples/AvatarChatbot/docker/ui/gradio
-python3 app_gradio_demo.py
+sudo apt update
+sudo apt install -y yasm pkg-config libx264-dev nasm
+cd $WORKPATH
+git clone https://github.com/FFmpeg/FFmpeg.git
+cd FFmpeg
+sudo ./configure --enable-gpl --enable-libx264 && sudo make -j$(nproc-1) && sudo make install && hash -r
+pip install gradio==4.38.1 soundfile
 ```
 
-The UI can be viewed at http://${host_ip}:7861
+```bash
+cd $WORKPATH/GenAIExamples/AvatarChatbot
+python3 ui/gradio/app_gradio_demo_avatarchatbot.py
+```
+
+The UI can be viewed at http://${host_ip}:7861  
+<img src="../../../../assets/img/UI.png" alt="UI Example" width="60%">  
+In the current version v1.0, you need to set the avatar figure image/video and the DL model choice in the environment variables before starting AvatarChatbot backend service and running the UI. Please just customize the audio question in the UI.  
+\*\* We will enable change of avatar figure between runs in v2.0
 
 ## Troubleshooting
 

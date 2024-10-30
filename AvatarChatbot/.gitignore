@@ -4,3 +4,5 @@
 *.log
 docker_compose/intel/cpu/xeon/data
 docker_compose/intel/hpu/gaudi/data
+inputs/
+outputs/

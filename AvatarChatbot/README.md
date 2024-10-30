@@ -75,7 +75,7 @@ The AvatarChatbot service can be deployed on either Intel Gaudi2 AI Accelerator 
 
 ### Deploy AvatarChatbot on Gaudi
 
-Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instructions on deploying AvatarChatbot on Gaudi.
+Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instructions on deploying AvatarChatbot on Gaudi, and on setting up an UI for the application.
 
 ### Deploy AvatarChatbot on Xeon
 
