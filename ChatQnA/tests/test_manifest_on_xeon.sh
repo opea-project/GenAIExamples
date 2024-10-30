@@ -40,7 +40,7 @@ function get_end_point() {
 function validate_chatqna() {
     local ns=$1
     local log=$2
-    max_retry=20
+    max_retry=10
     # make sure microservice retriever-usvc is ready
     # try to curl retriever-svc for max_retry times
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -111,7 +111,7 @@ function _cleanup_ns() {
 
 function install_and_validate_chatqna_guardrail() {
     echo "Testing manifests chatqna_guardrils"
-    local ns=${NAMESPACE}-gaurdrails
+    local ns=${NAMESPACE}
     _cleanup_ns $ns
     kubectl create namespace $ns
     # install guardrail
