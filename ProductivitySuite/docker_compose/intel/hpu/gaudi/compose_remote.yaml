@@ -102,7 +102,7 @@ services:
       CLIENTID: ${CLIENTID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       TOKEN_URL: ${TOKEN_URL}
-      
+
     restart: unless-stopped
   chatqna-gaudi-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
@@ -277,7 +277,7 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_PROXY=edge
     ipc: host
-    command: 
+    command:
       - start-dev
     restart: always
   productivity-suite-gaudi-react-ui-server:
