@@ -76,7 +76,7 @@ To begin with, ensure that you have following prerequisites in place:
 ##  🌐 Deploying ProductivitySuite
 You can use yaml files in xeon folder to deploy ProductivitySuite with reactUI.
 ```
-cd GenAIExamples/ProductivitySuite/kubernetes/intel/cpu/xeon/manifests/
+cd GenAIExamples/ProductivitySuite/kubernetes/intel/cpu/xeon/manifest/
 kubectl apply -f .
 ```
 
