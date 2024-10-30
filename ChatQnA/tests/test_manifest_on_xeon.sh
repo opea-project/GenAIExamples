@@ -119,10 +119,9 @@ function install_and_validate_chatqna_guardrail() {
     # Sleep enough time for chatqna_guardrail to be ready
     sleep 60
     if kubectl rollout status deployment -n "$ns" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
-        echo "Waiting for cahtqna_guardrail pod ready done!"
+        echo "Waiting for chatqna_guardrail pod ready done!"
     else
         echo "Timeout waiting for chatqna_guardrail pod ready!"
-        _cleanup_ns $ns
         exit 1
     fi
 
@@ -130,10 +129,8 @@ function install_and_validate_chatqna_guardrail() {
     validate_chatqna $ns chatqna-guardrails
     local ret=$?
     if [ $ret -ne 0 ]; then
-        _cleanup_ns $ns
         exit 1
     fi
-    _cleanup_ns $ns
 }
 
 if [ $# -eq 0 ]; then
@@ -162,7 +159,6 @@ case "$1" in
             exit $ret
         fi
         pushd ChatQnA/kubernetes/intel/cpu/xeon/manifests
-        set +e
         install_and_validate_chatqna_guardrail
         popd
         ;;
