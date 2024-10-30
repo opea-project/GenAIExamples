@@ -177,8 +177,10 @@ def face_detect(args, images):
     while 1:
         predictions = []
         try:
-            for i in tqdm(range(0, len(images), batch_size)):
-                predictions.extend(detector.get_detections_for_batch(np.array(images[i : i + batch_size])))
+            with torch.no_grad():
+                for i in tqdm(range(0, len(images), batch_size)):
+                    with torch.autocast(device_type=args.device, dtype=torch.bfloat16):
+                        predictions.extend(detector.get_detections_for_batch(np.array(images[i : i + batch_size])))
         except RuntimeError:
             if batch_size == 1:
                 raise RuntimeError(

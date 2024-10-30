@@ -84,7 +84,7 @@ docker run --privileged -d --name "wav2lip-service" -p 7860:7860 --ipc=host -w /
 - Gaudi2 HPU
 
 ```bash
-docker run --privileged -d --name "wav2lip-gaudi-service" -p 7860:7860 --runtime=habana --cap-add=sys_nice --net=host --ipc=host -w /home/user/comps/animation/wav2lip -v $(pwd)/comps/animation/wav2lip/assets:/home/user/comps/animation/wav2lip/assets -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PYTHON=/usr/bin/python3.10 -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip-gaudi:latest
+docker run --privileged -d --name "wav2lip-gaudi-service" -p 7860:7860 --runtime=habana --cap-add=sys_nice --ipc=host -w /home/user/comps/animation/wav2lip -v $(pwd)/comps/animation/wav2lip/assets:/home/user/comps/animation/wav2lip/assets -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PYTHON=/usr/bin/python3.10 -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip-gaudi:latest
 ```
 
 ## 2.2 Run Animation Microservice
@@ -119,7 +119,7 @@ cd GenAIComps
 python3 comps/animation/wav2lip/dependency/check_animation_server.py
 ```
 
-The expected output is a message similar to the following:
+The expected output will be a message similar to the following:
 
 ```bash
 {'wav2lip_result': '....../GenAIComps/comps/animation/wav2lip/assets/outputs/result.mp4'}

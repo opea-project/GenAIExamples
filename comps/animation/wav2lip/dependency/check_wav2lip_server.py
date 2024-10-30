@@ -10,9 +10,9 @@ endpoint = "http://localhost:7860/v1/wav2lip"
 outfile = os.environ.get("OUTFILE")
 
 # Read the JSON file
-with open("comps/animation/wav2lip/assets/audio/sample_question.json", "r") as file:
+with open("comps/animation/wav2lip/assets/audio/sample_whoareyou.json", "r") as file:
     data = json.load(file)
 
-inputs = {"audio": data["byte_str"]}
+inputs = {"audio": data["byte_str"], "max_tokens": 64}
 response = requests.post(url=endpoint, data=json.dumps(inputs), proxies={"http": None})
 print(response.json())

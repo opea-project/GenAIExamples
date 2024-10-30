@@ -84,6 +84,7 @@ async def animate(request: Request):
             ffmpeg.input(args.audio).output("temp/temp.wav", strict="-2").run(overwrite_output=True)
             args.audio = "temp/temp.wav"
     else:
+        print(f"Signature for your audio: {audio_b64_str[:100]}")
         sr, y = base64_to_int16_to_wav(audio_b64_str, "temp/temp.wav")
         args.audio = "temp/temp.wav"
 
@@ -113,40 +114,41 @@ async def animate(request: Request):
     gen = datagen(args, full_frames.copy(), mel_chunks)
 
     # iterate over the generator
-    for i, (img_batch, mel_batch, frames, coords) in enumerate(
-        tqdm(gen, total=int(np.ceil(float(len(mel_chunks)) / batch_size)))
-    ):
-        if i == 0:
-            frame_h, frame_w = full_frames[0].shape[:-1]
-            if args.inference_mode == "wav2lip_only":
-                out = cv2.VideoWriter("temp/result.avi", cv2.VideoWriter_fourcc(*"DIVX"), fps, (frame_w, frame_h))
-            else:
-                out = cv2.VideoWriter(
-                    "temp/result.avi",
-                    cv2.VideoWriter_fourcc(*"DIVX"),
-                    fps,
-                    (frame_w * args.upscale, frame_h * args.upscale),
-                )
+    with torch.no_grad():
+        for i, (img_batch, mel_batch, frames, coords) in enumerate(
+            tqdm(gen, total=int(np.ceil(float(len(mel_chunks)) / batch_size)))
+        ):
+            if i == 0:
+                frame_h, frame_w = full_frames[0].shape[:-1]
+                if args.inference_mode == "wav2lip_only":
+                    out = cv2.VideoWriter("temp/result.avi", cv2.VideoWriter_fourcc(*"DIVX"), fps, (frame_w, frame_h))
+                else:
+                    out = cv2.VideoWriter(
+                        "temp/result.avi",
+                        cv2.VideoWriter_fourcc(*"DIVX"),
+                        fps,
+                        (frame_w * args.upscale, frame_h * args.upscale),
+                    )
 
-        img_batch = torch.FloatTensor(np.transpose(img_batch, (0, 3, 1, 2))).to(device)
-        mel_batch = torch.FloatTensor(np.transpose(mel_batch, (0, 3, 1, 2))).to(device)
+            img_batch = torch.FloatTensor(np.transpose(img_batch, (0, 3, 1, 2))).to(device)
+            mel_batch = torch.FloatTensor(np.transpose(mel_batch, (0, 3, 1, 2))).to(device)
 
-        with torch.no_grad():
-            pred = model(mel_batch, img_batch)
+            with torch.autocast(device_type=args.device, dtype=torch.bfloat16):
+                pred = model(mel_batch, img_batch)
 
-        pred = pred.cpu().numpy().transpose(0, 2, 3, 1) * 255.0
+            pred = pred.cpu().to(torch.float32).numpy().transpose(0, 2, 3, 1) * 255.0
 
-        for p, f, c in tqdm(zip(pred, frames, coords), total=pred.shape[0]):
-            y1, y2, x1, x2 = c
-            p = cv2.resize(p.astype(np.uint8), (x2 - x1, y2 - y1))
-            f[y1:y2, x1:x2] = p  # patching
+            for p, f, c in tqdm(zip(pred, frames, coords), total=pred.shape[0]):
+                y1, y2, x1, x2 = c
+                p = cv2.resize(p.astype(np.uint8), (x2 - x1, y2 - y1))
+                f[y1:y2, x1:x2] = p  # patching
 
-            # restore faces and background if necessary
-            if args.inference_mode == "wav2lip+gfpgan":
-                cropped_faces, restored_faces, f = model_restorer.enhance(
-                    f, has_aligned=args.aligned, only_center_face=args.only_center_face, paste_back=True
-                )
-            out.write(f)
+                # restore faces and background if necessary
+                if args.inference_mode == "wav2lip+gfpgan":
+                    cropped_faces, restored_faces, f = model_restorer.enhance(
+                        f, has_aligned=args.aligned, only_center_face=args.only_center_face, paste_back=True
+                    )
+                out.write(f)
     out.release()
 
     ffmpeg.output(
@@ -159,6 +161,8 @@ async def animate(request: Request):
         preset="medium",
         acodec="aac",
     ).run(overwrite_output=True)
+
+    args.audio = "None"  # IMPORTANT: Reset audio to None for the next audio request
 
     return {"wav2lip_result": args.outfile}
 
