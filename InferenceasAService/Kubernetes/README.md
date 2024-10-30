@@ -33,11 +33,11 @@ helm install habana-ai-operator gaudi-helm/habana-ai-operator --version 1.18.0-5
 Below steps has the kubernetes deployments which are used for Inference as a service on habana Gaudi . Following are kubectl commands examples for TGI models inference
 Make sure to update the HuggingFace token in the yaml files before applying them - HF_TOKEN: "<your-hf-token>"
 
-To delpoy Llama3.1-8B on 1 card
+To deploy Llama3.1-8B on 1 card
 ```
 kubectl apply -f chatqna-tgi-llama.yml
 ```
-To delpoy Llama3.1-70B 8 cards
+To deploy Llama3.1-70B 8 cards
 ```
 kubectl apply -f chatqna-tgi-llama70b.yml
 ```
