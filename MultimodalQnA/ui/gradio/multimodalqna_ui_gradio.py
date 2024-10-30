@@ -211,6 +211,58 @@ def ingest_video_gen_transcript(filepath, request: gr.Request):
     return
 
 
+def ingest_audio_gen_transcript(filepath, request: gr.Request):
+    yield (gr.Textbox(visible=True, value="Please wait for ingesting your uploaded audio file into database..."))
+    verified_filepath = os.path.normpath(filepath)
+    if not verified_filepath.startswith(tmp_upload_folder):
+        print("Found malicious audio file name!")
+        yield (
+            gr.Textbox(
+                visible=True,
+                value="Your uploaded audio file's name has special characters that are not allowed (depends on the OS, some examples are \, /, :, and *). Please consider changing the file name.",
+            )
+        )
+        return
+    basename = os.path.basename(verified_filepath)
+    dest = os.path.join(static_dir, basename)
+    shutil.copy(verified_filepath, dest)
+    print("Done copy uploaded file to static folder!")
+    headers = {
+        # 'Content-Type': 'multipart/form-data'
+    }
+    files = {
+        "files": open(dest, "rb"),
+    }
+    response = requests.post(dataprep_gen_transcript_addr, headers=headers, files=files)
+    print(response.status_code)
+    if response.status_code == 200:
+        response = response.json()
+        print(response)
+        yield (gr.Textbox(visible=True, value="Audio ingestion is done. Saving your uploaded audio..."))
+        time.sleep(2)
+        fn_no_ext = Path(dest).stem
+        if "file_id_maps" in response and fn_no_ext in response["file_id_maps"]:
+            new_dst = os.path.join(static_dir, response["file_id_maps"][fn_no_ext])
+            print(response["file_id_maps"][fn_no_ext])
+            os.rename(dest, new_dst)
+            yield (
+                gr.Textbox(
+                    visible=True,
+                    value="Congratulation! Your upload is done!\nClick the X button on the top right of the audio upload box to upload another file.",
+                )
+            )
+            return
+    else:
+        yield (
+            gr.Textbox(
+                visible=True,
+                value="Something wrong!\nPlease click the X button on the top right of the video upload boxreupload your audio!",
+            )
+        )
+        time.sleep(2)
+    return
+
+
 def ingest_video_gen_caption(filepath, request: gr.Request):
     yield (gr.Textbox(visible=True, value="Please wait for ingesting your uploaded video into database..."))
     verified_filepath = os.path.normpath(filepath)
@@ -374,11 +426,12 @@ with gr.Blocks() as upload_audio:
     )
     with gr.Row():
         with gr.Column(scale=6):
-            image_upload_cap = gr.Audio()
+            audio_upload = gr.Audio(type="filepath")
         with gr.Column(scale=3):
-            text_upload_result_cap = gr.Textbox(visible=False, interactive=False, label="Upload Status")
-        image_upload_cap.upload(ingest_image_gen_caption, [image_upload_cap], [text_upload_result_cap])
-        image_upload_cap.clear(clear_uploaded_video, [], [text_upload_result_cap])
+            text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
+        audio_upload.upload(ingest_audio_gen_transcript, [audio_upload], [text_upload_result])
+        audio_upload.stop_recording(ingest_audio_gen_transcript, [audio_upload], [text_upload_result])
+        audio_upload.clear(clear_uploaded_video, [], [text_upload_result])
 
 with gr.Blocks() as upload_pdf:
     gr.Markdown("# Ingest Your Own PDF")
