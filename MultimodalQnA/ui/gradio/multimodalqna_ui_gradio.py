@@ -167,7 +167,7 @@ def ingest_video_gen_transcript(filepath, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
+                value="Your uploaded video's file name has special characters that are not allowed (depends on the OS, some examples are \, /, :, and *). Please consider changing the file name.",
             )
         )
         return
@@ -219,7 +219,7 @@ def ingest_video_gen_caption(filepath, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
+                value="Your uploaded video's file name has special characters that are not allowed (depends on the OS, some examples are \, /, :, and *). Please consider changing the file name.",
             )
         )
         return
@@ -271,7 +271,7 @@ def ingest_image_gen_caption(filepath, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value="Your uploaded image's file name has special characters that are not allowed. Please consider updating the file name!",
+                value="Your uploaded image's file name has special characters that are not allowed (depends on the OS, some examples are \, /, :, and *). Please consider changing the file name.",
             )
         )
         return
@@ -286,6 +286,66 @@ def ingest_image_gen_caption(filepath, request: gr.Request):
         "files": open(dest, "rb"),
     }
     response = requests.post(dataprep_gen_caption_addr, headers=headers, files=files)
+    print(response.status_code)
+    if response.status_code == 200:
+        response = response.json()
+        print(response)
+        yield (gr.Textbox(visible=True, value="Image ingestion is done. Saving your uploaded image..."))
+        time.sleep(2)
+        fn_no_ext = Path(dest).stem
+        if "file_id_maps" in response and fn_no_ext in response["file_id_maps"]:
+            new_dst = os.path.join(static_dir, response["file_id_maps"][fn_no_ext])
+            print(response["file_id_maps"][fn_no_ext])
+            os.rename(dest, new_dst)
+            yield (
+                gr.Textbox(
+                    visible=True,
+                    value="Congratulation! Your upload is done!\nClick the X button on the top right of the image upload box to upload another image.",
+                )
+            )
+            return
+    else:
+        yield (
+            gr.Textbox(
+                visible=True,
+                value="Something went wrong!\nPlease click the X button on the top right of the image upload box to reupload your image!",
+            )
+        )
+        time.sleep(2)
+    return
+
+
+def ingest_image_with_text(filepath, text, request: gr.Request):
+    yield (gr.Textbox(visible=True, value="Please wait for your uploaded image to be ingested into the database..."))
+    verified_filepath = os.path.normpath(filepath)
+    if not verified_filepath.startswith(tmp_upload_folder):
+        print("Found malicious image file name!")
+        yield (
+            gr.Textbox(
+                visible=True,
+                value="Your uploaded image's file name has special characters that are not allowed (depends on the OS, some examples are \, /, :, and *). Please consider changing the file name.",
+            )
+        )
+        return
+    basename = os.path.basename(verified_filepath)
+    dest = os.path.join(static_dir, basename)
+    shutil.copy(verified_filepath, dest)
+    text_basename = "{}.txt".format(os.path.splitext(basename)[0])
+    text_dest = os.path.join(static_dir, text_basename)
+    with open(text_dest, "w") as file:
+        file.write(text)
+    print("Done copying uploaded files to static folder!")
+    headers = {
+        # 'Content-Type': 'multipart/form-data'
+    }
+    files = [
+        ('files', (basename, open(dest, "rb"))),
+        ('files', (text_basename, open(text_dest, "rb")))
+    ]
+    try:
+        response = requests.post(dataprep_ingest_addr, headers=headers, files=files)
+    finally:
+        os.remove(text_dest)
     print(response.status_code)
     if response.status_code == 200:
         response = response.json()
@@ -353,9 +413,17 @@ with gr.Blocks() as upload_image:
     gr.Markdown(
         "Use this interface to ingest your own image and generate a caption for it"
     )
+
+    def select_upload_type(choice, request: gr.Request):
+        if choice == 'gen_caption':
+            return gr.Image(sources="upload", visible=True), gr.Image(sources="upload", visible=False)
+        else:
+            return gr.Image(sources="upload", visible=False), gr.Image(sources="upload", visible=True)
+
     with gr.Row():
         with gr.Column(scale=6):
-            image_upload_cap = gr.Image(type='filepath', sources="upload", elem_id="image_upload_cap")
+            image_upload_cap = gr.Image(type='filepath', sources="upload", elem_id="image_upload_cap", visible=True)
+            image_upload_text = gr.Image(type='filepath', sources="upload", elem_id="image_upload_cap", visible=False)
         with gr.Column(scale=3):
             text_options_radio = gr.Radio([("Generate caption", 'gen_caption'),
                                            ("Custom caption or label", 'custom_caption')],
@@ -363,9 +431,12 @@ with gr.Blocks() as upload_image:
                                           info="How should text be ingested?",
                                           value='gen_caption')
             custom_caption = gr.Textbox(visible=True, interactive=True, label="Custom Caption or Label")
-            text_upload_result_cap = gr.Textbox(visible=False, interactive=False, label="Upload Status")
-        image_upload_cap.upload(ingest_image_gen_caption, [image_upload_cap], [text_upload_result_cap])
-        image_upload_cap.clear(clear_uploaded_video, [], [text_upload_result_cap])
+            text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
+        image_upload_cap.upload(ingest_image_gen_caption, [image_upload_cap], [text_upload_result])
+        image_upload_cap.clear(clear_uploaded_video, [], [text_upload_result])
+        image_upload_text.upload(ingest_image_with_text, [image_upload_text, custom_caption], [text_upload_result])
+        image_upload_text.clear(clear_uploaded_video, [], [text_upload_result])
+        text_options_radio.change(select_upload_type, [text_options_radio], [image_upload_cap, image_upload_text])
 
 with gr.Blocks() as upload_audio:
     gr.Markdown("# Ingest Your Own Audio Using Generated Transcripts")
@@ -463,6 +534,9 @@ if __name__ == "__main__":
     parser.add_argument("--share", action="store_true")
 
     backend_service_endpoint = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/multimodalqna")
+    dataprep_ingest_endpoint = os.getenv(
+        "DATAPREP_INGEST_SERVICE_ENDPOINT", "http://localhost:6007/v1/ingest_with_text"
+    )
     dataprep_gen_transcript_endpoint = os.getenv(
         "DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_transcripts"
     )
@@ -473,6 +547,8 @@ if __name__ == "__main__":
     logger.info(f"args: {args}")
     global gateway_addr
     gateway_addr = backend_service_endpoint
+    global dataprep_ingest_addr
+    dataprep_ingest_addr = dataprep_ingest_endpoint
     global dataprep_gen_transcript_addr
     dataprep_gen_transcript_addr = dataprep_gen_transcript_endpoint
     global dataprep_gen_caption_addr
