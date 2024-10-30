@@ -311,7 +311,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs tgi-service | grep Connected
    ```
 
    If the service is ready, you will get the response like below.

@@ -123,9 +123,12 @@ docker compose up -d
 3. MegaService
 
    ```bash
-   curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32, "language":"en", "stream":false
-        }'
+   curl http://${host_ip}:8888/v1/docsum \
+       -H "Content-Type: multipart/form-data" \
+       -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+       -F "max_tokens=32" \
+       -F "language=en" \
+       -F "stream=false"
    ```
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
