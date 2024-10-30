@@ -27,3 +27,7 @@ services:
     build:
       dockerfile: comps/retrievers/neo4j/langchain/Dockerfile
     image: ${REGISTRY:-opea}/retriever-neo4j:${TAG:-latest}
+  retriever-neo4j-llamaindex:
+    build:
+      dockerfile: comps/retrievers/neo4j/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-neo4j-llamaindex:${TAG:-latest}

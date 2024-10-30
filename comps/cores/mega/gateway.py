@@ -156,9 +156,12 @@ class ChatQnAGateway(Gateway):
 
     async def handle_request(self, request: Request):
         data = await request.json()
+        print("data in handle request", data)
         stream_opt = data.get("stream", True)
         chat_request = ChatCompletionRequest.parse_obj(data)
+        print("chat request in handle request", chat_request)
         prompt = self._handle_message(chat_request.messages)
+        print("prompt in gateway", prompt)
         parameters = LLMParams(
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
@@ -959,3 +962,75 @@ class AvatarChatbotGateway(Gateway):
         last_node = runtime_graph.all_leaves()[-1]
         response = result_dict[last_node]["video_path"]
         return response
+
+
+class GraphragGateway(Gateway):
+    def __init__(self, megaservice, host="0.0.0.0", port=8888):
+        super().__init__(
+            megaservice, host, port, str(MegaServiceEndpoint.GRAPH_RAG), ChatCompletionRequest, ChatCompletionResponse
+        )
+
+    async def handle_request(self, request: Request):
+        data = await request.json()
+        stream_opt = data.get("stream", True)
+        chat_request = ChatCompletionRequest.parse_obj(data)
+
+        def parser_input(data, TypeClass, key):
+            chat_request = None
+            try:
+                chat_request = TypeClass.parse_obj(data)
+                query = getattr(chat_request, key)
+            except:
+                query = None
+            return query, chat_request
+
+        query = None
+        for key, TypeClass in zip(["text", "input", "messages"], [TextDoc, EmbeddingRequest, ChatCompletionRequest]):
+            query, chat_request = parser_input(data, TypeClass, key)
+            if query is not None:
+                break
+        if query is None:
+            raise ValueError(f"Unknown request type: {data}")
+        if chat_request is None:
+            raise ValueError(f"Unknown request type: {data}")
+        prompt = self._handle_message(chat_request.messages)
+        parameters = LLMParams(
+            max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
+            top_k=chat_request.top_k if chat_request.top_k else 10,
+            top_p=chat_request.top_p if chat_request.top_p else 0.95,
+            temperature=chat_request.temperature if chat_request.temperature else 0.01,
+            frequency_penalty=chat_request.frequency_penalty if chat_request.frequency_penalty else 0.0,
+            presence_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 0.0,
+            repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
+            streaming=stream_opt,
+            chat_template=chat_request.chat_template if chat_request.chat_template else None,
+        )
+        retriever_parameters = RetrieverParms(
+            search_type=chat_request.search_type if chat_request.search_type else "similarity",
+            k=chat_request.k if chat_request.k else 4,
+            distance_threshold=chat_request.distance_threshold if chat_request.distance_threshold else None,
+            fetch_k=chat_request.fetch_k if chat_request.fetch_k else 20,
+            lambda_mult=chat_request.lambda_mult if chat_request.lambda_mult else 0.5,
+            score_threshold=chat_request.score_threshold if chat_request.score_threshold else 0.2,
+        )
+        initial_inputs = chat_request
+        result_dict, runtime_graph = await self.megaservice.schedule(
+            initial_inputs=initial_inputs,
+            llm_parameters=parameters,
+            retriever_parameters=retriever_parameters,
+        )
+        for node, response in result_dict.items():
+            if isinstance(response, StreamingResponse):
+                return response
+        last_node = runtime_graph.all_leaves()[-1]
+        response = result_dict[last_node]["text"]
+        choices = []
+        usage = UsageInfo()
+        choices.append(
+            ChatCompletionResponseChoice(
+                index=0,
+                message=ChatMessage(role="assistant", content=response),
+                finish_reason="stop",
+            )
+        )
+        return ChatCompletionResponse(model="chatqna", choices=choices, usage=usage)

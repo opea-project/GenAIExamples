@@ -1,0 +1,97 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+services:
+  neo4j-apoc:
+    image: neo4j:latest
+    container_name: neo4j-apoc
+    volumes:
+        - /$HOME/neo4j/logs:/logs
+        - /$HOME/neo4j/config:/config
+        - /$HOME/neo4j/data:/data
+        - /$HOME/neo4j/plugins:/plugins
+    ipc: host
+    environment:
+      - NEO4J_AUTH=${NEO4J_USERNAME}/${NEO4J_PASSWORD}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.\*
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    restart: always
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-embedding-server
+    ports:
+      - "6006:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      NO_PROXY: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    ipc: host
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+  tgi-gaudi-service:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+    container_name: tgi-gaudi-server
+    ports:
+      - "6005:80"
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      NO_PROXY: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      ENABLE_HPU_GRAPH: true
+      LIMIT_HPU_GRAPH: true
+      USE_FLASH_ATTENTION: true
+      FLASH_ATTENTION_RECOMPUTE: true
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096
+  dataprep-neo4j-llamaindex:
+    image: opea/dataprep-neo4j-llamaindex:latest
+    container_name: dataprep-neo4j-server
+    depends_on:
+      - neo4j-apoc
+      - tgi-gaudi-service
+      - tei-embedding-service
+    ports:
+      - "6004:6004"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      host_ip: ${host_ip}
+      NEO4J_URL: ${NEO4J_URL}
+      NEO4J_USERNAME: ${NEO4J_USERNAME}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL}
+      OPENAI_LLM_MODEL: ${OPENAI_LLM_MODEL}
+      EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LOGFLAG: ${LOGFLAG}
+    restart: unless-stopped
+networks:
+  default:
+    driver: bridge

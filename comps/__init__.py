@@ -59,6 +59,7 @@ from comps.cores.mega.gateway import (
     VideoQnAGateway,
     VisualQnAGateway,
     MultimodalQnAGateway,
+    GraphragGateway,
     AvatarChatbotGateway,
 )
 

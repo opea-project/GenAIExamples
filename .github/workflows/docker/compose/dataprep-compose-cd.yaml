@@ -27,3 +27,7 @@ services:
     build:
       dockerfile: comps/dataprep/neo4j/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-neo4j:${TAG:-latest}
+  dataprep-neo4j-llamaindex:
+    build:
+      dockerfile: comps/dataprep/neo4j/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-neo4j-llamaindex:${TAG:-latest}
