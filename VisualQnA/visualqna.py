@@ -15,7 +15,6 @@ from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
-MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9399))
@@ -89,6 +88,6 @@ class VisualQnAService(Gateway):
 
 
 if __name__ == "__main__":
-    visualqna = VisualQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    visualqna = VisualQnAService(port=MEGA_SERVICE_PORT)
     visualqna.add_remote_service()
     visualqna.start()

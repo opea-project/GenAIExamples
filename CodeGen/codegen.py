@@ -16,7 +16,6 @@ from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
-MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 7778))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
@@ -90,6 +89,6 @@ class CodeGenService(Gateway):
 
 
 if __name__ == "__main__":
-    chatqna = CodeGenService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    chatqna = CodeGenService(port=MEGA_SERVICE_PORT)
     chatqna.add_remote_service()
     chatqna.start()

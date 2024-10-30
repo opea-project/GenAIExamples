@@ -15,7 +15,6 @@ from comps.cores.proto.api_protocol import (
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
-MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 7777))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
@@ -89,6 +88,6 @@ class CodeTransService(Gateway):
 
 
 if __name__ == "__main__":
-    service_ochestrator = CodeTransService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    service_ochestrator = CodeTransService(port=MEGA_SERVICE_PORT)
     service_ochestrator.add_remote_service()
     service_ochestrator.start()

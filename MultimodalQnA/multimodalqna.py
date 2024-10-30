@@ -19,7 +19,6 @@ from fastapi import Request
 from fastapi.responses import StreamingResponse
 from PIL import Image
 
-MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 MM_EMBEDDING_SERVICE_HOST_IP = os.getenv("MM_EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
 MM_EMBEDDING_PORT_MICROSERVICE = int(os.getenv("MM_EMBEDDING_PORT_MICROSERVICE", 6000))
@@ -244,6 +243,6 @@ class MultimodalQnAService(Gateway):
 
 
 if __name__ == "__main__":
-    mmragwithvideos = MultimodalQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    mmragwithvideos = MultimodalQnAService(port=MEGA_SERVICE_PORT)
     mmragwithvideos.add_remote_service()
     mmragwithvideos.start()

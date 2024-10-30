@@ -9,7 +9,6 @@ from comps.cores.proto.api_protocol import AudioChatCompletionRequest, ChatCompl
 from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
 
-MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 ASR_SERVICE_HOST_IP = os.getenv("ASR_SERVICE_HOST_IP", "0.0.0.0")
 ASR_SERVICE_PORT = int(os.getenv("ASR_SERVICE_PORT", 9099))
@@ -90,6 +89,6 @@ class AudioQnAService(Gateway):
 
 
 if __name__ == "__main__":
-    audioqna = AudioQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    audioqna = AudioQnAService(port=MEGA_SERVICE_PORT)
     audioqna.add_remote_service()
     audioqna.start()

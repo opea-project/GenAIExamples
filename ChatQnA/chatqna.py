@@ -45,7 +45,6 @@ If you don't know the answer to a question, please don't share false information
         return template.format(context=context_str, question=question)
 
 
-MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 GUARDRAIL_SERVICE_HOST_IP = os.getenv("GUARDRAIL_SERVICE_HOST_IP", "0.0.0.0")
 GUARDRAIL_SERVICE_PORT = int(os.getenv("GUARDRAIL_SERVICE_PORT", 80))
@@ -392,7 +391,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    chatqna = ChatQnAService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    chatqna = ChatQnAService(port=MEGA_SERVICE_PORT)
     if args.without_rerank:
         chatqna.add_remote_service_without_rerank()
     elif args.with_guardrails:

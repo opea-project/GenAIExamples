@@ -11,7 +11,6 @@ from comps.cores.proto.docarray import LLMParamsDoc, RerankedDoc, RerankerParms,
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
-MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8889)
 EMBEDDING_SERVICE_HOST_IP = os.getenv("EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
 EMBEDDING_SERVICE_PORT = os.getenv("EMBEDDING_SERVICE_PORT", 6000)
@@ -127,6 +126,6 @@ class RetrievalToolService(Gateway):
 
 
 if __name__ == "__main__":
-    chatqna = RetrievalToolService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    chatqna = RetrievalToolService(port=MEGA_SERVICE_PORT)
     chatqna.add_remote_service()
     chatqna.start()
