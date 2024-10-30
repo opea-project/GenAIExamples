@@ -5,7 +5,8 @@ import os
 import time
 
 from config import EMBED_MODEL, PINECONE_API_KEY, PINECONE_INDEX_NAME
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone, ServerlessSpec
 
@@ -84,10 +85,34 @@ if __name__ == "__main__":
     # Create vectorstore
     if tei_embedding_endpoint:
         # create embeddings using TEI endpoint service
-        embeddings = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
+        embeddings = HuggingFaceEndpointEmbeddings(model=tei_embedding_endpoint)
     else:
         # create embeddings using local embedding model
         embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
 
-    vector_db = PineconeVectorStore(embedding=embeddings, index_name=PINECONE_INDEX_NAME)
+    pc = Pinecone(api_key=PINECONE_API_KEY)
+    spec = ServerlessSpec(cloud="aws", region="us-east-1")
+
+    existing_indexes = [index_info["name"] for index_info in pc.list_indexes()]
+
+    # For testing purposes we want to create a fresh index each time.
+    # In production you would probably keep your index and
+    # replace this with a check if the index doesn't exist then create it.
+    if PINECONE_INDEX_NAME in existing_indexes:
+        pc.configure_index(PINECONE_INDEX_NAME, deletion_protection="disabled")
+        pc.delete_index(PINECONE_INDEX_NAME)
+        time.sleep(1)
+
+    pc.create_index(
+        PINECONE_INDEX_NAME,
+        dimension=1024,  # Based on TEI Embedding service using BAAI/bge-large-en-v1.5
+        deletion_protection="disabled",
+        spec=spec,
+    )
+    while not pc.describe_index(PINECONE_INDEX_NAME).status["ready"]:
+        time.sleep(1)
+
+    index = pc.Index(PINECONE_INDEX_NAME)
+    vector_db = PineconeVectorStore(index=index, embedding=embeddings)
+
     opea_microservices["opea_service@retriever_pinecone"].start()

@@ -5,6 +5,7 @@ fastapi
 huggingface_hub
 langchain
 langchain-community
+langchain-huggingface
 langchain-pinecone
 numpy
 opentelemetry-api
