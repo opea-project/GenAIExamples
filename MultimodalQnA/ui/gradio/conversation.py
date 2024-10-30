@@ -60,6 +60,8 @@ class Conversation:
                                 else:
                                     base64_frame = get_b64_frame_from_timestamp(self.video_file, self.time_of_frame_ms)
                                     self.base64_frame = base64_frame
+                                if base64_frame is None:
+                                    base64_frame = ""
                                 content.append({"type": "image_url", "image_url": {"url": base64_frame}})
                             else:
                                 content = message
