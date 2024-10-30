@@ -18,7 +18,7 @@ import {
   CHAT_HISTORY_GET,
   CHAT_HISTORY_DELETE,
 } from "../../config";
-import { Model } from './Conversation';
+import { Model } from "./Conversation";
 
 const initialState: ConversationReducer = {
   conversations: [],
@@ -79,9 +79,9 @@ export const ConversationSlice = createSlice({
     setMaxToken: (state, action: PayloadAction<number>) => {
       state.maxToken = action.payload;
     },
-    setModels: (state, action: PayloadAction<Model []>) => {
+    setModels: (state, action: PayloadAction<Model[]>) => {
       state.models = action.payload;
-    }
+    },
   },
   extraReducers(builder) {
     builder.addCase(uploadFile.fulfilled, () => {
@@ -245,7 +245,7 @@ export const deleteConversation = createAsyncThunkWrapper(
 
 export const doConversation = (conversationRequest: ConversationRequest) => {
   const { conversationId, userPrompt, messages, model, token, temperature } = conversationRequest;
-  if(messages.length==1){
+  if (messages.length == 1) {
     store.dispatch(addMessageToMessages(messages[0]));
   }
   store.dispatch(addMessageToMessages(userPrompt));
@@ -287,7 +287,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
             const match = msg.data.match(/b'([^']*)'/);
             if (match && match[1] != "</s>") {
               const extractedText = match[1];
-              result += extractedText.replace("<|eot_id|>","").replace(/\\n/g, "\n");
+              result += extractedText.replace("<|eot_id|>", "").replace(/\\n/g, "\n");
               store.dispatch(setOnGoingResult(result));
             }
           } catch (e) {
@@ -340,7 +340,7 @@ export const {
   setModel,
   setMinToken,
   setMaxToken,
-  setModels
+  setModels,
 } = ConversationSlice.actions;
 export const conversationSelector = (state: RootState) => state.conversationReducer;
 export default ConversationSlice.reducer;

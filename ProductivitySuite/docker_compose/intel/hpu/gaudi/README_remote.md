@@ -1,6 +1,6 @@
 # Build Mega Service of Productivity Suite
 
-This document outlines the deployment process for OPEA Productivity Suite utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server and [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) solutions. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. 
+This document outlines the deployment process for OPEA Productivity Suite utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server and [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) solutions. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
 
 ## 🚀 Build Docker Images
 
@@ -10,6 +10,7 @@ Create a directory and clone the GenAIComps repository
 mkdir genai
 git clone --branch v1.0 https://github.com/opea-project/GenAIComps.git
 ```
+
 Copy patch files related to GenAIComps inside GenAIComps folder and apply the patch
 
 ```bash
@@ -68,6 +69,7 @@ cd GenAIExamples
 Copy the patch files related to GenAIExamples into above cloned GenAIExamples folder
 
 Apply the patches
+
 ```bash
 git am *.patch
 ```
@@ -177,9 +179,9 @@ export tgi_endpoint="Your_Remote_TGI_Endpoint"
 ```
 
 **To use multiple TGI models**
+
 > Create the model_configs.json file under /GenAIExamples/ProductivitySuite/docker_compose/intel/hpu/gaudi folder
 > Add the model details as shown in the below example
-
 
 ```bash
 cd ..
@@ -190,46 +192,46 @@ touch model_configs.json
 File Structure:
 
 [
-    {
-        "model_name": "Your Model Name",
-        "displayName": "Model Display Name for the UI",
-        "endpoint": "Model Endpoint with http/https",
-        "minToken": 100, //Min Token Value
-        "maxToken": 2000 //Max Token Value
-    },
-    {
-        "model_name": "Your Model Name",
-        "displayName": "Model Display Name for the UI",
-        "endpoint": "Model Endpoint with http/https",
-        "minToken": 100, //Min Token Value
-        "maxToken": 2000 //Max Token Value
-    }
+{
+"model_name": "Your Model Name",
+"displayName": "Model Display Name for the UI",
+"endpoint": "Model Endpoint with http/https",
+"minToken": 100, //Min Token Value
+"maxToken": 2000 //Max Token Value
+},
+{
+"model_name": "Your Model Name",
+"displayName": "Model Display Name for the UI",
+"endpoint": "Model Endpoint with http/https",
+"minToken": 100, //Min Token Value
+"maxToken": 2000 //Max Token Value
+}
 ]
 
 Example:
 
 [
-    {
-        "model_name": "meta-llama/Meta-Llama-3.1-70B-Instruct",
-        "displayName": "llama-3.1-70B",
-        "endpoint": "https://<host>/<endpoint>",
-        "minToken": 100,
-        "maxToken": 2000
-    },
-    {
-        "model_name": "meta-llama/Meta-Llama-3.1-8B-Instruct",
-        "displayName": "llama-3.1-8B",
-        "endpoint": "https://<host>/<endpoint>",
-        "minToken": 100,
-        "maxToken": 2000
-    },
-    {
-        "model_name": "Intel/neural-chat-7b-v3-3",
-        "displayName": "neural chat",
-        "endpoint": "https://<host>/<endpoint>",
-        "minToken": 100,
-        "maxToken": 1000
-    }
+{
+"model_name": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+"displayName": "llama-3.1-70B",
+"endpoint": "https://<host>/<endpoint>",
+"minToken": 100,
+"maxToken": 2000
+},
+{
+"model_name": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+"displayName": "llama-3.1-8B",
+"endpoint": "https://<host>/<endpoint>",
+"minToken": 100,
+"maxToken": 2000
+},
+{
+"model_name": "Intel/neural-chat-7b-v3-3",
+"displayName": "neural chat",
+"endpoint": "https://<host>/<endpoint>",
+"minToken": 100,
+"maxToken": 1000
+}
 ]
 
 > After creating and adding details in the model_configs.json file. Copy the same file into the public folder of the UI
@@ -252,16 +254,19 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 ### Start all the services Docker Containers
 
 #### Run all services locally
+
 ```bash
 docker compose -f compose.yaml up -d
 ```
 
 #### Run TGI and TEI inference remote
+
 ```bash
 docker compose -f compose_remote.yaml up -d
 ```
 
 #### Run only TGI remote
+
 ```bash
 docker compose -f compose_tgi_remote.yaml up -d
 ```
@@ -270,8 +275,6 @@ docker compose -f compose_tgi_remote.yaml up -d
 
 Please refer to [keycloak_setup_guide](keycloak_setup_guide.md) for more detail related to Keycloak configuration setup.
 
-
 ## 🚀 Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5174.
-

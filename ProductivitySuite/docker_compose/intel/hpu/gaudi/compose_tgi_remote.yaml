@@ -136,7 +136,7 @@ services:
       CLIENTID: ${CLIENTID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       TOKEN_URL: ${TOKEN_URL}
-      
+
     restart: unless-stopped
   chatqna-gaudi-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}

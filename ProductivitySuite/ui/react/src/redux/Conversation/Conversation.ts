@@ -33,9 +33,9 @@ type file = {
 export type Model = {
   model_name: string;
   displayName: string;
-  minToken: number,
-  maxToken:number
-}
+  minToken: number;
+  maxToken: number;
+};
 
 export interface ConversationReducer {
   selectedConversationId: string;
