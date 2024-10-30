@@ -167,7 +167,7 @@ def ingest_video_gen_transcript(filepath, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
+                value="Your uploaded video's file name has special characters that are not allowed (depends on the OS, some examples are \, /, :, and *). Please consider changing the file name.",
             )
         )
         return
@@ -219,7 +219,7 @@ def ingest_video_gen_caption(filepath, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value="Your uploaded video's file name has special characters that are not allowed. Please consider update the video file name!",
+                value="Your uploaded video's file name has special characters that are not allowed (depends on the OS, some examples are \, /, :, and *). Please consider changing the file name.",
             )
         )
         return
@@ -271,7 +271,7 @@ def ingest_image_gen_caption(filepath, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value="Your uploaded image's file name has special characters that are not allowed. Please consider updating the file name!",
+                value="Your uploaded image's file name has special characters that are not allowed (depends on the OS, some examples are \, /, :, and *). Please consider changing the file name.",
             )
         )
         return
@@ -323,7 +323,7 @@ def ingest_image_with_text(filepath, text, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value="Your uploaded image's file name has special characters that are not allowed. Please consider updating the file name!",
+                value="Your uploaded image's file name has special characters that are not allowed (depends on the OS, some examples are \, /, :, and *). Please consider changing the file name.",
             )
         )
         return
@@ -332,7 +332,7 @@ def ingest_image_with_text(filepath, text, request: gr.Request):
     shutil.copy(verified_filepath, dest)
     text_basename = "{}.txt".format(os.path.splitext(basename)[0])
     text_dest = os.path.join(static_dir, text_basename)
-    with open(text_dest, "a") as file:
+    with open(text_dest, "w") as file:
         file.write(text)
     print("Done copying uploaded files to static folder!")
     headers = {
@@ -342,9 +342,11 @@ def ingest_image_with_text(filepath, text, request: gr.Request):
         ('files', (basename, open(dest, "rb"))),
         ('files', (text_basename, open(text_dest, "rb")))
     ]
-    response = requests.post(dataprep_ingest_addr, headers=headers, files=files)
+    try:
+        response = requests.post(dataprep_ingest_addr, headers=headers, files=files)
+    finally:
+        os.remove(text_dest)
     print(response.status_code)
-    os.remove(text_dest)
     if response.status_code == 200:
         response = response.json()
         print(response)
