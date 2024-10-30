@@ -158,7 +158,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-      
+
     restart: unless-stopped
   chatqna-gaudi-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
