@@ -50,18 +50,22 @@ function validate() {
 
 function validate_agent_service() {
     echo "----------------Test agent ----------------"
-    local CONTENT=$(http_proxy="" curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Tell me about Michael Jackson song thriller"
-    }')
-    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
-    docker logs docgrader-agent-endpoint
+    # local CONTENT=$(http_proxy="" curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+    #  "query": "Tell me about Michael Jackson song thriller"
+    # }')
+    export agent_port="9095"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
+    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
+    docker logs rag-agent-endpoint
     if [ "$EXIT_CODE" == "1" ]; then
         exit 1
     fi
 
-    local CONTENT=$(http_proxy="" curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Tell me about Michael Jackson song thriller"
-    }')
+    # local CONTENT=$(http_proxy="" curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+    #  "query": "Tell me about Michael Jackson song thriller"
+    # }')
+    export agent_port="9090"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
     docker logs react-agent-endpoint
     if [ "$EXIT_CODE" == "1" ]; then
