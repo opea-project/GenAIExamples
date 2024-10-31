@@ -8,6 +8,10 @@ import random
 from socket import AF_INET, SOCK_STREAM, socket
 from typing import List, Optional, Union
 
+import requests
+
+from .logger import CustomLogger
+
 
 def is_port_free(host: str, port: int) -> bool:
     """Check if a given port on a host is free.
@@ -181,6 +185,24 @@ def random_port() -> Optional[int]:
         assigned_ports.clear()
         unassigned_ports.clear()
         return _random_port()
+
+
+def get_access_token(token_url: str, client_id: str, client_secret: str) -> str:
+    """Get access token using OAuth client credentials flow."""
+    logger = CustomLogger("tgi_or_tei_service_auth")
+    data = {
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "grant_type": "client_credentials",
+    }
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = requests.post(token_url, data=data, headers=headers)
+    if response.status_code == 200:
+        token_info = response.json()
+        return token_info.get("access_token", "")
+    else:
+        logger.error(f"Failed to retrieve access token: {response.status_code}, {response.text}")
+        return ""
 
 
 class SafeContextManager:

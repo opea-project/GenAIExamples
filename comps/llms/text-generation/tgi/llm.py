@@ -22,16 +22,18 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+from comps.cores.mega.utils import get_access_token
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 
 logger = CustomLogger("llm_tgi")
 logflag = os.getenv("LOGFLAG", False)
 
+# Environment variables
+TOKEN_URL = os.getenv("TOKEN_URL")
+CLIENTID = os.getenv("CLIENTID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
 llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
-llm = AsyncInferenceClient(
-    model=llm_endpoint,
-    timeout=600,
-)
 
 
 @register_microservice(
@@ -45,6 +47,16 @@ llm = AsyncInferenceClient(
 async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, SearchedDoc]):
     if logflag:
         logger.info(input)
+
+    access_token = (
+        get_access_token(TOKEN_URL, CLIENTID, CLIENT_SECRET) if TOKEN_URL and CLIENTID and CLIENT_SECRET else None
+    )
+    headers = {}
+    if access_token:
+        headers = {"Authorization": f"Bearer {access_token}"}
+
+    llm = AsyncInferenceClient(model=llm_endpoint, timeout=600, headers=headers)
+
     prompt_template = None
     if not isinstance(input, SearchedDoc) and input.chat_template:
         prompt_template = PromptTemplate.from_template(input.chat_template)

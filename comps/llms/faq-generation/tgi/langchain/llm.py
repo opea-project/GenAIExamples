@@ -11,9 +11,15 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.llms import HuggingFaceEndpoint
 
 from comps import CustomLogger, GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
+from comps.cores.mega.utils import get_access_token
 
 logger = CustomLogger("llm_faqgen")
 logflag = os.getenv("LOGFLAG", False)
+
+# Environment variables
+TOKEN_URL = os.getenv("TOKEN_URL")
+CLIENTID = os.getenv("CLIENTID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 
 def post_process_text(text: str):
@@ -37,6 +43,12 @@ def post_process_text(text: str):
 async def llm_generate(input: LLMParamsDoc):
     if logflag:
         logger.info(input)
+    access_token = (
+        get_access_token(TOKEN_URL, CLIENTID, CLIENT_SECRET) if TOKEN_URL and CLIENTID and CLIENT_SECRET else None
+    )
+    server_kwargs = {}
+    if access_token:
+        server_kwargs["headers"] = {"Authorization": f"Bearer {access_token}"}
     llm = HuggingFaceEndpoint(
         endpoint_url=llm_endpoint,
         max_new_tokens=input.max_tokens,
@@ -46,6 +58,7 @@ async def llm_generate(input: LLMParamsDoc):
         temperature=input.temperature,
         repetition_penalty=input.repetition_penalty,
         streaming=input.streaming,
+        server_kwargs=server_kwargs,
     )
     templ = """Create a concise FAQs (frequently asked questions and answers) for following text:
         TEXT: {text}
