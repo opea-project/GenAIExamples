@@ -8,14 +8,14 @@
 ## Deploy On Xeon
 
 ```
-cd GenAIExamples/visualqna/kubernetes/intel/cpu/xeon/manifests
+cd GenAIExamples/visualqna/kubernetes/intel/cpu/xeon/manifest
 kubectl apply -f visualqna.yaml
 ```
 
 ## Deploy On Gaudi
 
 ```
-cd GenAIExamples/visualqna/kubernetes/intel/hpu/gaudi/manifests
+cd GenAIExamples/visualqna/kubernetes/intel/hpu/gaudi/manifest
 kubectl apply -f visualqna.yaml
 ```
 

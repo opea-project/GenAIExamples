@@ -8,12 +8,11 @@ VideoQnA is implemented on top of [GenAIComps](https://github.com/opea-project/G
 ---
 config:
   flowchart:
-    nodeSpacing: 100
+    nodeSpacing: 400
     rankSpacing: 100
     curve: linear
-  theme: base
   themeVariables:
-    fontSize: 42px
+    fontSize: 50px
 ---
 flowchart LR
     %% Colors %%
@@ -25,27 +24,16 @@ flowchart LR
     %% Subgraphs %%
     subgraph VideoQnA-MegaService["VideoQnA-MegaService"]
         direction LR
-        EM([Embedding <br>]):::blue
-        RET([Retrieval <br>]):::blue
-        RER([Rerank <br>]):::blue
-        LLM([LLM <br>]):::blue
+        EM([Embedding MicroService]):::blue
+        RET([Retrieval MicroService]):::blue
+        RER([Rerank MicroService]):::blue
+        LVM([LVM MicroService]):::blue
     end
     subgraph User Interface
-        direction TB
+        direction LR
         a([User Input Query]):::orchid
         UI([UI server<br>]):::orchid
         Ingest([Ingest<br>]):::orchid
-    end
-    subgraph VideoQnA GateWay
-        direction LR
-        invisible1[ ]:::invisible
-        GW([VideoQnA GateWay<br>]):::orange
-    end
-    subgraph .
-        X([OPEA Micsrservice]):::blue
-        Y{{Open Source Service}}
-        Z([OPEA Gateway]):::orange
-        Z1([UI]):::orchid
     end
 
     LOCAL_RER{{Reranking service<br>}}
@@ -54,35 +42,37 @@ flowchart LR
     V_RET{{Retriever service <br>}}
     Ingest{{Ingest data <br>}}
     DP([Data Preparation<br>]):::blue
-    LVM_gen{{LLM Service <br>}}
+    LVM_gen{{LVM Service <br>}}
+    GW([VideoQnA GateWay<br>]):::orange
 
     %% Data Preparation flow
     %% Ingest data flow
     direction LR
-    Ingest[Ingest data] -->|a| DP
-    DP <-.->|b| CLIP_EM
+    Ingest[Ingest data] --> UI
+    UI --> DP
+    DP <-.-> CLIP_EM
 
     %% Questions interaction
     direction LR
-    a[User Input Query] -->|1| UI
-    UI -->|2| GW
-    GW <==>|3| VideoQnA-MegaService
-    EM ==>|4| RET
-    RET ==>|5| RER
-    RER ==>|6| LLM
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> VideoQnA-MegaService
+    EM ==> RET
+    RET ==> RER
+    RER ==> LVM
 
 
     %% Embedding service flow
-    direction TB
-    EM <-.->|3'| CLIP_EM
-    RET <-.->|4'| V_RET
-    RER <-.->|5'| LOCAL_RER
-    LLM <-.->|6'| LVM_gen
+    direction LR
+    EM <-.-> CLIP_EM
+    RET <-.-> V_RET
+    RER <-.-> LOCAL_RER
+    LVM <-.-> LVM_gen
 
     direction TB
     %% Vector DB interaction
-    V_RET <-.->|d|VDB
-    DP <-.->|d|VDB
+    V_RET <-.->VDB
+    DP <-.->VDB
 ```
 
 - This project implements a Retrieval-Augmented Generation (RAG) workflow using LangChain, Intel VDMS VectorDB, and Text Generation Inference, optimized for Intel Xeon Scalable Processors.

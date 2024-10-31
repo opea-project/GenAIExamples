@@ -71,8 +71,6 @@ cd GenAIExamples/DocSum/docker_compose/intel/hpu/gaudi/
 docker compose -f compose.yaml up -d
 ```
 
-> Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
-
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 #### Deploy on Xeon
@@ -102,25 +100,53 @@ Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree
 
 ### Workflow of the deployed Document Summarization Service
 
-The workflow of the Document Summarization Service, from user's input query to the application's output response, is as follows:
+The DocSum example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
 flowchart LR
-    subgraph DocSum
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style DocSum-MegaService stroke:#000000
+
+    %% Subgraphs %%
+    subgraph DocSum-MegaService["DocSum MegaService "]
         direction LR
-        A[User] <--> |Input query| B[DocSum Gateway]
-        B <--> |Post| Megaservice
-        subgraph Megaservice["Megaservice"]
-            direction TB
-            C([ Microservice : llm-docsum-tgi <br>9000]) -. Post .-> D{{TGI Service<br>8008}}
-        end
-        Megaservice --> |Output| E[Response]
+        LLM([LLM MicroService]):::blue
     end
-    subgraph Legend
-        X([Micsrservice])
-        Y{{Service from industry peers}}
-        Z[Gateway]
+    subgraph UserInterface[" User Interface "]
+        direction LR
+        a([User Input Query]):::orchid
+        UI([UI server<br>]):::orchid
     end
+
+
+    LLM_gen{{LLM Service <br>}}
+    GW([DocSum GateWay<br>]):::orange
+
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> DocSum-MegaService
+
+
+    %% Embedding service flow
+    direction LR
+    LLM <-.-> LLM_gen
+
 ```
 
 ## Consume Document Summarization Service
@@ -130,9 +156,21 @@ Two ways of consuming Document Summarization Service:
 1. Use cURL command on terminal
 
    ```bash
+   #Use English mode (default).
    curl http://${host_ip}:8888/v1/docsum \
-       -H "Content-Type: application/json" \
-       -d '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+       -H "Content-Type: multipart/form-data" \
+       -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+       -F "max_tokens=32" \
+       -F "language=en" \
+       -F "stream=true"
+
+   #Use Chinese mode.
+   curl http://${host_ip}:8888/v1/docsum \
+       -H "Content-Type: multipart/form-data" \
+       -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
+       -F "max_tokens=32" \
+       -F "language=zh" \
+       -F "stream=true"
    ```
 
 2. Access via frontend

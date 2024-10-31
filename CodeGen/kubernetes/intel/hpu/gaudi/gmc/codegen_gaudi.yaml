@@ -29,6 +29,6 @@ spec:
         internalService:
           serviceName: tgi-gaudi-svc
           config:
-            MODEL_ID: meta-llama/CodeLlama-7b-hf
+            MODEL_ID: Qwen/Qwen2.5-Coder-7B-Instruct
             endpoint: /generate
           isDownstreamService: true

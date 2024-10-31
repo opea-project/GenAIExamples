@@ -63,17 +63,17 @@ This document introduces the supported examples of GenAIExamples. The supported 
 
 [CodeGen](./CodeGen/README.md) is an example of copilot designed for code generation in Visual Studio Code.
 
-| Framework                                                                      | LLM                                                                             | Serving                                                         | HW          | Description |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ----------- |
-| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Copilot     |
+| Framework                                                                      | LLM                                                                                     | Serving                                                         | HW          | Description |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ----------- |
+| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Copilot     |
 
 ### CodeTrans
 
 [CodeTrans](./CodeTrans/README.md) is an example of chatbot for converting code written in one programming language to another programming language while maintaining the same functionality.
 
-| Framework                                                                      | LLM                                                                                   | Serving                                                         | HW          | Description      |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ---------------- |
-| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [HuggingFaceH4/mistral-7b-grok](https://huggingface.co/HuggingFaceH4/mistral-7b-grok) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Code Translation |
+| Framework                                                                      | LLM                                                                                             | Serving                                                         | HW          | Description      |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ---------------- |
+| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [mistralai/Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Code Translation |
 
 ### DocSum
 

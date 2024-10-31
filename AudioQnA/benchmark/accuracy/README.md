@@ -1,4 +1,4 @@
-# AudioQnA accuracy Evaluation
+# AudioQnA Accuracy
 
 AudioQnA is an example that demonstrates the integration of Generative AI (GenAI) models for performing question-answering (QnA) on audio scene, which contains Automatic Speech Recognition (ASR) and Text-to-Speech (TTS). The following is the piepline for evaluating the ASR accuracy.
 
@@ -36,9 +36,9 @@ Evaluate the performance with the LLM:
 
 ```py
 # validate the offline model
-# python offline_evaluate.py
+# python offline_eval.py
 # validate the online asr microservice accuracy
-python online_evaluate.py
+python online_eval.py
 ```
 
 ### Performance Result

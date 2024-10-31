@@ -18,6 +18,55 @@ The workflow falls into the following architecture:
 
 ![architecture](./assets/img/codegen_architecture.png)
 
+The CodeGen example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
+
+```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
+flowchart LR
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style CodeGen-MegaService stroke:#000000
+
+    %% Subgraphs %%
+    subgraph CodeGen-MegaService["CodeGen MegaService "]
+        direction LR
+        LLM([LLM MicroService]):::blue
+    end
+    subgraph UserInterface[" User Interface "]
+        direction LR
+        a([User Input Query]):::orchid
+        UI([UI server<br>]):::orchid
+    end
+
+
+    LLM_gen{{LLM Service <br>}}
+    GW([CodeGen GateWay<br>]):::orange
+
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> CodeGen-MegaService
+
+
+    %% Embedding service flow
+    direction LR
+    LLM <-.-> LLM_gen
+
+```
+
 ## Deploy CodeGen Service
 
 The CodeGen service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
@@ -36,12 +85,12 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 
 By default, the LLM model is set to a default value as listed below:
 
-| Service      | Model                                                                           |
-| ------------ | ------------------------------------------------------------------------------- |
-| LLM_MODEL_ID | [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) |
+| Service      | Model                                                                                   |
+| ------------ | --------------------------------------------------------------------------------------- |
+| LLM_MODEL_ID | [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) |
 
-[meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) is a gated model that requires submitting an access request through Hugging Face. You can replace it with another model.
-Change the `LLM_MODEL_ID` below for your needs, such as: [Qwen/CodeQwen1.5-7B-Chat](https://huggingface.co/Qwen/CodeQwen1.5-7B-Chat), [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
+[Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) may be a gated model that requires submitting an access request through Hugging Face. You can replace it with another model.
+Change the `LLM_MODEL_ID` below for your needs, such as: [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
 
 If you choose to use `meta-llama/CodeLlama-7b-hf` as LLM model, you will need to visit [here](https://huggingface.co/meta-llama/CodeLlama-7b-hf), click the `Expand to review and access` button to ask for model access.
 
@@ -82,8 +131,6 @@ Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.y
 cd GenAIExamples/CodeGen/docker_compose/intel/hpu/gaudi
 docker compose up -d
 ```
-
-> Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
