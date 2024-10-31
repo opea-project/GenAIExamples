@@ -81,7 +81,6 @@ flowchart LR
 3. Hierarchical agent can further improve performance.
    Expert worker agents, such as retrieval agent, knowledge graph agent, SQL agent, etc., can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information together to provide a comprehensive answer.
 
-
 ## Deployment with docker
 
 1. Build agent docker image
@@ -126,12 +125,14 @@ flowchart LR
 3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
 
    First, launch the mega-service.
+
    ```
    cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool
    bash launch_retrieval_tool.sh
    ```
 
    Then, ingest data into the vector database. Here we provide an example. You can ingest your own data.
+
    ```
    bash run_ingest_data.sh
    ```
@@ -147,6 +148,7 @@ flowchart LR
    We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
 
    To use open-source LLMs on Gaudi2, run commands below.
+
    ```
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
    bash launch_tgi_gaudi.sh
@@ -154,6 +156,7 @@ flowchart LR
    ```
 
    To use OpenAI models, run commands below.
+
    ```
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
    bash launch_agent_service_openai.sh
