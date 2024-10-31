@@ -59,19 +59,19 @@ stop_retrieval_tool
 cd $WORKPATH/tests
 
 echo "=================== #1 Building docker images===================="
-bash 1_build_images.sh
+bash step1_build_images.sh
 echo "=================== #1 Building docker images completed===================="
 
 echo "=================== #2 Start retrieval tool===================="
-bash 2_start_retrieval_tool.sh
+bash step2_start_retrieval_tool.sh
 echo "=================== #2 Retrieval tool started===================="
 
 echo "=================== #3 Ingest data and validate retrieval===================="
-bash 3_ingest_data_and_validate_retrieval.sh
+bash step3_ingest_data_and_validate_retrieval.sh
 echo "=================== #3 Data ingestion and validation completed===================="
 
 echo "=================== #4 Start agent and API server===================="
-bash 4_launch_and_validate_agent_tgi.sh
+bash step4_launch_and_validate_agent_tgi.sh
 echo "=================== #4 Agent test passed ===================="
 
 echo "=================== #5 Stop agent and API server===================="
