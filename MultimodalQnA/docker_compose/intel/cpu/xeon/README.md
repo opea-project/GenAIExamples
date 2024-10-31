@@ -91,6 +91,7 @@ export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
+export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/ingest_with_text"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
 export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
@@ -276,7 +277,7 @@ curl http://${host_ip}:9399/v1/lvm \
 
 6. dataprep-multimodal-redis
 
-Download a sample video, image, and audio file.
+Download a sample video, image, and audio file and create a caption
 
 ```bash
 export video_fn="WeAreGoingOnBullrun.mp4"
@@ -284,6 +285,9 @@ wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoing
 
 export image_fn="apple.png"
 wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
+
+export caption_fn="apple.txt"
+echo "This is an apple."  > ${caption_fn}
 
 export audio_fn="AudioSample.wav"
 wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav -O ${audio_fn}
@@ -307,6 +311,15 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
     -X POST -F "files=@./${image_fn}"
+```
+
+Now, test the microservice with posting a custom caption along with an image
+
+```bash
+curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+    ${DATAPREP_INGEST_SERVICE_ENDPOINT} \
+    -H 'Content-Type: multipart/form-data' \
+    -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}"
 ```
 
 Also, you are able to get the list of all files that you uploaded:
