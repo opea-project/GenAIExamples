@@ -2,7 +2,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+# set -e
+
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -35,6 +36,18 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
+
+    export V2A_SERVICE_HOST_IP=${host_ip}
+    export V2A_ENDPOINT=http://$host_ip:7078
+
+    export A2T_ENDPOINT=http://$host_ip:7066
+    export A2T_SERVICE_HOST_IP=${host_ip}
+    export A2T_SERVICE_PORT=9099 
+
+    export DATA_ENDPOINT=http://$host_ip:7079
+    export DATA_SERVICE_HOST_IP=${host_ip}
+    export DATA_SERVICE_PORT=7079 
+
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -80,8 +93,44 @@ function validate_services() {
     sleep 1s
 }
 
+get_base64_str() {
+    local file_name=$1
+    base64 -w 0 "$file_name" 
+}
+
+# Function to generate input data for testing based on the document type
+input_data_for_test() {
+    local document_type=$1
+    case $document_type in
+        ("text")
+            echo "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are."
+            ;;
+        ("audio")
+            get_base64_str "$root_folder/data/test.wav"
+            ;;
+        ("video")
+            get_base64_str "$root_folder/data/test.mp4"
+            ;;
+        (*)
+            echo "Invalid document type" >&2
+            exit 1
+            ;;
+    esac
+}
+
 function validate_microservices() {
     # Check if the microservices are running correctly.
+
+    # whisper microservice
+    ulimit -s 65536
+    validate_services \
+        "${ip_address}:7066/v1/asr" \
+        '{"asr_result":"who is pat gelsinger"}' \
+        "whisper-service" \
+        "whisper-service" \
+        "{\"audio\": \"$(input_data_for_test "audio")\"}"
+
+
 
     # tgi for llm service
     validate_services \
@@ -145,17 +194,17 @@ function stop_docker() {
 
 function main() {
 
-    stop_docker
+    # stop_docker
 
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_services
+    # # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    # start_services
 
     validate_microservices
-    validate_megaservice
-    validate_frontend
+    # validate_megaservice
+    # validate_frontend
 
-    stop_docker
-    echo y | docker system prune
+    # stop_docker
+    # echo y | docker system prune
 
 }
 

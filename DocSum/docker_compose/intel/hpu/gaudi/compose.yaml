@@ -38,11 +38,9 @@ services:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
-  
-  
+    
   whisper-service:
-    # image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-    image: opea/whisper:latest
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
     container_name: whisper-service
     ports:
       - "7066:7066"
@@ -51,10 +49,14 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+    runtime: habana
+    cap_add:
+      - SYS_NICE
     restart: unless-stopped
 
   a2t:
-    # image: ${REGISTRY:-opea}/asr:${TAG:-latest}
     image: opea/a2t:latest
     container_name: a2t-service
     ports:
@@ -64,7 +66,6 @@ services:
       A2T_ENDPOINT: ${A2T_ENDPOINT}
  
   v2a:
-    # image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
     image: opea/v2a:latest
     container_name: v2a-service
     ports:
@@ -74,7 +75,6 @@ services:
       V2A_ENDPOINT: ${V2A_ENDPOINT}
 
   multimedia2text-service:
-    # image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
     image: opea/multimedia2text:latest
     container_name: multimedia2text
     ports:
@@ -83,17 +83,16 @@ services:
     environment:
       V2A_ENDPOINT: ${V2A_ENDPOINT}
       A2T_ENDPOINT: ${A2T_ENDPOINT}
-  
-  
-  
-  
-  
+    
   docsum-gaudi-backend-server:
-    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+    image: opea/docsum:latest
     container_name: docsum-gaudi-backend-server
     depends_on:
       - tgi-service
       - llm
+      - multimedia2text-service
+      - v2a
+      - a2t
     ports:
       - "8888:8888"
     environment:
@@ -101,7 +100,9 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+
     ipc: host
     restart: always
     

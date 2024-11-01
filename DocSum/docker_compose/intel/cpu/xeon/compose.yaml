@@ -35,7 +35,6 @@ services:
     restart: unless-stopped
 
   whisper-service:
-    # image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
     image: opea/whisper:latest
     container_name: whisper-service
     ports:
@@ -48,7 +47,6 @@ services:
     restart: unless-stopped
 
   a2t:
-    # image: ${REGISTRY:-opea}/asr:${TAG:-latest}
     image: opea/a2t:latest
     container_name: a2t-service
     ports:
@@ -58,7 +56,6 @@ services:
       A2T_ENDPOINT: ${A2T_ENDPOINT}
  
   v2a:
-    # image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
     image: opea/v2a:latest
     container_name: v2a-service
     ports:
@@ -68,7 +65,6 @@ services:
       V2A_ENDPOINT: ${V2A_ENDPOINT}
 
   multimedia2text-service:
-    # image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
     image: opea/multimedia2text:latest
     container_name: multimedia2text
     ports:
@@ -79,7 +75,6 @@ services:
       A2T_ENDPOINT: ${A2T_ENDPOINT}
 
   docsum-xeon-backend-server:
-    # image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     image: opea/docsum:latest
     container_name: docsum-xeon-backend-server
     depends_on:
