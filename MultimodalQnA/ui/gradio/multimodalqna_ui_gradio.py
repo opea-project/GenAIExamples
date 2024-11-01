@@ -323,8 +323,12 @@ def ingest_with_text(filepath, text, request: gr.Request):
     return
 
 
-def clear_uploaded_file(request: gr.Request):
+def hide_text(request: gr.Request):
     return gr.Textbox(visible=False)
+
+
+def clear_text(request: gr.Request):
+    return None
 
     
 with gr.Blocks() as upload_video:
@@ -351,9 +355,9 @@ with gr.Blocks() as upload_video:
                                           value='transcript')
             text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
         video_upload_trans.upload(ingest_gen_transcript, [video_upload_trans, gr.Textbox(value="video", visible=False)], [text_upload_result])
-        video_upload_trans.clear(clear_uploaded_file, [], [text_upload_result])
+        video_upload_trans.clear(hide_text, [], [text_upload_result])
         video_upload_cap.upload(ingest_gen_caption, [video_upload_cap, gr.Textbox(value="video", visible=False)], [text_upload_result])
-        video_upload_cap.clear(clear_uploaded_file, [], [text_upload_result])
+        video_upload_cap.clear(hide_text, [], [text_upload_result])
         text_options_radio.change(select_upload_type, [text_options_radio], [video_upload_trans, video_upload_cap])
 
 with gr.Blocks() as upload_image:
@@ -381,9 +385,13 @@ with gr.Blocks() as upload_image:
             custom_caption = gr.Textbox(visible=True, interactive=True, label="Custom Caption or Label")
             text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
         image_upload_cap.upload(ingest_gen_caption, [image_upload_cap, gr.Textbox(value="image", visible=False)], [text_upload_result])
-        image_upload_cap.clear(clear_uploaded_file, [], [text_upload_result])
-        image_upload_text.upload(ingest_with_text, [image_upload_text, custom_caption], [text_upload_result])
-        image_upload_text.clear(clear_uploaded_file, [], [text_upload_result])
+        image_upload_cap.clear(hide_text, [], [text_upload_result])
+        image_upload_text.upload(
+            ingest_with_text,
+            [image_upload_text, custom_caption],
+            [text_upload_result]
+            ).then(clear_text, [], [custom_caption])
+        image_upload_text.clear(hide_text, [], [text_upload_result])
         text_options_radio.change(select_upload_type, [text_options_radio], [image_upload_cap, image_upload_text])
 
 with gr.Blocks() as upload_audio:
@@ -398,7 +406,7 @@ with gr.Blocks() as upload_audio:
             text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
         audio_upload.upload(ingest_gen_transcript, [audio_upload, gr.Textbox(value="audio", visible=False)], [text_upload_result])
         audio_upload.stop_recording(ingest_gen_transcript, [audio_upload, gr.Textbox(value="audio", visible=False)], [text_upload_result])
-        audio_upload.clear(clear_uploaded_file, [], [text_upload_result])
+        audio_upload.clear(hide_text, [], [text_upload_result])
 
 with gr.Blocks() as upload_pdf:
     gr.Markdown("# Ingest Your Own PDF")
