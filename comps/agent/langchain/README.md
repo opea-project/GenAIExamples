@@ -11,23 +11,28 @@ We currently support the following types of agents:
 1. ReAct: use `react_langchain` or `react_langgraph` or `react_llama` as strategy. First introduced in this seminal [paper](https://arxiv.org/abs/2210.03629). The ReAct agent engages in "reason-act-observe" cycles to solve problems. Please refer to this [doc](https://python.langchain.com/v0.2/docs/how_to/migrate_agent/) to understand the differences between the langchain and langgraph versions of react agents. See table below to understand the validated LLMs for each react strategy.
 2. RAG agent: use `rag_agent` or `rag_agent_llama` strategy. This agent is specifically designed for improving RAG performance. It has the capability to rephrase query, check relevancy of retrieved context, and iterate if context is not relevant. See table below to understand the validated LLMs for each rag agent strategy.
 3. Plan and execute: `plan_execute` strategy. This type of agent first makes a step-by-step plan given a user request, and then execute the plan sequentially (or in parallel, to be implemented in future). If the execution results can solve the problem, then the agent will output an answer; otherwise, it will replan and execute again.
-   For advanced developers who want to implement their own agent strategies, please refer to [Section 5](#5-customize-agent-strategy) below.
+
+**Note**:
+
+1. Due to the limitations in support for tool calling by TGI and vllm, we have developed subcategories of agent strategies (`rag_agent_llama` and `react_llama`) specifically designed for open-source LLMs served with TGI and vllm.
+2. For advanced developers who want to implement their own agent strategies, please refer to [Section 5](#5-customize-agent-strategy) below.
 
 ### 1.2 LLM engine
 
-Agents use LLM for reasoning and planning. We support 2 options of LLM engine:
+Agents use LLM for reasoning and planning. We support 3 options of LLM engine:
 
-1. Open-source LLMs served with TGI-gaudi. To use open-source llms, follow the instructions in [Section 2](#222-start-microservices) below. Note: we recommend using state-of-the-art LLMs, such as llama3.1-70B-instruct, to get higher success rate.
-2. OpenAI LLMs via API calls. To use OpenAI llms, specify `llm_engine=openai` and `export OPENAI_API_KEY=<your-openai-key>`
+1. Open-source LLMs served with TGI. Follow the instructions in [Section 2.2.1](#221-start-agent-microservices-with-tgi).
+2. Open-source LLMs served with vllm. Follow the instructions in [Section 2.2.2](#222-start-agent-microservices-with-vllm).
+3. OpenAI LLMs via API calls. To use OpenAI llms, specify `llm_engine=openai` and `export OPENAI_API_KEY=<your-openai-key>`
 
-| Agent type       | `strategy` arg    | Validated LLMs                                                                                                                                                                                       | Notes                                                                                                                                                                                                            |
-| ---------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ReAct            | `react_langchain` | GPT-4o-mini, [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct)                                                                                                       | Only allows tools with one input variable                                                                                                                                                                        |
-| ReAct            | `react_langgraph` | GPT-4o-mini, [Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3)-on-vllm,                                                                                          | Currently does not work for open-source LLMs served with TGI-Gaudi, [Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)-on-vllm is not synced from vllm upstream to gaudi repo yet. |
-| ReAct            | `react_llama`     | [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct)                                                                                                                    | Recommended for open-source LLMs served with TGI-Gaudi                                                                                                                                                           |
-| RAG agent        | `rag_agent`       | GPT-4o-mini                                                                                                                                                                                          | Currently does not work for open-source LLMs served with TGI-Gaudi                                                                                                                                               |
-| RAG agent        | `rag_agent_llama` | [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct)                                                                                                                    | Recommended for open-source LLMs served with TGI-Gaudi, only allows 1 tool with input variable to be "query"                                                                                                     |
-| Plan and execute | `plan_execute`    | GPT-4o-mini, [Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3)-on-vllm, [Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)-on-vllm |                                                                                                                                                                                                                  |
+| Agent type       | `strategy` arg    | Validated LLMs (serving SW)                                                                                                                                                                                    | Notes                                                                                                                           |
+| ---------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| ReAct            | `react_langchain` | [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct) (tgi-gaudi)                                                                                                                  | Only allows tools with one input variable                                                                                       |
+| ReAct            | `react_langgraph` | GPT-4o-mini, [Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) (vllm-gaudi),                                                                                               | if using vllm, need to specify `--enable-auto-tool-choice --tool-call-parser ${model_parser}`, refer to vllm docs for more info |
+| ReAct            | `react_llama`     | [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct) (tgi-gaudi)                                                                                                                  | Recommended for open-source LLMs                                                                                                |
+| RAG agent        | `rag_agent`       | GPT-4o-mini                                                                                                                                                                                                    |                                                                                                                                 |
+| RAG agent        | `rag_agent_llama` | [llama3.1-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct) (tgi-gaudi)                                                                                                                  | Recommended for open-source LLMs, only allows 1 tool with input variable to be "query"                                          |
+| Plan and execute | `plan_execute`    | GPT-4o-mini, [Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) (vllm-gaudi), [Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct) (vllm-gaudi) |                                                                                                                                 |
 
 ### 1.3 Tools
 
@@ -36,11 +41,15 @@ The tools are registered with a yaml file. We support the following types of too
 1. Endpoint: user to provide url
 2. User-defined python functions. This is usually used to wrap endpoints with request post or simple pre/post-processing.
 3. Langchain tool modules.
-   Examples of how to register tools can be found in [Section 4](#-4-provide-your-own-tools) below.
+
+Examples of how to register tools can be found in [Section 4](#-4-provide-your-own-tools) below.
 
 ### 1.4 Agent APIs
 
-Currently we have implemented OpenAI chat completion compatible API for agents. We are working to support OpenAI assistants APIs.
+1. OpenAI compatible chat completions API
+2. OpenAI compatible assistants APIs.
+
+**Note**: not all keywords are supported yet.
 
 ## 🚀2. Start Agent Microservice
 

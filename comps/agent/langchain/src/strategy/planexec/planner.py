@@ -14,7 +14,7 @@ from langgraph.graph.message import add_messages
 from pydantic import BaseModel, Field
 
 from ...global_var import threads_global_kv
-from ...utils import has_multi_tool_inputs, tool_renderer, wrap_chat
+from ...utils import has_multi_tool_inputs, tool_renderer
 from ..base_agent import BaseAgent
 from .prompt import (
     answer_check_prompt,
@@ -24,8 +24,6 @@ from .prompt import (
     planner_prompt,
     replanner_prompt,
 )
-
-# Define protocol
 
 
 class PlanExecute(TypedDict):
@@ -56,16 +54,14 @@ class PlanStepChecker:
         str: A decision for whether we should use this plan or not
     """
 
-    def __init__(self, llm_endpoint, model_id=None, is_vllm=False):
+    def __init__(self, llm, is_vllm=False):
         class grade(BaseModel):
             binary_score: str = Field(description="executable score 'yes' or 'no'")
 
         if is_vllm:
-            llm = wrap_chat(llm_endpoint, model_id).bind_tools(
-                [grade], tool_choice={"function": {"name": grade.__name__}}
-            )
+            llm = llm.bind_tools([grade], tool_choice={"function": {"name": grade.__name__}})
         else:
-            llm = wrap_chat(llm_endpoint, model_id).bind_tools([grade])
+            llm = llm.bind_tools([grade])
 
         output_parser = PydanticToolsParser(tools=[grade], first_tool_only=True)
         self.chain = plan_check_prompt | llm | output_parser
@@ -74,7 +70,7 @@ class PlanStepChecker:
         # print("---CALL PlanStepChecker---")
         scored_result = self.chain.invoke(state)
         score = scored_result.binary_score
-        # print(f"Task is {state['context']}, Greade of relevance to question is {score}")
+        print(f"Task is {state['context']}, Score is {score}")
         if score.startswith("yes"):
             return True
         else:
@@ -83,13 +79,11 @@ class PlanStepChecker:
 
 # Define workflow Node
 class Planner:
-    def __init__(self, llm_endpoint, model_id=None, plan_checker=None, is_vllm=False):
+    def __init__(self, llm, plan_checker=None, is_vllm=False):
         if is_vllm:
-            llm = wrap_chat(llm_endpoint, model_id).bind_tools(
-                [Plan], tool_choice={"function": {"name": Plan.__name__}}
-            )
+            llm = llm.bind_tools([Plan], tool_choice={"function": {"name": Plan.__name__}})
         else:
-            llm = wrap_chat(llm_endpoint, model_id).bind_tools([Plan])
+            llm = llm.bind_tools([Plan])
         output_parser = PydanticToolsParser(tools=[Plan], first_tool_only=True)
         self.llm = planner_prompt | llm | output_parser
         self.plan_checker = plan_checker
@@ -103,6 +97,7 @@ class Planner:
             while not success:
                 try:
                     plan = self.llm.invoke({"messages": [("user", state["messages"][-1].content)]})
+                    print("Generated plan: ", plan)
                     success = True
                 except OutputParserException as e:
                     pass
@@ -116,17 +111,17 @@ class Planner:
 
             if len(steps) == 0:
                 success = False
-
+        print("Steps: ", steps)
         return {"input": input, "plan": steps}
 
 
 class Executor:
-    def __init__(self, llm_endpoint, model_id=None, tools=[]):
+    def __init__(self, llm, tools=[]):
         prompt = hwchase17_react_prompt
         if has_multi_tool_inputs(tools):
             raise ValueError("Only supports single input tools when using strategy == react")
         else:
-            agent_chain = create_react_agent(llm_endpoint, tools, prompt, tools_renderer=tool_renderer)
+            agent_chain = create_react_agent(llm, tools, prompt, tools_renderer=tool_renderer)
         self.agent_executor = AgentExecutor(
             agent=agent_chain, tools=tools, handle_parsing_errors=True, max_iterations=50
         )
@@ -148,6 +143,7 @@ previous steps and output: {out_state}
                 agent_response = self.agent_executor.invoke({"input": task_formatted})
                 output = agent_response["output"]
                 success = True
+            print(f"Task is {step}, Response is {output}")
             out_state.append(f"Task is {step}, Response is {output}")
         return {
             "past_steps": out_state,
@@ -155,13 +151,11 @@ previous steps and output: {out_state}
 
 
 class AnswerMaker:
-    def __init__(self, llm_endpoint, model_id=None, is_vllm=False):
+    def __init__(self, llm, is_vllm=False):
         if is_vllm:
-            llm = wrap_chat(llm_endpoint, model_id).bind_tools(
-                [Response], tool_choice={"function": {"name": Response.__name__}}
-            )
+            llm = llm.bind_tools([Response], tool_choice={"function": {"name": Response.__name__}})
         else:
-            llm = wrap_chat(llm_endpoint, model_id).bind_tools([Response])
+            llm = llm.bind_tools([Response])
         output_parser = PydanticToolsParser(tools=[Response], first_tool_only=True)
         self.llm = answer_make_prompt | llm | output_parser
 
@@ -172,6 +166,7 @@ class AnswerMaker:
         while not success:
             try:
                 output = self.llm.invoke(state)
+                print("Generated response: ", output.response)
                 success = True
             except OutputParserException as e:
                 pass
@@ -188,16 +183,14 @@ class FinalAnswerChecker:
         str: A decision for whether we should use this plan or not
     """
 
-    def __init__(self, llm_endpoint, model_id=None, is_vllm=False):
+    def __init__(self, llm, is_vllm=False):
         class grade(BaseModel):
             binary_score: str = Field(description="executable score 'yes' or 'no'")
 
         if is_vllm:
-            llm = wrap_chat(llm_endpoint, model_id).bind_tools(
-                [grade], tool_choice={"function": {"name": grade.__name__}}
-            )
+            llm = llm.bind_tools([grade], tool_choice={"function": {"name": grade.__name__}})
         else:
-            llm = wrap_chat(llm_endpoint, model_id).bind_tools([grade])
+            llm = llm.bind_tools([grade])
         output_parser = PydanticToolsParser(tools=[grade], first_tool_only=True)
         self.chain = answer_check_prompt | llm | output_parser
 
@@ -213,8 +206,8 @@ class FinalAnswerChecker:
 
 
 class Replanner:
-    def __init__(self, llm_endpoint, model_id=None, answer_checker=None):
-        llm = wrap_chat(llm_endpoint, model_id).bind_tools([Plan])
+    def __init__(self, llm, answer_checker=None):
+        llm = llm.bind_tools([Plan])
         output_parser = PydanticToolsParser(tools=[Plan], first_tool_only=True)
         self.llm = replanner_prompt | llm | output_parser
         self.answer_checker = answer_checker
@@ -227,6 +220,7 @@ class Replanner:
             try:
                 output = self.llm.invoke(state)
                 success = True
+                print("Replan: ", output)
             except OutputParserException as e:
                 pass
             except Exception as e:
@@ -240,11 +234,11 @@ class PlanExecuteAgentWithLangGraph(BaseAgent):
         super().__init__(args, local_vars=globals(), **kwargs)
 
         # Define Node
-        plan_checker = PlanStepChecker(self.llm_endpoint, args.model, is_vllm=self.is_vllm)
+        plan_checker = PlanStepChecker(self.llm, is_vllm=self.is_vllm)
 
-        plan_step = Planner(self.llm_endpoint, args.model, plan_checker, is_vllm=self.is_vllm)
-        execute_step = Executor(self.llm_endpoint, args.model, self.tools_descriptions)
-        make_answer = AnswerMaker(self.llm_endpoint, args.model, is_vllm=self.is_vllm)
+        plan_step = Planner(self.llm, plan_checker, is_vllm=self.is_vllm)
+        execute_step = Executor(self.llm, self.tools_descriptions)
+        make_answer = AnswerMaker(self.llm, is_vllm=self.is_vllm)
 
         # Define Graph
         workflow = StateGraph(PlanExecute)

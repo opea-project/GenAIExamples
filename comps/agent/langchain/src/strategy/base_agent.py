@@ -4,12 +4,12 @@
 from uuid import uuid4
 
 from ..tools import get_tools_descriptions
-from ..utils import adapt_custom_prompt, setup_llm
+from ..utils import adapt_custom_prompt, setup_chat_model
 
 
 class BaseAgent:
     def __init__(self, args, local_vars=None, **kwargs) -> None:
-        self.llm_endpoint = setup_llm(args)
+        self.llm = setup_chat_model(args)
         self.tools_descriptions = get_tools_descriptions(args.tools)
         self.app = None
         self.memory = None

@@ -1,0 +1,28 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+ react-agent:
+    image: ${agent_image}
+    container_name: test-comps-agent-endpoint
+    volumes:
+      - ${TOOLSET_PATH}:/home/user/tools/
+    ports:
+      - "9095:9095"
+    ipc: host
+    environment:
+      ip_address: ${ip_address}
+      strategy: react_langgraph
+      recursion_limit: ${recursion_limit}
+      llm_engine: openai
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      model: "gpt-4o-mini"
+      temperature: ${temperature}
+      max_new_tokens: ${max_new_tokens}
+      streaming: false
+      tools: /home/user/tools/custom_tools.yaml
+      require_human_feedback: false
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      port: 9095

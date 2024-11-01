@@ -14,19 +14,25 @@ class ReActLlamaOutputParser(BaseOutputParser):
     def parse(self, text: str):
         print("raw output from llm: ", text)
         json_lines = text.split("\n")
-        print("json_lines: ", json_lines)
         output = []
         for line in json_lines:
             try:
+                if "TOOL CALL:" in line:
+                    line = line.replace("TOOL CALL:", "")
+                if "FINAL ANSWER:" in line:
+                    line = line.replace("FINAL ANSWER:", "")
                 if "assistant" in line:
                     line = line.replace("assistant", "")
-                output.append(json.loads(line))
+                parsed_line = json.loads(line)
+                if isinstance(parsed_line, dict):
+                    print("parsed line: ", parsed_line)
+                    output.append(parsed_line)
             except Exception as e:
                 print("Exception happened in output parsing: ", str(e))
         if output:
             return output
         else:
-            return text  # None
+            return text
 
 
 def convert_json_to_tool_call(json_str):
@@ -46,12 +52,21 @@ def convert_json_to_tool_call(json_str):
     return add_kw_tc, tool_call
 
 
+def get_tool_output(messages, id):
+    for msg in reversed(messages):
+        if isinstance(msg, ToolMessage):
+            if msg.tool_call_id == id:
+                tool_output = msg.content
+                break
+    return tool_output
+
+
 def assemble_history(messages):
     """
     messages: AI, TOOL, AI, TOOL, etc.
     """
     query_history = ""
-    n = 1
+    breaker = "-" * 10
     for m in messages[1:]:  # exclude the first message
         if isinstance(m, AIMessage):
             # if there is tool call
@@ -59,10 +74,11 @@ def assemble_history(messages):
                 for tool_call in m.tool_calls:
                     tool = tool_call["name"]
                     tc_args = tool_call["args"]
-                    query_history += f"Tool Call: {tool} - {tc_args}\n"
+                    id = tool_call["id"]
+                    tool_output = get_tool_output(messages, id)
+                    query_history += f"Tool Call: {tool} - {tc_args}\nTool Output: {tool_output}\n{breaker}\n"
             else:
                 # did not make tool calls
-                query_history += f"Assistant Output {n}: {m.content}\n"
-        elif isinstance(m, ToolMessage):
-            query_history += f"Tool Output: {m.content}\n"
+                query_history += f"Assistant Output: {m.content}\n"
+
     return query_history

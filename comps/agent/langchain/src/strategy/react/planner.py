@@ -11,7 +11,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
 from ...global_var import threads_global_kv
-from ...utils import has_multi_tool_inputs, tool_renderer, wrap_chat
+from ...utils import has_multi_tool_inputs, tool_renderer
 from ..base_agent import BaseAgent
 from .prompt import REACT_SYS_MESSAGE, hwchase17_react_prompt
 
@@ -24,7 +24,7 @@ class ReActAgentwithLangchain(BaseAgent):
             raise ValueError("Only supports single input tools when using strategy == react_langchain")
         else:
             agent_chain = create_react_langchain_agent(
-                self.llm_endpoint, self.tools_descriptions, prompt, tools_renderer=tool_renderer
+                self.llm, self.tools_descriptions, prompt, tools_renderer=tool_renderer
             )
         self.app = AgentExecutor(
             agent=agent_chain, tools=self.tools_descriptions, verbose=True, handle_parsing_errors=True
@@ -84,8 +84,6 @@ class ReActAgentwithLanggraph(BaseAgent):
     def __init__(self, args, with_memory=False, **kwargs):
         super().__init__(args, local_vars=globals(), **kwargs)
 
-        self.llm = wrap_chat(self.llm_endpoint, args.model)
-
         tools = self.tools_descriptions
         print("REACT_SYS_MESSAGE: ", REACT_SYS_MESSAGE)
 
@@ -131,19 +129,23 @@ class ReActAgentwithLanggraph(BaseAgent):
             return str(e)
 
 
+###############################################################################
+# ReActAgentLlama:
+# Only validated with with Llama3.1-70B-Instruct model served with TGI-gaudi
+# support multiple tools
+# does not rely on langchain bind_tools API
+# since tgi and vllm still do not have very good support for tool calling like OpenAI
+
 from typing import Annotated, Sequence, TypedDict
 
 from langchain_core.messages import AIMessage, BaseMessage
 from langchain_core.prompts import PromptTemplate
 from langgraph.graph import END, StateGraph
 from langgraph.graph.message import add_messages
-
-###############################################################################
-# ReAct Agent:
-# Temporary workaround for open-source LLM served by TGI-gaudi
-# Only validated with with Llama3.1-70B-Instruct model served with TGI-gaudi
 from langgraph.managed import IsLastStep
 from langgraph.prebuilt import ToolNode
+
+from ...utils import setup_chat_model
 
 
 class AgentState(TypedDict):
@@ -159,7 +161,7 @@ class ReActAgentNodeLlama:
     A workaround for open-source llm served by TGI-gaudi.
     """
 
-    def __init__(self, llm_endpoint, model_id, tools, args):
+    def __init__(self, tools, args):
         from .prompt import REACT_AGENT_LLAMA_PROMPT
         from .utils import ReActLlamaOutputParser
 
@@ -168,7 +170,7 @@ class ReActAgentNodeLlama:
             template=REACT_AGENT_LLAMA_PROMPT,
             input_variables=["input", "history", "tools"],
         )
-        llm = ChatHuggingFace(llm=llm_endpoint, model_id=model_id)
+        llm = setup_chat_model(args)
         self.tools = tools
         self.chain = prompt | llm | output_parser
 
@@ -201,7 +203,7 @@ class ReActAgentNodeLlama:
         if tool_calls:
             ai_message = AIMessage(content="", additional_kwargs=add_kw_tc, tool_calls=tool_calls)
         elif "answer" in output[0]:
-            ai_message = AIMessage(content=output[0]["answer"])
+            ai_message = AIMessage(content=str(output[0]["answer"]))
         else:
             ai_message = AIMessage(content=output)
         return {"messages": [ai_message]}
@@ -210,9 +212,7 @@ class ReActAgentNodeLlama:
 class ReActAgentLlama(BaseAgent):
     def __init__(self, args, with_memory=False, **kwargs):
         super().__init__(args, local_vars=globals(), **kwargs)
-        agent = ReActAgentNodeLlama(
-            llm_endpoint=self.llm_endpoint, model_id=args.model, tools=self.tools_descriptions, args=args
-        )
+        agent = ReActAgentNodeLlama(tools=self.tools_descriptions, args=args)
         tool_node = ToolNode(self.tools_descriptions)
 
         workflow = StateGraph(AgentState)

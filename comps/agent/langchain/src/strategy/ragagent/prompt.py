@@ -4,10 +4,10 @@
 from langchain_core.prompts import ChatPromptTemplate
 
 DOC_GRADER_PROMPT = """\
-Given the QUERY, determine if a relevant answer can be derived from the DOCUMENT.\n
+Given the QUERY, determine if the DOCUMENT contains all the information to answer the query.\n
 QUERY: {question} \n
 DOCUMENT:\n{context}\n\n
-Give score 'yes' if the document provides sufficient and relevant information to answer the question. Otherwise, give score 'no'. ONLY answer with 'yes' or 'no'. NOTHING ELSE."""
+Give score 'yes' if the document provides all the information needed to answer the question. Otherwise, give score 'no'. ONLY answer with 'yes' or 'no'. NOTHING ELSE."""
 
 
 PROMPT = """\
@@ -60,9 +60,3 @@ If you can directly answer the user question, output your answer in JSON format 
 User Question: {question}
 You Output:\n
 """
-
-DOC_GRADER_Llama_PROMPT = """\
-Given the QUERY, determine if the DOCUMENT contains all the information to answer the query.\n
-QUERY: {question} \n
-DOCUMENT:\n{context}\n\n
-Give score 'yes' if the document provides all the information needed to answer the question. Otherwise, give score 'no'. ONLY answer with 'yes' or 'no'. NOTHING ELSE."""

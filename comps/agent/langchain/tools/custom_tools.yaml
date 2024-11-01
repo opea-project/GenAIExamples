@@ -1,5 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-duckduckgo_search:
-  callable_api: ddg-search
+search_knowledge_base:
+  description: Search the web for a given query.
+  callable_api: custom_tools.py:search_web
+  args_schema:
+    query:
+      type: str
+      description: query
+  return_output: retrieved_data
