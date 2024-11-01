@@ -425,19 +425,19 @@ with gr.Blocks() as qna:
     state = gr.State(multimodalqna_conv.copy())
     with gr.Row():
         with gr.Column(scale=4):
-            video = gr.Video(height=512, width=512, elem_id="video", visible=True)
-            image = gr.Image(height=512, width=512, elem_id="image", visible=False)
+            video = gr.Video(height=512, width=512, elem_id="video", visible=True, label="Media")
+            image = gr.Image(height=512, width=512, elem_id="image", visible=False, label="Media")
         with gr.Column(scale=7):
             chatbot = gr.Chatbot(elem_id="chatbot", label="MultimodalQnA Chatbot", height=390)
             with gr.Row():
                 with gr.Column(scale=6):
                     # textbox.render()
-                    textbox = gr.MultimodalTextbox(
+                    textbox = gr.Textbox(
                         # show_label=False,
                         # container=False,
                         label="Query",
-                        info="Enter your query here!",
-                        submit_btn=False,
+                        info="Enter a text query here",
+                        # submit_btn=False,
                     )
                 with gr.Column(scale=1, min_width=100):
                     with gr.Row():
