@@ -1,0 +1,14 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+workflow_executor:
+  description: "Starts a workflow with the given workflow id and params. Gets the output result of the workflow."
+  callable_api: tools.py:workflow_executor
+  args_schema:
+    workflow_id:
+      type: int
+      description: Workflow id
+    params:
+      type: dict
+      description: Workflow parameters.
+  return_output: workflow_data
