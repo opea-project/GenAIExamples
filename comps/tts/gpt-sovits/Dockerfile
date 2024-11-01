@@ -25,8 +25,10 @@ RUN mv pretrained_models/*  GPT-SoVITS/GPT_SoVITS/pretrained_models/ && \
     python -m nltk.downloader averaged_perceptron_tagger_eng cmudict
 
 RUN mv GPT-SoVITS /home/user/
+RUN mv /root/nltk_data /home/user/
+RUN chown -R user /home/user/
 
-# USER user
+USER user
 # ENV LANG=C.UTF-8
 
 WORKDIR /home/user/GPT-SoVITS
