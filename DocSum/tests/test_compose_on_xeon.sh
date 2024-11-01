@@ -16,7 +16,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 # Get the root folder of the current script
-root_folder=$(dirname "$(readlink -f "$0")")
+ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
@@ -76,8 +76,6 @@ function validate_services() {
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     
     echo "==========================================="
-    # echo "START >>>> " $HTTP_STATUS
-    # echo "==========================================="
     
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
@@ -100,8 +98,6 @@ function validate_services() {
         exit 1
     fi
     sleep 1s
-
-    # echo "================== <<<<< END >>>> ========================="
     
 }
 
@@ -118,10 +114,10 @@ input_data_for_test() {
             echo "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are."
             ;;
         ("audio")
-            get_base64_str "$root_folder/data/test.wav"
+            get_base64_str "$ROOT_FOLDER/data/test.wav"
             ;;
         ("video")
-            get_base64_str "$root_folder/data/test.mp4"
+            get_base64_str "$ROOT_FOLDER/data/test.mp4"
             ;;
         (*)
             echo "Invalid document type" >&2

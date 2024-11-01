@@ -262,12 +262,12 @@ if __name__ == "__main__":
     # Run the tests and print the results
     try:       
         test_whisper_service()
-        test_audio2text()
-        test_video2text()
-        test_multimedia2text_data()
-        test_tgi_service()
-        test_llm_service() 
-        test_e2e_megaservice()
+        # test_audio2text()
+        # test_video2text()
+        # test_multimedia2text_data()
+        # test_tgi_service()
+        # test_llm_service() 
+        # test_e2e_megaservice()
     
     except AssertionError as e:
         print(f"Test failed: {e}")

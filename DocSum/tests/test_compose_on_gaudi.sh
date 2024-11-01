@@ -15,6 +15,9 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
+# Get the root folder of the current script
+ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
+
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
@@ -73,6 +76,9 @@ function validate_services() {
     local INPUT_DATA="$5"
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    
+    echo "==========================================="
+
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
@@ -106,10 +112,10 @@ input_data_for_test() {
             echo "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are."
             ;;
         ("audio")
-            get_base64_str "$root_folder/data/test.wav"
+            get_base64_str "$ROOT_FOLDER/data/test.wav"
             ;;
         ("video")
-            get_base64_str "$root_folder/data/test.mp4"
+            get_base64_str "$ROOT_FOLDER/data/test.mp4"
             ;;
         (*)
             echo "Invalid document type" >&2
@@ -130,7 +136,45 @@ function validate_microservices() {
         "whisper-service" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
 
+    # Audio2Text service
+    validate_services \
+        "${ip_address}:9099/v1/audio/transcriptions" \
+        '"query":"who is pat gelsinger"' \
+        "a2t" \
+        "a2t-service" \
+        "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
+    
+    # Video2Audio service
+    validate_services \
+        "${ip_address}:7078/v1/video2audio" \
+        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAGAAAKmwA6Ojo6Ojo6Ojo6Ojo6Ojo6YmJiYmJiYmJiYmJiYmJiYmKJiYmJiYmJiYmJiYmJiYmJsbGxsbGxsbGxsbGxsbGxsbHY2NjY2NjY2NjY2NjY2NjY2P////////////////////8AAAAATGF2YzU4L" \
+        "v2a" \
+        "v2a-service" \
+        "{\"byte_str\": \"$(input_data_for_test "video")\"}"
 
+        # Docsum Data service - video
+    validate_services \
+        "${ip_address}:7079/v1/multimedia2text" \
+        '"query":"you"' \
+        "multimedia2text-service" \
+        "multimedia2text" \
+        "{\"video\": \"$(input_data_for_test "video")\"}"
+
+    # Docsum Data service - audio
+    validate_services \
+        "${ip_address}:7079/v1/multimedia2text" \
+        '"query":"who is pat gelsinger"' \
+        "multimedia2text-service" \
+        "multimedia2text" \
+        "{\"audio\": \"$(input_data_for_test "audio")\"}"
+
+    # Docsum Data service - text
+    validate_services \
+        "${ip_address}:7079/v1/multimedia2text" \
+        "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco" \
+        "multimedia2text-service" \
+        "multimedia2text" \
+        "{\"text\": \"$(input_data_for_test "text")\"}"
 
     # tgi for llm service
     validate_services \
@@ -152,11 +196,11 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-    "${ip_address}:8888/v1/docsum" \
-    "toolkit" \
-    "mega-docsum" \
-    "docsum-gaudi-backend-server" \
-    '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        "${ip_address}:8888/v1/docsum" \
+        "[DONE]" \
+        "mega-docsum" \
+        "docsum-xeon-backend-server" \
+        '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function validate_frontend() {
@@ -194,17 +238,17 @@ function stop_docker() {
 
 function main() {
 
-    # stop_docker
+    stop_docker
 
-    # # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    # start_services
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    start_services
 
     validate_microservices
-    # validate_megaservice
+    validate_megaservice
     # validate_frontend
 
-    # stop_docker
-    # echo y | docker system prune
+    stop_docker
+    echo y | docker system prune
 
 }
 
