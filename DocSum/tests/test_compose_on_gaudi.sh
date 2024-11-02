@@ -112,10 +112,10 @@ input_data_for_test() {
             echo "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are."
             ;;
         ("audio")
-            get_base64_str "$ROOT_FOLDER/data/test.wav"
+            get_base64_str "$ROOT_FOLDER/data/intel_short.wav"
             ;;
         ("video")
-            get_base64_str "$ROOT_FOLDER/data/test.mp4"
+            get_base64_str "$ROOT_FOLDER/data/intel_short.mp4"
             ;;
         (*)
             echo "Invalid document type" >&2
@@ -131,7 +131,7 @@ function validate_microservices() {
     ulimit -s 65536
     validate_services \
         "${ip_address}:7066/v1/asr" \
-        '{"asr_result":"who is pat gelsinger"}' \
+        '{"asr_result":"well"}' \
         "whisper-service" \
         "whisper-service" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
@@ -139,7 +139,7 @@ function validate_microservices() {
     # Audio2Text service
     validate_services \
         "${ip_address}:9099/v1/audio/transcriptions" \
-        '"query":"who is pat gelsinger"' \
+        '"query":"well"' \
         "a2t" \
         "a2t-service" \
         "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
@@ -147,15 +147,15 @@ function validate_microservices() {
     # Video2Audio service
     validate_services \
         "${ip_address}:7078/v1/video2audio" \
-        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAGAAAKmwA6Ojo6Ojo6Ojo6Ojo6Ojo6YmJiYmJiYmJiYmJiYmJiYmKJiYmJiYmJiYmJiYmJiYmJsbGxsbGxsbGxsbGxsbGxsbHY2NjY2NjY2NjY2NjY2NjY2P////////////////////8AAAAATGF2YzU4L" \
+        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd9L18KaAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
         "v2a" \
         "v2a-service" \
         "{\"byte_str\": \"$(input_data_for_test "video")\"}"
 
-        # Docsum Data service - video
+    # Docsum Data service - video
     validate_services \
         "${ip_address}:7079/v1/multimedia2text" \
-        '"query":"you"' \
+        '"query":"well"' \
         "multimedia2text-service" \
         "multimedia2text" \
         "{\"video\": \"$(input_data_for_test "video")\"}"
@@ -163,7 +163,7 @@ function validate_microservices() {
     # Docsum Data service - audio
     validate_services \
         "${ip_address}:7079/v1/multimedia2text" \
-        '"query":"who is pat gelsinger"' \
+        '"query":"well"' \
         "multimedia2text-service" \
         "multimedia2text" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
@@ -191,6 +191,7 @@ function validate_microservices() {
         "llm" \
         "llm-docsum-gaudi-server" \
         '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+
 }
 
 function validate_megaservice() {
@@ -239,7 +240,6 @@ function stop_docker() {
 function main() {
 
     stop_docker
-
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 

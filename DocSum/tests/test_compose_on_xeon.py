@@ -89,10 +89,10 @@ def input_data_for_test(document_type):
     if document_type == "text":
         input_data = "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are."
     elif document_type == "audio":
-        input_data = get_base64_str(os.path.join(root_folder, 'data/test_audio_30s.wav'))
+        input_data = get_base64_str(os.path.join(root_folder, 'data/intel_short.wav'))
         # input_data = get_base64_str(os.path.join(root_folder, 'data/test_full.wav'))
     elif document_type == "video":
-        input_data = get_base64_str(os.path.join(root_folder, 'data/test_video_30s.mp4'))
+        input_data = get_base64_str(os.path.join(root_folder, 'data/intel_short.mp4'))
         # input_data = get_base64_str(os.path.join(root_folder, 'data/test_full.mp4'))
     else:
         raise ValueError("Invalid document type")
@@ -262,12 +262,12 @@ if __name__ == "__main__":
     # Run the tests and print the results
     try:       
         test_whisper_service()
-        # test_audio2text()
-        # test_video2text()
-        # test_multimedia2text_data()
-        # test_tgi_service()
-        # test_llm_service() 
-        # test_e2e_megaservice()
+        test_audio2text()
+        test_video2text()
+        test_multimedia2text_data()
+        test_tgi_service()
+        test_llm_service() 
+        test_e2e_megaservice()
     
     except AssertionError as e:
         print(f"Test failed: {e}")
