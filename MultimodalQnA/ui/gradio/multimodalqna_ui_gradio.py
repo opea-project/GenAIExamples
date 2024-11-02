@@ -54,17 +54,17 @@ def clear_history(state, request: gr.Request):
 
 
 def add_text(state, text, request: gr.Request):
-    logger.info(f"add_text. ip: {request.client.host}. len: {len(text['text'])}")
-    if len(text['text']) <= 0:
+    logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
+    if len(text) <= 0:
         state.skip_next = True
-        return (state, state.to_gradio_chatbot(), {}) + (no_change_btn,) * 1
+        return (state, state.to_gradio_chatbot(), None) + (no_change_btn,) * 1
 
-    text['text'] = text['text'][:2000]  # Hard cut-off
+    text = text[:2000]  # Hard cut-off
 
-    state.append_message(state.roles[0], text['text'])
+    state.append_message(state.roles[0], text)
     state.append_message(state.roles[1], None)
     state.skip_next = False
-    return (state, state.to_gradio_chatbot(), {}) + (disable_btn,) * 1
+    return (state, state.to_gradio_chatbot(), None) + (disable_btn,) * 1
 
 
 def http_bot(state, request: gr.Request):
@@ -204,7 +204,7 @@ def ingest_gen_transcript(filepath, filetype, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value=f"Something went wrong!\nPlease click the X button on the top right of the {filetype} upload box to reupload your video.",
+                value=f"Something went wrong (server error: {response.status_code})!\nPlease click the X button on the top right of the {filetype} upload box to reupload your video.",
             )
         )
         time.sleep(2)
@@ -256,7 +256,7 @@ def ingest_gen_caption(filepath, filetype, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value=f"Something went wrong!\nPlease click the X button on the top right of the {filetype} upload box to reupload your video.",
+                value=f"Something went wrong (server error: {response.status_code})!\nPlease click the X button on the top right of the {filetype} upload box to reupload your video.",
             )
         )
         time.sleep(2)
@@ -316,7 +316,7 @@ def ingest_with_text(filepath, text, request: gr.Request):
         yield (
             gr.Textbox(
                 visible=True,
-                value="Something went wrong!\nPlease click the X button on the top right of the image upload box to reupload your image!",
+                value=f"Something went wrong (server error: {response.status_code})!\nPlease click the X button on the top right of the image upload box to reupload your image!",
             )
         )
         time.sleep(2)
@@ -419,7 +419,7 @@ with gr.Blocks() as upload_pdf:
         with gr.Column(scale=3):
             text_upload_result_cap = gr.Textbox(visible=False, interactive=False, label="Upload Status")
         image_upload_cap.upload(ingest_gen_caption, [image_upload_cap, gr.Textbox(value="PDF", visible=False)], [text_upload_result_cap])
-        image_upload_cap.clear(clear_uploaded_file, [], [text_upload_result_cap])
+        image_upload_cap.clear(hide_text, [], [text_upload_result_cap])
 
 with gr.Blocks() as qna:
     state = gr.State(multimodalqna_conv.copy())
