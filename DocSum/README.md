@@ -176,8 +176,8 @@ flowchart LR
 
     %% Embedding service flow
     direction LR
-    ASR <-.-> A2T_SRV <-.-> WSP_SRV
     ASR <-.-> V2A_SRV
+    ASR <-.-> A2T_SRV <-.-> WSP_SRV
     A2T_SRV <-.-> V2A_SRV 
     LLM <-.-> LLM_gen
     TTS <-.-> SPC_SRV
