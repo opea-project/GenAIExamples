@@ -135,7 +135,7 @@ function validate_microservices() {
     ulimit -s 65536
     validate_services \
         "${ip_address}:7066/v1/asr" \
-        '{"asr_result":"who is pat gelsinger"}' \
+        '{"asr_result":"well"}' \
         "whisper-service" \
         "whisper-service" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
@@ -143,15 +143,15 @@ function validate_microservices() {
     # Audio2Text service
     validate_services \
         "${ip_address}:9099/v1/audio/transcriptions" \
-        '"query":"who is pat gelsinger"' \
+        '"query":"well"' \
         "a2t" \
         "a2t-service" \
         "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
-
+    
     # Video2Audio service
     validate_services \
         "${ip_address}:7078/v1/video2audio" \
-        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAGAAAKmwA6Ojo6Ojo6Ojo6Ojo6Ojo6YmJiYmJiYmJiYmJiYmJiYmKJiYmJiYmJiYmJiYmJiYmJsbGxsbGxsbGxsbGxsbGxsbHY2NjY2NjY2NjY2NjY2NjY2P////////////////////8AAAAATGF2YzU4L" \
+        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd9L18KaAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
         "v2a" \
         "v2a-service" \
         "{\"byte_str\": \"$(input_data_for_test "video")\"}"
@@ -159,7 +159,7 @@ function validate_microservices() {
     # Docsum Data service - video
     validate_services \
         "${ip_address}:7079/v1/multimedia2text" \
-        '"query":"you"' \
+        '"query":"well"' \
         "multimedia2text-service" \
         "multimedia2text" \
         "{\"video\": \"$(input_data_for_test "video")\"}"
@@ -167,7 +167,7 @@ function validate_microservices() {
     # Docsum Data service - audio
     validate_services \
         "${ip_address}:7079/v1/multimedia2text" \
-        '"query":"who is pat gelsinger"' \
+        '"query":"well"' \
         "multimedia2text-service" \
         "multimedia2text" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
