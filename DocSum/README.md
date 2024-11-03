@@ -1,6 +1,6 @@
 # Document Summarization Application
 
-Large Language Models (LLMs) have revolutionized the way we interact with text. These models can be used to create summaries of news articles, research papers, technical documents, legal documents and other types of text. Suppose you have a set of documents (PDFs, Notion pages, customer questions, etc.) and you want to summarize the content. In this example use case, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference.
+Large Language Models (LLMs) have revolutionized the way we interact with text. These models can be used to create summaries of news articles, research papers, technical documents, legal documents, multimedia documents, and other types of documents. Suppose you have a set of documents (PDFs, Notion pages, customer questions, multimedia files, etc.) and you want to summarize the content. In this example use case, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference.
 
 The architecture for document summarization will be illustrated/described below:
 
@@ -27,7 +27,7 @@ Currently we support two ways of deploying Document Summarization services with 
 
 We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "docker_compose/set_env.sh" if you want to use other models.
 
-```
+```bash
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 ```
 
@@ -43,7 +43,7 @@ To set up environment variables for deploying Document Summarization services, f
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
+   export no_proxy="Your_No_Proxy"     
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
@@ -112,15 +112,74 @@ flowchart LR
         B <--> |Post| Megaservice
         subgraph Megaservice["Megaservice"]
             direction TB
-            C([ Microservice : llm-docsum-tgi <br>9000]) -. Post .-> D{{TGI Service<br>8008}}
+            C([ Microservice : multimedia2text <br>7079]) -. Post .-> D([ Microservice : llm-docsum-tgi <br>9000]) -. Post .-> E{{TGI Service<br>8008}}
         end
-        Megaservice --> |Output| E[Response]
+        Megaservice --> |Output| F[Response]
     end
     subgraph Legend
         X([Micsrservice])
         Y{{Service from industry peers}}
         Z[Gateway]
     end
+```
+
+
+
+
+```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
+flowchart LR
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style DocSum-MegaService stroke:#000000
+
+    %% Subgraphs %%
+    subgraph DocSum-MegaService["DocSum MegaService "]
+        direction LR
+        ASR([Multimedia2text MicroService]):::blue
+        LLM([LLM MicroService]):::blue
+        TTS([TTS MicroService]):::blue
+    end
+    subgraph UserInterface[" User Interface "]
+        direction LR
+        a([User Input Query]):::orchid
+        UI([UI server<br>]):::orchid
+    end
+
+
+    V2A_SRV{{Video2Audio service<br>}}
+    WSP_SRV{{whisper service<br>}}
+    SPC_SRV{{speecht5 service <br>}}
+    LLM_gen{{LLM Service <br>}}
+    GW([DocSum GateWay<br>]):::orange
+
+
+    %% Questions interaction
+    direction LR
+    a[User Document] --> UI
+    UI --> GW
+    GW <==> DocSum-MegaService
+    ASR ==> LLM
+    LLM ==> TTS
+
+    %% Embedding service flow
+    direction LR
+    ASR <-.-> WSP_SRV
+    ASR <-.-> V2A_SRV
+    LLM <-.-> LLM_gen
+    TTS <-.-> SPC_SRV
+
 ```
 
 ## Consume Document Summarization Service
