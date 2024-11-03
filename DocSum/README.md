@@ -159,7 +159,10 @@ flowchart LR
     M2T <-.-> A2T_SRV <-.-> WSP_SRV
     V2A_SRV .-> A2T_SRV 
     
-
+    subgraph Legend[" Legend "]
+        UI([User Interface])
+        GW([DocSum GateWay])    
+    end
 
 ```
 
