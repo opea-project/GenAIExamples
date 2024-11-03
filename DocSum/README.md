@@ -121,11 +121,9 @@ config:
 ---
 config:
   flowchart:
-    nodeSpacing: 200
+    nodeSpacing: 50
     rankSpacing: 50
     
-  themeVariables:
-    fontSize: 30px
 ---
 flowchart LR
     %% Colors %%
