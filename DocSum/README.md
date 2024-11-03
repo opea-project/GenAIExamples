@@ -104,25 +104,6 @@ Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree
 
 The workflow of the Document Summarization Service, from user's input query to the application's output response, is as follows:
 
-```mermaid
-flowchart LR
-    subgraph DocSum
-        direction LR
-        A[User] <--> |Input query| B[DocSum Gateway]
-        B <--> |Post| Megaservice
-        subgraph Megaservice["Megaservice"]
-            direction TB
-            C([ Microservice : multimedia2text <br>7079]) -. Post .-> D([ Microservice : llm-docsum-tgi <br>9000]) -. Post .-> E{{TGI Service<br>8008}}
-        end
-        Megaservice --> |Output| F[Response]
-    end
-    subgraph Legend
-        X([Micsrservice])
-        Y{{Service from industry peers}}
-        Z[Gateway]
-    end
-```
-
 
 
 
@@ -145,10 +126,6 @@ flowchart LR
     style DocSum-MegaService stroke:#000000
 
     %% Subgraphs %%
-    subgraph Legend
-        UI([User Interface])
-        GW([DocSum GateWay])    
-    end
     subgraph DocSum-MegaService["DocSum MegaService "]
         direction LR
         M2T([Multimedia2text MicroService]):::blue
