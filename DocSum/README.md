@@ -158,6 +158,7 @@ flowchart LR
     end
 
 
+    A2T_SRV{{Audio2Text service<br>}}
     V2A_SRV{{Video2Audio service<br>}}
     WSP_SRV{{whisper service<br>}}
     SPC_SRV{{speecht5 service <br>}}
@@ -175,8 +176,9 @@ flowchart LR
 
     %% Embedding service flow
     direction LR
-    ASR <-.-> WSP_SRV
+    ASR <-.-> A2T_SRV <-.-> WSP_SRV
     ASR <-.-> V2A_SRV
+    A2T_SRV <-.-> V2A_SRV 
     LLM <-.-> LLM_gen
     TTS <-.-> SPC_SRV
 
