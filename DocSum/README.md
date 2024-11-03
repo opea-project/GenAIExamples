@@ -176,8 +176,17 @@ flowchart LR
     M2T <-.-> A2T_SRV <-.-> WSP_SRV
     V2A_SRV .-> A2T_SRV 
     
+    subgraph Legend
+        UI([User Interface])
+        GW([DocSum GateWay])
+        
+    end
 
 ```
+<!-- 
+Y{{Service from industry peers}}
+        Z[Gateway] -->
+
 <!-- TTS([TTS MicroService]):::blue -->
 <!-- SPC_SRV{{speecht5 service <br>}} -->
 <!-- LLM_gen{{LLM Service <br>}} -->
