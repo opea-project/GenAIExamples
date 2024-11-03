@@ -115,10 +115,18 @@ config:
     fontSize: 50px
 --- -->
 
-
+<!-- curve: linear -->
 
 ```mermaid
-
+---
+config:
+  flowchart:
+    nodeSpacing: 200
+    rankSpacing: 50
+    
+  themeVariables:
+    fontSize: 30px
+---
 flowchart LR
     %% Colors %%
     classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
@@ -127,8 +135,8 @@ flowchart LR
     classDef invisible fill:transparent,stroke:transparent;
     
     subgraph Legend[" Legend "]
-        M2T([Multimedia2text MicroService]):::blue
-        LLM([LLM MicroService]):::blue   
+        M2T([MicroService in MegaService ]):::blue
+        LLM([MicroService called by other MicroServices]):::orchid   
     end
 
 ```
