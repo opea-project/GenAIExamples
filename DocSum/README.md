@@ -168,11 +168,11 @@ flowchart LR
 
     %% Questions interaction
     direction LR
-    a[User Document] --> UI
+    a[User Document for Summarization] --> UI
     UI --> GW
     GW <==> DocSum-MegaService
     ASR ==> LLM
-    LLM ==> TTS
+    <!-- LLM ==> TTS -->
 
     %% Embedding service flow
     direction LR
@@ -180,7 +180,7 @@ flowchart LR
     ASR <-.-> A2T_SRV <-.-> WSP_SRV
     A2T_SRV <-.-> V2A_SRV 
     LLM <-.-> LLM_gen
-    TTS <-.-> SPC_SRV
+    <!-- TTS <-.-> SPC_SRV -->
 
 ```
 
