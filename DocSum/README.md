@@ -147,7 +147,7 @@ flowchart LR
     %% Subgraphs %%
     subgraph DocSum-MegaService["DocSum MegaService "]
         direction LR
-        ASR([Multimedia2text MicroService]):::blue
+        M2T([Multimedia2text MicroService]):::blue
         LLM([LLM MicroService]):::blue
         TTS([TTS MicroService]):::blue
     end
@@ -171,12 +171,12 @@ flowchart LR
     a[User Document for Summarization] --> UI
     UI --> GW
     GW <==> DocSum-MegaService
-    ASR ==> LLM
+    M2T ==> LLM
     
     %% Embedding service flow
     direction LR
-    ASR <-.-> V2A_SRV
-    ASR <-.-> A2T_SRV <-.-> WSP_SRV
+    M2T <-.-> V2A_SRV
+    M2T <-.-> A2T_SRV <-.-> WSP_SRV
     A2T_SRV <-.-> V2A_SRV 
     LLM <-.-> LLM_gen
 
