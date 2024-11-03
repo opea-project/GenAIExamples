@@ -175,7 +175,6 @@ flowchart LR
     M2T <-.-> V2A_SRV
     M2T <-.-> A2T_SRV <-.-> WSP_SRV
     A2T_SRV <-.-> V2A_SRV 
-    M2T <-.-> LLM
     
 
 ```
