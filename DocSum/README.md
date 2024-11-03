@@ -172,17 +172,20 @@ flowchart LR
     UI --> GW
     GW <==> DocSum-MegaService
     ASR ==> LLM
-    <!-- LLM ==> TTS -->
-
+    
     %% Embedding service flow
     direction LR
     ASR <-.-> V2A_SRV
     ASR <-.-> A2T_SRV <-.-> WSP_SRV
     A2T_SRV <-.-> V2A_SRV 
     LLM <-.-> LLM_gen
-    <!-- TTS <-.-> SPC_SRV -->
+
 
 ```
+
+<!-- LLM ==> TTS -->
+<!-- TTS <-.-> SPC_SRV -->
+
 
 ## Consume Document Summarization Service
 
