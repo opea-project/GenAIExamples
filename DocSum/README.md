@@ -125,6 +125,33 @@ flowchart LR
     classDef invisible fill:transparent,stroke:transparent;
     style DocSum-MegaService stroke:#000000
 
+    subgraph Legend[" Legend "]
+        M2T([Multimedia2text MicroService]):::blue
+        LLM([LLM MicroService]):::blue   
+    end
+
+```
+
+
+
+```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 50px
+---
+flowchart LR
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style DocSum-MegaService stroke:#000000
+
 
 
     %% Subgraphs %%
@@ -159,10 +186,7 @@ flowchart LR
     M2T <-.-> A2T_SRV <-.-> WSP_SRV
     V2A_SRV .-> A2T_SRV 
     
-    subgraph Legend[" Legend "]
-        UI([User Interface])
-        GW([DocSum GateWay])    
-    end
+
 
 ```
 
