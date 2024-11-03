@@ -105,10 +105,7 @@ Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree
 The workflow of the Document Summarization Service, from user's input query to the application's output response, is as follows:
 
 
-
-
-```mermaid
----
+<!-- ---
 config:
   flowchart:
     nodeSpacing: 400
@@ -116,15 +113,19 @@ config:
     curve: linear
   themeVariables:
     fontSize: 50px
----
+--- -->
+
+
+
+```mermaid
+
 flowchart LR
     %% Colors %%
     classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef invisible fill:transparent,stroke:transparent;
-    style DocSum-MegaService stroke:#000000
-
+    
     subgraph Legend[" Legend "]
         M2T([Multimedia2text MicroService]):::blue
         LLM([LLM MicroService]):::blue   
