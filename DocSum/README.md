@@ -105,42 +105,6 @@ Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree
 The workflow of the Document Summarization Service, from user's input query to the application's output response, is as follows:
 
 
-<!-- ---
-config:
-  flowchart:
-    nodeSpacing: 400
-    rankSpacing: 100
-    curve: linear
-  themeVariables:
-    fontSize: 50px
---- -->
-
-<!-- curve: linear -->
-
-```mermaid
----
-config:
-  flowchart:
-    nodeSpacing: 50
-    rankSpacing: 50
-    
----
-flowchart LR
-    %% Colors %%
-    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef invisible fill:transparent,stroke:transparent;
-    
-    subgraph Legend[" Legend "]
-        M2T([MicroService in MegaService ]):::blue
-        LLM([MicroService called by other MicroServices]):::orchid   
-    end
-
-```
-
-
-
 ```mermaid
 ---
 config:
@@ -193,23 +157,7 @@ flowchart LR
     M2T <-.-> A2T_SRV <-.-> WSP_SRV
     V2A_SRV .-> A2T_SRV 
     
-
-
 ```
-
-
-
-<!-- 
-Y{{Service from industry peers}}
-        Z[Gateway] -->
-
-<!-- TTS([TTS MicroService]):::blue -->
-<!-- SPC_SRV{{speecht5 service <br>}} -->
-<!-- LLM_gen{{LLM Service <br>}} -->
-
-<!-- LLM ==> TTS -->
-<!-- TTS <-.-> SPC_SRV -->
-<!-- LLM <-.-> LLM_gen -->
 
 
 ## Consume Document Summarization Service
