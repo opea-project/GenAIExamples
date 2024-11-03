@@ -144,12 +144,11 @@ flowchart LR
     classDef invisible fill:transparent,stroke:transparent;
     style DocSum-MegaService stroke:#000000
 
+    %% Subgraphs %%
     subgraph Legend
         UI([User Interface])
         GW([DocSum GateWay])    
     end
-
-    %% Subgraphs %%
     subgraph DocSum-MegaService["DocSum MegaService "]
         direction LR
         M2T([Multimedia2text MicroService]):::blue
