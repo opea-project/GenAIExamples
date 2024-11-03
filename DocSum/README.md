@@ -149,7 +149,6 @@ flowchart LR
         direction LR
         M2T([Multimedia2text MicroService]):::blue
         LLM([LLM MicroService]):::blue
-        TTS([TTS MicroService]):::blue
     end
     subgraph UserInterface[" User Interface "]
         direction LR
@@ -182,7 +181,7 @@ flowchart LR
 
 
 ```
-
+<!-- TTS([TTS MicroService]):::blue -->
 <!-- LLM ==> TTS -->
 <!-- TTS <-.-> SPC_SRV -->
 
