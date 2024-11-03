@@ -160,7 +160,6 @@ flowchart LR
     A2T_SRV{{Audio2Text service<br>}}
     V2A_SRV{{Video2Audio service<br>}}
     WSP_SRV{{whisper service<br>}}
-    LLM_gen{{LLM Service <br>}}
     GW([DocSum GateWay<br>]):::orange
 
 
@@ -176,14 +175,17 @@ flowchart LR
     M2T <-.-> V2A_SRV
     M2T <-.-> A2T_SRV <-.-> WSP_SRV
     A2T_SRV <-.-> V2A_SRV 
-    LLM <-.-> LLM_gen
-
+    M2T <-.-> LLM
+    
 
 ```
 <!-- TTS([TTS MicroService]):::blue -->
 <!-- SPC_SRV{{speecht5 service <br>}} -->
+<!-- LLM_gen{{LLM Service <br>}} -->
+
 <!-- LLM ==> TTS -->
 <!-- TTS <-.-> SPC_SRV -->
+<!-- LLM <-.-> LLM_gen -->
 
 
 ## Consume Document Summarization Service
