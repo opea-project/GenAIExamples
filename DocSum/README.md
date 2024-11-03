@@ -160,7 +160,6 @@ flowchart LR
     A2T_SRV{{Audio2Text service<br>}}
     V2A_SRV{{Video2Audio service<br>}}
     WSP_SRV{{whisper service<br>}}
-    SPC_SRV{{speecht5 service <br>}}
     LLM_gen{{LLM Service <br>}}
     GW([DocSum GateWay<br>]):::orange
 
@@ -182,6 +181,7 @@ flowchart LR
 
 ```
 <!-- TTS([TTS MicroService]):::blue -->
+<!-- SPC_SRV{{speecht5 service <br>}} -->
 <!-- LLM ==> TTS -->
 <!-- TTS <-.-> SPC_SRV -->
 
