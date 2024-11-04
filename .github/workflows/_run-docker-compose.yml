@@ -145,7 +145,7 @@ jobs:
           for container_name in $container_list; do
               cid=$(docker ps -aq --filter "name=$container_name")
               if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-          done 
+          done
           docker system prune -f
           docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
 
