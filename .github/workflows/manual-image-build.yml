@@ -30,6 +30,12 @@ on:
         description: 'OPEA branch for image build'
         required: false
         type: string
+      inject_commit:
+        default: true
+        description: "inject commit to docker images true or false"
+        required: false
+        type: string
+
 jobs:
   get-test-matrix:
     runs-on: ubuntu-latest
@@ -56,4 +62,5 @@ jobs:
       services: ${{ inputs.services }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
+      inject_commit: ${{ inputs.inject_commit }}
     secrets: inherit
