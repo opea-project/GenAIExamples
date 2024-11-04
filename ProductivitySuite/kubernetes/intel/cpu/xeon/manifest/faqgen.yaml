@@ -138,7 +138,7 @@ spec:
             - configMapRef:
                 name: faqgen-tgi-config
           securityContext: {}
-          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
+          image: "ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
