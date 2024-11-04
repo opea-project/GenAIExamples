@@ -30,9 +30,9 @@ on:
         description: 'OPEA branch for image build'
         required: false
         type: string
-      mode:
-        default: "CI"
-        description: "Whether the test range is CI or CD"
+      inject_commit:
+        default: false
+        description: "inject commit to docker images true or false"
         required: false
         type: string
 
@@ -62,5 +62,5 @@ jobs:
       services: ${{ inputs.services }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
-      mode: ${{ inputs.mode }}
+      inject_commit: ${{ inputs.inject_commit }}
     secrets: inherit

@@ -40,8 +40,8 @@ on:
         default: "main"
         required: false
         type: string
-      mode:
-        default: "CI"
+      inject_commit:
+        default: false
         required: false
         type: string
 
@@ -82,13 +82,13 @@ jobs:
 
       - name: Build Image
         if: ${{ fromJSON(inputs.build) }}
-        uses: opea-project/validation/actions/image-build@main
+        uses: opea-project/validation/actions/image-build@images-commit
         with:
           work_dir: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           service_list: ${{ inputs.services }}
           registry: ${OPEA_IMAGE_REPO}opea
-          mode: ${{ inputs.mode }}
+          inject_commit: ${{ inputs.inject_commit }}
           tag: ${{ inputs.tag }}
 
 ####################################################################################################
