@@ -12,17 +12,56 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 ## 🚀 Build Docker Images
 
+### 1. Build MicroService Docker Image
 First of all, you need to build Docker Images locally and install the python package of it.
 
-### 1. Build LLM Image
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+```
+<!-- ### 1. Build LLM Image
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/langchain/Dockerfile .
 ```
+ -->
 
-Then run the command `docker images`, you will have the following four Docker Images:
+#### Whisper Service
+
+The Whisper Service converts audio files to text. Follow these steps to build and run the service:
+
+```bash
+docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
+```
+
+#### A2T Service
+
+The A2T Service is another service for converting audio to text. Follow these steps to build and run the service:
+
+```bash
+docker build -t opea/a2t:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/audio2text/Dockerfile .
+```
+
+#### Video to Audio Service
+
+The Video to Audio Service extracts audio from video files. Follow these steps to build and run the service:
+
+```bash
+docker build -t opea/v2a:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/video2audio/Dockerfile .
+```
+
+#### Multimedia2Text Service
+
+The Multimedia2Text Service transforms multimedia data to text data. Follow these steps to build and run the service:
+
+```bash
+docker build -t opea/multimedia2text:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/Dockerfile .
+```
+
+
+<!-- Then run the command `docker images`, you will have the following four Docker Images: -->
 
 ### 2. Build MegaService Docker Image
 
@@ -43,13 +82,13 @@ cd GenAIExamples/DocSum/ui
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following Docker Images:
+<!-- Then run the command `docker images`, you will have the following Docker Images:
 
 1. `opea/llm-docsum-tgi:latest`
 2. `opea/docsum:latest`
-3. `opea/docsum-ui:latest`
+3. `opea/docsum-ui:latest` -->
 
-### 4. Build React UI Docker Image
+<!-- ### 4. Build React UI Docker Image
 
 Build the frontend Docker image via below command:
 
@@ -66,7 +105,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 1. `opea/llm-docsum-tgi:latest`
 2. `opea/docsum:latest`
 3. `opea/docsum-ui:latest`
-4. `opea/docsum-react-ui:latest`
+4. `opea/docsum-react-ui:latest` -->
 
 ## 🚀 Start Microservices and MegaService
 
@@ -75,7 +114,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
 If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
-### Setup Environment Variables
+<!-- ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
@@ -91,7 +130,36 @@ export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 ```
 
-Note: Please replace with `host_ip` with your external IP address, do not use localhost.
+Note: Please replace with `host_ip` with your external IP address, do not use localhost. -->
+
+
+### Setup Environment Variable
+
+To set up environment variables for deploying Document Summarization services, follow these steps:
+
+1. Set the required environment variables:
+
+   ```bash
+   # Example: host_ip="192.168.1.1"
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"     
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   ```
+
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   ```
+
+3. Set up other environment variables:
+
+   ```bash
+   cd GenAIExamples/DocSum/docker_compose/
+   source ./docker_compose/set_env.sh
+   ```
 
 ### Start Microservice Docker Containers
 
@@ -120,27 +188,71 @@ docker compose up -d
      -H 'Content-Type: application/json'
    ```
 
-3. MegaService
+4. Whisper Microservice
+
+   ```bash
+    curl http://${host_ip}:7066/v1/asr \
+        -X POST \
+        -d '{"audio":"UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
+        -H 'Content-Type: application/json'
+   ```
+
+    Expected output:
+    ```bash
+      expected to >>> {"asr_result":"you"}
+    ```
+
+5. Audio2Text Microservice
+
+   ```bash
+    curl http://${host_ip}:9099/v1/audio/transcriptions \
+        -X POST \
+        -d '{"byte_str":"UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
+        -H 'Content-Type: application/json'
+   ```
+
+    Expected output:
+    ```bash
+      expected to >>> {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
+    ```
+
+5. Multimedia2text Microservice
+
+   ```bash
+    curl http://${host_ip}:7079/v1/multimedia2text \
+        -X POST \
+        -d '{"audio":"UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
+        -H 'Content-Type: application/json'
+   ```
+
+    Expected output:
+    ```bash
+      expected to >>> {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
+    ```
+
+6. MegaService
 
    ```bash
    curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+        "type":"text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
         }'
    ```
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
+> More detailed tests can be found here ```cd GenAIExamples/DocSum/test```
+
 ## 🚀 Launch the UI
 
-Open this URL `http://{host_ip}:5173` in your browser to access the svelte based frontend.
+<!-- Open this URL `http://{host_ip}:5173` in your browser to access the svelte based frontend. -->
 
-Open this URL `http://{host_ip}:5174` in your browser to access the React based frontend.
+<!-- Open this URL `http://{host_ip}:5174` in your browser to access the React based frontend. -->
 
 ### Svelte UI
 
 ![project-screenshot](../../../../assets/img/docSum_ui_text.png)
 
-### React UI (Optional)
+<!-- ### React UI (Optional)
 
 To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `docsum-xeon-ui-server` service with the `docsum-xeon-react-ui-server` service as per the config below:
 
@@ -160,4 +272,4 @@ docsum-xeon-react-ui-server:
   restart: always
 ```
 
-![preject-react-screenshot](../../../../assets/img/docsum-ui-react.png)
+![preject-react-screenshot](../../../../assets/img/docsum-ui-react.png) -->
