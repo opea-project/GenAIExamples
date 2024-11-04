@@ -31,7 +31,7 @@ on:
         required: false
         type: string
       inject_commit:
-        default: false
+        default: true
         description: "inject commit to docker images true or false"
         required: false
         type: string
