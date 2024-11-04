@@ -1,0 +1,65 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Nightly build/publish latest docker images
+
+on:
+  schedule:
+    - cron: "30 1 * * *"
+  workflow_dispatch:
+
+env:
+  examples: "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"
+  node: gaudi
+  tag: latest
+  publish_tags: latest
+
+jobs:
+  get-build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      examples: ${{ steps.get-matrix.outputs.examples }}
+    steps:
+      - name: Create Matrix
+        id: get-matrix
+        run: |
+          examples=($(echo ${{ env.examples }} | tr ',' ' '))
+          examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "examples=$examples_json" >> $GITHUB_OUTPUT
+
+  build:
+    needs: get-build-matrix
+    strategy:
+      matrix:
+        example: ${{ fromJSON(needs.get-build-matrix.outputs.examples) }}
+      fail-fast: false
+    uses: ./.github/workflows/_example-workflow.yml
+    with:
+      node: ${{ env.node }}
+      example: ${{ matrix.example }}
+      inject_commit: true
+    secrets: inherit
+
+  get-image-list:
+    uses: ./.github/workflows/_get-image-list.yml
+    with:
+      examples: ${{ env.examples }}
+
+  publish:
+    needs: [get-image-list, build]
+    strategy:
+      matrix:
+        image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
+    runs-on: "docker-build-${{ env.node }}"
+    steps:
+      - uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Image Publish
+        uses: opea-project/validation/actions/image-publish@main
+        with:
+          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ env.tag }}
+          image_name: opea/${{ matrix.image }}
+          publish_tags: ${{ env.publish_tags }}
