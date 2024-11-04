@@ -30,6 +30,12 @@ on:
         description: 'OPEA branch for image build'
         required: false
         type: string
+      mode:
+        default: "CI"
+        description: "Whether the test range is CI or CD"
+        required: false
+        type: string
+
 jobs:
   get-test-matrix:
     runs-on: ubuntu-latest
@@ -56,4 +62,5 @@ jobs:
       services: ${{ inputs.services }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
+      mode: ${{ inputs.mode }}
     secrets: inherit

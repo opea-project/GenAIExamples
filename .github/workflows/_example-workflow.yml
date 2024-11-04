@@ -40,6 +40,11 @@ on:
         default: "main"
         required: false
         type: string
+      mode:
+        default: "CI"
+        required: false
+        type: string
+
 jobs:
 ####################################################################################################
 # Image Build
@@ -83,6 +88,7 @@ jobs:
           docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           service_list: ${{ inputs.services }}
           registry: ${OPEA_IMAGE_REPO}opea
+          mode: ${{ inputs.mode }}
           tag: ${{ inputs.tag }}
 
 ####################################################################################################
