@@ -19,50 +19,45 @@
   import Doc from "$lib/doc.svelte";
   import Summary from "$lib/summary.svelte";
   import { fetchTextStream } from "$lib/shared/Network.js";
-  import { loading } from "$lib/shared/Store.js";
+  import { loading, uploadFile, uploadFilesName } from "$lib/shared/Store.js";
   import { onMount } from "svelte";
   import { scrollToBottom } from "$lib/shared/Utils.js";
 
-  let messages = '';
+  let messages = "";
   let scrollToDiv: HTMLDivElement;
 
   onMount(() => {
-    scrollToDiv = document
-		.querySelector("#editor")!
-    console.log('scrollToDiv', scrollToDiv);
-
-  })
+    scrollToDiv = document.querySelector("#editor")!;
+    console.log("scrollToDiv", scrollToDiv);
+  });
 
   const callTextStream = async (
     query: string,
     urlSuffix: string,
     params: string
   ) => {
-    messages = "";
-    const eventSource = await fetchTextStream(query, urlSuffix, params);
+    // Fetch the stream
+    const eventStream = await fetchTextStream(
+      query,
+      params,
+      $uploadFile,
+      $uploadFilesName
+    );
 
-    eventSource.addEventListener("message", (e: any) => {
-      let Msg = e.data;
-      if (Msg !== "[DONE]") {
-        let res = JSON.parse(Msg);
-        let logs = res.ops;
-
-        logs.forEach((log: { op: string; path: string; value: any }) => {
-          if (log.op === "add") {
-            if (
-              log.value !== "</s>" && log.path.endsWith("/streamed_output/-") && log.path.length > "/streamed_output/-".length
-            ) {
-              messages += log.value;
-              scrollToBottom(scrollToDiv)
-            }
-          }
-        });
-      } else {
-        loading.set(false);
-        scrollToBottom(scrollToDiv)
+    // Process the stream as an async iterator
+    try {
+      for await (const chunk of eventStream) {
+        if (chunk !== '[DONE]' && chunk !== '</s>') {
+          messages += chunk;
+          scrollToBottom(scrollToDiv)
+        } else if (chunk == '[DONE]') {
+          loading.set(false);
+          scrollToBottom(scrollToDiv)
+        }
       }
-    });
-    eventSource.stream();
+    } catch (error) {
+      console.error("Error processing the stream:", error);
+    }
   };
 
   async function handleGenerateSummary(e) {
@@ -82,10 +77,15 @@
 
 <div class="h-full">
   <Header />
-  <p class="m-7 sm:mb-0 text-gray-500 font-semibold xl:m-8">Please upload file or paste content for summarization.</p>
-  <div class="mt-2 m-6 grid grid-cols-3 gap-8 h-full">
-    <div class="col-span-2 h-full">
-      <Doc on:generateSummary={handleGenerateSummary} on:clearMsg={handleClearMsg}/>
+  <p class="m-7 sm:mb-0 text-gray-500 font-semibold xl:m-8">
+    Please upload file or paste content for summarization.
+  </p>
+  <div class="mt-2 m-6 grid grid-cols-3 gap-8">
+    <div class="col-span-2">
+      <Doc
+        on:generateSummary={handleGenerateSummary}
+        on:clearMsg={handleClearMsg}
+      />
     </div>
     <div class="col-span-1">
       <Summary chatMessage={messages} />
