@@ -166,7 +166,10 @@ def align_generator(self, gen, **kwargs):
         try:
             # sometimes yield empty chunk, do a fallback here
             json_data = json.loads(json_str)
-            if json_data["choices"][0]["finish_reason"] != "eos_token":
+            if (
+                json_data["choices"][0]["finish_reason"] != "eos_token"
+                and "content" in json_data["choices"][0]["delta"]
+            ):
                 yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
         except Exception as e:
             yield f"data: {repr(json_str.encode('utf-8'))}\n\n"

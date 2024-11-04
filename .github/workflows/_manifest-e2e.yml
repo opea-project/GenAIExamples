@@ -90,9 +90,15 @@ jobs:
               echo "Validate ${{ inputs.example }} successful!"
             else
               echo "Validate ${{ inputs.example }} failure!!!"
-              .github/workflows/scripts/k8s-utils.sh dump_all_pod_logs $NAMESPACE
+              echo "Check the logs in 'Dump logs when e2e test failed' step!!!"
+              exit 1
             fi
           fi
+
+      - name: Dump logs when e2e test failed
+        if: failure()
+        run: |
+          .github/workflows/scripts/k8s-utils.sh dump_all_pod_logs $NAMESPACE
 
       - name: Kubectl uninstall
         if: always()
