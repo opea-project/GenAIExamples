@@ -436,7 +436,7 @@ with gr.Blocks() as qna:
                         # show_label=False,
                         # container=False,
                         label="Query",
-                        info="Enter a text query here",
+                        info="Enter a text query below",
                         # submit_btn=False,
                     )
                 with gr.Column(scale=1, min_width=100):
