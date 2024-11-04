@@ -63,6 +63,3 @@ jobs:
           local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ env.tag }}
           image_name: opea/${{ matrix.image }}
           publish_tags: ${{ env.publish_tags }}
-
-
-
