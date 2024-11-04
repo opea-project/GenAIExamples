@@ -10,7 +10,9 @@ First of all, you need to build Docker Images locally and install the python pac
 mkdir ~/OPEA -p
 cd ~/OPEA
 git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
+git clone https://github.com/opea-project/GenAIExamples.git
+cd ~/OPEA/GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc/
+docker compose build --no-cache
 ```
 
 If you are in a proxy environment, set the proxy-related environment variables:
@@ -18,47 +20,7 @@ If you are in a proxy environment, set the proxy-related environment variables:
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
 
-### 1. Build Retriever Image
-
-```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
-```
-
-### 2. Build Dataprep Image
-
-```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
-cd ..
-```
-
-### 3. Build MegaService Docker Image
-
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
-
-```bash
-cd ~/OPEA
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA
-docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f Dockerfile .
-```
-
-### 4. Build UI Docker Image
-
-Build frontend Docker image via below command:
-
-```bash
-cd ~/OPEA/GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-```
-
-### 5. Build Nginx Docker Image
-
-```bash
-cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
-```
-
-Then run the command `docker images`, you will have the following 6 Docker Images:
+Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `opea/dataprep-redis:latest`
 2. `opea/retriever-redis:latest`
@@ -125,10 +87,7 @@ Note: Please replace with `host_ip` with you external IP address, do not use loc
 
 ### Start all the services Docker Containers
 
-> Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
-
 ```bash
-cd ~/OPEA/GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc/
 docker compose up -d
 ```
 
