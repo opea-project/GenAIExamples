@@ -1,0 +1,59 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build specific images on manual event
+on:
+  workflow_dispatch:
+    inputs:
+      nodes:
+        default: "gaudi,xeon"
+        description: "Hardware to run test"
+        required: true
+        type: string
+      example:
+        default: "ChatQnA"
+        description: 'Build images belong to which example?'
+        required: true
+        type: string
+      services:
+        default: "chatqna,chatqna-without-rerank"
+        description: 'Service list to build'
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+      opea_branch:
+        default: "main"
+        description: 'OPEA branch for image build'
+        required: false
+        type: string
+jobs:
+  get-test-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      nodes: ${{ steps.get-matrix.outputs.nodes }}
+    steps:
+      - name: Create Matrix
+        id: get-matrix
+        run: |
+          nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
+          nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+
+  image-build:
+    needs: get-test-matrix
+    strategy:
+      matrix:
+        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+      fail-fast: false
+    uses: ./.github/workflows/_example-workflow.yml
+    with:
+      node: ${{ matrix.node }}
+      example: ${{ inputs.example }}
+      services: ${{ inputs.services }}
+      tag: ${{ inputs.tag }}
+      opea_branch: ${{ inputs.opea_branch }}
+    secrets: inherit

@@ -1,0 +1,23 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  texttosql-service:
+    build:
+      context: GenAIComps
+      dockerfile: comps/texttosql/langchain/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+    image: ${REGISTRY:-opea}/texttosql:${TAG:-latest}
+
+  dbqna-xeon-react-ui:
+    build:
+      context: GenAIExamples/DBQnA/ui/docker
+      dockerfile: Dockerfile.react
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+    image: ${REGISTRY:-opea}/texttosql-react-ui:${TAG:-latest}
