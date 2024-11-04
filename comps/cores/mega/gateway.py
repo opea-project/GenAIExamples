@@ -42,6 +42,7 @@ class Gateway:
         self.input_datatype = input_datatype
         self.output_datatype = output_datatype
         self.service = MicroService(
+            self.__class__.__name__,
             service_role=ServiceRoleType.MEGASERVICE,
             service_type=ServiceType.GATEWAY,
             host=self.host,

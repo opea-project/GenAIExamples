@@ -21,7 +21,7 @@ class BaseStatistics:
         if first_token_latency:
             self.first_token_latencies.append(first_token_latency)
 
-    def calcuate_statistics(self):
+    def calculate_statistics(self):
         if not self.response_times:
             return {
                 "p50_latency": None,
@@ -42,7 +42,7 @@ class BaseStatistics:
             "average_latency": avg,
         }
 
-    def calcuate_first_token_statistics(self):
+    def calculate_first_token_statistics(self):
         if not self.first_token_latencies:
             return {
                 "p50_latency_first_token": None,
@@ -79,7 +79,7 @@ def collect_all_statistics():
     results = {}
     if statistics_dict:
         for name, statistic in statistics_dict.items():
-            tmp_dict = statistic.calcuate_statistics()
-            tmp_dict.update(statistic.calcuate_first_token_statistics())
+            tmp_dict = statistic.calculate_statistics()
+            tmp_dict.update(statistic.calculate_first_token_statistics())
             results.update({name: tmp_dict})
     return results

@@ -17,7 +17,7 @@ class MicroService:
 
     def __init__(
         self,
-        name: Optional[str] = None,
+        name: str,
         service_role: ServiceRoleType = ServiceRoleType.MICROSERVICE,
         service_type: ServiceType = ServiceType.LLM,
         protocol: str = "http",
@@ -141,7 +141,7 @@ class MicroService:
 
 
 def register_microservice(
-    name: Optional[str] = None,
+    name: str,
     service_role: ServiceRoleType = ServiceRoleType.MICROSERVICE,
     service_type: ServiceType = ServiceType.UNDEFINED,
     protocol: str = "http",

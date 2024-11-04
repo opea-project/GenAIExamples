@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import time
 import unittest
 
 from fastapi.responses import StreamingResponse
@@ -66,11 +67,16 @@ class TestServiceOrchestratorStreaming(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(res, "example test.")
 
     def test_token_generator(self):
+        start = time.time()
         sentence = "I write an example test.</s>"
-        for i in self.service_builder.token_generator(sentence=sentence, is_last=False):
+        for i in self.service_builder.token_generator(
+            sentence=sentence, token_start=start, is_first=True, is_last=False
+        ):
             self.assertTrue(i.startswith("data: b'"))
 
-        for i in self.service_builder.token_generator(sentence=sentence, is_last=True):
+        for i in self.service_builder.token_generator(
+            sentence=sentence, token_start=start, is_first=False, is_last=True
+        ):
             self.assertTrue(i.startswith("data: "))
 
 
