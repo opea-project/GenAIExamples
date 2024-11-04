@@ -4,11 +4,12 @@
 name: Nightly build/publish latest docker images
 
 on:
+  schedule:
+    - cron: "30 1 * * *"
   workflow_dispatch:
 
 env:
-  EXAMPLES: "CodeGen"
-  # EXAMPLES: "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"
+  EXAMPLES: "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"
   TAG: "latest"
   PUBLISH_TAGS: "latest"
 
