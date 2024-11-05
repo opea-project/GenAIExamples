@@ -176,6 +176,7 @@ The AudioQnA example demonstrates the integration of Generative AI (GenAI) model
         <td> Talkingbot service</td>
     </tr>
 </table>
+
 ### FaqGen
 
 FAQ Generation Application leverages the power of large language models (LLMs) to revolutionize the way you interact with and comprehend complex textual data. By harnessing cutting-edge natural language processing techniques, our application can automatically generate comprehensive and natural-sounding frequently asked questions (FAQs) from your documents, legal texts, customer queries, and other sources. In this example use case, we utilize LangChain to implement FAQ Generation and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.
@@ -194,7 +195,6 @@ FAQ Generation Application leverages the power of large language models (LLMs) t
 | LVM       | [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf)        | Xeon/Gaudi | LVM service              |
 | LVM       | [llava-hf/llava-1.5-13b-hf](https://huggingface.co/llava-hf/llava-1.5-13b-hf)        | Xeon/Gaudi | LVM service              |
 | LVM       | [llava-hf/llava-v1.6-vicuna-13b-hf](https://huggingface.co/llava-hf/llava-v1.6-vicuna-13b-hf)        | Xeon/Gaudi | LVM service              |
-
 
 ### ProductivitySuite
 
