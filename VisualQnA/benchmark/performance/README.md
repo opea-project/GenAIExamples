@@ -55,7 +55,7 @@ sudo systemctl daemon-reload; sudo systemctl restart containerd
 
 Please deploy VisualQnA service before benchmarking.
 
-##### Run Benchmark Test
+#### Run Benchmark Test
 
 Before the benchmark, we can configure the number of test queries and test output directory by:
 
@@ -72,6 +72,6 @@ bash benchmark.sh -n <node_count>
 
 The argument `-n` refers to the number of test nodes.
 
-##### 4. Data collection
+#### Data collection
 
 All the test results will come to this folder `/tmp/benchmark_output` configured by the environment variable `TEST_OUTPUT_DIR` in previous steps.
