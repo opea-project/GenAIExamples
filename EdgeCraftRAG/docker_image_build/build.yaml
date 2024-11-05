@@ -1,0 +1,18 @@
+services:
+  server: 
+    build: 
+      context: ..
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      dockerfile: ./Dockerfile.server
+    image: edgecraftrag.server:${TAG:-latest}
+  ecrag:
+    build: 
+      context: ..
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      dockerfile: ./Dockerfile
+    image: edgecraftrag.ecrag:${TAG:-latest}
+

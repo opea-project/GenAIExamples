@@ -1,0 +1,15 @@
+llama-index>=0.11.0
+llama-index-embeddings-openvino>=0.4.0
+llama-index-postprocessor-openvino-rerank>=0.3.0
+opea-comps>=0.9
+llama-index-vector-stores-faiss>=0.2.1
+faiss-cpu>=1.8.0.post1
+langchain-core==0.2.29
+llama-index-retrievers-bm25>=0.3.0
+llama-index-llms-openvino>=0.3.1
+omegaconf>=2.3.0
+gradio>=4.44.1
+loguru>=0.7.2
+py-cpuinfo>=9.0.0
+docx2txt
+
