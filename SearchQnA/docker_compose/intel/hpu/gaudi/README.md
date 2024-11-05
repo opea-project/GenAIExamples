@@ -38,14 +38,14 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/SearchQnA/docker
+cd GenAIExamples/SearchQnA
 docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 Then you need to build the last Docker image `opea/searchqna:latest`, which represents the Mega service through following commands:
 
 ```bash
-cd GenAIExamples/SearchQnA/docker
+cd GenAIExamples/SearchQnA
 docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
