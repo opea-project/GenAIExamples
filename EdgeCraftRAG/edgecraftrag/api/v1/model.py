@@ -11,7 +11,7 @@ async def get_models():
 
 # GET Model
 @register_microservice(name="opea_service@ec_rag", endpoint="/v1/settings/models/{model_id:path}", host="0.0.0.0", port=16010, methods=['GET'])
-async def get_models(model_id):
+async def get_model_by_name(model_id):
     return ctx.get_model_mgr().get_model_by_name(model_id)
 
 
