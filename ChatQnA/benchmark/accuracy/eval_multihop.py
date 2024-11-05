@@ -41,11 +41,11 @@ class MultiHop_Evaluator(Evaluator):
             return []
 
     def get_retrieved_documents(self, query, arguments):
-        data = {"text": query}
+        data = {"inputs": query}
         headers = {"Content-Type": "application/json"}
-        response = requests.post(arguments.embedding_endpoint, data=json.dumps(data), headers=headers)
+        response = requests.post(arguments.tei_embedding_endpoint + "/embed", data=json.dumps(data), headers=headers)
         if response.ok:
-            embedding = response.json()["embedding"]
+            embedding = response.json()[0]
         else:
             print(f"Request for embedding failed due to {response.text}.")
             return []
