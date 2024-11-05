@@ -1,0 +1,33 @@
+services:
+  server: 
+    image: edgecraftrag.server:${TAG:-latest}
+    container_name: edgecraftrag.server
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    volumes:
+      - ${MODEL_PATH}:/home/user/${MODEL_ID}
+      - ${DOC_PATH}:/home/user/examples/example_docs
+    ports:
+      - ${PIPELINE_SERVICE_PORT}:${PIPELINE_SERVICE_PORT}
+    privileged: true
+  ecrag:
+    image: edgecraftrag.ecrag:${TAG:-latest}
+    container_name: edgecraftrag.ecrag
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MEGA_SERVICE_PORT: ${MEGA_SERVICE_PORT}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      PIPELINE_SERVICE_PORT: ${PIPELINE_SERVICE_PORT}
+      PIPELINE_SERVICE_HOST_IP: ${PIPELINE_SERVICE_HOST_IP}
+    ports: 
+      - ${MEGA_SERVICE_PORT}:${MEGA_SERVICE_PORT}
+    depends_on:
+      - server
+
+networks:
+  default:
+    driver: bridge
