@@ -2,7 +2,7 @@
 
 This dataprep microservice ingests the input files and uses LLM (TGI or OpenAI model when OPENAI_API_KEY is set) to extract entities, relationships and descriptions of those to build a graph-based text index.
 
-### Setup Environment Variables
+## Setup Environment Variables
 
 ```bash
 # Manually set private environment settings
