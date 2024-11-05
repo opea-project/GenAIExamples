@@ -1,6 +1,9 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 services:
-  server: 
-    build: 
+  server:
+    build:
       context: ..
       args:
         http_proxy: ${http_proxy}
@@ -8,11 +11,10 @@ services:
       dockerfile: ./Dockerfile.server
     image: edgecraftrag.server:${TAG:-latest}
   ecrag:
-    build: 
+    build:
       context: ..
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
       dockerfile: ./Dockerfile
     image: edgecraftrag.ecrag:${TAG:-latest}
-

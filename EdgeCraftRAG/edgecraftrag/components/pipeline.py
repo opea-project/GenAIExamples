@@ -1,17 +1,13 @@
-from edgecraftrag.base import (
-    BaseComponent,
-    CompType,
-    CallbackType
-)
-from edgecraftrag.components.postprocessor import RerankProcessor
-from typing import Any, Optional, Callable, List
-from pydantic import Field, model_serializer
-from llama_index.core.schema import (
-    Document,
-    QueryBundle
-)
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+from typing import Any, Callable, List, Optional
+
 from comps.cores.proto.api_protocol import ChatCompletionRequest
-from pydantic import BaseModel
+from edgecraftrag.base import BaseComponent, CallbackType, CompType
+from edgecraftrag.components.postprocessor import RerankProcessor
+from llama_index.core.schema import Document, QueryBundle
+from pydantic import BaseModel, Field, model_serializer
 
 
 class PipelineStatus(BaseModel):
@@ -34,10 +30,7 @@ class Pipeline(BaseComponent):
         self,
         name,
     ):
-        super().__init__(
-            name=name,
-            comp_type=CompType.PIPELINE
-        )
+        super().__init__(name=name, comp_type=CompType.PIPELINE)
         if self.name == "" or self.name is None:
             self.name = self.idx
         self.run_pipeline_cb = run_test_generator
@@ -66,25 +59,18 @@ class Pipeline(BaseComponent):
     # callback dispatcher
     def run(self, **kwargs) -> Any:
         print(kwargs)
-        if 'cbtype' in kwargs:
-            if kwargs['cbtype'] == CallbackType.DATAPREP:
-                if 'docs' in kwargs:
-                    return self.run_data_prepare_cb(self, docs=kwargs['docs'])
-            if kwargs['cbtype'] == CallbackType.RETRIEVE:
-                if 'chat_request' in kwargs:
-                    return self.run_retriever_cb(self, chat_request=kwargs['chat_request'])
-            if kwargs['cbtype'] == CallbackType.PIPELINE:
-                if 'chat_request' in kwargs:
-                    return self.run_pipeline_cb(self, chat_request=kwargs['chat_request'])
+        if "cbtype" in kwargs:
+            if kwargs["cbtype"] == CallbackType.DATAPREP:
+                if "docs" in kwargs:
+                    return self.run_data_prepare_cb(self, docs=kwargs["docs"])
+            if kwargs["cbtype"] == CallbackType.RETRIEVE:
+                if "chat_request" in kwargs:
+                    return self.run_retriever_cb(self, chat_request=kwargs["chat_request"])
+            if kwargs["cbtype"] == CallbackType.PIPELINE:
+                if "chat_request" in kwargs:
+                    return self.run_pipeline_cb(self, chat_request=kwargs["chat_request"])
 
-    def update(
-        self,
-        node_parser=None,
-        indexer=None,
-        retriever=None,
-        postprocessor=None,
-        generator=None
-    ):
+    def update(self, node_parser=None, indexer=None, retriever=None, postprocessor=None, generator=None):
         if node_parser is not None:
             self.node_parser = node_parser
         if indexer is not None:
@@ -98,18 +84,18 @@ class Pipeline(BaseComponent):
 
     @model_serializer
     def ser_model(self):
-        ser = {
-            'idx': self.idx,
-            'name': self.name,
-            'comp_type': self.comp_type,
-            'node_parser': self.node_parser,
-            'indexer': self.indexer,
-            'retriever': self.retriever,
-            'postprocessor': self.postprocessor,
-            'generator': self.generator,
-            'status': self.status,
+        set = {
+            "idx": self.idx,
+            "name": self.name,
+            "comp_type": self.comp_type,
+            "node_parser": self.node_parser,
+            "indexer": self.indexer,
+            "retriever": self.retriever,
+            "postprocessor": self.postprocessor,
+            "generator": self.generator,
+            "status": self.status,
         }
-        return ser
+        return set
 
     def model_existed(self, model_id: str) -> bool:
         # judge if the given model is existed in a pipeline by model_id
@@ -136,7 +122,10 @@ def run_test_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query_bundle = QueryBundle(query)
     if pl.postprocessor:
         for processor in pl.postprocessor:
-            if isinstance(processor, RerankProcessor) and chat_request.top_n != ChatCompletionRequest.model_fields['top_n'].default:
+            if (
+                isinstance(processor, RerankProcessor)
+                and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
+            ):
                 processor.top_n = chat_request.top_n
             retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
     return retri_res
@@ -156,7 +145,10 @@ def run_test_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any
     query_bundle = QueryBundle(query)
     if pl.postprocessor:
         for processor in pl.postprocessor:
-            if isinstance(processor, RerankProcessor) and chat_request.top_n != ChatCompletionRequest.model_fields['top_n'].default:
+            if (
+                isinstance(processor, RerankProcessor)
+                and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
+            ):
                 processor.top_n = chat_request.top_n
             retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
     if pl.generator is None:

@@ -1,15 +1,11 @@
-from edgecraftrag.base import (
-    BaseComponent,
-    BaseMgr,
-    CallbackType,
-    ModelType
-)
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
-from edgecraftrag.api_schema import NodeParserIn, IndexerIn, ModelIn
 from typing import List
-from llama_index.core.schema import (
-    BaseNode,
-)
+
+from edgecraftrag.api_schema import IndexerIn, ModelIn, NodeParserIn
+from edgecraftrag.base import BaseComponent, BaseMgr, CallbackType, ModelType
+from llama_index.core.schema import BaseNode
 
 
 class NodeMgr:

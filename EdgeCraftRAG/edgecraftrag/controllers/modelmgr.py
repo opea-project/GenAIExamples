@@ -1,16 +1,12 @@
-from edgecraftrag.base import (
-    BaseComponent,
-    BaseMgr,
-    CallbackType,
-    ModelType
-)
-from edgecraftrag.components.model import (
-    OpenVINOEmbeddingModel,
-    OpenVINORerankModel,
-    OpenVINOLLMModel
-)
-from edgecraftrag.api_schema import NodeParserIn, IndexerIn, ModelIn
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import asyncio
+
+from edgecraftrag.api_schema import IndexerIn, ModelIn, NodeParserIn
+from edgecraftrag.base import BaseComponent, BaseMgr, CallbackType, ModelType
+from edgecraftrag.components.model import OpenVINOEmbeddingModel, OpenVINOLLMModel, OpenVINORerankModel
+
 
 class ModelMgr(BaseMgr):
 
@@ -24,17 +20,17 @@ class ModelMgr(BaseMgr):
                 model_type = v.comp_subtype.value
                 model_info = {
                     "model_type": model_type,
-                    "model_id": getattr(v, 'model_id', 'Unknown'),
+                    "model_id": getattr(v, "model_id", "Unknown"),
                 }
                 if model_type == ModelType.LLM:
-                    model_info["model_path"] = getattr(v, 'model_name', 'Unknown')
-                    model_info["device"] = getattr(v, 'device_map', 'Unknown')
+                    model_info["model_path"] = getattr(v, "model_name", "Unknown")
+                    model_info["device"] = getattr(v, "device_map", "Unknown")
                 else:
-                    model_info["model_path"] = getattr(v, 'model_id_or_path', 'Unknown')
-                    model_info["device"] = getattr(v, 'device', getattr(v, '_device', 'Unknown'))         
+                    model_info["model_path"] = getattr(v, "model_id_or_path", "Unknown")
+                    model_info["device"] = getattr(v, "device", getattr(v, "_device", "Unknown"))
                 return model_info
         return None
-    
+
     def get_models(self):
         model = {}
         for k, v in self.components.items():
@@ -42,22 +38,26 @@ class ModelMgr(BaseMgr):
             model_type = v.comp_subtype.value
             model_info = {
                 "model_type": model_type,
-                "model_id": getattr(v, 'model_id', 'Unknown'),
+                "model_id": getattr(v, "model_id", "Unknown"),
             }
             if model_type == ModelType.LLM:
-                model_info["model_path"] = getattr(v, 'model_name', 'Unknown')
-                model_info["device"] = getattr(v, 'device_map', 'Unknown')
+                model_info["model_path"] = getattr(v, "model_name", "Unknown")
+                model_info["device"] = getattr(v, "device_map", "Unknown")
             else:
-                model_info["model_path"] = getattr(v, 'model_id_or_path', 'Unknown')
-                model_info["device"] = getattr(v, 'device', getattr(v, '_device', 'Unknown'))
+                model_info["model_path"] = getattr(v, "model_id_or_path", "Unknown")
+                model_info["device"] = getattr(v, "device", getattr(v, "_device", "Unknown"))
             model[k] = model_info
         return model
-    
+
     def search_model(self, modelin: ModelIn) -> BaseComponent:
         # Compare model_path and device to search model
         for _, v in self.components.items():
-            model_path = v.model_name if v.comp_subtype.value == 'llm' else v.model_id_or_path
-            model_dev =  v.device_map if v.comp_subtype.value == 'llm' else getattr(v, 'device', getattr(v, '_device', 'Unknown'))
+            model_path = v.model_name if v.comp_subtype.value == "llm" else v.model_id_or_path
+            model_dev = (
+                v.device_map
+                if v.comp_subtype.value == "llm"
+                else getattr(v, "device", getattr(v, "_device", "Unknown"))
+            )
             if model_path == modelin.model_path and model_dev == modelin.device:
                 return v
         return None
@@ -79,7 +79,7 @@ class ModelMgr(BaseMgr):
                     model_path=model_para.model_path,
                     device=model_para.device,
                 )
-            case ModelType.RERANKER:  
+            case ModelType.RERANKER:
                 model = OpenVINORerankModel(
                     model_id=model_para.model_id,
                     model_path=model_para.model_path,

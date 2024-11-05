@@ -1,16 +1,15 @@
-from enum import Enum
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import os
+import sys
+from enum import Enum
+
 import openvino.runtime as ov
 from config import SUPPORTED_EMBEDDING_MODELS, SUPPORTED_LLM_MODELS, SUPPORTED_RERANK_MODELS
-import sys
+
 sys.path.append("..")
-from edgecraftrag.base import (
-    NodeParserType,
-    IndexerType,
-    RetrieverType,
-    PostProcessorType,
-    GeneratorType
-)
+from edgecraftrag.base import GeneratorType, IndexerType, NodeParserType, PostProcessorType, RetrieverType
 
 
 def _get_llm_model_ids(supported_models, model_language=None):
@@ -33,8 +32,7 @@ def _get_llm_model_ids(supported_models, model_language=None):
 
 
 def _list_subdirectories(parent_directory):
-    """
-    List all subdirectories under the given parent directory using os.listdir.
+    """List all subdirectories under the given parent directory using os.listdir.
 
     Parameters:
     parent_directory (str): The path to the parent directory from which to list subdirectories.
@@ -52,8 +50,7 @@ def _list_subdirectories(parent_directory):
 
 
 def _get_available_models(model_ids, local_dirs):
-    """
-    Filters and sorts model IDs based on their presence in the local directories.
+    """Filters and sorts model IDs based on their presence in the local directories.
 
     Parameters:
     model_ids (list): A list of model IDs to check.

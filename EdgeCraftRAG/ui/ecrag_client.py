@@ -1,12 +1,15 @@
-import requests
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import sys
+
+import requests
 
 sys.path.append("..")
 from edgecraftrag import api_schema
 
-
 # hard code only for test
-server_addr = 'http://127.0.0.1:16010'
+server_addr = "http://127.0.0.1:16010"
 
 
 def get_current_pipelines():
@@ -48,9 +51,7 @@ def create_update_pipeline(
         name=name,
         active=active,
         node_parser=api_schema.NodeParserIn(
-            parser_type=node_parser,
-            chunk_size=chunk_size,
-            chunk_overlap=chunk_overlap
+            parser_type=node_parser, chunk_size=chunk_size, chunk_overlap=chunk_overlap
         ),
         indexer=api_schema.IndexerIn(
             indexer_type=indexer,
@@ -58,13 +59,10 @@ def create_update_pipeline(
                 model_id=embedding_id,
                 # TODO: remove hardcoding
                 model_path="./bge_ov_embedding",
-                device=embedding_device
+                device=embedding_device,
             ),
         ),
-        retriever=api_schema.RetrieverIn(
-            retriever_type=retriever,
-            retriever_topk=vector_search_top_k
-        ),
+        retriever=api_schema.RetrieverIn(retriever_type=retriever, retriever_topk=vector_search_top_k),
         postprocessor=[
             api_schema.PostProcessorIn(
                 processor_type=postprocessor[0],
@@ -72,7 +70,7 @@ def create_update_pipeline(
                     model_id=rerank_id,
                     # TODO: remove hardcoding
                     model_path="./bge_ov_reranker",
-                    device=rerank_device
+                    device=rerank_device,
                 ),
             )
         ],
@@ -83,10 +81,9 @@ def create_update_pipeline(
                 model_id=llm_id,
                 # TODO: remove hardcoding
                 model_path="./qwen2-7b-instruct/INT4_compressed_weights",
-                device=llm_device
+                device=llm_device,
             ),
-
-        )
+        ),
     )
     # hard code only for test
     print(req_dict)
@@ -95,9 +92,7 @@ def create_update_pipeline(
 
 
 def activate_pipeline(name):
-    active_dict = {
-        "active": "True"
-    }
+    active_dict = {"active": "True"}
     res = requests.patch(f"{server_addr}/v1/settings/pipelines/{name}", json=active_dict, proxies={"http": None})
     status = False
     restext = f"Activate pipeline {name} failed."
@@ -119,6 +114,7 @@ def get_files():
     for file in res.json():
         files.append((file["file_name"], file["file_id"]))
     return files
+
 
 def delete_file(file_name_or_id):
     res = requests.delete(f"{server_addr}/v1/data/files/{file_name_or_id}", proxies={"http": None})

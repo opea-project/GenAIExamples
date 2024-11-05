@@ -2,7 +2,7 @@
 
 Edge Craft RAG (EC-RAG) is a customizable, tunable and production-ready
 Retrieval-Augmented Generation system for edge solutions. It is designed to
-curate the RAG pipeline to meet hardware requirements at edge with garanteed
+curate the RAG pipeline to meet hardware requirements at edge with guaranteed
 quality and performance.
 
 ## Quick Start Guide
@@ -13,7 +13,7 @@ quality and performance.
 pip install -r requirements.txt
 python3 -m edgecraftrag.server
 # Run Mega Service
-python3 -m edgecraftrag.ecrag 
+python3 -m edgecraftrag.ecrag
 ```
 
 ### ChatQnA with LLM Example (Command Line)
@@ -50,6 +50,7 @@ Open your browser, access [http://127.0.0.1:8082](http://127.0.0.1:8082)
 ```bash
 curl -X POST http://127.0.0.1:16010/v1/settings/pipelines -H "Content-Type: application/json" -d @examples/test_pipeline.json | jq '.'
 ```
+
 It will take some time to prepare the embedding model.
 
 ### Upload a text
@@ -98,6 +99,7 @@ curl -X POST http://127.0.0.1:16010/v1/retrieval -H "Content-Type: application/j
 ```bash
 curl -X POST http://127.0.0.1:16010/v1/settings/models -H "Content-Type: application/json" -d @examples/test_model_load.json | jq '.'
 ```
+
 It will take some time to load the model.
 
 ### Check all models

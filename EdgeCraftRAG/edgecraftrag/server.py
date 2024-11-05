@@ -1,12 +1,9 @@
-from comps import opea_microservices
-from llama_index.core.settings import Settings
-from edgecraftrag.api.v1 import (
-    pipeline,
-    data,
-    chatqna,
-    model
-)
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
+from comps import opea_microservices
+from edgecraftrag.api.v1 import chatqna, data, model, pipeline
+from llama_index.core.settings import Settings
 
 if __name__ == "__main__":
     Settings.llm = None
