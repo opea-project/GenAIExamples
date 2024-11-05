@@ -9,48 +9,54 @@ on:
   workflow_dispatch:
 
 env:
-  examples: "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"
-  node: gaudi
-  tag: latest
-  publish_tags: latest
+  EXAMPLES: "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"
+  TAG: "latest"
+  PUBLISH_TAGS: "latest"
 
 jobs:
   get-build-matrix:
     runs-on: ubuntu-latest
     outputs:
-      examples: ${{ steps.get-matrix.outputs.examples }}
+      examples_json: ${{ steps.get-matrix.outputs.examples_json }}
+      EXAMPLES: ${{ steps.get-matrix.outputs.EXAMPLES }}
+      TAG: ${{ steps.get-matrix.outputs.TAG }}
+      PUBLISH_TAGS: ${{ steps.get-matrix.outputs.PUBLISH_TAGS }}
     steps:
       - name: Create Matrix
         id: get-matrix
         run: |
-          examples=($(echo ${{ env.examples }} | tr ',' ' '))
+          examples=($(echo ${EXAMPLES} | tr ',' ' '))
           examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
-          echo "examples=$examples_json" >> $GITHUB_OUTPUT
+          echo "examples_json=$examples_json" >> $GITHUB_OUTPUT
+          echo "EXAMPLES=$EXAMPLES" >> $GITHUB_OUTPUT
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "PUBLISH_TAGS=$PUBLISH_TAGS" >> $GITHUB_OUTPUT
 
   build:
     needs: get-build-matrix
     strategy:
       matrix:
-        example: ${{ fromJSON(needs.get-build-matrix.outputs.examples) }}
+        example: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json) }}
       fail-fast: false
     uses: ./.github/workflows/_example-workflow.yml
     with:
-      node: ${{ env.node }}
+      node: gaudi
       example: ${{ matrix.example }}
       inject_commit: true
     secrets: inherit
 
   get-image-list:
+    needs: get-build-matrix
     uses: ./.github/workflows/_get-image-list.yml
     with:
-      examples: ${{ env.examples }}
+      examples: ${{ needs.get-build-matrix.outputs.EXAMPLES }}
 
   publish:
-    needs: [get-image-list, build]
+    needs: [get-build-matrix, get-image-list, build]
     strategy:
       matrix:
         image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
-    runs-on: "docker-build-${{ env.node }}"
+    runs-on: "docker-build-gaudi"
     steps:
       - uses: docker/login-action@v3.2.0
         with:
@@ -60,6 +66,6 @@ jobs:
       - name: Image Publish
         uses: opea-project/validation/actions/image-publish@main
         with:
-          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ env.tag }}
+          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ needs.get-build-matrix.outputs.TAG }}
           image_name: opea/${{ matrix.image }}
-          publish_tags: ${{ env.publish_tags }}
+          publish_tags: ${{ needs.get-build-matrix.outputs.PUBLISH_TAGS }}
