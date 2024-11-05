@@ -1,5 +1,7 @@
 FROM python:3.11-slim
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
     libjemalloc-dev 
@@ -12,7 +14,7 @@ COPY ./edgecraftrag /home/user/edgecraftrag
 COPY ./chatqna.py /home/user/chatqna.py
 
 WORKDIR /home/user/edgecraftrag
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /home/user
 
