@@ -19,7 +19,7 @@ function get_hpu_usage {
 }
 
 function get_hpu_mapping {
-    local data=$(hl-smi -Q index,device_id -f csv,noheader)
+    local data=$(hl-smi -Q index,module_id -f csv,noheader)
     echo "$data"
 }
 
