@@ -16,7 +16,7 @@ for example in ${examples}; do
     if [[ ! $(find . -type f | grep ${test_mode}) ]]; then continue; fi
     cd tests
     ls -l
-    hardware_list=$(find . -type f -name "test_compose_*_on_*.sh" | cut -d/ -f2 | cut -d. -f1 | awk -F'_on_' '{print $2}'| sort -u)
+    hardware_list=$(find . -type f -name "test_compose*_on_*.sh" | cut -d/ -f2 | cut -d. -f1 | awk -F'_on_' '{print $2}'| sort -u)
     echo "Test supported hardware list = ${hardware_list}"
 
     run_hardware=""
