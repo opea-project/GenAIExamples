@@ -5,9 +5,14 @@ import requests
 import json
 import ast
 import base64
+import logging
 
 from fastapi import FastAPI
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class DocSumUI:
     def __init__(self):
@@ -28,6 +33,7 @@ class DocSumUI:
         Returns:
             str: The base64 encoded string of the file content.
         """
+        logger.info("Encoding file to base64: %s", file_path)
         with open(file_path, "rb") as f:
             base64_str = base64.b64encode(f.read()).decode("utf-8")
         return base64_str
@@ -51,7 +57,7 @@ class DocSumUI:
             loader = Docx2txtLoader(file)
         else:
             msg = f"Unsupported file type '{file.name}'. Choose from {self.ACCEPTED_FILE_TYPES}"
-            print(msg)
+            logger.error(msg)
             return msg
 
         for page in loader.lazy_load():
@@ -69,6 +75,7 @@ class DocSumUI:
         Returns:
             str: The base64 encoded content of the audio file.
         """
+        logger.info("Reading audio file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
         return self.generate_summary(base64_str, document_type="audio")
 
@@ -82,6 +89,7 @@ class DocSumUI:
         Returns:
             str: The base64 encoded content of the video file.
         """
+        logger.info("Reading video file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
         return self.generate_summary(base64_str, document_type="video")
 
@@ -97,6 +105,7 @@ class DocSumUI:
             str: The generated summary or an error message.
         """
         data = {
+            "max_tokens": 256,
             "type": document_type,
             "messages": doc_content
         }
@@ -106,14 +115,12 @@ class DocSumUI:
                 url=self.BACKEND_SERVICE_ENDPOINT,
                 headers=self.HEADERS,
                 data=json.dumps(data),
-                # proxies={
-                #     'http': os.getenv('HTTP_PROXY', ''),
-                #     'https': os.getenv('HTTPS_PROXY', '')
-                # }
-                
                 proxies={
-                    'http_proxy': os.environ['HTTP_PROXY'],
-                    'https_proxy': os.environ['HTTPS_PROXY']
+                    'http_proxy': os.environ['http_proxy'],
+                    'https_proxy': os.environ['https_proxy']
+                    
+                    # 'http_proxy': os.environ['HTTP_PROXY'],
+                    # 'https_proxy': os.environ['HTTPS_PROXY']
                 }
             )
             
@@ -146,10 +153,11 @@ class DocSumUI:
                         return cleaned_text
                 except (IndexError, KeyError, ValueError) as e:
                     # Handle potential errors during parsing
-                    print(f"Error parsing response: {e}")
+                    logger.error("Error parsing response: %s", e)
                     return response.text
 
         except requests.exceptions.RequestException as e:
+            logger.error("Request exception: %s", e)
             return str(e)
 
         return str(response.status_code)
@@ -166,6 +174,7 @@ class DocSumUI:
         Returns:
             gr.Blocks: The Gradio Blocks object representing the upload UI.
         """
+        logger.info("Creating upload UI for label: %s", label)
         with gr.Blocks() as upload_ui:
             with gr.Row():
                 with gr.Column():
@@ -186,6 +195,7 @@ class DocSumUI:
         Returns:
             gr.Blocks: The Gradio Blocks object representing the UI.
         """
+        logger.info("Rendering Gradio UI")
         # Plain text UI
         with gr.Blocks() as text_ui:
             with gr.Row():
@@ -245,4 +255,11 @@ demo.queue()
 app = gr.mount_gradio_app(app, demo, path='/')
 
 if __name__ == '__main__':
-    uvicorn.run(app)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", type=str, default="0.0.0.0")
+    parser.add_argument("--port", type=int, default=5173)
+    
+    args = parser.parse_args()
+    logger.info("Starting server at %s:%d", args.host, args.port)
+    uvicorn.run(app, host=args.host, port=args.port)

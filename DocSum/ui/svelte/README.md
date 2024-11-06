@@ -1,5 +1,28 @@
 # Doc Summary
 
+
+## Build UI Docker Image
+
+Build the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/ui/gradio
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
+
+## Run UI Docker Image
+
+Run the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/ui/gradio
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
+
+
+
+
+
 ## 📸 Project Screenshots
 
 ![project-screenshot](../../assets/img/docSum_ui_upload.png)

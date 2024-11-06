@@ -96,7 +96,7 @@ services:
     restart: always
 
   docsum-xeon-ui-server:
-    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+    image: opea/docsum-ui:latest
     container_name: docsum-xeon-ui-server
     depends_on:
       - docsum-xeon-backend-server
@@ -106,7 +106,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 

@@ -78,8 +78,8 @@ docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-
 Build the frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/DocSum/ui
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+cd GenAIExamples/DocSum/ui/gradio
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 <!-- Then run the command `docker images`, you will have the following Docker Images:
@@ -243,33 +243,10 @@ Following the validation of all aforementioned microservices, we are now prepare
 > More detailed tests can be found here ```cd GenAIExamples/DocSum/test```
 
 ## 🚀 Launch the UI
+Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based frontend.
 
-<!-- Open this URL `http://{host_ip}:5173` in your browser to access the svelte based frontend. -->
-
-<!-- Open this URL `http://{host_ip}:5174` in your browser to access the React based frontend. -->
-
-### Svelte UI
+### Gradio UI
 
 ![project-screenshot](../../../../assets/img/docSum_ui_text.png)
 
-<!-- ### React UI (Optional)
 
-To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `docsum-xeon-ui-server` service with the `docsum-xeon-react-ui-server` service as per the config below:
-
-```yaml
-docsum-xeon-react-ui-server:
-  image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
-  container_name: docsum-xeon-react-ui-server
-  depends_on:
-    - docsum-xeon-backend-server
-  ports:
-    - "5174:80"
-  environment:
-    - no_proxy=${no_proxy}
-    - https_proxy=${https_proxy}
-    - http_proxy=${http_proxy}
-  ipc: host
-  restart: always
-```
-
-![preject-react-screenshot](../../../../assets/img/docsum-ui-react.png) -->
