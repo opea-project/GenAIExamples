@@ -1,17 +1,14 @@
-from edgecraftrag.controllers.compmgr import (
-    NodeParserMgr,
-    IndexerMgr,
-    RetrieverMgr,
-    PostProcessorMgr,
-    GeneratorMgr
-)
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+from edgecraftrag.controllers.compmgr import GeneratorMgr, IndexerMgr, NodeParserMgr, PostProcessorMgr, RetrieverMgr
+from edgecraftrag.controllers.filemgr import FilelMgr
 from edgecraftrag.controllers.modelmgr import ModelMgr
 from edgecraftrag.controllers.nodemgr import NodeMgr
 from edgecraftrag.controllers.pipelinemgr import PipelineMgr
-from edgecraftrag.controllers.filemgr import FilelMgr
 
 
-class Context():
+class Context:
 
     def __init__(self):
         self.plmgr = PipelineMgr()

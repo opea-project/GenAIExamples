@@ -1,5 +1,9 @@
-from pydantic import BaseModel
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 class ModelIn(BaseModel):
@@ -51,6 +55,7 @@ class PipelineCreateIn(BaseModel):
 class DataIn(BaseModel):
     text: Optional[str] = None
     local_path: Optional[str] = None
+
 
 class FilesIn(BaseModel):
     local_paths: Optional[list[str]] = None

@@ -1,30 +1,34 @@
-import requests
-from omegaconf import OmegaConf
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+import argparse
+import platform
+import re
+from datetime import datetime
+from pathlib import Path
+
+import cpuinfo
+import distro  # if running Python 3.8 or above
+import ecrag_client as cli
 import gradio as gr
+import httpx
 
 # Creation of the ModelLoader instance and loading models remain the same
 import platform_config as pconf
-from platform_config import get_local_available_models, get_available_devices, get_available_weights
-import ecrag_client as cli
-from loguru import logger
-import argparse
-from pathlib import Path
 import psutil
-from datetime import datetime
-import platform
-import cpuinfo
-import distro  # if running Python 3.8 or above
-import re
-import httpx
+import requests
+from loguru import logger
+from omegaconf import OmegaConf
+from platform_config import get_available_devices, get_available_weights, get_local_available_models
 
 pipeline_df = []
 
 
 def get_llm_model_dir(llm_model_id, weights_compression):
     model_dirs = {
-        'fp16_model_dir': Path(llm_model_id) / "FP16",
-        'int8_model_dir': Path(llm_model_id) / "INT8_compressed_weights",
-        'int4_model_dir': Path(llm_model_id) / "INT4_compressed_weights"
+        "fp16_model_dir": Path(llm_model_id) / "FP16",
+        "int8_model_dir": Path(llm_model_id) / "INT8_compressed_weights",
+        "int4_model_dir": Path(llm_model_id) / "INT4_compressed_weights",
     }
 
     if weights_compression == "INT4":
@@ -93,17 +97,16 @@ def build_demo(cfg, args):
             "embedding_id": embedding_id,
             "embedding_device": embedding_device,
             "rerank_id": rerank_id,
-            "rerank_device": rerank_device
+            "rerank_device": rerank_device,
         }
         # hard code only for test
-        worker_addr = 'http://127.0.0.1:8084'
+        worker_addr = "http://127.0.0.1:8084"
         print(req_dict)
         result = requests.post(f"{worker_addr}/load", json=req_dict, proxies={"http": None})
         return result.text
 
     def user(message, history):
-        """
-        callback function for updating user messages in interface on submit button click
+        """Callback function for updating user messages in interface on submit button click.
 
         Params:
         message: current message
@@ -115,26 +118,25 @@ def build_demo(cfg, args):
         return "", history + [[message, ""]]
 
     async def bot(
-            history,
-            temperature,
-            top_p,
-            top_k,
-            repetition_penalty,
-            hide_full_prompt,
-            do_rag,
-            docs,
-            spliter_name,
-            vector_db,
-            chunk_size,
-            chunk_overlap,
-            vector_search_top_k,
-            vector_search_top_n,
-            run_rerank,
-            search_method,
-            score_threshold,
+        history,
+        temperature,
+        top_p,
+        top_k,
+        repetition_penalty,
+        hide_full_prompt,
+        do_rag,
+        docs,
+        spliter_name,
+        vector_db,
+        chunk_size,
+        chunk_overlap,
+        vector_search_top_k,
+        vector_search_top_n,
+        run_rerank,
+        search_method,
+        score_threshold,
     ):
-        """
-        callback function for running chatbot on submit button click
+        """Callback function for running chatbot on submit button click.
 
         Params:
         history: conversation history
@@ -144,7 +146,6 @@ def build_demo(cfg, args):
         top_k: parameter for control the range of tokens considered by the AI model based on their cumulative probability, selecting number of tokens with highest probability.
         repetition_penalty: parameter for penalizing tokens based on how frequently they occur in the text.
         conversation_id: unique conversation identifier.
-
         """
         # req_dict = {
         #     "history": history,
@@ -167,11 +168,9 @@ def build_demo(cfg, args):
         #     "streaming": True
         # }
         print(history)
-        new_req = {
-            "messages": history[-1][0]
-        }
+        new_req = {"messages": history[-1][0]}
         # hard code only for test
-        server_addr = 'http://127.0.0.1:16010'
+        server_addr = "http://127.0.0.1:16010"
 
         # Async for streaming response
         partial_text = ""
@@ -179,7 +178,7 @@ def build_demo(cfg, args):
             async with client.stream("POST", f"{server_addr}/v1/chatqna", json=new_req, timeout=None) as response:
                 partial_text = ""
                 async for chunk in response.aiter_lines():
-                    new_text = re.sub(r'\r\n', '', chunk.split("data: ")[-1])
+                    new_text = re.sub(r"\r\n", "", chunk.split("data: ")[-1])
                     new_text = new_text.replace("'", "")
                     partial_text = partial_text + new_text
                     history[-1][1] = partial_text
@@ -204,10 +203,7 @@ def build_demo(cfg, args):
     .disclaimer {font-variant-caps: all-small-caps}
     """
 
-    with gr.Blocks(
-        theme=gr.themes.Soft(),
-        css=css
-    ) as demo:
+    with gr.Blocks(theme=gr.themes.Soft(), css=css) as demo:
         gr.HTML(
             """
             <!DOCTYPE html>
@@ -251,7 +247,8 @@ def build_demo(cfg, args):
 
             </body>
             </html>
-            """)
+            """
+        )
         _ = gr.Textbox(
             label="System Status",
             value=get_system_status,
@@ -279,14 +276,10 @@ def build_demo(cfg, args):
                         label="Pipelines",
                         show_label=True,
                         interactive=False,
-                        every=5
+                        every=5,
                     )
 
-                    u_rag_pipeline_status = gr.Textbox(
-                        label="Status",
-                        value="",
-                        interactive=False
-                    )
+                    u_rag_pipeline_status = gr.Textbox(label="Status", value="", interactive=False)
 
                 with gr.Column(scale=3):
                     with gr.Accordion("Pipeline Configuration"):
@@ -295,7 +288,7 @@ def build_demo(cfg, args):
                             rag_activate_pipeline = gr.Button("Activate Pipeline")
                             rag_remove_pipeline = gr.Button("Remove Pipeline")
 
-                        with gr.Column(variant='panel'):
+                        with gr.Column(variant="panel"):
                             u_pipeline_name = gr.Textbox(
                                 label="Name",
                                 value=cfg.name,
@@ -307,7 +300,7 @@ def build_demo(cfg, args):
                                 interactive=True,
                             )
 
-                        with gr.Column(variant='panel'):
+                        with gr.Column(variant="panel"):
                             with gr.Accordion("Node Parser"):
                                 u_node_parser = gr.Dropdown(
                                     choices=avail_node_parsers,
@@ -337,7 +330,7 @@ def build_demo(cfg, args):
                                     info=("Overlap between 2 chunks"),
                                 )
 
-                        with gr.Column(variant='panel'):
+                        with gr.Column(variant="panel"):
                             with gr.Accordion("Indexer"):
                                 u_indexer = gr.Dropdown(
                                     choices=avail_indexers,
@@ -366,13 +359,13 @@ def build_demo(cfg, args):
                                         multiselect=False,
                                     )
 
-                        with gr.Column(variant='panel'):
+                        with gr.Column(variant="panel"):
                             with gr.Accordion("Retriever"):
                                 u_retriever = gr.Dropdown(
                                     choices=avail_retrievers,
                                     value=cfg.retriever,
                                     label="Retriever",
-                                    info="Select a retriver for retrieving context.",
+                                    info="Select a retriever for retrieving context.",
                                     multiselect=False,
                                     interactive=True,
                                 )
@@ -386,7 +379,7 @@ def build_demo(cfg, args):
                                     interactive=True,
                                 )
 
-                        with gr.Column(variant='panel'):
+                        with gr.Column(variant="panel"):
                             with gr.Accordion("Postprocessor"):
                                 u_postprocessor = gr.Dropdown(
                                     choices=avail_postprocessors,
@@ -415,7 +408,7 @@ def build_demo(cfg, args):
                                         multiselect=False,
                                     )
 
-                        with gr.Column(variant='panel'):
+                        with gr.Column(variant="panel"):
                             with gr.Accordion("Generator"):
                                 u_generator = gr.Dropdown(
                                     choices=avail_generators,
@@ -458,7 +451,7 @@ def build_demo(cfg, args):
             # get selected pipeline id
             # Dataframe: {'headers': '', 'data': [[x00, x01], [x10, x11]}
             # SelectData.index: [i, j]
-            print(u_pipelines.value['data'])
+            print(u_pipelines.value["data"])
             print(evt.index)
             # always use pipeline id for indexing
             selected_id = pipeline_df[evt.index[0]][0]
@@ -466,12 +459,22 @@ def build_demo(cfg, args):
             # TODO: change to json fomart
             # pl["postprocessor"][0]["processor_type"]
             # pl["postprocessor"]["model"]["model_id"], pl["postprocessor"]["model"]["device"]
-            return pl["name"], pl["status"]["active"], \
-                pl["node_parser"]["parser_type"], pl["node_parser"]["chunk_size"], pl["node_parser"]["chunk_overlap"], \
-                pl["indexer"]["indexer_type"], pl["retriever"]["retriever_type"], pl["retriever"]["retrieve_topk"], \
-                pl["generator"]["generator_type"], \
-                pl["generator"]["model"]["model_id"], pl["generator"]["model"]["device"], "", \
-                pl["indexer"]["model"]["model_id"], pl["indexer"]["model"]["device"]
+            return (
+                pl["name"],
+                pl["status"]["active"],
+                pl["node_parser"]["parser_type"],
+                pl["node_parser"]["chunk_size"],
+                pl["node_parser"]["chunk_overlap"],
+                pl["indexer"]["indexer_type"],
+                pl["retriever"]["retriever_type"],
+                pl["retriever"]["retrieve_topk"],
+                pl["generator"]["generator_type"],
+                pl["generator"]["model"]["model_id"],
+                pl["generator"]["model"]["device"],
+                "",
+                pl["indexer"]["model"]["model_id"],
+                pl["indexer"]["model"]["device"],
+            )
 
         def modify_create_pipeline_button():
             return "Create Pipeline"
@@ -520,31 +523,35 @@ def build_demo(cfg, args):
             return res, get_pipeline_df()
 
         # Events
-        u_pipelines.select(show_pipeline_detail, inputs=None, outputs=[
-            u_pipeline_name,
-            u_active,
-            # node parser
-            u_node_parser,
-            u_chunk_size,
-            u_chunk_overlap,
-            # indexer
-            u_indexer,
-            # retriever
-            u_retriever,
-            u_vector_search_top_k,
-            # postprocessor
-            # u_postprocessor,
-            # generator
-            u_generator,
-            # models
-            u_llm_model_id,
-            u_llm_device,
-            u_llm_weights,
-            u_embed_model_id,
-            u_embed_device,
-            # u_rerank_model_id,
-            # u_rerank_device
-        ])
+        u_pipelines.select(
+            show_pipeline_detail,
+            inputs=None,
+            outputs=[
+                u_pipeline_name,
+                u_active,
+                # node parser
+                u_node_parser,
+                u_chunk_size,
+                u_chunk_overlap,
+                # indexer
+                u_indexer,
+                # retriever
+                u_retriever,
+                u_vector_search_top_k,
+                # postprocessor
+                # u_postprocessor,
+                # generator
+                u_generator,
+                # models
+                u_llm_model_id,
+                u_llm_device,
+                u_llm_weights,
+                u_embed_model_id,
+                u_embed_device,
+                # u_rerank_model_id,
+                # u_rerank_device
+            ],
+        )
 
         u_pipeline_name.input(modify_create_pipeline_button, inputs=None, outputs=rag_create_pipeline)
 
@@ -573,7 +580,7 @@ def build_demo(cfg, args):
                 u_embed_model_id.input,
                 u_embed_device.input,
                 u_rerank_model_id.input,
-                u_rerank_device.input
+                u_rerank_device.input,
             ],
             fn=modify_update_pipeline_button,
             inputs=None,
@@ -599,7 +606,7 @@ def build_demo(cfg, args):
                 u_embed_model_id,
                 u_embed_device,
                 u_rerank_model_id,
-                u_rerank_device
+                u_rerank_device,
             ],
             outputs=[u_rag_pipeline_status, u_pipelines],
             queue=False,
@@ -624,6 +631,7 @@ def build_demo(cfg, args):
 
         global u_files_selected_row
         u_files_selected_row = None
+
         def select_file(data, evt: gr.SelectData):
             if not evt.selected or len(evt.index) == 0:
                 return "No file selected"
@@ -655,8 +663,18 @@ def build_demo(cfg, args):
                         label="Step 1: Load text files",
                         file_count="multiple",
                         file_types=[
-                            ".csv", ".doc", ".docx", ".enex", ".epub", ".html",
-                            ".md", ".odt", ".pdf", ".ppt", ".pptx", ".txt",
+                            ".csv",
+                            ".doc",
+                            ".docx",
+                            ".enex",
+                            ".epub",
+                            ".html",
+                            ".md",
+                            ".odt",
+                            ".pdf",
+                            ".ppt",
+                            ".pptx",
+                            ".txt",
                         ],
                     )
                     retriever_argument = gr.Accordion("Vector Store Configuration", open=False)
@@ -678,26 +696,18 @@ def build_demo(cfg, args):
                         )
                     load_docs = gr.Button("Upload files")
 
-                    u_files_status = gr.Textbox(
-                        label="File Processing Status",
-                        value="",
-                        interactive=False
-                    )
+                    u_files_status = gr.Textbox(label="File Processing Status", value="", interactive=False)
                     u_files = gr.Dataframe(
                         headers=["Loaded File Name", "File ID"],
                         value=get_files,
                         label="Loaded Files",
                         show_label=False,
                         interactive=False,
-                        every=5
+                        every=5,
                     )
 
                     with gr.Accordion("Delete File", open=False):
-                        selected_files = gr.Textbox(
-                            label="Click file to select",
-                            value="",
-                            interactive=False
-                        )
+                        selected_files = gr.Textbox(label="Click file to select", value="", interactive=False)
                         with gr.Row():
                             with gr.Column():
                                 delete_button = gr.Button("Delete Selected File")
@@ -832,7 +842,7 @@ def build_demo(cfg, args):
             queue=True,
         )
         # TODO: Need to de-select the dataframe,
-        # otherwise everytime the dataframe is updated, a select event is triggered
+        # otherwise every time the dataframe is updated, a select event is triggered
         u_files.select(select_file, inputs=[u_files], outputs=selected_files, queue=True)
 
         delete_button.click(
@@ -854,7 +864,8 @@ def build_demo(cfg, args):
                 top_p,
                 top_k,
                 repetition_penalty,
-                hide_context, do_rag,
+                hide_context,
+                do_rag,
                 docs,
                 spliter,
                 vector_db,
@@ -877,7 +888,8 @@ def build_demo(cfg, args):
                 top_p,
                 top_k,
                 repetition_penalty,
-                hide_context, do_rag,
+                hide_context,
+                do_rag,
                 docs,
                 spliter,
                 vector_db,
@@ -905,14 +917,14 @@ def build_demo(cfg, args):
 
 def main():
     # Create the parser
-    parser = argparse.ArgumentParser(description='Load Embedding and LLM Models with OpenVino.')
+    parser = argparse.ArgumentParser(description="Load Embedding and LLM Models with OpenVino.")
     # Add the arguments
-    parser.add_argument("--prompt_template", type=str, required=False, help='User specific template')
+    parser.add_argument("--prompt_template", type=str, required=False, help="User specific template")
     parser.add_argument("--server_name", type=str, default="0.0.0.0")
     parser.add_argument("--server_port", type=int, default=8082)
-    parser.add_argument("--config", type=str, default='./default.yaml', help="configuration file path")
-    parser.add_argument("--share", action='store_true', help="share model")
-    parser.add_argument("--debug", action='store_true', help="enable debugging")
+    parser.add_argument("--config", type=str, default="./default.yaml", help="configuration file path")
+    parser.add_argument("--share", action="store_true", help="share model")
+    parser.add_argument("--debug", action="store_true", help="enable debugging")
 
     # Execute the parse_args() method to collect command line arguments
     args = parser.parse_args()
@@ -958,5 +970,5 @@ def init_cfg_(cfg):
         cfg.score_threshold = 0.5
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,17 +1,14 @@
-from edgecraftrag.base import (
-    BaseMgr,
-    CallbackType
-)
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+import asyncio
+from typing import Any, List
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
+from edgecraftrag.base import BaseMgr, CallbackType
 from edgecraftrag.components.pipeline import Pipeline
 from edgecraftrag.controllers.nodemgr import NodeMgr
-
-from typing import List, Any
-from llama_index.core.schema import (
-    Document,
-)
-import asyncio
+from llama_index.core.schema import Document
 
 
 class PipelineMgr(BaseMgr):

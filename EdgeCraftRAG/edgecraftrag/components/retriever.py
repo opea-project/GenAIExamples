@@ -1,14 +1,12 @@
-from edgecraftrag.base import (
-    BaseComponent,
-    CompType,
-    RetrieverType,
-)
-from typing import List, Any, cast
-from llama_index.core.schema import BaseNode
-from llama_index.core.indices.vector_store.retrievers import (
-    VectorIndexRetriever,
-)
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+from typing import Any, List, cast
+
+from edgecraftrag.base import BaseComponent, CompType, RetrieverType
+from llama_index.core.indices.vector_store.retrievers import VectorIndexRetriever
 from llama_index.core.retrievers import AutoMergingRetriever
+from llama_index.core.schema import BaseNode
 from llama_index.retrievers.bm25 import BM25Retriever
 from pydantic import model_serializer
 
@@ -31,26 +29,26 @@ class VectorSimRetriever(BaseComponent, VectorIndexRetriever):
         )
         # This might be a bug of llamaindex retriever.
         # The node_ids will never be updated after the retriever's
-        # creation. However, the node_ids decides the avaliable node
+        # creation. However, the node_ids decides the available node
         # ids to be retrieved which means the target nodes to be
         # retrieved are freezed to the time of the retriever's creation.
         self._node_ids = None
 
     def run(self, **kwargs) -> Any:
         for k, v in kwargs.items():
-            if k == 'query':
+            if k == "query":
                 return self.retrieve(v)
 
         return None
 
     @model_serializer
     def ser_model(self):
-        ser = {
-            'idx': self.idx,
-            'retriever_type': self.comp_subtype,
-            'retrieve_topk': self.similarity_top_k,
+        set = {
+            "idx": self.idx,
+            "retriever_type": self.comp_subtype,
+            "retrieve_topk": self.similarity_top_k,
         }
-        return ser
+        return set
 
 
 class AutoMergeRetriever(BaseComponent, AutoMergingRetriever):
@@ -62,19 +60,19 @@ class AutoMergeRetriever(BaseComponent, AutoMergingRetriever):
             comp_subtype=RetrieverType.AUTOMERGE,
         )
         self._index = indexer
-        self.topk = kwargs['similarity_top_k']
+        self.topk = kwargs["similarity_top_k"]
 
         AutoMergingRetriever.__init__(
             self,
             vector_retriever=indexer.as_retriever(**kwargs),
             storage_context=indexer._storage_context,
             object_map=indexer._object_map,
-            callback_manager=indexer._callback_manager
+            callback_manager=indexer._callback_manager,
         )
 
     def run(self, **kwargs) -> Any:
         for k, v in kwargs.items():
-            if k == 'query':
+            if k == "query":
                 # vector_retriever needs to be updated
                 self._vector_retriever = self._index.as_retriever(similarity_top_k=self.topk)
                 return self.retrieve(v)
@@ -94,11 +92,11 @@ class SimpleBM25Retriever(BaseComponent):
             comp_subtype=RetrieverType.BM25,
         )
         self._docstore = indexer._docstore
-        self.topk = kwargs['similarity_top_k']
+        self.topk = kwargs["similarity_top_k"]
 
     def run(self, **kwargs) -> Any:
         for k, v in kwargs.items():
-            if k == 'query':
+            if k == "query":
                 nodes = cast(List[BaseNode], list(self._docstore.docs.values()))
                 bm25_retr = BM25Retriever.from_defaults(nodes=nodes, similarity_top_k=self.topk)
                 return bm25_retr.retrieve(v)

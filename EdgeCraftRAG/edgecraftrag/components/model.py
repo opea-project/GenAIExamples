@@ -1,12 +1,12 @@
-from edgecraftrag.base import (
-    BaseComponent,
-    CompType,
-    ModelType,
-)
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 from typing import Any
+
+from edgecraftrag.base import BaseComponent, CompType, ModelType
 from llama_index.embeddings.huggingface_openvino import OpenVINOEmbedding
-from llama_index.postprocessor.openvino_rerank import OpenVINORerank
 from llama_index.llms.openvino import OpenVINOLLM
+from llama_index.postprocessor.openvino_rerank import OpenVINORerank
 from pydantic import Field, model_serializer
 
 
@@ -21,27 +21,21 @@ class BaseModelComponent(BaseComponent):
 
     @model_serializer
     def ser_model(self):
-        ser = {
-            'idx': self.idx,
-            'type': self.comp_subtype,
-            'model_id': self.model_id,
-            'model_path': self.model_path,
-            'device': self.device
+        set = {
+            "idx": self.idx,
+            "type": self.comp_subtype,
+            "model_id": self.model_id,
+            "model_path": self.model_path,
+            "device": self.device,
         }
-        return ser
+        return set
 
 
 class OpenVINOEmbeddingModel(BaseModelComponent, OpenVINOEmbedding):
 
     def __init__(self, model_id, model_path, device):
-        OpenVINOEmbedding.create_and_save_openvino_model(
-            model_id, model_path
-        )
-        OpenVINOEmbedding.__init__(
-            self,
-            model_id_or_path=model_path,
-            device=device
-        )
+        OpenVINOEmbedding.create_and_save_openvino_model(model_id, model_path)
+        OpenVINOEmbedding.__init__(self, model_id_or_path=model_path, device=device)
         self.comp_type = CompType.MODEL
         self.comp_subtype = ModelType.EMBEDDING
         self.model_id = model_id
@@ -52,9 +46,7 @@ class OpenVINOEmbeddingModel(BaseModelComponent, OpenVINOEmbedding):
 class OpenVINORerankModel(BaseModelComponent, OpenVINORerank):
 
     def __init__(self, model_id, model_path, device):
-        OpenVINORerank.create_and_save_openvino_model(
-            model_id, model_path
-        )
+        OpenVINORerank.create_and_save_openvino_model(model_id, model_path)
         OpenVINORerank.__init__(
             self,
             model_id_or_path=model_path,

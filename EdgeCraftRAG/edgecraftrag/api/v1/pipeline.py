@@ -1,51 +1,35 @@
-from comps import register_microservice
-from edgecraftrag.api_schema import PipelineCreateIn
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
-from edgecraftrag.base import (
-    NodeParserType,
-    IndexerType,
-    RetrieverType,
-    PostProcessorType,
-    ModelType
-)
-from edgecraftrag.components.node_parser import (
-    SimpleNodeParser,
-    HierarchyNodeParser,
-    SWindowNodeParser
-)
-from edgecraftrag.components.indexer import (
-    VectorIndexer
-)
-from edgecraftrag.components.retriever import (
-    VectorSimRetriever,
-    AutoMergeRetriever,
-    SimpleBM25Retriever
-)
-from edgecraftrag.components.postprocessor import (
-    RerankProcessor,
-    MetadataReplaceProcessor
-)
-from edgecraftrag.components.generator import (
-    QnAGenerator
-)
-from edgecraftrag.context import ctx
 import weakref
+
+from edgecraftrag.api_schema import PipelineCreateIn
+from edgecraftrag.base import IndexerType, ModelType, NodeParserType, PostProcessorType, RetrieverType
+from edgecraftrag.components.generator import QnAGenerator
+from edgecraftrag.components.indexer import VectorIndexer
+from edgecraftrag.components.node_parser import HierarchyNodeParser, SimpleNodeParser, SWindowNodeParser
+from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, RerankProcessor
+from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
+from edgecraftrag.context import ctx
+from fastapi import FastAPI
+
+pipeline_app = FastAPI()
 
 
 # GET Pipelines
-@register_microservice(name="opea_service@ec_rag", endpoint="/v1/settings/pipelines", host="0.0.0.0", port=16010, methods=['GET'])
+@pipeline_app.get(path="/v1/settings/pipelines")
 async def get_pipelines():
     return ctx.get_pipeline_mgr().get_pipelines()
 
 
 # GET Pipeline
-@register_microservice(name="opea_service@ec_rag", endpoint="/v1/settings/pipelines/{name}", host="0.0.0.0", port=16010, methods=['GET'])
+@pipeline_app.get(path="/v1/settings/pipelines/{name}")
 async def get_pipeline(name):
     return ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
 
 
 # POST Pipeline
-@register_microservice(name="opea_service@ec_rag", endpoint="/v1/settings/pipelines", host="0.0.0.0", port=16010, methods=['POST'])
+@pipeline_app.post(path="/v1/settings/pipelines")
 async def add_pipeline(request: PipelineCreateIn):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(request.name)
     if pl is None:
@@ -61,7 +45,7 @@ async def add_pipeline(request: PipelineCreateIn):
 
 
 # PATCH Pipeline
-@register_microservice(name="opea_service@ec_rag", endpoint="/v1/settings/pipelines/{name}", host="0.0.0.0", port=16010, methods=['PATCH'])
+@pipeline_app.patch(path="/v1/settings/pipelines/{name}")
 async def update_pipeline(name, request: PipelineCreateIn):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
     if pl is None:
@@ -88,16 +72,18 @@ def update_pipeline_handler(pl, req):
                 case NodeParserType.SIMPLE:
                     pl.node_parser = SimpleNodeParser(chunk_size=np.chunk_size, chunk_overlap=np.chunk_overlap)
                 case NodeParserType.HIERARCHY:
-                    '''
-                        HierarchyNodeParser is for Auto Merging Retriever
-                        (https://docs.llamaindex.ai/en/stable/examples/retrievers/auto_merging_retriever/)
-                        By default, the hierarchy is:
-                        1st level: chunk size 2048
-                        2nd level: chunk size 512
-                        3rd level: chunk size 128
-                        Please set chunk size with List. e.g. chunk_size=[2048,512,128]
-                    '''
-                    pl.node_parser = HierarchyNodeParser.from_defaults(chunk_sizes=np.chunk_sizes, chunk_overlap=np.chunk_overlap)
+                    """
+                    HierarchyNodeParser is for Auto Merging Retriever
+                    (https://docs.llamaindex.ai/en/stable/examples/retrievers/auto_merging_retriever/)
+                    By default, the hierarchy is:
+                    1st level: chunk size 2048
+                    2nd level: chunk size 512
+                    3rd level: chunk size 128
+                    Please set chunk size with List. e.g. chunk_size=[2048,512,128]
+                    """
+                    pl.node_parser = HierarchyNodeParser.from_defaults(
+                        chunk_sizes=np.chunk_sizes, chunk_overlap=np.chunk_overlap
+                    )
                 case NodeParserType.SENTENCEWINDOW:
                     pl.node_parser = SWindowNodeParser.from_defaults(window_size=np.window_size)
             ctx.get_node_parser_mgr().add(pl.node_parser)
@@ -154,7 +140,7 @@ def update_pipeline_handler(pl, req):
                 case PostProcessorType.RERANKER:
                     if processor.reranker_model:
                         prm = processor.reranker_model
-                        reranker_model = ctx.get_model_mgr().search_model(prm)                     
+                        reranker_model = ctx.get_model_mgr().search_model(prm)
                         if reranker_model is None:
                             prm.model_type = ModelType.RERANKER
                             reranker_model = ctx.get_model_mgr().load_model(prm)

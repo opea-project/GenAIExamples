@@ -1,9 +1,12 @@
-from enum import Enum
-from pydantic import BaseModel, ConfigDict, Field, model_serializer
-from typing import List, Any, Optional, Callable
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
-import uuid
 import abc
+import uuid
+from enum import Enum
+from typing import Any, Callable, List, Optional
+
+from pydantic import BaseModel, ConfigDict, Field, model_serializer
 
 
 class CompType(str, Enum):
@@ -15,7 +18,7 @@ class CompType(str, Enum):
     INDEXER = "indexer"
     RETRIEVER = "retriever"
     POSTPROCESSOR = "postprocessor"
-    GENERATOR ="generator"
+    GENERATOR = "generator"
     FILE = "file"
 
 
@@ -28,9 +31,9 @@ class ModelType(str, Enum):
 
 class FileType(str, Enum):
     TEXT = "text"
-    VISUAL = 'visual'
-    AURAL = 'aural'
-    VIRTUAL = 'virtual'
+    VISUAL = "visual"
+    AURAL = "aural"
+    VIRTUAL = "virtual"
     OTHER = "other"
 
 
@@ -78,7 +81,7 @@ class CallbackType(str, Enum):
 
 class BaseComponent(BaseModel):
 
-    model_config = ConfigDict(extra='allow', arbitrary_types_allowed=True)
+    model_config = ConfigDict(extra="allow", arbitrary_types_allowed=True)
 
     idx: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: Optional[str] = Field(default="")
@@ -87,13 +90,13 @@ class BaseComponent(BaseModel):
 
     @model_serializer
     def ser_model(self):
-        ser = {
-            'idx': self.idx,
-            'name': self.name,
-            'comp_type': self.comp_type,
-            'comp_subtype': self.comp_subtype,
+        set = {
+            "idx": self.idx,
+            "name": self.name,
+            "comp_type": self.comp_type,
+            "comp_subtype": self.comp_subtype,
         }
-        return ser
+        return set
 
     @abc.abstractmethod
     def run(self, **kwargs) -> Any:

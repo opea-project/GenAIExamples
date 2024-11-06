@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Model language for LLM
 model_language: "Chinese"
 vector_db:  "FAISS"
@@ -17,7 +20,7 @@ chunk_overlap: 48
 
 # Indexer
 indexer: "faiss_vector"
- 
+
 # Retriever
 retriever: "vectorsimilarity"
 k_retrieval: 30
