@@ -6,12 +6,12 @@ import unittest
 
 import yaml
 
-from comps.cores.mega.manifests_exporter import build_chatqna_manifests
+from comps.cores.mega.exporter import convert_to_deployment_and_service
 
 
 class TestChatQnAManifestsExporter(unittest.TestCase):
     def tearDown(self):
-        file_path = "ChatQnA_E2E_manifests.yaml"
+        file_path = "E2E_manifests.yaml"
 
         try:
             os.remove(file_path)
@@ -22,10 +22,10 @@ class TestChatQnAManifestsExporter(unittest.TestCase):
             print(f"Fail to delete: {e}")
 
     def test_manifests(self):
-        build_chatqna_manifests()
+        convert_to_deployment_and_service("./mega.yaml", "E2E_manifests.yaml")
 
         result = True
-        with open("ChatQnA_E2E_manifests.yaml", "r") as f1, open("ChatQnA_E2E_manifests_base.yaml", "r") as f2:
+        with open("E2E_manifests.yaml", "r") as f1, open("ChatQnA_E2E_manifests_base.yaml", "r") as f2:
             docs1 = yaml.safe_load_all(f1)
             docs2 = yaml.safe_load_all(f2)
 

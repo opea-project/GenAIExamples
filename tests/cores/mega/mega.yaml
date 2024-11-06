@@ -1,117 +1,113 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-environment_variables:
-  common: &common
-    no_proxy: "localhost"
-    http_proxy: ""
-    https_proxy: ""
-    HUGGINGFACEHUB_API_TOKEN: ""
+global_envs:
+  no_proxy: ${no_proxy}
+  http_proxy: ${http_proxy}
+  https_proxy: ${https_proxy}
+  HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
 
-  redis: &redis
-    REDIS_URL: "redis://localhost:6379"
-    INDEX_NAME: "rag-redis"
+micro_services:
+  - service_name: dataprep
+    image: opea/dataprep-redis:latest
+    ports:
+      - "6007:6007"
+    envs:
+      - REDIS_URL: redis://redis-vector-db:6379
+      - INDEX_NAME: "rag-redis"
+      - TEI_ENDPOINT: embedding-server:8090
+    dependencies:
+      - redis-vector-db
+  - service_name: embedding-server
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    ports:
+      - "8090:80"
+    volumes:
+      - "/mnt/models:/data"
+    replicas: 1
+    options:
+      - runtime: habana
+      - cap_add: SYS_NICE
+    envs:
+      - HABANA_VISIBLE_DEVICES: all
+      - OMPI_MCA_btl_vader_single_copy_mechanism: none
+      - MAX_WARMUP_SEQUENCE_LENGTH: 512
+      - INIT_HCCL_ON_ACQUIRE: 0
+      - ENABLE_EXPERIMENTAL_FLAGS: true
+    args:
+      - --model-id: BAAI/bge-base-en-v1.5
+      - --auto-truncate
+  - service_name: llm-server
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+    ports:
+      - "8005:80"
+    volumes:
+      - "/mnt/models:/data"
+    replicas: 1
+    resources:
+      hpu: 1
+    envs:
+      - HF_HUB_DISABLE_PROGRESS_BARS: 1
+      - HF_HUB_ENABLE_HF_TRANSFER: 0
+      - HABANA_VISIBLE_DEVICES: all
+      - OMPI_MCA_btl_vader_single_copy_mechanism: none
+      - ENABLE_HPU_GRAPH: true
+      - LIMIT_HPU_GRAPH: true
+      - USE_FLASH_ATTENTION: true
+      - FLASH_ATTENTION_RECOMPUTE: true
+    options:
+      - runtime: habana
+      - cap_add: SYS_NICE
+    args:
+     - --model-id: Intel/neural-chat-7b-v3-3
+     - --max-input-length: 2048
+     - --max-total-tokens: 4096
+  - service_name: raranking-server
+    image: ghcr.io/huggingface/tei-gaudi:latest
+    ports:
+      - "8808:80"
+    volumes:
+      - "/mnt/models:/data"
+    replicas: 1
+    resources:
+      hpu: 1
+    envs:
+      - HF_HUB_DISABLE_PROGRESS_BARS: 1
+      - HF_HUB_ENABLE_HF_TRANSFER: 0
+    args:
+      - --model-id: BAAI/bge-reranker-base
+      - --auto-truncate
 
-  tei_embedding: &tei_embedding
-    TEI_EMBEDDING_ENDPOINT: "http://localhost:8090"
+  - service_name: retriever-server
+    image: opea/retriever-redis:latest
+    ports:
+      - "7000:7000"
+    envs:
+      - REDIS_HOST: redis-vector-db
+      - REDIS_URL: redis://redis-vector-db:6379
+      - INDEX_NAME: "rag-redis"
+      - TEI_EMBEDDING_ENDPOINT: embedding-server:8090
+    dependencies:
+      - redis-vector-db
+  - service_name: redis-vector-db
+    image: redis/redis-stack:7.2.0-v9
+    ports:
+      - "6379:6379"
+      - "8001:8001"
 
-  tei_reranking: &tei_reranking
-    TEI_RERANKING_ENDPOINT: "http://localhost:8808"
-
-  llm: &llm
-    TGI_LLM_ENDPOINT: "http://localhost:8005"
-
-  chatqna: &chatqna
-    MEGA_SERVICE_HOST_IP: localhost
-    EMBEDDING_SERVICE_HOST_IP: localhost
-    RETRIEVER_SERVICE_HOST_IP: localhost
-    RERANK_SERVICE_HOST_IP: localhost
-    LLM_SERVICE_HOST_IP: localhost
-
-  ui: &ui
-    CHAT_BASE_URL: "http://localhost:8888/v1/chatqna"
-    DATAPREP_SERVICE_ENDPOINT: "http://localhost:6007/v1/dataprep"
-    DATAPREP_GET_FILE_ENDPOINT: "http://localhost:6007/v1/dataprep/get_file"
-    DATAPREP_DELETE_FILE_ENDPOINT: "http://localhost:6007/v1/dataprep/delete_file"
-
-opea_micro_services:
-  embedding:
-    opea/embedding-tei:
-      tag: latest
-      type: cpu
-      dependency:
-        ghcr.io/huggingface/text-embeddings-inference:
-          tag: cpu-1.5
-          type: cpu
-          requirements:
-            model_id: "BAAI/bge-base-en-v1.5"
-        opea/tei-gaudi:
-          tag: latest
-          type: hpu
-          requirements:
-            model_id: "BAAI/bge-base-en-v1.5"
-      environment:
-        <<: [*common, *tei_embedding]
-
-  llm:
-    opea/llm-tgi:
-      tag: latest
-      type: cpu
-      dependency:
-        ghcr.io/huggingface/text-generation-inference:
-          tag: 2.2.0
-          type: cpu
-          requirements:
-            model_id: "Intel/neural-chat-7b-v3-3"
-        ghcr.io/huggingface/tgi-gaudi:
-          tag: 2.0.5
-          type: hpu
-          requirements:
-            model_id: "Intel/neural-chat-7b-v3-3"
-      environment:
-        <<: [*common, *llm]
-
-  data_prep:
-    opea/dataprep-redis:
-      tag: latest
-      type: cpu
-      environment:
-        <<: [*common, *redis, *tei_embedding]
-
-  retrieval:
-    opea/retriever-redis:
-      tag: latest
-      type: cpu
-      environment:
-        <<: [*common, *redis]
-
-  reranking:
-    opea/reranking-tei:
-      tag: latest
-      type: cpu
-      dependency:
-        ghcr.io/huggingface/text-embeddings-inference:
-          tag: cpu-1.5
-          type: cpu
-          requirements:
-            model_id: "BAAI/bge-reranker-base"
-        opea/tei-gaudi:
-          tag: latest
-          type: hpu
-          requirements:
-            model_id: "BAAI/bge-reranker-base"
-      environment:
-        <<: [*common, *tei_reranking]
-
-opea_mega_service:
-  opea/chatqna:
-    tag: latest
-    type: cpu
-    environment:
-      <<: [*common, *chatqna]
-
-  opea/chatqna-ui:
-    tag: latest
-    type: cpu
-    environment:
-      <<: [*common, *ui]
+mega_service:
+  - service_name: chatqna-gaudi-backend-server
+    image: opea/chatqna:latest
+    ports:
+      - "8888:8888"
+    node_ports:
+      - "30888"
+    envs:
+      - MEGA_SERVICE_HOST_IP: chatqna-gaudi-backend-server
+      - EMBEDDING_SERVER_HOST_IP: embedding-server
+      - EMBEDDING_SERVER_PORT: 8090
+      - RETRIEVER_SERVICE_HOST_IP: retriever-server
+      - RERANK_SERVER_HOST_IP: raranking-server
+      - RERANK_SERVER_PORT: 8808
+      - LLM_SERVER_HOST_IP: llm-server
+      - LLM_SERVER_PORT: 8005

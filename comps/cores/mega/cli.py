@@ -4,16 +4,17 @@
 import argparse
 
 from .exporter import convert_to_docker_compose
+from .manifests_exporter import convert_to_manifests
 
 
-def export_kubernetes_manifests(mega_yaml, output_dir, device="cpu"):
-    print(f"Generating Kubernetes manifests from {mega_yaml} to {output_dir}")
-    # Add your logic to convert the YAML to Kubernetes manifest here
+def export_kubernetes_manifests(mega_yaml, output_file):
+    print(f"Generating Kubernetes manifests from {mega_yaml} to {output_file}")
+    convert_to_manifests(mega_yaml, output_file)
 
 
-def export_docker_compose(mega_yaml, output_file, device="cpu"):
+def export_docker_compose(mega_yaml, output_file):
     print(f"Generating Docker Compose file from {mega_yaml} to {output_file}")
-    convert_to_docker_compose(mega_yaml, output_file, device)
+    convert_to_docker_compose(mega_yaml, output_file)
 
 
 def opea_execute():
@@ -30,9 +31,6 @@ def opea_execute():
     compose_parser = export_subparsers.add_parser("docker-compose", help="Export to Docker Compose")
     compose_parser.add_argument("mega_yaml", help="Path to the mega YAML file")
     compose_parser.add_argument("output_file", help="Path to the Docker Compose file")
-    compose_parser.add_argument(
-        "--device", choices=["cpu", "gaudi", "xpu", "gpu"], default="cpu", help="Device type to use (default: cpu)"
-    )
 
     # Export to Kubernetes
     kube_parser = export_subparsers.add_parser("kubernetes", help="Export to Kubernetes")
@@ -48,7 +46,7 @@ def opea_execute():
     # Execute appropriate command
     if args.command == "export":
         if args.export_command == "docker-compose":
-            export_docker_compose(args.mega_yaml, args.output_file, args.device)
+            export_docker_compose(args.mega_yaml, args.output_file)
         elif args.export_command == "kubernetes":
             export_kubernetes_manifests(args.mega_yaml, args.output_dir, args.device)
         else:

@@ -21,9 +21,9 @@ class TestConvertToDockerCompose(unittest.TestCase):
         if os.path.isfile(self.output_file):
             os.unlink(self.output_file)
 
-    def test_convert_to_docker_compose_gaudi(self):
+    def test_convert_to_docker_compose(self):
         # Call the function directly
-        convert_to_docker_compose(self.mega_yaml, self.output_file, device="gaudi")
+        convert_to_docker_compose(self.mega_yaml, self.output_file)
 
         # Load and verify the content of the generated docker-compose.yaml
         with open(self.output_file, "r") as f:
@@ -32,27 +32,10 @@ class TestConvertToDockerCompose(unittest.TestCase):
         self.assertEqual(docker_compose["version"], "3.8")
         self.assertIn("services", docker_compose)
         self.assertIn("redis-vector-db", docker_compose["services"])
-        self.assertIn("text-embeddings-inference-service", docker_compose["services"])
+        self.assertIn("llm-server", docker_compose["services"])
         self.assertEqual(
-            docker_compose["services"]["text-embeddings-inference-service"]["image"], "opea/tei-gaudi:latest"
-        )
-        self.assertEqual(docker_compose["services"]["text-embeddings-inference-service"]["runtime"], "habana")
-
-    def test_convert_to_docker_compose_xeon(self):
-        # Call the function directly
-        convert_to_docker_compose(self.mega_yaml, self.output_file, device="cpu")
-
-        # Load and verify the content of the generated docker-compose.yaml
-        with open(self.output_file, "r") as f:
-            docker_compose = yaml.safe_load(f)
-
-        self.assertEqual(docker_compose["version"], "3.8")
-        self.assertIn("services", docker_compose)
-        self.assertIn("redis-vector-db", docker_compose["services"])
-        self.assertIn("text-embeddings-inference-service", docker_compose["services"])
-        self.assertEqual(
-            docker_compose["services"]["text-embeddings-inference-service"]["image"],
-            "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5",
+            docker_compose["services"]["llm-server"]["image"],
+            "ghcr.io/huggingface/tgi-gaudi:2.0.5",
         )
 
     # def test_convert_to_docker_compose_cli(self):
