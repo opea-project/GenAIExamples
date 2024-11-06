@@ -20,13 +20,19 @@ export async function fetchTextStream(query: string | Blob, params: string, file
   const url = `${DOC_BASE_URL}`; // Ensure the URL is constructed correctly
   const formData = new FormData();
 
-  if (params === "doc_id" && file) {
+  if (!file) {
+    file = new Blob([""], { type: "text/plain" });
+    fileName = "empty.txt";
+  }
+
+  if (params === "doc_id") {
     formData.append("files", file, fileName);
     formData.append("messages", query);
   } else if (params === "text") {
     formData.append("files", file, fileName);
     formData.append("messages", query);
   }
+
 
   // Initiate the POST request to upload the file
   const init = {
