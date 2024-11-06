@@ -41,7 +41,7 @@ function setup_env() {
     export INDEX_NAME="mm-rag-redis"
     export LLAVA_SERVER_PORT=8399
     export LVM_ENDPOINT="http://${host_ip}:8399"
-    export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
+    export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
     export WHISPER_MODEL="base"
     export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
