@@ -1,11 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import gc
+
 from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.context import ctx
-import gc
 from fastapi import FastAPI
-
 
 model_app = FastAPI()
 
