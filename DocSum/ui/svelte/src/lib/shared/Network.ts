@@ -33,7 +33,6 @@ export async function fetchTextStream(query: string | Blob, params: string, file
     formData.append("messages", query);
   }
 
-
   // Initiate the POST request to upload the file
   const init = {
     method: "POST",
