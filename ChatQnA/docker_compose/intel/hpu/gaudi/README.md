@@ -317,10 +317,11 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
 
    In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
 
-   Try the command below to check whether the LLM serving is ready.
+   Try the command below with the container name to check whether the LLM serving is ready.
 
    ```bash
-   docker logs tgi-service | grep Connected
+   #Use TGI Service as an example
+   docker logs tgi-gaudi-server | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
