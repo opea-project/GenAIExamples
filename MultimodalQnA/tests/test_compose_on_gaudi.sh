@@ -166,13 +166,6 @@ function validate_microservices() {
         "dataprep-multimodal-redis-transcript" \
         "dataprep-multimodal-redis"
 
-    echo "Data Prep with Generating Caption for Image"
-    validate_service \
-        "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
-        "Data preparation succeeded" \
-        "dataprep-multimodal-redis-caption" \
-        "dataprep-multimodal-redis"
-
     echo "Data Prep with Image & Caption Ingestion"
     validate_service \
         "${DATAPREP_INGEST_SERVICE_ENDPOINT}" \
@@ -225,6 +218,14 @@ function validate_microservices() {
         "lvm-tgi" \
         "lvm-tgi" \
         '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
+
+    # data prep requiring lvm
+    echo "Data Prep with Generating Caption for Image"
+    validate_service \
+        "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
+        "Data preparation succeeded" \
+        "dataprep-multimodal-redis-caption" \
+        "dataprep-multimodal-redis"
 
     sleep 1m
 }
