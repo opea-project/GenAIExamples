@@ -33,7 +33,7 @@ class DocSumUI:
         Returns:
             str: The base64 encoded string of the file content.
         """
-        logger.info("Encoding file to base64: %s", file_path)
+        logger.info(">>> Encoding file to base64: %s", file_path)
         with open(file_path, "rb") as f:
             base64_str = base64.b64encode(f.read()).decode("utf-8")
         return base64_str
@@ -75,7 +75,7 @@ class DocSumUI:
         Returns:
             str: The base64 encoded content of the audio file.
         """
-        logger.info("Reading audio file: %s", file.name)
+        logger.info(">>> Reading audio file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
         return self.generate_summary(base64_str, document_type="audio")
 
@@ -89,7 +89,7 @@ class DocSumUI:
         Returns:
             str: The base64 encoded content of the video file.
         """
-        logger.info("Reading video file: %s", file.name)
+        logger.info(">>> Reading video file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
         return self.generate_summary(base64_str, document_type="video")
 
@@ -104,6 +104,9 @@ class DocSumUI:
         Returns:
             str: The generated summary or an error message.
         """
+        
+        logger.info(">>> BACKEND_SERVICE_ENDPOINT - %s", self.BACKEND_SERVICE_ENDPOINT)
+        
         data = {
             "max_tokens": 256,
             "type": document_type,
@@ -118,9 +121,6 @@ class DocSumUI:
                 proxies={
                     'http_proxy': os.environ['http_proxy'],
                     'https_proxy': os.environ['https_proxy']
-                    
-                    # 'http_proxy': os.environ['HTTP_PROXY'],
-                    # 'https_proxy': os.environ['HTTPS_PROXY']
                 }
             )
             
@@ -174,7 +174,7 @@ class DocSumUI:
         Returns:
             gr.Blocks: The Gradio Blocks object representing the upload UI.
         """
-        logger.info("Creating upload UI for label: %s", label)
+        logger.info(">>> Creating upload UI for label: %s", label)
         with gr.Blocks() as upload_ui:
             with gr.Row():
                 with gr.Column():
@@ -195,7 +195,7 @@ class DocSumUI:
         Returns:
             gr.Blocks: The Gradio Blocks object representing the UI.
         """
-        logger.info("Rendering Gradio UI")
+        logger.info(">>> Rendering Gradio UI")
         # Plain text UI
         with gr.Blocks() as text_ui:
             with gr.Row():
@@ -261,5 +261,6 @@ if __name__ == '__main__':
     parser.add_argument("--port", type=int, default=5173)
     
     args = parser.parse_args()
-    logger.info("Starting server at %s:%d", args.host, args.port)
+    logger.info(">>> Starting server at %s:%d", args.host, args.port)
+    
     uvicorn.run(app, host=args.host, port=args.port)

@@ -106,18 +106,18 @@ services:
     ipc: host
     restart: always
     
-  docsum-gaudi-ui-server:
-    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
-    container_name: docsum-gaudi-ui-server
+  docsum-xeon-ui-server:
+    image: opea/docsum-ui:latest
+    container_name: docsum-xeon-ui-server
     depends_on:
-      - docsum-gaudi-backend-server
+      - docsum-xeon-backend-server
     ports:
       - "5173:5173"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 

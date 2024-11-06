@@ -19,14 +19,6 @@ First of all, you need to build Docker Images locally and install the python pac
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
-<!-- ### 1. Build LLM Image
-
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/langchain/Dockerfile .
-```
- -->
 
 #### Whisper Service
 
@@ -60,9 +52,6 @@ The Multimedia2Text Service transforms multimedia data to text data. Follow thes
 docker build -t opea/multimedia2text:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/Dockerfile .
 ```
 
-
-<!-- Then run the command `docker images`, you will have the following four Docker Images: -->
-
 ### 2. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `docsum.py` Python script. Build the MegaService Docker image via below command:
@@ -82,56 +71,12 @@ cd GenAIExamples/DocSum/ui/gradio
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-<!-- Then run the command `docker images`, you will have the following Docker Images:
-
-1. `opea/llm-docsum-tgi:latest`
-2. `opea/docsum:latest`
-3. `opea/docsum-ui:latest` -->
-
-<!-- ### 4. Build React UI Docker Image
-
-Build the frontend Docker image via below command:
-
-```bash
-cd GenAIExamples/DocSum/ui
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
-
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f ./docker/Dockerfile.react .
-```
-
-Then run the command `docker images`, you will have the following Docker Images:
-
-1. `opea/llm-docsum-tgi:latest`
-2. `opea/docsum:latest`
-3. `opea/docsum-ui:latest`
-4. `opea/docsum-react-ui:latest` -->
-
 ## 🚀 Start Microservices and MegaService
 
 ### Required Models
 
 We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
 If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
-
-<!-- ### Setup Environment Variables
-
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
-
-```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
-```
-
-Note: Please replace with `host_ip` with your external IP address, do not use localhost. -->
-
 
 ### Setup Environment Variable
 
@@ -167,6 +112,17 @@ To set up environment variables for deploying Document Summarization services, f
 cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
+
+You will have the following Docker Images:
+
+1. `opea/docsum-ui:latest`
+2. `opea/docsum:latest`
+3. `opea/llm-docsum-tgi:latest`
+4. `opea/whisper:latest`
+5. `opea/a2t:latest`
+6. `opea/multimedia2text:latest`
+7. `opea/v2a:latest`
+
 
 ### Validate Microservices
 
@@ -248,5 +204,3 @@ Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based
 ### Gradio UI
 
 ![project-screenshot](../../../../assets/img/docSum_ui_text.png)
-
-
