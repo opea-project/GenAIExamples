@@ -58,6 +58,7 @@ Please refer to 'Build Docker Images' in below.
 ## QuickStart: 3.Consume the ChatQnA Service
 
 Prepare and upload test document
+
 ```
 # download pdf file
 wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
