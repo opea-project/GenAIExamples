@@ -2,26 +2,16 @@
 
 Large Language Models (LLMs) have revolutionized the way we interact with text. These models can be used to create summaries of news articles, research papers, technical documents, legal documents, multimedia documents, and other types of documents. Suppose you have a set of documents (PDFs, Notion pages, customer questions, multimedia files, etc.) and you want to summarize the content. In this example use case, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference.
 
-The architecture for document summarization will be illustrated/described below:
-
 ![Architecture](./assets/img/docsum_architecture.png)
-
-![Workflow](./assets/img/docsum_workflow.png)
 
 ## Deploy Document Summarization Service
 
 The Document Summarization service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
 Based on whether you want to use Docker or Kubernetes, follow the instructions below.
 
-Currently we support two ways of deploying Document Summarization services with docker compose:
+Currently we support deploying Document Summarization services with docker compose:
 
-1. Start services using the docker image on `docker hub`:
-
-   ```bash
-   docker pull opea/docsum:latest
-   ```
-
-2. Start services using the docker images `built from source`: [Guide](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose)
+Start services using the docker images `built from source`: [Guide](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose)
 
 ### Required Models
 
