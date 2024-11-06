@@ -1,15 +1,12 @@
-from edgecraftrag.base import (
-    BaseComponent,
-    CompType,
-    IndexerType,
-)
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 from typing import Any
-from llama_index.core import (
-    VectorStoreIndex,
-    StorageContext,
-)
-from llama_index.vector_stores.faiss import FaissVectorStore
+
 import faiss
+from edgecraftrag.base import BaseComponent, CompType, IndexerType
+from llama_index.core import StorageContext, VectorStoreIndex
+from llama_index.vector_stores.faiss import FaissVectorStore
 from pydantic import model_serializer
 
 
@@ -25,6 +22,7 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
         if not embed_model:
             # Settings.embed_model should be set to None when embed_model is None to avoid 'no oneapi key' error
             from llama_index.core import Settings
+
             Settings.embed_model = None
         match vector_type:
             case IndexerType.DEFAULT_VECTOR:
@@ -43,9 +41,5 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
 
     @model_serializer
     def ser_model(self):
-        ser = {
-            'idx': self.idx,
-            'indexer_type': self.comp_subtype,
-            'model': self.model
-        }
-        return ser
+        set = {"idx": self.idx, "indexer_type": self.comp_subtype, "model": self.model}
+        return set

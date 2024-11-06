@@ -1,16 +1,18 @@
 FROM python:3.11-slim
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
     libjemalloc-dev
 
-RUN apt update && apt install -y gnupg wget 
+RUN apt-get update && apt-get install -y gnupg wget 
 RUN wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | \
     gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
 RUN echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu jammy client" | \
     tee /etc/apt/sources.list.d/intel-gpu-jammy.list
-RUN apt update
-RUN apt install -y \
+RUN apt-get update
+RUN apt-get install -y \
     intel-opencl-icd intel-level-zero-gpu level-zero intel-level-zero-gpu-raytracing \
     intel-media-va-driver-non-free libmfx1 libmfxgen1 libvpl2 \
     libegl-mesa0 libegl1-mesa libegl1-mesa-dev libgbm1 libgl1-mesa-dev libgl1-mesa-dri \
@@ -24,7 +26,7 @@ RUN useradd -m -s /bin/bash user && \
 COPY ./edgecraftrag /home/user/edgecraftrag
 
 WORKDIR /home/user/edgecraftrag
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /home/user/
 

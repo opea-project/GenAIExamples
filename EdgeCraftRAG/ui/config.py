@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 DEFAULT_SYSTEM_PROMPT = """\
 You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
 If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
@@ -209,12 +212,12 @@ SUPPORTED_LLM_MODELS = {
             <|im_start|>user
             问题: 根据已知内容写一篇简短的摘要.
             已知内容: {text}
-            回答: <|im_end|><|im_start|>assistant""",       
+            回答: <|im_end|><|im_start|>assistant""",
             "combine_summary_template": """
             <|im_start|>user
             问题: 根据已知内容写一篇摘要,不少于{character_num}字.
             已知内容: {text}
-            回答: <|im_end|><|im_start|>assistant""", 
+            回答: <|im_end|><|im_start|>assistant""",
             "rag_prompt_template": f"""<|im_start|>system
             {DEFAULT_RAG_PROMPT_CHINESE }<|im_end|>"""
             + """

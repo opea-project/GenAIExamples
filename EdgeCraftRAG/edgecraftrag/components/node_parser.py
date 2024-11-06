@@ -1,15 +1,10 @@
-from edgecraftrag.base import (
-    BaseComponent,
-    CompType,
-    NodeParserType,
-)
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
 from typing import Any
-from llama_index.core.node_parser import (
-    SentenceSplitter,
-    HierarchicalNodeParser,
-    SentenceWindowNodeParser
-)
+
+from edgecraftrag.base import BaseComponent, CompType, NodeParserType
+from llama_index.core.node_parser import HierarchicalNodeParser, SentenceSplitter, SentenceWindowNodeParser
 from pydantic import model_serializer
 
 
@@ -24,20 +19,20 @@ class SimpleNodeParser(BaseComponent, SentenceSplitter):
 
     def run(self, **kwargs) -> Any:
         for k, v in kwargs.items():
-            if k == 'docs':
+            if k == "docs":
                 return self.get_nodes_from_documents(v, show_progress=False)
 
         return None
 
     @model_serializer
     def ser_model(self):
-        ser = {
-            'idx': self.idx,
-            'parser_type': self.comp_subtype,
-            'chunk_size': self.chunk_size,
-            'chunk_overlap': self.chunk_overlap,
+        set = {
+            "idx": self.idx,
+            "parser_type": self.comp_subtype,
+            "chunk_size": self.chunk_size,
+            "chunk_overlap": self.chunk_overlap,
         }
-        return ser
+        return set
 
 
 class HierarchyNodeParser(BaseComponent, HierarchicalNodeParser):
@@ -49,20 +44,20 @@ class HierarchyNodeParser(BaseComponent, HierarchicalNodeParser):
 
     def run(self, **kwargs) -> Any:
         for k, v in kwargs.items():
-            if k == 'docs':
+            if k == "docs":
                 return self.get_nodes_from_documents(v, show_progress=False)
 
         return None
 
     @model_serializer
     def ser_model(self):
-        ser = {
-            'idx': self.idx,
-            'parser_type': self.comp_subtype,
-            'chunk_size': self.chunk_sizes,
-            'chunk_overlap': None,
+        set = {
+            "idx": self.idx,
+            "parser_type": self.comp_subtype,
+            "chunk_size": self.chunk_sizes,
+            "chunk_overlap": None,
         }
-        return ser
+        return set
 
 
 class SWindowNodeParser(BaseComponent, SentenceWindowNodeParser):
@@ -74,17 +69,17 @@ class SWindowNodeParser(BaseComponent, SentenceWindowNodeParser):
 
     def run(self, **kwargs) -> Any:
         for k, v in kwargs.items():
-            if k == 'docs':
+            if k == "docs":
                 return self.get_nodes_from_documents(v, show_progress=False)
 
         return None
 
     @model_serializer
     def ser_model(self):
-        ser = {
-            'idx': self.idx,
-            'parser_type': self.comp_subtype,
-            'chunk_size': None,
-            'chunk_overlap':None,
+        set = {
+            "idx": self.idx,
+            "parser_type": self.comp_subtype,
+            "chunk_size": None,
+            "chunk_overlap": None,
         }
-        return ser
+        return set
