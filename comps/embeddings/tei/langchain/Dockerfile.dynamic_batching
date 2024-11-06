@@ -1,0 +1,28 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# FROM opea/habanalabs:1.16.1-pytorch-installer-2.2.2 as hpu
+FROM vault.habana.ai/gaudi-docker/1.18.0/ubuntu22.04/habanalabs/pytorch-installer-2.4.0:latest as hpu
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    libgl1-mesa-glx \
+    libjemalloc-dev
+
+RUN useradd -m -s /bin/bash user && \
+    mkdir -p /home/user && \
+    chown -R user /home/user/
+
+# Disable user for now
+# USER user
+
+COPY comps /home/user/comps
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /home/user/comps/embeddings/tei/langchain/requirements.txt && \
+    pip install git+https://github.com/huggingface/optimum-habana.git
+
+ENV PYTHONPATH=$PYTHONPATH:/home/user
+
+WORKDIR /home/user/comps/embeddings/tei/langchain
+
+ENTRYPOINT ["python", "local_embedding_reranking.py"]

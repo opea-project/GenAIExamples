@@ -22,3 +22,7 @@ services:
     build:
       dockerfile: comps/embeddings/predictionguard/Dockerfile
     image: ${REGISTRY:-opea}/embedding-predictionguard:${TAG:-latest}
+  embedding-reranking-local:
+    build:
+      dockerfile: comps/embeddings/tei/langchain/Dockerfile.dynamic_batching
+    image: ${REGISTRY:-opea}/embedding-reranking-local:${TAG:-latest}
