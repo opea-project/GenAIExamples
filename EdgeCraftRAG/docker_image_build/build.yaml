@@ -9,7 +9,15 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
       dockerfile: ./Dockerfile.server
-    image: edgecraftrag.server:${TAG:-latest}
+    image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
+  ui: 
+    build: 
+      context: ..
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      dockerfile: ./Dockerfile.ui
+    image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
   ecrag:
     build:
       context: ..
@@ -17,4 +25,4 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
       dockerfile: ./Dockerfile
-    image: edgecraftrag.ecrag:${TAG:-latest}
+    image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}

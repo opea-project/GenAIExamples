@@ -30,4 +30,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /home/user/
 
+USER user
+
 ENTRYPOINT ["python", "-m", "edgecraftrag.server"]

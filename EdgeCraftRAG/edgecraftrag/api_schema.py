@@ -9,7 +9,7 @@ from pydantic import BaseModel
 class ModelIn(BaseModel):
     model_type: Optional[str] = "LLM"
     model_id: Optional[str]
-    model_path: str
+    model_path: Optional[str] = "./"
     device: Optional[str] = "cpu"
 
 
@@ -39,7 +39,8 @@ class PostProcessorIn(BaseModel):
 
 class GeneratorIn(BaseModel):
     prompt_path: Optional[str] = None
-    qna_model: Optional[ModelIn] = None
+    model: Optional[ModelIn] = None
+    inference_type: Optional[str] = "local"
 
 
 class PipelineCreateIn(BaseModel):
