@@ -43,7 +43,7 @@ function setup_env() {
     export LLAVA_SERVER_PORT=8399
     export LVM_ENDPOINT="http://${host_ip}:8399"
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-    export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
+    export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-7b-hf"
     export WHISPER_MODEL="base"
     export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
     export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
@@ -200,7 +200,7 @@ function validate_microservices() {
         "retriever-multimodal-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
-    sleep 10s
+    sleep 3m
 
     # llava server
     echo "Evaluating LLAVA tgi-gaudi"
