@@ -52,7 +52,6 @@ docker compose -f ./compose_milvus.yaml up -d
 
 It will automatically download the docker images on `docker hub`.
 
-
 In following cases, you could build docker image from source by yourself.
 
 - Failed to download the docker image.
@@ -60,7 +59,6 @@ In following cases, you could build docker image from source by yourself.
 - If you want to use a specific version of Docker image.
 
 Please refer to 'Build Docker Images' in below.
-
 
 ## QuickStart: 3.Consume the ChatQnA Service
 

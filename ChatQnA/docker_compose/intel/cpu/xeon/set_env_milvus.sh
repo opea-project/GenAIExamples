@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 export host_ip=$(hostname -i)
 export DOCKER_VOLUME_DIRECTORY="~/OPEA/tmp"
 export http_proxy=${http_proxy}
@@ -8,4 +11,3 @@ export MILVUS_PORT=19530
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-
