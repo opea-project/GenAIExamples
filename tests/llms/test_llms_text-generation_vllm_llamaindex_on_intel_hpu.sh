@@ -8,12 +8,11 @@ WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    ## Build VLLM Ray docker
-    cd $WORKPATH/comps/llms/text-generation/vllm/llama_index/dependency
-    docker build \
-        -f Dockerfile.intel_hpu \
-        --no-cache -t opea/vllm-hpu:comps \
-        --shm-size=128g .
+    ## Build VLLM docker
+    cd $WORKPATH
+    git clone https://github.com/HabanaAI/vllm-fork.git
+    cd vllm-fork/
+    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-hpu:comps --shm-size=128g .
     if [ $? -ne 0 ]; then
         echo "opea/vllm-hpu built fail"
         exit 1
@@ -48,7 +47,7 @@ function start_service() {
         --ipc=host \
         -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
         opea/vllm-hpu:comps \
-        /bin/bash -c "export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --enforce-eager --model $LLM_MODEL  --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048"
+        --enforce-eager --model $LLM_MODEL  --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
 
     export vLLM_ENDPOINT="http://${ip_address}:${port_number}"
     docker run -d --rm \
@@ -65,7 +64,7 @@ function start_service() {
     until [[ "$n" -ge 120 ]] || [[ $ready == true ]]; do
         docker logs test-comps-vllm-service > ${WORKPATH}/tests/test-comps-vllm-service.log
         n=$((n+1))
-        if grep -q Connected ${WORKPATH}/tests/test-comps-vllm-service.log; then
+        if grep -q throughput ${WORKPATH}/tests/test-comps-vllm-service.log; then
             break
         fi
         sleep 5s

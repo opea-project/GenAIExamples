@@ -23,7 +23,7 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: /bin/bash -c "export VLLM_CPU_KVCACHE_SPACE=40 && python3 -m vllm.entrypoints.openai.api_server --enforce-eager --model $LLM_MODEL --tensor-parallel-size 1 --host 0.0.0.0 --port 80"
+    command: --enforce-eager --model $LLM_MODEL --tensor-parallel-size 1 --host 0.0.0.0 --port 80
   llm:
     image: opea/llm-vllm-llamaindex:latest
     container_name: llm-vllm-gaudi-server

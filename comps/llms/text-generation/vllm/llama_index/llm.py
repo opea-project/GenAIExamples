@@ -66,7 +66,8 @@ async def llm_generate(input: LLMParamsDoc):
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     else:
-        response = await llm.acomplete(input.query).text
+        response = await llm.acomplete(input.query)
+        response = response.text
         if logflag:
             logger.info(response)
         return GeneratedDoc(text=response, prompt=input.query)
