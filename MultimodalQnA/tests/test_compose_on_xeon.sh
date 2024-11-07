@@ -199,7 +199,18 @@ function validate_microservices() {
         "retriever-multimodal-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
-    sleep 10s
+    echo "Wait for lvm-llava service to be ready"
+    max_retries=10
+    for i in $(seq $max_retries)
+    do
+        lvm_logs=$(docker logs lvm-llava 2>&1 | grep "Uvicorn running on http://0.0.0.0") 
+	if [[ "$lvm_logs" != *"Uvicorn running on http://0.0.0.0"* ]]; then
+            sleep 10s
+	else
+	    echo "lvm-llava service is ready"
+	    break
+	fi
+    done
 
     # llava server
     echo "Evaluating lvm-llava"
