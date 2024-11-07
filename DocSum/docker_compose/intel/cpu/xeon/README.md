@@ -102,8 +102,7 @@ To set up environment variables for deploying Document Summarization services, f
 3. Set up other environment variables:
 
    ```bash
-   cd GenAIExamples/DocSum/docker_compose/
-   source ./docker_compose/set_env.sh
+   source GenAIExamples/DocSum/docker_compose/set_env.sh
    ```
 
 ### Start Microservice Docker Containers
