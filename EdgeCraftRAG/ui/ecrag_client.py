@@ -78,11 +78,11 @@ def create_update_pipeline(
         ],
         generator=api_schema.GeneratorIn(
             # TODO: remove hardcoding
-            prompt_path="./data/default_prompt.txt",
-            qna_model=api_schema.ModelIn(
+            prompt_path="./edgecraftrag/prompt_template/default_prompt.txt",
+            model=api_schema.ModelIn(
                 model_id=llm_id,
                 # TODO: remove hardcoding
-                model_path="./qwen2-7b-instruct/INT4_compressed_weights",
+                model_path="./models/qwen2-7b-instruct/INT4_compressed_weights",
                 device=llm_device,
             ),
         ),
