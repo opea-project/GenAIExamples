@@ -4,7 +4,7 @@
 from typing import Any, Callable, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
-from edgecraftrag.base import BaseComponent, CallbackType, CompType
+from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType
 from edgecraftrag.components.postprocessor import RerankProcessor
 from llama_index.core.schema import Document, QueryBundle
 from pydantic import BaseModel, Field, model_serializer
@@ -152,6 +152,9 @@ def run_test_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any
                 processor.top_n = chat_request.top_n
             retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
     if pl.generator is None:
-        return "No LLM Specified"
-    answer = pl.generator.run(chat_request, retri_res)
+        return "No Generator Specified"
+    if pl.generator.inference_type == InferenceType.LOCAL:
+        answer = pl.generator.run(chat_request, retri_res)
+    elif pl.generator.inference_type == InferenceType.VLLM:
+        answer = pl.generator.run_vllm(chat_request, retri_res)
     return answer

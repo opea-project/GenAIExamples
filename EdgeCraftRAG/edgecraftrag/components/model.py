@@ -8,13 +8,14 @@ from llama_index.embeddings.huggingface_openvino import OpenVINOEmbedding
 from llama_index.llms.openvino import OpenVINOLLM
 from llama_index.postprocessor.openvino_rerank import OpenVINORerank
 from pydantic import Field, model_serializer
+from typing import Optional
 
 
 class BaseModelComponent(BaseComponent):
 
-    model_id: str = Field(default="")
-    model_path: str = Field(default="")
-    device: str = Field(default="")
+    model_id: Optional[str] = Field(default="")
+    model_path: Optional[str] = Field(default="")
+    device: Optional[str] = Field(default="cpu")
 
     def run(self, **kwargs) -> Any:
         pass

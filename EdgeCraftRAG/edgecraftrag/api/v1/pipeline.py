@@ -4,7 +4,7 @@
 import weakref
 
 from edgecraftrag.api_schema import PipelineCreateIn
-from edgecraftrag.base import IndexerType, ModelType, NodeParserType, PostProcessorType, RetrieverType
+from edgecraftrag.base import IndexerType, ModelType, NodeParserType, PostProcessorType, RetrieverType, InferenceType
 from edgecraftrag.components.generator import QnAGenerator
 from edgecraftrag.components.indexer import VectorIndexer
 from edgecraftrag.components.node_parser import HierarchyNodeParser, SimpleNodeParser, SWindowNodeParser
@@ -155,16 +155,25 @@ def update_pipeline_handler(pl, req):
 
     if req.generator:
         gen = req.generator
-        if gen.qna_model is None:
+        if gen.model is None:
             return "No ChatQnA Model"
-        qna_model = ctx.get_model_mgr().search_model(gen.qna_model)
-        if qna_model is None:
-            gen.qna_model.model_type = ModelType.LLM
-            qna_model = ctx.get_model_mgr().load_model(gen.qna_model)
-            ctx.get_model_mgr().add(qna_model)
-        # Use weakref to achieve model deletion and memory release
-        qna_model_ref = weakref.ref(qna_model)
-        pl.generator = QnAGenerator(qna_model_ref, gen.prompt_path)
+        if gen.inference_type == InferenceType.VLLM:
+            if gen.model.model_id:
+                model_ref = gen.model.model_id
+            else:
+                model_ref = gen.model.model_path
+            pl.generator = QnAGenerator(model_ref, gen.prompt_path, gen.inference_type)
+        elif gen.inference_type == InferenceType.LOCAL:
+            model = ctx.get_model_mgr().search_model(gen.model)
+            if model is None:
+                gen.model.model_type = ModelType.LLM
+                model = ctx.get_model_mgr().load_model(gen.model)
+                ctx.get_model_mgr().add(model)
+            # Use weakref to achieve model deletion and memory release
+            model_ref = weakref.ref(model)
+            pl.generator = QnAGenerator(model_ref, gen.prompt_path, gen.inference_type)
+        else:
+            return "Inference Type Not Supported"
 
     if pl.status.active != req.active:
         ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_node_mgr())

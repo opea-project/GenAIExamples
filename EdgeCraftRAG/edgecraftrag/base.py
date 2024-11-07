@@ -68,6 +68,11 @@ class PostProcessorType(str, Enum):
 
 class GeneratorType(str, Enum):
 
+    CHATQNA = "chatqna"
+
+
+class InferenceType(str, Enum):
+
     LOCAL = "local"
     VLLM = "vllm"
 

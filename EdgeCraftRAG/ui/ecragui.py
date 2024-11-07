@@ -20,8 +20,15 @@ import requests
 from loguru import logger
 from omegaconf import OmegaConf
 from platform_config import get_available_devices, get_available_weights, get_local_available_models
+import json
 
 pipeline_df = []
+
+import os
+MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "127.0.0.1")
+MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 16011))
+UI_SERVICE_HOST_IP = os.getenv("UI_SERVICE_HOST_IP", "0.0.0.0")
+UI_SERVICE_PORT = int(os.getenv("UI_SERVICE_PORT", 8084))
 
 
 def get_llm_model_dir(llm_model_id, weights_compression):
@@ -168,9 +175,10 @@ def build_demo(cfg, args):
         #     "streaming": True
         # }
         print(history)
-        new_req = {"messages": history[-1][0]}
-        # hard code only for test
-        server_addr = "http://127.0.0.1:16010"
+        new_req = {
+            "messages": history[-1][0]
+        }
+        server_addr = f"http://{MEGA_SERVICE_HOST_IP}:{MEGA_SERVICE_PORT}"
 
         # Async for streaming response
         partial_text = ""
@@ -178,8 +186,10 @@ def build_demo(cfg, args):
             async with client.stream("POST", f"{server_addr}/v1/chatqna", json=new_req, timeout=None) as response:
                 partial_text = ""
                 async for chunk in response.aiter_lines():
-                    new_text = re.sub(r"\r\n", "", chunk.split("data: ")[-1])
-                    new_text = new_text.replace("'", "")
+                    new_text = chunk
+                    if new_text.startswith("data"):
+                        new_text = re.sub(r'\r\n', '', chunk.split("data: ")[-1])
+                    new_text = json.loads(chunk)["choices"][0]["message"]["content"]
                     partial_text = partial_text + new_text
                     history[-1][1] = partial_text
                     yield history
@@ -683,7 +693,7 @@ def build_demo(cfg, args):
                             ["Character", "RecursiveCharacter", "Markdown", "Chinese"],
                             value=cfg.splitter_name,
                             label="Text Spliter",
-                            info="Method used to splite the documents",
+                            info="Method used to split the documents",
                             multiselect=False,
                         )
 
@@ -919,12 +929,12 @@ def main():
     # Create the parser
     parser = argparse.ArgumentParser(description="Load Embedding and LLM Models with OpenVino.")
     # Add the arguments
-    parser.add_argument("--prompt_template", type=str, required=False, help="User specific template")
-    parser.add_argument("--server_name", type=str, default="0.0.0.0")
-    parser.add_argument("--server_port", type=int, default=8082)
-    parser.add_argument("--config", type=str, default="./default.yaml", help="configuration file path")
-    parser.add_argument("--share", action="store_true", help="share model")
-    parser.add_argument("--debug", action="store_true", help="enable debugging")
+    parser.add_argument("--prompt_template", type=str, required=False, help='User specific template')
+    # parser.add_argument("--server_name", type=str, default="0.0.0.0")
+    # parser.add_argument("--server_port", type=int, default=8082)
+    parser.add_argument("--config", type=str, default='./default.yaml', help="configuration file path")
+    parser.add_argument("--share", action='store_true', help="share model")
+    parser.add_argument("--debug", action='store_true', help="enable debugging")
 
     # Execute the parse_args() method to collect command line arguments
     args = parser.parse_args()
@@ -941,7 +951,7 @@ def main():
     # it creates a publicly shareable link for the interface. Read more in the docs: https://gradio.app/docs/
     # demo.launch(share=True)
     demo.queue().launch(
-        server_name=args.server_name, server_port=args.server_port, share=args.share, allowed_paths=["."]
+        server_name=UI_SERVICE_HOST_IP, server_port=UI_SERVICE_PORT, share=args.share, allowed_paths=["."]
     )
 
     # %%
