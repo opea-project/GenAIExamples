@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+
 import uvicorn
 from edgecraftrag.api.v1.chatqna import chatqna_app
 from edgecraftrag.api.v1.data import data_app
 from edgecraftrag.api.v1.model import model_app
 from edgecraftrag.api.v1.pipeline import pipeline_app
-from fastapi import FastAPI
 from fastapi import FastAPI
 from llama_index.core.settings import Settings
 
