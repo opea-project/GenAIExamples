@@ -35,7 +35,7 @@ function build_docker_images() {
 }
 
 function start_service() {
-    export LLM_MODEL="facebook/opt-125m"
+    export LLM_MODEL="Intel/neural-chat-7b-v3-3"
     port_number=5031
     docker run -d --rm \
         --name="test-comps-vllm-ray-service" \
@@ -78,7 +78,7 @@ function validate_microservice() {
     port_number=5031
     result=$(http_proxy="" curl http://${ip_address}:$port_number/v1/chat/completions \
         -H "Content-Type: application/json" \
-        -d '{"model": "facebook/opt-125m", "messages": [{"role": "user", "content": "How are you?"}]}')
+        -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "How are you?"}]}')
     if [[ $result == *"message"* ]]; then
         echo "Result correct."
     else
