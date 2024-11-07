@@ -1,5 +1,10 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import os
+
 import yaml
+
 
 def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selector=None, tune=False):
     """Create a values.yaml file based on the provided configuration."""
@@ -16,49 +21,27 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
 
     # Construct the base values dictionary
     values = {
-        "tei": {
-            "nodeSelector":  {key: value for key, value in node_selector.items()}
-        },
-        "tgi": {
-            "nodeSelector": {key: value for key, value in node_selector.items()}
-        },
-        "data-prep": {
-            "nodeSelector": {key: value for key, value in node_selector.items()}
-        },
-        "redis-vector-db": {
-            "nodeSelector": {key: value for key, value in node_selector.items()}
-        },
-        "retriever-usvc": {
-            "nodeSelector": {key: value for key, value in node_selector.items()}
-        },
-        "llm-uservice": {
-            "nodeSelector": {key: value for key, value in node_selector.items()}
-        },
-        "embedding-usvc": {
-            "nodeSelector": {key: value for key, value in node_selector.items()}
-        },
-        "chatqna-ui": {
-            "nodeSelector": {key: value for key, value in node_selector.items()}
-        },
+        "tei": {"nodeSelector": {key: value for key, value in node_selector.items()}},
+        "tgi": {"nodeSelector": {key: value for key, value in node_selector.items()}},
+        "data-prep": {"nodeSelector": {key: value for key, value in node_selector.items()}},
+        "redis-vector-db": {"nodeSelector": {key: value for key, value in node_selector.items()}},
+        "retriever-usvc": {"nodeSelector": {key: value for key, value in node_selector.items()}},
+        "llm-uservice": {"nodeSelector": {key: value for key, value in node_selector.items()}},
+        "embedding-usvc": {"nodeSelector": {key: value for key, value in node_selector.items()}},
+        "chatqna-ui": {"nodeSelector": {key: value for key, value in node_selector.items()}},
         "global": {
             "HUGGINGFACEHUB_API_TOKEN": hf_token,  # Use passed token
             "modelUseHostPath": model_dir,  # Use passed model directory
-            "extraEnvConfig": "extra-env"  # Added MAX_WARMUP_SEQUENCE_LENGTH: 512 to extra-env in deploy.py  
+            "extraEnvConfig": "extra-env",  # Added MAX_WARMUP_SEQUENCE_LENGTH: 512 to extra-env in deploy.py
         },
-        "nodeSelector": {key: value for key, value in node_selector.items()}
+        "nodeSelector": {key: value for key, value in node_selector.items()},
     }
 
     if with_rerank:
-        values["teirerank"] = {
-            "nodeSelector": {key: value for key, value in node_selector.items()}
-        }
-        values["reranking-usvc"] = {
-            "nodeSelector": {key: value for key, value in node_selector.items()}
-        }
+        values["teirerank"] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
+        values["reranking-usvc"] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
     else:
-        values["image"] = {
-            "repository": "opea/chatqna-without-rerank"
-        }
+        values["image"] = {"repository": "opea/chatqna-without-rerank"}
 
     default_replicas = [
         {"name": "chatqna", "replicaCount": 2},
@@ -100,8 +83,20 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
     resources = []
     if tune:
         resources = [
-            {"name": "chatqna", "resources": {"limits": {"cpu": "16", "memory": "8000Mi"}, "requests": {"cpu": "16", "memory": "8000Mi"}}},
-            {"name": "tei", "resources": {"limits": {"cpu": "80", "memory": "20000Mi"}, "requests": {"cpu": "80", "memory": "20000Mi"}}},
+            {
+                "name": "chatqna",
+                "resources": {
+                    "limits": {"cpu": "16", "memory": "8000Mi"},
+                    "requests": {"cpu": "16", "memory": "8000Mi"},
+                },
+            },
+            {
+                "name": "tei",
+                "resources": {
+                    "limits": {"cpu": "80", "memory": "20000Mi"},
+                    "requests": {"cpu": "80", "memory": "20000Mi"},
+                },
+            },
             {"name": "teirerank", "resources": {"limits": {"habana.ai/gaudi": 1}}} if with_rerank else None,
             {"name": "tgi", "resources": {"limits": {"habana.ai/gaudi": 1}}},
             {"name": "retriever", "resources": {"requests": {"cpu": "8", "memory": "8000Mi"}}},
@@ -120,8 +115,16 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
 
         # Add extraCmdArgs for tgi service with default values
         if "tgi" in values:
-            values["tgi"]["extraCmdArgs"] = ["--max-input-length", "1280", "--max-total-tokens", "2048",
-                                             "--max-batch-total-tokens", "65536", "--max-batch-prefill-tokens", "4096"]
+            values["tgi"]["extraCmdArgs"] = [
+                "--max-input-length",
+                "1280",
+                "--max-total-tokens",
+                "2048",
+                "--max-batch-total-tokens",
+                "65536",
+                "--max-batch-prefill-tokens",
+                "4096",
+            ]
 
     yaml_string = yaml.dump(values, default_flow_style=False)
 
@@ -145,6 +148,7 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
     print(f"YAML file {filepath} has been generated.")
     return filepath  # Optionally return the file path
 
+
 # Main execution for standalone use of create_values_yaml
 if __name__ == "__main__":
     # Example values for standalone execution
@@ -158,6 +162,6 @@ if __name__ == "__main__":
     filename = generate_helm_values(with_rerank, num_nodes, hftoken, modeldir, node_selector, tune)
 
     # Read back the generated YAML file for verification
-    with open(filename, 'r') as file:
+    with open(filename, "r") as file:
         print("Generated YAML contents:")
         print(file.read())
