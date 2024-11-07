@@ -5,3 +5,4 @@ opencv-python==4.10.0.82
 Pillow==10.3.0
 langchain_community
 pypdf
+docx2txt
