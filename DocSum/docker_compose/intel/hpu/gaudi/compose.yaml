@@ -108,9 +108,9 @@ services:
     
   docsum-xeon-ui-server:
     image: opea/docsum-ui:latest
-    container_name: docsum-xeon-ui-server
+    container_name: docsum-gaudi-ui-server
     depends_on:
-      - docsum-xeon-backend-server
+      - docsum-gaudi-backend-server
     ports:
       - "5173:5173"
     environment:
