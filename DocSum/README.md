@@ -87,7 +87,7 @@ Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree
 
 ### Workflow of the deployed Document Summarization Service
 
-The workflow of the Document Summarization Service, from user's input query to the application's output response, is as follows:
+The DocSum example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 
 ```mermaid

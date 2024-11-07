@@ -25,7 +25,7 @@ get_billboard_rank_date:
   args_schema:
     rank:
       type: int
-      description: song name
+      description: the rank of interest, for example 1 for top 1
     date:
       type: str
       description: date

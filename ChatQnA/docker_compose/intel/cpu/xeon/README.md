@@ -17,8 +17,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
@@ -27,6 +25,9 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service
    ```
 
 3. Set up other environment variables:
@@ -47,13 +48,13 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-In following cases, you could build docker image from source by yourself.
+NB: You should build docker image from source by yourself if:
 
-- Failed to download the docker image.
+- You are developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
+- You can't download the docker image.
+- You want to use a specific version of Docker image.
 
-- If you want to use a specific version of Docker image.
-
-Please refer to 'Build Docker Images' in below.
+Please refer to ['Build Docker Images'](#🚀-build-docker-images) in below.
 
 ## QuickStart: 3.Consume the ChatQnA Service
 
@@ -97,61 +98,25 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-### 1. Build Embedding Image
-
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
 ```
 
-### 2. Build Retriever Image
+### 1. Build Retriever Image
 
 ```bash
 docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
-### 3. Build Rerank Image
-
-> Skip for ChatQnA without Rerank pipeline
-
-```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
-```
-
-### 4. Build LLM Image
-
-#### Use TGI as backend
-
-```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
-```
-
-#### Use vLLM as backend
-
-Build vLLM docker.
-
-```bash
-git clone https://github.com/vllm-project/vllm.git
-cd ./vllm/
-docker build --no-cache -t opea/vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu .
-cd ..
-```
-
-Build microservice.
-
-```bash
-docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/langchain/Dockerfile .
-```
-
-### 5. Build Dataprep Image
+### 2. Build Dataprep Image
 
 ```bash
 docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
 cd ..
 ```
 
-### 6. Build MegaService Docker Image
+### 3. Build MegaService Docker Image
 
 1. MegaService with Rerank
 
@@ -173,7 +138,7 @@ cd ..
    docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.without_rerank .
    ```
 
-### 7. Build UI Docker Image
+### 4. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -182,7 +147,7 @@ cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-### 8. Build Conversational React UI Docker Image (Optional)
+### 5. Build Conversational React UI Docker Image (Optional)
 
 Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
 
@@ -193,23 +158,20 @@ cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 ```
 
-### 9. Build Nginx Docker Image
+### 6. Build Nginx Docker Image
 
 ```bash
 cd GenAIComps
 docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 8 Docker Images:
+Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `opea/dataprep-redis:latest`
-2. `opea/embedding-tei:latest`
-3. `opea/retriever-redis:latest`
-4. `opea/reranking-tei:latest`
-5. `opea/llm-tgi:latest` or `opea/llm-vllm:latest`
-6. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest`
-7. `opea/chatqna-ui:latest`
-8. `opea/nginx:latest`
+2. `opea/retriever-redis:latest`
+3. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest`
+4. `opea/chatqna-ui:latest`
+5. `opea/nginx:latest`
 
 ## 🚀 Start Microservices
 
@@ -233,7 +195,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
-   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu --model-id $model_name
+   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id $model_name
    ```
 
 2. Offline
@@ -247,7 +209,7 @@ For users in China who are unable to download models directly from Huggingface, 
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu --model-id /data
+     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
      ```
 
 ### Setup Environment Variables
@@ -257,8 +219,6 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
@@ -269,6 +229,8 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service
    ```
 
 3. Set up other environment variables:
@@ -315,16 +277,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -H 'Content-Type: application/json'
    ```
 
-2. Embedding Microservice
-
-   ```bash
-   curl http://${host_ip}:6000/v1/embeddings\
-     -X POST \
-     -d '{"text":"hello"}' \
-     -H 'Content-Type: application/json'
-   ```
-
-3. Retriever Microservice
+2. Retriever Microservice
 
    To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
    is determined by the embedding model.
@@ -340,7 +293,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
      -H 'Content-Type: application/json'
    ```
 
-4. TEI Reranking Service
+3. TEI Reranking Service
 
    > Skip for ChatQnA without Rerank pipeline
 
@@ -351,25 +304,14 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -H 'Content-Type: application/json'
    ```
 
-5. Reranking Microservice
-
-   > Skip for ChatQnA without Rerank pipeline
-
-   ```bash
-   curl http://${host_ip}:8000/v1/reranking\
-     -X POST \
-     -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-     -H 'Content-Type: application/json'
-   ```
-
-6. LLM backend Service
+4. LLM backend Service
 
    In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
 
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs tgi-service | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
@@ -395,31 +337,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
      -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
    ```
 
-7. LLM Microservice
-
-   This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
-
-   ```bash
-   # TGI service
-   curl http://${host_ip}:9000/v1/chat/completions\
-     -X POST \
-     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-     -H 'Content-Type: application/json'
-   ```
-
-   For parameters in TGI modes, please refer to [HuggingFace InferenceClient API](https://huggingface.co/docs/huggingface_hub/package_reference/inference_client#huggingface_hub.InferenceClient.text_generation) (except we rename "max_new_tokens" to "max_tokens".)
-
-   ```bash
-   # vLLM Service
-   curl http://${host_ip}:9000/v1/chat/completions \
-    -X POST \
-    -d '{"query":"What is Deep Learning?","max_tokens":17,"top_p":1,"temperature":0.7,"frequency_penalty":0,"presence_penalty":0, "streaming":false}' \
-    -H 'Content-Type: application/json'
-   ```
-
-   For parameters in vLLM modes, can refer to [LangChain VLLMOpenAI API](https://api.python.langchain.com/en/latest/llms/langchain_community.llms.vllm.VLLMOpenAI.html)
-
-8. MegaService
+5. MegaService
 
    ```bash
     curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -427,7 +345,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
           }'
    ```
 
-9. Nginx Service
+6. Nginx Service
 
    ```bash
    curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
@@ -435,7 +353,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -d '{"messages": "What is the revenue of Nike in 2023?"}'
    ```
 
-10. Dataprep Microservice（Optional）
+7. Dataprep Microservice（Optional）
 
 If you want to update the default knowledge base, you can use the following commands:
 
