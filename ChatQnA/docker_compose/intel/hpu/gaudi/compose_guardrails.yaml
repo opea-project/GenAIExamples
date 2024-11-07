@@ -65,25 +65,17 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   tei-embedding-service:
-    image: ghcr.io/huggingface/tei-gaudi:latest
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-gaudi-server
     ports:
       - "8090:80"
     volumes:
       - "./data:/data"
-    runtime: habana
-    cap_add:
-      - SYS_NICE
-    ipc: host
+    shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-      HABANA_VISIBLE_DEVICES: all
-      OMPI_MCA_btl_vader_single_copy_mechanism: none
-      MAX_WARMUP_SEQUENCE_LENGTH: 512
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   retriever:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
