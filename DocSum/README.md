@@ -54,27 +54,26 @@ To set up environment variables for deploying Document Summarization services, f
 
 #### Deploy on Gaudi
 
-Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
+Follow the instructions provided in the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build Docker images from source. Once the images are built, run the following command to start the services:
 
 ```bash
 cd GenAIExamples/DocSum/docker_compose/intel/hpu/gaudi/
 docker compose -f compose.yaml up -d
 ```
+Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
-Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
-
 #### Deploy on Xeon
 
-Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
+Follow the instructions provided in the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) to build Docker images from source. Once the images are built, run the following command to start the services:
 
 ```bash
 cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon/
 docker compose up -d
 ```
 
-Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
+Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
 ### Deploy using Kubernetes with GMC
 
