@@ -205,12 +205,18 @@ function validate_microservices() {
     do
         lvm_logs=$(docker logs lvm-llava 2>&1 | grep "Uvicorn running on http://0.0.0.0")
 	if [[ "$lvm_logs" != *"Uvicorn running on http://0.0.0.0"* ]]; then
-            sleep 10s
+            echo "The lvm-llava service is not ready yet, sleeping 30s..."
+            sleep 30s
 	else
 	    echo "lvm-llava service is ready"
 	    break
 	fi
     done
+
+    if [[ $i -ge 10 ]]; then
+        echo "WARNING: Max retries reached when waiting for the lvm-llava service to be ready"
+        docker logs lvm-llava >> ${LOG_PATH}/lvm_llava_file.log
+    fi
 
     # llava server
     echo "Evaluating lvm-llava"
