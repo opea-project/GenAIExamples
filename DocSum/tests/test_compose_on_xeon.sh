@@ -208,6 +208,45 @@ function validate_megaservice() {
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
+function validate_frontend_gradio() {
+    cd $WORKPATH/ui/gradio
+
+    local python3_env_name="OPEA_e2e"
+    local python3_script="docsum_ui_gradio.py"
+
+    echo "[TEST INFO]: Creating a python3 virtualenv..."
+
+    python3 -m venv ${python3_env_name}
+
+    source ${python3_env_name}/bin/activate
+
+    echo "[TEST INFO]: Installing requirements for gradio ui..."
+
+    pip install -r requirements.txt
+
+    HOST=0.0.0.0
+    PORT=5173
+
+    echo "[TEST INFO]: Running the UI and testing..."
+    nohup python3 ${python3_script} > uvicorn.log 2>&1 &
+
+    # Wait for uvicorn server to start
+    sleep 5
+
+    # Check if the port is open and being listened to
+    if netstat -tuln | grep -q "$HOST:$PORT"; then
+        echo "[TEST INFO]: ---------frontend test passed---------"
+    else
+        echo "[TEST INFO]: ---------frontend test failed---------" >&2
+        exit 1
+    fi
+
+    echo "[TEST INFO]: Cleaning up..."
+    rm -rf ${python3_env_name} uvicorn.log
+    kill -9 $(lsof -i :5173 | grep LISTEN | awk '{print $2}')
+
+}
+
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose stop && docker compose rm -f
@@ -221,6 +260,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
+    validate_frontend_gradio
 
     stop_docker
     echo y | docker system prune
