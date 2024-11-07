@@ -203,7 +203,7 @@ function validate_microservices() {
     max_retries=10
     for i in $(seq $max_retries)
     do
-        lvm_logs=$(docker logs lvm-llava 2>&1 | grep "Uvicorn running on http://0.0.0.0") 
+        lvm_logs=$(docker logs lvm-llava 2>&1 | grep "Uvicorn running on http://0.0.0.0")
 	if [[ "$lvm_logs" != *"Uvicorn running on http://0.0.0.0"* ]]; then
             sleep 10s
 	else
