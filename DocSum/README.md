@@ -7,11 +7,7 @@ Large Language Models (LLMs) have revolutionized the way we interact with text. 
 ## Deploy Document Summarization Service
 
 The Document Summarization service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
-Based on whether you want to use Docker or Kubernetes, follow the instructions below.
-
-Currently we support deploying Document Summarization services with docker compose:
-
-Start services using the docker images `built from source`: [Guide](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose)
+Based on whether you want to use Docker or Kubernetes, follow the instructions below. Currently we support deploying Document Summarization services with docker compose.
 
 ### Required Models
 
@@ -21,7 +17,7 @@ We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "d
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 ```
 
-If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+If you use gated models, you also need to provide a [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
 ### Setup Environment Variable
 

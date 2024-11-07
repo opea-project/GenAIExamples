@@ -51,7 +51,7 @@ function start_services() {
     export DATA_SERVICE_HOST_IP=${ip_address}
     export DATA_SERVICE_PORT=7079 
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
+    # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -214,6 +214,7 @@ function stop_docker() {
 }
 
 function main() {
+
     stop_docker
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
