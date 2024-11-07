@@ -74,6 +74,9 @@ function start_services() {
     export LLM_SERVICE_HOST_PORT_FAQGEN=9002
     export LLM_SERVICE_HOST_PORT_CODEGEN=9001
     export LLM_SERVICE_HOST_PORT_DOCSUM=9003
+    export RERANK_SERVER_PORT=8808
+    export EMBEDDING_SERVER_PORT=6006
+    export LLM_SERVER_PORT=9009
     export PROMPT_COLLECTION_NAME="prompt"
 
     # Start Docker Containers
