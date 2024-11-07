@@ -106,7 +106,7 @@ services:
     ipc: host
     restart: always
     
-  docsum-xeon-ui-server:
+  docsum-gaudi-ui-server:
     image: opea/docsum-ui:latest
     container_name: docsum-gaudi-ui-server
     depends_on:
