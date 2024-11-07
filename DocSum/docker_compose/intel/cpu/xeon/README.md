@@ -109,7 +109,7 @@ To set up environment variables for deploying Document Summarization services, f
 
 ```bash
 cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon
-docker compose up -d
+docker compose -f compose.yaml up -d
 ```
 
 You will have the following Docker Images:
@@ -154,7 +154,7 @@ You will have the following Docker Images:
 
     Expected output:
     ```bash
-      expected to >>> {"asr_result":"you"}
+      {"asr_result":"you"}
     ```
 
 5. Audio2Text Microservice
@@ -168,7 +168,7 @@ You will have the following Docker Images:
 
     Expected output:
     ```bash
-      expected to >>> {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
+      {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
     ```
 
 5. Multimedia2text Microservice
@@ -182,7 +182,7 @@ You will have the following Docker Images:
 
     Expected output:
     ```bash
-      expected to >>> {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
+      {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
     ```
 
 6. MegaService
@@ -192,8 +192,6 @@ You will have the following Docker Images:
         "type":"text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
         }'
    ```
-
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
 > More detailed tests can be found here ```cd GenAIExamples/DocSum/test```
 

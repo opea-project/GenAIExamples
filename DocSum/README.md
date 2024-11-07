@@ -66,7 +66,7 @@ Follow the instructions provided in the [Xeon Guide](./docker_compose/intel/cpu/
 
 ```bash
 cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon/
-docker compose up -d
+docker compose -f compose.yaml up -d
 ```
 
 Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
@@ -152,9 +152,9 @@ Two ways of consuming Document Summarization Service:
 1. Use cURL command on terminal
 
    ```bash
-   curl http://${host_ip}:8888/v1/docsum \
-       -H "Content-Type: application/json" \
-       -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+   curl -X POST http://${host_ip}:8888/v1/docsum \
+        -H "Content-Type: application/json" \
+        -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
    ```
 
 2. Access via frontend
@@ -168,7 +168,6 @@ Two ways of consuming Document Summarization Service:
 1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
 
    ```bash
-   http_proxy=""
    curl http://${host_ip}:8008/generate \
      -X POST \
      -d '{"inputs":"What is Deep Learning?","parameters":{"max_tokens":17, "do_sample": true}}' \
