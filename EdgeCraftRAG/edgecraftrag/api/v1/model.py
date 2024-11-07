@@ -3,11 +3,8 @@
 
 import gc
 
-import gc
-
 from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.context import ctx
-
 from fastapi import FastAPI
 
 model_app = FastAPI()
