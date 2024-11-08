@@ -54,7 +54,7 @@ services:
     ipc: host
     environment:
       A2T_ENDPOINT: ${A2T_ENDPOINT}
- 
+
   v2a:
     image: opea/v2a:latest
     container_name: v2a-service

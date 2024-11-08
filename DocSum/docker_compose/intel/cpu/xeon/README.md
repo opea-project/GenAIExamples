@@ -13,6 +13,7 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 ## 🚀 Build Docker Images
 
 ### 1. Build MicroService Docker Image
+
 First of all, you need to build Docker Images locally and install the python package of it.
 
 ```bash
@@ -88,7 +89,7 @@ To set up environment variables for deploying Document Summarization services, f
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"     
+   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
@@ -122,7 +123,6 @@ You will have the following Docker Images:
 6. `opea/multimedia2text:latest`
 7. `opea/v2a:latest`
 
-
 ### Validate Microservices
 
 1. TGI Service
@@ -143,7 +143,7 @@ You will have the following Docker Images:
      -H 'Content-Type: application/json'
    ```
 
-4. Whisper Microservice
+3. Whisper Microservice
 
    ```bash
     curl http://${host_ip}:7066/v1/asr \
@@ -152,12 +152,13 @@ You will have the following Docker Images:
         -H 'Content-Type: application/json'
    ```
 
-    Expected output:
-    ```bash
-      {"asr_result":"you"}
-    ```
+   Expected output:
 
-5. Audio2Text Microservice
+   ```bash
+     {"asr_result":"you"}
+   ```
+
+4. Audio2Text Microservice
 
    ```bash
     curl http://${host_ip}:9099/v1/audio/transcriptions \
@@ -166,10 +167,11 @@ You will have the following Docker Images:
         -H 'Content-Type: application/json'
    ```
 
-    Expected output:
-    ```bash
-      {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
-    ```
+   Expected output:
+
+   ```bash
+     {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
+   ```
 
 5. Multimedia2text Microservice
 
@@ -180,10 +182,11 @@ You will have the following Docker Images:
         -H 'Content-Type: application/json'
    ```
 
-    Expected output:
-    ```bash
-      {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
-    ```
+   Expected output:
+
+   ```bash
+     {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
+   ```
 
 6. MegaService
 
@@ -193,9 +196,10 @@ You will have the following Docker Images:
         -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
    ```
 
-> More detailed tests can be found here ```cd GenAIExamples/DocSum/test```
+> More detailed tests can be found here `cd GenAIExamples/DocSum/test`
 
 ## 🚀 Launch the UI
+
 Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based frontend.
 
 ### Gradio UI

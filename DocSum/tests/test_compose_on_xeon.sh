@@ -45,11 +45,11 @@ function start_services() {
 
     export A2T_ENDPOINT=http://$ip_address:7066
     export A2T_SERVICE_HOST_IP=${ip_address}
-    export A2T_SERVICE_PORT=9099 
+    export A2T_SERVICE_PORT=9099
 
     export DATA_ENDPOINT=http://$ip_address:7079
     export DATA_SERVICE_HOST_IP=${ip_address}
-    export DATA_SERVICE_PORT=7079 
+    export DATA_SERVICE_PORT=7079
 
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -74,9 +74,9 @@ function validate_services() {
     local INPUT_DATA="$5"
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    
+
     echo "==========================================="
-    
+
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
@@ -98,12 +98,12 @@ function validate_services() {
         exit 1
     fi
     sleep 1s
-    
+
 }
 
 get_base64_str() {
     local file_name=$1
-    base64 -w 0 "$file_name" 
+    base64 -w 0 "$file_name"
 }
 
 # Function to generate input data for testing based on the document type
@@ -147,7 +147,7 @@ function validate_microservices() {
         "a2t" \
         "a2t-service" \
         "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
-    
+
     # Video2Audio service
     validate_services \
         "${ip_address}:7078/v1/video2audio" \
@@ -195,7 +195,7 @@ function validate_microservices() {
         "llm" \
         "llm-docsum-server" \
         '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
-  
+
 }
 
 function validate_megaservice() {
@@ -227,4 +227,3 @@ function main() {
 }
 
 main
-

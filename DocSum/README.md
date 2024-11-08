@@ -29,7 +29,7 @@ To set up environment variables for deploying Document Summarization services, f
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"     
+   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
@@ -56,6 +56,7 @@ Follow the instructions provided in the [Gaudi Guide](./docker_compose/intel/hpu
 cd GenAIExamples/DocSum/docker_compose/intel/hpu/gaudi/
 docker compose -f compose.yaml up -d
 ```
+
 Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
 
 > Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
@@ -88,7 +89,6 @@ Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree
 ### Workflow of the deployed Document Summarization Service
 
 The DocSum example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
-
 
 ```mermaid
 ---
@@ -135,15 +135,14 @@ flowchart LR
     UI --> GW
     GW <==> DocSum-MegaService
     M2T ==> LLM
-    
+
     %% Embedding service flow
     direction LR
     M2T .-> V2A_SRV
     M2T <-.-> A2T_SRV <-.-> WSP_SRV
-    V2A_SRV .-> A2T_SRV 
-    
-```
+    V2A_SRV .-> A2T_SRV
 
+```
 
 ## Consume Document Summarization Service
 

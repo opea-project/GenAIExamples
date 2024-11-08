@@ -14,9 +14,8 @@ export V2A_ENDPOINT=http://$host_ip:7078
 
 export A2T_ENDPOINT=http://$host_ip:7066
 export A2T_SERVICE_HOST_IP=${host_ip}
-export A2T_SERVICE_PORT=9099 
+export A2T_SERVICE_PORT=9099
 
 export DATA_ENDPOINT=http://$host_ip:7079
 export DATA_SERVICE_HOST_IP=${host_ip}
-export DATA_SERVICE_PORT=7079 
-
+export DATA_SERVICE_PORT=7079
