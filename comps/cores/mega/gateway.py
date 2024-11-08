@@ -107,8 +107,19 @@ class Gateway:
 
     def list_service(self):
         response = {}
-        for node in self.all_leaves():
-            response = {self.services[node].description: self.services[node].endpoint_path}
+        for node, service in self.megaservice.services.items():
+            # Check if the service has a 'description' attribute and it is not None
+            if hasattr(service, "description") and service.description:
+                response[node] = {"description": service.description}
+            # Check if the service has an 'endpoint' attribute and it is not None
+            if hasattr(service, "endpoint") and service.endpoint:
+                if node in response:
+                    response[node]["endpoint"] = service.endpoint
+                else:
+                    response[node] = {"endpoint": service.endpoint}
+            # If neither 'description' nor 'endpoint' is available, add an error message for the node
+            if node not in response:
+                response[node] = {"error": f"Service node {node} does not have 'description' or 'endpoint' attribute."}
         return response
 
     def list_parameter(self):

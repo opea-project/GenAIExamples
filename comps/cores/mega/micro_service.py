@@ -38,6 +38,7 @@ class MicroService:
         provider: Optional[str] = None,
         provider_endpoint: Optional[str] = None,
         use_remote_service: Optional[bool] = False,
+        description: Optional[str] = None,
         dynamic_batching: bool = False,
         dynamic_batching_timeout: int = 1,
         dynamic_batching_max_batch_size: int = 32,
@@ -53,6 +54,7 @@ class MicroService:
         self.input_datatype = input_datatype
         self.output_datatype = output_datatype
         self.use_remote_service = use_remote_service
+        self.description = description
         self.dynamic_batching = dynamic_batching
         self.dynamic_batching_timeout = dynamic_batching_timeout
         self.dynamic_batching_max_batch_size = dynamic_batching_max_batch_size
