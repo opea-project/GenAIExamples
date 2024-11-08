@@ -26,7 +26,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,vllm-ray-service,guardrails
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,guardrails
    ```
 
 3. Set up other environment variables:
@@ -227,7 +227,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,vllm-ray-service,guardrails
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,guardrails
    ```
 
 3. Set up other environment variables:
@@ -255,12 +255,6 @@ If use vllm for llm backend.
 
 ```bash
 docker compose -f compose_vllm.yaml up -d
-```
-
-If use vllm-on-ray for llm backend.
-
-```bash
-docker compose -f compose_vllm_ray.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
@@ -349,13 +343,6 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
      "max_tokens": 32,
      "temperature": 0
      }'
-   ```
-
-   ```bash
-   #vLLM-on-Ray Service
-   curl http://${host_ip}:8006/v1/chat/completions \
-     -H "Content-Type: application/json" \
-     -d '{"model": "${LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
    ```
 
 5. MegaService
