@@ -28,13 +28,13 @@
       }
     }
   ],
-  "generator": {
-    "model": {
-      "model_id": "Qwen/Qwen2-7B-Instruct",
-      "model_path": "./models/qwen2-7b-instruct/INT4_compressed_weights",
-      "device": "cpu"
+  "generator":{
+    "model":{
+        "model_id": "Qwen/Qwen2-7B-Instruct",
+        "model_path": "./models/qwen2-7b-instruct/INT4_compressed_weights",
+        "device": "cpu"
     },
-    "prompt_path": "./edgecraftrag/prompt_template/default_prompt.txt",
+    "prompt_path" : "./edgecraftrag/prompt_template/default_prompt.txt",
     "inference_type": "local"
   },
   "active": "True"

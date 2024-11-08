@@ -4,7 +4,7 @@
 import weakref
 
 from edgecraftrag.api_schema import PipelineCreateIn
-from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
+from edgecraftrag.base import IndexerType, ModelType, NodeParserType, PostProcessorType, RetrieverType, InferenceType
 from edgecraftrag.components.generator import QnAGenerator
 from edgecraftrag.components.indexer import VectorIndexer
 from edgecraftrag.components.node_parser import HierarchyNodeParser, SimpleNodeParser, SWindowNodeParser

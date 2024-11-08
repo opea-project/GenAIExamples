@@ -5,6 +5,7 @@ import gc
 
 from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.context import ctx
+
 from fastapi import FastAPI
 
 model_app = FastAPI()
@@ -17,11 +18,7 @@ async def get_models():
 
 
 # GET Model
-<<<<<<< HEAD
 @model_app.get(path="/v1/settings/models/{model_id:path}")
-=======
-@register_microservice(name="opea_service@ec_rag", endpoint="/v1/settings/models/{model_id:path}", host="0.0.0.0", port=16010, methods=['GET'])
->>>>>>> 7807806 (resolve pre-commit.ci check error)
 async def get_model_by_name(model_id):
     return ctx.get_model_mgr().get_model_by_name(model_id)
 

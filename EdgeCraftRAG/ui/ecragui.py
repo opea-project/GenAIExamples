@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import json
 import platform
 import re
 from datetime import datetime
@@ -21,11 +20,11 @@ import requests
 from loguru import logger
 from omegaconf import OmegaConf
 from platform_config import get_available_devices, get_available_weights, get_local_available_models
+import json
 
 pipeline_df = []
 
 import os
-
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "127.0.0.1")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 16011))
 UI_SERVICE_HOST_IP = os.getenv("UI_SERVICE_HOST_IP", "0.0.0.0")
@@ -176,7 +175,9 @@ def build_demo(cfg, args):
         #     "streaming": True
         # }
         print(history)
-        new_req = {"messages": history[-1][0]}
+        new_req = {
+            "messages": history[-1][0]
+        }
         server_addr = f"http://{MEGA_SERVICE_HOST_IP}:{MEGA_SERVICE_PORT}"
 
         # Async for streaming response
@@ -187,7 +188,7 @@ def build_demo(cfg, args):
                 async for chunk in response.aiter_lines():
                     new_text = chunk
                     if new_text.startswith("data"):
-                        new_text = re.sub(r"\r\n", "", chunk.split("data: ")[-1])
+                        new_text = re.sub(r'\r\n', '', chunk.split("data: ")[-1])
                     new_text = json.loads(chunk)["choices"][0]["message"]["content"]
                     partial_text = partial_text + new_text
                     history[-1][1] = partial_text
@@ -928,12 +929,12 @@ def main():
     # Create the parser
     parser = argparse.ArgumentParser(description="Load Embedding and LLM Models with OpenVino.")
     # Add the arguments
-    parser.add_argument("--prompt_template", type=str, required=False, help="User specific template")
+    parser.add_argument("--prompt_template", type=str, required=False, help='User specific template')
     # parser.add_argument("--server_name", type=str, default="0.0.0.0")
     # parser.add_argument("--server_port", type=int, default=8082)
-    parser.add_argument("--config", type=str, default="./default.yaml", help="configuration file path")
-    parser.add_argument("--share", action="store_true", help="share model")
-    parser.add_argument("--debug", action="store_true", help="enable debugging")
+    parser.add_argument("--config", type=str, default='./default.yaml', help="configuration file path")
+    parser.add_argument("--share", action='store_true', help="share model")
+    parser.add_argument("--debug", action='store_true', help="enable debugging")
 
     # Execute the parse_args() method to collect command line arguments
     args = parser.parse_args()

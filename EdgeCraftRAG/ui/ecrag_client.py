@@ -6,14 +6,13 @@ import sys
 import requests
 
 sys.path.append("..")
-import os
-
 from edgecraftrag import api_schema
 
+
+import os
 PIPELINE_SERVICE_HOST_IP = os.getenv("PIPELINE_SERVICE_HOST_IP", "127.0.0.1")
 PIPELINE_SERVICE_PORT = int(os.getenv("PIPELINE_SERVICE_PORT", 16010))
 server_addr = f"http://{PIPELINE_SERVICE_HOST_IP}:{PIPELINE_SERVICE_PORT}"
-
 
 def get_current_pipelines():
     res = requests.get(f"{server_addr}/v1/settings/pipelines", proxies={"http": None})

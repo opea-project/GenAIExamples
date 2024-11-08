@@ -4,13 +4,17 @@
 import dataclasses
 import os
 
-from comps import GeneratedDoc, opea_telemetry
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType
-from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
-from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
 
+from fastapi.responses import StreamingResponse
+from llama_index.llms.openai_like import OpenAILike
+
+from comps import (
+    GeneratedDoc,
+    opea_telemetry
+)
 
 @opea_telemetry
 def post_process_text(text: str):
@@ -89,8 +93,11 @@ class QnAGenerator(BaseComponent):
             text_gen_context += self.clean_string(origin_text.strip())
 
         query = chat_request.messages
-        prompt_str = self.prompt.format(input=query, context=text_gen_context)
-
+        prompt_str = self.prompt.format(
+            input=query, 
+            context=text_gen_context
+        )
+    
         llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8008")
         model_name = self.llm
         llm = OpenAILike(
@@ -104,7 +111,6 @@ class QnAGenerator(BaseComponent):
         )
 
         if chat_request.stream:
-
             async def stream_generator():
                 response = await llm.astream_complete(prompt_str)
                 async for text in response:
@@ -119,7 +125,7 @@ class QnAGenerator(BaseComponent):
             response = response.text
 
             return GeneratedDoc(text=response, prompt=prompt_str)
-
+        
     @model_serializer
     def ser_model(self):
         set = {"idx": self.idx, "generator_type": self.comp_subtype, "model": self.model_id}

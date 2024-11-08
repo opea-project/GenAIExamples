@@ -10,8 +10,8 @@ services:
         https_proxy: ${https_proxy}
       dockerfile: ./Dockerfile.server
     image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
-  ui:
-    build:
+  ui: 
+    build: 
       context: ..
       args:
         http_proxy: ${http_proxy}

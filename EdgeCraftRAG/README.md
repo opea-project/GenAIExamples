@@ -2,7 +2,7 @@
 
 Edge Craft RAG (EC-RAG) is a customizable, tunable and production-ready
 Retrieval-Augmented Generation system for edge solutions. It is designed to
-curate the RAG pipeline to meet hardware requirements at edge with guaranteed
+curate the RAG pipeline to meet hardware requirements at edge with garanteed
 quality and performance.
 
 ## Quick Start Guide
@@ -26,8 +26,8 @@ export vLLM_ENDPOINT="http://${HOST_IP}:8008"
 # export HF_ENDPOINT="your HF mirror endpoint"
 
 # By default, the ports of the containers are set, uncomment if you want to change
-# export MEGA_SERVICE_PORT=16011
-# export PIPELINE_SERVICE_PORT=16011
+# export MEGA_SERVICE_PORT=16011 
+# export PIPELINE_SERVICE_PORT=16011 
 
 docker compose up -d
 ```
@@ -121,8 +121,7 @@ Open your browser, access http://${HOST_IP}:8082
 
 > Your browser should be running on the same host of your console, otherwise you will need to access UI with your host domain name instead of ${HOST_IP}.
 
-### (Optional) Launch vLLM with OpenVINO service
-
+### (Optional) Launch vLLM with OpenVINO service 
 ```bash
 # 1. export LLM_MODEL
 export LLM_MODEL="your model id"
@@ -158,7 +157,6 @@ export LLM_MODEL="your model id"
 ```bash
 curl -X POST http://${HOST_IP}:16010/v1/settings/pipelines -H "Content-Type: application/json" -d @examples/test_pipeline.json | jq '.'
 ```
-
 It will take some time to prepare the embedding model.
 
 #### Upload a text
@@ -207,7 +205,6 @@ curl -X POST http://${HOST_IP}:16010/v1/retrieval -H "Content-Type: application/
 ```bash
 curl -X POST http://${HOST_IP}:16010/v1/settings/models -H "Content-Type: application/json" -d @examples/test_model_load.json | jq '.'
 ```
-
 It will take some time to load the model.
 
 #### Check all models
