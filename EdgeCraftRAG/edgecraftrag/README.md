@@ -39,7 +39,7 @@ cd edgecraftrag/ui
 python3 -m ecragui
 ```
 
-Open your browser, access [http://127.0.0.1:8082](http://127.0.0.1:8082)
+Open your browser, access [http://127.0.0.1:8082]
 
 > Your browser should be running on the same host of your console, otherwise you will need to access UI with your host domain name instead of 127.0.0.1.
 
