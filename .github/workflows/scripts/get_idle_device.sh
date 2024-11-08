@@ -12,39 +12,28 @@
 # fi
 
 declare -A dict
+: "${USE_MODULE_ID:=0}"
 
 function get_hpu_usage {
-    local data=$(hl-smi -Q index,utilization.aip,memory.used -f csv)
-    echo "$data"
-}
-
-function get_hpu_mapping {
-    local data=$(hl-smi -Q index,module_id -f csv,noheader)
+    local data=$(hl-smi -Q index,module_id,utilization.aip,memory.used -f csv)
     echo "$data"
 }
 
 function get_idle_device_id {
     local device_usage=$(get_hpu_usage)
-    local available_indices=($(echo "$device_usage" | awk -F ', ' '$2=="0 %" && $3=="768 MiB" {print $1}'))
+    local available_indices=($(echo "$device_usage" | awk -F ', ' '$3=="0 %" && $4=="768 MiB" {print $1}'))
+    local available_modules=($(echo "$device_usage" | awk -F ', ' '$3=="0 %" && $4=="768 MiB" {print $2}'))
 
     if [ ${#available_indices[@]} -gt 0 ]; then
-        local random_index=${available_indices[$RANDOM % ${#available_indices[@]}]}
-        echo "$random_index"
+        if [ $USE_MODULE_ID -eq 1 ]; then
+            local random_id=${available_modules[$RANDOM % ${#available_modules[@]}]}
+        else
+            local random_id=${available_indices[$RANDOM % ${#available_indices[@]}]}
+        fi
+        echo "$random_id"
     else
         echo "-1"
     fi
-}
-
-function get_idle_module_id {
-    local device_id=$1
-    local mapping=$(get_hpu_mapping)
-    local dict=()
-    while IFS=',' read -r key value; do
-        key=$(echo "$key" | xargs)
-        value=$(echo "$value" | xargs)
-        dict["$key"]="$value"
-    done <<<"$mapping"
-    echo "${dict[$device_id]}"
 }
 
 function main {
