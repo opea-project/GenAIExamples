@@ -38,8 +38,8 @@
     } else {
       currentIdx = index;
       if (
-        (currentIdx === 1 && message !== "") ||
-        (currentIdx === 2 && $kb_id !== "")
+        (currentIdx === 2 && message !== "") ||
+        (currentIdx === 1 && $kb_id !== "")
       ) {
         formModal = true;
       } else {
@@ -49,10 +49,10 @@
   }
 
   function panelExchange() {
-    if (currentIdx === 2) {
+    if (currentIdx === 1) {
       kb_id.set("");
       dispatch("clearMsg", { status: true });
-    } else if (currentIdx === 1) {
+    } else if (currentIdx === 2) {
       message = "";
       dispatch("clearMsg", { status: true });
     }
@@ -127,7 +127,7 @@
               data-testid="sum-input"
               id="textarea-id"
               class="xl:h-[30rem] xl:my-4"
-              placeholder="Copy the text information you need to generate FAQs."
+              placeholder="Copy the text information you need to summarize."
               rows="13"
               name="message"
               bind:value={message}
@@ -151,10 +151,10 @@
     <button
       type="submit"
       data-testid="sum-click"
-      class="xl:my-12 inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 mt-2 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
+      class="xl:my-10 inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
       on:click={() => generateFaq()}
     >
-      Generate FAQs
+      Generate Summary
     </button>
   {/if}
 </div>
@@ -164,12 +164,12 @@
     class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
   />
   {#if currentIdx === 1}
-    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-      The current content will be cleared.
+    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 text-center">
+      The currently uploaded file will be cleared.
     </h3>
   {:else if currentIdx === 2}
-    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-      The currently uploaded file will be cleared.
+    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 text-center">
+      The current content will be cleared.
     </h3>
   {/if}
 
