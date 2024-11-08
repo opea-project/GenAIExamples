@@ -1,0 +1,93 @@
+apiVersion: v1
+data:
+  default.conf: |+
+    # Copyright (C) 2024 Intel Corporation
+    # SPDX-License-Identifier: Apache-2.0
+
+
+    server {
+        listen       80;
+        listen  [::]:80;
+
+        location /home {
+            alias  /usr/share/nginx/html/index.html;
+        }
+
+        location / {
+            proxy_pass http://{{ include "ui.fullname" (index .Subcharts "docsum-ui") }}:{{ index .Values "docsum-ui" "service" "port" }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/docsum {
+            proxy_pass http://{{ include "docsum.fullname" . }}:{{ .Values.service.port }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+
+kind: ConfigMap
+metadata:
+  name: {{ include "docsum.fullname" . }}-nginx-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "docsum.fullname" . }}-nginx
+  labels:
+    {{- include "docsum.labels" . | nindent 4 }}
+    app: {{ include "docsum.fullname" . }}-nginx
+spec:
+  selector:
+    matchLabels:
+      {{- include "docsum.selectorLabels" . | nindent 6 }}
+      app: {{ include "docsum.fullname" . }}-nginx
+  template:
+    metadata:
+      labels:
+        {{- include "docsum.selectorLabels" . | nindent 8 }}
+        app: {{ include "docsum.fullname" . }}-nginx
+    spec:
+      containers:
+      - image: nginx:1.27.1
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: nginx
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-config-volume
+      securityContext: {}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: {{ include "docsum.fullname" . }}-nginx-config
+        name: nginx-config-volume
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "docsum.fullname" . }}-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    {{- include "docsum.selectorLabels" . | nindent 4 }}
+    app: {{ include "docsum.fullname" . }}-nginx
+  type: {{ .Values.nginx.service.type }}

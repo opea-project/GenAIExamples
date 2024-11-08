@@ -1,0 +1,18 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+{{- if .Values.global.monitoring }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "docsum.fullname" . }}
+  labels:
+    release: {{ .Values.global.prometheusRelease }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "docsum.selectorLabels" . | nindent 6 }}
+  endpoints:
+  - port: docsum
+    interval: 5s
+{{- end }}

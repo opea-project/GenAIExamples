@@ -1,0 +1,73 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Default values for docsum.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+LLM_SERVICE_HOST_IP: ""
+
+image:
+  repository: opea/docsum
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+port: 8888
+service:
+  type: ClusterIP
+  port: 8888
+
+nginx:
+  service:
+    type: NodePort
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+    - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# To override values in subchart llm-uservice
+llm-uservice:
+  image:
+    repository: opea/llm-docsum-tgi
+
+# To override values in subchart tgi
+tgi:
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
+
+docsum-ui:
+  image:
+    repository: opea/docsum-ui
+    tag: "latest"
+  BACKEND_SERVICE_ENDPOINT: "/v1/docsum"
+  containerPort: 5173
+
+global:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  # set modelUseHostPath or modelUsePVC to use model cache.
+  modelUseHostPath: ""
+  # modelUseHostPath: /mnt/opea-models
+  # modelUsePVC: model-volume
+
+  # Install Prometheus serviceMonitors for service components
+  monitoring: false
+
+  # Prometheus Helm install release name needed for serviceMonitors
+  prometheusRelease: prometheus-stack
