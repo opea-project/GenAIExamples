@@ -27,7 +27,6 @@ jobs:
     - name: Build Online Document
       shell: bash
       run: |
-        git config --local --get remote.origin.url
         echo "build online doc"
         pwd
         ls
