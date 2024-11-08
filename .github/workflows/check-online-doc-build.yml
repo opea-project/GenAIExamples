@@ -28,8 +28,4 @@ jobs:
       shell: bash
       run: |
         echo "build online doc"
-        pwd
-        ls
-        cd docs
-        pwd
         bash scripts/build.sh

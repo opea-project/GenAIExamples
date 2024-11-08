@@ -1,4 +1,4 @@
-## Generative AI Examples
+# Generative AI Examples
 
 [![version](https://img.shields.io/badge/release-0.9-green)](https://github.com/opea-project/GenAIExamples/releases)
 [![license](https://img.shields.io/badge/license-Apache%202-blue)](https://github.com/intel/neural-compressor/blob/master/LICENSE)
