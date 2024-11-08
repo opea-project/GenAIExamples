@@ -19,7 +19,7 @@ const FAQ_BASE_URL = env.FAQ_BASE_URL;
 export async function fetchTextStream(query: string | Blob, params: string, file: Blob, fileName: string | undefined) {
   const url = `${FAQ_BASE_URL}`; // Ensure the URL is constructed correctly
   const formData = new FormData();
-  
+
   if (!file) {
     file = new Blob([""], { type: "text/plain" });
     fileName = "empty.txt";

@@ -49,7 +49,7 @@
       for await (const chunk of eventStream) {
       let Msg = chunk;
       console.log('Msg', Msg);
-      
+
       if (Msg !== "[DONE]") {
         let res = JSON.parse(Msg);
         let logs = res.ops;
@@ -78,7 +78,7 @@
 
   async function handleGenerateFaq(e) {
     console.log('handleGenerateFaq', e);
-    
+
     if (e.detail.mode === "file") {
       await callTextStream(e.detail.value, "/file_summarize", "doc_id");
     } else if (e.detail.mode === "text") {
