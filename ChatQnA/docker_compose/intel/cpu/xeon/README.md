@@ -48,13 +48,13 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-In following cases, you could build docker image from source by yourself.
+NB: You should build docker image from source by yourself if:
 
-- Failed to download the docker image.
+- You are developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
+- You can't download the docker image.
+- You want to use a specific version of Docker image.
 
-- If you want to use a specific version of Docker image.
-
-Please refer to 'Build Docker Images' in below.
+Please refer to ['Build Docker Images'](#🚀-build-docker-images) in below.
 
 ## QuickStart: 3.Consume the ChatQnA Service
 
