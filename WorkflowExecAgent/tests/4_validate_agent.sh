@@ -5,30 +5,11 @@
 set -e
 
 WORKPATH=$(dirname "$PWD")
-workflow_id=9809
-vllm_port=${vllm_port}
-[[ -z "$vllm_port" ]] && vllm_port=8084
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
-export SDK_BASE_URL=${SDK_BASE_URL}
-export SERVING_TOKEN=${SERVING_TOKEN}
-export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export llm_engine=vllm
 export ip_address=$(hostname -I | awk '{print $1}')
-export llm_endpoint_url=http://${ip_address}:${vllm_port}
-export model=mistralai/Mistral-7B-Instruct-v0.3
-export recursion_limit=25
-export temperature=0
-export max_new_tokens=1000
-export TOOLSET_PATH=$WORKDIR/GenAIExamples/WorkflowExecAgent/tools/
-
-function start_agent_and_api_server() {
-    echo "Starting Agent services"
-    cd $WORKDIR/GenAIExamples/WorkflowExecAgent/docker_compose/intel/cpu/xeon
-    WORKDIR=$WORKPATH/docker_image_build/ docker compose -f compose_vllm.yaml up -d
-    echo "Waiting agent service ready"
-    sleep 5s
-}
+query=$1
+validate_result=$2
 
 function validate() {
     local CONTENT="$1"
@@ -47,17 +28,13 @@ function validate() {
 function validate_agent_service() {
     echo "----------------Test agent ----------------"
     local CONTENT=$(curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "I have a data with gender Female, tenure 55, MonthlyAvgCharges 103.7. Predict if this entry will churn. My workflow id is '${workflow_id}'."
+     "query": "'"${query}"'"
     }')
-    validate "$CONTENT" "The entry is not likely to churn" "workflowexec-agent-endpoint"
+    validate "$CONTENT" "$validate_result" "workflowexec-agent-endpoint"
     docker logs workflowexec-agent-endpoint
 }
 
 function main() {
-    echo "==================== Start agent ===================="
-    start_agent_and_api_server
-    echo "==================== Agent started ===================="
-
     echo "==================== Validate agent service ===================="
     validate_agent_service
     echo "==================== Agent service validated ===================="

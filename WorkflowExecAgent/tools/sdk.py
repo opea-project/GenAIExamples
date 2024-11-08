@@ -7,7 +7,7 @@ from tools.components.workflow import Workflow
 from tools.utils.handle_requests import RequestHandler
 
 
-class EasyDataSDK:      # Example SDK class for Data Insight Automation platform
+class DataInsightAutomationSDK:      # Example SDK class for Data Insight Automation platform
     """SDK class containing all components.
 
     Attributes:

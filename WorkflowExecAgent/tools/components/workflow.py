@@ -36,7 +36,7 @@ class Workflow(Component):
         
         data = json.dumps({"params": params})
         endpoint = f"serving/servable_workflows/{self.workflow_id}/start"
-        self.wf_key = self._make_request(endpoint, "POST", data)["wf_key"]
+        self.wf_key = self._make_request(endpoint, "POST", data).get("wf_key", None)
         if self.wf_key:
             return f"Workflow successfully started. The workflow key is {self.wf_key}."
         else:

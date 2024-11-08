@@ -17,7 +17,7 @@ function build_agent_docker_image() {
     cd $WORKDIR/GenAIExamples/WorkflowExecAgent/docker_image_build/
     get_genai_comps
     echo "Build agent image with --no-cache..."
-    docker compose -f build.yaml build --no-cache
+    docker compose -f build.yaml build
 }
 
 function main() {

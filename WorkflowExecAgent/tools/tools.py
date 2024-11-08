@@ -3,7 +3,7 @@
 
 import time
 
-from tools.sdk import EasyDataSDK
+from tools.sdk import DataInsightAutomationSDK
 
 
 def workflow_executor(params, workflow_id: int) -> dict:
@@ -18,7 +18,7 @@ def workflow_executor(params, workflow_id: int) -> dict:
 
     # Replace function logic with use-case
 
-    sdk = EasyDataSDK()                             # Initialize SDK instance
+    sdk = DataInsightAutomationSDK()                # Initialize SDK instance
     workflow = sdk.create_workflow(workflow_id)     # Create workflow instance object
 
     params = {key: str(val) for key, val in params.items()}
