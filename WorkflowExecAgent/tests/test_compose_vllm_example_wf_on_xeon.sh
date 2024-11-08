@@ -5,6 +5,7 @@
 wf_api_port=${wf_api_port}
 [[ -z "$wf_api_port" ]] && wf_api_port=5000
 api_server_url=http://$(hostname -I | awk '{print $1}'):${wf_api_port}/
+workflow_id=9838
 query="I have a data with gender Female, tenure 55, MonthlyCharges 103.7, TotalCharges 1840.75. Predict if this entry will churn. My workflow id is ${workflow_id}."
 validate_result="the prediction is No"
 
