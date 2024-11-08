@@ -31,5 +31,7 @@ jobs:
       run: |
         git config --local --get remote.origin.url
         echo "build online doc"
+        pwd
+        ls
         cd docs
         bash scripts/build.sh
