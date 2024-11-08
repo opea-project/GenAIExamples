@@ -10,7 +10,7 @@ quality and performance.
 ### Run Containers with Docker Compose
 
 ```bash
-cd GenAIExamples/EdgeCraftRAG/docker_compose/Intel/Arc
+cd GenAIExamples/EdgeCraftRAG/docker_compose/intel/gpu/arc
 
 export MODEL_PATH="your model path for all your models"
 export DOC_PATH="your doc path for uploading a dir of files"
@@ -39,7 +39,7 @@ cd GenAIExamples/EdgeCraftRAG
 
 docker build --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --build-arg no_proxy=$NO_PROXY -t opea/edgecraftrag:latest -f Dockerfile .
 docker build --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --build-arg no_proxy=$NO_PROXY -t opea/edgecraftrag-server:latest -f Dockerfile.server .
-docker build --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --build-arg no_proxy=$NO_PROXY -t opea/edgecraftrag-ui:latest -f Dockerfile.ui .
+docker build --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --build-arg no_proxy=$NO_PROXY -t opea/edgecraftrag-ui:latest -f ui/docker/Dockerfile.ui .
 ```
 
 ### ChatQnA with LLM Example (Command Line)
@@ -126,7 +126,7 @@ Open your browser, access http://${HOST_IP}:8082
 ```bash
 # 1. export LLM_MODEL
 export LLM_MODEL="your model id"
-# 2. Uncomment below code in 'GenAIExamples/EdgeCraftRAG/docker_compose/Intel/Arc/compose.yaml'
+# 2. Uncomment below code in 'GenAIExamples/EdgeCraftRAG/docker_compose/intel/gpu/arc/compose.yaml'
   # vllm-service:
   #   image: vllm:openvino
   #   container_name: vllm-openvino-server

@@ -16,7 +16,7 @@ services:
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
-      dockerfile: ./Dockerfile.ui
+      dockerfile: ./ui/docker/Dockerfile.ui
     image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
   ecrag:
     build:

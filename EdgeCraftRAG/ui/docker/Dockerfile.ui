@@ -5,10 +5,10 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
     libjemalloc-dev 
 
 RUN useradd -m -s /bin/bash user && \
-    mkdir -p /home/user && \
+    mkdir -p /home/user/ui && \
     chown -R user /home/user/
 
-COPY ./ui /home/user/ui
+COPY . /home/user/ui
 COPY ./edgecraftrag /home/user/edgecraftrag
 
 WORKDIR /home/user/edgecraftrag
