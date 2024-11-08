@@ -56,7 +56,9 @@ class BridgeTowerEmbedding(BaseModel, Embeddings):
         Returns:
             List of embeddings, one for each text.
         """
-        encodings = self.PROCESSOR.tokenizer(texts, return_tensors="pt").to(self.device)
+        encodings = self.PROCESSOR.tokenizer(
+            texts, return_tensors="pt", max_length=200, padding="max_length", truncation=True
+        ).to(self.device)
         with torch.no_grad():
             outputs = self.TEXT_MODEL(**encodings)
         embeddings = outputs.cpu().numpy().tolist()

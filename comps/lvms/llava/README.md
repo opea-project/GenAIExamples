@@ -103,8 +103,11 @@ docker run -p 9399:9399 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$htt
 ```bash
 # Use curl/python
 
-# curl
+# curl with an image and a prompt
 http_proxy="" curl http://localhost:9399/v1/lvm -XPOST -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}' -H 'Content-Type: application/json'
+
+# curl with a prompt only (no image)
+http_proxy="" curl http://localhost:9399/v1/lvm -XPOST -d '{"image": "", "prompt":"What is deep learning?"}' -H 'Content-Type: application/json'
 
 # python
 python check_lvm.py

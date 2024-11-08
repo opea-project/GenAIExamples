@@ -4,7 +4,7 @@
 import os
 
 # Models
-EMBED_MODEL = os.getenv("EMBED_MODEL", "BridgeTower/bridgetower-large-itm-mlm-itc")
+EMBED_MODEL = os.getenv("EMBEDDING_MODEL_ID", "BridgeTower/bridgetower-large-itm-mlm-itc")
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small")
 
 # Redis Connection Information

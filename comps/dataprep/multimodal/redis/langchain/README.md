@@ -1,6 +1,10 @@
 # Dataprep Microservice for Multimodal Data with Redis
 
-This `dataprep` microservice accepts videos (mp4 files) and their transcripts (optional) from the user and ingests them into Redis vectorstore.
+This `dataprep` microservice accepts the following from the user and ingests them into a Redis vector store:
+
+- Videos (mp4 files) and their transcripts (optional)
+- Images (gif, jpg, jpeg, and png files) and their captions (optional)
+- Audio (wav files)
 
 ## 🚀1. Start Microservice with Python（Option 1）
 
@@ -107,18 +111,18 @@ docker container logs -f dataprep-multimodal-redis
 
 ## 🚀4. Consume Microservice
 
-Once this dataprep microservice is started, user can use the below commands to invoke the microservice to convert videos and their transcripts (optional) to embeddings and save to the Redis vector store.
+Once this dataprep microservice is started, user can use the below commands to invoke the microservice to convert images and videos and their transcripts (optional) to embeddings and save to the Redis vector store.
 
-This mircroservice has provided 3 different ways for users to ingest videos into Redis vector store corresponding to the 3 use cases.
+This microservice provides 3 different ways for users to ingest files into Redis vector store corresponding to the 3 use cases.
 
-### 4.1 Consume _videos_with_transcripts_ API
+### 4.1 Consume _ingest_with_text_ API
 
-**Use case:** This API is used when a transcript file (under `.vtt` format) is available for each video.
+**Use case:** This API is used when videos are accompanied by transcript files (`.vtt` format) or images are accompanied by text caption files (`.txt` format).
 
 **Important notes:**
 
 - Make sure the file paths after `files=@` are correct.
-- Every transcript file's name must be identical with its corresponding video file's name (except their extension .vtt and .mp4). For example, `video1.mp4` and `video1.vtt`. Otherwise, if `video1.vtt` is not included correctly in this API call, this microservice will return error `No captions file video1.vtt found for video1.mp4`.
+- Every transcript or caption file's name must be identical to its corresponding video or image file's name (except their extension - .vtt goes with .mp4 and .txt goes with .jpg, .jpeg, .png, or .gif). For example, `video1.mp4` and `video1.vtt`. Otherwise, if `video1.vtt` is not included correctly in the API call, the microservice will return an error `No captions file video1.vtt found for video1.mp4`.
 
 #### Single video-transcript pair upload
 
@@ -127,10 +131,20 @@ curl -X POST \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./video1.mp4" \
     -F "files=@./video1.vtt" \
-    http://localhost:6007/v1/videos_with_transcripts
+    http://localhost:6007/v1/ingest_with_text
 ```
 
-#### Multiple video-transcript pair upload
+#### Single image-caption pair upload
+
+```bash
+curl -X POST \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./image.jpg" \
+    -F "files=@./image.txt" \
+    http://localhost:6007/v1/ingest_with_text
+```
+
+#### Multiple file pair upload
 
 ```bash
 curl -X POST \
@@ -139,16 +153,20 @@ curl -X POST \
     -F "files=@./video1.vtt" \
     -F "files=@./video2.mp4" \
     -F "files=@./video2.vtt" \
-    http://localhost:6007/v1/videos_with_transcripts
+    -F "files=@./image1.png" \
+    -F "files=@./image1.txt" \
+    -F "files=@./image2.jpg" \
+    -F "files=@./image2.txt" \
+    http://localhost:6007/v1/ingest_with_text
 ```
 
 ### 4.2 Consume _generate_transcripts_ API
 
-**Use case:** This API should be used when a video has meaningful audio or recognizable speech but its transcript file is not available.
+**Use case:** This API should be used when a video has meaningful audio or recognizable speech but its transcript file is not available, or for audio files with speech.
 
-In this use case, this microservice will use [`whisper`](https://openai.com/index/whisper/) model to generate the `.vtt` transcript for the video.
+In this use case, this microservice will use [`whisper`](https://openai.com/index/whisper/) model to generate the `.vtt` transcript for the video or audio files.
 
-#### Single video upload
+#### Single file upload
 
 ```bash
 curl -X POST \
@@ -157,21 +175,22 @@ curl -X POST \
     http://localhost:6007/v1/generate_transcripts
 ```
 
-#### Multiple video upload
+#### Multiple file upload
 
 ```bash
 curl -X POST \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./video1.mp4" \
     -F "files=@./video2.mp4" \
+    -F "files=@./audio1.wav" \
     http://localhost:6007/v1/generate_transcripts
 ```
 
 ### 4.3 Consume _generate_captions_ API
 
-**Use case:** This API should be used when a video does not have meaningful audio or does not have audio.
+**Use case:** This API should be used when uploading an image, or when uploading a video that does not have meaningful audio or does not have audio.
 
-In this use case, transcript either does not provide any meaningful information or does not exist. Thus, it is preferred to leverage a LVM microservice to summarize the video frames.
+In this use case, there is no meaningful language transcription. Thus, it is preferred to leverage a LVM microservice to summarize the frames.
 
 - Single video upload
 
@@ -192,22 +211,31 @@ curl -X POST \
     http://localhost:6007/v1/generate_captions
 ```
 
-### 4.4 Consume get_videos API
-
-To get names of uploaded videos, use the following command.
+- Single image upload
 
 ```bash
 curl -X POST \
-    -H "Content-Type: application/json" \
-    http://localhost:6007/v1/dataprep/get_videos
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./image.jpg" \
+    http://localhost:6007/v1/generate_captions
 ```
 
-### 4.5 Consume delete_videos API
+### 4.4 Consume get_files API
 
-To delete uploaded videos and clear the database, use the following command.
+To get names of uploaded files, use the following command.
 
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
-    http://localhost:6007/v1/dataprep/delete_videos
+    http://localhost:6007/v1/dataprep/get_files
+```
+
+### 4.5 Consume delete_files API
+
+To delete uploaded files and clear the database, use the following command.
+
+```bash
+curl -X POST \
+    -H "Content-Type: application/json" \
+    http://localhost:6007/v1/dataprep/delete_files
 ```

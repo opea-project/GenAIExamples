@@ -34,12 +34,24 @@ function validate_microservice() {
     lvm_port=5050
     result=$(http_proxy="" curl http://localhost:$lvm_port/v1/lvm -XPOST -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}' -H 'Content-Type: application/json')
     if [[ $result == *"yellow"* ]]; then
-        echo "Result correct."
+        echo "LVM prompt with an image - Result correct."
     else
-        echo "Result wrong."
+        echo "LVM prompt with an image - Result wrong."
         docker logs test-comps-lvm-tgi-llava >> ${LOG_PATH}/llava-dependency.log
         docker logs test-comps-lvm-tgi >> ${LOG_PATH}/llava-server.log
         exit 1
+    fi
+
+    result=$(http_proxy="" curl http://localhost:$lvm_port/v1/lvm --silent --write-out "HTTPSTATUS:%{http_code}" -XPOST -d '{"image": "", "prompt":"What is deep learning?"}' -H 'Content-Type: application/json')
+    http_status=$(echo $result | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    if [ "$http_status" -ne "200" ]; then
+
+        echo "LVM prompt without image - HTTP status is not 200. Received status was $http_status"
+        docker logs test-comps-lvm-tgi-llava >> ${LOG_PATH}/llava-dependency.log
+        docker logs test-comps-lvm-tgi >> ${LOG_PATH}/llava-server.log
+        exit 1
+    else
+        echo "LVM prompt without image - HTTP status (successful)"
     fi
 
 }

@@ -52,11 +52,12 @@ async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> Union[TextDoc
             raise HTTPException(status_code=500, detail="There is no video segments retrieved given the query!")
 
         img_b64_str = retrieved_metadatas[0]["b64_img_str"]
+        has_image = img_b64_str != ""
         initial_query = request.initial_query
         context = retrieved_metadatas[0]["transcript_for_inference"]
         prompt = initial_query
         if request.chat_template is None:
-            prompt = ChatTemplate.generate_multimodal_rag_on_videos_prompt(initial_query, context)
+            prompt = ChatTemplate.generate_multimodal_rag_on_videos_prompt(initial_query, context, has_image)
         else:
             prompt_template = PromptTemplate.from_template(request.chat_template)
             input_variables = prompt_template.input_variables

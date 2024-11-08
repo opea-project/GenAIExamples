@@ -14,6 +14,7 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 from transformers import pipeline
+from transformers.image_utils import load_image
 
 model_name_or_path = None
 model_dtype = None
@@ -23,6 +24,72 @@ generator = None
 
 
 app = FastAPI()
+
+
+def pipeline_preprocess(self, image, prompt=None, timeout=None):
+    """
+    This replaces the preprocess function used by the image-to-text pipeline
+    (https://github.com/huggingface/transformers/blob/main/src/transformers/pipelines/image_to_text.py).
+    The original transformers image-to-text pipeline preprocess function requires that an image is passed in, and will
+    fail if the image parameter is null/empty. In order to support multimodal use cases with the same pipeline, this
+    preprocess function handles the case where there is no image with the prompt.
+    """
+
+    if image:
+        image = load_image(image, timeout=timeout)
+
+    if prompt is not None:
+        if not isinstance(prompt, str):
+            raise ValueError(
+                f"Received an invalid text input, got - {type(prompt)} - but expected a single string. "
+                "Note also that one single text can be provided for conditional image to text generation."
+            )
+
+        model_type = self.model.config.model_type
+
+        if model_type == "git":
+            if image:
+                model_inputs = self.image_processor(images=image, return_tensors=self.framework)
+                if self.framework == "pt":
+                    model_inputs = model_inputs.to(self.torch_dtype)
+            else:
+                model_inputs = {}
+            input_ids = self.tokenizer(text=prompt, add_special_tokens=False).input_ids
+            input_ids = [self.tokenizer.cls_token_id] + input_ids
+            input_ids = torch.tensor(input_ids).unsqueeze(0)
+            model_inputs.update({"input_ids": input_ids})
+        elif model_type == "pix2struct":
+            model_inputs = self.image_processor(images=image, header_text=prompt, return_tensors=self.framework)
+            if self.framework == "pt":
+                model_inputs = model_inputs.to(self.torch_dtype)
+
+        elif model_type != "vision-encoder-decoder":
+            if image:
+                # vision-encoder-decoder does not support conditional generation
+                model_inputs = self.image_processor(images=image, return_tensors=self.framework)
+
+                if self.framework == "pt":
+                    model_inputs = model_inputs.to(self.torch_dtype)
+            else:
+                model_inputs = {}
+
+            text_inputs = self.tokenizer(prompt, return_tensors=self.framework)
+            model_inputs.update(text_inputs)
+
+        else:
+            raise ValueError(f"Model type {model_type} does not support conditional text generation")
+
+    elif image:
+        model_inputs = self.image_processor(images=image, return_tensors=self.framework)
+        if self.framework == "pt":
+            model_inputs = model_inputs.to(self.torch_dtype)
+    else:
+        raise ValueError("Both image and prompt cannot be empty.")
+
+    if self.model.config.model_type == "git" and prompt is None:
+        model_inputs["input_ids"] = None
+
+    return model_inputs
 
 
 def process_image(image, max_len=1344, min_len=672):
@@ -54,12 +121,16 @@ async def generate(request: Request) -> Response:  # FIXME batch_size=1 for now,
     img_b64_str = request_dict.pop("img_b64_str")
     max_new_tokens = request_dict.pop("max_new_tokens", 100)
 
-    # format the prompt
-    prompt = f"<image>\nUSER: {prompt}\nASSISTANT:"
-
-    # Decode and Resize the image
-    image = PIL.Image.open(BytesIO(base64.b64decode(img_b64_str)))
-    image = process_image(image)
+    if img_b64_str:
+        # Decode and Resize the image
+        image = PIL.Image.open(BytesIO(base64.b64decode(img_b64_str)))
+        image = process_image(image)
+        # format the prompt with an image
+        prompt = f"<image>\nUSER: {prompt}\nASSISTANT:"
+    else:
+        image = None
+        # format the prompt with text only
+        prompt = f"USER: {prompt}\nASSISTANT:"
 
     if args.device == "hpu":
         generate_kwargs = {
@@ -74,11 +145,17 @@ async def generate(request: Request) -> Response:  # FIXME batch_size=1 for now,
         }
 
     start = time.time()
+
+    # Override the pipeline preprocessing
+    generator.preprocess = pipeline_preprocess.__get__(generator, type(generator))
+
     result = generator(image, prompt=prompt, batch_size=1, generate_kwargs=generate_kwargs)
     end = time.time()
     result = result[0]["generated_text"].split("ASSISTANT: ")[-1]
     print(f"LLaVA result = {result}, time = {(end-start) * 1000 }ms")
-    image.close()
+    if image:
+        image.close()
+
     ret = {"text": result}
     return JSONResponse(ret)
 

@@ -68,6 +68,17 @@ function validate_microservice() {
         exit 1
     fi
 
+    # Test the LVM with text only (no image)
+    result=$(http_proxy="" curl http://localhost:$lvm_port/v1/lvm -XPOST -d '{"image": "", "prompt":"What is deep learning?"}' -H 'Content-Type: application/json')
+    if [[ $result == *"Deep learning is"* ]]; then
+        echo "Result correct."
+    else
+        echo "Result wrong."
+        docker logs test-comps-lvm-llava >> ${LOG_PATH}/llava-dependency.log
+        docker logs test-comps-lvm-llava-svc >> ${LOG_PATH}/llava-server.log
+        exit 1
+    fi
+
 }
 
 function stop_docker() {
