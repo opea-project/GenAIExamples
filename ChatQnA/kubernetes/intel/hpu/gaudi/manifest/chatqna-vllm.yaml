@@ -1106,7 +1106,7 @@ spec:
             privileged: true
             capabilities:
               add: ["SYS_NICE"]
-          image: "ghcr.io/huggingface/tei-gaudi:latest"
+          image: "ghcr.io/huggingface/tei-gaudi:1.5.0"
           imagePullPolicy: IfNotPresent
           args:
             - "--auto-truncate"
