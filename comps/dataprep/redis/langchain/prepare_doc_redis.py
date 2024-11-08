@@ -436,63 +436,63 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
         logger.info(f"[ delete ] delete_path: {delete_path}")
 
     # partially delete files
-    if delete_path.exists():
-        doc_id = "file:" + encode_filename(file_path)
+    doc_id = "file:" + encode_filename(file_path)
+    logger.info(f"[ delete ] doc id: {doc_id}")
 
-        # determine whether this file exists in db KEY_INDEX_NAME
+    # determine whether this file exists in db KEY_INDEX_NAME
+    try:
+        key_ids = search_by_id(client, doc_id).key_ids
+    except Exception as e:
+        if logflag:
+            logger.info(f"[ delete ] {e}, File {file_path} does not exists.")
+        raise HTTPException(status_code=404, detail=f"File not found in db {KEY_INDEX_NAME}. Please check file_path.")
+    file_ids = key_ids.split("#")
+
+    # delete file keys id in db KEY_INDEX_NAME
+    try:
+        assert delete_by_id(client, doc_id)
+    except Exception as e:
+        if logflag:
+            logger.info(f"[ delete ] {e}. File {file_path} delete failed for db {KEY_INDEX_NAME}.")
+        raise HTTPException(status_code=500, detail=f"File {file_path} delete failed for key index.")
+
+    # delete file content in db INDEX_NAME
+    for file_id in file_ids:
+        # determine whether this file exists in db INDEX_NAME
         try:
-            key_ids = search_by_id(client, doc_id).key_ids
+            search_by_id(client2, file_id)
         except Exception as e:
             if logflag:
-                logger.info(f"[ delete ] {e}, File {file_path} does not exists.")
-            raise HTTPException(
-                status_code=404, detail=f"File not found in db {KEY_INDEX_NAME}. Please check file_path."
-            )
-        file_ids = key_ids.split("#")
+                logger.info(f"[ delete ] {e}. File {file_path} does not exists.")
+            raise HTTPException(status_code=404, detail=f"File not found in db {INDEX_NAME}. Please check file_path.")
 
-        # delete file
-        if delete_path.is_file():
-            # delete file keys id in db KEY_INDEX_NAME
-            try:
-                assert delete_by_id(client, doc_id)
-            except Exception as e:
-                if logflag:
-                    logger.info(f"[ delete ] {e}. File {file_path} delete failed for db {KEY_INDEX_NAME}.")
-                raise HTTPException(status_code=500, detail=f"File {file_path} delete failed.")
-
-            # delete file content in db INDEX_NAME
-            for file_id in file_ids:
-                # determine whether this file exists in db INDEX_NAME
-                try:
-                    content = search_by_id(client2, file_id).content
-                except Exception as e:
-                    if logflag:
-                        logger.info(f"[ delete ] {e}. File {file_path} does not exists.")
-                    raise HTTPException(
-                        status_code=404, detail=f"File not found in db {INDEX_NAME}. Please check file_path."
-                    )
-
-                # delete file content
-                try:
-                    assert delete_by_id(client2, file_id)
-                except Exception as e:
-                    if logflag:
-                        logger.info(f"[ delete ] {e}. File {file_path} delete failed for db {INDEX_NAME}")
-                    raise HTTPException(status_code=500, detail=f"File {file_path} delete failed.")
-
-            # delete file on local disk
-            delete_path.unlink()
+        # delete file content
+        try:
+            assert delete_by_id(client2, file_id)
+        except Exception as e:
             if logflag:
-                logger.info({"status": True})
-            return {"status": True}
+                logger.info(f"[ delete ] {e}. File {file_path} delete failed for db {INDEX_NAME}")
+            raise HTTPException(status_code=500, detail=f"File {file_path} delete failed for index.")
 
-        # delete folder
-        else:
-            if logflag:
-                logger.info(f"[ delete ] Delete folder {file_path} is not supported for now.")
-            raise HTTPException(status_code=404, detail=f"Delete folder {file_path} is not supported for now.")
+    # local file does not exist (restarted docker container)
+    if not delete_path.exists():
+        if logflag:
+            logger.info(f"[ delete ] File {file_path} not saved locally.")
+        return {"status": True}
+
+    # delete local file
+    if delete_path.is_file():
+        # delete file on local disk
+        delete_path.unlink()
+        if logflag:
+            logger.info(f"[ delete ] File {file_path} deleted successfully.")
+        return {"status": True}
+
+    # delete folder
     else:
-        raise HTTPException(status_code=404, detail=f"File {file_path} not found. Please check file_path.")
+        if logflag:
+            logger.info(f"[ delete ] Delete folder {file_path} is not supported for now.")
+        raise HTTPException(status_code=404, detail=f"Delete folder {file_path} is not supported for now.")
 
 
 if __name__ == "__main__":
