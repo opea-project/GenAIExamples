@@ -1,0 +1,32 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Check Online Document Building
+permissions: {}
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+
+    - name: Checkout tools repo
+      uses: actions/checkout@v4
+      with:
+        repository: opea-project/docs
+        path: ../docs
+
+    - uses: actions/checkout@v4
+    - name: Build Online Document
+      shell: bash
+      run: |
+        git config --local --get remote.origin.url
+        echo "build online doc"
+        cd ../docs
+        bash scripts/build.sh
