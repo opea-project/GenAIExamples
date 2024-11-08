@@ -2,20 +2,20 @@
 
 This microservice, designed for Language Model Inference (LLM), processes input consisting of a query string and associated reranked documents. It constructs a prompt based on the query and documents, which is then used to perform inference with a large language model. The service delivers the inference results as output.
 
-A prerequisite for using this microservice is that users must have a LLM text generation service (etc., TGI, vLLM and Ray) already running. Users need to set the LLM service's endpoint into an environment variable. The microservice utilizes this endpoint to create an LLM object, enabling it to communicate with the LLM service for executing language model operations.
+A prerequisite for using this microservice is that users must have a LLM text generation service (etc., TGI, vLLM) already running. Users need to set the LLM service's endpoint into an environment variable. The microservice utilizes this endpoint to create an LLM object, enabling it to communicate with the LLM service for executing language model operations.
 
-Overall, this microservice offers a streamlined way to integrate large language model inference into applications, requiring minimal setup from the user beyond initiating a TGI/vLLM/Ray service and configuring the necessary environment variables. This allows for the seamless processing of queries and documents to generate intelligent, context-aware responses.
+Overall, this microservice offers a streamlined way to integrate large language model inference into applications, requiring minimal setup from the user beyond initiating a TGI/vLLM service and configuring the necessary environment variables. This allows for the seamless processing of queries and documents to generate intelligent, context-aware responses.
 
 ## Validated LLM Models
 
-| Model                       | TGI-Gaudi | vLLM-CPU | vLLM-Gaudi | Ray |
-| --------------------------- | --------- | -------- | ---------- | --- |
-| [Intel/neural-chat-7b-v3-3] | ✓         | ✓        | ✓          | ✓   |
-| [Llama-2-7b-chat-hf]        | ✓         | ✓        | ✓          | ✓   |
-| [Llama-2-70b-chat-hf]       | ✓         | -        | ✓          | x   |
-| [Meta-Llama-3-8B-Instruct]  | ✓         | ✓        | ✓          | ✓   |
-| [Meta-Llama-3-70B-Instruct] | ✓         | -        | ✓          | x   |
-| [Phi-3]                     | x         | Limit 4K | Limit 4K   | ✓   |
+| Model                       | TGI-Gaudi | vLLM-CPU | vLLM-Gaudi |
+| --------------------------- | --------- | -------- | ---------- |
+| [Intel/neural-chat-7b-v3-3] | ✓         | ✓        | ✓          |
+| [Llama-2-7b-chat-hf]        | ✓         | ✓        | ✓          |
+| [Llama-2-70b-chat-hf]       | ✓         | -        | ✓          |
+| [Meta-Llama-3-8B-Instruct]  | ✓         | ✓        | ✓          |
+| [Meta-Llama-3-70B-Instruct] | ✓         | -        | ✓          |
+| [Phi-3]                     | x         | Limit 4K | Limit 4K   |
 
 ## Clone OPEA GenAIComps
 
@@ -121,53 +121,6 @@ export vLLM_ENDPOINT="http://${vLLM_HOST_IP}:8008"
 python llm.py
 ```
 
-#### 1.2.3 Start the Ray Service
-
-Install the requirements for Ray Service
-
-```bash
-cd ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/ray
-
-pip install -r requirements.txt
-```
-
-Execute the docker run command to initiate the backend, along with the Python script that launches the microservice.
-
-```bash
-export vLLM_RAY_HOST_IP=$(hostname -I | awk '{print $1}')  # This sets IP of the current machine
-export LLM_MODEL=${your_hf_llm_model}
-export DATA_DIR=$HOME/data  # Location to download the model
-export HF_TOKEN=${your_hf_api_token}
-
-# Build the image first as opea/vllm:cpu
-bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/ray/dependency/build_docker_vllmray.sh
-
-# Initiate the backend
-docker run \
-  --name="vllm-ray-service" \
-  --runtime=habana \
-  -v $DATA_DIR:/data \
-  -e HABANA_VISIBLE_DEVICES=all \
-  -e OMPI_MCA_btl_vader_single_copy_mechanism=none \
-  --cap-add=sys_nice \
-  --ipc=host \
-  -p 8006:8000 \
-  -e HF_TOKEN=$HF_TOKEN \
-  opea/vllm_ray:habana \
-  /bin/bash -c " \
-    ray start --head && \
-    python vllm_ray_openai.py \
-    --port_number 8000 \
-    --model_id_or_path $LLM_MODEL \
-    --tensor_parallel_size 2 \
-    --enforce_eager False"
-
-# Start the microservice with an endpoint as the above docker run command
-export vLLM_RAY_ENDPOINT="http://${vLLM_RAY_HOST_IP}:8006"
-
-python llm.py
-```
-
 ## 🚀2. Start Microservice with Docker (Option 2)
 
 In order to start the microservices with docker, you need to build the docker images first for the microservice.
@@ -203,22 +156,6 @@ docker build \
   -f comps/llms/text-generation/vllm/langchain/Dockerfile .
 ```
 
-#### 2.1.3 Ray
-
-```bash
-# Build the Ray Serve docker
-bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/ray/dependency/build_docker_vllmray.sh
-
-# Build the microservice docker
-cd ${OPEA_GENAICOMPS_ROOT}
-
-docker build \
-  --build-arg https_proxy=$https_proxy \
-  --build-arg http_proxy=$http_proxy \
-  -t opea/llm-vllm-ray:latest \
-  -f comps/llms/text-generation/vllm/ray/Dockerfile .
-```
-
 ### 2.2 Start LLM Service with the built image
 
 To start a docker container, you have two options:
@@ -245,15 +182,6 @@ In order to start vLLM and LLM services, you need to setup the following environ
 export HF_TOKEN=${your_hf_api_token}
 export vLLM_LLM_ENDPOINT="http://${your_ip}:8008"
 export LLM_MODEL=${your_hf_llm_model}
-```
-
-In order to start Ray serve and LLM services, you need to setup the following environment variables first.
-
-```bash
-export HF_TOKEN=${your_hf_api_token}
-export RAY_Serve_ENDPOINT="http://${your_ip}:8008"
-export LLM_MODEL=${your_hf_llm_model}
-export CHAT_PROCESSOR="ChatModelLlama"
 ```
 
 ### 2.3 Run Docker with CLI (Option A)
@@ -311,29 +239,6 @@ docker run \
   opea/llm-vllm:latest
 ```
 
-#### 2.3.3 Ray Serve
-
-Start Ray Serve endpoint.
-
-```bash
-bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/ray/dependency/launch_vllmray.sh
-```
-
-Start Ray Serve microservice.
-
-```bash
-docker run -d \
-  --name="llm-ray-server" \
-  -p 9000:9000 \
-  --ipc=host \
-  -e http_proxy=$http_proxy \
-  -e https_proxy=$https_proxy \
-  -e RAY_Serve_ENDPOINT=$RAY_Serve_ENDPOINT \
-  -e HF_TOKEN=$HF_TOKEN \
-  -e LLM_MODEL=$LLM_MODEL \
-  opea/llm-ray:latest
-```
-
 ### 2.4 Run Docker with Docker Compose (Option B)
 
 #### 2.4.1 TGI
@@ -347,13 +252,6 @@ docker compose -f docker_compose_llm.yaml up -d
 
 ```bash
 cd ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/langchain
-docker compose -f docker_compose_llm.yaml up -d
-```
-
-#### 2.4.3 Ray Serve
-
-```bash
-cd ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/ray
 docker compose -f docker_compose_llm.yaml up -d
 ```
 
@@ -388,22 +286,6 @@ curl http://${your_ip}:8008/v1/completions \
   "prompt": "What is Deep Learning?",
   "max_tokens": 32,
   "temperature": 0
-  }'
-```
-
-#### 3.2.3 Verify the Ray Service
-
-```bash
-curl http://${your_ip}:8008/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-  "model": ${your_hf_llm_model},
-  "messages": [
-        {"role": "assistant", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What is Deep Learning?"}
-    ],
-  "max_tokens": 32,
-  "stream": true
   }'
 ```
 
