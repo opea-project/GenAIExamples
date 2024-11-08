@@ -2,9 +2,9 @@
 
 ### Required Models
 
-We set default model as "meta-llama/Meta-Llama-3-8B-Instruct", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
+Default model is "meta-llama/Meta-Llama-3-8B-Instruct".  Change "LLM_MODEL_ID" in environment variables below if you want to use another model.
 
-If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+For gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) in "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
 ### Setup Environment Variables
 
