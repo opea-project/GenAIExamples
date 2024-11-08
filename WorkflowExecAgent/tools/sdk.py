@@ -7,7 +7,7 @@ from tools.components.workflow import Workflow
 from tools.utils.handle_requests import RequestHandler
 
 
-class DataInsightAutomationSDK:      # Example SDK class for Data Insight Automation platform
+class DataInsightAutomationSDK:  # Example SDK class for Data Insight Automation platform
     """SDK class containing all components.
 
     Attributes:
@@ -17,11 +17,11 @@ class DataInsightAutomationSDK:      # Example SDK class for Data Insight Automa
     def __init__(self):
         self.request_handler = RequestHandler(os.environ["SDK_BASE_URL"], os.environ["SERVING_TOKEN"])
 
-    def create_workflow(self, workflow_id:int=None, workflow_key=None):
+    def create_workflow(self, workflow_id: int = None, workflow_key=None):
         """Creates a Workflow object.
-        
+
         :param int workflow_id: Servable workflow id.
-        
+
         :returns: Workflow
         """
 

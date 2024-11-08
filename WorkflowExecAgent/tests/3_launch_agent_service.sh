@@ -33,7 +33,7 @@ function start_agent() {
 function main() {
     echo "==================== Start agent service ===================="
     start_agent
-    echo "==================== Agent service started ===================="  
+    echo "==================== Agent service started ===================="
 }
 
 main

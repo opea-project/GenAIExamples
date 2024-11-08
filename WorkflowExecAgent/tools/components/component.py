@@ -14,8 +14,8 @@ class Component:
 
     def _make_request(self, *args, **kwargs):
         """Uses the request_handler object to make API requests.
-        
+
         :returns: API response
         """
-        
+
         return self.request_handler._make_request(*args, **kwargs)

@@ -34,7 +34,7 @@ function start_example_workflow_api() {
 function main() {
     echo "==================== Start example workflow API ===================="
     start_example_workflow_api
-    echo "==================== Example workflow API started ===================="  
+    echo "==================== Example workflow API started ===================="
 }
 
 main

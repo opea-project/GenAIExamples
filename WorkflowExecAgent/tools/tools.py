@@ -18,8 +18,8 @@ def workflow_executor(params, workflow_id: int) -> dict:
 
     # Replace function logic with use-case
 
-    sdk = DataInsightAutomationSDK()                # Initialize SDK instance
-    workflow = sdk.create_workflow(workflow_id)     # Create workflow instance object
+    sdk = DataInsightAutomationSDK()  # Initialize SDK instance
+    workflow = sdk.create_workflow(workflow_id)  # Create workflow instance object
 
     params = {key: str(val) for key, val in params.items()}
     start_workflow = workflow.start(params)

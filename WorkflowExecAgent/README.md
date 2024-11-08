@@ -5,10 +5,10 @@
 GenAI Workflow Executor Example showcases the capability to handle data/AI workflow operations via LangChain agents to execute custom-defined workflow-based tools. These workflow tools can be interfaced from any 3rd-party tools in the market (no-code/low-code/IDE) such as Alteryx, RapidMiner, Power BI, Intel Data Insight Automation which allows users to create complex data/AI workflow operations for different use-cases.
 
 ### Definitions
- 
+
 Before we begin, here are the definitions to some terms for clarity:
 
-- servable/serving workflow - A workflow made ready to be executed through API. It should be able to accept paramater injection for workflow scheduling and have a way to retrieve the final output data. It should also have a unique workflow ID for referencing. For platform providers guide to create their own servable workflows compatible with this example, refer to [Workflow Building Platform](#workflow-building-platform)
+- servable/serving workflow - A workflow made ready to be executed through API. It should be able to accept parameter injection for workflow scheduling and have a way to retrieve the final output data. It should also have a unique workflow ID for referencing. For platform providers guide to create their own servable workflows compatible with this example, refer to [Workflow Building Platform](#workflow-building-platform)
 
 - SDK Class - Performs requests to interface with a 3rd-party API to perform workflow operations on the servable workflow. Found in `tools/sdk.py`.
 

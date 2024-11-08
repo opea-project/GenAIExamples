@@ -1,22 +1,22 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import logging
-from fastapi import FastAPI, APIRouter
 
+from fastapi import APIRouter, FastAPI
 from workflow import run_workflow
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 app = FastAPI()
 
-router = APIRouter(
-    prefix="/serving",
-    tags=["Workflow Serving"]
-)
+router = APIRouter(prefix="/serving", tags=["Workflow Serving"])
 
 app.results = {}
 
-@router.post('/servable_workflows/{wf_id}/start', summary="Start Workflow")
+
+@router.post("/servable_workflows/{wf_id}/start", summary="Start Workflow")
 async def start_workflow(wf_id: int, params: dict):
     try:
         app.results = run_workflow(params["params"])
@@ -25,9 +25,10 @@ async def start_workflow(wf_id: int, params: dict):
 
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {"msg": "error occured"}
-    
-@router.get('/serving_workflows/{wf_key}/status', summary="Get Workflow Status")
+        return {"msg": "error occurred"}
+
+
+@router.get("/serving_workflows/{wf_key}/status", summary="Get Workflow Status")
 async def get_status(wf_key: str):
     try:
         if app.results:
@@ -38,9 +39,10 @@ async def get_status(wf_key: str):
         return {"workflow_status": status}
     except Exception as e:
         logging.error(e)
-        return {"msg": "error occured"}
+        return {"msg": "error occurred"}
 
-@router.get('/serving_workflows/{wf_key}/results', summary = "Get Workflow Results")
+
+@router.get("/serving_workflows/{wf_key}/results", summary="Get Workflow Results")
 async def get_results(wf_key: str):
     try:
         if app.results:
@@ -51,5 +53,6 @@ async def get_results(wf_key: str):
     except Exception as e:
         logging.error(e)
         return {"msg": "There is an issue while getting results !!"}
+
 
 app.include_router(router)

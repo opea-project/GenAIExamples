@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 apt-get -qq -y install --no-install-recommends unzip curl ca-certificates
 apt-get -qq -y install --no-install-recommends python3 python3-pip
 
