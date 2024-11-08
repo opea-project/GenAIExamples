@@ -84,16 +84,18 @@ export INDEX_NAME="mm-rag-redis"
 export LLAVA_SERVER_PORT=8399
 export LVM_ENDPOINT="http://${host_ip}:8399"
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
+export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
 export WHISPER_MODEL="base"
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
+export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/ingest_with_text"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
 export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
-export DATAPREP_GET_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
-export DATAPREP_DELETE_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_videos"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_files"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -274,54 +276,76 @@ curl http://${host_ip}:9399/v1/lvm \
 
 6. dataprep-multimodal-redis
 
-Download a sample video
+Download a sample video, image, and audio file and create a caption
 
 ```bash
 export video_fn="WeAreGoingOnBullrun.mp4"
 wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
+
+export image_fn="apple.png"
+wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
+
+export caption_fn="apple.txt"
+echo "This is an apple."  > ${caption_fn}
+
+export audio_fn="AudioSample.wav"
+wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav -O ${audio_fn}
 ```
 
-Test dataprep microservice. This command updates a knowledge base by uploading a local video .mp4.
+Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
-    -X POST -F "files=@./${video_fn}"
+    -X POST \
+    -F "files=@./${video_fn}" \
+    -F "files=@./${audio_fn}"
 ```
 
-Also, test dataprep microservice with generating caption using lvm microservice
+Also, test dataprep microservice with generating an image caption using lvm microservice
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
-    -X POST -F "files=@./${video_fn}"
+    -X POST -F "files=@./${image_fn}"
 ```
 
-Also, you are able to get the list of all videos that you uploaded:
+Now, test the microservice with posting a custom caption along with an image
+
+```bash
+curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+    ${DATAPREP_INGEST_SERVICE_ENDPOINT} \
+    -H 'Content-Type: multipart/form-data' \
+    -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}"
+```
+
+Also, you are able to get the list of all files that you uploaded:
 
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
-    ${DATAPREP_GET_VIDEO_ENDPOINT}
+    ${DATAPREP_GET_FILE_ENDPOINT}
 ```
 
-Then you will get the response python-style LIST like this. Notice the name of each uploaded video e.g., `videoname.mp4` will become `videoname_uuid.mp4` where `uuid` is a unique ID for each uploaded video. The same video that are uploaded twice will have different `uuid`.
+Then you will get the response python-style LIST like this. Notice the name of each uploaded file e.g., `videoname.mp4` will become `videoname_uuid.mp4` where `uuid` is a unique ID for each uploaded file. The same files that are uploaded twice will have different `uuid`.
 
 ```bash
 [
     "WeAreGoingOnBullrun_7ac553a1-116c-40a2-9fc5-deccbb89b507.mp4",
-    "WeAreGoingOnBullrun_6d13cf26-8ba2-4026-a3a9-ab2e5eb73a29.mp4"
+    "WeAreGoingOnBullrun_6d13cf26-8ba2-4026-a3a9-ab2e5eb73a29.mp4",
+    "apple_fcade6e6-11a5-44a2-833a-3e534cbe4419.png",
+    "AudioSample_976a85a6-dc3e-43ab-966c-9d81beef780c.wav
 ]
 ```
 
-To delete all uploaded videos along with data indexed with `$INDEX_NAME` in REDIS.
+To delete all uploaded files along with data indexed with `$INDEX_NAME` in REDIS.
 
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
-    ${DATAPREP_DELETE_VIDEO_ENDPOINT}
+    ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
 7. MegaService
