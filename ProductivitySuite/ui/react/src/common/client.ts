@@ -6,8 +6,8 @@ import keycloak from "../keycloack";
 
 //add iterceptors to add any request headers
 axios.interceptors.request.use(async (config) => {
-    config.headers['Authorization'] = `Bearer ${keycloak.token}`;
-    return config;
+  config.headers["Authorization"] = `Bearer ${keycloak.token}`;
+  return config;
 });
 
 export default axios;
