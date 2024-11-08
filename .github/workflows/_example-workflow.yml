@@ -78,7 +78,7 @@ jobs:
               cd vllm && git rev-parse HEAD && cd ../
           fi
           if [[ $(grep -c "vllm-hpu:" ${docker_compose_yml}) != 0 ]]; then
-               git clone https://github.com/HabanaAI/vllm-fork.git vllm-hpu
+               git clone https://github.com/HabanaAI/vllm-fork.git vllm-fork
           fi
           git clone https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git checkout ${{ inputs.opea_branch }} && git rev-parse HEAD && cd ../
