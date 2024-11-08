@@ -24,10 +24,10 @@ function build_vllm_docker_image() {
     fi
     docker build -f Dockerfile.cpu -t vllm-cpu-env --shm-size=100g .
     if [ $? -ne 0 ]; then
-        echo "opea/vllm:cpu failed"
+        echo "opea/vllm-cpu failed"
         exit 1
     else
-        echo "opea/vllm:cpu successful"
+        echo "opea/vllm-cpu successful"
     fi
 }
 
