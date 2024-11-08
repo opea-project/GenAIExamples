@@ -17,6 +17,12 @@ if [ ! -d "$HF_CACHE_DIR" ]; then
 fi
 ls $HF_CACHE_DIR
 
+function start_tgi(){
+    echo "Starting tgi-gaudi server"
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
+    bash launch_tgi_gaudi.sh
+
+}
 
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
@@ -25,6 +31,7 @@ function start_agent_and_api_server() {
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
     bash launch_agent_service_tgi_gaudi.sh
+    sleep 10
 }
 
 function validate() {
@@ -43,18 +50,22 @@ function validate() {
 
 function validate_agent_service() {
     echo "----------------Test agent ----------------"
-    local CONTENT=$(http_proxy="" curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Tell me about Michael Jackson song thriller"
-    }')
-    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
-    docker logs docgrader-agent-endpoint
+    # local CONTENT=$(http_proxy="" curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+    #  "query": "Tell me about Michael Jackson song thriller"
+    # }')
+    export agent_port="9095"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
+    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
+    docker logs rag-agent-endpoint
     if [ "$EXIT_CODE" == "1" ]; then
         exit 1
     fi
 
-    local CONTENT=$(http_proxy="" curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Tell me about Michael Jackson song thriller"
-    }')
+    # local CONTENT=$(http_proxy="" curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+    #  "query": "Tell me about Michael Jackson song thriller"
+    # }')
+    export agent_port="9090"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
     docker logs react-agent-endpoint
     if [ "$EXIT_CODE" == "1" ]; then
@@ -64,6 +75,10 @@ function validate_agent_service() {
 }
 
 function main() {
+    echo "==================== Start TGI ===================="
+    start_tgi
+    echo "==================== TGI started ===================="
+
     echo "==================== Start agent ===================="
     start_agent_and_api_server
     echo "==================== Agent started ===================="

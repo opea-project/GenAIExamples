@@ -48,13 +48,13 @@ docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-In following cases, you could build docker image from source by yourself.
+NB: You should build docker image from source by yourself if:
 
-- Failed to download the docker image.
+- You are developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
+- You can't download the docker image.
+- You want to use a specific version of Docker image.
 
-- If you want to use a specific version of Docker image.
-
-Please refer to 'Build Docker Images' in below.
+Please refer to ['Build Docker Images'](#🚀-build-docker-images) in below.
 
 ## QuickStart: 3.Consume the ChatQnA Service
 
@@ -195,7 +195,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
-   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu --model-id $model_name
+   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id $model_name
    ```
 
 2. Offline
@@ -209,7 +209,7 @@ For users in China who are unable to download models directly from Huggingface, 
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu --model-id /data
+     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
      ```
 
 ### Setup Environment Variables
