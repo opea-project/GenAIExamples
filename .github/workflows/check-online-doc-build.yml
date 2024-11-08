@@ -8,8 +8,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      -  "**.md"
-      -  "**.rst"
+      - "**.md"
+      - "**.rst"
 
 jobs:
   build:
