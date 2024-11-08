@@ -28,7 +28,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/FaqGen/docker/
+cd GenAIExamples/FaqGen/
 docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
@@ -37,7 +37,7 @@ docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_pro
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/FaqGen/
+cd GenAIExamples/FaqGen/ui
 docker build -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -115,9 +115,11 @@ docker compose up -d
 3. MegaService
 
    ```bash
-   curl http://${host_ip}:8888/v1/faqgen -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-        }'
+   curl http://${host_ip}:8888/v1/faqgen \
+      -H "Content-Type: multipart/form-data" \
+      -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+      -F "max_tokens=32" \
+      -F "stream=false"
    ```
 
 ## 🚀 Launch the UI
