@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 your_ip="0.0.0.0"
+model=$(curl http://localhost:8008/v1/models -s|jq -r '.data[].id')
 
 curl http://${your_ip}:8008/v1/completions \
   -H "Content-Type: application/json" \
   -d '{
-  "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+  "model": "'$model'",
   "prompt": "What is Deep Learning?",
   "max_tokens": 32,
   "temperature": 0
