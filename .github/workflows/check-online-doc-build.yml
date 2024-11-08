@@ -28,4 +28,5 @@ jobs:
       shell: bash
       run: |
         echo "build online doc"
+        cd docs
         bash scripts/build.sh
