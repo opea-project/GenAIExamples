@@ -147,8 +147,6 @@ bash launch_vllm_service_openvino.sh -d gpu
 
 #### Performance tips
 
----
-
 vLLM OpenVINO backend environment variables
 
 - `VLLM_OPENVINO_DEVICE` to specify which device utilize for the inference. If there are multiple GPUs in the system, additional indexes can be used to choose the proper one (e.g, `VLLM_OPENVINO_DEVICE=GPU.1`). If the value is not specified, CPU device is used by default.
