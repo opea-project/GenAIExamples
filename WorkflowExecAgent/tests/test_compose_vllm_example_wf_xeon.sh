@@ -2,12 +2,16 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-query="I have a data with gender Female, tenure 55, MonthlyAvgCharges 103.7. Predict if this entry will churn. My workflow id is '${workflow_id}'."
-validate_result="The entry is not likely to churn"
+wf_api_port=${wf_api_port}
+[[ -z "$wf_api_port" ]] && wf_api_port=5000
+api_server_url=http://$(hostname -I | awk '{print $1}'):${wf_api_port}/
+query="I have a data with gender Female, tenure 55, MonthlyCharges 103.7, TotalCharges 1840.75. Predict if this entry will churn. My workflow id is ${workflow_id}."
+validate_result="the prediction is No"
 
-function stop_agent_server() {
+function stop_agent_and_api_server() {
     echo "Stopping Agent services"
     docker rm --force $(docker ps -a -q --filter="name=workflowexec-agent-endpoint")
+    docker rm --force $(docker ps -a -q --filter="name=example-workflow-service")
 }
 
 function stop_vllm_docker() {
@@ -26,16 +30,20 @@ bash 2_start_vllm_service.sh
 echo "=================== #2 Start vllm service completed ===================="
 
 echo "=================== #3 Start agent service ===================="
-bash 3_launch_agent_service.sh $SDK_BASE_URL
+bash 3_launch_agent_service.sh $api_server_url
 echo "=================== #3 Agent service started ===================="
 
-echo "=================== #4 Start validate agent ===================="
-bash 4_validate_agent.sh "$query" "$validate_result"
-echo "=================== #4 Validate agent completed ===================="
+echo "=================== #4 Start example workflow API ===================="
+bash 3_launch_example_wf_api.sh
+echo "=================== #4 Example workflow API started ===================="
 
-echo "=================== #4 Stop agent and vllm server ===================="
-stop_agent_server
+echo "=================== #5 Start validate agent ===================="
+bash 4_validate_agent.sh "$query" "$validate_result"
+echo "=================== #5 Validate agent completed ===================="
+
+echo "=================== #4 Stop all services ===================="
+stop_agent_and_api_server
 stop_vllm_docker
-echo "=================== #4 Agent and vllm server stopped ===================="
+echo "=================== #4 All services stopped ===================="
 
 echo "ALL DONE!"
