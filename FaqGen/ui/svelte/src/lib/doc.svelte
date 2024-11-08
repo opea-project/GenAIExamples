@@ -127,7 +127,7 @@
               data-testid="sum-input"
               id="textarea-id"
               class="xl:h-[30rem] xl:my-4"
-              placeholder="Copy the text information you need to summarize."
+              placeholder="Copy the text information you need to generate FAQs."
               rows="13"
               name="message"
               bind:value={message}
@@ -151,10 +151,10 @@
     <button
       type="submit"
       data-testid="sum-click"
-      class="xl:my-10 inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
-      on:click={() => generateFaq()}
+      class="xl:my-12 inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 mt-2 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
+       on:click={() => generateFaq()}
     >
-      Generate Summary
+      Generate FAQs
     </button>
   {/if}
 </div>
@@ -164,11 +164,11 @@
     class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
   />
   {#if currentIdx === 1}
-    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 text-center">
+    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
       The currently uploaded file will be cleared.
     </h3>
   {:else if currentIdx === 2}
-    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400 text-center">
+    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
       The current content will be cleared.
     </h3>
   {/if}
