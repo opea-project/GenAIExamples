@@ -36,6 +36,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       PORT: ${EMBEDDER_PORT}
+    entrypoint: ["python", "bridgetower_server.py", "--device", "cpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
     restart: unless-stopped
   embedding-multimodal:
     image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
@@ -76,6 +77,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+    entrypoint: ["python", "llava_server.py", "--device", "cpu", "--model_name_or_path", $LVM_MODEL_ID]
     restart: unless-stopped
   lvm-llava-svc:
     image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
@@ -125,6 +127,7 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DATAPREP_INGEST_SERVICE_ENDPOINT=${DATAPREP_INGEST_SERVICE_ENDPOINT}
       - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
       - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
     ipc: host

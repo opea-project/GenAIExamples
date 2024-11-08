@@ -30,6 +30,7 @@ class Conversation:
     base64_frame: str = None
     skip_next: bool = False
     split_video: str = None
+    image: str = None
 
     def _template_caption(self):
         out = ""
@@ -59,6 +60,8 @@ class Conversation:
                                 else:
                                     base64_frame = get_b64_frame_from_timestamp(self.video_file, self.time_of_frame_ms)
                                     self.base64_frame = base64_frame
+                                if base64_frame is None:
+                                    base64_frame = ""
                                 content.append({"type": "image_url", "image_url": {"url": base64_frame}})
                             else:
                                 content = message
@@ -137,6 +140,7 @@ class Conversation:
             "caption": self.caption,
             "base64_frame": self.base64_frame,
             "split_video": self.split_video,
+            "image": self.image,
         }
 
 
@@ -152,4 +156,5 @@ multimodalqna_conv = Conversation(
     time_of_frame_ms=None,
     base64_frame=None,
     split_video=None,
+    image=None,
 )
