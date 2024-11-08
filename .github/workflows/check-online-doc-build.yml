@@ -30,8 +30,6 @@ jobs:
         echo "build online doc"
         pwd
         ls
-        cd ..
-        pwd
-        ls
         cd docs
+        pwd
         bash scripts/build.sh
