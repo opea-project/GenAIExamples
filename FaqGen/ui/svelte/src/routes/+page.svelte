@@ -77,8 +77,6 @@
   };
 
   async function handleGenerateFaq(e) {
-    console.log('handleGenerateFaq', e);
-
     if (e.detail.mode === "file") {
       await callTextStream(e.detail.value, "/file_summarize", "doc_id");
     } else if (e.detail.mode === "text") {
