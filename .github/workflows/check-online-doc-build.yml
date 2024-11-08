@@ -17,6 +17,11 @@ jobs:
       uses: actions/checkout@v4
       with:
         path: GenAIExamples
+      shell: bash
+      run: |
+        pwd
+        ls
+
 
 
     - name: Checkout docs
@@ -24,6 +29,10 @@ jobs:
       with:
         repository: opea-project/docs
         path: docs
+      shell: bash
+      run: |
+        pwd
+        ls
 
     - uses: actions/checkout@v4
     - name: Build Online Document
