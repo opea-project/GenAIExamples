@@ -56,7 +56,7 @@ For this agent workflow execution, the inferencing path is executed to yield the
 
 There are `Serving Parameters` in the workflow, which are the tool input variables used to start a workflow instance at runtime obtained from `params` the LLM extracts from the user query. Below shows the parameter configuration option for the Intel Data Insight Automation workflow UI.
 
-![image](https://github.com/user-attachments/assets/ce8ef01a-56ff-4278-b84d-b6e4592b28c6)
+<img src="https://github.com/user-attachments/assets/ce8ef01a-56ff-4278-b84d-b6e4592b28c6" alt="image" width="500"/>
 
 Manually running the workflow yields the tabular data output as shown below:
 

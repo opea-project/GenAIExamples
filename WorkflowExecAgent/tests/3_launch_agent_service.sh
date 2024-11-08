@@ -5,7 +5,6 @@
 set -e
 
 WORKPATH=$(dirname "$PWD")
-workflow_id=9809
 vllm_port=${vllm_port}
 [[ -z "$vllm_port" ]] && vllm_port=8084
 export WORKDIR=$WORKPATH/../../
@@ -21,6 +20,7 @@ export recursion_limit=25
 export temperature=0
 export max_new_tokens=1000
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/WorkflowExecAgent/tools/
+export workflow_id=9838
 
 function start_agent() {
     echo "Starting Agent services"
