@@ -153,14 +153,10 @@ OpenVINO best known configuration is:
 And then you can make requests like below to check the service status:
 
 ```bash
-curl http://${your_ip}:8008/v1/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-  "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-  "prompt": "What is Deep Learning?",
-  "max_tokens": 32,
-  "temperature": 0
-  }'
+curl http://${host_ip}:8008/v1/chat/completions \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 ```
 
 ## 🚀3. Set up LLM microservice

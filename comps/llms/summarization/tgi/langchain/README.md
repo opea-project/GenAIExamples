@@ -23,10 +23,10 @@ docker run -p 8008:80 -v ./data:/data --name llm-docsum-tgi --shm-size 1g ghcr.i
 ### 1.3 Verify the TGI Service
 
 ```bash
-curl http://${your_ip}:8008/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
+curl http://${your_ip}:8008/v1/chat/completions \
+     -X POST \
+     -d '{"model": ${your_hf_llm_model}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -H 'Content-Type: application/json'
 ```
 
 ### 1.4 Start LLM Service with Python Script

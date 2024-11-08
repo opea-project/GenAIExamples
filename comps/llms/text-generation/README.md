@@ -270,23 +270,19 @@ curl http://${your_ip}:9000/v1/health_check\
 #### 3.2.1 Verify the TGI Service
 
 ```bash
-curl http://${your_ip}:8008/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
+curl http://${your_ip}:8008/v1/chat/completions \
+     -X POST \
+     -d '{"model": ${your_hf_llm_model}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -H 'Content-Type: application/json'
 ```
 
 #### 3.2.2 Verify the vLLM Service
 
 ```bash
-curl http://${your_ip}:8008/v1/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-  "model": ${your_hf_llm_model},
-  "prompt": "What is Deep Learning?",
-  "max_tokens": 32,
-  "temperature": 0
-  }'
+curl http://${host_ip}:8008/v1/chat/completions \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"model": ${your_hf_llm_model}, "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 ```
 
 ### 3.3 Consume LLM Service
