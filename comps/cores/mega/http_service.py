@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import logging
 import re
 from typing import Optional
 
@@ -131,6 +132,7 @@ class HTTPService(BaseService):
                 **self.uvicorn_kwargs,
             )
         )
+        logging.getLogger("uvicorn.access").addFilter(lambda record: "/v1/health_check" not in record.getMessage())
         self.logger.info(f"Uvicorn server setup on port {self.primary_port}")
         await self.server.setup_server()
         self.logger.info("HTTP server setup successful")
