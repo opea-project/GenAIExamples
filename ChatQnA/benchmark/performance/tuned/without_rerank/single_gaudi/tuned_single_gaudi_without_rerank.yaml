@@ -167,10 +167,10 @@ spec:
         - containerPort: 80
         resources:
           limits:
-            cpu: 76
+            cpu: 80
             memory: 20000Mi
           requests:
-            cpu: 76
+            cpu: 80
             memory: 20000Mi
         volumeMounts:
         - mountPath: /data
