@@ -42,7 +42,6 @@ jobs:
     with:
       node: gaudi
       example: ${{ matrix.example }}
-      inject_commit: true
     secrets: inherit
 
   get-image-list:
