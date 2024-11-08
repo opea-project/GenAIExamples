@@ -68,7 +68,7 @@ jobs:
                   # echo $url_line
                   url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
                   path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
-                  response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")
+                  response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")|| true
                   if [ "$response" -ne 200 ]; then
                     echo "**********Validation failed, try again**********"
                     response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
