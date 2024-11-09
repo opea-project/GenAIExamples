@@ -68,4 +68,3 @@ services:
       dockerfile: comps/llms/summarization/tgi/langchain/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
-
