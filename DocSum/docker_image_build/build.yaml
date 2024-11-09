@@ -31,7 +31,7 @@ services:
       dockerfile: comps/asr/whisper/dependency/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-    
+
   multimedia2text-service:
     build:
       args:

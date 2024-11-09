@@ -21,14 +21,14 @@ ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-    
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-ui whisper-service multimedia2text-service a2t v2a llm-docsum-tgi" 
+    service_list="docsum docsum-ui whisper-service multimedia2text-service a2t v2a llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
-    
+
     docker pull ghcr.io/huggingface/text-generation-inference:1.4
     docker images && sleep 1s
-    
+
 }
 
 function start_services() {
