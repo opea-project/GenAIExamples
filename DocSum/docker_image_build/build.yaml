@@ -1,0 +1,71 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  docsum:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+
+  docsum-ui:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: ../ui/gradio/
+      dockerfile: ./Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+
+  whisper-service:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/asr/whisper/dependency/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    
+  multimedia2text-service:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/dataprep/multimedia2text/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/multimedia2text:${TAG:-latest}
+
+  a2t:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/dataprep/multimedia2text/audio2text/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/a2t:${TAG:-latest}
+
+  v2a:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/dataprep/multimedia2text/video2audio/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
+
+  llm-docsum-tgi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/summarization/tgi/langchain/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+
