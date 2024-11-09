@@ -28,6 +28,7 @@ function build_docker_images() {
     
     docker pull ghcr.io/huggingface/text-generation-inference:1.4
     docker images && sleep 1s
+    
 }
 
 function start_services() {
