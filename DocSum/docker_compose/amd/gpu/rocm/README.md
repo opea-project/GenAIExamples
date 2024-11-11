@@ -2,7 +2,7 @@
 
 ### Required Models
 
-We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in following setting if you want to use other models.
+Default model is "Intel/neural-chat-7b-v3-3". Change "LLM_MODEL_ID" in environment variables below if you want to use another model.
 If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
 ### Setup Environment Variables
