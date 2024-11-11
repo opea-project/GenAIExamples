@@ -19,7 +19,7 @@
   import Doc from "$lib/doc.svelte";
   import Faq from "$lib/faq.svelte";
   import { fetchTextStream } from "$lib/shared/Network.js";
-  import { loading } from "$lib/shared/Store.js";
+  import { loading, uploadFilesName, uploadFile } from "$lib/shared/Store.js";
   import { onMount } from "svelte";
   import { scrollToBottom } from "$lib/shared/Utils.js";
 
@@ -31,20 +31,25 @@
     console.log("scrollToDiv", scrollToDiv);
   });
 
-  let code_output: string = "";
-  let query: string = "";
-  let deleteFlag: boolean = false;
-
   const callTextStream = async (
     query: string,
     urlSuffix: string,
-    params: string,
+    params: string
   ) => {
-    messages = "";
-    const eventSource = await fetchTextStream(query, urlSuffix, params);
+    // Fetch the stream
+    const eventStream = await fetchTextStream(
+      query,
+      params,
+      $uploadFile,
+      $uploadFilesName
+    );
 
-    eventSource.addEventListener("message", (e: any) => {
-      let Msg = e.data;
+    // Process the stream as an async iterator
+    try {
+      for await (const chunk of eventStream) {
+      let Msg = chunk;
+      console.log('Msg', Msg);
+
       if (Msg !== "[DONE]") {
         let res = JSON.parse(Msg);
         let logs = res.ops;
@@ -52,7 +57,7 @@
         logs.forEach((log: { op: string; path: string; value: any }) => {
           if (log.op === "add") {
             if (
-              log.value !== "</s>" &&
+              log.value !== "<|eot_id|>" &&
               log.path.endsWith("/streamed_output/-") &&
               log.path.length > "/streamed_output/-".length
             ) {
@@ -65,8 +70,10 @@
         loading.set(false);
         scrollToBottom(scrollToDiv);
       }
-    });
-    eventSource.stream();
+      }
+    } catch (error) {
+      console.error("Error processing the stream:", error);
+    }
   };
 
   async function handleGenerateFaq(e) {
