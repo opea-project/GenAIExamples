@@ -8,6 +8,7 @@ services:
     ports:
       - "8008:80"
     environment:
+      HABANA_VISIBLE_DEVICES: all
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
