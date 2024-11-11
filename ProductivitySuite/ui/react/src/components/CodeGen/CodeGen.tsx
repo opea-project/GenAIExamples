@@ -8,7 +8,8 @@ import { IconArrowRight } from '@tabler/icons-react'
 import { ConversationMessage } from '../Message/conversationMessage'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { CODE_GEN_URL } from '../../config'
-
+import { conversationSelector } from '../../redux/Conversation/ConversationSlice';
+import { useAppSelector } from "../../redux/store";
 
 
 const CodeGen = () => {
@@ -17,6 +18,7 @@ const CodeGen = () => {
     const [response,setResponse] = useState<string>("");
     const promptInputRef = useRef<HTMLTextAreaElement>(null)
     const scrollViewport = useRef<HTMLDivElement>(null)
+    const { model } = useAppSelector(conversationSelector);
 
     const toSend = "Enter"
 
@@ -24,7 +26,8 @@ const CodeGen = () => {
         setResponse("")
         setSubmittedPrompt(prompt)
         const body = {
-            messages:prompt
+            messages:prompt,
+            model: model
         }
         fetchEventSource(CODE_GEN_URL, {
             method: "POST",
