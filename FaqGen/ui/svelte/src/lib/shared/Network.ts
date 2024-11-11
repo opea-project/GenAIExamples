@@ -12,50 +12,75 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SSE } from "sse.js";
 import { env } from "$env/dynamic/public";
 
-const DOC_BASE_URL = env.DOC_BASE_URL;
+const FAQ_BASE_URL = env.FAQ_BASE_URL;
 
-async function fetchPostRes(url, init) {
-  try {
-    const response = await fetch(url, init);
-    if (!response.ok) throw response.status;
-    return await response.json();
-  } catch (error) {
-    console.error("network error: ", error);
-    return undefined;
-  }
-}
-
-export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
-  const url = `${DOC_BASE_URL}/doc_upload`;
+export async function fetchTextStream(query: string | Blob, params: string, file: Blob, fileName: string | undefined) {
+  const url = `${FAQ_BASE_URL}`; // Ensure the URL is constructed correctly
   const formData = new FormData();
-  formData.append("file", file, fileName);
 
-  const init: RequestInit = {
+  if (!file) {
+    file = new Blob([""], { type: "text/plain" });
+    fileName = "empty.txt";
+  }
+
+  if (params === "doc_id") {
+    formData.append("files", file, fileName);
+    formData.append("messages", query);
+  } else if (params === "text") {
+    formData.append("files", file, fileName);
+    formData.append("messages", query);
+  }
+
+  // Initiate the POST request to upload the file
+  const init = {
     method: "POST",
     body: formData,
   };
 
-  return fetchPostRes(url, init);
-}
+  const postResponse = await fetch(url, init);
 
-export async function fetchTextStream(query: string, urlSuffix: string, params: string) {
-  let payload = {};
-  let url = "";
-  if (params === "doc_id") {
-    payload = { doc_id: query };
-    url = ``;
-  } else if (params === "text") {
-    payload = { messages: query };
-    url = `${DOC_BASE_URL}`;
+  if (!postResponse.ok) {
+    throw new Error(`Error uploading file: ${postResponse.status}`);
   }
 
-  console.log("url", url);
+  // Function to create an async iterator for the stream
+  async function* streamGenerator() {
+    if (!postResponse.body) {
+      throw new Error("Response body is null");
+    }
+    const reader = postResponse.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let done, value;
 
-  return new SSE(url, {
-    headers: { "Content-Type": "application/json" },
-    payload: JSON.stringify(payload),
-  });
+    let buffer = ""; // Initialize a buffer
+
+    while (({ done, value } = await reader.read())) {
+      if (done) break;
+
+      // Decode chunk and append to buffer
+      const chunk = decoder.decode(value, { stream: true });
+      buffer += chunk;
+
+      // Use regex to clean and extract data
+      const cleanedChunks = buffer
+        .split("\n")
+        .map((line) => {
+          // Remove 'data: b' at the start and ' ' at the end
+          return line.replace(/^data:\s*|^b'|'\s*$/g, "").trim(); // Clean unnecessary characters
+        })
+        .filter((line) => line); // Remove empty lines
+
+      for (const cleanedChunk of cleanedChunks) {
+        // Further clean to ensure all unnecessary parts are removed
+        yield cleanedChunk.replace(/^b'|['"]$/g, ""); // Again clean 'b' and other single or double quotes
+      }
+
+      // If there is an incomplete message in the current buffer, keep it
+      buffer = buffer.endsWith("\n") ? "" : cleanedChunks.pop() || ""; // Keep the last incomplete part
+    }
+  }
+
+  return streamGenerator(); // Return the async generator
 }

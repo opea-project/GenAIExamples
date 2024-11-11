@@ -148,6 +148,8 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
         next_data["inputs"] = prompt
 
+    elif self.services[cur_node].service_type == ServiceType.LLM and not llm_parameters_dict["streaming"]:
+        next_data["text"] = data["choices"][0]["message"]["content"]
     else:
         next_data = data
 
@@ -166,7 +168,10 @@ def align_generator(self, gen, **kwargs):
         try:
             # sometimes yield empty chunk, do a fallback here
             json_data = json.loads(json_str)
-            if json_data["choices"][0]["finish_reason"] != "eos_token":
+            if (
+                json_data["choices"][0]["finish_reason"] != "eos_token"
+                and "content" in json_data["choices"][0]["delta"]
+            ):
                 yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
         except Exception as e:
             yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
