@@ -26,20 +26,16 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
         "data-prep": {"nodeSelector": {key: value for key, value in node_selector.items()}},
         "redis-vector-db": {"nodeSelector": {key: value for key, value in node_selector.items()}},
         "retriever-usvc": {"nodeSelector": {key: value for key, value in node_selector.items()}},
-        "llm-uservice": {"nodeSelector": {key: value for key, value in node_selector.items()}},
-        "embedding-usvc": {"nodeSelector": {key: value for key, value in node_selector.items()}},
         "chatqna-ui": {"nodeSelector": {key: value for key, value in node_selector.items()}},
         "global": {
             "HUGGINGFACEHUB_API_TOKEN": hf_token,  # Use passed token
             "modelUseHostPath": model_dir,  # Use passed model directory
-            "extraEnvConfig": "extra-env",  # Added MAX_WARMUP_SEQUENCE_LENGTH: 512 to extra-env in deploy.py
         },
         "nodeSelector": {key: value for key, value in node_selector.items()},
     }
 
     if with_rerank:
         values["teirerank"] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
-        values["reranking-usvc"] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
     else:
         values["image"] = {"repository": "opea/chatqna-without-rerank"}
 
