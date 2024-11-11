@@ -28,12 +28,24 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
 ```
 
-### 4. Build LLM Image
+### 4. Build LLM Images
 
-#### Use TGI as backend
+#### Use vLLM as backend to build Text-Generation
 
 ```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build --no-cache -t opea/llm-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/vllm/langchain/Dockerfile .
+```
+
+#### Use vLLM as backend to build FAQ Generation
+
+```bash
+docker build -t opea/llm-faqgen-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/vllm/langchain/Dockerfile .
+```
+
+#### Use vLLM as backend to build Doc Summarization
+
+```bash
+docker build -t opea/llm-docsum-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/vllm/langchain/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
@@ -96,7 +108,7 @@ Build frontend Docker image that enables via below command:
 
 ```bash
 cd GenAIExamples/ProductivitySuite/ui
-docker build --no-cache -t ProductivitySuite/docker_compose/intel/hpu/gaudi/compose.yaml docker/Dockerfile.react .
+docker build --no-cache -t opea/productivity-suite-react-ui-server:latest -f docker/Dockerfile.react .
 ```
 
 ---
@@ -136,11 +148,11 @@ export DB_NAME="test"
 export COLLECTION_NAME="Conversations"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-70B-Instruct"
 export LLM_MODEL_ID_CODEGEN="meta-llama/CodeLlama-7b-hf"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
+export vLLM_ENDPOINT="http://${host_ip}:9009"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
@@ -153,10 +165,10 @@ export LLM_SERVICE_HOST_IP_DOCSUM=${host_ip}
 export LLM_SERVICE_HOST_IP_FAQGEN=${host_ip}
 export LLM_SERVICE_HOST_IP_CODEGEN=${host_ip}
 export LLM_SERVICE_HOST_IP_CHATQNA=${host_ip}
-export TGI_LLM_ENDPOINT_CHATQNA="http://${host_ip}:9009"
-export TGI_LLM_ENDPOINT_CODEGEN="http://${host_ip}:8028"
-export TGI_LLM_ENDPOINT_FAQGEN="http://${host_ip}:9009"
-export TGI_LLM_ENDPOINT_DOCSUM="http://${host_ip}:9009"
+export vLLM_ENDPOINT_CHATQNA="http://${host_ip}:9009"
+export vLLM_ENDPOINT_CODEGEN="http://${host_ip}:8028"
+export vLLM_ENDPOINT_FAQGEN="http://${host_ip}:9009"
+export vLLM_ENDPOINT_DOCSUM="http://${host_ip}:9009"
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
 export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${host_ip}:8889/v1/faqgen"
@@ -179,14 +191,130 @@ export PROMPT_COLLECTION_NAME="prompt"
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
+
+**To use remote vLLM and TEI service endpoints instead of local set below environment variables**
+
+> Change the EMBEDDING_ENDPOINT, RERANKING_ENDPOINT and vLLM_ENDPOINT with values of corresponding remote endpoints
+
+```
+export embedding_endpoint="EMBEDDING_ENDPOINT"
+export reranking_endpoint="RERANKING_ENDPOINT"
+export vllm_endpoint="vLLM_ENDPOINT"
+```
+
+> Run the below export commands to set all the required environment variables for remote vLLM and TEI
+
+```bash
+export TEI_EMBEDDING_ENDPOINT=${embedding_endpoint}
+export TEI_RERANKING_ENDPOINT=${reranking_endpoint}
+export vLLM_ENDPOINT=${vllm_endpoint}
+export vLLM_ENDPOINT_CHATQNA=${vllm_endpoint}
+export vLLM_ENDPOINT_CODEGEN=${vllm_endpoint}
+export vLLM_ENDPOINT_FAQGEN=${vllm_endpoint}
+export vLLM_ENDPOINT_DOCSUM=${vllm_endpoint}
+```
+
+**To use authentication for remote vLLM and TEI service endpoints (OAuth Client Credentials Flow)**
+
+> Change the token_url, clientid and client_secret with exact values from identify provider that you are using
+
+```bash
+export CLIENTID=${clientid}
+export CLIENT_SECRET=${client_secret}
+export TOKEN_URL=${token_url}
+```
+
+**To use multiple models**
+
+> Create the model_configs.json file under Gaudi's docker_conpose folder
+
+```bash
+cd ..
+cd docker_compose/intel/hpu/gaudi
+touch model_configs.json
+```
+
+> Add the model details as shown in the below template.
+
+File Structure:
+
+```json
+[{
+"model_name": "Your Model Name",
+"displayName": "Model Display Name for the UI",
+"endpoint": "Model Endpoint with http/https",
+"minToken": 100, //Min Token Value
+"maxToken": 2000 //Max Token Value
+},
+{
+"model_name": "Your Model Name",
+"displayName": "Model Display Name for the UI",
+"endpoint": "Model Endpoint with http/https",
+"minToken": 100, //Min Token Value
+"maxToken": 2000 //Max Token Value
+}]
+
+```
+
+Example:
+
+```json
+[{
+"model_name": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+"displayName": "llama-3.1-70B",
+"endpoint": "<remote_vllm_model_endpoint>",
+"minToken": 100,
+"maxToken": 2000
+},
+{
+"model_name": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+"displayName": "llama-3.1-8B",
+"endpoint": "<remote_vllm_model_endpoint>",
+"minToken": 100,
+"maxToken": 2000
+}]
+```
+
+> Run the below export command to set the MODEL_CONFIGS environment variable
+
+```bash
+export MODEL_CONFIGS=$(jq -c . model_configs.json)
+```
+
+> To show multiple models in ProductivitySuite UI, copy the model_configs.json file into public folder of ui
+
+```bash
+cd ../../../../
+cp docker_compose/intel/hpu/gaudi/model_configs.json ui/react/public/model_configs.json
+```
+
+> Build UI Docker Image
+
+```bash
+cd ui
+docker build --no-cache -t opea/productivity-suite-react-ui-server:latest -f docker/Dockerfile.react .
+```
+
 ### Start all the services Docker Containers
 
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
+#### All Services Local
+
 ```bash
-cd GenAIExamples/ProductivitySuite/docker_compose/intel/hpu/gaudi
+cd ..
+cd docker_compose/intel/hpu/gaudi
 
 docker compose -f compose.yaml up -d
+```
+
+#### With vLLM and TEI running remotely
+
+```bash
+cd ..
+cd docker_compose/intel/hpu/gaudi
+
+docker compose -f compose_remote.yaml up -d
 ```
 
 ---
@@ -254,18 +382,18 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 6. LLM backend Service (ChatQnA, DocSum, FAQGen)
 
    ```bash
-   curl http://${host_ip}:9009/generate \
+   curl http://${host_ip}:9009/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
      -H 'Content-Type: application/json'
    ```
 
 7. LLM backend Service (CodeGen)
 
    ```bash
-   curl http://${host_ip}:8028/generate \
+   curl http://${host_ip}:8028/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}' \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
      -H 'Content-Type: application/json'
    ```
 
