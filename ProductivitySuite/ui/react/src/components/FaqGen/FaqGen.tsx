@@ -7,7 +7,8 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { notifications } from '@mantine/notifications'
 import { FAQ_GEN_URL } from '../../config'
 import { FileWithPath } from '@mantine/dropzone'
-
+import { conversationSelector } from '../../redux/Conversation/ConversationSlice';
+import { useAppSelector } from "../../redux/store";
 
 const FaqGen = () => {
     const [isFile, setIsFile] = useState<boolean>(false);
@@ -16,6 +17,7 @@ const FaqGen = () => {
     const [value, setValue] = useState<string>('');
     const [fileContent, setFileContent] = useState<string>('');
     const [response, setResponse] = useState<string>('');
+    const { model } = useAppSelector(conversationSelector);
     
     let messagesEnd:HTMLDivElement;
 
@@ -59,7 +61,8 @@ const FaqGen = () => {
 
     setIsGenerating(true)
     const body = {
-            messages: isFile ? fileContent : value
+            messages: isFile ? fileContent : value,
+            model: model
     }
     fetchEventSource(FAQ_GEN_URL, {
         method: "POST",
