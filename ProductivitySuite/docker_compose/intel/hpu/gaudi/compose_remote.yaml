@@ -36,6 +36,9 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-embedding-service"
       CLIENTID: ${CLIENTID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       TOKEN_URL: ${TOKEN_URL}
@@ -71,13 +74,16 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-reranking-service"
       CLIENTID: ${CLIENTID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       TOKEN_URL: ${TOKEN_URL}
     restart: unless-stopped
   llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-gaudi-server
+    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
+    container_name: llm-vllm-gaudi-server
     ports:
       - "9000:9000"
     ipc: host
@@ -85,15 +91,12 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CHATQNA}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-      MODEL_CONFIGS: ${MODEL_CONFIGS}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
       CLIENTID: ${CLIENTID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       TOKEN_URL: ${TOKEN_URL}
-
     restart: unless-stopped
   chatqna-gaudi-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
@@ -118,8 +121,8 @@ services:
     ipc: host
     restart: always
   llm_codegen:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-server-codegen
+    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
+    container_name: llm-vllm-server-codegen
     ports:
       - "9001:9000"
     ipc: host
@@ -127,11 +130,15 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CODEGEN}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT_CODEGEN}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
       CLIENTID: ${CLIENTID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       TOKEN_URL: ${TOKEN_URL}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
     restart: unless-stopped
   codegen-gaudi-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
@@ -148,7 +155,7 @@ services:
     ipc: host
     restart: always
   llm_faqgen:
-    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-faqgen-vllm:${TAG:-latest}
     container_name: llm-faqgen-server
     ports:
       - "9002:9000"
@@ -157,11 +164,15 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_FAQGEN}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT_FAQGEN}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
       CLIENTID: ${CLIENTID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       TOKEN_URL: ${TOKEN_URL}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
     restart: unless-stopped
   faqgen-gaudi-backend-server:
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
@@ -180,7 +191,7 @@ services:
     ipc: host
     restart: always
   llm_docsum_server:
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-docsum-vllm:${TAG:-latest}
     container_name: llm-docsum-server
     ports:
       - "9003:9000"
@@ -189,11 +200,15 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_DOCSUM}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT_DOCSUM}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
       CLIENTID: ${CLIENTID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       TOKEN_URL: ${TOKEN_URL}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
     restart: unless-stopped
   docsum-gaudi-backend-server:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
@@ -259,7 +274,7 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_PROXY=edge
     ipc: host
-    command:
+    command: 
       - start-dev
     restart: always
   productivity-suite-gaudi-react-ui-server:
