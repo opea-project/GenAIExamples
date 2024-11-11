@@ -148,6 +148,8 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
         next_data["inputs"] = prompt
 
+    elif self.services[cur_node].service_type == ServiceType.LLM and not llm_parameters_dict["streaming"]:
+        next_data["text"] = data["choices"][0]["message"]["content"]
     else:
         next_data = data
 
