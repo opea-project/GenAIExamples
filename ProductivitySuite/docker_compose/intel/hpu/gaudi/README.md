@@ -191,7 +191,6 @@ export PROMPT_COLLECTION_NAME="prompt"
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-
 **To use remote vLLM and TEI service endpoints instead of local set below environment variables**
 
 > Change the EMBEDDING_ENDPOINT, RERANKING_ENDPOINT and vLLM_ENDPOINT with values of corresponding remote endpoints
@@ -239,40 +238,43 @@ touch model_configs.json
 File Structure:
 
 ```json
-[{
-"model_name": "Your Model Name",
-"displayName": "Model Display Name for the UI",
-"endpoint": "Model Endpoint with http/https",
-"minToken": 100, //Min Token Value
-"maxToken": 2000 //Max Token Value
-},
-{
-"model_name": "Your Model Name",
-"displayName": "Model Display Name for the UI",
-"endpoint": "Model Endpoint with http/https",
-"minToken": 100, //Min Token Value
-"maxToken": 2000 //Max Token Value
-}]
-
+[
+  {
+    "model_name": "Your Model Name",
+    "displayName": "Model Display Name for the UI",
+    "endpoint": "Model Endpoint with http/https",
+    "minToken": 100, //Min Token Value
+    "maxToken": 2000 //Max Token Value
+  },
+  {
+    "model_name": "Your Model Name",
+    "displayName": "Model Display Name for the UI",
+    "endpoint": "Model Endpoint with http/https",
+    "minToken": 100, //Min Token Value
+    "maxToken": 2000 //Max Token Value
+  }
+]
 ```
 
 Example:
 
 ```json
-[{
-"model_name": "meta-llama/Meta-Llama-3.1-70B-Instruct",
-"displayName": "llama-3.1-70B",
-"endpoint": "<remote_vllm_model_endpoint>",
-"minToken": 100,
-"maxToken": 2000
-},
-{
-"model_name": "meta-llama/Meta-Llama-3.1-8B-Instruct",
-"displayName": "llama-3.1-8B",
-"endpoint": "<remote_vllm_model_endpoint>",
-"minToken": 100,
-"maxToken": 2000
-}]
+[
+  {
+    "model_name": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+    "displayName": "llama-3.1-70B",
+    "endpoint": "<remote_vllm_model_endpoint>",
+    "minToken": 100,
+    "maxToken": 2000
+  },
+  {
+    "model_name": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+    "displayName": "llama-3.1-8B",
+    "endpoint": "<remote_vllm_model_endpoint>",
+    "minToken": 100,
+    "maxToken": 2000
+  }
+]
 ```
 
 > Run the below export command to set the MODEL_CONFIGS environment variable
