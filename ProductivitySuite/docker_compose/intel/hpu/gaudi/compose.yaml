@@ -116,37 +116,31 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
-  tgi_service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
-    container_name: tgi-service
+  vllm_service:
+    image: opea/vllm:hpu
+    container_name: vllm-gaudi-server
     ports:
       - "9009:80"
     volumes:
       - "./data:/data"
-    shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HF_TOKEN: ${HF_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
-      ENABLE_HPU_GRAPH: true
-      LIMIT_HPU_GRAPH: true
-      USE_FLASH_ATTENTION: true
-      FLASH_ATTENTION_RECOMPUTE: true
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID}
+    command: --enforce-eager --model $LLM_MODEL_ID --tensor-parallel-size 1 --host 0.0.0.0 --port 80
   llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-gaudi-server
+    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
+    container_name: llm-vllm-gaudi-server
     depends_on:
-      - tgi_service
+      - vllm_service
     ports:
       - "9000:9000"
     ipc: host
@@ -154,11 +148,10 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CHATQNA}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-
     restart: unless-stopped
   chatqna-gaudi-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
@@ -170,7 +163,7 @@ services:
       - retriever
       - tei-reranking-service
       - reranking
-      - tgi_service
+      - vllm_service
       - llm
     ports:
       - "8888:8888"
@@ -185,9 +178,9 @@ services:
       LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP_CHATQNA}
     ipc: host
     restart: always
-  tgi_service_codegen:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
-    container_name: tgi_service_codegen
+  vllm_service_codegen:
+    image: opea/vllm:hpu
+    container_name: vllm_service_codegen
     ports:
       - "8028:80"
     volumes:
@@ -210,10 +203,10 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID_CODEGEN} --max-input-length 1024 --max-total-tokens 2048
   llm_codegen:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-server-codegen
+    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
+    container_name: llm-vllm-server-codegen
     depends_on:
-      - tgi_service_codegen
+      - vllm_service_codegen
     ports:
       - "9001:9000"
     ipc: host
@@ -221,8 +214,9 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CODEGEN}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT_CODEGEN}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID_CODEGEN}
     restart: unless-stopped
   codegen-gaudi-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
@@ -241,10 +235,10 @@ services:
     ipc: host
     restart: always
   llm_faqgen:
-    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-faqgen-vllm:${TAG:-latest}
     container_name: llm-faqgen-server
     depends_on:
-      - tgi_service
+      - vllm_service
     ports:
       - "9002:9000"
     ipc: host
@@ -252,14 +246,15 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_FAQGEN}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT_FAQGEN}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
     restart: unless-stopped
   faqgen-gaudi-backend-server:
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
     container_name: faqgen-gaudi-backend-server
     depends_on:
-      - tgi_service
+      - vllm_service
       - llm_faqgen
     ports:
       - "8889:8888"
@@ -273,10 +268,10 @@ services:
     ipc: host
     restart: always
   llm_docsum_server:
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-docsum-vllm:${TAG:-latest}
     container_name: llm-docsum-server
     depends_on:
-      - tgi_service
+      - vllm_service
     ports:
       - "9003:9000"
     ipc: host
@@ -284,14 +279,15 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_DOCSUM}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT_DOCSUM}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
     restart: unless-stopped
   docsum-gaudi-backend-server:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-gaudi-backend-server
     depends_on:
-      - tgi_service
+      - vllm_service
       - llm_docsum_server
     ports:
       - "8890:8888"
@@ -346,7 +342,7 @@ services:
     image: quay.io/keycloak/keycloak:25.0.2
     container_name: keycloak-server
     ports:
-      - 8081:8080
+      - 8080:8080
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
