@@ -6,14 +6,35 @@
 
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
+host_ip=$(hostname -I | awk '{print $1}')
+
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export LLM_SERVICE_HOST_IP=${host_ip}
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
+export no_proxy="${no_proxy},${host_ip}"
+
+export V2A_SERVICE_HOST_IP=${host_ip}
+export V2A_ENDPOINT=http://$host_ip:7078
+
+export A2T_ENDPOINT=http://$host_ip:7066
+export A2T_SERVICE_HOST_IP=${host_ip}
+export A2T_SERVICE_PORT=9099
+
+export DATA_ENDPOINT=http://$host_ip:7079
+export DATA_SERVICE_HOST_IP=${host_ip}
+export DATA_SERVICE_PORT=7079
+
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
-ip_address=$(hostname -I | awk '{print $1}')
+
 
 # Get the root folder of the current script
 ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
@@ -21,7 +42,7 @@ ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-
+    
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="docsum docsum-ui whisper-service multimedia2text-service a2t v2a llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
@@ -33,24 +54,6 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
-
-    export V2A_SERVICE_HOST_IP=${host_ip}
-    export V2A_ENDPOINT=http://$host_ip:7078
-
-    export A2T_ENDPOINT=http://$host_ip:7066
-    export A2T_SERVICE_HOST_IP=${host_ip}
-    export A2T_SERVICE_PORT=9099
-
-    export DATA_ENDPOINT=http://$host_ip:7079
-    export DATA_SERVICE_HOST_IP=${host_ip}
-    export DATA_SERVICE_PORT=7079
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -128,7 +131,7 @@ function validate_microservices() {
     # whisper microservice
     ulimit -s 65536
     validate_services \
-        "${ip_address}:7066/v1/asr" \
+        "${host_ip}:7066/v1/asr" \
         '{"asr_result":"well"}' \
         "whisper-service" \
         "whisper-service" \
@@ -136,7 +139,7 @@ function validate_microservices() {
 
     # Audio2Text service
     validate_services \
-        "${ip_address}:9099/v1/audio/transcriptions" \
+        "${host_ip}:9099/v1/audio/transcriptions" \
         '"query":"well"' \
         "a2t" \
         "a2t-service" \
@@ -144,7 +147,7 @@ function validate_microservices() {
 
     # Video2Audio service
     validate_services \
-        "${ip_address}:7078/v1/video2audio" \
+        "${host_ip}:7078/v1/video2audio" \
         "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd9L18KaAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
         "v2a" \
         "v2a-service" \
@@ -152,7 +155,7 @@ function validate_microservices() {
 
     # Docsum Data service - video
     validate_services \
-        "${ip_address}:7079/v1/multimedia2text" \
+        "${host_ip}:7079/v1/multimedia2text" \
         '"query":"well"' \
         "multimedia2text-service" \
         "multimedia2text" \
@@ -160,7 +163,7 @@ function validate_microservices() {
 
     # Docsum Data service - audio
     validate_services \
-        "${ip_address}:7079/v1/multimedia2text" \
+        "${host_ip}:7079/v1/multimedia2text" \
         '"query":"well"' \
         "multimedia2text-service" \
         "multimedia2text" \
@@ -168,7 +171,7 @@ function validate_microservices() {
 
     # Docsum Data service - text
     validate_services \
-        "${ip_address}:7079/v1/multimedia2text" \
+        "${host_ip}:7079/v1/multimedia2text" \
         "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco" \
         "multimedia2text-service" \
         "multimedia2text" \
@@ -176,7 +179,7 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_services \
-        "${ip_address}:8008/generate" \
+        "${host_ip}:8008/generate" \
         "generated_text" \
         "tgi-gaudi" \
         "tgi-gaudi-server" \
@@ -184,7 +187,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${ip_address}:9000/v1/chat/docsum" \
+        "${host_ip}:9000/v1/chat/docsum" \
         "data: " \
         "llm" \
         "llm-docsum-gaudi-server" \
@@ -195,7 +198,7 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-        "${ip_address}:8888/v1/docsum" \
+        "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
         "mega-docsum" \
         "docsum-xeon-backend-server" \
