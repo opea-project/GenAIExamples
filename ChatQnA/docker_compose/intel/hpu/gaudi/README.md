@@ -326,23 +326,18 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
    Then try the `cURL` command below to validate services.
 
    ```bash
-   #TGI Service
-   curl http://${host_ip}:8005/generate \
+   # TGI service
+   curl http://${host_ip}:9009/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
+     -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 
    ```bash
-   #vLLM Service
-   curl http://${host_ip}:8007/v1/completions \
+   # vLLM Service
+   curl http://${host_ip}:9009/v1/chat/completions \
      -H "Content-Type: application/json" \
-     -d '{
-     "model": "${LLM_MODEL_ID}",
-     "prompt": "What is Deep Learning?",
-     "max_tokens": 32,
-     "temperature": 0
-     }'
+     -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
    ```
 
 5. MegaService

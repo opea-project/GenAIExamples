@@ -252,9 +252,9 @@ For details on how to verify the correctness of the response, refer to [how-to-v
    Then try the `cURL` command below to validate TGI.
 
    ```bash
-   curl http://${host_ip}:6042/generate \
+   curl http://${host_ip}:6042/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 

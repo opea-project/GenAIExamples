@@ -26,7 +26,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
    export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service
    ```
 
@@ -324,17 +323,17 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
    ```bash
    # TGI service
-   curl http://${host_ip}:9009/generate \
+   curl http://${host_ip}:9009/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 
    ```bash
    # vLLM Service
-   curl http://${host_ip}:9009/v1/completions \
+   curl http://${host_ip}:9009/v1/chat/completions \
      -H "Content-Type: application/json" \
-     -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
    ```
 
 5. MegaService
