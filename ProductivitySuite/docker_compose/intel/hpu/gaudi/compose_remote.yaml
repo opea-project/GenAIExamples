@@ -274,7 +274,7 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_PROXY=edge
     ipc: host
-    command: 
+    command:
       - start-dev
     restart: always
   productivity-suite-gaudi-react-ui-server:
