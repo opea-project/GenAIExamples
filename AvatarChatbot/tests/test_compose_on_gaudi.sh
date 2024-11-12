@@ -29,7 +29,7 @@ function build_docker_images() {
     service_list="avatarchatbot whisper-gaudi asr llm-tgi speecht5-gaudi tts wav2lip-gaudi animation"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
 
     docker images && sleep 1s
 }
@@ -127,15 +127,17 @@ function stop_docker() {
 
 
 function main() {
-
     stop_docker
+    echo y | docker builder prune --all
+    echo y | docker image prune
+
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
     # validate_microservices
     validate_megaservice
     # validate_frontend
-    stop_docker
 
+    stop_docker
     echo y | docker builder prune --all
     echo y | docker image prune
 

@@ -2,7 +2,7 @@
 
 Suppose you possess a set of videos and wish to perform question-answering to extract insights from these videos. To respond to your questions, it typically necessitates comprehension of visual cues within the videos, knowledge derived from the audio content, or often a mix of both these visual elements and auditory facts. The MultimodalQnA framework offers an optimal solution for this purpose.
 
-`MultimodalQnA` addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos. For this purpose, MultimodalQnA utilizes [BridgeTower model](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi), a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the video ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MultimodalQnA will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVM) as input context to generate a response for the user.
+`MultimodalQnA` addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos, images, and audio files. For this purpose, MultimodalQnA utilizes [BridgeTower model](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi), a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MultimodalQnA will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVM) as input context to generate a response for the user.
 
 The MultimodalQnA architecture shows below:
 
@@ -100,10 +100,12 @@ In the below, we provide a table that describes for each microservice component 
 
 By default, the embedding and LVM models are set to a default value as listed below:
 
-| Service              | Model                                       |
-| -------------------- | ------------------------------------------- |
-| embedding-multimodal | BridgeTower/bridgetower-large-itm-mlm-gaudi |
-| LVM                  | llava-hf/llava-v1.6-vicuna-13b-hf           |
+| Service              | HW    | Model                                     |
+| -------------------- | ----- | ----------------------------------------- |
+| embedding-multimodal | Xeon  | BridgeTower/bridgetower-large-itm-mlm-itc |
+| LVM                  | Xeon  | llava-hf/llava-1.5-7b-hf                  |
+| embedding-multimodal | Gaudi | BridgeTower/bridgetower-large-itm-mlm-itc |
+| LVM                  | Gaudi | llava-hf/llava-v1.6-vicuna-13b-hf         |
 
 You can choose other LVM models, such as `llava-hf/llava-1.5-7b-hf ` and `llava-hf/llava-1.5-13b-hf`, as needed.
 

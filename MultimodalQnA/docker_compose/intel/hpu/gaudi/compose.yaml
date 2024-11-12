@@ -36,6 +36,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       PORT: ${EMBEDDER_PORT}
+    entrypoint: ["python", "bridgetower_server.py", "--device", "hpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
     restart: unless-stopped
   embedding-multimodal:
     image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
@@ -68,7 +69,7 @@ services:
       INDEX_NAME: ${INDEX_NAME}
     restart: unless-stopped
   tgi-gaudi:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
     container_name: tgi-llava-gaudi-server
     ports:
       - "8399:80"
@@ -83,6 +84,10 @@ services:
       PREFILL_BATCH_BUCKET_SIZE: 1
       BATCH_BUCKET_SIZE: 1
       MAX_BATCH_TOTAL_TOKENS: 4096
+      ENABLE_HPU_GRAPH: true
+      LIMIT_HPU_GRAPH: true
+      USE_FLASH_ATTENTION: true
+      FLASH_ATTENTION_RECOMPUTE: true
     runtime: habana
     cap_add:
       - SYS_NICE
@@ -139,6 +144,7 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DATAPREP_INGEST_SERVICE_ENDPOINT=${DATAPREP_INGEST_SERVICE_ENDPOINT}
       - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
       - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
     ipc: host

@@ -11,7 +11,6 @@ docker run -it --rm \
     -p $port_number:80 \
     -v $volume:/data \
     --runtime=habana \
-    --restart always \
     -e HUGGING_FACE_HUB_TOKEN=$HUGGING_FACE_HUB_TOKEN \
     -e HABANA_VISIBLE_DEVICES=all \
     -e OMPI_MCA_btl_vader_single_copy_mechanism=none \
@@ -20,7 +19,7 @@ docker run -it --rm \
     --ipc=host \
     -e HTTPS_PROXY=$https_proxy \
     -e HTTP_PROXY=$https_proxy \
-    ghcr.io/huggingface/tgi-gaudi:2.0.5 \
+    ghcr.io/huggingface/tgi-gaudi:2.0.6 \
     --model-id $model_name \
     --max-input-tokens $max_input_tokens \
     --max-total-tokens $max_total_tokens \
