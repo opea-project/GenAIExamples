@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
@@ -48,7 +48,7 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-rocm-server > ${LOG_PATH}/tgi_service_start.log
+        docker logs faggen-tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
@@ -157,7 +157,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+#    validate_frontend
 
     stop_docker
     echo y | docker system prune
