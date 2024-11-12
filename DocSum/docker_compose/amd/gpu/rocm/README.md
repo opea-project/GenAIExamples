@@ -41,7 +41,7 @@ Example for set isolation for 2 GPUs
       - /dev/dri/renderD129:/dev/dri/renderD129
 ```
 
-Pelase find more information about accessing and restricting AMD GPUs in the link (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
+Please find more information about accessing and restricting AMD GPUs in the link (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
 
 ### Start Microservice Docker Containers
 
