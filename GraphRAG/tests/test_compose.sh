@@ -23,7 +23,7 @@ function build_docker_images() {
     service_list="graphrag dataprep-neo4j-llamaindex retriever-neo4j-llamaindex chatqna-gaudi-ui-server chatqna-gaudi-nginx-server"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull neo4j:latest
     docker images && sleep 1s

@@ -25,7 +25,7 @@ Should you desire to use the Gaudi accelerator, two alternate images are used fo
 For Gaudi:
 
 - tei-embedding-service: ghcr.io/huggingface/tei-gaudi:latest
-- tgi-service: gghcr.io/huggingface/tgi-gaudi:2.0.5
+- tgi-service: gghcr.io/huggingface/tgi-gaudi:2.0.6
 
 > [NOTE]  
 > Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/hpu/gaudi/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.

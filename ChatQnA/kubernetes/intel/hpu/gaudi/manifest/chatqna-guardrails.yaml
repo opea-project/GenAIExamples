@@ -1103,7 +1103,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/tgi-gaudi:2.0.5"
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.6"
           imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
@@ -1184,8 +1184,13 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
+<<<<<<< HEAD
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.6"
+          imagePullPolicy: IfNotPresent
+=======
           image: "ghcr.io/huggingface/tgi-gaudi:2.0.5"
           imagePullPolicy: Always
+>>>>>>> e3187be819ad088c24bf1b2cbb419255af0f2be3
           volumeMounts:
             - mountPath: /data
               name: model-volume
