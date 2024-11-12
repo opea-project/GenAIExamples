@@ -99,7 +99,7 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
             },
             {"name": "teirerank", "resources": {"limits": {"habana.ai/gaudi": 1}}} if with_rerank else None,
             {"name": "tgi", "resources": {"limits": {"habana.ai/gaudi": 1}}},
-            {"name": "retriever", "resources": {"requests": {"cpu": "8", "memory": "8000Mi"}}},
+            {"name": "retriever-usvc", "resources": {"requests": {"cpu": "8", "memory": "8000Mi"}}},
         ]
 
         # Filter out any None values directly as part of initialization

@@ -556,7 +556,7 @@ spec:
           securityContext:
             {}
           image: "opea/chatqna-ui:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: ui
               containerPort: 5173
@@ -614,7 +614,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/dataprep-redis:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: data-prep
               containerPort: 6007
@@ -692,7 +692,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/guardrails-tgi:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: guardrails-usvc
               containerPort: 9090
@@ -767,7 +767,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "redis/redis-stack:7.2.0-v9"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
               name: data-volume
@@ -842,7 +842,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/retriever-redis:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: retriever-usvc
               containerPort: 7000
@@ -921,7 +921,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "ghcr.io/huggingface/tei-gaudi:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args:
             - "--auto-truncate"
           volumeMounts:
@@ -1013,7 +1013,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args:
             - "--auto-truncate"
           volumeMounts:
@@ -1103,8 +1103,8 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/tgi-gaudi:2.0.5"
-          imagePullPolicy: IfNotPresent
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.6"
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -1184,8 +1184,13 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/tgi-gaudi:2.0.5"
+<<<<<<< HEAD
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.6"
           imagePullPolicy: IfNotPresent
+=======
+          image: "ghcr.io/huggingface/tgi-gaudi:2.0.5"
+          imagePullPolicy: Always
+>>>>>>> e3187be819ad088c24bf1b2cbb419255af0f2be3
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -1278,7 +1283,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/chatqna-guardrails:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /tmp
               name: tmp
@@ -1319,7 +1324,7 @@ spec:
     spec:
       containers:
       - image: nginx:1.27.1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: nginx
         volumeMounts:
         - mountPath: /etc/nginx/conf.d
