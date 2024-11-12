@@ -50,6 +50,11 @@ on:
         description: 'OPEA branch for image build'
         required: false
         type: string
+      inject_commit:
+        default: true
+        description: "inject commit to docker images true or false"
+        required: false
+        type: string
 
 permissions: read-all
 jobs:
@@ -101,4 +106,5 @@ jobs:
       test_k8s: ${{ fromJSON(inputs.test_k8s) }}
       test_gmc: ${{ fromJSON(inputs.test_gmc) }}
       opea_branch: ${{ inputs.opea_branch }}
+      inject_commit: ${{ inputs.inject_commit }}
     secrets: inherit

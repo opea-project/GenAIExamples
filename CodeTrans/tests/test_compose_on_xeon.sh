@@ -22,7 +22,7 @@ function build_docker_images() {
     service_list="codetrans codetrans-ui llm-tgi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker images && sleep 1s
 }
 
@@ -30,7 +30,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
-    export LLM_MODEL_ID="HuggingFaceH4/mistral-7b-grok"
+    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}

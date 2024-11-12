@@ -71,8 +71,6 @@ cd GenAIExamples/DocSum/docker_compose/intel/hpu/gaudi/
 docker compose -f compose.yaml up -d
 ```
 
-> Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
-
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 #### Deploy on Xeon
@@ -158,9 +156,21 @@ Two ways of consuming Document Summarization Service:
 1. Use cURL command on terminal
 
    ```bash
+   #Use English mode (default).
    curl http://${host_ip}:8888/v1/docsum \
-       -H "Content-Type: application/json" \
-       -d '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+       -H "Content-Type: multipart/form-data" \
+       -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+       -F "max_tokens=32" \
+       -F "language=en" \
+       -F "stream=true"
+
+   #Use Chinese mode.
+   curl http://${host_ip}:8888/v1/docsum \
+       -H "Content-Type: multipart/form-data" \
+       -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
+       -F "max_tokens=32" \
+       -F "language=zh" \
+       -F "stream=true"
    ```
 
 2. Access via frontend
