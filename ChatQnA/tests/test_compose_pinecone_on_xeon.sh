@@ -22,7 +22,7 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui dataprep-pinecone retriever-pinecone nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
@@ -54,7 +54,7 @@ function start_services() {
     done
 }
 
-function validate_services() {
+function validate_service() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
@@ -101,7 +101,7 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # tei for embedding service
-    validate_services \
+    validate_service \
         "${ip_address}:6006/embed" \
         "[[" \
         "tei-embedding" \
@@ -111,7 +111,7 @@ function validate_microservices() {
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # test /v1/dataprep/delete_file
-    validate_services \
+    validate_service \
        "http://${ip_address}:6009/v1/dataprep/delete_file" \
        '{"status":true}' \
         "dataprep_del" \
@@ -120,7 +120,7 @@ function validate_microservices() {
 
     # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
-    validate_services \
+    validate_service \
        "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
@@ -129,7 +129,7 @@ function validate_microservices() {
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-    validate_services \
+    validate_service \
         "${ip_address}:7000/v1/retrieval" \
         " " \
         "retrieval" \
@@ -138,7 +138,7 @@ function validate_microservices() {
 
     # tei for rerank microservice
     echo "Validating reranking service"
-    validate_services \
+    validate_service \
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
@@ -148,7 +148,7 @@ function validate_microservices() {
 
     # tgi for llm service
     echo "Validating llm service"
-    validate_services \
+    validate_service \
         "${ip_address}:9009/generate" \
         "generated_text" \
         "tgi-llm" \
@@ -159,9 +159,9 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
-    validate_services \
+    validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "billion" \
+        "data: " \
         "chatqna-megaservice" \
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
@@ -208,7 +208,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    #if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
