@@ -235,6 +235,102 @@ class PretrainingDataProcessor:
         return examples
 
 
+class DPODataProcessor:
+    def __init__(self, config, tokenizer):
+        self.tokenizer = tokenizer
+        self.max_length = config["Dataset"].get("max_length", 1024)
+        self.max_prompt_length = config["Dataset"].get("max_prompt_length", 512)
+        self.pad_to_max = config["Dataset"].get("pad_to_max", False)
+
+    def tokenize(self, examples):
+        prompts = {(system + question).strip() for system, question in zip(examples["system"], examples["question"])}
+        chosens = {c.strip() for c in examples["chosen"]}
+        rejects = {r.strip() for r in examples["rejected"]}
+
+        examples = {
+            "prompt": [],
+            "chosen": [],
+            "rejected": [],
+            "chosen_response_only": [],
+            "rejected_response_only": [],
+            "chosen_input_ids": [],
+            "chosen_attention_mask": [],
+            "chosen_labels": [],
+            "rejected_input_ids": [],
+            "rejected_attention_mask": [],
+            "rejected_labels": [],
+            "prompt_input_ids": [],
+            "prompt_attention_mask": [],
+        }
+
+        for prompt, chosen, reject in zip(prompts, chosens, rejects):
+
+            prompt_tokens = self.tokenizer.tokenize(prompt)
+
+            if len(prompt_tokens) > self.max_prompt_length:
+                prompt_tokens = prompt_tokens[: self.max_prompt_length]
+
+            prompt_ids = self.tokenizer.convert_tokens_to_ids(prompt_tokens)
+            prompt_mask = [1] * len(prompt_ids)
+
+            max_resp = self.max_length - len(prompt_ids)
+            chosen_tokens = self.tokenizer.tokenize(chosen)
+            chosen_tokens = chosen_tokens[: max_resp - 1]
+            chosen_tokens.append(self.tokenizer.eos_token)
+            chosen_ids = self.tokenizer.convert_tokens_to_ids(chosen_tokens)
+            chosen_mask = [1] * len(chosen_ids)
+
+            reject_tokens = self.tokenizer.tokenize(reject)
+            reject_tokens = reject_tokens[: max_resp - 1]
+            reject_tokens.append(self.tokenizer.eos_token)
+            reject_ids = self.tokenizer.convert_tokens_to_ids(reject_tokens)
+            reject_mask = [1] * len(reject_ids)
+
+            chosen_input_ids = prompt_ids + chosen_ids
+            chosen_attention_mask = prompt_mask + chosen_mask
+            chosen_labels = [IGNORE_INDEX] * len(prompt_ids) + chosen_ids
+
+            reject_input_ids = prompt_ids + reject_ids
+            reject_attention_mask = prompt_mask + reject_mask
+            reject_labels = [IGNORE_INDEX] * len(prompt_ids) + reject_ids
+
+            # padding
+            input_len = len(chosen_input_ids)
+            if self.pad_to_max:
+                pad_len = self.max_length - input_len
+                chosen_input_ids = chosen_input_ids + [0] * pad_len
+                chosen_labels = chosen_labels + [-100] * pad_len
+                chosen_attention_mask = chosen_attention_mask + [0] * pad_len
+                assert len(chosen_input_ids) == self.max_length
+
+            input_len = len(reject_input_ids)
+            if self.pad_to_max:
+                pad_len = self.max_length - input_len
+                reject_input_ids = reject_input_ids + [0] * pad_len
+                reject_labels = reject_labels + [-100] * pad_len
+                reject_attention_mask = reject_attention_mask + [0] * pad_len
+                assert len(reject_input_ids) == self.max_length
+
+            examples["prompt"].append(prompt)
+            examples["chosen"].append(prompt + chosen)
+            examples["rejected"].append(prompt + reject)
+            examples["chosen_response_only"].append(chosen)
+            examples["rejected_response_only"].append(reject)
+
+            examples["chosen_input_ids"].append(chosen_input_ids)
+            examples["chosen_attention_mask"].append(chosen_attention_mask)
+            examples["chosen_labels"].append(chosen_labels)
+
+            examples["rejected_input_ids"].append(reject_input_ids)
+            examples["rejected_attention_mask"].append(reject_attention_mask)
+            examples["rejected_labels"].append(reject_labels)
+
+            examples["prompt_input_ids"].append(prompt_ids)
+            examples["prompt_attention_mask"].append(prompt_mask)
+
+        return examples
+
+
 class TrainDatasetForCE(Dataset):
     def __init__(self, dataset, args, tokenizer):
         self.dataset = dataset
@@ -350,3 +446,28 @@ class EmbedCollator(DataCollatorWithPadding):
             return_tensors="pt",
         )
         return {"query": q_collated, "passage": d_collated}
+
+
+@dataclass
+class DPOCollator(DataCollatorWithPadding):
+    def __call__(self, features) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
+        input_ids = [torch.tensor(ins["chosen_input_ids"]) for ins in features] + [
+            torch.tensor(ins["rejected_input_ids"]) for ins in features
+        ]
+        labels = [torch.tensor(ins["chosen_labels"]) for ins in features] + [
+            torch.tensor(ins["rejected_labels"]) for ins in features
+        ]
+        attention_mask = [torch.tensor(ins["chosen_attention_mask"]) for ins in features] + [
+            torch.tensor(ins["rejected_attention_mask"]) for ins in features
+        ]
+
+        input_ids = torch.nn.utils.rnn.pad_sequence(
+            input_ids, batch_first=True, padding_value=self.tokenizer.eos_token_id
+        )
+        labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True, padding_value=IGNORE_INDEX)
+        attention_mask = torch.nn.utils.rnn.pad_sequence(attention_mask, batch_first=True, padding_value=0)
+        return dict(
+            input_ids=input_ids,
+            labels=labels,
+            attention_mask=attention_mask,
+        )

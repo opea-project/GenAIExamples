@@ -26,6 +26,8 @@ from comps import CustomLogger
 from comps.finetuning.finetune_config import FinetuneConfig
 from comps.finetuning.llm_on_ray import common
 from comps.finetuning.llm_on_ray.finetune.data_process import (
+    DPOCollator,
+    DPODataProcessor,
     EmbedCollator,
     GroupCollator,
     InstructionDataProcessor,
@@ -287,6 +289,18 @@ def tokenize_dataset(config: Dict, tokenizer, dataset):
             )
 
         return tokenized_dataset
+    elif task == "dpo":
+        tokenizer.pad_token = tokenizer.eos_token if not tokenizer.pad_token else tokenizer.pad_token
+        processor = DPODataProcessor(config, tokenizer)
+        column_names = dataset["train"].column_names
+        tokenized_dataset = dataset.map(
+            processor.tokenize,
+            remove_columns=column_names,
+            batched=True,
+            load_from_cache_file=False,
+            desc="Tokenize dataset",
+        )
+        return tokenized_dataset
     elif task == "rerank":
         dataset["train"] = TrainDatasetForCE(dataset["train"], config["Dataset"], tokenizer)
         return dataset
@@ -303,6 +317,8 @@ def prepare_data_collator(config: Dict, tokenizer):
         return transformers.DataCollatorForLanguageModeling(
             tokenizer=tokenizer, mlm=False, return_tensors="pt", pad_to_multiple_of=8
         )
+    elif task == "dpo":
+        return DPOCollator(tokenizer)
     elif task == "rerank":
         return GroupCollator(tokenizer)
     elif task == "embedding":
@@ -321,10 +337,15 @@ def load_model(config: Dict):
     model_dtype = convert_dtype(config["Training"].get("mixed_precision", "no"))
     model_config = config["General"].get("config", {})
     task = config["General"].get("task", "instruction_tuning")
-    if task == "instruction_tuning" or task == "pretraining":
+    ref_model = None
+    if task in ["instruction_tuning", "pretraining", "dpo"]:
         model = transformers.AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=model_dtype, **model_config)
+        if task == "dpo":
+            ref_model = transformers.AutoModelForCausalLM.from_pretrained(
+                model_name, torch_dtype=model_dtype, **model_config
+            )
         lora_config = config["General"].get("lora_config", None)
-        if lora_config and task != "pretraining":
+        if lora_config and task == "instruction_tuning":
             peft_config = LoraConfig(**lora_config)
             model = get_peft_model(model, peft_config)
     elif task == "rerank":
@@ -362,47 +383,93 @@ def load_model(config: Dict):
 
     model.to(dtype=model_dtype, device=torch.device(config["Training"]["device"]))
 
-    return model
+    return model, ref_model
 
 
-def get_trainer(config: Dict, model, tokenizer, tokenized_dataset, data_collator):
+def get_trainer(config: Dict, model, ref_model, tokenizer, tokenized_dataset, data_collator):
     device = config["Training"]["device"]
+    task = config["General"].get("task", "instruction_tuning")
     if device in ["cpu", "gpu", "cuda"]:
         training_args = convert_to_training_args(TrainingArguments, config)
-        trainer = Trainer(
-            model=model,
-            args=training_args,
-            train_dataset=tokenized_dataset["train"],
-            eval_dataset=tokenized_dataset["validation"] if tokenized_dataset.get("validation") is not None else None,
-            tokenizer=tokenizer,
-            data_collator=data_collator,
-        )
+        if task == "dpo":
+            lora_config = config["General"].get("lora_config", None)
+            peft_config = LoraConfig(**lora_config)
+            from comps.finetuning.llm_on_ray.finetune.dpo_trainer import DPOTrainer
+
+            trainer = DPOTrainer(
+                model,
+                ref_model,
+                args=training_args,
+                data_collator=data_collator,
+                beta=config["Training"].get("dpo_beta", 0.1),
+                train_dataset=tokenized_dataset["train"],
+                eval_dataset=(
+                    tokenized_dataset["validation"] if tokenized_dataset.get("validation") is not None else None
+                ),
+                tokenizer=tokenizer,
+                peft_config=peft_config,
+                max_length=config["Dataset"].get("max_length", 1024),
+            )
+        else:
+            trainer = Trainer(
+                model=model,
+                args=training_args,
+                train_dataset=tokenized_dataset["train"],
+                eval_dataset=(
+                    tokenized_dataset["validation"] if tokenized_dataset.get("validation") is not None else None
+                ),
+                tokenizer=tokenizer,
+                data_collator=data_collator,
+            )
         return training_args, trainer
     elif device in ["hpu"]:
         from optimum.habana import GaudiConfig
         from optimum.habana.transformers import GaudiTrainer, GaudiTrainingArguments
 
-        # If gaudi_config_name is provided, load gaudi_config from huggingface model hub(https://huggingface.co/Habana), otherwise use default gaudi_config
-        gaudi_config_name = config["General"].get("gaudi_config_name", None)
-        if gaudi_config_name is not None:
-            gaudi_config = GaudiConfig.from_pretrained(gaudi_config_name)
-        else:
-            gaudi_config = GaudiConfig()
-            gaudi_config.use_fused_adam = True
-            gaudi_config.use_fused_clip_norm = True
-
         training_args = convert_to_training_args(GaudiTrainingArguments, config)
-        trainer = GaudiTrainer(
-            model=model,
-            args=training_args,
-            gaudi_config=gaudi_config,
-            train_dataset=tokenized_dataset["train"],
-            eval_dataset=tokenized_dataset["validation"] if tokenized_dataset.get("validation") is not None else None,
-            tokenizer=tokenizer,
-            data_collator=data_collator,
-        )
+
+        if task == "dpo":
+            lora_config = config["General"].get("lora_config", None)
+            peft_config = LoraConfig(**lora_config)
+            from comps.finetuning.llm_on_ray.finetune.dpo_trainer import GaudiDPOTrainer
+
+            trainer = GaudiDPOTrainer(
+                model,
+                ref_model,
+                args=training_args,
+                data_collator=data_collator,
+                beta=config["Training"].get("dpo_beta", 0.1),
+                train_dataset=tokenized_dataset["train"],
+                eval_dataset=(
+                    tokenized_dataset["validation"] if tokenized_dataset.get("validation") is not None else None
+                ),
+                tokenizer=tokenizer,
+                peft_config=peft_config,
+                max_length=config["Dataset"].get("max_length", 1024),
+            )
+        else:
+            # If gaudi_config_name is provided, load gaudi_config from huggingface model hub(https://huggingface.co/Habana), otherwise use default gaudi_config
+            gaudi_config_name = config["General"].get("gaudi_config_name", None)
+            if gaudi_config_name is not None:
+                gaudi_config = GaudiConfig.from_pretrained(gaudi_config_name)
+            else:
+                gaudi_config = GaudiConfig()
+                gaudi_config.use_fused_adam = True
+                gaudi_config.use_fused_clip_norm = True
+
+            trainer = GaudiTrainer(
+                model=model,
+                args=training_args,
+                gaudi_config=gaudi_config,
+                train_dataset=tokenized_dataset["train"],
+                eval_dataset=(
+                    tokenized_dataset["validation"] if tokenized_dataset.get("validation") is not None else None
+                ),
+                tokenizer=tokenizer,
+                data_collator=data_collator,
+            )
         return training_args, trainer
-    return None
+    return None, None
 
 
 def train_func(config: Dict[str, Any]):
@@ -428,9 +495,9 @@ def train_func(config: Dict[str, Any]):
 
     data_collator = prepare_data_collator(config, tokenizer)
 
-    model = load_model(config)
+    model, ref_model = load_model(config)
 
-    training_args, trainer = get_trainer(config, model, tokenizer, tokenized_dataset, data_collator)
+    training_args, trainer = get_trainer(config, model, ref_model, tokenizer, tokenized_dataset, data_collator)
 
     logger.info("train start")
     trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)

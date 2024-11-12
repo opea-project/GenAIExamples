@@ -58,7 +58,7 @@ class GeneralConfig(BaseModel):
 
     @validator("task")
     def check_task(cls, v: str):
-        assert v in ["instruction_tuning", "pretraining", "rerank", "embedding"]
+        assert v in ["instruction_tuning", "pretraining", "dpo", "rerank", "embedding"]
         return v
 
 
@@ -71,11 +71,13 @@ class DatasetConfig(BaseModel):
     block_size: int = 512
     shuffle: bool = False
     max_source_length: int = 384
+    max_prompt_length: int = 512
     padding_side: str = "right"
     truncation_side: str = "right"
     max_seq_length: int = 512
     truncation: bool = True
     padding: Union[bool, str] = True
+    pad_to_max: bool = False
     mask_input: bool = True
     mask_response: bool = True
     data_preprocess_type: str = "neural_chat"
@@ -132,6 +134,7 @@ class TrainingConfig(BaseModel):
     logging_steps: int = 10
     deepspeed_config_file: str = ""
     embedding_training_config: Optional[EmbeddingTrainingConfig] = EmbeddingTrainingConfig()
+    dpo_beta: float = Field(default=0.1, description="the beta parameter for DPO loss")
 
     @validator("device")
     def check_device(cls, v: str):

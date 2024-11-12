@@ -73,6 +73,7 @@ function validate_finetune() {
     HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' -d "$INPUT_DATA" "$URL")
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+    FINTUNING_ID=$(echo "$RESPONSE_BODY" | jq -r '.id')
 
     # Parse the JSON response
     purpose=$(echo "$RESPONSE_BODY" | jq -r '.purpose')
@@ -96,6 +97,26 @@ function validate_finetune() {
     fi
 
     sleep 10s
+
+    # check finetuning job status
+    URL="$URL/retrieve"
+    for((i=1;i<=10;i++));
+    do
+	HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": "'$FINTUNING_ID'"}' "$URL")
+	echo $HTTP_RESPONSE
+	RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+	STATUS=$(echo "$RESPONSE_BODY" | jq -r '.status')
+	if [[ "$STATUS" == "succeeded" ]]; then
+	    echo "training: succeeded."
+	    break
+	elif [[ "$STATUS" == "failed" ]]; then
+	    echo "training: failed."
+	    exit 1
+	else
+	    echo "training: '$STATUS'"
+	fi
+	sleep 1m
+    done
 }
 
 function validate_microservice() {
@@ -148,7 +169,7 @@ EOF
         "rerank - finetuning" \
         "test-comps-finetuning-server" \
         '{"id":"ft-job' \
-        '{"training_file": "test_data.json","model": "BAAI/bge-reranker-base","General":{"task":"rerank","lora_config":null}}'
+        '{"training_file": "test_data_rerank.json","model": "BAAI/bge-reranker-base","General":{"task":"rerank","lora_config":null}}'
 
 
     ##########################
@@ -176,8 +197,31 @@ EOF
         "pretrain - finetuning" \
         "test-comps-finetuning-server" \
         '{"id":"ft-job' \
-        '{"training_file": "test_data.json","model": "facebook/opt-125m","General":{"task":"pretraining","lora_config":null}}'
+        '{"training_file": "test_data_pretrain.json","model": "facebook/opt-125m","General":{"task":"pretraining","lora_config":null}}'
 
+
+    ##########################
+    #    dpo test   #
+    ##########################
+    # test /v1/dataprep upload file
+    cat <<EOF > test_data_dpo.jsonl
+{"system": "", "question": "You will be given a definition of a task first, then some input of the task.\nThis task is about using the specified sentence and converting the sentence to Resource Description Framework (RDF) triplets of the form (subject, predicate object). The RDF triplets generated must be such that the triplets accurately capture the structure and semantics of the input sentence. The input is a sentence and the output is a list of triplets of the form [subject, predicate, object] that capture the relationships present in the sentence. When a sentence has more than 1 RDF triplet possible, the output must contain all of them.\n\nAFC Ajax (amateurs)'s ground is Sportpark De Toekomst where Ajax Youth Academy also play.\nOutput:", "chosen": "[\n  [\"AFC Ajax (amateurs)\", \"has ground\", \"Sportpark De Toekomst\"],\n  [\"Ajax Youth Academy\", \"plays at\", \"Sportpark De Toekomst\"]\n]", "rejected": " Sure, I'd be happy to help! Here are the RDF triplets for the input sentence:\n\n[AFC Ajax (amateurs), hasGround, Sportpark De Toekomst]\n[Ajax Youth Academy, playsAt, Sportpark De Toekomst]\n\nExplanation:\n\n* AFC Ajax (amateurs) is the subject of the first triplet, and hasGround is the predicate that describes the relationship between AFC Ajax (amateurs) and Sportpark De Toekomst.\n* Ajax Youth Academy is the subject of the second triplet, and playsAt is the predicate that describes the relationship between Ajax Youth Academy and Sportpark De Toekomst.\n\nNote that there may be other possible RDF triplets that could be derived from the input sentence, but the above triplets capture the main relationships present in the sentence."}
+{"system": "You are an AI assistant. You will be given a task. You must generate a detailed and long answer.", "question": "Generate an approximately fifteen-word sentence that describes all this data: Midsummer House eatType restaurant; Midsummer House food Chinese; Midsummer House priceRange moderate; Midsummer House customer rating 3 out of 5; Midsummer House near All Bar One", "chosen": "Midsummer House is a moderately priced Chinese restaurant with a 3/5 customer rating, located near All Bar One.", "rejected": " Sure! Here's a sentence that describes all the data you provided:\n\n\"Midsummer House is a moderately priced Chinese restaurant with a customer rating of 3 out of 5, located near All Bar One, offering a variety of delicious dishes.\""}
+EOF
+    validate_upload \
+        "http://${ip_address}:$finetuning_service_port/v1/files" \
+        "dpo - upload" \
+        "test-comps-finetuning-server" \
+        "fine-tune" \
+        "test_data_dpo.jsonl"
+
+    # test /v1/fine_tuning/jobs
+    validate_finetune \
+        "http://${ip_address}:$finetuning_service_port/v1/fine_tuning/jobs" \
+        "dpo - finetuning" \
+        "test-comps-finetuning-server" \
+        '{"id":"ft-job' \
+        '{"training_file": "test_data_dpo.jsonl","model": "facebook/opt-125m","General":{"task":"dpo"}}'
 
 }
 
