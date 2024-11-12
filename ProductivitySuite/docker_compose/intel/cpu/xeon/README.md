@@ -175,6 +175,9 @@ export LLM_SERVICE_HOST_PORT_FAQGEN=9002
 export LLM_SERVICE_HOST_PORT_CODEGEN=9001
 export LLM_SERVICE_HOST_PORT_DOCSUM=9003
 export PROMPT_COLLECTION_NAME="prompt"
+export RERANK_SERVER_PORT=8808
+export EMBEDDING_SERVER_PORT=6006
+export LLM_SERVER_PORT=9009
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -290,7 +293,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 10. DocSum LLM Microservice
 
     ```bash
-    curl http://${host_ip}:9002/v1/chat/docsum\
+    curl http://${host_ip}:9003/v1/chat/docsum\
       -X POST \
       -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
       -H 'Content-Type: application/json'
@@ -299,7 +302,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 11. FAQGen LLM Microservice
 
     ```bash
-    curl http://${host_ip}:9003/v1/faqgen\
+    curl http://${host_ip}:9002/v1/faqgen\
       -X POST \
       -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
       -H 'Content-Type: application/json'
