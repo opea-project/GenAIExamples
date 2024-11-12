@@ -211,7 +211,7 @@ Change the `xxx_MODEL_ID` below for your needs.
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    ```
-   
+
 3. Note: In order to limit access to a subset of GPUs, please pass each device individually using one or more -device /dev/dri/rendered<node>, where <node> is the card index, starting from 128. (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus) into tgi-service in compose.yaml file
 
 Example for set isolation for 1 GPU
