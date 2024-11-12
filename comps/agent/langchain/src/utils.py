@@ -57,9 +57,15 @@ def setup_chat_model(args):
     }
     if args.llm_engine == "vllm" or args.llm_engine == "tgi":
         openai_endpoint = f"{args.llm_endpoint_url}/v1"
-        llm = ChatOpenAI(openai_api_key="EMPTY", openai_api_base=openai_endpoint, model_name=args.model, **params)
+        llm = ChatOpenAI(
+            openai_api_key="EMPTY",
+            openai_api_base=openai_endpoint,
+            model_name=args.model,
+            request_timeout=args.timeout,
+            **params,
+        )
     elif args.llm_engine == "openai":
-        llm = ChatOpenAI(model_name=args.model, **params)
+        llm = ChatOpenAI(model_name=args.model, request_timeout=args.timeout, **params)
     else:
         raise ValueError("llm_engine must be vllm, tgi or openai")
     return llm
@@ -129,6 +135,9 @@ def get_args():
     parser.add_argument("--repetition_penalty", type=float, default=1.03)
     parser.add_argument("--return_full_text", type=bool, default=False)
     parser.add_argument("--custom_prompt", type=str, default=None)
+    parser.add_argument("--with_memory", type=bool, default=False)
+    parser.add_argument("--with_store", type=bool, default=False)
+    parser.add_argument("--timeout", type=int, default=60)
 
     sys_args, unknown_args = parser.parse_known_args()
     # print("env_config: ", env_config)

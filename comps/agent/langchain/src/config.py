@@ -63,3 +63,12 @@ if os.environ.get("return_full_text") is not None:
 
 if os.environ.get("custom_prompt") is not None:
     env_config += ["--custom_prompt", os.environ["custom_prompt"]]
+
+if os.environ.get("with_memory") is not None:
+    env_config += ["--with_memory", os.environ["with_memory"]]
+
+if os.environ.get("with_store") is not None:
+    env_config += ["--with_store", os.environ["with_store"]]
+
+if os.environ.get("timeout") is not None:
+    env_config += ["--timeout", os.environ["timeout"]]

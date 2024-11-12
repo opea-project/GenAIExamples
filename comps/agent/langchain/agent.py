@@ -35,6 +35,15 @@ logflag = os.getenv("LOGFLAG", False)
 
 args, _ = get_args()
 
+logger.info("========initiating agent============")
+logger.info(f"args: {args}")
+agent_inst = instantiate_agent(args, args.strategy, with_memory=args.with_memory)
+
+
+class AgentCompletionRequest(LLMParamsDoc):
+    thread_id: str = "0"
+    user_id: str = "0"
+
 
 @register_microservice(
     name="opea_service@comps-chat-agent",
@@ -43,16 +52,19 @@ args, _ = get_args()
     host="0.0.0.0",
     port=args.port,
 )
-async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest]):
+async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, AgentCompletionRequest]):
     if logflag:
         logger.info(input)
-    # 1. initialize the agent
-    if logflag:
-        logger.info(f"args: {args}")
+
     input.streaming = args.streaming
     config = {"recursion_limit": args.recursion_limit}
-    print("========initiating agent============")
-    agent_inst = instantiate_agent(args, args.strategy)
+
+    if args.with_memory:
+        if isinstance(input, AgentCompletionRequest):
+            config["configurable"] = {"thread_id": input.thread_id}
+        else:
+            config["configurable"] = {"thread_id": "0"}
+
     if logflag:
         logger.info(type(agent_inst))
 
@@ -68,14 +80,13 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest]):
 
     # 2. prepare the input for the agent
     if input.streaming:
-        print("-----------STREAMING-------------")
+        logger.info("-----------STREAMING-------------")
         return StreamingResponse(agent_inst.stream_generator(input_query, config), media_type="text/event-stream")
 
     else:
-        print("-----------NOT STREAMING-------------")
+        logger.info("-----------NOT STREAMING-------------")
         response = await agent_inst.non_streaming_run(input_query, config)
-        print("-----------Response-------------")
-        print(response)
+        logger.info("-----------Response-------------")
         return GeneratedDoc(text=response, prompt=input_query)
 
 
@@ -87,13 +98,11 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest]):
 )
 def create_assistants(input: CreateAssistantsRequest):
     # 1. initialize the agent
-    print("args: ", args)
-    agent_inst = instantiate_agent(args, args.strategy, with_memory=True)
     agent_id = agent_inst.id
     created_at = int(datetime.now().timestamp())
     with assistants_global_kv as g_assistants:
         g_assistants[agent_id] = (agent_inst, created_at)
-    print(f"Record assistant inst {agent_id} in global KV")
+    logger.info(f"Record assistant inst {agent_id} in global KV")
 
     # get current time in string format
     return AssistantsObject(
@@ -115,7 +124,7 @@ def create_threads(input: CreateThreadsRequest):
     status = "ready"
     with threads_global_kv as g_threads:
         g_threads[thread_id] = (thread_inst, created_at, status)
-    print(f"Record thread inst {thread_id} in global KV")
+    logger.info(f"Record thread inst {thread_id} in global KV")
 
     return ThreadObject(
         id=thread_id,
