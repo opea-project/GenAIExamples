@@ -19,3 +19,31 @@ services:
     build:
       dockerfile: comps/retrievers/multimodal/redis/langchain/Dockerfile
     image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}
+  retriever-pgvector:
+    build:
+      dockerfile: comps/retrievers/pgvector/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-pgvector:${TAG:-latest}
+  retriever-pinecone:
+    build:
+      dockerfile: comps/retrievers/pinecone/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-pinecone:${TAG:-latest}
+  retriever-milvus:
+    build:
+      dockerfile: comps/retrievers/milvus/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-milvus:${TAG:-latest}
+  retriever-redis-llamaindex:
+    build:
+      dockerfile: comps/retrievers/redis/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-redis-llamaindex:${TAG:-latest}
+  retriever-pathway:
+    build:
+      dockerfile: comps/retrievers/pathway/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-pathway:${TAG:-latest}
+  retriever-neo4j:
+    build:
+      dockerfile: comps/retrievers/neo4j/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-neo4j:${TAG:-latest}
+  retriever-neo4j-llamaindex:
+    build:
+      dockerfile: comps/retrievers/neo4j/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-neo4j-llamaindex:${TAG:-latest}

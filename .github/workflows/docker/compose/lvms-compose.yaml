@@ -23,3 +23,23 @@ services:
     build:
       dockerfile: comps/lvms/llava/Dockerfile
     image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
+  llava-hpu:
+    build:
+      dockerfile: comps/lvms/llava/dependency/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/llava-hpu:${TAG:-latest}
+  lvm-predictionguard:
+    build:
+      dockerfile: comps/lvms/predictionguard/Dockerfile
+    image: ${REGISTRY:-opea}/lvm-predictionguard:${TAG:-latest}
+  lvm-llama-vision:
+    build:
+      dockerfile: comps/lvms/llama-vision/Dockerfile
+    image: ${REGISTRY:-opea}/lvm-llama-vision:${TAG:-latest}
+  lvm-llama-vision-tp:
+    build:
+      dockerfile: comps/lvms/llama-vision/Dockerfile_tp
+    image: ${REGISTRY:-opea}/lvm-llama-vision-tp:${TAG:-latest}
+  lvm-llama-vision-guard:
+    build:
+      dockerfile: comps/lvms/llama-vision/Dockerfile_guard
+    image: ${REGISTRY:-opea}/lvm-llama-vision-guard:${TAG:-latest}

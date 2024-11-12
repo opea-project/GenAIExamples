@@ -7,3 +7,7 @@ services:
     build:
       dockerfile: comps/finetuning/Dockerfile
     image: ${REGISTRY:-opea}/finetuning:${TAG:-latest}
+  finetuning-gaudi:
+    build:
+      dockerfile: comps/finetuning/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/finetuning-gaudi:${TAG:-latest}

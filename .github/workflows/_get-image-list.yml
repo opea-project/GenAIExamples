@@ -41,14 +41,10 @@ jobs:
               services=($(echo ${{ inputs.services }} | tr ',' ' '))
               for service in ${services[@]}
               do
-                  if [[ "${{ inputs.mode }}" == "CD" ]]; then
-                      docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${service}-compose-cd.yaml
-                  else
-                      docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${service}-compose.yaml
-                  fi
+                  docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${service}-compose.yaml
                   if [ -f "$docker_compose_yml" ]; then
-                      images=$(cat $docker_compose_yml | yq -r '.[]' | jq 'keys' | jq -c '.')
-                      image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
+                      build_list=$(bash ${{ github.workspace }}/.github/workflows/scripts/get_cicd_list.sh "${{ inputs.mode }}" $docker_compose_yml)
+                      image_list=$(echo $build_list| jq -R 'split(",")' | jq -s 'add')
                   fi
               done
           fi

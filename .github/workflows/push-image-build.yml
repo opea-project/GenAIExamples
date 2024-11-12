@@ -65,6 +65,14 @@ jobs:
             echo "file_exists=false" >> $GITHUB_ENV
             echo "docker_compose_path=${docker_compose_path} for this service does not exist, so skipping image build for this service!!!"
           fi
+      - name: Get build list
+        id: get-build-list
+        env:
+          docker_compose_path: ${{ env.docker_compose_path }}
+          mode: CI
+        run: |
+          build_list=$(bash ${{ github.workspace }}/.github/workflows/scripts/get_cicd_list.sh "${mode}" ${docker_compose_path})
+          echo "build_list=${build_list}" >> $GITHUB_OUTPUT
 
       - name: Build Image
         if: env.file_exists == 'true'
@@ -73,3 +81,4 @@ jobs:
           work_dir: ${{ github.workspace }}
           docker_compose_path: ${{ env.docker_compose_path }}
           registry: ${OPEA_IMAGE_REPO}opea
+          service_list: ${{ steps.get-build-list.outputs.build_list }}

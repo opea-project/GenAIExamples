@@ -27,7 +27,7 @@ on:
         type: string
       mode:
         default: "CD"
-        description: "Whether the test range is CI or CD"
+        description: "Whether the test range is CI, CD or CICD"
         required: false
         type: string
 

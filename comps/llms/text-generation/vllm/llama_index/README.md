@@ -113,7 +113,7 @@ To build the docker image, run the command
 bash ./build_docker_vllm_openvino.sh
 ```
 
-Once it successfully builds, you will have the `vllm:openvino` image. It can be used to spawn a serving container with OpenAI API endpoint or you can work with it interactively via bash shell.
+Once it successfully builds, you will have the `vllm-openvino` image. It can be used to spawn a serving container with OpenAI API endpoint or you can work with it interactively via bash shell.
 
 #### Launch vLLM service
 

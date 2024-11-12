@@ -101,7 +101,7 @@ export LLM_MODEL=${your_hf_llm_model}
 export DATA_DIR=$HOME/data  # Location to download the model
 export HF_TOKEN=${your_hf_api_token}
 
-# Build the image first as opea/vllm:cpu
+# Build the image first as opea/vllm-cpu
 bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/langchain/dependency/build_docker_vllm.sh cpu
 
 # Initiate the backend
@@ -111,7 +111,7 @@ docker run -d -it \
   -e HF_TOKEN=${HF_TOKEN} \
   -e VLLM_CPU_KVCACHE_SPACE=40 \
   -v ${DATA_DIR}:/data \
-  opea/vllm:cpu \
+  opea/vllm-cpu:latest \
   --model ${LLM_MODEL} \
   --port 80
 

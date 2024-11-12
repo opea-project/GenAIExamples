@@ -52,7 +52,7 @@ docker run -d --rm --name="vllm-openvino-server" \
   -e HTTP_PROXY=$https_proxy \
   -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
   -v $HOME/.cache/huggingface:/home/user/.cache/huggingface \
-  vllm:openvino /bin/bash -c "\
+  vllm-openvino:latest /bin/bash -c "\
     cd / && \
     export VLLM_CPU_KVCACHE_SPACE=50 && \
     python3 -m vllm.entrypoints.openai.api_server \

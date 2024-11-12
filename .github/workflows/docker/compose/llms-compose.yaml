@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # this file should be run in the root of the repo
-# images used by GenAIExamples: llm-tgi,llm-ollama,llm-docsum-tgi,llm-faqgen-tgi,llm-vllm,llm-vllm-hpu,llm-vllm-ray,llm-vllm-ray-hpu
 services:
   llm-tgi:
     build:
@@ -24,3 +23,38 @@ services:
     build:
       dockerfile: comps/llms/text-generation/vllm/langchain/Dockerfile
     image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
+  llm-native:
+    build:
+      dockerfile: comps/llms/text-generation/native/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/llm-native:${TAG:-latest}
+  llm-native-llamaindex:
+    build:
+      dockerfile: comps/llms/text-generation/native/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/llm-native-llamaindex:${TAG:-latest}
+  vllm-openvino:
+    build:
+      context: vllm-openvino
+      dockerfile: Dockerfile.openvino
+    image: ${REGISTRY:-opea}/vllm-openvino:${TAG:-latest}
+  vllm-hpu:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    shm_size: '128g'
+    image: ${REGISTRY:-opea}/vllm-hpu:${TAG:-latest}
+  vllm-arc:
+    build:
+      dockerfile: comps/llms/text-generation/vllm/langchain/dependency/Dockerfile.intel_gpu
+    image: ${REGISTRY:-opea}/vllm-arc:${TAG:-latest}
+  llm-eval:
+    build:
+      dockerfile: comps/llms/utils/lm-eval/Dockerfile
+    image: ${REGISTRY:-opea}/llm-eval:${TAG:-latest}
+  llm-vllm-llamaindex:
+    build:
+      dockerfile: comps/llms/text-generation/vllm/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/llm-vllm-llamaindex:${TAG:-latest}
+  llm-predictionguard:
+    build:
+      dockerfile: comps/llms/text-generation/predictionguard/Dockerfile
+    image: ${REGISTRY:-opea}/llm-textgen-predictionguard:${TAG:-latest}

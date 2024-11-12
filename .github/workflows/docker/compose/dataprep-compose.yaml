@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # this file should be run in the root of the repo
-# images used by GenAIExamples: dataprep,dataprep-qdrant
-# others: dataprep-redis-llama-index,dataprep-on-ray-redis
 services:
   dataprep-redis:
     build:
@@ -25,3 +23,31 @@ services:
     build:
       dockerfile: comps/dataprep/multimodal/redis/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
+  dataprep-redis-llama-index:
+    build:
+      dockerfile: comps/dataprep/redis/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-redis-llama-index:${TAG:-latest}
+  dataprep-milvus:
+    build:
+      dockerfile: comps/dataprep/milvus/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-milvus:${TAG:-latest}
+  dataprep-pgvector:
+    build:
+      dockerfile: comps/dataprep/pgvector/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-pgvector:${TAG:-latest}
+  dataprep-pinecone:
+    build:
+      dockerfile: comps/dataprep/pinecone/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-pinecone:${TAG:-latest}
+  dataprep-vdms:
+    build:
+      dockerfile: comps/dataprep/vdms/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-vdms:${TAG:-latest}
+  dataprep-neo4j:
+    build:
+      dockerfile: comps/dataprep/neo4j/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-neo4j:${TAG:-latest}
+  dataprep-neo4j-llamaindex:
+    build:
+      dockerfile: comps/dataprep/neo4j/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-neo4j-llamaindex:${TAG:-latest}

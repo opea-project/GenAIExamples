@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # this file should be run in the root of the repo
-# images used by GenAIExamples: embedding-tei
 services:
   embedding-tei:
     build:
@@ -20,3 +19,27 @@ services:
     build:
       dockerfile: comps/embeddings/multimodal/multimodal_langchain/Dockerfile
     image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
+  embedding-langchain-mosec-endpoint:
+    build:
+      dockerfile: comps/embeddings/mosec/langchain/dependency/Dockerfile
+    image: ${REGISTRY:-opea}/embedding-langchain-mosec-endpoint:${TAG:-latest}
+  embedding-langchain-mosec:
+    build:
+      dockerfile: comps/embeddings/mosec/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/embedding-langchain-mosec:${TAG:-latest}
+  embedding-tei-llama-index:
+    build:
+      dockerfile: comps/embeddings/tei/llama_index/Dockerfile
+    image: ${REGISTRY:-opea}/embedding-tei-llama-index:${TAG:-latest}
+  embedding-multimodal-bridgetower-gaudi:
+    build:
+      dockerfile: comps/embeddings/multimodal/bridgetower/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
+  embedding-predictionguard:
+    build:
+      dockerfile: comps/embeddings/predictionguard/Dockerfile
+    image: ${REGISTRY:-opea}/embedding-predictionguard:${TAG:-latest}
+  embedding-reranking-local:
+    build:
+      dockerfile: comps/embeddings/tei/langchain/Dockerfile.dynamic_batching
+    image: ${REGISTRY:-opea}/embedding-reranking-local:${TAG:-latest}

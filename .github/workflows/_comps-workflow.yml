@@ -24,7 +24,7 @@ on:
         type: boolean
       mode:
         default: "CD"
-        description: "Whether the test range is CI or CD"
+        description: "Whether the test range is CI, CD or CICD"
         required: false
         type: string
 
@@ -49,24 +49,32 @@ jobs:
         run: |
           cd ${{ github.workspace }}/.github/workflows/docker/compose
           # service=$(echo ${{ inputs.service }} | cut -d'_' -f1)
-          if [[ "${{ inputs.mode }}" == "CD" ]]; then
-            docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.service }}-compose-cd.yaml
-          else
-            docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.service }}-compose.yaml
-          fi
+          docker_compose_yml=${{ github.workspace }}/.github/workflows/docker/compose/${{ inputs.service }}-compose.yaml
           echo "docker_compose_path=${docker_compose_yml}" >> $GITHUB_OUTPUT
           if [ -f "$docker_compose_yml" ]; then
             echo "file_exists=true" >> $GITHUB_OUTPUT
           else
-            echo "There is no ${{ inputs.mode }} part of ${{ inputs.service }} that needs to be executed."
+            echo "The $docker_compose_yml does not exist!"
             echo "file_exists=false" >> $GITHUB_OUTPUT
           fi
 
           cd ${{ github.workspace }}
           if [[ $(grep -c "vllm-openvino:" ${docker_compose_yml}) != 0 ]]; then
               git clone https://github.com/vllm-project/vllm.git vllm-openvino
-              cd ./vllm-openvino && git checkout v0.6.1 && cd ../
+              cd ./vllm-openvino && git checkout v0.6.1 && git rev-parse HEAD && cd ../
           fi
+          if [[ $(grep -c "vllm-hpu:" ${docker_compose_yml}) != 0 ]]; then
+               git clone https://github.com/HabanaAI/vllm-fork.git vllm-fork
+               cd vllm-fork && git rev-parse HEAD && cd ../
+          fi
+      - name: Get build list
+        id: get-build-list
+        env:
+          docker_compose_path: ${{ steps.get-yaml-path.outputs.docker_compose_path }}
+          mode: ${{ inputs.mode }}
+        run: |
+          build_list=$(bash ${{ github.workspace }}/.github/workflows/scripts/get_cicd_list.sh "${mode}" ${docker_compose_path})
+          echo "build_list=${build_list}" >> $GITHUB_OUTPUT
 
       - name: Build Image
         if: ${{ fromJSON(inputs.build) && steps.get-yaml-path.outputs.file_exists == 'true' }}
@@ -75,6 +83,7 @@ jobs:
           work_dir: ${{ github.workspace }}
           docker_compose_path: ${{ steps.get-yaml-path.outputs.docker_compose_path }}
           registry: ${OPEA_IMAGE_REPO}opea
+          service_list: ${{ steps.get-build-list.outputs.build_list }}
           tag: ${{ inputs.tag }}
 
   ####################################################################################################
