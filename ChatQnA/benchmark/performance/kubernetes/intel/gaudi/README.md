@@ -100,12 +100,12 @@ python deploy.py --uninstall
 #### Case 2: Baseline Deployment without Rerank
 
 ```bash
-python deploy.py --hftoken $HFTOKEN --modeldir $MODELDIR --num-nodes 2
+python deploy.py --hf-token $HFTOKEN --model-dir $MODELDIR --num-nodes 2
 ```
 #### Case 3: Tuned Deployment with Rerank
 
 ```bash
-python deploy.py --hftoken $HFTOKEN --modeldir $MODELDIR --num-nodes 2 --with-rerank --tuned
+python deploy.py --hf-token $HFTOKEN --model-dir $MODELDIR --num-nodes 2 --with-rerank --tuned
 ```
 
 ## Benchmark
