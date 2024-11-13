@@ -60,7 +60,7 @@ function start_services() {
      
     echo "***************** docker compose ps ***********************"
     docker compose ps  
-    echo "*********************************************************"
+    echo "***********************************************************"
 
     until [[ "$n" -ge 20 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
@@ -131,8 +131,6 @@ input_data_for_test() {
             ;;
     esac
 }
-
-
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
@@ -243,11 +241,15 @@ function main() {
     echo ">>>> Microservices validated successfully."
 
     echo "==========================================="
-    echo $(docker logs docsum-xeon-backend-server)
+    echo "***************** docker compose ps ***********************"
+    docker compose ps  
+    echo "***********************************************************"
+    docker logs docsum-xeon-backend-server
+    echo "***********************************************************"
     echo ">>>> Validating megaservice..."
     validate_megaservice
     echo ">>>> Megaservice validated successfully."
-    echo $(docker logs docsum-xeon-backend-server)
+    docker logs docsum-xeon-backend-server
 
     echo "==========================================="
     echo ">>>> Stopping Docker containers..."
