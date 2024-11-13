@@ -238,12 +238,12 @@ function main() {
     stop_docker
     echo ">>>> Docker containers stopped."
 
-    # echo "==========================================="
-    # if [[ "$IMAGE_REPO" == "opea" ]]; then
-    #     echo ">>>> Building Docker images..."
-    #     build_docker_images
-    #     echo ">>>> Docker images built successfully."
-    # fi
+    echo "==========================================="
+    if [[ "$IMAGE_REPO" == "opea" ]]; then
+        echo ">>>> Building Docker images..."
+        build_docker_images
+        echo ">>>> Docker images built successfully."
+    fi
     
     echo "==========================================="
     echo ">>>> Starting Docker services..."
