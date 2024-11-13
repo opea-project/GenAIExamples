@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -11,7 +11,6 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
-WORKPATH=/home/rbrugaro/GenAIExamples/GraphRAG
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
