@@ -60,6 +60,13 @@ function start_services() {
     npx kill-port 7079
     npx kill-port 8008
     npx kill-port 8888
+
+    docker run -d -p 8888:8888 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy \
+        -e no_proxy=$no_proxy \
+        -e MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP} \
+        -e DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP} \
+        -e LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP} \
+        opea/docsum:ci
     
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 60s  
@@ -231,12 +238,12 @@ function main() {
     stop_docker
     echo ">>>> Docker containers stopped."
 
-    echo "==========================================="
-    if [[ "$IMAGE_REPO" == "opea" ]]; then
-        echo ">>>> Building Docker images..."
-        build_docker_images
-        echo ">>>> Docker images built successfully."
-    fi
+    # echo "==========================================="
+    # if [[ "$IMAGE_REPO" == "opea" ]]; then
+    #     echo ">>>> Building Docker images..."
+    #     build_docker_images
+    #     echo ">>>> Docker images built successfully."
+    # fi
     
     echo "==========================================="
     echo ">>>> Starting Docker services..."
