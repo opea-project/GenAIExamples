@@ -57,8 +57,18 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
+    echo $PWD
+    list -la
+
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml up -d
+    # docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+
+    echo "***************** list of images ************************"
+    docker images --filter "reference=*:*ci*"
+    echo "***************** list of compose ***********************"
+    docker compose ps 
+    echo "*********************************************************"
 
     n=0
     until [[ "$n" -ge 100 ]]; do

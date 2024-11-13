@@ -56,12 +56,18 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
-    # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    echo $PWD
+    list -la
 
-    echo "********************************************"
+    # Start Docker Containers
+    docker compose -f compose.yaml up -d
+    # docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+
+    echo "***************** list of images ************************"
+    docker images --filter "reference=*:*ci*"
+    echo "***************** list of compose ***********************"
     docker compose ps 
-    echo "********************************************"
+    echo "*********************************************************"
 
     until [[ "$n" -ge 20 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log

@@ -76,8 +76,13 @@ docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --bui
 
 ### Required Models
 
-We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
-If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+Default model is "Intel/neural-chat-7b-v3-3". Change "LLM_MODEL_ID" environment variable in commands below if you want to use another model.
+
+```bash
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+```
+
+When using gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
 ### Setup Environment Variable
 

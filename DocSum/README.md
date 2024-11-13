@@ -11,13 +11,13 @@ Based on whether you want to use Docker or Kubernetes, follow the instructions b
 
 ### Required Models
 
-We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "docker_compose/set_env.sh" if you want to use other models.
+Default model is "Intel/neural-chat-7b-v3-3". Change "LLM_MODEL_ID" environment variable in commands below if you want to use another model.
 
 ```bash
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 ```
 
-If you use gated models, you also need to provide a [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+When using gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
 ### Setup Environment Variable
 
