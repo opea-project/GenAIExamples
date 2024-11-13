@@ -35,7 +35,8 @@ function start_services() {
     export CODEGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export CODEGEN_MEGA_SERVICE_HOST_IP=${ip_address}
     export CODEGEN_LLM_SERVICE_HOST_IP=${ip_address}
-    export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:7778/v1/codegen"
+    export CODEGEN_BACKEND_SERVICE_PORT=7778
+    export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
     export CODEGEN_UI_SERVICE_PORT=5174
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
