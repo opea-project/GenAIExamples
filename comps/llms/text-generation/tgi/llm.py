@@ -22,18 +22,37 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
-from comps.cores.mega.utils import get_access_token
+from comps.cores.mega.utils import ConfigError, get_access_token, load_model_configs
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 
 logger = CustomLogger("llm_tgi")
 logflag = os.getenv("LOGFLAG", False)
 
 # Environment variables
+MODEL_CONFIGS = os.getenv("MODEL_CONFIGS")
+DEFAULT_ENDPOINT = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
 TOKEN_URL = os.getenv("TOKEN_URL")
 CLIENTID = os.getenv("CLIENTID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
-llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
+# Validate and Load the models config if MODEL_CONFIGS is not null
+configs_map = {}
+if MODEL_CONFIGS:
+    try:
+        configs_map = load_model_configs(MODEL_CONFIGS)
+    except ConfigError as e:
+        logger.error(f"Failed to load model configurations: {e}")
+        raise ConfigError(f"Failed to load model configurations: {e}")
+
+
+def get_llm_endpoint(model):
+    if not MODEL_CONFIGS:
+        return DEFAULT_ENDPOINT
+    try:
+        return configs_map.get(model).get("endpoint")
+    except ConfigError as e:
+        logger.error(f"Input model {model} not present in model_configs. Error {e}")
+        raise ConfigError(f"Input model {model} not present in model_configs")
 
 
 @register_microservice(
@@ -54,7 +73,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
     headers = {}
     if access_token:
         headers = {"Authorization": f"Bearer {access_token}"}
-
+    llm_endpoint = get_llm_endpoint(input.model)
     llm = AsyncInferenceClient(model=llm_endpoint, timeout=600, headers=headers)
 
     prompt_template = None
@@ -73,7 +92,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
             docs = [doc.text for doc in input.retrieved_docs]
             if logflag:
                 logger.info(f"[ SearchedDoc ] combined retrieved docs: {docs}")
-            prompt = ChatTemplate.generate_rag_prompt(input.initial_query, docs)
+            prompt = ChatTemplate.generate_rag_prompt(input.initial_query, docs, input.model)
         # use default llm parameters for inferencing
         new_input = LLMParamsDoc(query=prompt)
         if logflag:
@@ -126,7 +145,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
         else:
             if input.documents:
                 # use rag default template
-                prompt = ChatTemplate.generate_rag_prompt(input.query, input.documents)
+                prompt = ChatTemplate.generate_rag_prompt(input.query, input.documents, input.model)
 
         text_generation = await llm.text_generation(
             prompt=prompt,
@@ -182,7 +201,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
             else:
                 if input.documents:
                     # use rag default template
-                    prompt = ChatTemplate.generate_rag_prompt(input.messages, input.documents)
+                    prompt = ChatTemplate.generate_rag_prompt(input.messages, input.documents, input.model)
 
             chat_completion = client.completions.create(
                 model="tgi",
