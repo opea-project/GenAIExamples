@@ -9,6 +9,21 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
+export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export HOST_IP=${ip_address}
+export DOCSUM_TGI_SERVICE_PORT="8008"
+export DOCSUM_TGI_LLM_ENDPOINT="http://${HOST_IP}:8008"
+export DOCSUM_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export DOCSUM_LLM_SERVER_PORT="9000"
+export DOCSUM_BACKEND_SERVER_PORT="8888"
+export DOCSUM_FRONTEND_PORT="5552"
+export MEGA_SERVICE_HOST_IP=${ip_address}
+export LLM_SERVICE_HOST_IP=${ip_address}
+export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
+export DOCSUM_CARD_ID="card1"
+export DOCSUM_RENDER_ID="renderD136"
+
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -19,8 +34,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-ui llm-docsum-tgi"
-    docker compose -f build.yaml build "${service_list}" --no-cache > "${LOG_PATH}"/docker_image_build.log
+    docker compose -f build.yaml build --no-cache > "${LOG_PATH}"/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     docker images && sleep 1s
@@ -29,18 +43,7 @@ function build_docker_images() {
 function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
-    export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
-    export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export HOST_IP=${ip_address}
-    export DOCSUM_TGI_SERVICE_PORT="8008"
-    export DOCSUM_TGI_LLM_ENDPOINT="http://${HOST_IP}:8008"
-    export DOCSUM_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export DOCSUM_LLM_SERVER_PORT="9000"
-    export DOCSUM_BACKEND_SERVER_PORT="8888"
-    export DOCSUM_FRONTEND_PORT="5552"
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
+
 
     sed -i "s/backend_address/$ip_address/g" "$WORKPATH"/ui/svelte/.env
 
@@ -174,7 +177,7 @@ function main() {
 
     stop_docker
 
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+#    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices

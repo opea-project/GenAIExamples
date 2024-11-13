@@ -27,7 +27,7 @@ services:
     ipc: host
     command: --model-id ${DOCSUM_LLM_MODEL_ID}
   docsum-llm-server:
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-docsum-tgi:latest
     container_name: docsum-llm-server
     depends_on:
       - docsum-tgi-service
@@ -52,7 +52,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   docsum-backend-server:
-    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+    image: ${REGISTRY:-opea}/docsum:latest
     container_name: docsum-backend-server
     depends_on:
       - docsum-tgi-service
@@ -68,7 +68,7 @@ services:
     ipc: host
     restart: always
   docsum-ui-server:
-    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/docsum-ui:latest
     container_name: docsum-ui-server
     depends_on:
       - docsum-backend-server
@@ -78,7 +78,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - DOC_BASE_URL="http://${HOST_IP}:${DOCSUM_BACKEND_PORT}/v1/docsum"
+      - DOC_BASE_URL="http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
     ipc: host
     restart: always
 
