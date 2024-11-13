@@ -56,6 +56,11 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     
+    npx kill-port 9000
+    npx kill-port 7079
+    npx kill-port 8008
+    npx kill-port 8888
+    
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 60s  
     
