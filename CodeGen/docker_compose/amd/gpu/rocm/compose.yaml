@@ -76,8 +76,8 @@ services:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
-      BASIC_URL: "http://codegen-backend-server:7778/v1/codegen"
-      BACKEND_SERVICE_ENDPOINT: "http://codegen-backend-server:7778/v1/codegen"
+      BASIC_URL: ${CODEGEN_BACKEND_SERVICE_URL}
+      BACKEND_SERVICE_ENDPOINT: ${CODEGEN_BACKEND_SERVICE_URL}
     ipc: host
     restart: always
 
