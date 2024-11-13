@@ -71,7 +71,7 @@ services:
     depends_on:
       - codegen-backend-server
     ports:
-      - "${CODEGEN_UI_SERVICE_PORT:-5174}:5174"
+      - "${CODEGEN_UI_SERVICE_PORT:-5174}:80"
     environment:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
