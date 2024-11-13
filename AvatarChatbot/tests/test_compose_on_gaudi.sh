@@ -29,7 +29,7 @@ function build_docker_images() {
     service_list="avatarchatbot whisper-gaudi asr llm-tgi speecht5-gaudi tts wav2lip-gaudi animation"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
 
     docker images && sleep 1s
 }
@@ -74,7 +74,7 @@ function start_services() {
     export FPS=10
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -86,7 +86,6 @@ function start_services() {
        n=$((n+1))
     done
 
-    # sleep 5m
     echo "All services are up and running"
     sleep 5s
 }
@@ -99,6 +98,7 @@ function validate_megaservice() {
     if [[ $result == *"mp4"* ]]; then
         echo "Result correct."
     else
+        echo "Result wrong, print docker logs."
         docker logs whisper-service > $LOG_PATH/whisper-service.log
         docker logs asr-service > $LOG_PATH/asr-service.log
         docker logs speecht5-service > $LOG_PATH/speecht5-service.log
@@ -107,17 +107,11 @@ function validate_megaservice() {
         docker logs llm-tgi-gaudi-server > $LOG_PATH/llm-tgi-gaudi-server.log
         docker logs wav2lip-service > $LOG_PATH/wav2lip-service.log
         docker logs animation-gaudi-server > $LOG_PATH/animation-gaudi-server.log
-
-        echo "Result wrong."
+        echo "Exit test."
         exit 1
     fi
 
 }
-
-
-#function validate_frontend() {
-
-#}
 
 
 function stop_docker() {
