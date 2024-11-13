@@ -242,17 +242,21 @@ function main() {
     end_time=$(date +%s)
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
+    validate_microservices
+    echo "==== microservices validated ===="
+    validate_megaservice
+    echo "==== megaservice validated ===="
 
-    if [ "${mode}" == "perf" ]; then
-        python3 "$WORKPATH"/tests/chatqna_benchmark.py
-    elif [ "${mode}" == "" ]; then
-        validate_microservices
-        echo "==== microservices validated ===="
-        validate_megaservice
-        echo "==== megaservice validated ===="
+#    if [ "${mode}" == "perf" ]; then
+#        python3 "$WORKPATH"/tests/chatqna_benchmark.py
+#    elif [ "${mode}" == "" ]; then
+#        validate_microservices
+#        echo "==== microservices validated ===="
+#        validate_megaservice
+#        echo "==== megaservice validated ===="
 #        validate_frontend
 #        echo "==== frontend validated ===="
-    fi
+#    fi
 
     stop_docker
     echo y | docker system prune
