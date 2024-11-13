@@ -59,7 +59,7 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
-    until [[ "$n" -ge 100 ]]; do
+    until [[ "$n" -ge 20 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
@@ -217,16 +217,43 @@ function stop_docker() {
 }
 
 function main() {
-
+    echo "==========================================="
+    echo ">>>> Stopping any running Docker containers..."
     stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo ">>>> Docker containers stopped."
+
+    echo "==========================================="
+    if [[ "$IMAGE_REPO" == "opea" ]]; then
+        echo ">>>> Building Docker images..."
+        build_docker_images
+        echo ">>>> Docker images built successfully."
+    fi
+    
+    echo "==========================================="
+    echo ">>>> Starting Docker services..."
     start_services
+    echo ">>>> Docker services started successfully."
 
+    echo "==========================================="
+    echo ">>>> Validating microservices..."
     validate_microservices
-    validate_megaservice
+    echo ">>>> Microservices validated successfully."
 
+    echo "==========================================="
+    echo ">>>> Validating megaservice..."
+    validate_megaservice
+    echo ">>>> Megaservice validated successfully."
+
+    echo "==========================================="
+    echo ">>>> Stopping Docker containers..."
     stop_docker
+    echo ">>>> Docker containers stopped."
+
+    echo "==========================================="
+    echo ">>>> Pruning Docker system..."
     echo y | docker system prune
+    echo ">>>> Docker system pruned successfully."
+    echo "==========================================="
 }
 
 main

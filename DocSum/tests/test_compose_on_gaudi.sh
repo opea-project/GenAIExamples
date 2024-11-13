@@ -213,17 +213,43 @@ function stop_docker() {
 }
 
 function main() {
-
+    echo "==========================================="
+    echo ">>>> Stopping any running Docker containers..."
     stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo ">>>> Docker containers stopped."
+
+    echo "==========================================="
+    if [[ "$IMAGE_REPO" == "opea" ]]; then
+        echo ">>>> Building Docker images..."
+        build_docker_images
+        echo ">>>> Docker images built successfully."
+    fi
+    
+    echo "==========================================="
+    echo ">>>> Starting Docker services..."
     start_services
+    echo ">>>> Docker services started successfully."
 
+    echo "==========================================="
+    echo ">>>> Validating microservices..."
     validate_microservices
+    echo ">>>> Microservices validated successfully."
+
+    echo "==========================================="
+    echo ">>>> Validating megaservice..."
     validate_megaservice
+    echo ">>>> Megaservice validated successfully."
 
+    echo "==========================================="
+    echo ">>>> Stopping Docker containers..."
     stop_docker
-    echo y | docker system prune
+    echo ">>>> Docker containers stopped."
 
+    echo "==========================================="
+    echo ">>>> Pruning Docker system..."
+    echo y | docker system prune
+    echo ">>>> Docker system pruned successfully."
+    echo "==========================================="
 }
 
 main
