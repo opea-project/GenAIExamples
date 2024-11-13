@@ -58,10 +58,13 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-
+    sleep 60s 
+    
     echo "***************** docker compose ps ***********************"
-    docker compose ps 
-    echo "*********************************************************"
+    docker compose ps  
+    echo "***************** docker ps         ***********************"  
+    docker ps 
+    echo "***********************************************************" 
 
     n=0
     until [[ "$n" -ge 100 ]]; do

@@ -55,11 +55,6 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    
-    npx kill-port 9000
-    npx kill-port 7079
-    npx kill-port 8008
-    npx kill-port 8888
 
     docker run -d -p 8888:8888 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy \
         -e no_proxy=$no_proxy \
@@ -256,11 +251,6 @@ function main() {
     echo ">>>> Microservices validated successfully."
 
     echo "==========================================="
-    echo "***************** docker compose ps ***********************"
-    docker compose ps  
-    echo "***********************************************************"
-    docker ps  
-    echo "***********************************************************"
     echo ">>>> Validating megaservice..."
     validate_megaservice
     echo ">>>> Megaservice validated successfully."
