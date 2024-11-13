@@ -61,6 +61,7 @@ function start_services() {
     echo "***************** docker compose ps ***********************"
     docker compose ps  
     echo "***********************************************************"
+    sleep 60s
 
     until [[ "$n" -ge 20 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
@@ -244,7 +245,7 @@ function main() {
     echo "***************** docker compose ps ***********************"
     docker compose ps  
     echo "***********************************************************"
-    docker logs docsum-xeon-backend-server
+    docker ps  
     echo "***********************************************************"
     echo ">>>> Validating megaservice..."
     validate_megaservice
