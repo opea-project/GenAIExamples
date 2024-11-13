@@ -12,7 +12,7 @@ from typing import Dict, List
 import aiohttp
 import requests
 from fastapi.responses import StreamingResponse
-from prometheus_client import Histogram
+from prometheus_client import Gauge, Histogram
 from pydantic import BaseModel
 
 from ..proto.docarray import LLMParams
@@ -33,6 +33,7 @@ class OrchestratorMetrics:
     first_token_latency = Histogram("megaservice_first_token_latency", "First token latency (histogram)")
     inter_token_latency = Histogram("megaservice_inter_token_latency", "Inter-token latency (histogram)")
     request_latency = Histogram("megaservice_request_latency", "Whole request/reply latency (histogram)")
+    request_pending = Gauge("megaservice_request_pending", "Count of currently pending requests (gauge)")
 
     def __init__(self) -> None:
         pass
@@ -47,6 +48,12 @@ class OrchestratorMetrics:
 
     def request_update(self, req_start: float) -> None:
         self.request_latency.observe(time.time() - req_start)
+
+    def pending_update(self, increase: bool) -> None:
+        if increase:
+            self.request_pending.inc()
+        else:
+            self.request_pending.dec()
 
 
 class ServiceOrchestrator(DAG):
@@ -74,13 +81,15 @@ class ServiceOrchestrator(DAG):
             return False
 
     async def schedule(self, initial_inputs: Dict | BaseModel, llm_parameters: LLMParams = LLMParams(), **kwargs):
+        req_start = time.time()
+        self.metrics.pending_update(True)
+
         result_dict = {}
         runtime_graph = DAG()
         runtime_graph.graph = copy.deepcopy(self.graph)
         if LOGFLAG:
             logger.info(initial_inputs)
 
-        req_start = time.time()
         timeout = aiohttp.ClientTimeout(total=1000)
         async with aiohttp.ClientSession(trust_env=True, timeout=timeout) as session:
             pending = {
@@ -145,6 +154,9 @@ class ServiceOrchestrator(DAG):
         for node in all_nodes:
             if node not in nodes_to_keep:
                 runtime_graph.delete_node_if_exists(node)
+
+        if not llm_parameters.streaming:
+            self.metrics.pending_update(False)
 
         return result_dict, runtime_graph
 
@@ -234,6 +246,7 @@ class ServiceOrchestrator(DAG):
                                 token_start = self.metrics.token_update(token_start, is_first)
                             is_first = False
                     self.metrics.request_update(req_start)
+                    self.metrics.pending_update(False)
 
             return (
                 StreamingResponse(self.align_generator(generate(), **kwargs), media_type="text/event-stream"),

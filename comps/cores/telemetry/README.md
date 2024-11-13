@@ -6,21 +6,23 @@ OPEA Comps currently provides telemetry functionalities for metrics and tracing 
 
 ## Metrics
 
-OPEA microservice metrics are exported in Prometheus format and are divided into two categories: general metrics and specific metrics.
+OPEA microservice metrics are exported in Prometheus format under `/metrics` endpoint.
 
-General metrics, such as `http_requests_total`, `http_request_size_bytes`, are exposed by every microservice endpoint using the [prometheus-fastapi-instrumentator](https://github.com/trallnag/prometheus-fastapi-instrumentator).
+They come in several categories:
 
-Specific metrics are the built-in metrics exposed under `/metrics` by each specific microservices such as TGI, vLLM, TEI and others. Both types of the metrics adhere to the Prometheus format.
+- HTTP request metrics are exposed by every OPEA microservice using the [prometheus-fastapi-instrumentator](https://github.com/trallnag/prometheus-fastapi-instrumentator)
+- Megaservices export additional metrics for application end-to-end load / performance
+- Inferencing microservices such as TGI, vLLM, TEI provide their own metrics
 
-### General Metrics
-
-To access the general metrics of each microservice, you can use `curl` as follows:
+They can be fetched e.g. with `curl`:
 
 ```bash
 curl localhost:{port of your service}/metrics
 ```
 
-Then you will see Prometheus format metrics printed out as follows:
+### HTTP Metrics
+
+Metrics output looks following:
 
 ```yaml
 HELP http_requests_total Total number of requests by method, status and handler.
@@ -37,9 +39,22 @@ http_request_size_bytes_sum{handler="/v1/chatqna"} 128.0
 ...
 ```
 
-### Specific Metrics
+Most of them are histogram metrics.
 
-To access the metrics exposed by each specific microservice, ensure that you check the specific port and your port mapping to reach the `/metrics` endpoint correctly.
+### Megaservice E2E metrics
+
+Applications' megaservice `ServiceOrchectrator` provides following metrics:
+
+- `megaservice_first_token_latency`: time to first token (TTFT)
+- `megaservice_inter_token_latency`: inter-token latency (ITL ~ TPOT)
+- `megaservice_request_latency`: whole request E2E latency = TTFT + ITL \* tokens
+- `megaservice_request_pending`: how many LLM requests are still in progress
+
+Latency ones are histogram metrics i.e. include count, total value and set of value buckets for each item.
+
+They are available only for _streaming_ requests using LLM. Pending count accounts for all requests.
+
+### Inferencing Metrics
 
 For example, you can `curl localhost:6006/metrics` to retrieve the TEI embedding metrics, and the output should look like follows:
 
@@ -65,6 +80,8 @@ te_request_inference_duration_bucket{le="0.000015000000000000002"} 0
 te_request_inference_duration_bucket{le="0.000022500000000000005"} 0
 te_request_inference_duration_bucket{le="0.00003375000000000001"} 0
 ```
+
+### Metrics collection
 
 These metrics can be scraped by the Prometheus server into a time-series database and further visualized using Grafana.
 

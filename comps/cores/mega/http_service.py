@@ -35,18 +35,7 @@ class HTTPService(BaseService):
         self.uvicorn_kwargs = uvicorn_kwargs or {}
         self.cors = cors
         self._app = self._create_app()
-
-        # remove part before '@', used by register_microservice() callers, and
-        # part after '/', added by MicroService(), to get real service name, and
-        # convert invalid characters to '_'
-        suffix = re.sub(r"[^a-zA-Z0-9]", "_", self.title.split("/")[0].split("@")[-1].lower())
-
-        instrumentator = Instrumentator(
-            inprogress_name=f"http_requests_inprogress_{suffix}",
-            should_instrument_requests_inprogress=True,
-            inprogress_labels=True,
-        )
-        instrumentator.instrument(self._app).expose(self._app)
+        Instrumentator().instrument(self._app).expose(self._app)
 
     @property
     def app(self):
