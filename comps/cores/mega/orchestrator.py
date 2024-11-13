@@ -104,7 +104,7 @@ class ServiceOrchestrator(DAG):
                 done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
                 for done_task in done:
                     response, node = await done_task
-                    self.dump_outputs(node, response, result_dict)
+                    result_dict[node] = response
 
                     # traverse the current node's downstream nodes and execute if all one's predecessors are finished
                     downstreams = runtime_graph.downstream(node)
@@ -128,10 +128,8 @@ class ServiceOrchestrator(DAG):
                                     yield "data: b'" + text + "'\n\n"
                                     yield "data: [DONE]\n\n"
 
-                                self.dump_outputs(
-                                    node,
-                                    StreamingResponse(fake_stream(response["text"]), media_type="text/event-stream"),
-                                    result_dict,
+                                result_dict[node] = StreamingResponse(
+                                    fake_stream(response["text"]), media_type="text/event-stream"
                                 )
 
                     for d_node in downstreams:
@@ -181,20 +179,17 @@ class ServiceOrchestrator(DAG):
         # send the cur_node request/reply
         endpoint = self.services[cur_node].endpoint_path
         llm_parameters_dict = llm_parameters.dict()
-        if (
-            self.services[cur_node].service_type == ServiceType.LLM
-            or self.services[cur_node].service_type == ServiceType.LVM
-        ):
+
+        is_llm_vlm = self.services[cur_node].service_type in (ServiceType.LLM, ServiceType.LVM)
+
+        if is_llm_vlm:
             for field, value in llm_parameters_dict.items():
                 if inputs.get(field) != value:
                     inputs[field] = value
         # pre-process
         inputs = self.align_inputs(inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs)
 
-        if (
-            self.services[cur_node].service_type == ServiceType.LLM
-            or self.services[cur_node].service_type == ServiceType.LVM
-        ) and llm_parameters.streaming:
+        if is_llm_vlm and llm_parameters.streaming:
             # Still leave to sync requests.post for StreamingResponse
             if LOGFLAG:
                 logger.info(inputs)
@@ -286,9 +281,6 @@ class ServiceOrchestrator(DAG):
     def align_generator(self, gen, *args, **kwargs):
         """Override this method in megaservice definition."""
         return gen
-
-    def dump_outputs(self, node, response, result_dict):
-        result_dict[node] = response
 
     def get_all_final_outputs(self, result_dict, runtime_graph):
         final_output_dict = {}

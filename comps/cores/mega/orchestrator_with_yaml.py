@@ -30,9 +30,6 @@ class ServiceOrchestratorWithYaml(DAG):
         print(response)
         return response.json()
 
-    def dump_outputs(self, node, response):
-        self.result_dict[node] = response
-
     def get_all_final_outputs(self):
 
         for leaf in self.all_leaves():
@@ -52,7 +49,7 @@ class ServiceOrchestratorWithYaml(DAG):
             else:
                 inputs = self.process_outputs(self.predecessors(node))
             response = self.execute(node, inputs)
-            self.dump_outputs(node, response)
+            self.result_dict[node] = response
 
     def _load_from_yaml(self):
         """Parse the yaml and output docs, whether the mega graph is valid, the mega graph."""
