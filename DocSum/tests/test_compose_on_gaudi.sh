@@ -65,7 +65,7 @@ function start_services() {
     # docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     echo "***************** list of images ************************"
-    docker images --filter "reference=*:*ci*"
+    docker images --format "{{.Repository}}:{{.Tag}}" | grep ":ci"
     echo "***************** list of compose ***********************"
     docker compose ps 
     echo "*********************************************************"
