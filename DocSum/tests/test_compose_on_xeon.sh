@@ -57,11 +57,13 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-     
+    sleep 60s  
+    
     echo "***************** docker compose ps ***********************"
     docker compose ps  
-    echo "***********************************************************"
-    sleep 60s
+    echo "***************** docker ps         ***********************"  
+    docker ps 
+    echo "***********************************************************" 
 
     until [[ "$n" -ge 20 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
