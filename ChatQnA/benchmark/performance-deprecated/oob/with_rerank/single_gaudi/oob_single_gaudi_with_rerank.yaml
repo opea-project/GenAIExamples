@@ -327,7 +327,7 @@ spec:
         envFrom:
         - configMapRef:
             name: qna-config
-        image: ghcr.io/huggingface/tei-gaudi:latest
+        image: ghcr.io/huggingface/tei-gaudi:1.5.0
         imagePullPolicy: IfNotPresent
         name: reranking-dependency-deploy
         ports:

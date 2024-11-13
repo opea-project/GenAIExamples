@@ -24,7 +24,7 @@ function build_docker_images() {
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/tei-gaudi:latest
+    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
 
     docker images && sleep 1s
 }

@@ -3,7 +3,7 @@
 
 services:
   tei-embedding-service:
-    image: ghcr.io/huggingface/tei-gaudi:latest
+    image: ghcr.io/huggingface/tei-gaudi:1.5.0
     container_name: tei-embedding-gaudi-server
     ports:
       - "3001:80"

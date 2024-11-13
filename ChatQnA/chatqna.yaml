@@ -19,7 +19,7 @@ opea_micro_services:
   tei-embedding-service:
     host: ${TEI_EMBEDDING_SERVICE_IP}
     ports: ${TEI_EMBEDDING_SERVICE_PORT}
-    image: ghcr.io/huggingface/tei-gaudi:latest
+    image: ghcr.io/huggingface/tei-gaudi:1.5.0
     volumes:
       - "./data:/data"
     runtime: habana

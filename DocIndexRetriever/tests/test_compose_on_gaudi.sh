@@ -24,7 +24,7 @@ function build_docker_images() {
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull redis/redis-stack:7.2.0-v9
-    docker pull ghcr.io/huggingface/tei-gaudi:latest
+    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
     docker images && sleep 1s
 }
 

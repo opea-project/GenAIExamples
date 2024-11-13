@@ -96,7 +96,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/tei-gaudi:latest
+    image: ghcr.io/huggingface/tei-gaudi:1.5.0
     container_name: tei-reranking-gaudi-server
     ports:
       - "8808:80"

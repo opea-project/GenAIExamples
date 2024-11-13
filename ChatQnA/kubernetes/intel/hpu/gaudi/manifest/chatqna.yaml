@@ -741,8 +741,8 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/tei-gaudi:latest"
-          imagePullPolicy: Always
+          image: "ghcr.io/huggingface/tei-gaudi:1.5.0"
+          imagePullPolicy: IfNotPresent
           args:
             - "--auto-truncate"
           volumeMounts:
