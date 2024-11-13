@@ -57,15 +57,17 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
-    echo $PWD
-    list -la
+    echo "Current Directory: $PWD"
+    echo "List of files:"
+    ls -la
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d
     # docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     echo "***************** list of images ************************"
-    docker images --format "{{.Repository}}:{{.Tag}}" | grep ":ci"
+    # docker images --format "{{.Repository}}:{{.Tag}}" | grep ":ci"
+    docker images
     echo "***************** list of compose ***********************"
     docker compose ps 
     echo "*********************************************************"
