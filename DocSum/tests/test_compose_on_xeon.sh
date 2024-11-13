@@ -243,9 +243,11 @@ function main() {
     echo ">>>> Microservices validated successfully."
 
     echo "==========================================="
+    echo $(docker logs docsum-xeon-backend-server)
     echo ">>>> Validating megaservice..."
     validate_megaservice
     echo ">>>> Megaservice validated successfully."
+    echo $(docker logs docsum-xeon-backend-server)
 
     echo "==========================================="
     echo ">>>> Stopping Docker containers..."
