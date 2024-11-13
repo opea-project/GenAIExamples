@@ -58,6 +58,10 @@ services:
     build:
       dockerfile: comps/llms/text-generation/predictionguard/Dockerfile
     image: ${REGISTRY:-opea}/llm-textgen-predictionguard:${TAG:-latest}
+  llm-docsum-vllm:
+    build:
+      dockerfile: comps/llms/summarization/vllm/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/llm-docsum-vllm:${TAG:-latest}
   llm-faqgen-vllm:
     build:
       dockerfile: comps/llms/faq-generation/vllm/langchain/Dockerfile
