@@ -46,7 +46,7 @@ In the file "GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm/set_env.sh " it i
 ```bash
 ### Set environments
 chmod +x set_env.sh
-./set_env.sh
+. set_env.sh
 
 ### Run application services using Docker Compose
 docker compose up -d
