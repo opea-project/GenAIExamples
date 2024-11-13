@@ -186,7 +186,7 @@ jobs:
                 for url_line in $url_lines; do
                   url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
                   path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
-                  if [[ "https://platform.openai.com/docs/api-reference/fine-tuning" == "$url" || "https://platform.openai.com/docs/api-reference/" == "$url" || "https://openai.com/index/whisper/" == "$url" || "https://platform.openai.com/docs/api-reference/chat/create" == "$url" ]]; then
+                  if [[ "https://platform.openai.com/docs/api-reference/fine-tuning" == "$url" || "https://platform.openai.com/docs/api-reference/" == "$url" || "https://www.docker.com/get-started" == "$url" || "https://openai.com/index/whisper/" == "$url" || "https://platform.openai.com/docs/api-reference/chat/create" == "$url" ]]; then
                     echo "Link "$url" from ${{github.workspace}}/$path need to be verified by a real person."
                   else
                     response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")
