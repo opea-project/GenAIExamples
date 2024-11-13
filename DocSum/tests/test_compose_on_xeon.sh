@@ -60,12 +60,12 @@ function start_services() {
     echo "List of files:"
     ls -la
 
-    # Start Docker Containers
-    docker run -d -p 7066:7066 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/whisper
-    docker run -d -p 9099:9099 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:ci
-    docker run -d -p 7078:7078 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/v2a:ci
+    # # Start Docker Containers
+    # docker run -d -p 7066:7066 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/whisper
+    # docker run -d -p 9099:9099 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:ci
+    # docker run -d -p 7078:7078 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/v2a:ci
     
-    # docker compose -f compose.yaml up -d
+    docker compose -f compose.yaml up -d
     # docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     echo "***************** list of images ************************"
