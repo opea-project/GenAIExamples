@@ -107,7 +107,7 @@ function validate_megaservice() {
         "${ip_address}:7778/v1/codegen" \
         "print" \
         "mega-codegen" \
-        "codegen-xeon-backend-server" \
+        "codegen-backend-server" \
         '{"messages": "def print_hello_world():"}'
 
 }
