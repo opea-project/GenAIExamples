@@ -34,3 +34,4 @@ export CODEGEN_LLM_SERVICE_HOST_IP=${HOST_IP}
 
 ### The CodeGen service UI port
 export CODEGEN_UI_SERVICE_PORT=18151
+
