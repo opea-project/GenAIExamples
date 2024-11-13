@@ -66,7 +66,7 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs chatqna-tgi-service > "${LOG_PATH}"/tgi_service_start.log
+        docker logs chatqna-tgi-server > "${LOG_PATH}"/tgi_service_start.log
         if grep -q Connected "${LOG_PATH}"/tgi_service_start.log; then
             break
         fi
