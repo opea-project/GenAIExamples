@@ -16,7 +16,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    # TODO change to main OPEA branch before merge
+    # TODO change to main OPEA branch before mergeh
     #git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     git clone https://github.com/rbrugaro/GenAIComps.git && cd GenAIComps && git checkout "GRAG_1.1" && cd ../
 
@@ -35,6 +35,9 @@ function start_services() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export NEO4J_USERNAME="neo4j"
+    export NEO4J_PASSWORD="neo4jtest"
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -61,7 +64,6 @@ function validate_service() {
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"neo4j-apoc"* ]]; then
-	 curl --write-out "HTTPSTATUS:%{http_code}" "$URL"
          HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
