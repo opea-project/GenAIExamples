@@ -53,6 +53,12 @@ services:
       dockerfile: comps/retrievers/qdrant/haystack/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}
+  retriever-pinecone:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/pinecone/langchain/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/retriever-pinecone:${TAG:-latest}
   reranking-tei:
     build:
       context: GenAIComps
@@ -89,6 +95,12 @@ services:
       dockerfile: comps/dataprep/qdrant/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
+  dataprep-pinecone:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/pinecone/langchain/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/dataprep-pinecone:${TAG:-latest}
   guardrails-tgi:
     build:
       context: GenAIComps
