@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 
 ### The IP address or domain name of the server on which the application is running
-export HOST_IP=192.165.1.21
+export HOST_IP=direct-supercomputer1.powerml.co
 
 ### The port of the TGI service. On this port, the TGI service will accept connections
 export CODEGEN_TGI_SERVICE_PORT=8028
