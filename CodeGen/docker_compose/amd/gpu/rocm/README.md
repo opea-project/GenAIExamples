@@ -52,5 +52,16 @@ chmod +x set_env.sh
 docker compose up -d
 ```
 
+# Validate the MicroServices and MegaService
+
+## Validate TGI service
+
+```bash
+curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
+  -X POST \
+  -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":256, "do_sample": true}}' \
+  -H 'Content-Type: application/json'
+```
+
 
 

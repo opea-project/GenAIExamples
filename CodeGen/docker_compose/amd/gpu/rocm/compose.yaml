@@ -4,8 +4,8 @@ services:
   codegen-tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     container_name: codegen-tgi-server
-#    ports:
-#      - "${CODEGEN_TGI_SERVICE_PORT:-8028}:80"
+    ports:
+      - "${CODEGEN_TGI_SERVICE_PORT:-8028}:80"
     volumes:
       - "/var/lib/GenAI/data:/data"
     environment:
@@ -31,8 +31,8 @@ services:
     container_name: codegen-llm-server
     depends_on:
       - codegen-tgi-service
-#    ports:
-#      - "${CODEGEN_LLM_SERVICE_PORT:-9000}:9000"
+    ports:
+      - "${CODEGEN_LLM_SERVICE_PORT:-9000}:9000"
     ipc: host
     group_add:
       - video
