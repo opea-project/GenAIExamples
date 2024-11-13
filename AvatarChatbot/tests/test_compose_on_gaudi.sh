@@ -74,7 +74,7 @@ function start_services() {
     export FPS=10
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
