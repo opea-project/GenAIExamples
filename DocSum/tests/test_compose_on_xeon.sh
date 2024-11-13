@@ -61,7 +61,9 @@ function start_services() {
     ls -la
 
     # Start Docker Containers
-    docker compose -f compose.yaml up -d
+    docker run -d -p 7066:7066 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/whisper
+    
+    #docker compose -f compose.yaml up -d
     # docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     echo "***************** list of images ************************"
