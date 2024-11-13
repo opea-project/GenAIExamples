@@ -78,6 +78,7 @@ services:
       http_proxy: ${http_proxy}
       BASIC_URL: ${CODEGEN_BACKEND_SERVICE_URL}
       BACKEND_SERVICE_ENDPOINT: ${CODEGEN_BACKEND_SERVICE_URL}
+      APP_CODE_GEN_URL: ${CODEGEN_BACKEND_SERVICE_URL}
     ipc: host
     restart: always
 
