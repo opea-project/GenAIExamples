@@ -38,6 +38,8 @@ function start_services() {
     export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export NEO4J_USERNAME="neo4j"
     export NEO4J_PASSWORD="neo4jtest"
+    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
+    export TGI_LLM_ENDPOINT="http://${ip_address}:6005"
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
