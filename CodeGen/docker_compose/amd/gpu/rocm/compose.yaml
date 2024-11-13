@@ -1,0 +1,86 @@
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
+
+services:
+  codegen-tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    container_name: codegen-tgi-server
+    ports:
+      - "${CODEGEN_TGI_SERVICE_PORT:-8028}:80"
+    volumes:
+      - "var/lib/GenAI/data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGING_FACE_HUB_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+    shm_size: 1g
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    ipc: host
+    command: --model-id ${CODEGEN_LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
+  codegen-llm-server:
+    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    container_name: codegen-llm-server
+    depends_on:
+      - codegen-tgi-service
+    ports:
+      - "${CODEGEN_LLM_SERVICE_PORT:-9000}:9000"
+    ipc: host
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: "http://codegen-tgi-server"
+      HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  codegen-backend-server:
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
+    container_name: codegen-backend-server
+    depends_on:
+      - codegen-llm
+    ports:
+      - "${CODEGEN_BACKEND_SERVICE_PORT:-7778}:7778"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${CODEGEN_MEGA_SERVICE_HOST_IP}
+      LLM_SERVICE_HOST_IP: "http://codegen-llm-server:9000"
+    ipc: host
+    restart: always
+  codegen-react-ui-server:
+    image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
+    container_name: codegen-react-ui-server
+    depends_on:
+      - codegen-backend-server
+    ports:
+      - "${CODEGEN_UI_SERVICE_PORT:-5174}:5174"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      BASIC_URL: "http://codegen-backend-server:7778/v1/codegen"
+      BACKEND_SERVICE_ENDPOINT: "http://codegen-backend-server:7778/v1/codegen"
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
