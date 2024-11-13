@@ -55,24 +55,9 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-
-    echo "Current Directory: $PWD"
-    echo "List of files:"
-    ls -la
-
-    # # Start Docker Containers
-    # docker run -d -p 7066:7066 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/whisper
-    # docker run -d -p 9099:9099 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:ci
-    # docker run -d -p 7078:7078 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/v2a:ci
     
-    docker compose -f compose.yaml up -d
-    # docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-
-    echo "***************** list of images ************************"
-    # docker images --format "{{.Repository}}:{{.Tag}}" | grep ":ci"
-    docker images 
-    echo "***************** docker ps         ***********************"
-    docker ps 
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+     
     echo "***************** docker compose ps ***********************"
     docker compose ps  
     echo "*********************************************************"
@@ -224,7 +209,7 @@ function validate_megaservice() {
     validate_services \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
-        "mega-docsum" \
+        "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }

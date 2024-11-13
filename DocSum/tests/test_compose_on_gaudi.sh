@@ -57,18 +57,9 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
-    echo "Current Directory: $PWD"
-    echo "List of files:"
-    ls -la
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
-    # Start Docker Containers
-    docker compose -f compose.yaml up -d
-    # docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-
-    echo "***************** list of images ************************"
-    # docker images --format "{{.Repository}}:{{.Tag}}" | grep ":ci"
-    docker images
-    echo "***************** list of compose ***********************"
+    echo "***************** docker compose ps ***********************"
     docker compose ps 
     echo "*********************************************************"
 
@@ -214,8 +205,8 @@ function validate_megaservice() {
     validate_services \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
-        "mega-docsum" \
-        "docsum-xeon-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
