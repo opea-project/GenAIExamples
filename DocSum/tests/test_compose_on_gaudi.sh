@@ -6,9 +6,9 @@
 
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
-host_ip=$(hostname -I | awk '{print $1}')
 export http_proxy=$http_proxy
 export https_proxy=$https_proxy
+export host_ip=$(hostname -I | awk '{print $1}')
 
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
