@@ -7,6 +7,13 @@ IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+
+
+
+WORKPATH=$(dirname "$PWD")
+LOG_PATH="$WORKPATH/tests"
+ip_address=$(hostname -I | awk '{print $1}')
+
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
@@ -23,11 +30,6 @@ export LLM_SERVICE_HOST_IP=${ip_address}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 export DOCSUM_CARD_ID="card1"
 export DOCSUM_RENDER_ID="renderD136"
-
-
-WORKPATH=$(dirname "$PWD")
-LOG_PATH="$WORKPATH/tests"
-ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build
