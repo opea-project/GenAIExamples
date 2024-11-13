@@ -47,7 +47,7 @@ function build_docker_images() {
     service_list="docsum docsum-ui whisper-service multimedia2text-service a2t v2a llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:1.4
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 
 }
