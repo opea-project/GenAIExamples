@@ -271,7 +271,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: audio-qna-config
-        image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.6
         name: llm-dependency-deploy-demo
         securityContext:
           capabilities:
