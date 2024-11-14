@@ -84,8 +84,9 @@ flowchart LR
 ## Deployment with docker
 
 1. Build agent docker image[Optional]
-> [!NOTE]
-> the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
+
+   > [!NOTE]
+   > the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
 
    First, clone the opea GenAIComps repo.
 
@@ -153,7 +154,9 @@ flowchart LR
 
 5. Launch agent services</br>
    We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
+
    ### Deploy on Gaudi
+
    To use open-source LLMs on Gaudi2, run commands below.
 
    ```
@@ -161,7 +164,9 @@ flowchart LR
    bash launch_tgi_gaudi.sh
    bash launch_agent_service_tgi_gaudi.sh
    ```
+
    ### Deploy on Xeon
+
    To use OpenAI models, run commands below.
 
    ```
