@@ -5,7 +5,7 @@ import json
 import uuid
 
 from huggingface_hub import ChatCompletionOutputFunctionDefinition, ChatCompletionOutputToolCall
-from langchain_core.messages import AIMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.messages.tool import ToolCall
 from langchain_core.output_parsers import BaseOutputParser
 
@@ -82,3 +82,41 @@ def assemble_history(messages):
                 query_history += f"Assistant Output: {m.content}\n"
 
     return query_history
+
+
+def assemble_memory(messages):
+    """
+    messages: Human, AI, TOOL, AI, TOOL, etc.
+    """
+    query = ""
+    query_id = None
+    query_history = ""
+    breaker = "-" * 10
+
+    # get query
+    for m in messages[::-1]:
+        if isinstance(m, HumanMessage):
+            query = m.content
+            query_id = m.id
+            break
+
+    for m in messages:
+        if isinstance(m, AIMessage):
+            # if there is tool call
+            if hasattr(m, "tool_calls") and len(m.tool_calls) > 0:
+                for tool_call in m.tool_calls:
+                    tool = tool_call["name"]
+                    tc_args = tool_call["args"]
+                    id = tool_call["id"]
+                    tool_output = get_tool_output(messages, id)
+                    query_history += f"Tool Call: {tool} - {tc_args}\nTool Output: {tool_output}\n{breaker}\n"
+            else:
+                # did not make tool calls
+                query_history += f"Assistant Output: {m.content}\n"
+
+        elif isinstance(m, HumanMessage):
+            if m.id == query_id:
+                continue
+            query_history += f"Human Input: {m.content}\n"
+
+    return query, query_history
