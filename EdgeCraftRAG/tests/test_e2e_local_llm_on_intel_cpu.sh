@@ -104,6 +104,7 @@ function main() {
     echo "EC_RAG service started" && sleep 1s
 
     validate_rag
+    validate_megaservice
 
     stop_docker
     echo y | docker system prune
