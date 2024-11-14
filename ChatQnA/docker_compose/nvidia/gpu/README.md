@@ -38,17 +38,17 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 ## Quick Start: 2.Modify the TEI Docker Image for Reranking
 
->**Note:**
-The default Docker image for the `tei-reranking-service` in `compose.yaml` is built for A100 and A30 backend with compute capacity 8.0. If you are using A100/A30, skip this step. For other GPU archtectures, please modify the `image` with specific tag for `tei-reranking-service` based on the following table with target CUDA compute capacity.
+> **Note:**
+> The default Docker image for the `tei-reranking-service` in `compose.yaml` is built for A100 and A30 backend with compute capacity 8.0. If you are using A100/A30, skip this step. For other GPU architectures, please modify the `image` with specific tag for `tei-reranking-service` based on the following table with target CUDA compute capacity.
 
-| GPU Arch | GPU | Compute Capacity | Image |
-| ------------ | ------------------------------------------ | --- | -------------------------------------------------------- |
-| Volta        | V100                                       | 7.0 | NOT SUPPORTED                                            |
-| Turing       | T4, GeForce RTX 2000 Series                | 7.5 | ghcr.io/huggingface/text-embeddings-inference:turing-1.5 |
-| Ampere 80    | A100, A30                                  | 8.0 | ghcr.io/huggingface/text-embeddings-inference:1.5        |
-| Ampere 86    | A40, A10, A16, A2, GeForce RTX 3000 Series | 8.6 | ghcr.io/huggingface/text-embeddings-inference:86-1.5     |
-| Ada Lovelace | L40S, L40, L4, GeForce RTX 4000 Series     | 8.9 | ghcr.io/huggingface/text-embeddings-inference:89-1.5     |
-| Hopper       | H100                                       | 9.0 | ghcr.io/huggingface/text-embeddings-inference:hopper-1.5 |
+| GPU Arch     | GPU                                        | Compute Capacity | Image                                                    |
+| ------------ | ------------------------------------------ | ---------------- | -------------------------------------------------------- |
+| Volta        | V100                                       | 7.0              | NOT SUPPORTED                                            |
+| Turing       | T4, GeForce RTX 2000 Series                | 7.5              | ghcr.io/huggingface/text-embeddings-inference:turing-1.5 |
+| Ampere 80    | A100, A30                                  | 8.0              | ghcr.io/huggingface/text-embeddings-inference:1.5        |
+| Ampere 86    | A40, A10, A16, A2, GeForce RTX 3000 Series | 8.6              | ghcr.io/huggingface/text-embeddings-inference:86-1.5     |
+| Ada Lovelace | L40S, L40, L4, GeForce RTX 4000 Series     | 8.9              | ghcr.io/huggingface/text-embeddings-inference:89-1.5     |
+| Hopper       | H100                                       | 9.0              | ghcr.io/huggingface/text-embeddings-inference:hopper-1.5 |
 
 For instance, if Hopper arch GPU (such as H100/H100 NVL) is the target backend:
 
@@ -202,17 +202,17 @@ Change the `xxx_MODEL_ID` below for your needs.
 
 ### Modify the TEI Docker Image for Reranking
 
->**Note:**
-The default Docker image for the `tei-reranking-service` in `compose.yaml` is built for A100 and A30 backend with compute capacity 8.0. If you are using A100/A30, skip this step. For other GPU archtectures, please modify the `image` with specific tag for `tei-reranking-service` based on the following table with target CUDA compute capacity.
+> **Note:**
+> The default Docker image for the `tei-reranking-service` in `compose.yaml` is built for A100 and A30 backend with compute capacity 8.0. If you are using A100/A30, skip this step. For other GPU architectures, please modify the `image` with specific tag for `tei-reranking-service` based on the following table with target CUDA compute capacity.
 
-| GPU Arch | GPU | Compute Capacity | Image |
-| ------------ | ------------------------------------------ | --- | -------------------------------------------------------- |
-| Volta        | V100                                       | 7.0 | NOT SUPPORTED                                            |
-| Turing       | T4, GeForce RTX 2000 Series                | 7.5 | ghcr.io/huggingface/text-embeddings-inference:turing-1.5 |
-| Ampere 80    | A100, A30                                  | 8.0 | ghcr.io/huggingface/text-embeddings-inference:1.5        |
-| Ampere 86    | A40, A10, A16, A2, GeForce RTX 3000 Series | 8.6 | ghcr.io/huggingface/text-embeddings-inference:86-1.5     |
-| Ada Lovelace | L40S, L40, L4, GeForce RTX 4000 Series     | 8.9 | ghcr.io/huggingface/text-embeddings-inference:89-1.5     |
-| Hopper       | H100                                       | 9.0 | ghcr.io/huggingface/text-embeddings-inference:hopper-1.5 |
+| GPU Arch     | GPU                                        | Compute Capacity | Image                                                    |
+| ------------ | ------------------------------------------ | ---------------- | -------------------------------------------------------- |
+| Volta        | V100                                       | 7.0              | NOT SUPPORTED                                            |
+| Turing       | T4, GeForce RTX 2000 Series                | 7.5              | ghcr.io/huggingface/text-embeddings-inference:turing-1.5 |
+| Ampere 80    | A100, A30                                  | 8.0              | ghcr.io/huggingface/text-embeddings-inference:1.5        |
+| Ampere 86    | A40, A10, A16, A2, GeForce RTX 3000 Series | 8.6              | ghcr.io/huggingface/text-embeddings-inference:86-1.5     |
+| Ada Lovelace | L40S, L40, L4, GeForce RTX 4000 Series     | 8.9              | ghcr.io/huggingface/text-embeddings-inference:89-1.5     |
+| Hopper       | H100                                       | 9.0              | ghcr.io/huggingface/text-embeddings-inference:hopper-1.5 |
 
 For instance, if Hopper arch GPU (such as H100/H100 NVL) is the target backend:
 
