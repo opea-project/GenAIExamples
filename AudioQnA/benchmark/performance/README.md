@@ -51,7 +51,7 @@ LimitNOFILE=65536:1048576
 sudo systemctl daemon-reload; sudo systemctl restart containerd
 ```
 
-### Test Steps
+## Test Steps
 
 Please deploy AudioQnA service before benchmarking.
 
