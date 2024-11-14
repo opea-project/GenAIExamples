@@ -39,7 +39,7 @@ function start_services() {
     export CODETRANS_LLM_SERVICE_HOST_IP=${ip_address}
     export CODETRANS_FRONTEND_SERVICE_IP=${ip_address}
     export CODETRANS_FRONTEND_SERVICE_PORT=18155
-    export CODETRANS_BACKEND_SERVICE_NAME=codetrans-backend-server
+    export CODETRANS_BACKEND_SERVICE_NAME=codetrans
     export CODETRANS_BACKEND_SERVICE_IP=${ip_address}
     export CODETRANS_BACKEND_SERVICE_PORT=18154
     export CODETRANS_NGINX_PORT=18153
@@ -92,7 +92,7 @@ function validate_services() {
 function validate_microservices() {
     # tgi for embedding service
     validate_services \
-        "http://${ip_address}:${CODETRANS_TGI_SERVICE_PORT}/generate" \
+        "${ip_address}:${CODETRANS_TGI_SERVICE_PORT}/generate" \
         "generated_text" \
         "codetrans-tgi-service" \
         "codetrans-tgi-service" \
@@ -100,7 +100,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "http://${ip_address}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions" \
+        "${ip_address}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions" \
         "data: " \
         "codetrans-llm-server" \
         "codetrans-llm-server" \
@@ -111,7 +111,7 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-        "http://${ip_address}:${CODETRANS_BACKEND_SERVICE_PORT}/v1/codetrans" \
+        "${ip_address}:${CODETRANS_BACKEND_SERVICE_PORT}/v1/codetrans" \
         "print" \
         "codetrans-backend-server" \
         "codetrans-backend-server" \
@@ -119,7 +119,7 @@ function validate_megaservice() {
 
     # test the megeservice via nginx
     validate_services \
-        "http://${ip_address}:${CODETRANS_NGINX_PORT}/v1/codetrans" \
+        "${ip_address}:${CODETRANS_NGINX_PORT}/v1/codetrans" \
         "print" \
         "codetrans-nginx-server" \
         "codetrans-nginx-server" \
