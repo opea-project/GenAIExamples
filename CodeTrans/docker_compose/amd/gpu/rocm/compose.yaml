@@ -52,7 +52,7 @@ services:
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
       MEGA_SERVICE_HOST_IP: ${HOST_IP}
-      LLM_SERVICE_HOST_IP: "http://codetrans-llm-server:9000"
+      LLM_SERVICE_HOST_IP: "codetrans-llm-server"
     ipc: host
     restart: always
   codetrans-ui-server:
