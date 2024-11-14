@@ -79,6 +79,7 @@ export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
+export LLM_SERVICE_PORT=9000
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
 ```
 

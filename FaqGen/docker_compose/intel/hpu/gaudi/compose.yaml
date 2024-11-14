@@ -56,6 +56,7 @@ services:
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
     ipc: host
     restart: always
   faqgen-gaudi-ui-server:
@@ -69,7 +70,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - FAQ_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 
