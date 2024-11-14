@@ -5,23 +5,18 @@
 set -xe
 USER_ID=$(whoami)
 LOG_PATH=/home/$(whoami)/logs
-MOUNT_DIR=~/.cache/huggingface/hub
-IMAGE_REPO=${IMAGE_REPO:-}
+MOUNT_DIR=/home/$USER_ID/.cache/huggingface/hub
+IMAGE_REPO=${IMAGE_REPO:-opea}
 IMAGE_TAG=${IMAGE_TAG:-latest}
 
 function init_docsum() {
     # executed under path manifest/docsum/xeon
     # replace the mount dir "path: /mnt/model" with "path: $CHART_MOUNT"
     find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/opea-models#path: $MOUNT_DIR#g" {} \;
-    if [ $CONTEXT == "CI" ]; then
-        # replace megaservice image tag
-        find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/docsum:latest#image: \"opea/docsum:${IMAGE_TAG}#g" {} \;
-    else
-        # replace microservice image tag
-        find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/\(.*\):latest#image: \"opea/\1:${IMAGE_TAG}#g" {} \;
-    fi
+    # replace microservice image tag
+    find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/\(.*\):latest#image: \"opea/\1:${IMAGE_TAG}#g" {} \;
     # replace the repository "image: opea/*" with "image: $IMAGE_REPO/opea/"
-    find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}opea/#g" {} \;
+    find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}/#g" {} \;
     # set huggingface token
     find . -name '*.yaml' -type f -exec sed -i "s#insert-your-huggingface-token-here#$(cat /home/$USER_ID/.cache/huggingface/token)#g" {} \;
 }
@@ -39,9 +34,9 @@ function validate_docsum() {
     # generate a random logfile name to avoid conflict among multiple runners
     LOGFILE=$LOG_PATH/curlmega_$NAMESPACE.log
     # Curl the Mega Service
-    curl -X POST http://${host_ip}:8888/v1/docsum \
-    -H "Content-Type: application/json" \
-    -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' > $LOGFILE
+    curl http://${ip_address}:${port}/v1/docsum \
+    -H 'Content-Type: multipart/form-data' \
+    -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "Megaservice docsum failed, please check the logs in $LOGFILE!"
@@ -51,7 +46,7 @@ function validate_docsum() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOGFILE ]] && \
-    [[ $(grep -c "[DONE]" $LOGFILE) != 0 ]]; then
+    [[ $(grep -c "versatile toolkit" $LOGFILE) != 0 ]]; then
         status=true
     fi
 

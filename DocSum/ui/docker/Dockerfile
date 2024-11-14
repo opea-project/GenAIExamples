@@ -1,7 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-
 # Use the official Python 3.11 slim image as the base image
 FROM python:3.11-slim
 
