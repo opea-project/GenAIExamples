@@ -30,7 +30,7 @@ services:
     ipc: host
     command: --model-id ${FAQGEN_LLM_MODEL_ID}
   faqgen-llm-server:
-    image: ${REGISTRY:-opea}/llm-faqgen-tgi:latest
+    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
     container_name: faqgen-llm-server
     depends_on:
       - faqgen-tgi-service
@@ -62,7 +62,7 @@ services:
     ipc: host
     restart: always
   faqgen-ui-server:
-    image: ${REGISTRY:-opea}/faqgen-ui:latest
+    image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
     container_name: faqgen-ui-server
     depends_on:
       - faqgen-backend-server
