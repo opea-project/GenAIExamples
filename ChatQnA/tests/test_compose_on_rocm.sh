@@ -138,14 +138,14 @@ function validate_microservices() {
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
-        "chatqna-dataprep-redis-server"
+        "dataprep-redis-server"
 
     # test /v1/dataprep upload link
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
-        "chatqna-dataprep-redis-server"
+        "dataprep-redis-server"
 
     # test /v1/dataprep/get_file
     validate_service \
@@ -159,7 +159,7 @@ function validate_microservices() {
         "http://${ip_address}:6007/v1/dataprep/delete_file" \
         '{"status":true}' \
         "dataprep_del" \
-        "chatqna-dataprep-redis-server"
+        "dataprep-redis-server"
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
