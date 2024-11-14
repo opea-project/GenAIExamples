@@ -165,7 +165,7 @@ function validate_microservices() {
 
     # Audio2Text service
     validate_services \
-        "${host_ip}:9099/v1/audio/transcriptions" \
+        "${host_ip}:9100/v1/audio/transcriptions" \
         '"query":"well"' \
         "a2t" \
         "a2t-service" \
