@@ -53,7 +53,7 @@ function start_services() {
 
 function validate_rag() {
     cd $WORKPATH/tests
-    
+
     # setup pipeline
     validate_services \
         "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/settings/pipelines" \
