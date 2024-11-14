@@ -50,7 +50,7 @@ services:
     image: ${REGISTRY:-opea}/a2t:${TAG:-latest}
     container_name: a2t-service
     ports:
-      - "9099:9099"
+      - "9094:9099"
     ipc: host
     environment:
       A2T_ENDPOINT: ${A2T_ENDPOINT}

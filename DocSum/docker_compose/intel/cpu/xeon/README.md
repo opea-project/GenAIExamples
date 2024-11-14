@@ -209,4 +209,4 @@ Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based
 
 ### Gradio UI
 
-![project-screenshot](../../../../assets/img/docSum_ui_text.png)
+![project-screenshot](../../../../assets/img/docSum_ui_gradio_text.png)

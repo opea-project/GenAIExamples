@@ -143,7 +143,7 @@ function validate_microservices() {
 
     # Audio2Text service
     validate_services \
-        "${host_ip}:9099/v1/audio/transcriptions" \
+        "${host_ip}:9094/v1/audio/transcriptions" \
         '"query":"well"' \
         "a2t" \
         "a2t-service" \
@@ -238,12 +238,12 @@ function main() {
     stop_docker
     echo ">>>> Docker containers stopped."
 
-    echo "==========================================="
-    if [[ "$IMAGE_REPO" == "opea" ]]; then
-        echo ">>>> Building Docker images..."
-        build_docker_images
-        echo ">>>> Docker images built successfully."
-    fi
+    # echo "==========================================="
+    # if [[ "$IMAGE_REPO" == "opea" ]]; then
+    #     echo ">>>> Building Docker images..."
+    #     build_docker_images
+    #     echo ">>>> Docker images built successfully."
+    # fi
 
     echo "==========================================="
     echo ">>>> Starting Docker services..."
