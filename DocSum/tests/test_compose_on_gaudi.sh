@@ -44,7 +44,7 @@ ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-    
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="docsum docsum-ui whisper-service multimedia2text-service a2t v2a llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
@@ -79,13 +79,13 @@ function start_services() {
     #     opea/docsum:ci
 
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 60s 
+    sleep 60s
 
     echo "***************** docker compose ps ***********************"
-    docker compose ps  
-    echo "***************** docker ps         ***********************"  
-    docker ps 
-    echo "***********************************************************" 
+    docker compose ps
+    echo "***************** docker ps         ***********************"
+    docker ps
+    echo "***********************************************************"
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -251,7 +251,7 @@ function main() {
         build_docker_images
         echo ">>>> Docker images built successfully."
     fi
-    
+
     echo "==========================================="
     echo ">>>> Starting Docker services..."
     start_services
