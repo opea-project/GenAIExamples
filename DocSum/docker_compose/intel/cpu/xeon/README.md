@@ -69,7 +69,7 @@ Build the frontend Docker image via below command:
 
 ```bash
 cd GenAIExamples/DocSum/ui/docker
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.gradio .
 ```
 
 ## 🚀 Start Microservices and MegaService

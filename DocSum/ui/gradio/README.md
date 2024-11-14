@@ -10,7 +10,7 @@ To build the frontend Docker image, navigate to the `GenAIExamples/DocSum/ui` di
 
 ```bash
 cd GenAIExamples/DocSum/ui
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.gradio .
 ```
 
 This command builds the Docker image with the tag `opea/docsum-ui:latest`. It also passes the proxy settings as build arguments to ensure that the build process can access the internet if you are behind a corporate firewall.
@@ -46,7 +46,7 @@ This command starts the frontend application using Python.
 
 ## 📸 Project Screenshots
 
-![project-screenshot](../../assets/img/docSum_ui_text.png)
+![project-screenshot](../../assets/img/docSum_ui_gradio_text.png)
 
 ### 🧐 Features
 

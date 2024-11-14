@@ -1,42 +1,26 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-# Use the official Python 3.11 slim image as the base image
-FROM python:3.11-slim
+# Use node 20.11.1 as the base image
+FROM node:20.11.1
 
-# Set the default language environment variable
-ENV LANG=C.UTF-8
+# Update package manager and install Git
+RUN apt-get update -y && apt-get install -y git
 
-# Define a build argument for architecture (default is "cpu")
-ARG ARCH="cpu"
-
-# Update the package list and install necessary packages
-RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
-    build-essential \          
-    libgl1-mesa-glx \          
-    libjemalloc-dev \          
-    default-jre \              
-    wget \                     
-    vim && \                   
-    apt-get clean && \         
-    rm -rf /var/lib/apt/lists/* 
-
-# Create a directory for the application
-RUN mkdir -p /home/user
-
-# Copy the application code and requirements file to the container
-COPY ./gradio/docsum_ui_gradio.py /home/user/docsum_ui_gradio.py
-COPY ./gradio/requirements.txt /home/user/requirements.txt 
-
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip setuptools && \
-    pip install --no-cache-dir -r /home/user/requirements.txt
+# Copy the front-end code repository
+COPY svelte /home/user/svelte
 
 # Set the working directory
-WORKDIR /home/user/
+WORKDIR /home/user/svelte
 
-# Expose the port that the application will run on
+# Install front-end dependencies
+RUN npm install
+
+# Build the front-end application
+RUN npm run build
+
+# Expose the port of the front-end application
 EXPOSE 5173
 
-# Define the command to run the application
-CMD ["python", "docsum_ui_gradio.py"]
+# Run the front-end application in preview mode
+CMD ["npm", "run", "preview", "--", "--port", "5173", "--host", "0.0.0.0"]
