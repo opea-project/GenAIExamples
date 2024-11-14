@@ -30,8 +30,10 @@ function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
+    export CODETRANS_TGI_SERVICE_PORT=18156
+    export CODETRANS_LLM_SERVICE_PORT=18157
     export CODETRANS_LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-    export CODETRANS_TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export CODETRANS_TGI_LLM_ENDPOINT="http://${ip_address}:${CODETRANS_TGI_SERVICE_PORT}"
     export CODETRANS_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export CODETRANS_MEGA_SERVICE_HOST_IP=${ip_address}
     export CODETRANS_LLM_SERVICE_HOST_IP=${ip_address}
@@ -90,7 +92,7 @@ function validate_services() {
 function validate_microservices() {
     # tgi for embedding service
     validate_services \
-        "${ip_address}:8008/generate" \
+        "${ip_address}:${CODETRANS_TGI_SERVICE_PORT}/generate" \
         "generated_text" \
         "tgi" \
         "codetrans-tgi-service" \
@@ -98,7 +100,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${ip_address}:9000/v1/chat/completions" \
+        "${ip_address}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions" \
         "data: " \
         "llm" \
         "codetrans-llm-server" \
