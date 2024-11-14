@@ -155,7 +155,7 @@ flowchart LR
 5. Launch agent services</br>
    We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
 
-   ### Deploy on Gaudi
+   Deploy on Gaudi
 
    To use open-source LLMs on Gaudi2, run commands below.
 
@@ -165,7 +165,7 @@ flowchart LR
    bash launch_agent_service_tgi_gaudi.sh
    ```
 
-   ### Deploy on Xeon
+   Deploy on Xeon
 
    To use OpenAI models, run commands below.
 
