@@ -40,7 +40,8 @@ services:
     command: --model-id ${CHATQNA_EMBEDDING_MODEL_ID} --auto-truncate
     devices:
       - /dev/kfd:/dev/kfd
-      - /dev/dri/:/dev/dri/
+      - /dev/dri/card1:/dev/dri/card1
+      - /dev/dri/renderD136:/dev/dri/renderD136
     cap_add:
       - SYS_PTRACE
     group_add:
