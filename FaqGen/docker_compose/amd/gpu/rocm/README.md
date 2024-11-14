@@ -1,3 +1,20 @@
+###### Copyright (C) 2024 Advanced Micro Devices, Inc.
+
+# Build and deploy FaqGen Application on AMD GPU (ROCm)
+
+## Build images
+
+### Build the LLM Docker Image
+
+```bash
+### Cloning repo
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+
+### Build Docker image
+docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+```
+
 ## 🚀 Start Microservices and MegaService
 
 ### Required Models
