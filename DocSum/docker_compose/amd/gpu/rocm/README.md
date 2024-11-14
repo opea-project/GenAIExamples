@@ -1,4 +1,67 @@
-# 🚀 Start Microservices and MegaService
+###### Copyright (C) 2024 Advanced Micro Devices, Inc.
+
+# Build and deploy DocSum Application on AMD GPU (ROCm)
+
+## Build images
+## 🚀 Build Docker Images
+
+First of all, you need to build Docker Images locally and install the python package of it.
+
+### 1. Build LLM Image
+
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/langchain/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following four Docker Images:
+
+### 2. Build MegaService Docker Image
+
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `docsum.py` Python script. Build the MegaService Docker image via below command:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/DocSum/
+docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
+
+### 3. Build UI Docker Image
+
+Build the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/ui
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+1. `opea/llm-docsum-tgi:latest`
+2. `opea/docsum:latest`
+3. `opea/docsum-ui:latest`
+
+### 4. Build React UI Docker Image
+
+Build the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/ui
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f ./docker/Dockerfile.react .
+```
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+1. `opea/llm-docsum-tgi:latest`
+2. `opea/docsum:latest`
+3. `opea/docsum-ui:latest`
+4. `opea/docsum-react-ui:latest`
+
+## 🚀 Start Microservices and MegaService
 
 ### Required Models
 
