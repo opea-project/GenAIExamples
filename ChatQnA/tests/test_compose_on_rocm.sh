@@ -152,7 +152,7 @@ function validate_microservices() {
         "http://${ip_address}:6007/v1/dataprep/get_file" \
         '{"name":' \
         "dataprep_get" \
-        "chatqna-dataprep-redis-server"
+        "dataprep-redis-server"
 
     # test /v1/dataprep/delete_file
     validate_service \
