@@ -34,15 +34,6 @@ services:
     ports:
       - "${CODEGEN_LLM_SERVICE_PORT:-9000}:9000"
     ipc: host
-    group_add:
-      - video
-    security_opt:
-      - seccomp:unconfined
-    cap_add:
-      - SYS_PTRACE
-    devices:
-      - /dev/kfd:/dev/kfd
-      - /dev/dri/:/dev/dri/
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
