@@ -59,6 +59,12 @@ function start_services() {
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 60s
 
+    echo "***************** docker compose ps ***********************"
+    docker compose ps
+    echo "***************** docker ps         ***********************"
+    docker ps
+    echo "***********************************************************"
+
     until [[ "$n" -ge 100 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
@@ -238,12 +244,12 @@ function main() {
     stop_docker
     echo ">>>> Docker containers stopped."
 
-    # echo "==========================================="
-    # if [[ "$IMAGE_REPO" == "opea" ]]; then
-    #     echo ">>>> Building Docker images..."
-    #     build_docker_images
-    #     echo ">>>> Docker images built successfully."
-    # fi
+    echo "==========================================="
+    if [[ "$IMAGE_REPO" == "opea" ]]; then
+        echo ">>>> Building Docker images..."
+        build_docker_images
+        echo ">>>> Docker images built successfully."
+    fi
 
     echo "==========================================="
     echo ">>>> Starting Docker services..."
