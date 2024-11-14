@@ -59,12 +59,6 @@ function start_services() {
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 3m
 
-    echo "***************** docker compose ps ***********************"
-    docker compose ps
-    echo "***************** docker ps         ***********************"
-    docker ps
-    echo "***********************************************************"
-
     until [[ "$n" -ge 100 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then

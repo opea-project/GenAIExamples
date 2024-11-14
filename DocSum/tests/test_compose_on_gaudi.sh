@@ -57,7 +57,8 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-
+    sleep 3m
+    
     echo "***************** docker compose ps ***********************"
     docker compose ps
     echo "***************** docker ps         ***********************"
@@ -240,22 +241,22 @@ function main() {
     stop_docker
     echo ">>>> Docker containers stopped."
 
-    # echo "==========================================="
-    # if [[ "$IMAGE_REPO" == "opea" ]]; then
-    #     echo ">>>> Building Docker images..."
-    #     build_docker_images
-    #     echo ">>>> Docker images built successfully."
-    # fi
+    echo "==========================================="
+    if [[ "$IMAGE_REPO" == "opea" ]]; then
+        echo ">>>> Building Docker images..."
+        build_docker_images
+        echo ">>>> Docker images built successfully."
+    fi
 
     echo "==========================================="
     echo ">>>> Starting Docker services..."
     start_services
     echo ">>>> Docker services started successfully."
 
-    # echo "==========================================="
-    # echo ">>>> Validating microservices..."
-    # validate_microservices
-    # echo ">>>> Microservices validated successfully."
+    echo "==========================================="
+    echo ">>>> Validating microservices..."
+    validate_microservices
+    echo ">>>> Microservices validated successfully."
 
     echo "==========================================="
     echo ">>>> Validating megaservice..."
