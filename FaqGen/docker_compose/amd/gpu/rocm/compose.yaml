@@ -19,8 +19,8 @@ services:
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd
-      - /dev/dri/${DOCSUM_CARD_ID}:/dev/dri/${DOCSUM_CARD_ID}
-      - /dev/dri/${DOCSUM_RENDER_ID}:/dev/dri/${DOCSUM_RENDER_ID}
+      - /dev/dri/${FAQGEN_CARD_ID}:/dev/dri/${FAQGEN_CARD_ID}
+      - /dev/dri/${FAQGEN_RENDER_ID}:/dev/dri/${FAQGEN_RENDER_ID}
     cap_add:
       - SYS_PTRACE
     group_add:
