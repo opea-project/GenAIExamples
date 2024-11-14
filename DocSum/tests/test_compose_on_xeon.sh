@@ -57,7 +57,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 60s
+    sleep 3m
 
     echo "***************** docker compose ps ***********************"
     docker compose ps
