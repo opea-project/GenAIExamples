@@ -17,12 +17,12 @@ services:
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
-      context: ../ui/gradio/
-      dockerfile: ./Dockerfile
+      context: ../ui/
+      dockerfile: ./docker/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
 
-  whisper-service:
+  whisper:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -32,7 +32,7 @@ services:
     extends: docsum
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
 
-  multimedia2text-service:
+  multimedia2text:
     build:
       args:
         http_proxy: ${http_proxy}

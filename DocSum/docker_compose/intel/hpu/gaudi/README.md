@@ -52,7 +52,7 @@ docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-
 Build the frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/DocSum/ui/gradio
+cd GenAIExamples/DocSum/ui/docker
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 

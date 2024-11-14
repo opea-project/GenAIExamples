@@ -18,7 +18,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
 
-  llm:
+  llm-docsum-tgi:
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
     container_name: llm-docsum-server
     depends_on:
@@ -34,7 +34,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
 
-  whisper-service:
+  whisper:
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
     container_name: whisper-service
     ports:
@@ -64,7 +64,7 @@ services:
     environment:
       V2A_ENDPOINT: ${V2A_ENDPOINT}
 
-  multimedia2text-service:
+  multimedia2text:
     image: ${REGISTRY:-opea}/multimedia2text:${TAG:-latest}
     container_name: multimedia2text
     ports:
@@ -79,8 +79,8 @@ services:
     container_name: docsum-xeon-backend-server
     depends_on:
       - tgi-service
-      - llm
-      - multimedia2text-service
+      - llm-docsum-tgi
+      - multimedia2text
       - v2a
       - a2t
     ports:
@@ -95,7 +95,7 @@ services:
     ipc: host
     restart: always
 
-  docsum-xeon-ui-server:
+  docsum-ui:
     image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
     container_name: docsum-xeon-ui-server
     depends_on:

@@ -201,12 +201,30 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
+    echo ">>> Checking text data"
     validate_services \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
-        "docsum-xeon-backend-server" \
-        "docsum-xeon-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+
+    echo ">>> Checking audio data"
+    validate_services \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "{\"type\": \"audio\",  \"messages\": \"$(input_data_for_test "audio")\"}"
+
+    echo ">>> Checking video data"
+    validate_services \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\"}"
+
 }
 
 function stop_docker() {

@@ -6,21 +6,21 @@ This project provides a user interface for summarizing documents and text using 
 
 ### Build UI Docker Image
 
-To build the frontend Docker image, navigate to the `GenAIExamples/DocSum/ui/gradio` directory and run the following command:
+To build the frontend Docker image, navigate to the `GenAIExamples/DocSum/ui` directory and run the following command:
 
 ```bash
-cd GenAIExamples/DocSum/ui/gradio
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd GenAIExamples/DocSum/ui
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
 This command builds the Docker image with the tag `opea/docsum-ui:latest`. It also passes the proxy settings as build arguments to ensure that the build process can access the internet if you are behind a corporate firewall.
 
 ### Run UI Docker Image
 
-To run the frontend Docker image, navigate to the `GenAIExamples/DocSum/ui/gradio` directory and execute the following commands:
+To run the frontend Docker image, navigate to the `GenAIExamples/DocSum/ui/docker` directory and execute the following commands:
 
 ```bash
-cd GenAIExamples/DocSum/ui/gradio
+cd GenAIExamples/DocSum/ui/docker
 
 ip_address=$(hostname -I | awk '{print $1}')
 docker run -it -p 5173:5173 --ipc=host \
@@ -33,7 +33,7 @@ docker run -it -p 5173:5173 --ipc=host \
 
 This command runs the Docker container in interactive mode, mapping port 5173 of the host to port 5173 of the container. It also sets several environment variables, including the backend service endpoint, which is required for the frontend to communicate with the backend service.
 
-Python
+### Python
 To run the frontend application directly using Python, navigate to the `GenAIExamples/DocSum/ui/gradio` directory and run the following command:
 
 ```bash

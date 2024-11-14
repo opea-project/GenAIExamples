@@ -26,8 +26,8 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
 RUN mkdir -p /home/user
 
 # Copy the application code and requirements file to the container
-COPY docsum_ui_gradio.py /home/user/docsum_ui_gradio.py
-COPY requirements.txt /home/user/requirements.txt 
+COPY ./gradio/docsum_ui_gradio.py /home/user/docsum_ui_gradio.py
+COPY ./gradio/requirements.txt /home/user/requirements.txt 
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip setuptools && \
