@@ -56,21 +56,8 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
-    docker run -d -p 8888:8888 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy \
-        -e no_proxy=$no_proxy \
-        -e MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP} \
-        -e DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP} \
-        -e LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP} \
-        opea/docsum:ci
-    
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 60s  
-    
-    echo "***************** docker compose ps ***********************"
-    docker compose ps  
-    echo "***************** docker ps         ***********************"  
-    docker ps 
-    echo "***********************************************************" 
 
     until [[ "$n" -ge 20 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
