@@ -15,17 +15,12 @@ services:
       - ${MODEL_PATH:-${PWD}}:/home/user/models
       - ${DOC_PATH:-${PWD}}:/home/user/docs
       - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
-<<<<<<< HEAD
-      - ${HF_CACHE:-${HOME}/.cache}:/home/user/.cache
-=======
->>>>>>> 8b95a73 (Add E2E test cases for EC-RAG - local LLM and vllm)
     ports:
       - ${PIPELINE_SERVICE_PORT:-16010}:${PIPELINE_SERVICE_PORT:-16010}
     devices:
       - /dev/dri:/dev/dri
     group_add:
-      - ${VIDEOGROUPID:-44}
-      - ${RENDERGROUPID:-109}
+      - video
   ecrag:
     image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}
     container_name: edgecraftrag
@@ -62,34 +57,32 @@ services:
     depends_on:
       - server
       - ecrag
-  # vllm-openvino-server:
-  #   container_name: vllm-openvino-server
-  #   image: opea/vllm-arc:latest
-  #   ports:
-  #     - ${VLLM_SERVICE_PORT:-8008}:80
-  #   environment:
-  #     HTTPS_PROXY: ${https_proxy}
-  #     HTTP_PROXY: ${https_proxy}
-  #     VLLM_OPENVINO_DEVICE: GPU
-  #     HF_ENDPOINT: ${HF_ENDPOINT}
-  #     HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-  #   volumes:
-  #     - /dev/dri/by-path:/dev/dri/by-path
-  #     - $HOME/.cache/huggingface:/root/.cache/huggingface
-  #   devices:
-  #     - /dev/dri
-  #   group_add:
-  #     - ${VIDEOGROUPID:-44}
-  #     - ${RENDERGROUPID:-109}
-  #   entrypoint: /bin/bash -c "\
-  #     cd / && \
-  #     export VLLM_CPU_KVCACHE_SPACE=50 && \
-  #     export VLLM_OPENVINO_ENABLE_QUANTIZED_WEIGHTS=ON && \
-  #     python3 -m vllm.entrypoints.openai.api_server \
-  #       --model '${LLM_MODEL}' \
-  #       --max_model_len=1024 \
-  #       --host 0.0.0.0 \
-  #       --port 80"
+  vllm-openvino-server:
+    container_name: vllm-openvino-server
+    image: opea/vllm-arc:latest
+    ports:
+      - ${VLLM_SERVICE_PORT:-8008}:80
+    environment:
+      HTTPS_PROXY: ${https_proxy}
+      HTTP_PROXY: ${https_proxy}
+      VLLM_OPENVINO_DEVICE: GPU
+      HF_ENDPOINT: ${HF_ENDPOINT}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    volumes:
+      - /dev/dri/by-path:/dev/dri/by-path
+      - $HOME/.cache/huggingface:/root/.cache/huggingface
+    devices:
+      - /dev/dri
+    entrypoint: /bin/bash -c "\
+      cd / && \
+      export VLLM_CPU_KVCACHE_SPACE=50 && \
+      export VLLM_OPENVINO_ENABLE_QUANTIZED_WEIGHTS=ON && \
+      python3 -m vllm.entrypoints.openai.api_server \
+        --model '${LLM_MODEL}' \
+        --max_model_len=4096 \
+        --host 0.0.0.0 \
+        --port 80"
+
 networks:
   default:
     driver: bridge
