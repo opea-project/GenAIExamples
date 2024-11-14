@@ -34,6 +34,7 @@ docker run -it -p 5173:5173 --ipc=host \
 This command runs the Docker container in interactive mode, mapping port 5173 of the host to port 5173 of the container. It also sets several environment variables, including the backend service endpoint, which is required for the frontend to communicate with the backend service.
 
 ### Python
+
 To run the frontend application directly using Python, navigate to the `GenAIExamples/DocSum/ui/gradio` directory and run the following command:
 
 ```bash

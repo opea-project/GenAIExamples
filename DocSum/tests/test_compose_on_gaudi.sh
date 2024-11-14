@@ -57,7 +57,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    
+
     echo "***************** docker compose ps ***********************"
     docker compose ps
     echo "***************** docker ps         ***********************"
