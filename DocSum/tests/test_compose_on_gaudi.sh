@@ -57,6 +57,12 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
+    docker run -d -p 9001:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy \
+        -e no_proxy=$no_proxy \
+        -e TGI_LLM_ENDPOINT=${TGI_LLM_ENDPOINT} \
+        -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
+        opea/multimedia2text:ci
+
     # docker run -d -p 9100:9099 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:ci
     # docker run -d -p 7078:7078 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/v2a:ci
 
@@ -210,7 +216,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${host_ip}:9000/v1/chat/docsum" \
+        "${host_ip}:9001/v1/chat/docsum" \
         "data: " \
         "llm" \
         "llm-docsum-gaudi-server" \
