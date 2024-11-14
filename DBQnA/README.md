@@ -4,6 +4,48 @@ Experience a revolutionary way to interact with your database using our DBQnA ap
 
 ---
 
+```mermaid
+flowchart LR
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.7
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.7
+    classDef orchid fill:#DA70D6,stroke:#1E90FF,stroke-width:2px,fill-opacity:0.7
+    classDef invisible fill:transparent,stroke:transparent;
+    style Text2SQL-MegaService stroke:#000000
+
+    %% Subgraphs %%
+    subgraph Text2SQL-MegaService["Text-to-SQL MegaService "]
+        direction LR
+        LLM([LLM MicroService]):::invisible
+    end
+    subgraph UserInterface[" User Interface "]
+        direction LR
+        a([User Input Query]):::orchid
+        UI([UI server<br>]):::orchid
+    end
+
+    LLM_gen{{LLM Service <br>}}
+    POSTGRES_DB{{POSGRES DATABASE <br>}}
+    GW([Text-to-SQL GateWay<br>]):::orange
+
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> Text2SQL-MegaService
+
+
+    %% Text-to-SQL service flow
+    direction TB
+    LLM <-.-> POSTGRES_DB
+    direction LR
+    LLM <-.-> LLM_gen
+
+```
+
+---
+
 ## 🛠️ Key Features
 
 ### 💬 SQL Query Generation
