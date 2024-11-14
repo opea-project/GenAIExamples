@@ -88,16 +88,16 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:8028/generate" \
         "generated_text" \
-        "tgi-llm" \
-        "tgi-service" \
+        "codegen-tgi-service" \
+        "codegen-tgi-service" \
         '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}'
 
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
-        "llm" \
-        "llm-tgi-server" \
+        "codegen-llm-server" \
+        "codegen-llm-server" \
         '{"query":"def print_hello_world():"}'
 
 }
