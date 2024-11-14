@@ -34,7 +34,7 @@ function start_services() {
     export CODETRANS_LLM_SERVICE_PORT=18157
     export CODETRANS_LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
     export CODETRANS_TGI_LLM_ENDPOINT="http://${ip_address}:${CODETRANS_TGI_SERVICE_PORT}"
-    export CODETRANS_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export CODETRANS_HUGGINGFACEHUB_API_TOKEN=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
     export CODETRANS_MEGA_SERVICE_HOST_IP=${ip_address}
     export CODETRANS_LLM_SERVICE_HOST_IP=${ip_address}
     export CODETRANS_FRONTEND_SERVICE_IP=${ip_address}
