@@ -94,7 +94,7 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:${CODETRANS_TGI_SERVICE_PORT}/generate" \
         "generated_text" \
-        "tgi" \
+        "codetrans-tgi-service" \
         "codetrans-tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
@@ -102,7 +102,7 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions" \
         "data: " \
-        "llm" \
+        "codetrans-llm-server" \
         "codetrans-llm-server" \
         '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
 
