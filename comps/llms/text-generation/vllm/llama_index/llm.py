@@ -58,8 +58,9 @@ async def llm_generate(input: LLMParamsDoc):
 
         async def stream_generator():
             async for text in llm.astream_complete(input.query):
-                output = text.text
-                yield f"data: {output}\n\n"
+                if text.text not in ["<|im_end|>", "<|endoftext|>"]:
+                    output = text.text
+                    yield f"data: {output}\n\n"
             if logflag:
                 logger.info(f"[llm - chat_stream] stream response: {output}")
             yield "data: [DONE]\n\n"

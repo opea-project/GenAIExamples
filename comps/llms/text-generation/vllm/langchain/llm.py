@@ -124,11 +124,12 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
             async def stream_generator():
                 chat_response = ""
                 async for text in llm.astream(new_input.query, **parameters):
-                    chat_response += text
-                    chunk_repr = repr(text.encode("utf-8"))
-                    if logflag:
-                        logger.info(f"[ SearchedDoc ] chunk: {chunk_repr}")
-                    yield f"data: {chunk_repr}\n\n"
+                    if text not in ["<|im_end|>", "<|endoftext|>"]:
+                        chat_response += text
+                        chunk_repr = repr(text.encode("utf-8"))
+                        if logflag:
+                            logger.info(f"[ SearchedDoc ] chunk: {chunk_repr}")
+                        yield f"data: {chunk_repr}\n\n"
                 if logflag:
                     logger.info(f"[ SearchedDoc ] stream response: {chat_response}")
                 yield "data: [DONE]\n\n"
@@ -175,11 +176,12 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
             async def stream_generator():
                 chat_response = ""
                 async for text in llm.astream(prompt, **parameters):
-                    chat_response += text
-                    chunk_repr = repr(text.encode("utf-8"))
-                    if logflag:
-                        logger.info(f"[ LLMParamsDoc ] chunk: {chunk_repr}")
-                    yield f"data: {chunk_repr}\n\n"
+                    if text not in ["<|im_end|>", "<|endoftext|>"]:
+                        chat_response += text
+                        chunk_repr = repr(text.encode("utf-8"))
+                        if logflag:
+                            logger.info(f"[ LLMParamsDoc ] chunk: {chunk_repr}")
+                        yield f"data: {chunk_repr}\n\n"
                 if logflag:
                     logger.info(f"[ LLMParamsDoc ] stream response: {chat_response}")
                 yield "data: [DONE]\n\n"
