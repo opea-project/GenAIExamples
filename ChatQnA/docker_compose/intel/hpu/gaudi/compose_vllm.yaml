@@ -92,6 +92,7 @@ services:
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       LLM_MODEL_ID: ${LLM_MODEL_ID}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
     runtime: habana
     cap_add:
       - SYS_NICE
