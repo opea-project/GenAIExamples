@@ -201,7 +201,7 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID_CODEGEN} --max-input-length 1024 --max-total-tokens 2048
+    command: --enforce-eager --model $LLM_MODEL_ID_CODEGEN --tensor-parallel-size 1 --host 0.0.0.0 --port 80
   llm_codegen:
     image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
     container_name: llm-vllm-server-codegen
