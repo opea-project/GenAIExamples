@@ -22,7 +22,7 @@ function build_docker_images() {
     service_list="faqgen faqgen-ui llm-faqgen-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
@@ -34,6 +34,7 @@ function start_services() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export LLM_SERVICE_PORT=9000
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/faqgen"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
