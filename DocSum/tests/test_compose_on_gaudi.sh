@@ -57,23 +57,20 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
-    docker stop $(docker ps -q)
-    sleep 30s 
+    # docker run -d -p 9100:9099 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:ci
+    # docker run -d -p 7078:7078 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/v2a:ci
 
-    docker run -d -p 9100:9099 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:ci
-    docker run -d -p 7078:7078 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/v2a:ci
+    # docker run -d -p 7079:7079 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy \
+    #     -e A2T_ENDPOINT=http://$host_ip:7066 \
+    #     -e V2A_ENDPOINT=http://$host_ip:7078 \
+    #     opea/multimedia2text:ci
 
-    docker run -d -p 7079:7079 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy \
-        -e A2T_ENDPOINT=http://$host_ip:7066 \
-        -e V2A_ENDPOINT=http://$host_ip:7078 \
-        opea/multimedia2text:ci
-
-    docker run -d -p 8888:8888 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy \
-        -e no_proxy=$no_proxy \
-        -e MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP} \
-        -e DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP} \
-        -e LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP} \
-        opea/docsum:ci
+    # docker run -d -p 8888:8888 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy \
+    #     -e no_proxy=$no_proxy \
+    #     -e MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP} \
+    #     -e DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP} \
+    #     -e LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP} \
+    #     opea/docsum:ci
 
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 60s 
