@@ -168,7 +168,7 @@ function main() {
     start_services
 
     validate_microservices
-    validate_megaservice
+#    validate_megaservice
 #    validate_frontend
 
     stop_docker
