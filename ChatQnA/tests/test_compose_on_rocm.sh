@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -124,10 +124,10 @@ function validate_microservices() {
 
     # tei for embedding service
     validate_service \
-        "${ip_address}:6006/embed" \
+        "${ip_address}:8090/embed" \
         "[[" \
         "tei-embedding" \
-        "tei-embedding-server" \
+        "chatqna-tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -138,28 +138,28 @@ function validate_microservices() {
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
-        "dataprep-redis-server"
+        "chatqna-dataprep-redis-server"
 
     # test /v1/dataprep upload link
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
-        "dataprep-redis-server"
+        "chatqna-dataprep-redis-server"
 
     # test /v1/dataprep/get_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/get_file" \
         '{"name":' \
         "dataprep_get" \
-        "dataprep-redis-server"
+        "chatqna-dataprep-redis-server"
 
     # test /v1/dataprep/delete_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/delete_file" \
         '{"status":true}' \
         "dataprep_del" \
-        "dataprep-redis-server"
+        "chatqna-dataprep-redis-server"
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -167,7 +167,7 @@ function validate_microservices() {
         "${ip_address}:7000/v1/retrieval" \
         "retrieved_docs" \
         "retrieval-microservice" \
-        "retriever-redis-server" \
+        "chatqna-retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
@@ -175,7 +175,7 @@ function validate_microservices() {
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
-        "tei-reranking-server" \
+        "chatqna-tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
     # tgi for llm service
@@ -183,7 +183,7 @@ function validate_microservices() {
         "${ip_address}:9009/generate" \
         "generated_text" \
         "tgi-llm" \
-        "tgi-service" \
+        "chatqna-tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
 }
