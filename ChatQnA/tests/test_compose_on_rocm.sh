@@ -183,7 +183,7 @@ function validate_microservices() {
         "${ip_address}:9009/generate" \
         "generated_text" \
         "tgi-llm" \
-        "chatqna-tgi-service" \
+        "chatqna-tgi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
 }
@@ -194,7 +194,7 @@ function validate_megaservice() {
         "${ip_address}:8888/v1/chatqna" \
         "data: " \
         "chatqna-megaservice" \
-        "chatqna-xeon-backend-server" \
+        "chatqna-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
