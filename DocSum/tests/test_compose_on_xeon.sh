@@ -207,6 +207,7 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
+    echo ""
     echo ">>> Checking text data"
     validate_services \
         "${host_ip}:8888/v1/docsum" \
@@ -265,8 +266,7 @@ function main() {
     echo ">>>> Validating megaservice..."
     validate_megaservice
     echo ">>>> Megaservice validated successfully."
-    docker logs docsum-xeon-backend-server
-
+    
     echo "==========================================="
     echo ">>>> Stopping Docker containers..."
     stop_docker
