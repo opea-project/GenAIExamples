@@ -58,8 +58,9 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     docker stop $(docker ps -q)
+    sleep 30s 
 
-    docker run -d -p 9099:9099 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:ci
+    docker run -d -p 9100:9099 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:ci
     docker run -d -p 7078:7078 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/v2a:ci
 
     docker run -d -p 7079:7079 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy \
