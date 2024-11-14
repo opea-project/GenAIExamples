@@ -115,7 +115,7 @@ function validate_megaservice() {
         "print" \
         "codetrans-backend-server" \
         "codetrans-backend-server" \
-        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}\n"}'
 
     # test the megeservice via nginx
     validate_services \
@@ -123,7 +123,7 @@ function validate_megaservice() {
         "print" \
         "codetrans-nginx-server" \
         "codetrans-nginx-server" \
-        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}\n"}'
 
 }
 
