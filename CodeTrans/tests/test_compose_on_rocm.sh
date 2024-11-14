@@ -110,12 +110,12 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
-#    validate_services \
-#        "${ip_address}:${CODETRANS_BACKEND_SERVICE_PORT}/v1/codetrans" \
-#        "print" \
-#        "codetrans-backend-server" \
-#        "codetrans-backend-server" \
-#        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+    validate_services \
+        "${ip_address}:${CODETRANS_BACKEND_SERVICE_PORT}/v1/codetrans" \
+        "print" \
+        "codetrans-backend-server" \
+        "codetrans-backend-server" \
+        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 
     # test the megeservice via nginx
     validate_services \
@@ -168,6 +168,7 @@ function main() {
     start_services
 
     validate_microservices
+    sleep 10
     validate_megaservice
 #    validate_frontend
 
