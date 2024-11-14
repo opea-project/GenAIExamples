@@ -118,12 +118,12 @@ function validate_megaservice() {
         '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 
     # test the megeservice via nginx
-    validate_services \
-        "${ip_address}:${CODETRANS_NGINX_PORT}/v1/codetrans" \
-        "print" \
-        "codetrans-nginx-server" \
-        "codetrans-nginx-server" \
-        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+#    validate_services \
+#        "${ip_address}:${CODETRANS_NGINX_PORT}/v1/codetrans" \
+#        "print" \
+#        "codetrans-nginx-server" \
+#        "codetrans-nginx-server" \
+#        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 
 }
 
@@ -168,7 +168,7 @@ function main() {
     start_services
 
     validate_microservices
-#    validate_megaservice
+    validate_megaservice
 #    validate_frontend
 
     stop_docker
