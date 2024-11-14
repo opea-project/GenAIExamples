@@ -922,7 +922,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
+          image: "ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
@@ -994,18 +994,12 @@ spec:
           env:
             - name: LLM_SERVER_HOST_IP
               value: chatqna-tgi
-            - name: LLM_SERVER_PORT
-              value: "2080"
             - name: RERANK_SERVER_HOST_IP
               value: chatqna-teirerank
-            - name: RERANK_SERVER_PORT
-              value: "2082"
             - name: RETRIEVER_SERVICE_HOST_IP
               value: chatqna-retriever-usvc
             - name: EMBEDDING_SERVER_HOST_IP
               value: chatqna-tei
-            - name: EMBEDDING_SERVER_PORT
-              value: "2081"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

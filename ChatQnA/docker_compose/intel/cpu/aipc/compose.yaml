@@ -13,15 +13,17 @@ services:
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
+      - tei-embedding-service
     ports:
       - "6007:6007"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      REDIS_URL: ${REDIS_URL}
+      REDIS_URL: redis://redis-vector-db:6379
+      REDIS_HOST: redis-vector-db
       INDEX_NAME: ${INDEX_NAME}
-      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      TEI_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -48,9 +50,10 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      REDIS_URL: ${REDIS_URL}
+      REDIS_URL: redis://redis-vector-db:6379
+      REDIS_HOST: redis-vector-db
       INDEX_NAME: ${INDEX_NAME}
-      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   tei-reranking-service:
@@ -69,84 +72,84 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
-  llm:
-    image: ${REGISTRY:-opea}/llm-ollama
-    container_name: llm-ollama
+  ollama-service:
+    image: ollama/ollama
+    container_name: ollama
     ports:
-      - "9000:9000"
-    ipc: host
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    entrypoint: ["bash", "-c"]
+    command: ["ollama serve & sleep 10 && ollama run ${OLLAMA_MODEL} & wait"]
     environment:
       no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-      OLLAMA_ENDPOINT: ${OLLAMA_ENDPOINT}
       OLLAMA_MODEL: ${OLLAMA_MODEL}
-  chaqna-aipc-backend-server:
+
+  chatqna-aipc-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-aipc-backend-server
     depends_on:
       - redis-vector-db
+      - dataprep-redis-service
       - tei-embedding-service
       - retriever
       - tei-reranking-service
-      - llm
     ports:
       - "8888:8888"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
-      - EMBEDDING_SERVER_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
-      - EMBEDDING_SERVER_PORT=${EMBEDDING_SERVICE_PORT:-6006}
-      - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
-      - RERANK_SERVER_HOST_IP=${RERANK_SERVICE_HOST_IP}
-      - RERANK_SERVER_PORT=${RERANK_SERVICE_PORT:-8808}
-      - LLM_SERVER_HOST_IP=${LLM_SERVICE_HOST_IP}
-      - LLM_SERVER_PORT=${LLM_SERVICE_PORT:-9000}
+      - MEGA_SERVICE_HOST_IP=chatqna-aipc-backend-server
+      - EMBEDDING_SERVER_HOST_IP=tei-embedding-service
+      - EMBEDDING_SERVER_PORT=80
+      - RETRIEVER_SERVICE_HOST_IP=retriever
+      - RERANK_SERVER_HOST_IP=tei-reranking-service
+      - RERANK_SERVER_PORT=80
+      - LLM_SERVER_HOST_IP=${OLLAMA_HOST}
+      - LLM_SERVER_PORT=11434
+      - LLM_MODEL=${OLLAMA_MODEL}
       - LOGFLAG=${LOGFLAG}
     ipc: host
     restart: always
-  chaqna-aipc-ui-server:
+  chatqna-aipc-ui-server:
     image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     container_name: chatqna-aipc-ui-server
     depends_on:
-      - chaqna-aipc-backend-server
+      - chatqna-aipc-backend-server
     ports:
       - "5173:5173"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - CHAT_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
-      - UPLOAD_FILE_BASE_URL=${DATAPREP_SERVICE_ENDPOINT}
-      - GET_FILE=${DATAPREP_GET_FILE_ENDPOINT}
-      - DELETE_FILE=${DATAPREP_DELETE_FILE_ENDPOINT}
     ipc: host
     restart: always
-  chaqna-aipc-nginx-server:
+  chatqna-aipc-nginx-server:
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
-    container_name: chaqna-aipc-nginx-server
+    container_name: chatqna-aipc-nginx-server
     depends_on:
-      - chaqna-aipc-backend-server
-      - chaqna-aipc-ui-server
+      - chatqna-aipc-backend-server
+      - chatqna-aipc-ui-server
     ports:
       - "${NGINX_PORT:-80}:80"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - FRONTEND_SERVICE_IP=${FRONTEND_SERVICE_IP}
-      - FRONTEND_SERVICE_PORT=${FRONTEND_SERVICE_PORT}
-      - BACKEND_SERVICE_NAME=${BACKEND_SERVICE_NAME}
-      - BACKEND_SERVICE_IP=${BACKEND_SERVICE_IP}
-      - BACKEND_SERVICE_PORT=${BACKEND_SERVICE_PORT}
+      - FRONTEND_SERVICE_IP=chatqna-aipc-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=chatqna
+      - BACKEND_SERVICE_IP=chatqna-aipc-backend-server
+      - BACKEND_SERVICE_PORT=8888
+      - DATAPREP_SERVICE_IP=dataprep-redis-service
+      - DATAPREP_SERVICE_PORT=6007
     ipc: host
     restart: always
+
+volumes:
+  ollama:
 
 networks:
   default:

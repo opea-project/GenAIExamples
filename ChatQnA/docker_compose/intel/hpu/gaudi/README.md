@@ -17,8 +17,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
@@ -27,6 +25,8 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,guardrails
    ```
 
 3. Set up other environment variables:
@@ -70,6 +70,11 @@ curl http://${host_ip}:8888/v1/chatqna \
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+```
+
 ### 1. Build Retriever Image
 
 ```bash
@@ -98,7 +103,7 @@ docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy 
 
    ```bash
    git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA/docker
+   cd GenAIExamples/ChatQnA
    docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
    ```
 
@@ -118,7 +123,7 @@ docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy 
 
    ```bash
    git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA/docker
+   cd GenAIExamples/ChatQnA
    docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.without_rerank .
    ```
 
@@ -211,8 +216,6 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
@@ -223,6 +226,8 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,guardrails
    ```
 
 3. Set up other environment variables:
@@ -250,12 +255,6 @@ If use vllm for llm backend.
 
 ```bash
 docker compose -f compose_vllm.yaml up -d
-```
-
-If use vllm-on-ray for llm backend.
-
-```bash
-docker compose -f compose_vllm_ray.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
@@ -315,7 +314,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs tgi-service | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
@@ -344,13 +343,6 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
      "max_tokens": 32,
      "temperature": 0
      }'
-   ```
-
-   ```bash
-   #vLLM-on-Ray Service
-   curl http://${host_ip}:8006/v1/chat/completions \
-     -H "Content-Type: application/json" \
-     -d '{"model": "${LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
    ```
 
 5. MegaService
@@ -454,7 +446,7 @@ curl http://${host_ip}:9090/v1/guardrails\
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  chaqna-gaudi-ui-server:
+  chatqna-gaudi-ui-server:
     image: opea/chatqna-ui:latest
     ...
     ports:
@@ -467,10 +459,10 @@ If you want to launch the UI using Nginx, open this URL: `http://${host_ip}:${NG
 
 ## 🚀 Launch the Conversational UI (Optional)
 
-To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chatqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
 
 ```yaml
-chaqna-gaudi-conversation-ui-server:
+chatqna-gaudi-conversation-ui-server:
   image: opea/chatqna-conversation-ui:latest
   container_name: chatqna-gaudi-conversation-ui-server
   environment:
@@ -479,7 +471,7 @@ chaqna-gaudi-conversation-ui-server:
   ports:
     - "5174:80"
   depends_on:
-    - chaqna-gaudi-backend-server
+    - chatqna-gaudi-backend-server
   ipc: host
   restart: always
 ```
@@ -487,7 +479,7 @@ chaqna-gaudi-conversation-ui-server:
 Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  chaqna-gaudi-conversation-ui-server:
+  chatqna-gaudi-conversation-ui-server:
     image: opea/chatqna-conversation-ui:latest
     ...
     ports:
