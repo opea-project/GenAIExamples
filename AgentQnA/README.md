@@ -83,9 +83,9 @@ flowchart LR
 
 ## Deployment with docker
 
-1. Build agent docker image
-
-   Note: this is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
+1. Build agent docker image[Optional]
+> [!NOTE]
+> the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
 
    First, clone the opea GenAIComps repo.
 
@@ -113,6 +113,13 @@ flowchart LR
    Second, set up env vars.
 
    ```
+   # Example: host_ip="192.168.1.1" or export host_ip="External_Public_IP"
+   export host_ip=$(hostname -I | awk '{print $1}')
+   # if you are in a proxy environment, also set the proxy-related environment variables
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
    export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
    # for using open-source llms
    export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
@@ -146,7 +153,7 @@ flowchart LR
 
 5. Launch agent services</br>
    We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
-
+   ### Deploy on Gaudi
    To use open-source LLMs on Gaudi2, run commands below.
 
    ```
@@ -154,7 +161,7 @@ flowchart LR
    bash launch_tgi_gaudi.sh
    bash launch_agent_service_tgi_gaudi.sh
    ```
-
+   ### Deploy on Xeon
    To use OpenAI models, run commands below.
 
    ```
