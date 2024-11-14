@@ -2,10 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from typing import List, Union
 
 from llama_index.embeddings.text_embeddings_inference import TextEmbeddingsInference
 
 from comps import CustomLogger, EmbedDoc, ServiceType, TextDoc, opea_microservices, register_microservice
+from comps.cores.proto.api_protocol import (
+    ChatCompletionRequest,
+    EmbeddingRequest,
+    EmbeddingResponse,
+    EmbeddingResponseData,
+)
 
 logger = CustomLogger("embedding_tei_llamaindex")
 logflag = os.getenv("LOGFLAG", False)
@@ -20,14 +27,39 @@ logflag = os.getenv("LOGFLAG", False)
     input_datatype=TextDoc,
     output_datatype=EmbedDoc,
 )
-async def embedding(input: TextDoc) -> EmbedDoc:
+async def embedding(
+    input: Union[TextDoc, EmbeddingRequest, ChatCompletionRequest]
+) -> Union[EmbedDoc, EmbeddingResponse, ChatCompletionRequest]:
     if logflag:
         logger.info(input)
-    embed_vector = await embeddings.aget_query_embedding(input.text)
-    res = EmbedDoc(text=input.text, embedding=embed_vector)
+    if isinstance(input, TextDoc):
+        embed_vector = await get_embeddings(input.text)
+        embedding_res = embed_vector[0] if isinstance(input.text, str) else embed_vector
+        res = EmbedDoc(text=input.text, embedding=embedding_res)
+    else:
+        embed_vector = await get_embeddings(input.input)
+        if input.dimensions is not None:
+            embed_vector = [embed_vector[i][: input.dimensions] for i in range(len(embed_vector))]
+
+        # for standard openai embedding format
+        res = EmbeddingResponse(
+            data=[EmbeddingResponseData(index=i, embedding=embed_vector[i]) for i in range(len(embed_vector))]
+        )
+
+        if isinstance(input, ChatCompletionRequest):
+            input.embedding = res
+            # keep
+            res = input
+
     if logflag:
         logger.info(res)
     return res
+
+
+async def get_embeddings(text: Union[str, List[str]]) -> List[List[float]]:
+    texts = [text] if isinstance(text, str) else text
+    embed_vector = await embeddings._aget_text_embeddings(texts)
+    return embed_vector
 
 
 if __name__ == "__main__":

@@ -57,19 +57,22 @@ async def embedding(
         logger.info(input)
     if isinstance(input, TextDoc):
         embed_vector = await aembed_query(input.text, async_client)
-        res = EmbedDoc(text=input.text, embedding=embed_vector)
+        embedding_res = embed_vector[0] if isinstance(input.text, str) else embed_vector
+        res = EmbedDoc(text=input.text, embedding=embedding_res)
     else:
         embed_vector = await aembed_query(input.input, async_client)
         if input.dimensions is not None:
-            embed_vector = embed_vector[: input.dimensions]
+            embed_vector = [embed_vector[i][: input.dimensions] for i in range(len(embed_vector))]
+
+        # for standard openai embedding format
+        res = EmbeddingResponse(
+            data=[EmbeddingResponseData(index=i, embedding=embed_vector[i]) for i in range(len(embed_vector))]
+        )
 
         if isinstance(input, ChatCompletionRequest):
-            input.embedding = embed_vector
+            input.embedding = res
             # keep
             res = input
-        if isinstance(input, EmbeddingRequest):
-            # for standard openai embedding format
-            res = EmbeddingResponse(data=[EmbeddingResponseData(index=0, embedding=embed_vector)])
 
     statistics_dict["opea_service@embedding_tei_langchain"].append_latency(time.time() - start, None)
     if logflag:
@@ -77,8 +80,11 @@ async def embedding(
     return res
 
 
-async def aembed_query(text: str, async_client: AsyncInferenceClient, model_kwargs=None, task=None) -> List[float]:
-    response = (await aembed_documents([text], async_client, model_kwargs=model_kwargs, task=task))[0]
+async def aembed_query(
+    text: Union[str, List[str]], async_client: AsyncInferenceClient, model_kwargs=None, task=None
+) -> List[List[float]]:
+    texts = [text] if isinstance(text, str) else text
+    response = await aembed_documents(texts, async_client, model_kwargs=model_kwargs, task=task)
     return response
 
 

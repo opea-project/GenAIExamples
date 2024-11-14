@@ -38,15 +38,16 @@ function start_service() {
     docker run -d --name="test-comps-embedding-langchain-mosec-endpoint" -p $mosec_endpoint:8000  opea/embedding-langchain-mosec-endpoint:comps
     export MOSEC_EMBEDDING_ENDPOINT="http://${ip_address}:${mosec_endpoint}"
     mosec_service_port=5002
-    docker run -d --name="test-comps-embedding-langchain-mosec-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p ${mosec_service_port}:6000 --ipc=host -e MOSEC_EMBEDDING_ENDPOINT=$MOSEC_EMBEDDING_ENDPOINT  opea/embedding-langchain-mosec:comps
+    docker run -d --name="test-comps-embedding-langchain-mosec-server" -e LOGFLAG=True -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p ${mosec_service_port}:6000 --ipc=host -e MOSEC_EMBEDDING_ENDPOINT=$MOSEC_EMBEDDING_ENDPOINT  opea/embedding-langchain-mosec:comps
     sleep 3m
 }
 
-function validate_microservice() {
+function validate_service() {
+    local INPUT_DATA="$1"
     mosec_service_port=5002
     http_proxy="" curl http://${ip_address}:$mosec_service_port/v1/embeddings \
         -X POST \
-        -d '{"text":"What is Deep Learning?"}' \
+        -d "$INPUT_DATA" \
         -H 'Content-Type: application/json'
     if [ $? -eq 0 ]; then
         echo "curl command executed successfully"
@@ -56,6 +57,24 @@ function validate_microservice() {
         docker logs test-comps-embedding-langchain-mosec-server
         exit 1
     fi
+}
+
+function validate_microservice() {
+    ## query with single text
+    validate_service \
+        '{"text":"What is Deep Learning?"}'
+
+    ## query with multiple texts
+    validate_service \
+        '{"text":["What is Deep Learning?","How are you?"]}'
+
+    ## Test OpenAI API, input single text
+    validate_service \
+        '{"input":"What is Deep Learning?"}'
+
+    ## Test OpenAI API, input multiple texts with parameters
+    validate_service \
+        '{"input":["What is Deep Learning?","How are you?"], "dimensions":100}'
 }
 
 function stop_docker() {

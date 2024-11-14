@@ -17,7 +17,7 @@ class TopologyInfo:
 
 
 class TextDoc(BaseDoc, TopologyInfo):
-    text: str = None
+    text: Union[str, List[str]] = None
 
 
 class Audio2text(BaseDoc, TopologyInfo):
@@ -93,15 +93,15 @@ class DocPath(BaseDoc):
 
 
 class EmbedDoc(BaseDoc):
-    text: str
-    embedding: conlist(float, min_length=0)
+    text: Union[str, List[str]]
+    embedding: Union[conlist(float, min_length=0), List[conlist(float, min_length=0)]]
     search_type: str = "similarity"
     k: int = 4
     distance_threshold: Optional[float] = None
     fetch_k: int = 20
     lambda_mult: float = 0.5
     score_threshold: float = 0.2
-    constraints: Optional[Union[Dict[str, Any], None]] = None
+    constraints: Optional[Union[Dict[str, Any], List[Dict[str, Any]], None]] = None
 
 
 class EmbedMultimodalDoc(EmbedDoc):

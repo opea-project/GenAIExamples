@@ -2,12 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import datetime
+import os
 import time
+from typing import List, Optional, Union
 
 from dateparser.search import search_dates
 from embeddings_clip import vCLIP
 
 from comps import (
+    CustomLogger,
     EmbedDoc,
     ServiceType,
     TextDoc,
@@ -16,6 +19,15 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+from comps.cores.proto.api_protocol import (
+    ChatCompletionRequest,
+    EmbeddingRequest,
+    EmbeddingResponse,
+    EmbeddingResponseData,
+)
+
+logger = CustomLogger("embedding_multimodal")
+logflag = os.getenv("LOGFLAG", False)
 
 
 def filtler_dates(prompt):
@@ -64,19 +76,47 @@ def filtler_dates(prompt):
     output_datatype=EmbedDoc,
 )
 @register_statistics(names=["opea_service@embedding_multimodal"])
-def embedding(input: TextDoc) -> EmbedDoc:
+async def embedding(
+    input: Union[TextDoc, EmbeddingRequest, ChatCompletionRequest]
+) -> Union[EmbedDoc, EmbeddingResponse, ChatCompletionRequest]:
+    if logflag:
+        logger.info(input)
     start = time.time()
 
     if isinstance(input, TextDoc):
-        # Handle text input
-        embed_vector = embeddings.embed_query(input.text).tolist()[0]
-        res = EmbedDoc(text=input.text, embedding=embed_vector, constraints=filtler_dates(input.text))
-
+        embed_vector = await get_embeddings(input.text)
+        if isinstance(input.text, str):
+            embedding_res = embed_vector[0]
+            constraints_res = filtler_dates(input.text)
+        else:
+            embedding_res = embed_vector
+            constraints_res = [filtler_dates(input.text[i]) for i in range(len(input.text))]
+        res = EmbedDoc(text=input.text, embedding=embedding_res, constraints=constraints_res)
     else:
-        raise ValueError("Invalid input type")
+        embed_vector = await get_embeddings(input.input)
+        if input.dimensions is not None:
+            embed_vector = [embed_vector[i][: input.dimensions] for i in range(len(embed_vector))]
+
+        # for standard openai embedding format
+        res = EmbeddingResponse(
+            data=[EmbeddingResponseData(index=i, embedding=embed_vector[i]) for i in range(len(embed_vector))]
+        )
+
+        if isinstance(input, ChatCompletionRequest):
+            input.embedding = res
+            # keep
+            res = input
 
     statistics_dict["opea_service@embedding_multimodal"].append_latency(time.time() - start, None)
+    if logflag:
+        logger.info(res)
     return res
+
+
+async def get_embeddings(text: Union[str, List[str]]) -> List[List[float]]:
+    texts = [text] if isinstance(text, str) else text
+    embed_vector = embeddings.embed_query(texts).tolist()
+    return embed_vector
 
 
 if __name__ == "__main__":

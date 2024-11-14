@@ -26,17 +26,18 @@ function start_service() {
     tei_service_port=6000
     unset http_proxy
     docker run -d --name=test-comps-embedding-pg-server \
-    -e http_proxy= -e https_proxy= \
+    -e LOGFLAG=True -e http_proxy= -e https_proxy= \
     -e PREDICTIONGUARD_API_KEY=${PREDICTIONGUARD_API_KEY} \
     -p 6000:6000 --ipc=host opea/embedding-pg:comps
     sleep 60  # Sleep for 1 minute to allow the service to start
 }
 
-function validate_microservice() {
+function validate_service() {
+    local INPUT_DATA="$1"
     tei_service_port=6000
     result=$(http_proxy="" curl http://${ip_address}:${tei_service_port}/v1/embeddings \
         -X POST \
-        -d '{"text":"What is Deep Learning?"}' \
+        -d "$INPUT_DATA" \
         -H 'Content-Type: application/json')
 
     # Check for a proper response format
@@ -51,6 +52,24 @@ function validate_microservice() {
         docker logs test-comps-embedding-pg-server
         exit 1
     fi
+}
+
+function validate_microservice() {
+    ## query with single text
+    validate_service \
+        '{"text":"What is Deep Learning?"}'
+
+    ## query with multiple texts
+    validate_service \
+        '{"text":["What is Deep Learning?","How are you?"]}'
+
+    ## Test OpenAI API, input single text
+    validate_service \
+        '{"input":"What is Deep Learning?"}'
+
+    ## Test OpenAI API, input multiple texts with parameters
+    validate_service \
+        '{"input":["What is Deep Learning?","How are you?"], "dimensions":100}'
 }
 
 function stop_docker() {
