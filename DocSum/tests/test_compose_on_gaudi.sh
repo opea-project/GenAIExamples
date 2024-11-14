@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-# set -e
+set -e
 
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
@@ -58,7 +58,7 @@ function start_services() {
 
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 3m
-    
+
     echo "***************** docker compose ps ***********************"
     docker compose ps
     echo "***************** docker ps         ***********************"
@@ -146,7 +146,7 @@ function validate_microservices() {
 
     # Audio2Text service
     validate_services \
-        "${host_ip}:9099/v1/audio/transcriptions" \
+        "${host_ip}:9199/v1/audio/transcriptions" \
         '"query":"well"' \
         "a2t" \
         "a2t-service" \
