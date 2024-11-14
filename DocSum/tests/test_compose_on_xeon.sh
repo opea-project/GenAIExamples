@@ -155,7 +155,7 @@ function validate_microservices() {
         "a2t-service" \
         "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
 
-    # Video2Audio service 
+    # Video2Audio service
     validate_services \
         "${host_ip}:7078/v1/video2audio" \
         "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd9L18KaAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
@@ -266,7 +266,7 @@ function main() {
     echo ">>>> Validating megaservice..."
     validate_megaservice
     echo ">>>> Megaservice validated successfully."
-    
+
     echo "==========================================="
     echo ">>>> Stopping Docker containers..."
     stop_docker
