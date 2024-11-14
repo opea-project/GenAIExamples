@@ -98,3 +98,21 @@ services:
       dockerfile: comps/llms/summarization/tgi/langchain/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+  llm-vllm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/text-generation/vllm/langchain/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
+  llm-faqgen-vllm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/faq-generation/vllm/langchain/Dockerfile
+    extends: faqgen
+    image: ${REGISTRY:-opea}/llm-faqgen-vllm:${TAG:-latest}
+  llm-docsum-vllm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/summarization/vllm/langchain/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/llm-docsum-vllm:${TAG:-latest}

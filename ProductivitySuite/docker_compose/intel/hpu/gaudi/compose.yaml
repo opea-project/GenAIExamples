@@ -116,9 +116,9 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
-  vllm_service:
-    image: opea/vllm:hpu
-    container_name: vllm-gaudi-server
+  vllm-service:
+    image: opea/vllm-hpu:latest
+    container_name: vllm-service
     ports:
       - "9009:80"
     volumes:
@@ -140,7 +140,7 @@ services:
     image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
     container_name: llm-vllm-gaudi-server
     depends_on:
-      - vllm_service
+      - vllm-service
     ports:
       - "9000:9000"
     ipc: host
@@ -163,7 +163,7 @@ services:
       - retriever
       - tei-reranking-service
       - reranking
-      - vllm_service
+      - vllm-service
       - llm
     ports:
       - "8888:8888"
@@ -179,7 +179,7 @@ services:
     ipc: host
     restart: always
   vllm_service_codegen:
-    image: opea/vllm:hpu
+    image: opea/vllm-hpu:latest
     container_name: vllm_service_codegen
     ports:
       - "8028:80"
@@ -238,7 +238,7 @@ services:
     image: ${REGISTRY:-opea}/llm-faqgen-vllm:${TAG:-latest}
     container_name: llm-faqgen-server
     depends_on:
-      - vllm_service
+      - vllm-service
     ports:
       - "9002:9000"
     ipc: host
@@ -254,7 +254,7 @@ services:
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
     container_name: faqgen-gaudi-backend-server
     depends_on:
-      - vllm_service
+      - vllm-service
       - llm_faqgen
     ports:
       - "8889:8888"
@@ -271,7 +271,7 @@ services:
     image: ${REGISTRY:-opea}/llm-docsum-vllm:${TAG:-latest}
     container_name: llm-docsum-server
     depends_on:
-      - vllm_service
+      - vllm-service
     ports:
       - "9003:9000"
     ipc: host
@@ -287,7 +287,7 @@ services:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-gaudi-backend-server
     depends_on:
-      - vllm_service
+      - vllm-service
       - llm_docsum_server
     ports:
       - "8890:8888"
