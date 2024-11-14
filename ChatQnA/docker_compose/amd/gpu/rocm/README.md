@@ -1,4 +1,8 @@
-# Build MegaService of ChatQnA on AMD ROCm GPU
+###### Copyright (C) 2024 Advanced Micro Devices, Inc.
+
+# Build and deploy CodeGen Application on AMD GPU (ROCm)
+
+## Build MegaService of ChatQnA on AMD ROCm GPU
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD ROCm GPU platform. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as embedding, retriever, rerank, and llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
