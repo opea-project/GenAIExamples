@@ -1048,13 +1048,13 @@ class GraphragGateway(Gateway):
             if isinstance(response, StreamingResponse):
                 return response
         last_node = runtime_graph.all_leaves()[-1]
-        response = result_dict[last_node]["text"]
+        response_content = result_dict[last_node]["choices"][0]["message"]["content"]
         choices = []
         usage = UsageInfo()
         choices.append(
             ChatCompletionResponseChoice(
                 index=0,
-                message=ChatMessage(role="assistant", content=response),
+                message=ChatMessage(role="assistant", content=response_content),
                 finish_reason="stop",
             )
         )

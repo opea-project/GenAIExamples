@@ -48,7 +48,7 @@ function start_service() {
     docker run -d --name="test-comps-dataprep-neo4j-server" -p 6004:6004 -v ./data:/data --ipc=host -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT \
         -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e EMBEDDING_MODEL_ID=$emb_model -e LLM_MODEL_ID=$model -e host_ip=$ip_address -e no_proxy=$no_proxy \
         -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e NEO4J_URI="bolt://${ip_address}:7687" -e NEO4J_USERNAME="neo4j" \
-        -e NEO4J_PASSWORD="neo4jtest" -e LOGFLAG=True opea/dataprep-neo4j-llamaindex:comps
+        -e NEO4J_PASSWORD="neo4jtest" -e HF_TOKEN=$HF_TOKEN -e LOGFLAG=True opea/dataprep-neo4j-llamaindex:comps
     sleep 30s
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6004"
 
@@ -122,16 +122,6 @@ function validate_microservice() {
         "test-comps-dataprep-neo4j-server"
 
 }
-function kill_process_on_port() {
-    local port=$1
-    local pid=$(lsof -t -i:$port)
-    if [[ ! -z "$pid" ]]; then
-        echo "Killing process $pid on port $port"
-        kill -9 $pid
-    else
-        echo "No process found on port $port"
-    fi
-}
 
 function stop_docker() {
     cid_retrievers=$(docker ps -aq --filter "name=test-comps-dataprep-neo4j*")
@@ -145,7 +135,6 @@ function stop_docker() {
 }
 
 function main() {
-    kill_process_on_port 6006
 
     stop_docker
 

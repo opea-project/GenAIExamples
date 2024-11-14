@@ -40,6 +40,7 @@ from llama_index.llms.openai import OpenAI
 from llama_index.llms.text_generation_inference import TextGenerationInference
 from neo4j import GraphDatabase
 from openai import Client
+from transformers import AutoTokenizer
 
 from comps import CustomLogger, DocPath, opea_microservices, register_microservice
 from comps.dataprep.utils import (
@@ -67,14 +68,24 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
     # https://github.com/run-llama/llama_index/blob/main/docs/docs/examples/cookbooks/GraphRAG_v2.ipynb
     community_summary = {}
     entity_info = None
-    max_cluster_size = 5
+    max_cluster_size = 100
 
     def __init__(self, username: str, password: str, url: str, llm: LLM):
         super().__init__(username=username, password=password, url=url)
         self.llm = llm
+        self.driver = GraphDatabase.driver(NEO4J_URL, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
 
     def generate_community_summary(self, text):
         """Generate summary for a given text using an LLM."""
+        # Get model information from the TGI endpoint
+        model_name = get_attribute_from_tgi_endpoint(TGI_LLM_ENDPOINT, "model_id")
+        max_input_length = get_attribute_from_tgi_endpoint(TGI_LLM_ENDPOINT, "max_input_length")
+        if not model_name or not max_input_length:
+            raise ValueError(f"Could not retrieve model information from TGI endpoint: {TGI_LLM_ENDPOINT}")
+
+        # Get the tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+
         messages = [
             ChatMessage(
                 role="system",
@@ -89,10 +100,14 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
             ),
             ChatMessage(role="user", content=text),
         ]
+        # Trim the messages to fit within the token limit
+        # Microsoft does more sophisticated content optimization
+        trimmed_messages = trim_messages_to_token_limit(tokenizer, messages, max_input_length)
+
         if OPENAI_API_KEY:
             response = OpenAI().chat(messages)
         else:
-            response = self.llm.chat(messages)
+            response = self.llm.chat(trimmed_messages)
 
         clean_response = re.sub(r"^assistant:\s*", "", str(response)).strip()
         return clean_response
@@ -101,13 +116,21 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
         """Builds communities from the graph and summarizes them."""
         nx_graph = self._create_nx_graph()
         community_hierarchical_clusters = hierarchical_leiden(nx_graph, max_cluster_size=self.max_cluster_size)
+        logger.info(f"Number of clustered entities: {len(community_hierarchical_clusters)}")
+        logger.info(f"Community hierarchical clusters: {community_hierarchical_clusters}")
+        n_clusters = set([hc.cluster for hc in community_hierarchical_clusters])
+        logger.info(f"number of communities/clusters: {len(n_clusters)}")
         self.entity_info, community_info = self._collect_community_info(nx_graph, community_hierarchical_clusters)
+        # self._print_cluster_info(self.entity_info, community_info)
+        self.save_entity_info(self.entity_info)
+        # entity_from_db = self.read_entity_info()  # to verify if the data is stored in db
         self._summarize_communities(community_info)
+        # sum = self.read_all_community_summaries()  # to verify summaries are stored in db
 
     def _create_nx_graph(self):
         """Converts internal graph representation to NetworkX graph."""
         nx_graph = nx.Graph()
-        triplets = self.get_triplets()
+        triplets = self.get_triplets()  # [src, rel, tgt]
         for entity1, relation, entity2 in triplets:
             nx_graph.add_node(entity1.name)
             nx_graph.add_node(entity2.name)
@@ -143,52 +166,115 @@ class GraphRAGStore(Neo4jPropertyGraphStore):
 
         return dict(entity_info), dict(community_info)
 
+    def _print_cluster_info(self, entity_info, community_info):
+        """Print detailed information about each community cluster.
+
+        Args:
+            entity_info (dict): Dictionary where keys are nodes and values are lists of cluster IDs the node belongs to.
+            community_info (dict): Dictionary where keys are cluster IDs and values are lists of relationship details within the cluster.
+        """
+        print("Community Cluster Information:\n")
+
+        for cluster_id, details in community_info.items():
+            print(f"Cluster ID: {cluster_id}")
+            print("Nodes in this cluster:")
+
+            # Find nodes that belong to this cluster
+            nodes_in_cluster = [node for node, clusters in entity_info.items() if cluster_id in clusters]
+            for node in nodes_in_cluster:
+                print(f"  - Node: {node}")
+
+            print("Relationships in this cluster:")
+            for detail in details:
+                print(f"  - {detail}")
+
+            print("\n" + "-" * 40 + "\n")
+
+    def save_entity_info(self, entity_info: dict) -> None:
+        with self.driver.session() as session:
+            for entity_id, cluster_ids in entity_info.items():
+                entity_node = EntityNode(id=entity_id, name=str(entity_id))
+                for cluster_id in cluster_ids:
+                    cluster_node = EntityNode(id=int(cluster_id), name=str(cluster_id))
+                    relation_metadata = {"relationship_description": "BELONGS_TO"}
+                    rel_node = Relation(
+                        label="BELONGS_TO",
+                        source_id=entity_node.id,
+                        target_id=cluster_node.id,
+                        properties=relation_metadata,
+                    )
+
+                    session.run(
+                        """
+                        MERGE (e:Entity {id: $entity_id, name: $entity_name})
+                        MERGE (c:Cluster {id: $cluster_id, name: $cluster_name})
+                        MERGE (e)-[r:BELONGS_TO]->(c)
+                        ON CREATE SET r.relationship_description = $relationship_description
+                        """,
+                        entity_id=entity_node.id,
+                        entity_name=entity_node.name,
+                        cluster_id=cluster_node.id,
+                        cluster_name=cluster_node.name,
+                        relationship_description=relation_metadata["relationship_description"],
+                    )
+
+    def read_entity_info(self) -> dict:
+        entity_info = {}
+        with self.driver.session() as session:
+            result = session.run(
+                """
+                MATCH (e:Entity)-[:BELONGS_TO]->(c:Cluster)
+                RETURN e.id AS entity_id, collect(DISTINCT c.id) AS cluster_ids
+                """
+            )
+            for record in result:
+                # entity_info[record['entity_id']] = record['cluster_ids']
+                entity_info[record["entity_id"]] = [int(cluster_id) for cluster_id in record["cluster_ids"]]
+        return entity_info
+
     def _summarize_communities(self, community_info):
         """Generate and store summaries for each community."""
         for community_id, details in community_info.items():
+            logger.info(f"Summarizing community {community_id}")
             details_text = "\n".join(details) + "."  # Ensure it ends with a period
             self.community_summary[community_id] = self.generate_community_summary(details_text)
 
             # To store summaries in neo4j
-            # summary = self.generate_community_summary(details_text)
+            summary = self.generate_community_summary(details_text)
+            self.store_community_summary_in_neo4j(community_id, summary)
             # self.community_summary[
             #     community_id
             # ] = self.store_community_summary_in_neo4j(community_id, summary)
 
     def store_community_summary_in_neo4j(self, community_id, summary):
         """Store the community summary in Neo4j."""
-        with driver.session() as session:
+        with self.driver.session() as session:
             session.run(
                 """
-                MERGE (c:Community {id: $community_id})
+                MERGE (c:Cluster {id: $community_id})
                 SET c.summary = $summary
             """,
-                community_id=community_id,
+                community_id=int(community_id),
                 summary=summary,
             )
 
-    def get_community_summaries(self):
-        """Returns the community summaries, building them if not already done."""
-        if not self.community_summary:
-            self.build_communities()
-        return self.community_summary
-
-    def query_community_summaries(self):
-        """Query and print community summaries from Neo4j."""
-        with driver.session() as session:
+    def read_all_community_summaries(self) -> dict:
+        """Read all community summaries from Neo4j."""
+        community_summaries = {}
+        with self.driver.session() as session:
             result = session.run(
                 """
-                MATCH (c:Community)
+                MATCH (c:Cluster)
                 RETURN c.id AS community_id, c.summary AS summary
-            """
+                """
             )
             for record in result:
-                print(f"Community ID: {record['community_id']}")
-                print(f"Community Summary: {record['summary']}")
+                community_summaries[int(record["community_id"])] = record["summary"]
+        return community_summaries
 
     def query_schema(self):
         """Query and print the schema information from Neo4j."""
-        with driver.session() as session:
+        with self.driver.session() as session:
             result = session.run("CALL apoc.meta.schema()")
             schema = result.single()["value"]
 
@@ -233,8 +319,8 @@ class GraphRAGExtractor(TransformComponent):
         llm: Optional[LLM] = None,
         extract_prompt: Optional[Union[str, PromptTemplate]] = None,
         parse_fn: Callable = default_parse_triplets_fn,
-        max_paths_per_chunk: int = 10,
-        num_workers: int = 4,
+        max_paths_per_chunk: int = 4,
+        num_workers: int = 10,
     ) -> None:
         """Init params."""
         from llama_index.core import Settings
@@ -297,6 +383,8 @@ class GraphRAGExtractor(TransformComponent):
 
         node.metadata[KG_NODES_KEY] = existing_nodes
         node.metadata[KG_RELATIONS_KEY] = existing_relations
+        logger.info(f"number of extracted nodes {len(existing_nodes), existing_nodes}")
+        logger.info(f"number of extracted relations {len(existing_relations), existing_relations}")
         return node
 
     async def acall(self, nodes: List[BaseNode], show_progress: bool = False, **kwargs: Any) -> List[BaseNode]:
@@ -348,29 +436,6 @@ entity_pattern = r'\("entity"\$\$\$\$(.+?)\$\$\$\$(.+?)\$\$\$\$(.+?)\)'
 relationship_pattern = r'\("relationship"\$\$\$\$(.+?)\$\$\$\$(.+?)\$\$\$\$(.+?)\$\$\$\$(.+?)\)'
 
 
-def inspect_db():
-    try:
-        with driver.session() as session:
-            # Check for property keys
-            result = session.run("CALL db.propertyKeys()")
-            property_keys = [record["propertyKey"] for record in result]
-            print("Property Keys:", property_keys)
-
-            # Check for node labels
-            result = session.run("CALL db.labels()")
-            labels = [record["label"] for record in result]
-            print("Node Labels:", labels)
-
-            # Check for relationship types
-            result = session.run("CALL db.relationshipTypes()")
-            relationship_types = [record["relationshipType"] for record in result]
-            print("Relationship Types:", relationship_types)
-    except Exception as e:
-        print(f"Error: {e}")
-    finally:
-        driver.close()
-
-
 def parse_fn(response_str: str) -> Any:
     entities = re.findall(entity_pattern, response_str)
     relationships = re.findall(relationship_pattern, response_str)
@@ -379,17 +444,18 @@ def parse_fn(response_str: str) -> Any:
     return entities, relationships
 
 
-def get_model_name_from_tgi_endpoint(url):
+def get_attribute_from_tgi_endpoint(url, attribute_name):
+    """Get a specific attribute from the TGI endpoint."""
     try:
         response = requests.get(f"{url}/info")
         response.raise_for_status()  # Ensure we notice bad responses
         try:
             model_info = response.json()
-            model_name = model_info.get("model_id")
-            if model_name:
-                return model_name
+            attribute_value = model_info.get(attribute_name)
+            if attribute_value is not None:
+                return attribute_value
             else:
-                logger.error(f"model_id not found in the response from {url}")
+                logger.error(f"{attribute_name} not found in the response from {url}")
                 return None
         except ValueError:
             logger.error(f"Invalid JSON response from {url}")
@@ -399,11 +465,32 @@ def get_model_name_from_tgi_endpoint(url):
         return None
 
 
+def trim_messages_to_token_limit(tokenizer, messages, max_tokens):
+    """Trim the messages to fit within the token limit."""
+    total_tokens = 0
+    trimmed_messages = []
+
+    for message in messages:
+        tokens = tokenizer.tokenize(message.content)
+        total_tokens += len(tokens)
+        if total_tokens > max_tokens:
+            # Trim the message to fit within the remaining token limit
+            logger.info(f"Trimming messages: {total_tokens} > {max_tokens}")
+            remaining_tokens = max_tokens - (total_tokens - len(tokens))
+            tokens = tokens[:remaining_tokens]
+            message.content = tokenizer.convert_tokens_to_string(tokens)
+            trimmed_messages.append(message)
+            break
+        else:
+            trimmed_messages.append(message)
+
+    return trimmed_messages
+
+
 logger = CustomLogger("prepare_doc_neo4j")
 logflag = os.getenv("LOGFLAG", False)
 
 upload_folder = "./uploaded_files/"
-driver = GraphDatabase.driver(NEO4J_URL, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
 client = OpenAI()
 
 
@@ -465,18 +552,19 @@ def ingest_data_to_neo4j(doc_path: DocPath):
             logger.info(f"An error occurred while verifying the API Key: {e}")
     else:
         logger.info("NO OpenAI API Key. TGI/TEI endpoints will be used.")
-        llm_name = get_model_name_from_tgi_endpoint(TGI_LLM_ENDPOINT)
+        llm_name = get_attribute_from_tgi_endpoint(TGI_LLM_ENDPOINT, "model_id")
         llm = TextGenerationInference(
             model_url=TGI_LLM_ENDPOINT,
             model_name=llm_name,
             temperature=0.7,
-            max_tokens=1512,  # 512otherwise too shor
+            max_tokens=1512,
+            timeout=600,  # timeout in seconds
         )
-        emb_name = get_model_name_from_tgi_endpoint(TEI_EMBEDDING_ENDPOINT)
+        emb_name = get_attribute_from_tgi_endpoint(TEI_EMBEDDING_ENDPOINT, "model_id")
         embed_model = TextEmbeddingsInference(
             base_url=TEI_EMBEDDING_ENDPOINT,
             model_name=emb_name,
-            timeout=60,  # timeout in seconds
+            timeout=600,  # timeout in seconds
             embed_batch_size=10,  # batch size for embedding
         )
     Settings.embed_model = embed_model
@@ -498,16 +586,23 @@ def ingest_data_to_neo4j(doc_path: DocPath):
         embed_model=embed_model or Settings.embed_model,
         show_progress=True,
     )
-    inspect_db()
-    if logflag:
-        logger.info(f"Total number of triplets {len(index.property_graph_store.get_triplets())}")
-
-    # index.property_graph_store.build_communities()
-    # print("done building communities")
-
     if logflag:
         logger.info("The graph is built.")
+        logger.info(f"Total number of triplets {len(index.property_graph_store.get_triplets())}")
 
+    if logflag:
+        logger.info("Done building communities.")
+
+    return index
+
+
+def build_communities(index: PropertyGraphIndex):
+    try:
+        index.property_graph_store.build_communities()
+        if logflag:
+            logger.info("Done building communities.")
+    except Exception as e:
+        logger.error(f"Error building communities: {e}")
     return True
 
 
@@ -539,7 +634,7 @@ async def ingest_documents(
             encode_file = encode_filename(file.filename)
             save_path = upload_folder + encode_file
             await save_content_to_local_disk(save_path, file)
-            ingest_data_to_neo4j(
+            index = ingest_data_to_neo4j(
                 DocPath(
                     path=save_path,
                     chunk_size=chunk_size,
@@ -551,10 +646,6 @@ async def ingest_documents(
             uploaded_files.append(save_path)
             if logflag:
                 logger.info(f"Successfully saved file {save_path}")
-        result = {"status": 200, "message": "Data preparation succeeded"}
-        if logflag:
-            logger.info(result)
-        return result
 
     if link_list:
         link_list = json.loads(link_list)  # Parse JSON string to list
@@ -566,7 +657,7 @@ async def ingest_documents(
             content = parse_html([link])[0][0]
             try:
                 await save_content_to_local_disk(save_path, content)
-                ingest_data_to_neo4j(
+                index = ingest_data_to_neo4j(
                     DocPath(
                         path=save_path,
                         chunk_size=chunk_size,
@@ -576,17 +667,19 @@ async def ingest_documents(
                     )
                 )
             except json.JSONDecodeError:
-                raise HTTPException(status_code=500, detail="Fail to ingest data into qdrant.")
+                raise HTTPException(status_code=500, detail="Fail to ingest data")
 
             if logflag:
                 logger.info(f"Successfully saved link {link}")
 
+    if files or link_list:
+        build_communities(index)
         result = {"status": 200, "message": "Data preparation succeeded"}
         if logflag:
             logger.info(result)
         return result
-
-    raise HTTPException(status_code=400, detail="Must provide either a file or a string list.")
+    else:
+        raise HTTPException(status_code=400, detail="Must provide either a file or a string list.")
 
 
 if __name__ == "__main__":

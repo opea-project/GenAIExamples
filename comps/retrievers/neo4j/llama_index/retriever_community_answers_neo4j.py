@@ -26,6 +26,7 @@ from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.embeddings.text_embeddings_inference import TextEmbeddingsInference
 from llama_index.llms.openai import OpenAI
 from llama_index.llms.text_generation_inference import TextGenerationInference
+from neo4j import GraphDatabase
 from pydantic import BaseModel, PrivateAttr
 
 from comps import (
@@ -45,7 +46,7 @@ from comps.cores.proto.api_protocol import (
     RetrievalResponse,
     RetrievalResponseData,
 )
-from comps.dataprep.neo4j.llama_index.extract_graph_neo4j import GraphRAGStore, get_model_name_from_tgi_endpoint
+from comps.dataprep.neo4j.llama_index.extract_graph_neo4j import GraphRAGStore, get_attribute_from_tgi_endpoint
 
 logger = CustomLogger("retriever_neo4j")
 logflag = os.getenv("LOGFLAG", False)
@@ -70,15 +71,16 @@ class GraphRAGQueryEngine(CustomQueryEngine):
         """Process all community summaries to generate answers to a specific query."""
 
         entities = self.get_entities(query_str, self._similarity_top_k)
-
-        community_ids = self.retrieve_entity_communities(self._graph_store.entity_info, entities)
-        community_summaries = self._graph_store.get_community_summaries()
+        entity_info = self._graph_store.read_entity_info()
+        community_ids = self.retrieve_entity_communities(entity_info, entities)
+        community_summaries = self.retrieve_community_summaries_cypher(entities)
+        community_ids = list(community_summaries.keys())
         if logflag:
             logger.info(f"Community ids: {community_ids}")
+        # community_summaries of relevant communities
         community_answers = [
             self.generate_answer_from_summary(community_summary, query_str)
             for id, community_summary in community_summaries.items()
-            if id in community_ids
         ]
         # Convert answers to RetrievalResponseData objects
         response_data = [RetrievalResponseData(text=answer, metadata={}) for answer in community_answers]
@@ -94,14 +96,16 @@ class GraphRAGQueryEngine(CustomQueryEngine):
             similarity_top_k=self._similarity_top_k,
             # similarity_score=0.6
         )
-        nodes_retrieved = self._index.as_retriever(
-            sub_retrievers=[vecContext_retriever], similarity_top_k=self._similarity_top_k
-        ).retrieve(query_str)
+        # nodes_retrieved = self._index.as_retriever(
+        #    sub_retrievers=[vecContext_retriever], similarity_top_k=self._similarity_top_k
+        # ).retrieve(query_str)
         # if subretriever not specified it will use LLMSynonymRetriever with Settings.llm model
-        # nodes_retrieved = self._index.as_retriever(similarity_top_k=self._similarity_top_k).retrieve(query_str)
+        nodes_retrieved = self._index.as_retriever(similarity_top_k=self._similarity_top_k).retrieve(query_str)
         entities = set()
         pattern = r"(\w+(?:\s+\w+)*)\s*->\s*(\w+(?:\s+\w+)*)\s*->\s*(\w+(?:\s+\w+)*)"
-
+        if logflag:
+            logger.info(f" len of triplets {len(self._index.property_graph_store.get_triplets())}")
+            logger.info(f"number of nodes retrieved {len(nodes_retrieved), nodes_retrieved}")
         for node in nodes_retrieved:
             matches = re.findall(pattern, node.text, re.DOTALL)
 
@@ -131,6 +135,32 @@ class GraphRAGQueryEngine(CustomQueryEngine):
                 community_ids.extend(entity_info[entity])
 
         return list(set(community_ids))
+
+    def retrieve_community_summaries_cypher(self, entities):
+        """Retrieve cluster information and summaries for given entities using a Cypher query.
+
+        Args:
+        entities (list): List of entity names to retrieve information for.
+
+        Returns:
+        dict: Dictionary where keys are community or cluster IDs and values are summaries.
+        """
+        community_summaries = {}
+        print(f"driver working? {self._graph_store.driver})")
+
+        with self._graph_store.driver.session() as session:
+            for entity in entities:
+                result = session.run(
+                    """
+                    MATCH (e:Entity {id: $entity_id})-[:BELONGS_TO]->(c:Cluster)
+                    RETURN c.id AS cluster_id, c.summary AS summary
+                    """,
+                    entity_id=entity,
+                )
+                for record in result:
+                    community_summaries[record["cluster_id"]] = record["summary"]
+
+        return community_summaries
 
     def generate_answer_from_summary(self, community_summary, query):
         """Generate an answer from a community summary based on a given query using LLM."""
@@ -162,7 +192,11 @@ async def retrieve(input: Union[ChatCompletionRequest]) -> Union[ChatCompletionR
     if logflag:
         logger.info(input)
     start = time.time()
-    query = input.messages[0]["content"]
+
+    if isinstance(input.messages, str):
+        query = input.messages
+    else:
+        query = input.messages[0]["content"]
     logger.info(f"Query received in retriever: {query}")
 
     if OPENAI_API_KEY:
@@ -178,14 +212,14 @@ async def retrieve(input: Union[ChatCompletionRequest]) -> Union[ChatCompletionR
             logger.info(f"An error occurred while verifying the API Key: {e}")
     else:
         logger.info("No OpenAI API KEY provided. Will use TGI and TEI endpoints")
-        llm_name = get_model_name_from_tgi_endpoint(TGI_LLM_ENDPOINT)
+        llm_name = get_attribute_from_tgi_endpoint(TGI_LLM_ENDPOINT, "model_id")
         llm = TextGenerationInference(
             model_url=TGI_LLM_ENDPOINT,
             model_name=llm_name,
             temperature=0.7,
             max_tokens=1512,  # 512otherwise too shor
         )
-        emb_name = get_model_name_from_tgi_endpoint(TEI_EMBEDDING_ENDPOINT)
+        emb_name = get_attribute_from_tgi_endpoint(TEI_EMBEDDING_ENDPOINT, "model_id")
         embed_model = TextEmbeddingsInference(
             base_url=TEI_EMBEDDING_ENDPOINT,
             model_name=emb_name,
@@ -202,7 +236,7 @@ async def retrieve(input: Union[ChatCompletionRequest]) -> Union[ChatCompletionR
         embed_model=embed_model or Settings.embed_model,
         embed_kg_nodes=True,
     )
-    index.property_graph_store.build_communities()
+
     query_engine = GraphRAGQueryEngine(
         graph_store=index.property_graph_store,
         llm=llm,
