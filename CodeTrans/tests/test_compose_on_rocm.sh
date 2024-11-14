@@ -168,7 +168,6 @@ function main() {
     start_services
 
     validate_microservices
-    sleep 10
     validate_megaservice
     validate_frontend
 
