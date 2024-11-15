@@ -59,13 +59,6 @@ function start_services() {
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 3m
 
-    echo "***************** docker compose ps ***********************"
-    docker compose ps
-    echo "***************** docker ps         ***********************"
-    docker ps
-    echo "***********************************************************"
-
-    n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
@@ -203,8 +196,37 @@ function validate_microservices() {
 }
 
 function validate_megaservice() {
+    local SERVICE_NAME="docsum-gaudi-backend-server"
+    local DOCKER_NAME="docsum-gaudi-backend-server"
+    local EXPECTED_RESULT="[DONE]"
+    local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+    local URL="${host_ip}:8888/v1/docsum"
+
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
+    
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
+}
+
+function validate_megaservice_json() {
     # Curl the Mega Service
-    echo ">>> Checking text data"
+    echo ">>> Checking text data with Content-Type: application/json"
     validate_services \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
@@ -261,6 +283,8 @@ function main() {
     echo "==========================================="
     echo ">>>> Validating megaservice..."
     validate_megaservice
+    echo ">>>> Validating validate_megaservice_json..."
+    validate_megaservice_json
     echo ">>>> Megaservice validated successfully."
 
     echo "==========================================="

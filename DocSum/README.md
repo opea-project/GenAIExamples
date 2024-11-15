@@ -156,15 +156,66 @@ Two ways of consuming Document Summarization Service:
    curl -X POST http://${host_ip}:8888/v1/docsum \
         -H "Content-Type: application/json" \
         -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+   
+   #Use English mode (default).
+   curl http://${host_ip}:8888/v1/docsum \
+       -H "Content-Type: multipart/form-data" \
+       -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+       -F "max_tokens=32" \
+       -F "language=en" \
+       -F "stream=true"
+
+   #Use Chinese mode.
+   curl http://${host_ip}:8888/v1/docsum \
+       -H "Content-Type: multipart/form-data" \
+       -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
+       -F "max_tokens=32" \
+       -F "language=zh" \
+       -F "stream=true"
+
+   # upload file 
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=text" \
+      -F "messages=" \
+      -F "files=@/path to your file (.txt, .docx, .pdf)" \
+      -F "max_tokens=32" \
+      -F "language=en" \
+      -F "stream=true"
+
    ```
+   > Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI.
 
-   audio:
-
+   Audio:
    ```bash
    curl -X POST http://${host_ip}:8888/v1/docsum \
-   -H "Content-Type: application/json" \
-   -d '{"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
+      -H "Content-Type: application/json" \
+      -d '{"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
+
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=audio" \
+      -F "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
+      -F "max_tokens=32" \
+      -F "language=en" \
+      -F "stream=true"
    ```
+
+   Video:
+   ```bash
+   curl -X POST http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: application/json" \
+      -d '{"type": "video", "messages": "convert your video to base64 data type"}'
+
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=audio" \
+      -F "messages=convert your video to base64 data type" \
+      -F "max_tokens=32" \
+      -F "language=en" \
+      -F "stream=true"
+   ```
+
 
 2. Access via frontend
 

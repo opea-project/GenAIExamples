@@ -42,7 +42,8 @@ ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    # git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone -b docsum_gt_merge https://github.com/MSCetin37/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="docsum docsum-ui whisper multimedia2text a2t v2a llm-docsum-tgi"
@@ -75,16 +76,16 @@ function validate_services() {
     local SERVICE_NAME="$3"
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
-
+    
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-
+    
     echo "==========================================="
 
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
         local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
+        
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
@@ -200,30 +201,60 @@ function validate_microservices() {
 }
 
 function validate_megaservice() {
+    local SERVICE_NAME="docsum-xeon-backend-server"
+    local DOCKER_NAME="docsum-xeon-backend-server"
+    local EXPECTED_RESULT="[DONE]"
+    local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+    local URL="${host_ip}:8888/v1/docsum"
+
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
+    
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
+}
+
+
+function validate_megaservice_json() {
     # Curl the Mega Service
     echo ""
-    echo ">>> Checking text data"
+    echo ">>> Checking text data with Content-Type: application/json"
     validate_services \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     echo ">>> Checking audio data"
     validate_services \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "{\"type\": \"audio\",  \"messages\": \"$(input_data_for_test "audio")\"}"
 
     echo ">>> Checking video data"
     validate_services \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\"}"
 
 }
@@ -259,6 +290,8 @@ function main() {
     echo "==========================================="
     echo ">>>> Validating megaservice..."
     validate_megaservice
+    echo ">>>> Validating validate_megaservice_json..."
+    validate_megaservice_json
     echo ">>>> Megaservice validated successfully."
 
     echo "==========================================="

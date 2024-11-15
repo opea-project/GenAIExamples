@@ -185,12 +185,53 @@ You will have the following Docker Images:
         -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
    ```
 
+   ```bash
+   curl http://${host_ip}:8888/v1/docsum \
+       -H "Content-Type: multipart/form-data" \
+       -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+       -F "max_tokens=32" \
+       -F "language=en" \
+       -F "stream=false"
+   ```
+
 > More detailed tests can be found here `cd GenAIExamples/DocSum/test`
 
 ## 🚀 Launch the UI
-
-Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based frontend.
+Several UI options are provided. Default one is set to the Gradio UI.
 
 ### Gradio UI
-
+Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based frontend.
 ![project-screenshot](../../../../assets/img/docSum_ui_gradio_text.png)
+
+## 🚀 Launch the Svelte UI
+
+Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+
+![project-screenshot](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/93b1ed4b-4b76-4875-927e-cc7818b4825b)
+
+Here is an example for summarizing a article.
+
+![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/67ecb2ec-408d-4e81-b124-6ded6b833f55)
+
+## 🚀 Launch the React UI (Optional)
+
+To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `docsum-xeon-ui-server` service with the `docsum-xeon-react-ui-server` service as per the config below:
+
+```yaml
+docsum-gaudi-react-ui-server:
+  image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
+  container_name: docsum-gaudi-react-ui-server
+  depends_on:
+    - docsum-gaudi-backend-server
+  ports:
+    - "5174:80"
+  environment:
+    - no_proxy=${no_proxy}
+    - https_proxy=${https_proxy}
+    - http_proxy=${http_proxy}
+    - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+```
+
+Open this URL `http://{host_ip}:5175` in your browser to access the frontend.
+
+![project-screenshot](../../../../assets/img/docsum-ui-react.png)
