@@ -24,8 +24,6 @@ EC_RAG_SERVICE_PORT=16010
 MODEL_PATH="/home/media/models"
 HF_ENDPOINT=https://hf-mirror.com
 
-HUGGINGFACEHUB_API_TOKEN="your token"
-
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build

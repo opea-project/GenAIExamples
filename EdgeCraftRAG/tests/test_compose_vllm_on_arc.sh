@@ -27,8 +27,6 @@ LLM_MODEL="Qwen/Qwen2-7B-Instruct"
 VLLM_SERVICE_PORT=8008
 vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
 
-HUGGINGFACEHUB_API_TOKEN="your token"
-
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
