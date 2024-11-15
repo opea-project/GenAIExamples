@@ -1181,22 +1181,19 @@ spec:
             - configMapRef:
                 name: chatqna-teirerank-config
           securityContext:
-            privileged: true
+            allowPrivilegeEscalation: false
             capabilities:
-              add: ["SYS_NICE"]
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           image: "ghcr.io/huggingface/tei-gaudi:1.5.0"
           imagePullPolicy: IfNotPresent
           args:
             - "--auto-truncate"
-          env:
-            - name: OMPI_MCA_btl_vader_single_copy_mechanism
-              value: "none"
-            - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
-              value: "true"
-            - name: runtime
-              value: "habana"
-            - name: HABANA_VISIBLE_DEVICES
-              value: "3"
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -1278,7 +1275,6 @@ spec:
             capabilities:
               add: ["SYS_NICE"]
           image: "opea/vllm-hpu:latest"
-          command: ["/bin/bash", "-c"]
           args:
             - "--enforce-eager"
             - "--gpu-memory-utilization"
@@ -1305,7 +1301,9 @@ spec:
             - name: runtime
               value: "habana"
             - name: HABANA_VISIBLE_DEVICES
-              value: "6"
+              value: "all"
+            - name: HF_TOKEN
+              value: "insert-your-huggingface-token-here"
           imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
