@@ -1274,7 +1274,7 @@ spec:
             privileged: true
             capabilities:
               add: ["SYS_NICE"]
-          image: "opea/llm-vllm-hpu:latest"
+          image: "opea/vllm-hpu:latest"
           command:
             - /bin/bash
             - -c
@@ -1362,7 +1362,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/chatqna:latest"
+          image: "opea/chatqna-wrapper:latest"
           imagePullPolicy: Always
           volumeMounts:
             - mountPath: /tmp
