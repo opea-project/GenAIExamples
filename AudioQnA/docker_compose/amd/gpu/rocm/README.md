@@ -5,9 +5,9 @@ pipeline on server on AMD ROCm GPU platform.
 
 Quick Start Deployment Steps:
 
-1) Set up the environment variables.
-2) Run Docker Compose.
-3) Consume the ChatQnA Service.
+1. Set up the environment variables.
+2. Run Docker Compose.
+3. Consume the ChatQnA Service.
 
 ## 1) 🚀 Set the environment variables
 
@@ -110,8 +110,6 @@ Then run the command `docker images`, you will have following images ready:
 4. `opea/speecht5:latest`
 5. `opea/tts:latest`
 6. `opea/audioqna:latest`
-
-
 
 ## 🚀 Test MicroServices
 
