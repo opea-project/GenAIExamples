@@ -12,6 +12,16 @@ services:
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
 
+  docsum-ui:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: ../ui/
+      dockerfile: ./docker/Dockerfile.gradio
+    extends: docsum
+    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+
   whisper:
     build:
       args:
