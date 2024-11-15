@@ -1,13 +1,13 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import sys
 
+import platform_config as pconf
 import requests
 
 sys.path.append("..")
-import os
-
 from edgecraftrag import api_schema
 
 PIPELINE_SERVICE_HOST_IP = os.getenv("PIPELINE_SERVICE_HOST_IP", "127.0.0.1")
@@ -42,6 +42,7 @@ def create_update_pipeline(
     vector_search_top_k,
     postprocessor,
     generator,
+    llm_infertype,
     llm_id,
     llm_device,
     llm_weights,
@@ -50,6 +51,7 @@ def create_update_pipeline(
     rerank_id,
     rerank_device,
 ):
+    llm_path = pconf.get_llm_model_dir("./models/", llm_id, llm_weights)
     req_dict = api_schema.PipelineCreateIn(
         name=name,
         active=active,
@@ -60,9 +62,9 @@ def create_update_pipeline(
             indexer_type=indexer,
             embedding_model=api_schema.ModelIn(
                 model_id=embedding_id,
-                # TODO: remove hardcoding
-                model_path="./bge_ov_embedding",
+                model_path="./models/" + embedding_id,
                 device=embedding_device,
+                weight=llm_weights,
             ),
         ),
         retriever=api_schema.RetrieverIn(retriever_type=retriever, retriever_topk=vector_search_top_k),
@@ -70,22 +72,15 @@ def create_update_pipeline(
             api_schema.PostProcessorIn(
                 processor_type=postprocessor[0],
                 reranker_model=api_schema.ModelIn(
-                    model_id=rerank_id,
-                    # TODO: remove hardcoding
-                    model_path="./bge_ov_reranker",
-                    device=rerank_device,
+                    model_id=rerank_id, model_path="./models/" + rerank_id, device=rerank_device, weight=llm_weights
                 ),
             )
         ],
         generator=api_schema.GeneratorIn(
             # TODO: remove hardcoding
             prompt_path="./edgecraftrag/prompt_template/default_prompt.txt",
-            model=api_schema.ModelIn(
-                model_id=llm_id,
-                # TODO: remove hardcoding
-                model_path="./models/qwen2-7b-instruct/INT4_compressed_weights",
-                device=llm_device,
-            ),
+            model=api_schema.ModelIn(model_id=llm_id, model_path=llm_path, device=llm_device, weight=llm_weights),
+            inference_type=llm_infertype,
         ),
     )
     # hard code only for test
@@ -105,7 +100,7 @@ def activate_pipeline(name):
     return restext, status
 
 
-def create_vectordb(docs, spliter, vector_db):
+def create_vectordb(docs, spliter):
     req_dict = api_schema.FilesIn(local_paths=docs)
     res = requests.post(f"{server_addr}/v1/data/files", json=req_dict.dict(), proxies={"http": None})
     return res.text
@@ -116,6 +111,8 @@ def get_files():
     files = []
     for file in res.json():
         files.append((file["file_name"], file["file_id"]))
+    if not files:
+        files.append((None, None))
     return files
 
 
