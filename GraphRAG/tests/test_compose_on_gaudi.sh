@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -11,7 +11,6 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
-WORKPATH=/home/rbrugaro/GenAIExamples/GraphRAG
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
@@ -34,6 +33,13 @@ function start_services() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export NEO4J_USERNAME="neo4j"
+    export NEO4J_PASSWORD="neo4jtest"
+    export NEO4J_URL="bolt://${ip_address}:7687"
+    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
+    export TGI_LLM_ENDPOINT="http://${ip_address}:6005"
+    export host_ip=${ip_address}
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
