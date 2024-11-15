@@ -196,7 +196,7 @@ You should see something like "HTTP server setup successful" if the docker conta
 Second, validate worker agent:
 
 ```
-curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "Most recent album by Taylor Swift"
     }'
 ```
@@ -204,7 +204,7 @@ curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: app
 Third, validate supervisor agent:
 
 ```
-curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "Most recent album by Taylor Swift"
     }'
 ```
