@@ -3,7 +3,7 @@
 
 services:
   tei-embedding-service:
-    image: ghcr.io/huggingface/tei-gaudi:latest
+    image: ghcr.io/huggingface/tei-gaudi:1.5.0
     container_name: tei-embedding-gaudi-server
     ports:
       - "3001:80"
@@ -103,7 +103,7 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-gaudi-server
