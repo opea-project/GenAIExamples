@@ -84,7 +84,7 @@ services:
       export VLLM_OPENVINO_ENABLE_QUANTIZED_WEIGHTS=ON && \
       python3 -m vllm.entrypoints.openai.api_server \
         --model '${LLM_MODEL}' \
-        --max_model_len=1024 \
+        --max_model_len=4096 \
         --host 0.0.0.0 \
         --port 80"
 networks:
