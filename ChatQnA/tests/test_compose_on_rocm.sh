@@ -240,9 +240,9 @@ function main() {
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
-#    end_time=$(date +%s)
-#    duration=$((end_time-start_time))
-#    echo "Mega service start duration is $duration s" && sleep 1s
+    end_time=$(date +%s)
+    duration=$((end_time-start_time))
+    echo "Mega service start duration is $duration s" && sleep 1s
 
 
     if [ "${mode}" == "perf" ]; then
@@ -252,8 +252,8 @@ function main() {
         echo "==== microservices validated ===="
         validate_megaservice
         echo "==== megaservice validated ===="
-#        validate_frontend
-#        echo "==== frontend validated ===="
+        validate_frontend
+        echo "==== frontend validated ===="
     fi
 
     stop_docker
