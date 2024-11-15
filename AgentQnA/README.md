@@ -158,11 +158,11 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
 5. Launch agent services</br>
    We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
 
-   Deploy it on Gaudi or Xeon respectively 
+   Deploy it on Gaudi or Xeon respectively
 
    ::::{tab-set}
-    :::{tab-item} Gaudi
-      :sync: Gaudi
+   :::{tab-item} Gaudi
+   :sync: Gaudi
 
    To use open-source LLMs on Gaudi2, run commands below.
 
@@ -171,9 +171,10 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
    bash launch_tgi_gaudi.sh
    bash launch_agent_service_tgi_gaudi.sh
    ```
+
    :::
    :::{tab-item} Xeon
-     :sync: Xeon
+   :sync: Xeon
 
    To use OpenAI models, run commands below.
 
@@ -181,8 +182,10 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
    bash launch_agent_service_openai.sh
    ```
+
    :::
-::::
+   ::::
+
 ## Validate services
 
 First look at logs of the agent docker containers:
