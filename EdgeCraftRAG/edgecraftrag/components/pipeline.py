@@ -110,8 +110,10 @@ class Pipeline(BaseComponent):
                     return True
         if self.generator:
             llm = self.generator.llm
-            if llm() and llm().model_id == model_id:
-                return True
+            if isinstance(llm, str):
+                return llm == model_id
+            else:
+                return llm().model_id == model_id
         return False
 
 
@@ -154,7 +156,8 @@ def run_test_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any
     if pl.generator is None:
         return "No Generator Specified"
     if pl.generator.inference_type == InferenceType.LOCAL:
-        answer = pl.generator.run(chat_request, retri_res)
+        return pl.generator.run(chat_request, retri_res)
     elif pl.generator.inference_type == InferenceType.VLLM:
-        answer = pl.generator.run_vllm(chat_request, retri_res)
-    return answer
+        return pl.generator.run_vllm(chat_request, retri_res)
+    else:
+        return "LLM inference_type not supported"
