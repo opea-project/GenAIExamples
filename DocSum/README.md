@@ -157,7 +157,7 @@ Two ways of consuming Document Summarization Service:
         -H "Content-Type: application/json" \
         -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
-   #Use English mode (default).
+   # Use English mode (default).
    curl http://${host_ip}:8888/v1/docsum \
        -H "Content-Type: multipart/form-data" \
        -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
@@ -165,7 +165,7 @@ Two ways of consuming Document Summarization Service:
        -F "language=en" \
        -F "stream=true"
 
-   #Use Chinese mode.
+   # Use Chinese mode.
    curl http://${host_ip}:8888/v1/docsum \
        -H "Content-Type: multipart/form-data" \
        -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
@@ -173,7 +173,7 @@ Two ways of consuming Document Summarization Service:
        -F "language=zh" \
        -F "stream=true"
 
-   # upload file
+   # Upload file
    curl http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: multipart/form-data" \
       -F "type=text" \
@@ -182,7 +182,6 @@ Two ways of consuming Document Summarization Service:
       -F "max_tokens=32" \
       -F "language=en" \
       -F "stream=true"
-
    ```
 
    > Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI.

@@ -101,7 +101,6 @@ function validate_services() {
         exit 1
     fi
     sleep 1s
-
 }
 
 get_base64_str() {
