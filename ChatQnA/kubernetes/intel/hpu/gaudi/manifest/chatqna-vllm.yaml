@@ -1229,7 +1229,8 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
-            habana.ai/gaudi: 1
+            limits:
+              habana.ai/gaudi: 1
       volumes:
         - name: model-volume # Replace with Persistent volume claim/ host directory
           emptyDir: {}
