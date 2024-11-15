@@ -23,7 +23,7 @@ To run the frontend Docker image, navigate to the `GenAIExamples/DocSum/ui/docke
 cd GenAIExamples/DocSum/ui/docker
 
 ip_address=$(hostname -I | awk '{print $1}')
-docker run -it -p 5173:5173 --ipc=host \
+docker run -d -p 5173:5173 --ipc=host \
    -e http_proxy=$http_proxy \
    -e https_proxy=$https_proxy \
    -e no_proxy=$no_proxy \

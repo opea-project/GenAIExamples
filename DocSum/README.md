@@ -150,8 +150,7 @@ Two ways of consuming Document Summarization Service:
 
 1. Use cURL command on terminal
 
-   text:
-
+   Text:
    ```bash
    curl -X POST http://${host_ip}:8888/v1/docsum \
         -H "Content-Type: application/json" \
