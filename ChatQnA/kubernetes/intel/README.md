@@ -39,6 +39,61 @@ sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chat
 kubectl apply -f chatqna.yaml
 ```
 
+## Deploy on Xeon with Remote LLM Model
+
+```
+cd GenAIExamples/ChatQnA/kubernetes/intel/cpu/xeon/manifest
+export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
+export vLLM_ENDPOINT="Your Remote Inference Endpoint"
+sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chatqna-remote-inference.yaml
+sed -i "s/insert-your-remote-inference-endpoint/${vLLM_ENDPOINT}/g" chatqna-remote-inference.yaml
+```
+
+### Additional Steps for Remote Endpoints with Authentication (IF NO AUTHENTICATION SKIP THIS STEP)
+
+If your remote inference endpoint is protected with OAuth Client Credentials authentication, follow these additional steps:
+
+```
+export CLIENTID="Your Client ID"
+export CLIENT_SECRET="Your Client Secret"
+export TOKEN_URL="Your Token URL"
+```
+
+### Deploy
+```
+kubectl apply -f chatqna-remote-inference.yaml
+```
+
+## Deploy on Gaudi with TEI, Rerank, and vLLM Models Running Remotely
+
+```
+cd GenAIExamples/ChatQnA/kubernetes/intel/hpu/gaudi/manifest
+export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
+export vLLM_ENDPOINT="Your Remote Inference Endpoint"
+export TEI_EMBEDDING_ENDPOINT="Your Remote TEI Embedding Endpoint"
+export TEI_RERANKING_ENDPOINT="Your Remote Reranking Endpoint"
+
+sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chatqna-vllm-remote-inference.yaml
+sed -i "s/insert-your-remote-inference-endpoint/${vLLM_ENDPOINT}/g" chatqna-vllm-remote-inference.yaml
+sed -i "s/insert-your-remote-embedding-endpoint/${TEI_EMBEDDING_ENDPOINT}/g" chatqna-vllm-remote-inference.yaml
+sed -i "s/insert-your-remote-reranking-endpoint/${TEI_RERANKING_ENDPOINT}/g" chatqna-vllm-remote-inference.yaml
+```
+
+### Additional Steps for Remote Endpoints with Authentication (IF NO AUTHENTICATION SKIP THIS STEP)
+
+If your remote inference endpoints are protected with OAuth Client Credentials authentication, follow these additional steps:
+
+```
+export CLIENTID="Your Client ID"
+export CLIENT_SECRET="Your Client Secret"
+export TOKEN_URL="Your Token URL"
+```
+
+### Deploy
+```
+kubectl apply -f chatqna-vllm-remote-inference.yaml
+```
+
 ## Verify Services
 
 To verify the installation, run the command `kubectl get pod` to make sure all pods are running.
