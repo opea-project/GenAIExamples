@@ -13,14 +13,15 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 
 WORKPATH=$(dirname "$PWD")
-LOG_PATH="$WORKPATH/tests/logs_local_$(date +%Y%m%d%H%M%S)"
+LOG_PATH="$WORKPATH/tests"
 
 ip_address=$(hostname -I | awk '{print $1}')
 HOST_IP=$ip_address
 
 COMPOSE_FILE="compose.yaml"
 EC_RAG_SERVICE_PORT=16010
-MODEL_PATH="$WORKPATH/models"
+#MODEL_PATH="$WORKPATH/models"
+MODEL_PATH="/home/media/models"
 HF_ENDPOINT=https://hf-mirror.com
 
 HUGGINGFACEHUB_API_TOKEN="your token"
