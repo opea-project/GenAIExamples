@@ -76,17 +76,14 @@ function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
+    docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
+    docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
+    docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
+    docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
+
     if [[ $result == *"the"* ]]; then
-        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
-        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
-        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
-        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
         echo "Result correct."
     else
-        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
-        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
-        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
-        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
         echo "Result wrong."
         exit 1
     fi
