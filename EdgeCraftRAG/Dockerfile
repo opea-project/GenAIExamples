@@ -13,13 +13,11 @@ RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/
 
-COPY ./edgecraftrag /home/user/edgecraftrag
+COPY ./requirements.txt /home/user/requirements.txt
 COPY ./chatqna.py /home/user/chatqna.py
 
-WORKDIR /home/user/edgecraftrag
-RUN pip install --no-cache-dir -r requirements.txt
-
 WORKDIR /home/user
+RUN pip install --no-cache-dir -r requirements.txt
 
 USER user
 
