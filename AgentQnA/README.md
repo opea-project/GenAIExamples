@@ -88,20 +88,20 @@ flowchart LR
 > [!NOTE]
 > the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
 
-   First, clone the opea GenAIComps repo.
+First, clone the opea GenAIComps repo.
 
-   ```
-   export WORKDIR=<your-work-directory>
-   cd $WORKDIR
-   git clone https://github.com/opea-project/GenAIComps.git
-   ```
+```
+export WORKDIR=<your-work-directory>
+cd $WORKDIR
+git clone https://github.com/opea-project/GenAIComps.git
+```
 
-   Then build the agent docker image. Both the supervisor agent and the worker agent will use the same docker image, but when we launch the two agents we will specify different strategies and register different tools.
+Then build the agent docker image. Both the supervisor agent and the worker agent will use the same docker image, but when we launch the two agents we will specify different strategies and register different tools.
 
-   ```
-   cd GenAIComps
-   docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
-   ```
+```
+cd GenAIComps
+docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
+```
 
 2. Set up environment for this example </br>
    First, clone this repo.
