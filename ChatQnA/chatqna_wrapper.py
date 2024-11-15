@@ -45,6 +45,7 @@ RERANK_SERVICE_HOST_IP = os.getenv("RERANK_SERVICE_HOST_IP", "0.0.0.0")
 RERANK_SERVICE_PORT = int(os.getenv("RERANK_SERVICE_PORT", 8000))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
+LLM_MODEL = os.getenv("LLM_MODEL", "Intel/neural-chat-7b-v3-3")
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):

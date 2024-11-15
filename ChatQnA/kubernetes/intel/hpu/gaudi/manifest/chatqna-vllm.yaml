@@ -1342,8 +1342,8 @@ spec:
               value: chatqna-retriever-usvc
             - name: EMBEDDING_SERVICE_HOST_IP
               value: chatqna-embedding-usvc
-            - name: GUARDRAIL_SERVICE_HOST_IP
-              value: chatqna-guardrails-usvc
+            - name: LLM_MODEL
+              value: "meta-llama/Meta-Llama-3-8B-Instruct"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
