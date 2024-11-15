@@ -261,7 +261,7 @@ function main() {
     echo "==========================================="
     echo ">>>> Stopping any running Docker containers..."
     stop_docker
-    
+
     echo "==========================================="
     if [[ "$IMAGE_REPO" == "opea" ]]; then
         echo ">>>> Building Docker images..."
@@ -271,11 +271,11 @@ function main() {
     echo "==========================================="
     echo ">>>> Starting Docker services..."
     start_services
-    
+
     echo "==========================================="
     echo ">>>> Validating microservices..."
     validate_microservices
-    
+
     echo "==========================================="
     echo ">>>> Validating megaservice..."
     validate_megaservice
@@ -285,7 +285,7 @@ function main() {
     echo "==========================================="
     echo ">>>> Stopping Docker containers..."
     stop_docker
-    
+
     echo "==========================================="
     echo ">>>> Pruning Docker system..."
     echo y | docker system prune
