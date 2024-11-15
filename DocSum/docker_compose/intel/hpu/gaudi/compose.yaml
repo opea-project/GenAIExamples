@@ -104,7 +104,7 @@ services:
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
-      
+
     ipc: host
     restart: always
 

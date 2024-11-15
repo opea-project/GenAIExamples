@@ -64,9 +64,11 @@ docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-
 ```
 
 ### 3. Build UI Docker Image
+
 Several UI options are provided. If you need to work with multimedia documents, .doc, or .pdf files, suggested to use Gradio UI.
 
-#### Gradio UI 
+#### Gradio UI
+
 Build the Gradio UI frontend Docker image using the following command:
 
 ```bash
@@ -74,7 +76,7 @@ cd GenAIExamples/DocSum/ui
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.gradio .
 ```
 
-#### Svelte UI 
+#### Svelte UI
 
 Build the frontend Docker image via below command:
 
@@ -83,7 +85,7 @@ cd GenAIExamples/DocSum/ui
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
-#### React UI 
+#### React UI
 
 Build the frontend Docker image via below command:
 
@@ -94,7 +96,6 @@ docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT
 
 docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f ./docker/Dockerfile.react .
 ```
-
 
 ## 🚀 Start Microservices and MegaService
 
