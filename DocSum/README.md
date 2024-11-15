@@ -211,7 +211,7 @@ Two ways of consuming Document Summarization Service:
 
    curl http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: multipart/form-data" \
-      -F "type=audio" \
+      -F "type=video" \
       -F "messages=convert your video to base64 data type" \
       -F "max_tokens=32" \
       -F "language=en" \

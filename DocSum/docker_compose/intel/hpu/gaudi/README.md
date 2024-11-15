@@ -52,8 +52,8 @@ docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-
 Build the frontend Docker image via below command:
 
 ```bash
-cd GenAIExamples/DocSum/ui/docker
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.gradio .
+cd GenAIExamples/DocSum/ui
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.gradio .
 ```
 
 ## 🚀 Start Microservices and MegaService
@@ -240,7 +240,7 @@ You will have the following Docker Images:
 
    curl http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: multipart/form-data" \
-      -F "type=audio" \
+      -F "type=video" \
       -F "messages=convert your video to base64 data type" \
       -F "max_tokens=32" \
       -F "language=en" \
@@ -251,7 +251,7 @@ You will have the following Docker Images:
 
 ## 🚀 Launch the UI
 
-Several UI options are provided. Default one is set to the Gradio UI.
+Several UI options are provided. If you need to work with multimedia documents, .doc, or .pdf files, only the Gradio UI supports that. If the Gradio UI is not built, the Svelte UI will be started
 
 ### Gradio UI
 

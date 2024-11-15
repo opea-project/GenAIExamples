@@ -104,7 +104,7 @@ services:
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
-
+      
     ipc: host
     restart: always
 
@@ -120,6 +120,7 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 
