@@ -1,6 +1,7 @@
-# Single node on-prem deployment with Docker Compose on Xeon Scalable processors
+# Single node on-prem deployment AgentQnA on Gaudi
 
-This example showcases a hierarchical multi-agent system for question-answering applications. We deploy the example on Xeon. For LLMs, we use OpenAI models via API calls. For instructions on using open-source LLMs, please refer to the deployment guide [here](../../../../README.md).
+This example showcases a hierarchical multi-agent system for question-answering applications. We deploy the example on Gaudi using open-source LLMs,
+For more details, please refer to the deployment guide [here](../../../../README.md).
 
 ## Deployment with docker
 
@@ -22,8 +23,11 @@ This example showcases a hierarchical multi-agent system for question-answering 
    export no_proxy="Your_No_Proxy"
 
    export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
-   #OPANAI_API_KEY if you want to use OpenAI models
-   export OPENAI_API_KEY=<your-openai-key>
+   # for using open-source llms
+   export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
+   # Example export HF_CACHE_DIR=$WORKDIR so that no need to redownload every time
+   export HF_CACHE_DIR=<directory-where-llms-are-downloaded>
+
    ```
 
 3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
@@ -48,11 +52,12 @@ This example showcases a hierarchical multi-agent system for question-answering 
    ```
 5. Launch `Agent` service
 
-   The configurations of the supervisor agent and the worker agent are defined in the docker-compose yaml file. We currently use openAI GPT-4o-mini as LLM, and llama3.1-70B-instruct (served by TGI-Gaudi) in Gaudi example. To use openai llm, run command below.
+   To use open-source LLMs on Gaudi2, run commands below.
 
    ```
-   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
-   bash launch_agent_service_openai.sh
+   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
+   bash launch_tgi_gaudi.sh
+   bash launch_agent_service_tgi_gaudi.sh
    ```
 
 6. [Optional] Build `Agent` docker image if pulling images failed.
