@@ -9,7 +9,6 @@
     "indexer_type": "faiss_vector",
     "embedding_model": {
       "model_id": "BAAI/bge-small-en-v1.5",
-      "model_path": "./models/bge_ov_embedding",
       "device": "auto"
     }
   },
@@ -23,7 +22,6 @@
       "top_n": 2,
       "reranker_model": {
         "model_id": "BAAI/bge-reranker-large",
-        "model_path": "./models/bge_ov_reranker",
         "device": "auto"
       }
     }
@@ -31,7 +29,6 @@
   "generator": {
     "model": {
       "model_id": "Qwen/Qwen2-7B-Instruct",
-      "model_path": "./models/qwen2-7b-instruct/INT4_compressed_weights",
       "device": "cpu"
     },
     "prompt_path": "./edgecraftrag/prompt_template/default_prompt.txt",

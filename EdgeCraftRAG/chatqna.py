@@ -18,6 +18,7 @@ from comps.cores.proto.api_protocol import (
     ChatMessage,
     UsageInfo,
 )
+from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
@@ -30,7 +31,20 @@ class EdgeCraftRagGateway(Gateway):
 
     async def handle_request(self, request: Request):
         input = await request.json()
-        result_dict, runtime_graph = await self.megaservice.schedule(initial_inputs=input)
+        stream_opt = input.get("stream", False)
+        chat_request = ChatCompletionRequest.parse_obj(input)
+        parameters = LLMParams(
+            max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
+            top_k=chat_request.top_k if chat_request.top_k else 10,
+            top_p=chat_request.top_p if chat_request.top_p else 0.95,
+            temperature=chat_request.temperature if chat_request.temperature else 0.01,
+            frequency_penalty=chat_request.frequency_penalty if chat_request.frequency_penalty else 0.0,
+            presence_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 0.0,
+            repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
+            streaming=stream_opt,
+            chat_template=chat_request.chat_template if chat_request.chat_template else None,
+        )
+        result_dict, runtime_graph = await self.megaservice.schedule(initial_inputs=input, llm_parameters=parameters)
         for node, response in result_dict.items():
             if isinstance(response, StreamingResponse):
                 return response
@@ -61,7 +75,7 @@ class EdgeCraftRagService:
             port=PIPELINE_SERVICE_PORT,
             endpoint="/v1/chatqna",
             use_remote_service=True,
-            service_type=ServiceType.UNDEFINED,
+            service_type=ServiceType.LLM,
         )
         self.megaservice.add(edgecraftrag)
         self.gateway = EdgeCraftRagGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)

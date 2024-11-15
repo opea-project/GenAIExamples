@@ -90,6 +90,11 @@ def get_available_weights():
     return avail_weights_compression
 
 
+def get_avail_llm_inference_type():
+    avail_llm_inference_type = ["local", "vllm"]
+    return avail_llm_inference_type
+
+
 def get_enum_values(c: Enum):
     return [v.value for k, v in vars(c).items() if not callable(v) and not k.startswith("__") and not k.startswith("_")]
 
@@ -112,3 +117,25 @@ def get_available_postprocessors():
 
 def get_available_generators():
     return get_enum_values(GeneratorType)
+
+
+def get_llm_model_dir(prefix, llm_model_id, weights_compression):
+    model_dirs = {
+        "fp16_model_dir": prefix + llm_model_id + "/FP16",
+        "int8_model_dir": prefix + llm_model_id + "/INT8_compressed_weights",
+        "int4_model_dir": prefix + llm_model_id + "/INT4_compressed_weights",
+    }
+
+    if weights_compression == "INT4":
+        model_dir = model_dirs["int4_model_dir"]
+    elif weights_compression == "INT8":
+        model_dir = model_dirs["int8_model_dir"]
+    else:
+        model_dir = model_dirs["fp16_model_dir"]
+
+    # if not model_dir.exists():
+    #     raise FileNotFoundError(f"The model directory {model_dir} does not exist.")
+    # elif not model_dir.is_dir():
+    #     raise NotADirectoryError(f"The path {model_dir} is not a directory.")
+
+    return model_dir

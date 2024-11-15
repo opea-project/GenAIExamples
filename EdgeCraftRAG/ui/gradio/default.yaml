@@ -3,7 +3,6 @@
 
 # Model language for LLM
 model_language: "Chinese"
-vector_db:  "FAISS"
 splitter_name: "RecursiveCharacter"
 k_rerank: 5
 search_method: "similarity"
@@ -29,21 +28,19 @@ k_retrieval: 30
 postprocessor: "reranker"
 
 # Generator
-generator: "local"
-prompt_path: "./data/default_prompt.txt"
+generator: "chatqna"
+prompt_path: "./edgecraftrag/prompt_template/default_prompt.txt"
 
 # Models
 embedding_model_id: "BAAI/bge-small-en-v1.5"
-embedding_model_path: "./bge_ov_embedding"
 # Device for embedding model inference
 embedding_device: "AUTO"
 
 rerank_model_id: "BAAI/bge-reranker-large"
-rerank_model_path: "./bge_ov_reranker"
 # Device for reranking model inference
 rerank_device: "AUTO"
 
-llm_model_id: "qwen2-7b-instruct"
-llm_model_path: "./qwen2-7b-instruct/INT4_compressed_weights"
+llm_model_id: "Qwen/Qwen2-7B-Instruct"
+llm_weights: "INT4"
 # Device for LLM model inference
 llm_device: "AUTO"

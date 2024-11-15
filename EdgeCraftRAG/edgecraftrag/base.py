@@ -27,6 +27,7 @@ class ModelType(str, Enum):
     EMBEDDING = "embedding"
     RERANKER = "reranker"
     LLM = "llm"
+    VLLM = "vllm"
 
 
 class FileType(str, Enum):

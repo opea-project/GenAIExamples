@@ -157,16 +157,13 @@ def update_pipeline_handler(pl, req):
         gen = req.generator
         if gen.model is None:
             return "No ChatQnA Model"
-        if gen.inference_type == InferenceType.VLLM:
-            if gen.model.model_id:
-                model_ref = gen.model.model_id
-            else:
-                model_ref = gen.model.model_path
-            pl.generator = QnAGenerator(model_ref, gen.prompt_path, gen.inference_type)
-        elif gen.inference_type == InferenceType.LOCAL:
+        if gen.inference_type:
             model = ctx.get_model_mgr().search_model(gen.model)
             if model is None:
-                gen.model.model_type = ModelType.LLM
+                if gen.inference_type == InferenceType.VLLM:
+                    gen.model.model_type = ModelType.VLLM
+                else:
+                    gen.model.model_type = ModelType.LLM
                 model = ctx.get_model_mgr().load_model(gen.model)
                 ctx.get_model_mgr().add(model)
             # Use weakref to achieve model deletion and memory release

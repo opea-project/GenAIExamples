@@ -25,5 +25,8 @@ async def retrieval(request: ChatCompletionRequest):
 # ChatQnA
 @chatqna_app.post(path="/v1/chatqna")
 async def chatqna(request: ChatCompletionRequest):
-    ret = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
-    return str(ret)
+    if request.stream:
+        return ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+    else:
+        ret = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+        return str(ret)

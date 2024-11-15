@@ -1,27 +1,16 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import asyncio
 import dataclasses
 import os
 
-from comps import GeneratedDoc, opea_telemetry
+from comps import GeneratedDoc
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
-
-
-@opea_telemetry
-def post_process_text(text: str):
-    if text == " ":
-        return "data: @#$\n\n"
-    if text == "\n":
-        return "data: <br/>\n\n"
-    if text.isspace():
-        return None
-    new_text = text.replace(" ", "@#$")
-    return f"data: {new_text}\n\n"
 
 
 class QnAGenerator(BaseComponent):
@@ -76,8 +65,18 @@ class QnAGenerator(BaseComponent):
             repetition_penalty=chat_request.repetition_penalty,
         )
         self.llm().generate_kwargs = generate_kwargs
+        if chat_request.stream:
 
-        return self.llm().complete(prompt_str)
+            async def stream_generator():
+                response = self.llm().stream_complete(prompt_str)
+                for r in response:
+                    yield r.delta
+                    # Simulate asynchronous operation
+                    await asyncio.sleep(0.01)
+
+            return StreamingResponse(stream_generator(), media_type="text/event-stream")
+        else:
+            return self.llm().complete(prompt_str)
 
     def run_vllm(self, chat_request, retrieved_nodes, **kwargs):
         if self.llm is None:
@@ -92,7 +91,7 @@ class QnAGenerator(BaseComponent):
         prompt_str = self.prompt.format(input=query, context=text_gen_context)
 
         llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8008")
-        model_name = self.llm
+        model_name = self.llm().model_id
         llm = OpenAILike(
             api_key="fake",
             api_base=llm_endpoint + "/v1",
@@ -106,12 +105,10 @@ class QnAGenerator(BaseComponent):
         if chat_request.stream:
 
             async def stream_generator():
-                response = await llm.astream_complete(prompt_str)
-                async for text in response:
-                    output = text.text
-                    yield f"data: {output}\n\n"
-
-                yield "data: [DONE]\n\n"
+                response = llm.stream_complete(prompt_str)
+                for text in response:
+                    yield text.delta
+                    await asyncio.sleep(0.01)
 
             return StreamingResponse(stream_generator(), media_type="text/event-stream")
         else:
@@ -122,7 +119,12 @@ class QnAGenerator(BaseComponent):
 
     @model_serializer
     def ser_model(self):
-        set = {"idx": self.idx, "generator_type": self.comp_subtype, "model": self.model_id}
+        set = {
+            "idx": self.idx,
+            "generator_type": self.comp_subtype,
+            "inference_type": self.inference_type,
+            "model": self.llm(),
+        }
         return set
 
 

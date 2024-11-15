@@ -3,9 +3,14 @@
 
 import asyncio
 
-from edgecraftrag.api_schema import IndexerIn, ModelIn, NodeParserIn
-from edgecraftrag.base import BaseComponent, BaseMgr, CallbackType, ModelType
-from edgecraftrag.components.model import OpenVINOEmbeddingModel, OpenVINOLLMModel, OpenVINORerankModel
+from edgecraftrag.api_schema import ModelIn
+from edgecraftrag.base import BaseComponent, BaseMgr, CompType, ModelType
+from edgecraftrag.components.model import (
+    BaseModelComponent,
+    OpenVINOEmbeddingModel,
+    OpenVINOLLMModel,
+    OpenVINORerankModel,
+)
 
 
 class ModelMgr(BaseMgr):
@@ -78,17 +83,25 @@ class ModelMgr(BaseMgr):
                     model_id=model_para.model_id,
                     model_path=model_para.model_path,
                     device=model_para.device,
+                    weight=model_para.weight,
                 )
             case ModelType.RERANKER:
                 model = OpenVINORerankModel(
                     model_id=model_para.model_id,
                     model_path=model_para.model_path,
                     device=model_para.device,
+                    weight=model_para.weight,
                 )
             case ModelType.LLM:
                 model = OpenVINOLLMModel(
                     model_id=model_para.model_id,
                     model_path=model_para.model_path,
                     device=model_para.device,
+                    weight=model_para.weight,
                 )
+            case ModelType.VLLM:
+                model = BaseModelComponent(model_id=model_para.model_id, model_path="", device="", weight="")
+                model.comp_type = CompType.MODEL
+                model.comp_subtype = ModelType.VLLM
+                model.model_id_or_path = model_para.model_id
         return model
