@@ -64,13 +64,37 @@ docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-
 ```
 
 ### 3. Build UI Docker Image
+Several UI options are provided. If you need to work with multimedia documents, .doc, or .pdf files, suggested to use Gradio UI.
 
-Build the frontend Docker image via below command:
+#### Gradio UI 
+Build the Gradio UI frontend Docker image using the following command:
 
 ```bash
 cd GenAIExamples/DocSum/ui
 docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.gradio .
 ```
+
+#### Svelte UI 
+
+Build the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/ui
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+```
+
+#### React UI 
+
+Build the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/ui
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+
+docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f ./docker/Dockerfile.react .
+```
+
 
 ## 🚀 Start Microservices and MegaService
 
@@ -265,7 +289,7 @@ You will have the following Docker Images:
 
 ## 🚀 Launch the UI
 
-Several UI options are provided. If you need to work with multimedia documents, .doc, or .pdf files, only the Gradio UI supports that. If the Gradio UI is not built, the Svelte UI will be started
+Several UI options are provided. If you need to work with multimedia documents, .doc, or .pdf files, suggested to use Gradio UI.
 
 ### Gradio UI
 
@@ -275,7 +299,7 @@ Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based
 
 ### Svelte UI
 
-Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based frontend.
+Open this URL `http://{host_ip}:5173` in your browser to access the Svelte based frontend.
 
 ![project-screenshot](../../../../assets/img/docSum_ui_text.png)
 
