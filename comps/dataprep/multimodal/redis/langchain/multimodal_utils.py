@@ -270,7 +270,7 @@ def extract_frames_and_generate_captions(
             idx += 1
 
             mid_time = vidcap.get(cv2.CAP_PROP_POS_MSEC)
-            mid_time_ms = mid_time * 1000
+            mid_time_ms = mid_time  # Already in ms
 
             frame_no = curr_frame
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
