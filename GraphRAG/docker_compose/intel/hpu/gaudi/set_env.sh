@@ -17,4 +17,4 @@ export NEO4J_URL="bolt://${host_ip}:7687"
 export NEO4J_USERNAME=neo4j
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6004/v1/dataprep"
 export LOGFLAG=True
-export RETRIEVER_SERVICE_PORT=6009
+export RETRIEVER_SERVICE_PORT=80
