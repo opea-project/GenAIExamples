@@ -156,7 +156,7 @@ Two ways of consuming Document Summarization Service:
    curl -X POST http://${host_ip}:8888/v1/docsum \
         -H "Content-Type: application/json" \
         -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
-   
+
    #Use English mode (default).
    curl http://${host_ip}:8888/v1/docsum \
        -H "Content-Type: multipart/form-data" \
@@ -173,7 +173,7 @@ Two ways of consuming Document Summarization Service:
        -F "language=zh" \
        -F "stream=true"
 
-   # upload file 
+   # upload file
    curl http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: multipart/form-data" \
       -F "type=text" \
@@ -184,9 +184,11 @@ Two ways of consuming Document Summarization Service:
       -F "stream=true"
 
    ```
+
    > Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI.
 
    Audio:
+
    ```bash
    curl -X POST http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: application/json" \
@@ -202,6 +204,7 @@ Two ways of consuming Document Summarization Service:
    ```
 
    Video:
+
    ```bash
    curl -X POST http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: application/json" \
@@ -215,7 +218,6 @@ Two ways of consuming Document Summarization Service:
       -F "language=en" \
       -F "stream=true"
    ```
-
 
 2. Access via frontend
 

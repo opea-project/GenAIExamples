@@ -197,9 +197,11 @@ You will have the following Docker Images:
 > More detailed tests can be found here `cd GenAIExamples/DocSum/test`
 
 ## 🚀 Launch the UI
+
 Several UI options are provided. Default one is set to the Gradio UI.
 
 ### Gradio UI
+
 Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based frontend.
 ![project-screenshot](../../../../assets/img/docSum_ui_gradio_text.png)
 
