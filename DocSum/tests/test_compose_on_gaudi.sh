@@ -46,7 +46,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-ui whisper multimedia2text a2t v2a llm-docsum-tgi"
+    service_list="docsum whisper multimedia2text a2t v2a llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -252,34 +252,6 @@ function validate_megaservice_json() {
 
 }
 
-function validate_frontend() {
-    cd $WORKPATH/ui/svelte
-    local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
-    if conda info --envs | grep -q "$conda_env_name"; then
-        echo "$conda_env_name exist!"
-    else
-        conda create -n ${conda_env_name} python=3.12 -y
-    fi
-    source activate ${conda_env_name}
-
-    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-    conda install -c conda-forge nodejs -y
-    npm install && npm ci && npx playwright install --with-deps
-    node -v && npm -v && pip list
-
-    exit_status=0
-    npx playwright test || exit_status=$?
-
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
-}
-
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose stop && docker compose rm -f
@@ -289,37 +261,31 @@ function main() {
     echo "==========================================="
     echo ">>>> Stopping any running Docker containers..."
     stop_docker
-    echo ">>>> Docker containers stopped."
-
+    
     echo "==========================================="
     if [[ "$IMAGE_REPO" == "opea" ]]; then
         echo ">>>> Building Docker images..."
         build_docker_images
-        echo ">>>> Docker images built successfully."
     fi
 
     echo "==========================================="
     echo ">>>> Starting Docker services..."
     start_services
-    echo ">>>> Docker services started successfully."
-
+    
     echo "==========================================="
     echo ">>>> Validating microservices..."
     validate_microservices
-    echo ">>>> Microservices validated successfully."
-
+    
     echo "==========================================="
     echo ">>>> Validating megaservice..."
     validate_megaservice
     echo ">>>> Validating validate_megaservice_json..."
     validate_megaservice_json
-    echo ">>>> Megaservice validated successfully."
 
     echo "==========================================="
     echo ">>>> Stopping Docker containers..."
     stop_docker
-    echo ">>>> Docker containers stopped."
-
+    
     echo "==========================================="
     echo ">>>> Pruning Docker system..."
     echo y | docker system prune

@@ -12,13 +12,6 @@ services:
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
 
-  docsum-ui:
-    build:
-      context: ../ui
-      dockerfile: ./docker/Dockerfile
-    extends: docsum
-    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
-
   whisper:
     build:
       args:
