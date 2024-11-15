@@ -160,6 +160,7 @@ Two ways of consuming Document Summarization Service:
    # Use English mode (default).
    curl http://${host_ip}:8888/v1/docsum \
        -H "Content-Type: multipart/form-data" \
+       -F "type=text" \
        -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
        -F "max_tokens=32" \
        -F "language=en" \
@@ -168,6 +169,7 @@ Two ways of consuming Document Summarization Service:
    # Use Chinese mode.
    curl http://${host_ip}:8888/v1/docsum \
        -H "Content-Type: multipart/form-data" \
+       -F "type=text" \
        -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
        -F "max_tokens=32" \
        -F "language=zh" \
