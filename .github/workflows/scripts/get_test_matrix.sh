@@ -16,8 +16,13 @@ for example in ${examples}; do
     if [[ ! $(find . -type f | grep ${test_mode}) ]]; then continue; fi
     cd tests
     ls -l
-    hardware_list=$(find . -type f -name "test_compose*_on_*.sh" | cut -d/ -f2 | cut -d. -f1 | awk -F'_on_' '{print $2}'| sort -u)
-    echo "Test supported hardware list = ${hardware_list}"
+    if [[ "$test_mode" == "docker_image_build" ]]; then
+        find_name="test_manifest_on_*.sh"
+    else
+        find_name="test_${test_mode}*_on_*.sh"
+    fi
+    hardware_list=$(find . -type f -name "${find_name}" | cut -d/ -f2 | cut -d. -f1 | awk -F'_on_' '{print $2}'| sort -u)
+    echo -e "Test supported hardware list: \n${hardware_list}"
 
     run_hardware=""
     if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '*.py|Dockerfile*|ui|docker_image_build' ) ]]; then
