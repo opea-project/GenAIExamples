@@ -1293,15 +1293,7 @@ spec:
               protocol: TCP
           resources:
             limits:
-              habana.ai/gaudi: 8
-              cpu: 40
-              memory: 400Gi
-              hugepages-2Mi: 9800Mi
-            requests:
-              habana.ai/gaudi: 8
-              cpu: 40
-              memory: 400Gi
-              hugepages-2Mi: 9800Mi
+              habana.ai/gaudi: 1
       volumes:
         - name: model-volume # Replace with Persistent volume claim/ host directory
           emptyDir: {}
