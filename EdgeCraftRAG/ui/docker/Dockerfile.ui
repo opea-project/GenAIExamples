@@ -11,10 +11,11 @@ RUN useradd -m -s /bin/bash user && \
 COPY ./ui/gradio /home/user/ui
 COPY ./edgecraftrag /home/user/edgecraftrag
 
-WORKDIR /home/user/edgecraftrag
-RUN pip install --no-cache-dir -r requirements.txt
+RUN mkdir -p /home/user/gradio_cache 
+ENV GRADIO_TEMP_DIR=/home/user/gradio_cache
 
 WORKDIR /home/user/ui
+RUN pip install --no-cache-dir -r requirements.txt
 
 USER user
 
