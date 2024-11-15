@@ -45,6 +45,7 @@ export CHATQNA_RERANK_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_LLM_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_NGINX_PORT=15176
 export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export PATH="/home/huggingface/miniconda3/bin:$PATH"
 
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build
