@@ -196,6 +196,7 @@ You will have the following Docker Images:
 6. MegaService
 
    Text:
+
    ```bash
    curl -X POST http://${host_ip}:8888/v1/docsum \
         -H "Content-Type: application/json" \
@@ -261,8 +262,6 @@ You will have the following Docker Images:
       -F "language=en" \
       -F "stream=true"
    ```
-
-
 
 ## 🚀 Launch the UI
 
