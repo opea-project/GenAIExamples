@@ -434,6 +434,68 @@ curl http://${host_ip}:9090/v1/guardrails\
   -H 'Content-Type: application/json'
 ```
 
+### Profile Microservices
+
+To further analyze MicroService Performance, users could follow the instructions to profile MicroServices.
+
+#### 1. vLLM backend Service
+
+Users could follow previous section to testing vLLM microservice or ChatQnA MegaService.  
+ By default, vLLM profiling is not enabled. Users could start and stop profiling by following commands.
+
+##### Start vLLM profiling
+
+```bash
+curl http://${host_ip}:9009/start_profile \
+  -H "Content-Type: application/json" \
+  -d '{"model": ${LLM_MODEL_ID}}'
+```
+
+Users would see below docker logs from vllm-service if profiling is started correctly.
+
+```bash
+INFO api_server.py:361] Starting profiler...
+INFO api_server.py:363] Profiler started.
+INFO:     x.x.x.x:35940 - "POST /start_profile HTTP/1.1" 200 OK
+```
+
+After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService  
+ or ChatQnA MicroService.
+
+##### Stop vLLM profiling
+
+By following command, users could stop vLLM profliing and generate a \*.pt.trace.json.gz file as profiling result  
+ under /mnt folder in vllm-service docker instance.
+
+```bash
+# vLLM Service
+curl http://${host_ip}:9009/stop_profile \
+  -H "Content-Type: application/json" \
+  -d '{"model": ${LLM_MODEL_ID}}'
+```
+
+Users would see below docker logs from vllm-service if profiling is stopped correctly.
+
+```bash
+INFO api_server.py:368] Stopping profiler...
+INFO api_server.py:370] Profiler stopped.
+INFO:     x.x.x.x:41614 - "POST /stop_profile HTTP/1.1" 200 OK
+```
+
+After vllm profiling is stopped, users could use below command to get the \*.pt.trace.json.gz file under /mnt folder.
+
+```bash
+docker cp  vllm-service:/mnt/ .
+```
+
+##### Check profiling result
+
+Open a web browser and type "chrome://tracing" or "ui.perfetto.dev", and then load the json.gz file, you should be able  
+ to see the vLLM profiling result as below diagram.
+![image](https://github.com/user-attachments/assets/487c52c8-d187-46dc-ab3a-43f21d657d41)
+
+![image](https://github.com/user-attachments/assets/e3c51ce5-d704-4eb7-805e-0d88b0c158e3)
+
 ## 🚀 Launch the UI
 
 ### Launch with origin port
