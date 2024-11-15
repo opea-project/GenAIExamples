@@ -85,7 +85,7 @@ function validate_services() {
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
-        
+
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
@@ -103,7 +103,7 @@ function validate_services() {
 
 function validate_rag() {
     cd $WORKPATH/tests
-    
+
     # setup pipeline
     validate_services \
         "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/settings/pipelines" \
