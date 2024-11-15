@@ -83,7 +83,7 @@ flowchart LR
 
 ## Deployment with docker
 
-1.[Optional] Build agent docker image
+1. Build agent docker image [Optional]
 
 > [!NOTE]
 > the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
