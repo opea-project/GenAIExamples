@@ -18,7 +18,7 @@ jobs:
   job1:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      test_mode: "docker_image_build/build.yaml"
+      test_mode: "docker_image_build"
 
   image-build:
     needs: job1
