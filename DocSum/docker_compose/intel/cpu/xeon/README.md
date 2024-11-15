@@ -29,12 +29,12 @@ The Whisper Service converts audio files to text. Follow these steps to build an
 docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
 ```
 
-#### A2T Service
+#### Audio to text Service
 
-The A2T Service is another service for converting audio to text. Follow these steps to build and run the service:
+The Audio to text Service is another service for converting audio to text. Follow these steps to build and run the service:
 
 ```bash
-docker build -t opea/a2t:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/audio2text/Dockerfile .
+docker build -t opea/dataprep-audio2text:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/audio2text/Dockerfile .
 ```
 
 #### Video to Audio Service
@@ -42,15 +42,15 @@ docker build -t opea/a2t:latest --build-arg https_proxy=$https_proxy --build-arg
 The Video to Audio Service extracts audio from video files. Follow these steps to build and run the service:
 
 ```bash
-docker build -t opea/v2a:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/video2audio/Dockerfile .
+docker build -t opea/dataprep-video2audio:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/video2audio/Dockerfile .
 ```
 
-#### Multimedia2Text Service
+#### Multimedia to Text Service
 
-The Multimedia2Text Service transforms multimedia data to text data. Follow these steps to build and run the service:
+The Multimedia to Text Service transforms multimedia data to text data. Follow these steps to build and run the service:
 
 ```bash
-docker build -t opea/multimedia2text:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/Dockerfile .
+docker build -t opea/dataprep-multimedia2text:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -124,9 +124,9 @@ You will have the following Docker Images:
 2. `opea/docsum:latest`
 3. `opea/llm-docsum-tgi:latest`
 4. `opea/whisper:latest`
-5. `opea/a2t:latest`
-6. `opea/multimedia2text:latest`
-7. `opea/v2a:latest`
+5. `opea/dataprep-audio2text:latest`
+6. `opea/dataprep-multimedia2text:latest`
+7. `opea/dataprep-video2audio:latest`
 
 ### Validate Microservices
 
@@ -178,7 +178,7 @@ You will have the following Docker Images:
      {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
    ```
 
-5. Multimedia2text Microservice
+5. Multimedia to text Microservice
 
    ```bash
     curl http://${host_ip}:7079/v1/multimedia2text \

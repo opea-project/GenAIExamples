@@ -58,27 +58,27 @@ services:
       - SYS_NICE
     restart: unless-stopped
 
-  a2t:
-    image: ${REGISTRY:-opea}/a2t:${TAG:-latest}
-    container_name: a2t-service
+  dataprep-audio2text:
+    image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
+    container_name: dataprep-audio2text-service
     ports:
       - "9199:9099"
     ipc: host
     environment:
       A2T_ENDPOINT: ${A2T_ENDPOINT}
 
-  v2a:
-    image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
-    container_name: v2a-service
+  dataprep-video2audio:
+    image: ${REGISTRY:-opea}/dataprep-video2audio:${TAG:-latest}
+    container_name: dataprep-video2audio-service
     ports:
       - "7078:7078"
     ipc: host
     environment:
       V2A_ENDPOINT: ${V2A_ENDPOINT}
 
-  multimedia2text:
-    image: ${REGISTRY:-opea}/multimedia2text:${TAG:-latest}
-    container_name: multimedia2text
+  dataprep-multimedia2text:
+    image: ${REGISTRY:-opea}/dataprep-multimedia2text:${TAG:-latest}
+    container_name: dataprep-multimedia2text
     ports:
       - "7079:7079"
     ipc: host
@@ -92,9 +92,9 @@ services:
     depends_on:
       - tgi-service
       - llm-docsum-tgi
-      - multimedia2text
-      - v2a
-      - a2t
+      - dataprep-multimedia2text
+      - dataprep-video2audio
+      - dataprep-audio2text
     ports:
       - "8888:8888"
     environment:

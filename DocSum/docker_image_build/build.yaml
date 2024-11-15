@@ -32,7 +32,7 @@ services:
     extends: docsum
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
 
-  multimedia2text:
+  dataprep-multimedia2text:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -40,9 +40,9 @@ services:
       context: GenAIComps
       dockerfile: comps/dataprep/multimedia2text/Dockerfile
     extends: docsum
-    image: ${REGISTRY:-opea}/multimedia2text:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-multimedia2text:${TAG:-latest}
 
-  a2t:
+  dataprep-audio2text:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -50,9 +50,9 @@ services:
       context: GenAIComps
       dockerfile: comps/dataprep/multimedia2text/audio2text/Dockerfile
     extends: docsum
-    image: ${REGISTRY:-opea}/a2t:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
 
-  v2a:
+  dataprep-video2audio:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -60,7 +60,7 @@ services:
       context: GenAIComps
       dockerfile: comps/dataprep/multimedia2text/video2audio/Dockerfile
     extends: docsum
-    image: ${REGISTRY:-opea}/v2a:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-video2audio:${TAG:-latest}
 
   llm-docsum-tgi:
     build:
