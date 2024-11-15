@@ -12,6 +12,7 @@ function build_docker_images() {
     cd $WORKPATH
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd vllm-fork/
+    git checkout 3c39626
     docker build --no-cache -f Dockerfile.hpu -t opea/vllm-hpu:comps --shm-size=128g .
     if [ $? -ne 0 ]; then
         echo "opea/vllm-hpu built fail"
@@ -34,7 +35,7 @@ function build_docker_images() {
 }
 
 function start_service() {
-    export LLM_MODEL="facebook/opt-125m"
+    export LLM_MODEL="Intel/neural-chat-7b-v3-3"
     port_number=5025
     docker run -d --rm \
         --runtime=habana \
@@ -76,7 +77,7 @@ function validate_microservice() {
     result=$(http_proxy="" curl http://${ip_address}:5025/v1/completions \
         -H "Content-Type: application/json" \
         -d '{
-        "model": "facebook/opt-125m",
+        "model": "Intel/neural-chat-7b-v3-3",
         "prompt": "What is Deep Learning?",
         "max_tokens": 32,
         "temperature": 0
