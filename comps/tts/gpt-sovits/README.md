@@ -47,10 +47,16 @@ curl localhost:9880/ -XPOST -d '{
 
 - Change reference audio
 
+This microservice allows you to use the zero-shot voice cloning feature. For example, you can change the reference audio from the default female to a male voice:
+
 ```bash
-curl localhost:9880/change_refer -d '{
-    "refer_wav_path": "path_to_your_audio.wav",
-    "prompt_text": "transcription_of_your_audio",
-    "prompt_language": "language_of_your_audio"
+wget https://github.com/OpenTalker/SadTalker/blob/main/examples/driven_audio/chinese_poem1.wav
+
+docker cp chinese_poem1.wav gpt-sovits-service:/home/user/chinese_poem1.wav
+
+http_proxy="" curl localhost:9880/change_refer -d '{
+    "refer_wav_path": "/home/user/chinese_poem1.wav",
+    "prompt_text": "窗前明月光，疑是地上霜，举头望明月，低头思故乡。",
+    "prompt_language": "zh"
 }'
 ```
