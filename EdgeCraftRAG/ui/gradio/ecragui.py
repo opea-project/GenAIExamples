@@ -2,11 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import json
+import os
 import platform
-import re
 from datetime import datetime
-from pathlib import Path
 
 import cpuinfo
 import distro  # if running Python 3.8 or above
@@ -17,41 +15,22 @@ import httpx
 # Creation of the ModelLoader instance and loading models remain the same
 import platform_config as pconf
 import psutil
-import requests
 from loguru import logger
 from omegaconf import OmegaConf
-from platform_config import get_available_devices, get_available_weights, get_local_available_models
+from platform_config import (
+    get_avail_llm_inference_type,
+    get_available_devices,
+    get_available_weights,
+    get_local_available_models,
+)
 
 pipeline_df = []
 
-import os
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "127.0.0.1")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 16011))
 UI_SERVICE_HOST_IP = os.getenv("UI_SERVICE_HOST_IP", "0.0.0.0")
-UI_SERVICE_PORT = int(os.getenv("UI_SERVICE_PORT", 8084))
-
-
-def get_llm_model_dir(llm_model_id, weights_compression):
-    model_dirs = {
-        "fp16_model_dir": Path(llm_model_id) / "FP16",
-        "int8_model_dir": Path(llm_model_id) / "INT8_compressed_weights",
-        "int4_model_dir": Path(llm_model_id) / "INT4_compressed_weights",
-    }
-
-    if weights_compression == "INT4":
-        model_dir = model_dirs["int4_model_dir"]
-    elif weights_compression == "INT8":
-        model_dir = model_dirs["int8_model_dir"]
-    else:
-        model_dir = model_dirs["fp16_model_dir"]
-
-    if not model_dir.exists():
-        raise FileNotFoundError(f"The model directory {model_dir} does not exist.")
-    elif not model_dir.is_dir():
-        raise NotADirectoryError(f"The path {model_dir} is not a directory.")
-
-    return model_dir
+UI_SERVICE_PORT = int(os.getenv("UI_SERVICE_PORT", 8082))
 
 
 def get_system_status():
@@ -87,31 +66,7 @@ def get_system_status():
     return status
 
 
-def build_demo(cfg, args):
-
-    def load_chatbot_models(
-        llm_id,
-        llm_device,
-        llm_weights,
-        embedding_id,
-        embedding_device,
-        rerank_id,
-        rerank_device,
-    ):
-        req_dict = {
-            "llm_id": llm_id,
-            "llm_device": llm_device,
-            "llm_weights": llm_weights,
-            "embedding_id": embedding_id,
-            "embedding_device": embedding_device,
-            "rerank_id": rerank_id,
-            "rerank_device": rerank_device,
-        }
-        # hard code only for test
-        worker_addr = "http://127.0.0.1:8084"
-        print(req_dict)
-        result = requests.post(f"{worker_addr}/load", json=req_dict, proxies={"http": None})
-        return result.text
+def build_app(cfg, args):
 
     def user(message, history):
         """Callback function for updating user messages in interface on submit button click.
@@ -131,11 +86,9 @@ def build_demo(cfg, args):
         top_p,
         top_k,
         repetition_penalty,
+        max_tokens,
         hide_full_prompt,
-        do_rag,
         docs,
-        spliter_name,
-        vector_db,
         chunk_size,
         chunk_overlap,
         vector_search_top_k,
@@ -155,41 +108,16 @@ def build_demo(cfg, args):
         repetition_penalty: parameter for penalizing tokens based on how frequently they occur in the text.
         conversation_id: unique conversation identifier.
         """
-        # req_dict = {
-        #     "history": history,
-        #     "temperature": temperature,
-        #     "top_p": top_p,
-        #     "top_k": top_k,
-        #     "repetition_penalty": repetition_penalty,
-        #     "hide_full_prompt": hide_full_prompt,
-        #     "do_rag": do_rag,
-        #     "docs": docs,
-        #     "spliter_name": spliter_name,
-        #     "vector_db": vector_db,
-        #     "chunk_size": chunk_size,
-        #     "chunk_overlap": chunk_overlap,
-        #     "vector_search_top_k": vector_search_top_k,
-        #     "vector_search_top_n": vector_search_top_n,
-        #     "run_rerank": run_rerank,
-        #     "search_method": search_method,
-        #     "score_threshold": score_threshold,
-        #     "streaming": True
-        # }
-        print(history)
-        new_req = {"messages": history[-1][0]}
+        stream_opt = True
+        new_req = {"messages": history[-1][0], "stream": stream_opt, "max_tokens": max_tokens}
         server_addr = f"http://{MEGA_SERVICE_HOST_IP}:{MEGA_SERVICE_PORT}"
 
         # Async for streaming response
         partial_text = ""
         async with httpx.AsyncClient() as client:
             async with client.stream("POST", f"{server_addr}/v1/chatqna", json=new_req, timeout=None) as response:
-                partial_text = ""
-                async for chunk in response.aiter_lines():
-                    new_text = chunk
-                    if new_text.startswith("data"):
-                        new_text = re.sub(r"\r\n", "", chunk.split("data: ")[-1])
-                    new_text = json.loads(chunk)["choices"][0]["message"]["content"]
-                    partial_text = partial_text + new_text
+                async for chunk in response.aiter_text():
+                    partial_text = partial_text + chunk
                     history[-1][1] = partial_text
                     yield history
 
@@ -198,6 +126,7 @@ def build_demo(cfg, args):
     avail_rerank_models = get_local_available_models("rerank")
     avail_devices = get_available_devices()
     avail_weights_compression = get_available_weights()
+    avail_llm_inference_type = get_avail_llm_inference_type()
     avail_node_parsers = pconf.get_available_node_parsers()
     avail_indexers = pconf.get_available_indexers()
     avail_retrievers = pconf.get_available_retrievers()
@@ -212,7 +141,7 @@ def build_demo(cfg, args):
     .disclaimer {font-variant-caps: all-small-caps}
     """
 
-    with gr.Blocks(theme=gr.themes.Soft(), css=css) as demo:
+    with gr.Blocks(theme=gr.themes.Soft(), css=css) as app:
         gr.HTML(
             """
             <!DOCTYPE html>
@@ -250,7 +179,7 @@ def build_demo(cfg, args):
                 <!-- Title container centered in the remaining space -->
                 <div class="title-container">
                     <span class="title-line"><h1 >Edge Craft RAG based Q&A Chatbot</h1></span>
-                    <span class="title-line"><h5 style="margin: 0;">Powered by Intel NEXC Edge AI solutions</h5></span>
+                    <span class="title-line"><h5 style="margin: 0;">Powered by Intel</h5></span>
                 </div>
             </div>
 
@@ -295,7 +224,6 @@ def build_demo(cfg, args):
                         with gr.Row():
                             rag_create_pipeline = gr.Button("Create Pipeline")
                             rag_activate_pipeline = gr.Button("Activate Pipeline")
-                            rag_remove_pipeline = gr.Button("Remove Pipeline")
 
                         with gr.Column(variant="panel"):
                             u_pipeline_name = gr.Textbox(
@@ -366,6 +294,7 @@ def build_demo(cfg, args):
                                         label="Embedding run device",
                                         # info="Run embedding model on which device?",
                                         multiselect=False,
+                                        interactive=True,
                                     )
 
                         with gr.Column(variant="panel"):
@@ -415,6 +344,7 @@ def build_demo(cfg, args):
                                         label="Rerank run device",
                                         # info="Run rerank model on which device?",
                                         multiselect=False,
+                                        interactive=True,
                                     )
 
                         with gr.Column(variant="panel"):
@@ -426,6 +356,10 @@ def build_demo(cfg, args):
                                     info="Select a generator for AI inference.",
                                     multiselect=False,
                                     interactive=True,
+                                )
+
+                                u_llm_infertype = gr.Radio(
+                                    choices=avail_llm_inference_type, label="LLM Inference Type", value="local"
                                 )
 
                                 with gr.Accordion("LLM Configuration", open=True):
@@ -444,12 +378,15 @@ def build_demo(cfg, args):
                                         label="LLM run device",
                                         # info="Run LLM on which device?",
                                         multiselect=False,
+                                        interactive=True,
                                     )
 
                                     u_llm_weights = gr.Radio(
                                         avail_weights_compression,
                                         label="Weights",
                                         info="weights compression",
+                                        value=cfg.llm_weights,
+                                        interactive=True,
                                     )
 
         # -------------------
@@ -460,14 +397,9 @@ def build_demo(cfg, args):
             # get selected pipeline id
             # Dataframe: {'headers': '', 'data': [[x00, x01], [x10, x11]}
             # SelectData.index: [i, j]
-            print(u_pipelines.value["data"])
-            print(evt.index)
             # always use pipeline id for indexing
             selected_id = pipeline_df[evt.index[0]][0]
             pl = cli.get_pipeline(selected_id)
-            # TODO: change to json fomart
-            # pl["postprocessor"][0]["processor_type"]
-            # pl["postprocessor"]["model"]["model_id"], pl["postprocessor"]["model"]["device"]
             return (
                 pl["name"],
                 pl["status"]["active"],
@@ -477,12 +409,16 @@ def build_demo(cfg, args):
                 pl["indexer"]["indexer_type"],
                 pl["retriever"]["retriever_type"],
                 pl["retriever"]["retrieve_topk"],
+                pl["postprocessor"][0]["postprocessor_type"],
                 pl["generator"]["generator_type"],
+                pl["generator"]["inference_type"],
                 pl["generator"]["model"]["model_id"],
                 pl["generator"]["model"]["device"],
-                "",
+                pl["generator"]["model"]["weight"],
                 pl["indexer"]["model"]["model_id"],
                 pl["indexer"]["model"]["device"],
+                pl["postprocessor"][0]["model"]["model_id"] if pl["postprocessor"][0]["model"] is not None else "",
+                pl["postprocessor"][0]["model"]["device"] if pl["postprocessor"][0]["model"] is not None else "",
             )
 
         def modify_create_pipeline_button():
@@ -502,6 +438,7 @@ def build_demo(cfg, args):
             vector_search_top_k,
             postprocessor,
             generator,
+            llm_infertype,
             llm_id,
             llm_device,
             llm_weights,
@@ -521,6 +458,7 @@ def build_demo(cfg, args):
                 vector_search_top_k,
                 postprocessor,
                 generator,
+                llm_infertype,
                 llm_id,
                 llm_device,
                 llm_weights,
@@ -548,17 +486,18 @@ def build_demo(cfg, args):
                 u_retriever,
                 u_vector_search_top_k,
                 # postprocessor
-                # u_postprocessor,
+                u_postprocessor,
                 # generator
                 u_generator,
+                u_llm_infertype,
                 # models
                 u_llm_model_id,
                 u_llm_device,
                 u_llm_weights,
                 u_embed_model_id,
                 u_embed_device,
-                # u_rerank_model_id,
-                # u_rerank_device
+                u_rerank_model_id,
+                u_rerank_device,
             ],
         )
 
@@ -586,6 +525,7 @@ def build_demo(cfg, args):
                 u_llm_model_id.input,
                 u_llm_device.input,
                 u_llm_weights.input,
+                u_llm_infertype.input,
                 u_embed_model_id.input,
                 u_embed_device.input,
                 u_rerank_model_id.input,
@@ -609,6 +549,7 @@ def build_demo(cfg, args):
                 u_vector_search_top_k,
                 u_postprocessor,
                 u_generator,
+                u_llm_infertype,
                 u_llm_model_id,
                 u_llm_device,
                 u_llm_weights,
@@ -634,8 +575,8 @@ def build_demo(cfg, args):
         def get_files():
             return cli.get_files()
 
-        def create_vectordb(docs, spliter, vector_db):
-            res = cli.create_vectordb(docs, spliter, vector_db)
+        def create_vectordb(docs, spliter):
+            res = cli.create_vectordb(docs, spliter)
             return gr.update(value=get_files()), res
 
         global u_files_selected_row
@@ -696,13 +637,6 @@ def build_demo(cfg, args):
                             multiselect=False,
                         )
 
-                        vector_db = gr.Dropdown(
-                            ["FAISS", "Chroma"],
-                            value=cfg.vector_db,
-                            label="Vector Stores",
-                            info="Stores embedded data and performs vector search.",
-                            multiselect=False,
-                        )
                     load_docs = gr.Button("Upload files")
 
                     u_files_status = gr.Textbox(label="File Processing Status", value="", interactive=False)
@@ -723,12 +657,6 @@ def build_demo(cfg, args):
                             with gr.Column():
                                 deselect_button = gr.Button("Clear Selection")
 
-                    do_rag = gr.Checkbox(
-                        value=True,
-                        label="RAG is ON",
-                        interactive=True,
-                        info="Whether to do RAG for generation",
-                    )
                     with gr.Accordion("Generation Configuration", open=False):
                         with gr.Row():
                             with gr.Column():
@@ -778,6 +706,17 @@ def build_demo(cfg, args):
                                         interactive=True,
                                         info="Penalize repetition — 1.0 to disable.",
                                     )
+                            with gr.Column():
+                                with gr.Row():
+                                    u_max_tokens = gr.Slider(
+                                        label="Max Token Number",
+                                        value=512,
+                                        minimum=1,
+                                        maximum=8192,
+                                        step=10,
+                                        interactive=True,
+                                        info="Set Max Output Token",
+                                    )
                 with gr.Column(scale=4):
                     chatbot = gr.Chatbot(
                         height=600,
@@ -795,7 +734,6 @@ def build_demo(cfg, args):
                         with gr.Column():
                             with gr.Row():
                                 submit = gr.Button("Submit")
-                                stop = gr.Button("Stop")
                                 clear = gr.Button("Clear")
                     retriever_argument = gr.Accordion("Retriever Configuration", open=True)
                     with retriever_argument:
@@ -845,7 +783,6 @@ def build_demo(cfg, args):
             inputs=[
                 docs,
                 spliter,
-                vector_db,
             ],
             outputs=[u_files, u_files_status],
             queue=True,
@@ -873,11 +810,9 @@ def build_demo(cfg, args):
                 top_p,
                 top_k,
                 repetition_penalty,
+                u_max_tokens,
                 hide_context,
-                do_rag,
                 docs,
-                spliter,
-                vector_db,
                 u_chunk_size,
                 u_chunk_overlap,
                 u_vector_search_top_k,
@@ -897,11 +832,9 @@ def build_demo(cfg, args):
                 top_p,
                 top_k,
                 repetition_penalty,
+                u_max_tokens,
                 hide_context,
-                do_rag,
                 docs,
-                spliter,
-                vector_db,
                 u_chunk_size,
                 u_chunk_overlap,
                 u_vector_search_top_k,
@@ -913,15 +846,8 @@ def build_demo(cfg, args):
             chatbot,
             queue=True,
         )
-        # stop.click(
-        #     fn=request_cancel,
-        #     inputs=None,
-        #     outputs=None,
-        #     cancels=[submit_event, submit_click_event],
-        #     queue=False,
-        # )
         clear.click(lambda: None, None, chatbot, queue=False)
-    return demo
+    return app
 
 
 def main():
@@ -929,8 +855,6 @@ def main():
     parser = argparse.ArgumentParser(description="Load Embedding and LLM Models with OpenVino.")
     # Add the arguments
     parser.add_argument("--prompt_template", type=str, required=False, help="User specific template")
-    # parser.add_argument("--server_name", type=str, default="0.0.0.0")
-    # parser.add_argument("--server_port", type=int, default=8082)
     parser.add_argument("--config", type=str, default="./default.yaml", help="configuration file path")
     parser.add_argument("--share", action="store_true", help="share model")
     parser.add_argument("--debug", action="store_true", help="enable debugging")
@@ -942,20 +866,20 @@ def main():
     init_cfg_(cfg)
     logger.info(cfg)
 
-    demo = build_demo(cfg, args)
+    app = build_app(cfg, args)
     # if you are launching remotely, specify server_name and server_port
-    # demo.launch(server_name='your server name', server_port='server port in int')
+    # app.launch(server_name='your server name', server_port='server port in int')
     # if you have any issue to launch on your platform, you can pass share=True to launch method:
-    # demo.launch(share=True)
+    # app.launch(share=True)
     # it creates a publicly shareable link for the interface. Read more in the docs: https://gradio.app/docs/
-    # demo.launch(share=True)
-    demo.queue().launch(
+    # app.launch(share=True)
+    app.queue().launch(
         server_name=UI_SERVICE_HOST_IP, server_port=UI_SERVICE_PORT, share=args.share, allowed_paths=["."]
     )
 
     # %%
     # please run this cell for stopping gradio interface
-    demo.close()
+    app.close()
 
 
 def init_cfg_(cfg):
@@ -969,14 +893,14 @@ def init_cfg_(cfg):
         cfg.llm_device = "CPU"
     if "model_language" not in cfg:
         cfg.model_language = "Chinese"
-    if "vector_db" not in cfg:
-        cfg.vector_db = "FAISS"
     if "splitter_name" not in cfg:
         cfg.splitter_name = "RecursiveCharacter"  # or "Chinese"
     if "search_method" not in cfg:
         cfg.search_method = "similarity"
     if "score_threshold" not in cfg:
         cfg.score_threshold = 0.5
+    if "llm_weights" not in cfg:
+        cfg.llm_weights = "FP16"
 
 
 if __name__ == "__main__":
