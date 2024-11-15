@@ -14,7 +14,7 @@ on:
       test_mode:
         required: false
         type: string
-        default: 'docker_compose'
+        default: 'compose'
     outputs:
       run_matrix:
         description: "The matrix string"
