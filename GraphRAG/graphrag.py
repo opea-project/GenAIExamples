@@ -70,7 +70,11 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         # handle template
         # if user provides template, then format the prompt with it
         # otherwise, use the default template
-        prompt = inputs.messages[0]["content"]
+        print("outputs before align:\n", inputs)
+        if isinstance(inputs.messages, str):
+            prompt = inputs.messages
+        else:
+            prompt = inputs.messages[0]["content"]
         chat_template = llm_parameters_dict["chat_template"]
         if chat_template:
             prompt_template = PromptTemplate.from_template(chat_template)
