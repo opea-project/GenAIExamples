@@ -15,12 +15,14 @@ services:
       - ${MODEL_PATH:-${PWD}}:/home/user/models
       - ${DOC_PATH:-${PWD}}:/home/user/docs
       - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
+      - ${HF_CACHE:-${HOME}/.cache}:/home/user/.cache
     ports:
       - ${PIPELINE_SERVICE_PORT:-16010}:${PIPELINE_SERVICE_PORT:-16010}
     devices:
       - /dev/dri:/dev/dri
     group_add:
-      - video
+      - ${VIDEOGROUPID:-44}
+      - ${RENDERGROUPID:-109}
   ecrag:
     image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}
     container_name: edgecraftrag
@@ -73,16 +75,18 @@ services:
       - $HOME/.cache/huggingface:/root/.cache/huggingface
     devices:
       - /dev/dri
+    group_add:
+      - ${VIDEOGROUPID:-44}
+      - ${RENDERGROUPID:-109}
     entrypoint: /bin/bash -c "\
       cd / && \
       export VLLM_CPU_KVCACHE_SPACE=50 && \
       export VLLM_OPENVINO_ENABLE_QUANTIZED_WEIGHTS=ON && \
       python3 -m vllm.entrypoints.openai.api_server \
         --model '${LLM_MODEL}' \
-        --max_model_len=4096 \
+        --max_model_len=1024 \
         --host 0.0.0.0 \
         --port 80"
-
 networks:
   default:
     driver: bridge

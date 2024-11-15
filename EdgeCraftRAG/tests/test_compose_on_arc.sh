@@ -60,7 +60,7 @@ function validate_rag() {
         "active" \
         "pipeline" \
         "edgecraftrag-server" \
-        '@configs/test_pipeline_local_llm_cpu.json'
+        '@configs/test_pipeline_local_llm.json'
 
     # add data
     validate_services \
