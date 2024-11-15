@@ -66,6 +66,7 @@ class QnAGenerator(BaseComponent):
         )
         self.llm().generate_kwargs = generate_kwargs
         if chat_request.stream:
+
             async def stream_generator():
                 response = self.llm().stream_complete(prompt_str)
                 for r in response:
@@ -122,7 +123,7 @@ class QnAGenerator(BaseComponent):
             "idx": self.idx,
             "generator_type": self.comp_subtype,
             "inference_type": self.inference_type,
-            "model": self.llm()
+            "model": self.llm(),
         }
         return set
 

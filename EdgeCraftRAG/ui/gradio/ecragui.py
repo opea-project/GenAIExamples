@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+import os
 import platform
 from datetime import datetime
 
@@ -16,8 +17,12 @@ import platform_config as pconf
 import psutil
 from loguru import logger
 from omegaconf import OmegaConf
-from platform_config import get_available_devices, get_available_weights, get_local_available_models, get_avail_llm_inference_type
-import os
+from platform_config import (
+    get_avail_llm_inference_type,
+    get_available_devices,
+    get_available_weights,
+    get_local_available_models,
+)
 
 pipeline_df = []
 
@@ -354,9 +359,7 @@ def build_app(cfg, args):
                                 )
 
                                 u_llm_infertype = gr.Radio(
-                                    choices=avail_llm_inference_type,
-                                    label="LLM Inference Type",
-                                    value="local"
+                                    choices=avail_llm_inference_type, label="LLM Inference Type", value="local"
                                 )
 
                                 with gr.Accordion("LLM Configuration", open=True):
@@ -415,7 +418,7 @@ def build_app(cfg, args):
                 pl["indexer"]["model"]["model_id"],
                 pl["indexer"]["model"]["device"],
                 pl["postprocessor"][0]["model"]["model_id"] if pl["postprocessor"][0]["model"] is not None else "",
-                pl["postprocessor"][0]["model"]["device"] if pl["postprocessor"][0]["model"] is not None else ""
+                pl["postprocessor"][0]["model"]["device"] if pl["postprocessor"][0]["model"] is not None else "",
             )
 
         def modify_create_pipeline_button():
@@ -494,7 +497,7 @@ def build_app(cfg, args):
                 u_embed_model_id,
                 u_embed_device,
                 u_rerank_model_id,
-                u_rerank_device
+                u_rerank_device,
             ],
         )
 

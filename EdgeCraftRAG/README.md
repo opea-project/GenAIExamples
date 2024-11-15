@@ -23,7 +23,7 @@ docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_p
 
 #### Local inference with OpenVINO for Intel Arc GPU
 
-You can select "local" type in generation field which is the default approach to enable Intel Arc GPU for LLM. You don't need to build images for "local" type. 
+You can select "local" type in generation field which is the default approach to enable Intel Arc GPU for LLM. You don't need to build images for "local" type.
 
 #### vLLM with OpenVINO for Intel Arc GPU
 
@@ -86,6 +86,7 @@ export HUGGINGFACEHUB_API_TOKEN=#your HF token
 ```
 
 2. Uncomment below code in 'GenAIExamples/EdgeCraftRAG/docker_compose/intel/gpu/arc/compose.yaml'
+
 ```bash
   # vllm-openvino-server:
   #   container_name: vllm-openvino-server
@@ -193,10 +194,10 @@ Open your browser, access http://${HOST_IP}:8082
 
 > Your browser should be running on the same host of your console, otherwise you will need to access UI with your host domain name instead of ${HOST_IP}.
 
-To create a default pipeline, you need to click the `Create Pipeline` button on the `RAG Settings` page. You can also create multiple pipelines or update existing pipelines through the `Pipeline Configuration`, but please note that active pipelines cannot be updated. 
+To create a default pipeline, you need to click the `Create Pipeline` button on the `RAG Settings` page. You can also create multiple pipelines or update existing pipelines through the `Pipeline Configuration`, but please note that active pipelines cannot be updated.
 ![create_pipeline](assets/img/create_pipeline.png)
 
-After the pipeline creation, you can upload your data in the `Chatbot` page. 
+After the pipeline creation, you can upload your data in the `Chatbot` page.
 ![upload_data](assets/img/upload_data.png)
 
 Then, you can submit messages in the chat box.

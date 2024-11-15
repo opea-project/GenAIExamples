@@ -1,12 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import sys
 
-import requests
-
-import os
 import platform_config as pconf
+import requests
 
 sys.path.append("..")
 from edgecraftrag import api_schema
@@ -65,7 +64,7 @@ def create_update_pipeline(
                 model_id=embedding_id,
                 model_path="./models/" + embedding_id,
                 device=embedding_device,
-                weight=llm_weights
+                weight=llm_weights,
             ),
         ),
         retriever=api_schema.RetrieverIn(retriever_type=retriever, retriever_topk=vector_search_top_k),
@@ -73,22 +72,14 @@ def create_update_pipeline(
             api_schema.PostProcessorIn(
                 processor_type=postprocessor[0],
                 reranker_model=api_schema.ModelIn(
-                    model_id=rerank_id,
-                    model_path="./models/" + rerank_id,
-                    device=rerank_device,
-                    weight=llm_weights
+                    model_id=rerank_id, model_path="./models/" + rerank_id, device=rerank_device, weight=llm_weights
                 ),
             )
         ],
         generator=api_schema.GeneratorIn(
             # TODO: remove hardcoding
             prompt_path="./edgecraftrag/prompt_template/default_prompt.txt",
-            model=api_schema.ModelIn(
-                model_id=llm_id,
-                model_path=llm_path,
-                device=llm_device,
-                weight=llm_weights
-            ),
+            model=api_schema.ModelIn(model_id=llm_id, model_path=llm_path, device=llm_device, weight=llm_weights),
             inference_type=llm_infertype,
         ),
     )
