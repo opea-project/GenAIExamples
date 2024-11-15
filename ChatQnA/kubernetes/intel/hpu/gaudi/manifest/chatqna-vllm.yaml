@@ -1181,19 +1181,26 @@ spec:
             - configMapRef:
                 name: chatqna-teirerank-config
           securityContext:
-            allowPrivilegeEscalation: false
+            privileged: true
             capabilities:
-              drop:
-              - ALL
-            readOnlyRootFilesystem: false
-            runAsNonRoot: true
-            runAsUser: 1000
-            seccompProfile:
-              type: RuntimeDefault
+              add: ["SYS_NICE"]
           image: "ghcr.io/huggingface/tei-gaudi:1.5.0"
           imagePullPolicy: IfNotPresent
           args:
+            - --model-id
+            - "BAAI/bge-reranker-base"
             - "--auto-truncate"
+          env:
+            - name: OMPI_MCA_btl_vader_single_copy_mechanism
+              value: "none"
+            - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
+              value: "true"
+            - name: runtime
+              value: "habana"
+            - name: HABANA_VISIBLE_DEVICES
+              value: "all"
+            - name: MAX_WARMUP_SEQUENCE_LENGTH
+              value: "512"
           volumeMounts:
             - mountPath: /data
               name: model-volume
