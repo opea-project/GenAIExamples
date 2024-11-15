@@ -1,6 +1,6 @@
 # Single node on-prem deployment AgentQnA on Gaudi
 
-This example showcases a hierarchical multi-agent system for question-answering applications. We deploy the example on Gaudi using open-source LLMs, 
+This example showcases a hierarchical multi-agent system for question-answering applications. We deploy the example on Gaudi using open-source LLMs,
 For more details, please refer to the deployment guide [here](../../../../README.md).
 
 ## Deployment with docker
@@ -26,8 +26,8 @@ For more details, please refer to the deployment guide [here](../../../../README
    # for using open-source llms
    export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
    # Example export HF_CACHE_DIR=$WORKDIR so that no need to redownload every time
-   export HF_CACHE_DIR=<directory-where-llms-are-downloaded> 
-   
+   export HF_CACHE_DIR=<directory-where-llms-are-downloaded>
+
    ```
 
 3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
@@ -53,11 +53,13 @@ For more details, please refer to the deployment guide [here](../../../../README
 5. Launch `Agent` service
 
    To use open-source LLMs on Gaudi2, run commands below.
+
    ```
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
    bash launch_tgi_gaudi.sh
    bash launch_agent_service_tgi_gaudi.sh
    ```
+
 6. [Optional] Build `Agent` docker image if pulling images failed.
 
    ```
