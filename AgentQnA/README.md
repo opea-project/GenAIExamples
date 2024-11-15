@@ -84,7 +84,6 @@ flowchart LR
 ## Deployment with docker
 
 1.[Optional] Build agent docker image
-
 > [!NOTE]
 > the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
 
@@ -104,15 +103,14 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
 ```
 
 2. Set up environment for this example </br>
-   First, clone this repo.
 
+   First, clone this repo.
    ```
+   export WORKDIR=<your-work-directory>
    cd $WORKDIR
    git clone https://github.com/opea-project/GenAIExamples.git
    ```
-
    Second, set up env vars.
-
    ```
    # Example: host_ip="192.168.1.1" or export host_ip="External_Public_IP"
    export host_ip=$(hostname -I | awk '{print $1}')
@@ -121,6 +119,7 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
    export no_proxy="Your_No_Proxy"
+
    export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
    # for using open-source llms
    export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
@@ -130,7 +129,7 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
    export OPENAI_API_KEY=<your-openai-key>
    ```
 
-3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
+4. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
 
    First, launch the mega-service.
 
@@ -145,14 +144,14 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
    bash run_ingest_data.sh
    ```
 
-4. Launch other tools. </br>
+5. Launch other tools. </br>
    In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
 
    ```
    docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
    ```
 
-5. Launch agent services</br>
+6. Launch agent services</br>
    We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
 
    Deploy on Gaudi
