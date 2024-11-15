@@ -1,7 +1,9 @@
 # Single node on-prem deployment with Docker Compose on Xeon Scalable processors
+
 This example showcases a hierarchical multi-agent system for question-answering applications. We deploy the example on Xeon. For LLMs, we use OpenAI models via API calls. For instructions on using open-source LLMs, please refer to the deployment guide [here](../../../../README.md).
 
 ## Deployment with docker
+
 1. First, clone this repo.
    ```
    export WORKDIR=<your-work-directory>
@@ -9,6 +11,7 @@ This example showcases a hierarchical multi-agent system for question-answering 
    git clone https://github.com/opea-project/GenAIExamples.git
    ```
 2. Set up environment for this example </br>
+
    ```
    # Example: host_ip="192.168.1.1" or export host_ip="External_Public_IP"
    export host_ip=$(hostname -I | awk '{print $1}')
@@ -22,17 +25,22 @@ This example showcases a hierarchical multi-agent system for question-answering 
    #OPANAI_API_KEY if you want to use OpenAI models
    export OPENAI_API_KEY=<your-openai-key>
    ```
+
 3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
 
    First, launch the mega-service.
+
    ```
    cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool
    bash launch_retrieval_tool.sh
    ```
+
    Then, ingest data into the vector database. Here we provide an example. You can ingest your own data.
+
    ```
    bash run_ingest_data.sh
    ```
+
 4. Launch Tool service
    In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
    ```
@@ -40,19 +48,21 @@ This example showcases a hierarchical multi-agent system for question-answering 
    ```
 5. Launch `Agent` service
 
-    The configurations of the supervisor agent and the worker agent are defined in the docker-compose yaml file. We currently use openAI GPT-4o-mini as LLM, and llama3.1-70B-instruct   (served by TGI-Gaudi) in Gaudi example. To use openai llm, run command below.
+   The configurations of the supervisor agent and the worker agent are defined in the docker-compose yaml file. We currently use openAI GPT-4o-mini as LLM, and llama3.1-70B-instruct (served by TGI-Gaudi) in Gaudi example. To use openai llm, run command below.
 
-    ```
-    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
-    bash launch_agent_service_openai.sh
-    ```
+   ```
+   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
+   bash launch_agent_service_openai.sh
+   ```
+
 6. [Optional] Build `Agent` docker image if pulling images failed.
 
-    ```
-    git clone https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps
-    docker build -t opea/agent-langchain:latest -f comps/agent/langchain/Dockerfile .
-    ```
+   ```
+   git clone https://github.com/opea-project/GenAIComps.git
+   cd GenAIComps
+   docker build -t opea/agent-langchain:latest -f comps/agent/langchain/Dockerfile .
+   ```
+
 ## Validate services
 
 First look at logs of the agent docker containers:
