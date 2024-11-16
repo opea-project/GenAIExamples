@@ -120,8 +120,6 @@ function validate_chatqna_vllm() {
         return 1
     fi
 
-    sleep 200 # wait vllm-svc is ready, vllm warmup takes about 5 minutes
-
     # make sure microservice vllm-svc is ready
     for ((i=1; i<=max_retry; i++))
     do
@@ -205,8 +203,8 @@ function install_and_validate_chatqna_vllm() {
     kubectl create namespace $ns
     # install guardrail
     kubectl apply -f chatqna-vllm.yaml -n $ns
-    # Sleep enough time for chatqna_guardrail to be ready
-    sleep 60
+    # Sleep enough time for chatqna_vllm to be ready, vllm warmup takes about 5 minutes
+    sleep 280
     if kubectl rollout status deployment -n "$ns" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
         echo "Waiting for chatqna_vllm pod ready done!"
     else

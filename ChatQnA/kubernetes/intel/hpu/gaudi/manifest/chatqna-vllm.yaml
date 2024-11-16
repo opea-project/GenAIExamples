@@ -71,7 +71,6 @@ data:
   no_proxy: ""
   LOGFLAG: ""
   vLLM_ENDPOINT: "http://chatqna-vllm"
-  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   LLM_MODEL: "meta-llama/Meta-Llama-3-8B-Instruct"
   MODEL_ID: "meta-llama/Meta-Llama-3-8B-Instruct"
 ---
