@@ -28,7 +28,7 @@ docker run -d -p 5173:5173 --ipc=host \
    -e https_proxy=$https_proxy \
    -e no_proxy=$no_proxy \
    -e BACKEND_SERVICE_ENDPOINT=http://$ip_address:8888/v1/docsum \
-   opea/docsum-ui:latest
+   opea/docsum-gradio-ui:latest
 ```
 
 This command runs the Docker container in interactive mode, mapping port 5173 of the host to port 5173 of the container. It also sets several environment variables, including the backend service endpoint, which is required for the frontend to communicate with the backend service.
