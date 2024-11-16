@@ -119,6 +119,9 @@ function validate_chatqna_vllm() {
         echo "Microservice retriever failed, exit with error."
         return 1
     fi
+
+    sleep 200 # wait vllm-svc is ready, vllm warmup takes about 5 minutes
+
     # make sure microservice vllm-svc is ready
     for ((i=1; i<=max_retry; i++))
     do

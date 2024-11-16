@@ -43,6 +43,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_EMBEDDING_ENDPOINT: "http://chatqna-tei"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
@@ -145,7 +146,6 @@ data:
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
-  MAX_WARMUP_SEQUENCE_LENGTH: "512"
 ---
 # Source: chatqna/charts/teirerank/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -170,6 +170,7 @@ data:
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
+  MAX_WARMUP_SEQUENCE_LENGTH: "512"
 ---
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -183,7 +184,7 @@ metadata:
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "2.1.0"
 data:
-  MODEL_ID: "meta-llama/Llama-3.1-70B-Instruct"
+  MODEL_ID: "meta-llama/Meta-Llama-3-8B-Instruct"
   PORT: "2080"
   HF_TOKEN: "insert-your-huggingface-token-here"
   http_proxy: ""
@@ -194,6 +195,12 @@ data:
   PT_HPU_ENABLE_LAZY_COLLECTIVES: "true"
   OMPI_MCA_btl_vader_single_copy_mechanism: "none"
   HF_HOME: "/tmp/.cache/huggingface"
+  GPU_MEMORY_UTILIZATION: "0.5"
+  DTYPE: "auto"
+  TENSOR_PARALLEL_SIZE: "1"
+  BLOCK_SIZE: "128"
+  MAX_NUM_SEQS: "256"
+  MAX_SEQ_LEN_TO_CAPTURE: "2048"
 ---
 # Source: chatqna/templates/nginx-deployment.yaml
 apiVersion: v1
@@ -1181,26 +1188,17 @@ spec:
             - configMapRef:
                 name: chatqna-teirerank-config
           securityContext:
-            privileged: true
+            allowPrivilegeEscalation: false
             capabilities:
-              add: ["SYS_NICE"]
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           image: "ghcr.io/huggingface/tei-gaudi:1.5.0"
           imagePullPolicy: IfNotPresent
-          args:
-            - --model-id
-            - "BAAI/bge-reranker-base"
-            - "--auto-truncate"
-          env:
-            - name: OMPI_MCA_btl_vader_single_copy_mechanism
-              value: "none"
-            - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
-              value: "true"
-            - name: runtime
-              value: "habana"
-            - name: HABANA_VISIBLE_DEVICES
-              value: "all"
-            - name: MAX_WARMUP_SEQUENCE_LENGTH
-              value: "512"
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -1278,39 +1276,36 @@ spec:
             - configMapRef:
                 name: chatqna-vllm-config
           securityContext:
-            privileged: true
+            allowPrivilegeEscalation: false
             capabilities:
-              add: ["SYS_NICE"]
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           image: "opea/vllm-hpu:latest"
           args:
             - "--enforce-eager"
-            - "--gpu-memory-utilization"
-            - "0.5"
-            - "--dtype"
-            - "auto"
             - "--model"
-            - "meta-llama/Meta-Llama-3-8B-Instruct"
+            - "$(MODEL_ID)"
             - "--tensor-parallel-size"
             - "1"
-            - "--port"
-            - "2080"
-            - "--block-size"
-            - "128"
+            - "--gpu-memory-utilization"
+            - "$(GPU_MEMORY_UTILIZATION)"
+            - "--dtype"
+            - "$(DTYPE)"
             - "--max-num-seqs"
-            - "256"
-            - "--max-seq_len-to-capture"
-            - "2048"
-          env:
-            - name: OMPI_MCA_btl_vader_single_copy_mechanism
-              value: "none"
-            - name: PT_HPU_ENABLE_LAZY_COLLECTIVES
-              value: "true"
-            - name: runtime
-              value: "habana"
-            - name: HABANA_VISIBLE_DEVICES
-              value: "all"
-            - name: HF_TOKEN
-              value: "insert-your-huggingface-token-here"
+            - "$(MAX_NUM_SEQS)"
+            - "--block-size"
+            - "$(BLOCK_SIZE)"
+            - "--max-seq-len-to-capture"
+            - "$(MAX_SEQ_LEN_TO_CAPTURE)"
+            - "--host"
+            - "0.0.0.0"
+            - "--port"
+            - "$(PORT)"
           imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
@@ -1373,7 +1368,7 @@ spec:
               value: chatqna-retriever-usvc
             - name: EMBEDDING_SERVICE_HOST_IP
               value: chatqna-embedding-usvc
-            - name: LLM_MODEL
+            - name: MODEL_ID
               value: "meta-llama/Meta-Llama-3-8B-Instruct"
           securityContext:
             allowPrivilegeEscalation: false
@@ -1386,7 +1381,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/chatqna-wrapper:latest"
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /tmp
               name: tmp
