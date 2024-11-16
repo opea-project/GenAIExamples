@@ -18,7 +18,7 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
       context: ../ui/
-      dockerfile: ./docker/Dockerfile.gradio
+      dockerfile: ./docker/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
 
