@@ -220,7 +220,11 @@ class ChatQnAGateway(Gateway):
             repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
             streaming=stream_opt,
             chat_template=chat_request.chat_template if chat_request.chat_template else None,
-            model=chat_request.model if chat_request.model else None,
+            model=(
+                chat_request.model
+                if chat_request.model
+                else os.getenv("MODEL_ID") if os.getenv("MODEL_ID") else "Intel/neural-chat-7b-v3-3"
+            ),
         )
         retriever_parameters = RetrieverParms(
             search_type=chat_request.search_type if chat_request.search_type else "similarity",
