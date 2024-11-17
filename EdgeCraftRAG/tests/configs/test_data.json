@@ -1,0 +1,3 @@
+{
+  "text": "A test case for the rag pipeline. The test id is 1234567890. There are several tests in this test case. The first test is for node parser. There are 3 types of node parsers. Their names are Aa, Bb and Cc. The second test is for indexer. The indexer will do the indexing for the given nodes. The last test is for retriever. Retrieving text is based on similarity search."
+}

@@ -38,7 +38,7 @@
       "weight": "INT4"
     },
     "prompt_path": "./edgecraftrag/prompt_template/default_prompt.txt",
-    "inference_type": "local"
+    "inference_type": "vllm"
   },
   "active": "True"
 }
