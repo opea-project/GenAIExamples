@@ -46,12 +46,13 @@ function validate_docsum() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOGFILE ]] && \
-    [[ $(grep -c "versatile toolkit" $LOGFILE) != 0 ]]; then
+    [[ $(grep -c "embedding" $LOGFILE) != 0 ]]; then
         status=true
     fi
 
     if [ $status == false ]; then
         echo "Response check failed, please check the logs in artifacts!"
+        exit 1
     else
         echo "Response check succeed!"
     fi
