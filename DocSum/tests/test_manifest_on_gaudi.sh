@@ -36,6 +36,7 @@ function validate_docsum() {
     # Curl the Mega Service
     curl http://${ip_address}:${port}/v1/docsum \
     -H 'Content-Type: multipart/form-data' \
+    -F 'type=text' \
     -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
