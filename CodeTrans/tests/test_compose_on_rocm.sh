@@ -39,7 +39,7 @@ function start_services() {
     export CODETRANS_MEGA_SERVICE_HOST_IP=${ip_address}
     export CODETRANS_LLM_SERVICE_HOST_IP=${ip_address}
     export CODETRANS_FRONTEND_SERVICE_IP=${ip_address}
-    export CODETRANS_FRONTEND_SERVICE_PORT=18155
+    export CODETRANS_FRONTEND_SERVICE_PORT=5173
     export CODETRANS_BACKEND_SERVICE_NAME=codetrans
     export CODETRANS_BACKEND_SERVICE_IP=${ip_address}
     export CODETRANS_BACKEND_SERVICE_PORT=18154
@@ -139,7 +139,7 @@ function validate_frontend() {
     fi
     source activate ${conda_env_name}
 
-    sed -i "s/localhost/$ip_address:$CODETRANS_FRONTEND_SERVICE_PORT/g" playwright.config.ts
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
     conda install -c conda-forge nodejs -y
     npm install && npm ci && npx playwright install --with-deps
