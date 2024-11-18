@@ -68,6 +68,7 @@ services:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
+      BASE_URL: ${CODETRANS_BACKEND_SERVICE_URL}
       BASIC_URL: ${CODETRANS_BACKEND_SERVICE_URL}
     ipc: host
     restart: always
