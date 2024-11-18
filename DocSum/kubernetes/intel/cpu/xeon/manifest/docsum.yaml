@@ -855,24 +855,21 @@ spec:
               name: tmp
           livenessProbe:
             failureThreshold: 24
-            httpGet:
-              path: v1/health_check
-              port: audio2text
             initialDelaySeconds: 5
             periodSeconds: 5
+            tcpSocket:
+              port: http
           readinessProbe:
-            httpGet:
-              path: v1/health_check
-              port: audio2text
             initialDelaySeconds: 5
             periodSeconds: 5
+            tcpSocket:
+              port: http
           startupProbe:
             failureThreshold: 120
-            httpGet:
-              path: v1/health_check
-              port: audio2text
             initialDelaySeconds: 5
             periodSeconds: 5
+            tcpSocket:
+              port: http
           resources:
             {}
       volumes:
