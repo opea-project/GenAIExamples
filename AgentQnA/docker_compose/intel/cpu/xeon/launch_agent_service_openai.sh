@@ -1,6 +1,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+pushd "../../../../../" > /dev/null
+source .set_env.sh
+popd > /dev/null
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
 export ip_address=$(hostname -I | awk '{print $1}')
 export recursion_limit_worker=12

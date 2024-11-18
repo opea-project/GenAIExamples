@@ -2,6 +2,9 @@
 
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+pushd "../../../../../" > /dev/null
+source .set_env.sh
+popd > /dev/null
 
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
