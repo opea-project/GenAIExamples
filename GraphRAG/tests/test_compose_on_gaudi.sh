@@ -23,7 +23,6 @@ function build_docker_images() {
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull neo4j:latest
     docker images && sleep 1s
 }
 

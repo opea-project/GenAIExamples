@@ -38,7 +38,7 @@ services:
       context: GenAIComps
       dockerfile: comps/nginx/Dockerfile
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
-  chatqna-gaudi-ui-server:
+  graphrag-ui:
     build:
       args:
         http_proxy: ${http_proxy}
