@@ -46,4 +46,4 @@ services:
         no_proxy: ${no_proxy}
       context: ../ui
       dockerfile: ./docker/Dockerfile
-    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/graphrag-ui:${TAG:-latest}
