@@ -74,10 +74,17 @@ jobs:
           mode: ${{ inputs.mode }}
         run: |
           build_list=$(bash ${{ github.workspace }}/.github/workflows/scripts/get_cicd_list.sh "${mode}" ${docker_compose_path})
-          echo "build_list=${build_list}" >> $GITHUB_OUTPUT
+          echo "${build_list}"
+          if [ -z "${build_list}" ]; then
+            echo "empty=true" >> $GITHUB_OUTPUT
+            echo "${{ inputs.service }} have no ${mode} part."
+          else
+            echo "empty=false" >> $GITHUB_OUTPUT
+            echo "build_list=${build_list}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Build Image
-        if: ${{ fromJSON(inputs.build) && steps.get-yaml-path.outputs.file_exists == 'true' }}
+        if: ${{ fromJSON(inputs.build) && steps.get-yaml-path.outputs.file_exists == 'true' && steps.get-build-list.outputs.empty == 'false' }}
         uses: opea-project/validation/actions/image-build@main
         with:
           work_dir: ${{ github.workspace }}
