@@ -11,6 +11,12 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+  chatqna-wrapper:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile.wrapper
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna-wrapper:${TAG:-latest}
   chatqna-guardrails:
     build:
       context: ../
