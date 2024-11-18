@@ -34,7 +34,7 @@ docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --
 
 ## Deploy CodeTrans Application
 
-#### Features of Docker compose for AMD GPUs
+### Features of Docker compose for AMD GPUs
 
 1. Added forwarding of GPU devices to the container TGI service with instructions:
 
@@ -71,13 +71,13 @@ security_opt:
 
 To find out which GPU device IDs cardN and renderN correspond to the same GPU, use the GPU driver utility
 
-#### Go to the directory with the Docker compose file
+### Go to the directory with the Docker compose file
 
 ```bash
 cd GenAIExamples/CodeTrans/docker_compose/amd/gpu/rocm
 ```
 
-#### Set environments
+### Set environments
 
 In the file "GenAIExamples/CodeTrans/docker_compose/amd/gpu/rocm/set_env.sh " it is necessary to set the required values. Parameter assignments are specified in the comments for each variable setting command
 
@@ -86,7 +86,7 @@ chmod +x set_env.sh
 . set_env.sh
 ```
 
-#### Run services
+### Run services
 
 ```
 docker compose up -d
