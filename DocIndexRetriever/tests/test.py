@@ -6,22 +6,17 @@ import argparse
 import requests
 
 
-def search_knowledge_base(query: str, url: str, request_type="chat_completion") -> str:
+def search_knowledge_base(query: str, url: str) -> str:
     """Search the knowledge base for a specific query."""
     print(url)
     proxies = {"http": ""}
-    if request_type == "chat_completion":
-        print("Sending chat completion request")
-        payload = {
-            "messages": query,
-            "k": 5,
-            "top_n": 2,
-        }
-    else:
-        print("Sending text request")
-        payload = {
-            "text": query,
-        }
+
+    print("Sending chat completion request")
+    payload = {
+        "messages": query,
+        "k": 5,
+        "top_n": 2,
+    }
     response = requests.post(url, json=payload, proxies=proxies)
     print(response)
     if "documents" in response.json():
@@ -62,7 +57,7 @@ def main():
     port = args.port
     url = "http://{host_ip}:{port}/v1/retrievaltool".format(host_ip=host_ip, port=port)
 
-    response = search_knowledge_base("OPEA", url, request_type=args.request_type)
+    response = search_knowledge_base("OPEA", url)
 
     print(response)
 
