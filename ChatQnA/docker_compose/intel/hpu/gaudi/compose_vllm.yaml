@@ -78,7 +78,7 @@ services:
       MAX_WARMUP_SEQUENCE_LENGTH: 512
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm-hpu:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
     container_name: vllm-gaudi-server
     ports:
       - "8007:80"
