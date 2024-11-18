@@ -76,9 +76,7 @@ data:
   no_proxy: ""
   LOGFLAG: ""
   vLLM_ENDPOINT: "insert-your-remote-vllm-inference-endpoint"
-  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   LLM_MODEL: "meta-llama/Meta-Llama-3.1-8B-Instruct"
-  LLM_MODEL_ID: "meta-llama/Meta-Llama-3.1-8B-Instruct"
   MODEL_ID: "meta-llama/Meta-Llama-3.1-8B-Instruct"
   CLIENTID: ""
   CLIENT_SECRET: ""
@@ -521,7 +519,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/dataprep-redis:v0.9"
+          image: "opea/dataprep-redis:latest"
           imagePullPolicy: Always
           ports:
             - name: data-prep
@@ -982,8 +980,8 @@ spec:
               value: chatqna-retriever-usvc
             - name: EMBEDDING_SERVICE_HOST_IP
               value: chatqna-embedding-usvc
-            - name: GUARDRAIL_SERVICE_HOST_IP
-              value: chatqna-guardrails-usvc
+            - name: MODEL_ID
+              value: "meta-llama/Meta-Llama-3.1-8B-Instruct"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
