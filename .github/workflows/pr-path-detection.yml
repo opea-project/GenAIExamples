@@ -9,7 +9,7 @@ on:
     types: [opened, reopened, ready_for_review, synchronize]
 
 jobs:
-  check-dockerfile-paths:
+  check-dockerfile-paths-in-README:
     runs-on: ubuntu-latest
     steps:
       - name: Clean Up Working Directory
@@ -34,6 +34,59 @@ jobs:
                   echo "Missing Dockerfile: GenAIComps/${dockerfile_path} (Referenced in GenAIExamples/${file}:${line})"
               fi
           done < <(grep -Ern 'docker build .* -f comps/.+/Dockerfile' --include='*.md' .)
+
+
+          if [[ "$miss" == "TRUE" ]]; then
+            exit 1
+          fi
+
+        shell: bash
+
+  check-dockerfile-paths-in-build-yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+
+      - name: Clone Repo GenAIComps
+        run: |
+          cd ..
+          git clone https://github.com/opea-project/GenAIComps.git
+
+      - name: Check for Missing Dockerfile Paths in GenAIComps
+        run: |
+          cd ${{github.workspace}}
+          miss="FALSE"
+          build_yamls=$(find . -name 'build.yaml')
+          for build_yaml in $build_yamls; do
+            build_block=$(python3 .github/workflows/scripts/check-build-yaml.py "$build_yaml")
+            echo "$build_block"
+            if [[ "$build_block" == *"context:"* ]]; then
+              config_path=$(echo "$build_block" | awk '/dockerfile:/ { dockerfile = $2; combined = context "/" dockerfile; gsub(/\/+/, "/", combined); print combined }')
+            else
+              config_path=$(echo "$build_block" | awk '/context:/ { context = $2 } /dockerfile:/ { dockerfile = $2; combined = context "/" dockerfile; gsub(/\/+/, "/", combined); print combined }')
+            fi
+            echo "$config_path"
+          done
+            
+
+            for build_block in "${blocks[@]}"; do
+              if [[ "$build_block" == *"context:"* ]]; then
+              config_path=$(echo "$build_block" | awk '/context:/ { context = $2 } /dockerfile:/ { dockerfile = $2; combined = context "/" dockerfile; gsub(/\/+/, "/", combined); print combined }')
+              echo "$config_path"
+            done
+          done
+
+          while IFS=: read -r file line content; do
+              dockerfile_path=$(echo "$content" | awk -F 'dockerfile: ' '{print $2}')
+              if [[ ! -f "../GenAIComps/${dockerfile_path}" ]]; then
+                  miss="TRUE"
+                  echo "Missing Dockerfile: GenAIComps/${dockerfile_path} (Referenced in GenAIExamples/${file}:${line})"
+              fi
+          done < <(grep -Ern '  dockerfile: ' --include='build.yaml' .)
 
 
           if [[ "$miss" == "TRUE" ]]; then
