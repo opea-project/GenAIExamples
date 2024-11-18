@@ -1,5 +1,4 @@
 #!/bin/bash
-# Copyright (C) 2024 Advanced Micro Devices, Inc.
 
 set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}

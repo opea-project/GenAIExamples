@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# Copyright (C) 2024 Advanced Micro Devices, Inc.
-
 ### The IP address or domain name of the server on which the application is running
 export HOST_IP=direct-supercomputer1.powerml.co
 
