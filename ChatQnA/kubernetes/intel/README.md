@@ -15,7 +15,7 @@
 ```
 cd GenAIExamples/ChatQnA/kubernetes/intel/cpu/xeon/manifest
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
-sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chatqna.yaml
+sed -i "s|insert-your-huggingface-token-here|${HUGGINGFACEHUB_API_TOKEN}|g" chatqna.yaml
 kubectl apply -f chatqna.yaml
 ```
 
@@ -35,8 +35,53 @@ kubectl apply -f chatqna_bf16.yaml
 ```
 cd GenAIExamples/ChatQnA/kubernetes/intel/hpu/gaudi/manifest
 export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
-sed -i "s/insert-your-huggingface-token-here/${HUGGINGFACEHUB_API_TOKEN}/g" chatqna.yaml
+sed -i "s|insert-your-huggingface-token-here|${HUGGINGFACEHUB_API_TOKEN}|g" chatqna.yaml
 kubectl apply -f chatqna.yaml
+```
+
+## Deploy on Xeon with Remote LLM Model
+
+```
+cd GenAIExamples/ChatQnA/kubernetes/intel/cpu/xeon/manifest
+export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
+export vLLM_ENDPOINT="Your Remote Inference Endpoint"
+sed -i "s|insert-your-huggingface-token-here|${HUGGINGFACEHUB_API_TOKEN}|g" chatqna-remote-inference.yaml
+sed -i "s|insert-your-remote-inference-endpoint|${vLLM_ENDPOINT}|g" chatqna-remote-inference.yaml
+```
+
+### Additional Steps for Remote Endpoints with Authentication (If No Authentication Skip This Step)
+
+If your remote inference endpoint is protected with OAuth Client Credentials authentication, update CLIENTID, CLIENT_SECRET and TOKEN_URL with the correct values in "chatqna-llm-uservice-config" ConfigMap
+
+
+
+### Deploy
+```
+kubectl apply -f chatqna-remote-inference.yaml
+```
+
+## Deploy on Gaudi with TEI, Rerank, and vLLM Models Running Remotely
+
+```
+cd GenAIExamples/ChatQnA/kubernetes/intel/hpu/gaudi/manifest
+export HUGGINGFACEHUB_API_TOKEN="YourOwnToken"
+export vLLM_ENDPOINT="Your Remote Inference Endpoint"
+export TEI_EMBEDDING_ENDPOINT="Your Remote TEI Embedding Endpoint"
+export TEI_RERANKING_ENDPOINT="Your Remote Reranking Endpoint"
+
+sed -i "s|insert-your-huggingface-token-here|${HUGGINGFACEHUB_API_TOKEN}|g" chatqna-vllm-remote-inference.yaml
+sed -i "s|insert-your-remote-vllm-inference-endpoint|${vLLM_ENDPOINT}|g" chatqna-vllm-remote-inference.yaml
+sed -i "s|insert-your-remote-embedding-endpoint|${TEI_EMBEDDING_ENDPOINT}|g" chatqna-vllm-remote-inference.yaml
+sed -i "s|insert-your-remote-reranking-endpoint|${TEI_RERANKING_ENDPOINT}|g" chatqna-vllm-remote-inference.yaml
+```
+
+### Additional Steps for Remote Endpoints with Authentication (If No Authentication Skip This Step)
+
+If your remote inference endpoint is protected with OAuth Client Credentials authentication, update CLIENTID, CLIENT_SECRET and TOKEN_URL with the correct values in "chatqna-llm-uservice-config", "chatqna-data-prep-config", "chatqna-embedding-usvc-config", "chatqna-reranking-usvc-config", "chatqna-retriever-usvc-config" ConfigMaps
+
+### Deploy
+```
+kubectl apply -f chatqna-vllm-remote-inference.yaml
 ```
 
 ## Verify Services
