@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 services:
   codetrans-tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm

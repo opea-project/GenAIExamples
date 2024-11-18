@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 ### The IP address or domain name of the server on which the application is running
 export HOST_IP=direct-supercomputer1.powerml.co
 
