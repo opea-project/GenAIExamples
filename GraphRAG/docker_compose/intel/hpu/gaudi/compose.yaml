@@ -145,9 +145,9 @@ services:
       - LOGFLAG=${LOGFLAG}
     ipc: host
     restart: always
-  chatqna-gaudi-ui-server:
+  graphrag-ui-server:
     image: ${REGISTRY:-opea}/graphrag-ui:${TAG:-latest}
-    container_name: chatqna-gaudi-ui-server
+    container_name: graphrag-ui-server
     depends_on:
       - graphrag-gaudi-backend-server
     ports:
@@ -163,14 +163,14 @@ services:
     container_name: chatqna-gaudi-nginx-server
     depends_on:
       - graphrag-gaudi-backend-server
-      - chatqna-gaudi-ui-server
+      - graphrag-ui-server
     ports:
       - "${NGINX_PORT:-80}:80"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - FRONTEND_SERVICE_IP=chatqna-gaudi-ui-server
+      - FRONTEND_SERVICE_IP=graphrag-ui-server
       - FRONTEND_SERVICE_PORT=5173
       - BACKEND_SERVICE_NAME=graphrag
       - BACKEND_SERVICE_IP=graphrag-gaudi-backend-server
