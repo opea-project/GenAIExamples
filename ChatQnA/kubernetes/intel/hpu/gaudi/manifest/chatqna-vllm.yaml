@@ -655,7 +655,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/dataprep-redis:v0.9"
+          image: "opea/dataprep-redis:latest"
           imagePullPolicy: Always
           ports:
             - name: data-prep
