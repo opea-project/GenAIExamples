@@ -70,7 +70,6 @@ data:
   no_proxy: ""
   LOGFLAG: ""
   vLLM_ENDPOINT: "insert-your-remote-inference-endpoint"
-  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   LLM_MODEL: "meta-llama/Meta-Llama-3.1-8B-Instruct"
   LLM_MODEL_ID: "meta-llama/Meta-Llama-3.1-8B-Instruct"
   MODEL_ID: "meta-llama/Meta-Llama-3.1-8B-Instruct"
@@ -1257,8 +1256,8 @@ spec:
               value: chatqna-retriever-usvc
             - name: EMBEDDING_SERVICE_HOST_IP
               value: chatqna-embedding-usvc
-            - name: GUARDRAIL_SERVICE_HOST_IP
-              value: chatqna-guardrails-usvc
+            - name: MODEL_ID
+              value: "meta-llama/Meta-Llama-3.1-8B-Instruct"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
