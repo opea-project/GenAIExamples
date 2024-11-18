@@ -146,7 +146,7 @@ services:
     ipc: host
     restart: always
   chatqna-gaudi-ui-server:
-    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/graphrag-ui:${TAG:-latest}
     container_name: chatqna-gaudi-ui-server
     depends_on:
       - graphrag-gaudi-backend-server

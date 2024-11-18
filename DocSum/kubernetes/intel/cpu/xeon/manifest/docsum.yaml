@@ -112,6 +112,190 @@ kind: ConfigMap
 metadata:
   name: docsum-nginx-config
 ---
+# Source: docsum/charts/tgi/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docsum-whisper-config
+  labels:
+    helm.sh/chart: whisper-1.0.0
+    app.kubernetes.io/name: whisper
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  HABANA_LOGS: "/tmp/habana_logs"
+  NUMBA_CACHE_DIR: "/tmp"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  HF_HOME: "/tmp/.cache/huggingface"
+---
+# Source: docsum/charts/tgi/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docsum-audio2text-config
+  labels:
+    helm.sh/chart: audio2text-1.0.0
+    app.kubernetes.io/name: audio2text
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  A2T_ENDPOINT: "http://docsum-whisper"
+---
+# Source: docsum/charts/tgi/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docsum-video2audio-config
+  labels:
+    helm.sh/chart: video2audio-1.0.0
+    app.kubernetes.io/name: video2audio
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  V2A_ENDPOINT: "http://docsum-video2audio"
+---
+# Source: docsum/charts/tgi/templates/configmap.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docsum-multimedia2text-config
+  labels:
+    helm.sh/chart: multimedia2text-1.0.0
+    app.kubernetes.io/name: multimedia2text
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  V2A_ENDPOINT: "http://docsum-video2audio"
+  A2T_ENDPOINT: "http://docsum-whisper"
+---
+# Source: docsum/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-whisper
+  labels:
+    helm.sh/chart: whisper-1.0.0
+    app.kubernetes.io/name: whisper
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7066
+      targetPort: 7066
+      protocol: TCP
+      name: whisper
+  selector:
+    app.kubernetes.io/name: whisper
+    app.kubernetes.io/instance: docsum
+---
+# Source: docsum/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-audio2text
+  labels:
+    helm.sh/chart: audio2text-1.0.0
+    app.kubernetes.io/name: audio2text
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9099
+      targetPort: 9199
+      protocol: TCP
+      name: audio2text
+  selector:
+    app.kubernetes.io/name: audio2text
+    app.kubernetes.io/instance: docsum
+---
+# Source: docsum/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-video2audio
+  labels:
+    helm.sh/chart: video2audio-1.0.0
+    app.kubernetes.io/name: video2audio
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7078
+      targetPort: 7078
+      protocol: TCP
+      name: video2audio
+  selector:
+    app.kubernetes.io/name: video2audio
+    app.kubernetes.io/instance: docsum
+---
+# Source: docsum/charts/tgi/templates/service.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-multimedia2text
+  labels:
+    helm.sh/chart: multimedia2text-1.0.0
+    app.kubernetes.io/name: multimedia2text
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7079
+      targetPort: 7079
+      protocol: TCP
+      name: multimedia2text
+  selector:
+    app.kubernetes.io/name: multimedia2text
+    app.kubernetes.io/instance: docsum
+---
 # Source: docsum/charts/docsum-ui/templates/service.yaml
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -476,6 +660,8 @@ spec:
           env:
             - name: LLM_SERVICE_HOST_IP
               value: docsum-llm-uservice
+            - name: DATA_SERVICE_HOST_IP
+              value: docsum-multimedia2text
             #- name: MEGA_SERVICE_PORT
             #  value: 8888
           securityContext:
@@ -541,3 +727,288 @@ spec:
           defaultMode: 420
           name: docsum-nginx-config
         name: nginx-config-volume
+---
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-whisper
+  labels:
+    helm.sh/chart: whisper-1.0.0
+    app.kubernetes.io/name: whisper
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "2.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  # use explicit replica counts only of HorizontalPodAutoscaler is disabled
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: whisper
+      app.kubernetes.io/instance: docsum
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: whisper
+        app.kubernetes.io/instance: docsum
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: whisper
+          envFrom:
+            - configMapRef:
+                name: docsum-whisper-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/whisper:latest"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: http
+              containerPort: 7066
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 24
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          startupProbe:
+            failureThreshold: 120
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: http
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: docsum/charts/audio2text/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-audio2text
+  labels:
+    helm.sh/chart: audio2text-1.0.0
+    app.kubernetes.io/name: audio2text
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: audio2text
+      app.kubernetes.io/instance: docsum
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: audio2text
+        app.kubernetes.io/instance: docsum
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: docsum
+          envFrom:
+            - configMapRef:
+                name: docsum-audio2text-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/dataprep-audio2text:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: audio2text
+              containerPort: 9199
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: docsum/charts/video2audio/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-video2audio
+  labels:
+    helm.sh/chart: video2audio-1.0.0
+    app.kubernetes.io/name: video2audio
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: video2audio
+      app.kubernetes.io/instance: docsum
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: video2audio
+        app.kubernetes.io/instance: docsum
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: docsum
+          envFrom:
+            - configMapRef:
+                name: docsum-video2audio-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/dataprep-video2audio:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: video2audio
+              containerPort: 7078
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: video2audio
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: video2audio
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: video2audio
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Source: docsum/charts/multimedia2text/templates/deployment.yaml
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-multimedia2text
+  labels:
+    helm.sh/chart: multimedia2text-1.0.0
+    app.kubernetes.io/name: multimedia2text
+    app.kubernetes.io/instance: docsum
+    app.kubernetes.io/version: "v1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: multimedia2text
+      app.kubernetes.io/instance: docsum
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: multimedia2text
+        app.kubernetes.io/instance: docsum
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: docsum
+          envFrom:
+            - configMapRef:
+                name: docsum-multimedia2text-config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/dataprep-multimedia2text:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: multimedia2text
+              containerPort: 7079
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          livenessProbe:
+            failureThreshold: 24
+            httpGet:
+              path: v1/health_check
+              port: multimedia2text
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: v1/health_check
+              port: multimedia2text
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            failureThreshold: 120
+            httpGet:
+              path: v1/health_check
+              port: multimedia2text
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
