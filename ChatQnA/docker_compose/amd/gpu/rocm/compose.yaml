@@ -1,0 +1,183 @@
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  chatqna-redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "${CHATQNA_REDIS_VECTOR_PORT}:6379"
+      - "${CHATQNA_REDIS_VECTOR_INSIGHT_PORT}:8001"
+  chatqna-dataprep-redis-service:
+    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    container_name: dataprep-redis-server
+    depends_on:
+      - chatqna-redis-vector-db
+      - chatqna-tei-embedding-service
+    ports:
+      - "${CHATQNA_REDIS_DATAPREP_PORT}:6007"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${CHATQNA_REDIS_URL}
+      INDEX_NAME: ${CHATQNA_INDEX_NAME}
+      TEI_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+  chatqna-tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: chatqna-tei-embedding-server
+    ports:
+      - "${CHATQNA_TEI_EMBEDDING_PORT}:80"
+    volumes:
+      - "/var/opea/chatqna-service/data:/data"
+    shm_size: 1g
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    command: --model-id ${CHATQNA_EMBEDDING_MODEL_ID} --auto-truncate
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/card1:/dev/dri/card1
+      - /dev/dri/renderD136:/dev/dri/renderD136
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+  chatqna-retriever:
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    container_name: chatqna-retriever-redis-server
+    depends_on:
+      - chatqna-redis-vector-db
+    ports:
+      - "${CHATQNA_REDIS_RETRIEVER_PORT}:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${CHATQNA_REDIS_URL}
+      INDEX_NAME: ${CHATQNA_INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
+    restart: unless-stopped
+  chatqna-tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: chatqna-tei-reranking-server
+    ports:
+      - "${CHATQNA_TEI_RERANKING_PORT}:80"
+    volumes:
+      - "/var/opea/chatqna-service/data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    command: --model-id ${CHATQNA_RERANK_MODEL_ID} --auto-truncate
+  chatqna-tgi-service:
+    image: ${CHATQNA_TGI_SERVICE_IMAGE}
+    container_name: chatqna-tgi-server
+    ports:
+      - "${CHATQNA_TGI_SERVICE_PORT}:80"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    volumes:
+      - "/var/opea/chatqna-service/data:/data"
+    shm_size: 1g
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    command: --model-id ${CHATQNA_LLM_MODEL_ID}
+    ipc: host
+  chatqna-backend-server:
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    container_name: chatqna-backend-server
+    depends_on:
+      - chatqna-redis-vector-db
+      - chatqna-tei-embedding-service
+      - chatqna-retriever
+      - chatqna-tei-reranking-service
+      - chatqna-tgi-service
+    ports:
+      - "${CHATQNA_BACKEND_SERVICE_PORT}:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${CHATQNA_MEGA_SERVICE_HOST_IP}
+      - EMBEDDING_SERVER_HOST_IP=${HOST_IP}
+      - EMBEDDING_SERVER_PORT=${CHATQNA_TEI_EMBEDDING_PORT:-80}
+      - RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
+      - RERANK_SERVER_HOST_IP=${HOST_IP}
+      - RERANK_SERVER_PORT=${CHATQNA_TEI_RERANKING_PORT:-80}
+      - LLM_SERVER_HOST_IP=${HOST_IP}
+      - LLM_SERVER_PORT=${CHATQNA_TGI_SERVICE_PORT:-80}
+      - LLM_MODEL=${CHATQNA_LLM_MODEL_ID}
+    ipc: host
+    restart: always
+  chatqna-ui-server:
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    container_name: chatqna-ui-server
+    depends_on:
+      - chatqna-backend-server
+    ports:
+      - "${CHATQNA_FRONTEND_SERVICE_PORT}:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_BASE_URL=${CHATQNA_BACKEND_SERVICE_ENDPOINT}
+      - UPLOAD_FILE_BASE_URL=${CHATQNA_DATAPREP_SERVICE_ENDPOINT}
+      - GET_FILE=${CHATQNA_DATAPREP_GET_FILE_ENDPOINT}
+      - DELETE_FILE=${CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT}
+    ipc: host
+    restart: always
+  chatqna-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: chaqna-nginx-server
+    depends_on:
+      - chatqna-backend-server
+      - chatqna-ui-server
+    ports:
+      - "${CHATQNA_NGINX_PORT}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=${CHATQNA_FRONTEND_SERVICE_IP}
+      - FRONTEND_SERVICE_PORT=${CHATQNA_FRONTEND_SERVICE_PORT}
+      - BACKEND_SERVICE_NAME=${CHATQNA_BACKEND_SERVICE_NAME}
+      - BACKEND_SERVICE_IP=${CHATQNA_BACKEND_SERVICE_IP}
+      - BACKEND_SERVICE_PORT=${CHATQNA_BACKEND_SERVICE_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
