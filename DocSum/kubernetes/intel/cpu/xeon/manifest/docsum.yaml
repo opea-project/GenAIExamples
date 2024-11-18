@@ -853,23 +853,6 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp
-          livenessProbe:
-            failureThreshold: 24
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            tcpSocket:
-              port: http
-          readinessProbe:
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            tcpSocket:
-              port: http
-          startupProbe:
-            failureThreshold: 120
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            tcpSocket:
-              port: http
           resources:
             {}
       volumes:
