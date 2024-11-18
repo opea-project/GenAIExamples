@@ -19,14 +19,16 @@ export FAQGEN_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export FAQGEN_TGI_SERVICE_PORT=8008
 export FAQGEN_LLM_SERVER_PORT=9000
 export FAQGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export FAQGEN_CARD_ID="card0"
-export FAQGEN_RENDER_ID="renderD128"
+export FAQGEN_CARD_ID="card1"
+export FAQGEN_RENDER_ID="renderD136"
 export FAQGEN_BACKEND_SERVER_PORT=8888
 export FAGGEN_UI_PORT=5173
 export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
 export MEGA_SERVICE_HOST_IP=${ip_address}
 export LLM_SERVICE_HOST_IP=${ip_address}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/faqgen"
+export PATH="~/miniconda3/bin:$PATH"
+
 
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build
