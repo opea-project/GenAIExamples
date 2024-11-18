@@ -53,7 +53,7 @@ function start_services() {
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
-        sleep 10s
+        sleep 5s
         n=$((n+1))
     done
 }
