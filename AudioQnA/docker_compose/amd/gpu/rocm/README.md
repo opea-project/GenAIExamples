@@ -26,6 +26,7 @@ docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
+
 Note:
 For compose for ROCm example AMD optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm (https://github.com/huggingface/text-generation-inference)
 
@@ -79,7 +80,8 @@ export ASR_SERVICE_PORT=3001
 export TTS_SERVICE_PORT=3002
 export LLM_SERVICE_PORT=3007
 ```
-or use set_env.sh file to setup environment variables. 
+
+or use set_env.sh file to setup environment variables.
 
 Note: Please replace with host_ip with your external IP address, do not use localhost.
 
@@ -89,15 +91,15 @@ Example for set isolation for 1 GPU
 
       - /dev/dri/card0:/dev/dri/card0
       - /dev/dri/renderD128:/dev/dri/renderD128
+
 Example for set isolation for 2 GPUs
 
       - /dev/dri/card0:/dev/dri/card0
       - /dev/dri/renderD128:/dev/dri/renderD128
       - /dev/dri/card0:/dev/dri/card0
       - /dev/dri/renderD129:/dev/dri/renderD129
+
 Please find more information about accessing and restricting AMD GPUs in the link (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
-
-
 
 ## 2) 🚀 Start the MegaService
 
