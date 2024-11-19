@@ -773,7 +773,7 @@ class RetrievalToolGateway(Gateway):
             host,
             port,
             str(MegaServiceEndpoint.RETRIEVALTOOL),
-            Union[TextDoc, EmbeddingRequest, ChatCompletionRequest],
+            Union[TextDoc, ChatCompletionRequest],
             Union[RerankedDoc, LLMParamsDoc],
         )
 
@@ -789,7 +789,7 @@ class RetrievalToolGateway(Gateway):
 
         data = await request.json()
         query = None
-        for key, TypeClass in zip(["text", "input", "messages"], [TextDoc, EmbeddingRequest, ChatCompletionRequest]):
+        for key, TypeClass in zip(["text", "messages"], [TextDoc, ChatCompletionRequest]):
             query, chat_request = parser_input(data, TypeClass, key)
             if query is not None:
                 break

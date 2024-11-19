@@ -23,6 +23,7 @@ from comps import (
 )
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
+    EmbeddingResponse,
     RetrievalRequest,
     RetrievalResponse,
     RetrievalResponseData,
@@ -54,12 +55,25 @@ async def retrieve(
     else:
         if isinstance(input, EmbedDoc):
             query = input.text
+            embedding_data_input = input.embedding
         else:
             # for RetrievalRequest, ChatCompletionRequest
             query = input.input
+            if isinstance(input.embedding, EmbeddingResponse):
+                embeddings = input.embedding.data
+                embedding_data_input = []
+                for emb in embeddings:
+                    # each emb is EmbeddingResponseData
+                    # print("Embedding data: ", emb.embedding)
+                    # print("Embedding data length: ",len(emb.embedding))
+                    embedding_data_input.append(emb.embedding)
+                # print("All Embedding data length: ",len(embedding_data_input))
+            else:
+                embedding_data_input = input.embedding
+
         # if the Redis index has data, perform the search
         if input.search_type == "similarity":
-            search_res = await vector_db.asimilarity_search_by_vector(embedding=input.embedding, k=input.k)
+            search_res = await vector_db.asimilarity_search_by_vector(embedding=embedding_data_input, k=input.k)
         elif input.search_type == "similarity_distance_threshold":
             if input.distance_threshold is None:
                 raise ValueError("distance_threshold must be provided for " + "similarity_distance_threshold retriever")

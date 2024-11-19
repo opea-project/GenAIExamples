@@ -41,8 +41,8 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
     endpoint="/v1/reranking",
     host="0.0.0.0",
     port=8000,
-    input_datatype=SearchedDoc,
-    output_datatype=LLMParamsDoc,
+    input_datatype=Union[SearchedDoc, RerankingRequest, ChatCompletionRequest],
+    output_datatype=Union[LLMParamsDoc, RerankingResponse, ChatCompletionRequest],
 )
 @register_statistics(names=["opea_service@reranking_tei"])
 async def reranking(
