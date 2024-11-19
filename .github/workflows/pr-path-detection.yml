@@ -42,6 +42,41 @@ jobs:
 
         shell: bash
 
+  check-Dockerfile-in-build-yamls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Dockerfile path included in image build yaml
+        if: always()
+        run: |
+          set -e
+          shopt -s globstar
+          no_add="FALSE"
+          cd ${{github.workspace}}
+          Dockerfiles=$(realpath $(find ./ -name '*Dockerfile*'))
+          if [ -n "$Dockerfiles" ]; then
+            for dockerfile in $Dockerfiles; do
+              service=$(echo "$dockerfile" | awk -F 'GenAIExamples' '{print $2}' | awk -F '/' '{print $2}')
+              cd ${{github.workspace}}/$service/docker_image_build
+              all_paths=$(realpath $(awk '  /context:/ { context = $2 }  /dockerfile:/ { dockerfile = $2; combined = context "/" dockerfile; gsub(/\/+/, "/", combined); if  (index(context, ".") > 0) {print combined}}' build.yaml) 2> /dev/null || true  )
+              if ! echo "$all_paths" | grep -q "$dockerfile"; then
+                echo "AR: Update $dockerfile to GenAIExamples/$service/docker_image_build/build.yaml. The yaml is used for release images build."
+                no_add="TRUE"
+              fi
+            done
+          fi
+
+          if [[ "$no_add" == "TRUE" ]]; then
+            exit 1
+          fi
+
   check-image-and-service-names-in-build-yaml:
     runs-on: ubuntu-latest
     steps:
