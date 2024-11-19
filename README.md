@@ -1,10 +1,5 @@
 # Generative AI Examples
 
-[![version](https://img.shields.io/badge/release-0.9-green)](https://github.com/opea-project/GenAIExamples/releases)
-[![license](https://img.shields.io/badge/license-Apache%202-blue)](https://github.com/intel/neural-compressor/blob/master/LICENSE)
-
----
-
 ## Introduction
 
 GenAIExamples are designed to give developers an easy entry into generative AI, featuring microservice-based samples that simplify the processes of deploying, testing, and scaling GenAI applications. All examples are fully compatible with Docker and Kubernetes, supporting a wide range of hardware platforms such as Gaudi, Xeon, and NVIDIA GPU, and other hardwares, ensuring flexibility and efficiency for your GenAI adoption.
