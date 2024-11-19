@@ -40,13 +40,13 @@ services:
     ipc: host
     environment:
       TTS_ENDPOINT: ${TTS_ENDPOINT}
-tgi-service:
+  tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     container_name: tgi-service
     ports:
       - "3006:80"
     volumes:
-      - "./data:/data"
+     - "./data:/data"
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd
@@ -82,7 +82,7 @@ tgi-service:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
-audioqna-backend-server:
+  audioqna-backend-server:
     image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
     container_name: audioqna-xeon-backend-server
     depends_on:
