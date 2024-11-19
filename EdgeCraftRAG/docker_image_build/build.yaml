@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  server:
+  edgecraftrag-server:
     build:
       context: ..
       args:
@@ -10,7 +10,7 @@ services:
         https_proxy: ${https_proxy}
       dockerfile: ./Dockerfile.server
     image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
-  ui:
+  edgecraftrag-ui:
     build:
       context: ..
       args:
@@ -18,7 +18,7 @@ services:
         https_proxy: ${https_proxy}
       dockerfile: ./ui/docker/Dockerfile.ui
     image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
-  ecrag:
+  edgecraftrag:
     build:
       context: ..
       args:

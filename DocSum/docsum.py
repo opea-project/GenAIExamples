@@ -8,6 +8,10 @@ from comps import DocSumGateway, MicroService, ServiceOrchestrator, ServiceType
 
 MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
+
+DATA_SERVICE_HOST_IP = os.getenv("DATA_SERVICE_HOST_IP", "0.0.0.0")
+DATA_SERVICE_PORT = int(os.getenv("DATA_SERVICE_PORT", 7079))
+
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
@@ -19,6 +23,16 @@ class DocSumService:
         self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
+
+        data = MicroService(
+            name="multimedia2text",
+            host=DATA_SERVICE_HOST_IP,
+            port=DATA_SERVICE_PORT,
+            endpoint="/v1/multimedia2text",
+            use_remote_service=True,
+            service_type=ServiceType.DATAPREP,
+        )
+
         llm = MicroService(
             name="llm",
             host=LLM_SERVICE_HOST_IP,
@@ -27,7 +41,9 @@ class DocSumService:
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )
-        self.megaservice.add(llm)
+
+        self.megaservice.add(data).add(llm)
+        self.megaservice.flow_to(data, llm)
         self.gateway = DocSumGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
 
