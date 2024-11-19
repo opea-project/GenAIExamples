@@ -103,39 +103,6 @@ def delete_helm_repo(repo_name):
         print(f"Failed to delete Helm repo {repo_name}. It may not exist.")
 
 
-def configmap_exists(name, namespace):
-    """Check if a ConfigMap exists in the specified namespace."""
-    check_command = ["kubectl", "get", "configmap", name, "-n", namespace]
-    result = subprocess.run(check_command, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    return result.returncode == 0
-
-
-def create_configmap(name, namespace, data):
-    """Create a ConfigMap if it does not already exist."""
-    if configmap_exists(name, namespace):
-        print(f"ConfigMap '{name}' already exists in namespace '{namespace}', skipping creation.")
-    else:
-        create_command = (
-            ["kubectl", "create", "configmap", name]
-            + [f"--from-literal={k}={v}" for k, v in data.items()]
-            + ["-n", namespace]
-        )
-        print(f"Creating ConfigMap '{name}' in namespace '{namespace}'...")
-        subprocess.run(create_command, check=True)
-        print(f"ConfigMap '{name}' created successfully.")
-
-
-def delete_configmap(name, namespace):
-    """Delete a ConfigMap if it exists."""
-    if configmap_exists(name, namespace):
-        delete_command = ["kubectl", "delete", "configmap", name, "-n", namespace]
-        print(f"Deleting ConfigMap '{name}'...")
-        subprocess.run(delete_command, check=True)
-        print(f"ConfigMap '{name}' deleted successfully.")
-    else:
-        print(f"ConfigMap '{name}' does not exist in namespace '{namespace}', skipping deletion.")
-
-
 def install_helm_release(release_name, chart_name, namespace, values_file, device_type):
     """Deploy a Helm release with a specified name and chart.
 
@@ -145,7 +112,6 @@ def install_helm_release(release_name, chart_name, namespace, values_file, devic
     - namespace: The Kubernetes namespace for deployment.
     - values_file: The user values file for deployment.
     - device_type: The device type (e.g., "gaudi") for specific configurations (optional).
-    - extra_env_configmap_name: Name of the ConfigMap for extra environment variables (default "extra-env").
     """
 
     # Check if the namespace exists; if not, create it
@@ -159,9 +125,6 @@ def install_helm_release(release_name, chart_name, namespace, values_file, devic
         command = ["kubectl", "create", "namespace", namespace]
         subprocess.run(command, check=True)
         print(f"Namespace '{namespace}' created successfully.")
-
-    # This is workaround for teirerank-gaudi, will be removed later
-    create_configmap("extra-env", namespace, {"MAX_WARMUP_SEQUENCE_LENGTH": "512"})
 
     # Handle gaudi-specific values file if device_type is "gaudi"
     hw_values_file = None
@@ -217,9 +180,6 @@ def uninstall_helm_release(release_name, namespace=None):
         namespace = "default"
 
     try:
-        # This is workaround for teirerank-gaudi, will be removed later
-        delete_configmap("extra-env", namespace)
-
         # Uninstall the Helm release
         command = ["helm", "uninstall", release_name, "--namespace", namespace]
         print(f"Uninstalling Helm release {release_name} in namespace {namespace}...")

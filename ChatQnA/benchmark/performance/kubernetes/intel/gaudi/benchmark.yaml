@@ -17,14 +17,12 @@ test_suite_config: # Overall configuration settings for the test suite
   llm_model: "Intel/neural-chat-7b-v3-3"  # The LLM model used for the test
   test_output_dir: "${TEST_OUTPUT_DIR}"  # The directory to store the test output
   load_shape:              # Tenant concurrency pattern
-    name: constant           # poisson or constant(locust default load shape)
+    name: ${LOAD_SHAPE}      # poisson or constant(locust default load shape)
     params:                  # Loadshape-specific parameters
       constant:                # Constant load shape specific parameters, activate only if load_shape.name is constant
-        concurrent_level: 5      # If user_queries is specified, concurrent_level is target number of requests per user. If not, it is the number of simulated users
-        # arrival_rate: 1.0       # Request arrival rate. If set, concurrent_level will be overridden, constant load will be generated based on arrival-rate
+        concurrent_level: ${CONCURRENT_LEVEL}      # If user_queries is specified, concurrent_level is target number of requests per user. If not, it is the number of simulated users
       poisson:                 # Poisson load shape specific parameters, activate only if load_shape.name is poisson
-        arrival_rate: 1.0        # Request arrival rate
-  namespace: "my-chatqna"
+        arrival_rate: ${ARRIVAL_RATE}        # Request arrival rate
 
 test_cases:
   chatqna:
