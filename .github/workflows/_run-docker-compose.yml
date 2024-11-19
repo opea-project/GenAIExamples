@@ -54,9 +54,8 @@ jobs:
           cd ${{ github.workspace }}/tests
           test_cases=$(find . -type f -name "test_${service_l}*.sh")
           for script in $test_cases; do
-            echo $script
-            if echo "$script" | grep -q "on"; then
-              hardware=$(echo $script | cut -d'/' -f3 | cut -d'.' -f1 | awk -F'on_' '{print $2}')
+            if echo "$script" | grep -q "_on"; then
+              hardware=$(echo $script | cut -d'/' -f3 | cut -d'.' -f1 | awk -F'_on_' '{print $2}')
             else
               hardware="intel_cpu"
             fi
