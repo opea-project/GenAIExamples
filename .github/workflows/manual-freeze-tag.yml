@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        default: "latest"
+        default: "1.1.0"
         description: "Tag to apply to images"
         required: true
         type: string
