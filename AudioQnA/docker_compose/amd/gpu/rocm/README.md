@@ -3,63 +3,6 @@
 This document outlines the deployment process for a AudioQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice
 pipeline on server on AMD ROCm GPU platform.
 
-Quick Start Deployment Steps:
-
-1. Set up the environment variables.
-2. Run Docker Compose.
-3. Consume the ChatQnA Service.
-
-## 1) 🚀 Set the environment variables
-
-Before starting the services with `docker compose`, you have to recheck the following environment variables.
-
-```bash
-export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=<your HF token>
-
-export TGI_LLM_ENDPOINT=http://$host_ip:3006
-export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-
-export ASR_ENDPOINT=http://$host_ip:7066
-export TTS_ENDPOINT=http://$host_ip:7055
-
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export ASR_SERVICE_HOST_IP=${host_ip}
-export TTS_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-
-export ASR_SERVICE_PORT=3001
-export TTS_SERVICE_PORT=3002
-export LLM_SERVICE_PORT=3007
-```
-
-## 2) 🚀 Start the MegaService
-
-```bash
-cd GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm/
-docker compose up -d
-```
-
-In following cases, you could build docker image from source by yourself.
-
-- Failed to download the docker image.
-- If you want to use a specific version of Docker image.
-
-Please refer to 'Build Docker Images' in below.
-
-## 3) 🚀 Consume the AudioQnA Service
-
-Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the
-base64 string to the megaservice endpoint. The megaservice will return a spoken response as a base64 string. To listen
-to the response, decode the base64 string and save it as a .wav file.
-
-```bash
-curl http://${host_ip}:3008/v1/audioqna \
-  -X POST \
-  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' \
-  -H 'Content-Type: application/json' | sed 's/^"//;s/"$//' | base64 -d > output.wav
-```
-
 ## 🚀 Build Docker images
 
 ### 1. Source Code install GenAIComps
@@ -83,6 +26,8 @@ docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg
 ```bash
 docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
 ```
+Note:
+For compose for ROCm example AMD optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm (https://github.com/huggingface/text-generation-inference)
 
 ### 4. Build TTS Image
 
@@ -110,6 +55,76 @@ Then run the command `docker images`, you will have following images ready:
 4. `opea/speecht5:latest`
 5. `opea/tts:latest`
 6. `opea/audioqna:latest`
+
+## 1) 🚀 Set the environment variables
+
+Before starting the services with `docker compose`, you have to recheck the following environment variables.
+
+```bash
+export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
+export HUGGINGFACEHUB_API_TOKEN=<your HF token>
+
+export TGI_LLM_ENDPOINT=http://$host_ip:3006
+export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
+
+export ASR_ENDPOINT=http://$host_ip:7066
+export TTS_ENDPOINT=http://$host_ip:7055
+
+export MEGA_SERVICE_HOST_IP=${host_ip}
+export ASR_SERVICE_HOST_IP=${host_ip}
+export TTS_SERVICE_HOST_IP=${host_ip}
+export LLM_SERVICE_HOST_IP=${host_ip}
+
+export ASR_SERVICE_PORT=3001
+export TTS_SERVICE_PORT=3002
+export LLM_SERVICE_PORT=3007
+```
+or use set_env.sh file to setup environment variables. 
+
+Note: Please replace with host_ip with your external IP address, do not use localhost.
+
+Note: In order to limit access to a subset of GPUs, please pass each device individually using one or more -device /dev/dri/rendered, where is the card index, starting from 128. (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
+
+Example for set isolation for 1 GPU
+
+      - /dev/dri/card0:/dev/dri/card0
+      - /dev/dri/renderD128:/dev/dri/renderD128
+Example for set isolation for 2 GPUs
+
+      - /dev/dri/card0:/dev/dri/card0
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
+      - /dev/dri/renderD129:/dev/dri/renderD129
+Please find more information about accessing and restricting AMD GPUs in the link (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
+
+
+
+## 2) 🚀 Start the MegaService
+
+```bash
+cd GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm/
+docker compose up -d
+```
+
+In following cases, you could build docker image from source by yourself.
+
+- Failed to download the docker image.
+- If you want to use a specific version of Docker image.
+
+Please refer to 'Build Docker Images' in below.
+
+## 3) 🚀 Consume the AudioQnA Service
+
+Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the
+base64 string to the megaservice endpoint. The megaservice will return a spoken response as a base64 string. To listen
+to the response, decode the base64 string and save it as a .wav file.
+
+```bash
+curl http://${host_ip}:3008/v1/audioqna \
+  -X POST \
+  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' \
+  -H 'Content-Type: application/json' | sed 's/^"//;s/"$//' | base64 -d > output.wav
+```
 
 ## 🚀 Test MicroServices
 
