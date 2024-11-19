@@ -48,7 +48,7 @@ function start_services() {
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
        docker logs tgi-service > $LOG_PATH/tgi_service_start.log
@@ -81,7 +81,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    docker compose -f compose.yaml stop && docker compose -f compose.yaml rm -f
+    docker compose stop && docker compose rm -f
 }
 
 function main() {
