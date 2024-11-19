@@ -24,7 +24,8 @@ services:
       - SYS_NICE
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
-  llm:
+
+  llm-docsum-tgi:
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
     container_name: llm-docsum-gaudi-server
     depends_on:
@@ -39,12 +40,61 @@ services:
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
+
+  whisper:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+
+  dataprep-audio2text:
+    image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
+    container_name: dataprep-audio2text-service
+    ports:
+      - "9199:9099"
+    ipc: host
+    environment:
+      A2T_ENDPOINT: ${A2T_ENDPOINT}
+
+  dataprep-video2audio:
+    image: ${REGISTRY:-opea}/dataprep-video2audio:${TAG:-latest}
+    container_name: dataprep-video2audio-service
+    ports:
+      - "7078:7078"
+    ipc: host
+    environment:
+      V2A_ENDPOINT: ${V2A_ENDPOINT}
+
+  dataprep-multimedia2text:
+    image: ${REGISTRY:-opea}/dataprep-multimedia2text:${TAG:-latest}
+    container_name: dataprep-multimedia2text
+    ports:
+      - "7079:7079"
+    ipc: host
+    environment:
+      V2A_ENDPOINT: ${V2A_ENDPOINT}
+      A2T_ENDPOINT: ${A2T_ENDPOINT}
+
   docsum-gaudi-backend-server:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-gaudi-backend-server
     depends_on:
       - tgi-service
-      - llm
+      - llm-docsum-tgi
+      - dataprep-multimedia2text
+      - dataprep-video2audio
+      - dataprep-audio2text
     ports:
       - "8888:8888"
     environment:
@@ -52,10 +102,13 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+
     ipc: host
     restart: always
-  docsum-gaudi-ui-server:
+
+  docsum-ui:
     image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
     container_name: docsum-gaudi-ui-server
     depends_on:
@@ -66,6 +119,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
       - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always

@@ -31,7 +31,7 @@ docker ps
 # CONTAINER ID   IMAGE                                 COMMAND                  CREATED      STATUS      PORTS                                                                                                                                  NAMES
 # de088666cef2   gcr.io/k8s-minikube/kicbase:v0.0.45   "/usr/local/bin/entr…"   2 days ago   Up 2 days   127.0.0.1:49157->22/tcp...   minikube
 ```
-6. Deploy the ChatQnA application with `minikube apply -f chatqna.yaml`, check that the opea pods are in a running state with `kubectl get pods`
+6. Deploy the ChatQnA application with `kubectl apply -f chatqna.yaml`, check that the opea pods are in a running state with `kubectl get pods`
 ```bash
 kubectl get pods
 # NAME                                      READY   STATUS             RESTARTS   AGE

@@ -29,7 +29,7 @@ services:
       context: GenAIComps
       dockerfile: comps/dataprep/neo4j/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-neo4j-llamaindex:${TAG:-latest}
-  chatqna-gaudi-nginx-server:
+  nginx:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -38,7 +38,7 @@ services:
       context: GenAIComps
       dockerfile: comps/nginx/Dockerfile
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
-  chatqna-gaudi-ui-server:
+  graphrag-ui:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -46,4 +46,4 @@ services:
         no_proxy: ${no_proxy}
       context: ../ui
       dockerfile: ./docker/Dockerfile
-    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/graphrag-ui:${TAG:-latest}
