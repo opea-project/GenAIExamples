@@ -13,7 +13,7 @@ export TAG=${IMAGE_TAG}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-export PATH="/home/huggingface/miniconda3/bin:$PATH"
+export PATH="~/miniconda3/bin:$PATH"
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
@@ -79,6 +79,32 @@ function validate_megaservice() {
 
 }
 
+#function validate_frontend() {
+# Frontend tests are currently disabled
+#    cd $WORKPATH/ui/svelte
+#    local conda_env_name="OPEA_e2e"
+#    export PATH=${HOME}/miniforge3/bin/:$PATH
+##    conda remove -n ${conda_env_name} --all -y
+##    conda create -n ${conda_env_name} python=3.12 -y
+#    source activate ${conda_env_name}
+#
+#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+#
+##    conda install -c conda-forge nodejs -y
+#    npm install && npm ci && npx playwright install --with-deps
+#    node -v && npm -v && pip list
+#
+#    exit_status=0
+#    npx playwright test || exit_status=$?
+#
+#    if [ $exit_status -ne 0 ]; then
+#        echo "[TEST INFO]: ---------frontend test failed---------"
+#        exit $exit_status
+#    else
+#        echo "[TEST INFO]: ---------frontend test passed---------"
+#    fi
+#}
+
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
     docker compose stop && docker compose rm -f
@@ -91,6 +117,7 @@ function main() {
     start_services
 
     validate_megaservice
+    # Frontend tests are currently disabled
     # validate_frontend
 
     stop_docker
