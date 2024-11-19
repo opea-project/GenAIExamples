@@ -75,6 +75,9 @@ function run_benchmark() {
     export DEPLOYMENT_TYPE=${deployment_type}
     export SERVICE_IP=${service_ip:-"None"}
     export SERVICE_PORT=${service_port:-"None"}
+    export LOAD_SHAPE=${load_shape:-"constant"}
+    export CONCURRENT_LEVEL=${concurrent_level:-5}
+    export ARRIVAL_RATE=${arrival_rate:-1.0}
     if [[ -z $USER_QUERIES ]]; then
         user_query=$((query_per_node*node_number))
         export USER_QUERIES="[${user_query}, ${user_query}, ${user_query}, ${user_query}]"
