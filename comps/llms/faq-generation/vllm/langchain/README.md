@@ -35,7 +35,7 @@ You can choose one as needed.
 ### 1.3 Run Docker with CLI (Option A)
 
 ```bash
-docker run -d -p 8008:80 -v ./data:/data --name vllm-service --shm-size 1g opea/vllm:hpu --model-id ${LLM_MODEL_ID}
+docker run -d -p 8008:80 -v ./data:/data --name vllm-service --shm-size 1g opea/vllm-gaudi:latest --model-id ${LLM_MODEL_ID}
 ```
 
 ```bash

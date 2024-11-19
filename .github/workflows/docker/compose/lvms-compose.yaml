@@ -23,10 +23,10 @@ services:
     build:
       dockerfile: comps/lvms/llava/Dockerfile
     image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
-  llava-hpu:
+  llava-gaudi:
     build:
       dockerfile: comps/lvms/llava/dependency/Dockerfile.intel_hpu
-    image: ${REGISTRY:-opea}/llava-hpu:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llava-gaudi:${TAG:-latest}
   lvm-predictionguard:
     build:
       dockerfile: comps/lvms/predictionguard/Dockerfile

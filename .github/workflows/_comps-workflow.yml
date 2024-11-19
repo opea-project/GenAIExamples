@@ -63,7 +63,7 @@ jobs:
               git clone https://github.com/vllm-project/vllm.git vllm-openvino
               cd ./vllm-openvino && git checkout v0.6.1 && git rev-parse HEAD && cd ../
           fi
-          if [[ $(grep -c "vllm-hpu:" ${docker_compose_yml}) != 0 ]]; then
+          if [[ $(grep -c "vllm-gaudi:" ${docker_compose_yml}) != 0 ]]; then
                git clone https://github.com/HabanaAI/vllm-fork.git vllm-fork
                cd vllm-fork && git checkout 3c39626 && cd ../
           fi

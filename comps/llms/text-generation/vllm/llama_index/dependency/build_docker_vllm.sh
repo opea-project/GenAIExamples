@@ -33,7 +33,7 @@ if [ "$hw_mode" = "hpu" ]; then
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd ./vllm-fork/
     git checkout 3c39626
-    docker build -f Dockerfile.hpu -t opea/vllm-hpu:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    docker build -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     cd ..
     rm -rf vllm-fork
 else

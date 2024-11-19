@@ -18,7 +18,7 @@ pip install -r requirements.txt
 ```bash
 export HF_TOKEN=${your_hf_api_token}
 export LLM_MODEL_ID=${your_hf_llm_model}
-docker run -p 8008:80 -v ./data:/data --name llm-docsum-vllm --shm-size 1g opea/vllm:hpu --model-id ${LLM_MODEL_ID}
+docker run -p 8008:80 -v ./data:/data --name llm-docsum-vllm --shm-size 1g opea/vllm-gaudi:latest --model-id ${LLM_MODEL_ID}
 ```
 
 ### 1.3 Verify the vLLM Service

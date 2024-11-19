@@ -13,12 +13,12 @@ function build_docker_images() {
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd vllm-fork/
     git checkout 3c39626
-    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-hpu:comps --shm-size=128g .
+    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:comps --shm-size=128g .
     if [ $? -ne 0 ]; then
-        echo "opea/vllm-hpu built fail"
+        echo "opea/vllm-gaudi built fail"
         exit 1
     else
-        echo "opea/vllm-hpu built successful"
+        echo "opea/vllm-gaudi built successful"
     fi
 
     ## Build OPEA microservice docker
@@ -47,7 +47,7 @@ function start_service() {
         --cap-add=sys_nice \
         --ipc=host \
         -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
-        opea/vllm-hpu:comps \
+        opea/vllm-gaudi:comps \
         --enforce-eager --model $LLM_MODEL  --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
 
     export vLLM_ENDPOINT="http://${ip_address}:${port_number}"
