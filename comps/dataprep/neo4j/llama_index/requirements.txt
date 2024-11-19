@@ -6,6 +6,7 @@ easyocr
 fastapi
 future
 graspologic 
+html2text
 huggingface_hub
 ipython
 langchain

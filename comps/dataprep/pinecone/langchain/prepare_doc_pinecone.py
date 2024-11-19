@@ -24,7 +24,7 @@ from comps.dataprep.utils import (
     get_file_structure,
     get_separators,
     get_tables_result,
-    parse_html,
+    parse_html_new,
     remove_folder_with_ignore,
     save_content_to_local_disk,
 )
@@ -158,7 +158,7 @@ def ingest_data_to_pinecone(doc_path: DocPath):
     pc = Pinecone(api_key=PINECONE_API_KEY)
 
 
-async def ingest_link_to_pinecone(link_list: List[str]):
+async def ingest_link_to_pinecone(link_list: List[str], chunk_size, chunk_overlap):
     # Create embedding obj
     if tei_embedding_endpoint:
         # create embeddings using TEI endpoint service
@@ -178,7 +178,7 @@ async def ingest_link_to_pinecone(link_list: List[str]):
 
     # save link contents and doc_ids one by one
     for link in link_list:
-        content = parse_html([link])[0][0]
+        content = parse_html_new([link], chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         if logflag:
             logger.info(f"[ ingest link ] link: {link} content: {content}")
         encoded_link = encode_filename(link)
@@ -239,7 +239,7 @@ async def ingest_documents(
             link_list = json.loads(link_list)  # Parse JSON string to list
             if not isinstance(link_list, list):
                 raise HTTPException(status_code=400, detail="link_list should be a list.")
-            await ingest_link_to_pinecone(link_list)
+            await ingest_link_to_pinecone(link_list, chunk_size, chunk_overlap)
             result = {"status": 200, "message": "Data preparation succeeded"}
             if logflag:
                 logger.info(f"Successfully saved link list {link_list}")

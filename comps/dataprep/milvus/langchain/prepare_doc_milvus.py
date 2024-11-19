@@ -30,7 +30,7 @@ from comps.dataprep.utils import (
     encode_filename,
     get_separators,
     get_tables_result,
-    parse_html,
+    parse_html_new,
     remove_folder_with_ignore,
     save_content_to_local_disk,
 )
@@ -39,17 +39,16 @@ logger = CustomLogger("prepare_doc_milvus")
 logflag = os.getenv("LOGFLAG", False)
 
 # workaround notes: cp comps/dataprep/utils.py ./milvus/utils.py
-# from utils import document_loader, get_tables_result, parse_html
 index_params = {"index_type": "FLAT", "metric_type": "IP", "params": {}}
 partition_field_name = "filename"
 upload_folder = "./uploaded_files/"
+milvus_uri = f"http://{MILVUS_HOST}:{MILVUS_PORT}"
 
 
 class MosecEmbeddings(OpenAIEmbeddings):
     def _get_len_safe_embeddings(
         self, texts: List[str], *, engine: str, chunk_size: Optional[int] = None
     ) -> List[List[float]]:
-        _chunk_size = chunk_size or self.chunk_size
         batched_embeddings: List[List[float]] = []
         response = self.client.create(input=texts, **self._invocation_params)
         if not isinstance(response, dict):
@@ -93,7 +92,7 @@ def ingest_chunks_to_milvus(file_name: str, chunks: List):
                 batch_docs,
                 embeddings,
                 collection_name=COLLECTION_NAME,
-                connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT},
+                connection_args={"uri": milvus_uri},
                 partition_key_field=partition_field_name,
             )
         except Exception as e:
@@ -211,7 +210,7 @@ async def ingest_documents(
     my_milvus = Milvus(
         embedding_function=embeddings,
         collection_name=COLLECTION_NAME,
-        connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT},
+        connection_args={"uri": milvus_uri},
         index_params=index_params,
         auto_id=True,
     )
@@ -318,7 +317,7 @@ async def ingest_documents(
                     )
 
             save_path = upload_folder + encoded_link + ".txt"
-            content = parse_html([link])[0][0]
+            content = parse_html_new([link], chunk_size=chunk_size, chunk_overlap=chunk_overlap)
             await save_content_to_local_disk(save_path, content)
             ingest_data_to_milvus(
                 DocPath(
@@ -347,7 +346,7 @@ async def rag_get_file_structure():
     my_milvus = Milvus(
         embedding_function=embeddings,
         collection_name=COLLECTION_NAME,
-        connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT},
+        connection_args={"uri": milvus_uri},
         index_params=index_params,
         auto_id=True,
     )
@@ -405,7 +404,7 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
     my_milvus = Milvus(
         embedding_function=embeddings,
         collection_name=COLLECTION_NAME,
-        connection_args={"host": MILVUS_HOST, "port": MILVUS_PORT},
+        connection_args={"uri": milvus_uri},
         index_params=index_params,
         auto_id=True,
     )

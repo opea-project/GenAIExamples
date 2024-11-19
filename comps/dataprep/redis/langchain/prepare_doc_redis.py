@@ -26,7 +26,7 @@ from comps.dataprep.utils import (
     format_search_results,
     get_separators,
     get_tables_result,
-    parse_html,
+    parse_html_new,
     remove_folder_with_ignore,
     save_content_to_local_disk,
 )
@@ -320,7 +320,7 @@ async def ingest_documents(
                 )
 
             save_path = upload_folder + encoded_link + ".txt"
-            content = parse_html([link])[0][0]
+            content = parse_html_new([link], chunk_size=chunk_size, chunk_overlap=chunk_overlap)
             await save_content_to_local_disk(save_path, content)
             ingest_data_to_redis(
                 DocPath(

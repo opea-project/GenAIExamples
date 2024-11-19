@@ -6,6 +6,7 @@ docx2txt
 easyocr
 einops
 fastapi
+html2text
 huggingface_hub
 langchain
 langchain-community

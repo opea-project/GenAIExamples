@@ -21,7 +21,7 @@ from comps.dataprep.utils import (
     encode_filename,
     get_file_structure,
     get_separators,
-    parse_html,
+    parse_html_new,
     remove_folder_with_ignore,
     save_content_to_local_disk,
 )
@@ -158,7 +158,7 @@ async def ingest_link_to_pgvector(link_list: List[str]):
 
     for link in link_list:
         texts = []
-        content = parse_html([link])[0][0]
+        content = parse_html_new([link], chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
         if logflag:
             logger.info(f"[ ingest link ] link: {link} content: {content}")
         encoded_link = encode_filename(link)

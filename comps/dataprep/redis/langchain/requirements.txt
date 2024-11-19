@@ -4,6 +4,7 @@ docarray[full]
 docx2txt
 easyocr
 fastapi
+html2text
 huggingface_hub
 langchain
 langchain-community
