@@ -61,7 +61,7 @@ jobs:
             if [[ "$message" != *"consistent"* ]]; then
               consistency="FALSE"
               echo "Inconsistent service name and image name found in file $build_yaml."
-              echo "$message" 
+              echo "$message"
             fi
           done
 
