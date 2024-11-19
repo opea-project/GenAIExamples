@@ -53,6 +53,7 @@ jobs:
 
       - name: Check name agreement in build.yaml
         run: |
+          pip install ruamel.yaml
           cd ${{github.workspace}}
           consistency="TRUE"
           build_yamls=$(find . -name 'build.yaml')
