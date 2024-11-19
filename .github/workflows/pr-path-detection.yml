@@ -42,7 +42,7 @@ jobs:
 
         shell: bash
 
-  check-dockerfile-paths-in-build-yaml:
+  check-image-and-service-names-in-build-yaml:
     runs-on: ubuntu-latest
     steps:
       - name: Clean Up Working Directory
@@ -51,45 +51,22 @@ jobs:
       - name: Checkout Repo GenAIExamples
         uses: actions/checkout@v4
 
-      - name: Clone Repo GenAIComps
-        run: |
-          cd ..
-          git clone https://github.com/opea-project/GenAIComps.git
-
-      - name: Check for Missing Dockerfile Paths in GenAIComps
+      - name: Check name agreement in build.yaml
         run: |
           cd ${{github.workspace}}
-          miss="FALSE"
+          consistency="TRUE"
           build_yamls=$(find . -name 'build.yaml')
           for build_yaml in $build_yamls; do
-            build_block=$(python3 .github/workflows/scripts/check-build-yaml.py "$build_yaml")
-            echo "$build_block"
-            if [[ "$build_block" == *"context:"* ]]; then
-              config_path=$(echo "$build_block" | awk '/dockerfile:/ { dockerfile = $2; combined = context "/" dockerfile; gsub(/\/+/, "/", combined); print combined }')
-            else
-              config_path=$(echo "$build_block" | awk '/context:/ { context = $2 } /dockerfile:/ { dockerfile = $2; combined = context "/" dockerfile; gsub(/\/+/, "/", combined); print combined }')
+            message=$(python3 .github/workflows/scripts/check-name-agreement.py "$build_yaml")
+            if [[ "$message" != *"consistent"* ]]; then
+              consistency="FALSE"
+              echo "Inconsistent service name and image name found in file $build_yaml."
+              echo "$message" 
             fi
-            echo "$config_path"
-          done
-            
-
-            for build_block in "${blocks[@]}"; do
-              if [[ "$build_block" == *"context:"* ]]; then
-              config_path=$(echo "$build_block" | awk '/context:/ { context = $2 } /dockerfile:/ { dockerfile = $2; combined = context "/" dockerfile; gsub(/\/+/, "/", combined); print combined }')
-              echo "$config_path"
-            done
           done
 
-          while IFS=: read -r file line content; do
-              dockerfile_path=$(echo "$content" | awk -F 'dockerfile: ' '{print $2}')
-              if [[ ! -f "../GenAIComps/${dockerfile_path}" ]]; then
-                  miss="TRUE"
-                  echo "Missing Dockerfile: GenAIComps/${dockerfile_path} (Referenced in GenAIExamples/${file}:${line})"
-              fi
-          done < <(grep -Ern '  dockerfile: ' --include='build.yaml' .)
-
-
-          if [[ "$miss" == "TRUE" ]]; then
+          if [[ "$consistency" == "FALSE" ]]; then
+            echo "Please ensure that the service and image names are consistent, otherwise we cannot guarantee that your image will be published correctly."
             exit 1
           fi
 
