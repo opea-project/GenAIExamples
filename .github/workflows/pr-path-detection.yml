@@ -102,7 +102,7 @@ jobs:
           done
 
           if [[ "$consistency" == "FALSE" ]]; then
-            echo "Please ensure that the service and image names are consistent, otherwise we cannot guarantee that your image will be published correctly."
+            echo "Please ensure that the service and image names are consistent in build.yaml, otherwise we cannot guarantee that your image will be published correctly."
             exit 1
           fi
 
