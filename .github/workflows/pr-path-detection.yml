@@ -56,7 +56,7 @@ jobs:
       - name: Check Dockerfile path included in image build yaml
         if: always()
         run: |
-          set -xe
+          set -e
           shopt -s globstar
           no_add="FALSE"
           cd ${{github.workspace}}
