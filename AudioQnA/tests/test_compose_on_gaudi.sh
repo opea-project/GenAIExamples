@@ -100,7 +100,7 @@ function validate_megaservice() {
 #
 #    sed -i "s/localhost/$ip_address/g" playwright.config.ts
 #
-##    conda install -c conda-forge nodejs -y
+##    conda install -c conda-forge nodejs=22.6.0 -y
 #    npm install && npm ci && npx playwright install --with-deps
 #    node -v && npm -v && pip list
 #
