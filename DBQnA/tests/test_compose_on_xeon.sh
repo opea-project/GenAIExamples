@@ -94,7 +94,7 @@ function validate_frontend() {
     source activate ${conda_env_name}
     echo "[ TEST INFO ]: --------- conda env activated ---------"
 
-    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci
     node -v && npm -v && pip list
 
