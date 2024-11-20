@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -ex
 
 WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
