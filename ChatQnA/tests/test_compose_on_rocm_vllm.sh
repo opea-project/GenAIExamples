@@ -129,7 +129,7 @@ function validate_microservices() {
         "${ip_address}:8090/embed" \
         "[[" \
         "chatqna-tei-embedding-service" \
-        "chatqna-tei-embedding-server" \
+        "chatqna-tei-embedding-service" \
         '{"inputs":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
