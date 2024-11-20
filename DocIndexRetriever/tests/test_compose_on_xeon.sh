@@ -72,7 +72,7 @@ function validate_megaservice() {
     echo "===========Ingest data=================="
     local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
-     -F 'link_list=["https://opea.dev"]')
+     -F 'link_list=["https://opea.dev/"]')
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
@@ -84,10 +84,11 @@ function validate_megaservice() {
 
     # Curl the Mega Service
     echo "================Testing retriever service: Text Request ================"
-
-    local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-     "text": "Explain the OPEA project?"
-    }')
+    cd $WORKPATH/tests
+    # local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
+    #  "text": "Explain the OPEA project?"
+    # }')
+    local CONTENT=$(python test.py --host_ip ${ip_address} --request_type text)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
@@ -95,7 +96,7 @@ function validate_megaservice() {
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs tei-embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs reranking-tei-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         exit 1
     fi
@@ -110,7 +111,7 @@ function validate_megaservice() {
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs tei-embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs reranking-tei-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         exit 1
     fi
