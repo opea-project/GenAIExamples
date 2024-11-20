@@ -71,10 +71,10 @@ function start_services() {
     n=0
     until [[ "$n" -ge 500 ]]; do
         docker logs chatqna-vllm-service > "${LOG_PATH}"/chatqna-vllm-service_start.log
-        if grep -q "Application startup complete" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
+        if grep -q "Uvicorn running on http:" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 10s
         n=$((n+1))
     done
 }
