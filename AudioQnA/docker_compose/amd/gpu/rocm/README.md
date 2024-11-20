@@ -57,7 +57,7 @@ Then run the command `docker images`, you will have following images ready:
 5. `opea/tts:latest`
 6. `opea/audioqna:latest`
 
-## 1) 🚀 Set the environment variables
+## 🚀 Set the environment variables
 
 Before starting the services with `docker compose`, you have to recheck the following environment variables.
 
@@ -101,7 +101,7 @@ Example for set isolation for 2 GPUs
 
 Please find more information about accessing and restricting AMD GPUs in the link (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
 
-## 2) 🚀 Start the MegaService
+## 🚀 Start the MegaService
 
 ```bash
 cd GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm/
@@ -115,7 +115,7 @@ In following cases, you could build docker image from source by yourself.
 
 Please refer to 'Build Docker Images' in below.
 
-## 3) 🚀 Consume the AudioQnA Service
+## 🚀 Consume the AudioQnA Service
 
 Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the
 base64 string to the megaservice endpoint. The megaservice will return a spoken response as a base64 string. To listen
