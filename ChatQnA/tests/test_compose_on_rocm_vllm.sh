@@ -71,7 +71,7 @@ function start_services() {
     n=0
     until [[ "$n" -ge 500 ]]; do
         docker logs chatqna-vllm-service > "${LOG_PATH}"/chatqna-vllm-service_start.log
-        if grep -q "Uvicorn running on http:" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
+        if grep -q "INFO:     Uvicorn running on http://0.0.0.0:8011 (Press CTRL+C to quit)" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
             break
         fi
         sleep 10s
