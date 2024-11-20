@@ -19,6 +19,7 @@ export HOST_IP_EXTERNAL=${ip_address}
 export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+export MODEL=${CHATQNA_LLM_MODEL_ID}
 export CHATQNA_VLLM_SERVICE_PORT=9009
 export CHATQNA_TEI_EMBEDDING_PORT=8090
 export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"
@@ -70,8 +71,8 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs chatqna-vllm-service > "${LOG_PATH}"/chatqna-vllm-service_start.log
-        if grep -q "INFO:     Uvicorn running on http://0.0.0.0:8011 (Press CTRL+C to quit)" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
+        docker logs chatqna-vllm-service >& "${LOG_PATH}"/chatqna-vllm-service_start.log
+        if grep -q "Application startup complete" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
             break
         fi
         sleep 10s
@@ -129,7 +130,7 @@ function validate_microservices() {
         "${ip_address}:8090/embed" \
         "[[" \
         "chatqna-tei-embedding-service" \
-        "chatqna-tei-embedding-server" \
+        "chatqna-tei-embedding-service" \
         '{"inputs":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -139,28 +140,28 @@ function validate_microservices() {
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
-        "chatqna-dataprep-redis-service" \
+        "dataprep_upload_file" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep upload link
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
-        "chatqna-dataprep-redis-service" \
+        "dataprep_upload_link" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep/get_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/get_file" \
         '{"name":' \
-        "chatqna-dataprep-redis-service" \
+        "dataprep_get" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep/delete_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/delete_file" \
         '{"status":true}' \
-        "chatqna-dataprep-redis-service" \
+        "dataprep_del" \
         "chatqna-dataprep-redis-service"
 
     # retrieval microservice
@@ -182,11 +183,11 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_service \
-        "${ip_address}:9009/generate" \
-        "generated_text" \
+        "${ip_address}:9009/v1/chat/completions" \
+        "\"content\":" \
         "chatqna-vllm-service" \
         "chatqna-vllm-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 
 }
 
@@ -205,7 +206,7 @@ function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
     cd "$WORKPATH"/ui/svelte
     local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
+    export PATH=${HOME}/miniconda3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
         echo "$conda_env_name exist!"
     else
@@ -239,7 +240,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+#    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
