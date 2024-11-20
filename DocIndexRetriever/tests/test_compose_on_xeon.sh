@@ -109,9 +109,15 @@ function validate_megaservice() {
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
-        docker logs tei-embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Embedding container log=================="
+        docker logs embedding-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Retriever container log=================="
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============TEI Reranking log=================="
+        docker logs tei-reranking-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Reranking container log=================="
         docker logs reranking-tei-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Doc-index-retriever container log=================="
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         exit 1
     fi
