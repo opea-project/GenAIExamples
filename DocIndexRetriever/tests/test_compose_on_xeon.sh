@@ -50,7 +50,7 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d
-    sleep 20
+    sleep 5m
     echo "Docker services started!"
 }
 
@@ -83,23 +83,29 @@ function validate_megaservice() {
     fi
 
     # Curl the Mega Service
-    # echo "================Testing retriever service: Text Request ================"
-    # cd $WORKPATH/tests
-    # # local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-    # #  "text": "Explain the OPEA project?"
-    # # }')
+    echo "================Testing retriever service: Text Request ================"
+    cd $WORKPATH/tests
+    local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
+     "text": "Explain the OPEA project?"
+    }')
     # local CONTENT=$(python test.py --host_ip ${ip_address} --request_type text)
-    # local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
-    # echo "$EXIT_CODE"
-    # local EXIT_CODE="${EXIT_CODE:0-1}"
-    # echo "return value is $EXIT_CODE"
-    # if [ "$EXIT_CODE" == "1" ]; then
-    #     docker logs tei-embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-    #     docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-    #     docker logs reranking-tei-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-    #     docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-    #     exit 1
-    # fi
+    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
+    echo "$EXIT_CODE"
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    echo "return value is $EXIT_CODE"
+    if [ "$EXIT_CODE" == "1" ]; then
+        echo "=============Embedding container log=================="
+        docker logs embedding-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Retriever container log=================="
+        docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============TEI Reranking log=================="
+        docker logs tei-reranking-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Reranking container log=================="
+        docker logs reranking-tei-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Doc-index-retriever container log=================="
+        docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        exit 1
+    fi
 
     echo "================Testing retriever service: ChatCompletion Request================"
     cd $WORKPATH/tests
