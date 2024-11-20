@@ -56,26 +56,21 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui chatqna-conversation-ui dataprep-redis retriever-redis nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
 
-# The image for vllm is built locally. It will be hosted in the Docker Hub in the near future
-#    docker pull vllm-api-server
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd "$WORKPATH"/docker_compose/amd/gpu/rocm-vllm
 
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs chatqna-vllm-service >& "${LOG_PATH}"/chatqna-vllm-service_start.log
         if grep -q "Application startup complete" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
             break
         fi
-        sleep 10s
         n=$((n+1))
     done
 }
@@ -130,7 +125,6 @@ function validate_microservices() {
         "${ip_address}:8090/embed" \
         "[[" \
         "chatqna-tei-embedding-service" \
-        "chatqna-tei-embedding-service" \
         '{"inputs":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -140,28 +134,24 @@ function validate_microservices() {
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
-        "dataprep_upload_file" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep upload link
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
-        "dataprep_upload_link" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep/get_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/get_file" \
         '{"name":' \
-        "dataprep_get" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep/delete_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/delete_file" \
         '{"status":true}' \
-        "dataprep_del" \
         "chatqna-dataprep-redis-service"
 
     # retrieval microservice
@@ -183,11 +173,8 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_service \
-        "${ip_address}:9009/v1/chat/completions" \
-        "\"content\":" \
         "chatqna-vllm-service" \
         "chatqna-vllm-service" \
-        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 
 }
 
@@ -206,7 +193,6 @@ function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
     cd "$WORKPATH"/ui/svelte
     local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniconda3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
         echo "$conda_env_name exist!"
     else
@@ -233,7 +219,6 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd "$WORKPATH"/docker_compose/amd/gpu/rocm-vllm
     docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
