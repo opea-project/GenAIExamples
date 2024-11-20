@@ -30,15 +30,15 @@ export CHATQNA_REDIS_RETRIEVER_PORT=7000
 export CHATQNA_INDEX_NAME="rag-redis"
 export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
+export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
+export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep"
+export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get_file"
+export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete_file"
 export CHATQNA_FRONTEND_SERVICE_IP=${HOST_IP}
 export CHATQNA_FRONTEND_SERVICE_PORT=5173
 export CHATQNA_BACKEND_SERVICE_NAME=chatqna
 export CHATQNA_BACKEND_SERVICE_IP=${HOST_IP}
 export CHATQNA_BACKEND_SERVICE_PORT=8888
-export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
-export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep"
-export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get_file"
-export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete_file"
 export CHATQNA_REDIS_URL="redis://${HOST_IP}:${CHATQNA_REDIS_VECTOR_PORT}"
 export CHATQNA_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_RERANK_SERVICE_HOST_IP=${HOST_IP}
@@ -62,7 +62,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd "$WORKPATH"/docker_compose/amd/gpu/rocm-vllm
+    cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
@@ -231,7 +231,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd "$WORKPATH"/docker_compose/amd/gpu/rocm-vllm
+    cd "$WORKPATH"/docker_compose/amd/gpu/rocm
     docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
