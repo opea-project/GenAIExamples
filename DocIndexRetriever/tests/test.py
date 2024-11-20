@@ -6,7 +6,7 @@ import argparse
 import requests
 
 
-def search_knowledge_base(query: str, url: str, request_type:str) -> str:
+def search_knowledge_base(query: str, url: str, request_type: str) -> str:
     """Search the knowledge base for a specific query."""
     print(url)
     proxies = {"http": ""}
