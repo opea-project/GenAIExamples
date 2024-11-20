@@ -63,7 +63,7 @@ jobs:
           Dockerfiles=$(realpath $(find ./ -name '*Dockerfile*'))
           if [ -n "$Dockerfiles" ]; then
             for dockerfile in $Dockerfiles; do
-              service=$(echo "$dockerfile" | awk -F 'GenAIExamples' '{print $2}' | awk -F '/' '{print $2}')
+              service=$(echo "$dockerfile" | awk -F '/GenAIExamples/' '{print $2}' | awk -F '/' '{print $2}')
               cd ${{github.workspace}}/$service/docker_image_build
               all_paths=$(realpath $(awk '  /context:/ { context = $2 }  /dockerfile:/ { dockerfile = $2; combined = context "/" dockerfile; gsub(/\/+/, "/", combined); if  (index(context, ".") > 0) {print combined}}' build.yaml) 2> /dev/null || true  )
               if ! echo "$all_paths" | grep -q "$dockerfile"; then
