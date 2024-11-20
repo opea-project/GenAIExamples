@@ -66,7 +66,7 @@ function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
-    docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d >& "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 500 ]]; do
