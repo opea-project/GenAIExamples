@@ -19,7 +19,6 @@ export HOST_IP_EXTERNAL=${ip_address}
 export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export MODEL=${CHATQNA_LLM_MODEL_ID}
 export CHATQNA_VLLM_SERVICE_PORT=9009
 export CHATQNA_TEI_EMBEDDING_PORT=8090
 export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"
@@ -31,15 +30,15 @@ export CHATQNA_REDIS_RETRIEVER_PORT=7000
 export CHATQNA_INDEX_NAME="rag-redis"
 export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
+export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
+export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep"
+export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get_file"
+export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete_file"
 export CHATQNA_FRONTEND_SERVICE_IP=${HOST_IP}
 export CHATQNA_FRONTEND_SERVICE_PORT=5173
 export CHATQNA_BACKEND_SERVICE_NAME=chatqna
 export CHATQNA_BACKEND_SERVICE_IP=${HOST_IP}
 export CHATQNA_BACKEND_SERVICE_PORT=8888
-export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
-export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep"
-export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get_file"
-export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete_file"
 export CHATQNA_REDIS_URL="redis://${HOST_IP}:${CHATQNA_REDIS_VECTOR_PORT}"
 export CHATQNA_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_RERANK_SERVICE_HOST_IP=${HOST_IP}
@@ -53,29 +52,28 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="llm-vllm-rocm chatqna chatqna-ui chatqna-conversation-ui dataprep-redis retriever-redis nginx"
+    service_list="chatqna chatqna-ui chatqna-conversation-ui dataprep-redis retriever-redis nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
 
-# The image for vllm is built locally. It will be hosted in the Docker Hub in the near future
-#    docker pull vllm-api-server
-#    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull vllm-api-server
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd "$WORKPATH"/docker_compose/amd/gpu/rocm-vllm
+    cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs chatqna-vllm-service >& "${LOG_PATH}"/chatqna-vllm-service_start.log
+        docker logs chatqna-vllm-service > "${LOG_PATH}"/chatqna-vllm-service_start.log
         if grep -q "Application startup complete" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
             break
         fi
-        sleep 10s
+        sleep 1s
         n=$((n+1))
     done
 }
@@ -130,7 +128,7 @@ function validate_microservices() {
         "${ip_address}:8090/embed" \
         "[[" \
         "chatqna-tei-embedding-service" \
-        "chatqna-tei-embedding-service" \
+        "chatqna-tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -140,28 +138,28 @@ function validate_microservices() {
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
-        "dataprep_upload_file" \
+        "chatqna-dataprep-redis-service" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep upload link
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
-        "dataprep_upload_link" \
+        "chatqna-dataprep-redis-service" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep/get_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/get_file" \
         '{"name":' \
-        "dataprep_get" \
+        "chatqna-dataprep-redis-service" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep/delete_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/delete_file" \
         '{"status":true}' \
-        "dataprep_del" \
+        "chatqna-dataprep-redis-service" \
         "chatqna-dataprep-redis-service"
 
     # retrieval microservice
@@ -183,11 +181,11 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_service \
-        "${ip_address}:9009/v1/chat/completions" \
-        "\"content\":" \
+        "${ip_address}:9009/generate" \
+        "generated_text" \
         "chatqna-vllm-service" \
         "chatqna-vllm-service" \
-        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
 }
 
@@ -206,7 +204,7 @@ function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
     cd "$WORKPATH"/ui/svelte
     local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniconda3/bin/:$PATH
+    export PATH=${HOME}/miniforge3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
         echo "$conda_env_name exist!"
     else
@@ -233,7 +231,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd "$WORKPATH"/docker_compose/amd/gpu/rocm-vllm
+    cd "$WORKPATH"/docker_compose/amd/gpu/rocm
     docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
