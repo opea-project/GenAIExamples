@@ -66,11 +66,11 @@ function build_docker_images() {
 function start_services() {
 
     # Start Docker Containers
-    docker compose -f compose_vllm.yaml up -d >& "${LOG_PATH}"/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs chatqna-vllm-service > "${LOG_PATH}"/chatqna-vllm-service_start.log
+        docker logs chatqna-vllm-service >& "${LOG_PATH}"/chatqna-vllm-service_start.log
         if grep -q "INFO:     Uvicorn running on http://0.0.0.0:8011 (Press CTRL+C to quit)" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
             break
         fi
