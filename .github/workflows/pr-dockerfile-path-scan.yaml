@@ -67,12 +67,6 @@ jobs:
           if [ -n "$Dockerfiles" ]; then
             for Dockerfile in $Dockerfiles; do
               service=$(echo "$Dockerfile" | awk -F '/' '{print $2}')
-              if grep -q "$Dockerfile" ../GenAIExamples/**/*build.yaml*; then
-                mode=""  #CI
-              else
-                mode="-cd" #CD
-              fi
-
               yaml_file=${{github.workspace}}/.github/workflows/docker/compose/"$service"-compose
               if ! grep -q "$Dockerfile" "$yaml_file"*yaml; then
                   echo "AR: Update $Dockerfile to .github/workflows/docker/compose/"$service"-compose.yaml. The yaml is used for release images build."

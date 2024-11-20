@@ -92,14 +92,15 @@ jobs:
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PREDICTIONGUARD_API_KEY: ${{ secrets.PREDICTIONGUARD_API_KEY }}
           service: ${{ inputs.service }}
           test_case: ${{ matrix.test_case }}
           hardware: ${{ matrix.hardware }}
         run: |
           cd ${{ github.workspace }}/tests
-          service=$(echo "${test_case}" | cut -d'_' -f2- |cut -d'.' -f1)
+          service=$(echo "${test_case}" | cut -d'/' -f3 | cut -d'_' -f2- |cut -d'.' -f1)
           echo "service=${service}" >> $GITHUB_ENV
-          if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
+          if [ -f ${test_case} ]; then timeout 60m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container
         if: cancelled() || failure()
