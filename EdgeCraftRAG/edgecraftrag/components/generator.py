@@ -26,15 +26,13 @@ class QnAGenerator(BaseComponent):
             ("\n\n", "\n"),
             ("\t\n", "\n"),
         )
-        safe_root = "/path/to/safe/templates"
+        safe_root = "/templates"
         template = os.path.normpath(os.path.join(safe_root, prompt_template))
         if not template.startswith(safe_root):
             raise ValueError("Invalid template path")
-        self.prompt = (
-            DocumentedContextRagPromptTemplate.from_file(template)
-            if os.path.isfile(template)
-            else DocumentedContextRagPromptTemplate.from_template(template)
-        )
+        if not os.path.exists(template):
+            raise ValueError("Template file not exists")
+        self.prompt = DocumentedContextRagPromptTemplate.from_file(template)
         self.llm = llm_model
         if isinstance(llm_model, str):
             self.model_id = llm_model
