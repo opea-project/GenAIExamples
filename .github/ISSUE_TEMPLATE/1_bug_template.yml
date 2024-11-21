@@ -128,7 +128,7 @@ body:
       required: false
 
 
-  - type: file
+  - type: textarea
     id: attachments
     attributes:
       label: Attachments
