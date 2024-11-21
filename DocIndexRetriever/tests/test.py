@@ -6,7 +6,7 @@ import argparse
 import requests
 
 
-def search_knowledge_base(query: str, url: str, request_type="chat_completion") -> str:
+def search_knowledge_base(query: str, url: str, request_type: str) -> str:
     """Search the knowledge base for a specific query."""
     print(url)
     proxies = {"http": ""}
@@ -18,12 +18,13 @@ def search_knowledge_base(query: str, url: str, request_type="chat_completion") 
             "top_n": 2,
         }
     else:
-        print("Sending text request")
+        print("Sending textdoc request")
         payload = {
             "text": query,
         }
     response = requests.post(url, json=payload, proxies=proxies)
     print(response)
+    print(response.json().keys())
     if "documents" in response.json():
         docs = response.json()["documents"]
         context = ""
@@ -32,7 +33,6 @@ def search_knowledge_base(query: str, url: str, request_type="chat_completion") 
                 context = str(i) + ": " + doc
             else:
                 context += "\n" + str(i) + ": " + doc
-        # print(context)
         return context
     elif "text" in response.json():
         return response.json()["text"]
@@ -44,7 +44,6 @@ def search_knowledge_base(query: str, url: str, request_type="chat_completion") 
                 context = doc["text"]
             else:
                 context += "\n" + doc["text"]
-        # print(context)
         return context
     else:
         return "Error parsing response from the knowledge base."
