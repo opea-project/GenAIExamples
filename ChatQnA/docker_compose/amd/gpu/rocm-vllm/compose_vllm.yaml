@@ -90,7 +90,7 @@ services:
       - seccomp:unconfined
     command: --model-id ${CHATQNA_RERANK_MODEL_ID} --auto-truncate
   chatqna-vllm-service:
-    image: llm-vllm-rocm
+    image: opea/llm-vllm-rocm
     container_name: chatqna-vllm-service
     ports:
       - "${CHATQNA_VLLM_SERVICE_PORT:-8081}:8011"

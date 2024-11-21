@@ -58,7 +58,7 @@ function build_docker_images() {
 
 # The image for vllm is built locally. It will be hosted in the Docker Hub in the near future
 #    docker pull vllm-api-server
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+#    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
 }
