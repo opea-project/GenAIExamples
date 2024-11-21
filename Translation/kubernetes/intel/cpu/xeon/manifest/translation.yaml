@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/instance: translation
     app.kubernetes.io/version: "2.1.0"
 data:
-  LLM_MODEL_ID: "haoranxu/ALMA-13B"
+  MODEL_ID: "haoranxu/ALMA-13B"
   PORT: "2080"
   HF_TOKEN: "insert-your-huggingface-token-here"
   http_proxy: ""
