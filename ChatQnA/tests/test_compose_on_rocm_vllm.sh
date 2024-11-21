@@ -62,7 +62,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd "$WORKPATH"/docker_compose/amd/gpu/rocm
+    cd "$WORKPATH"/docker_compose/amd/gpu/rocm-vllm
 
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
@@ -231,7 +231,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd "$WORKPATH"/docker_compose/amd/gpu/rocm
+    cd "$WORKPATH"/docker_compose/amd/gpu/rocm-vllm
     docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
