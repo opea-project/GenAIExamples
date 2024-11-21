@@ -37,7 +37,7 @@
       "device": "auto",
       "weight": "INT4"
     },
-    "prompt_path": "./edgecraftrag/prompt_template/default_prompt.txt",
+    "prompt_path": "./default_prompt.txt",
     "inference_type": "local"
   },
   "active": "True"

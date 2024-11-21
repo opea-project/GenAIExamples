@@ -32,14 +32,14 @@ Please follow this link [vLLM with OpenVINO](https://github.com/opea-project/Gen
 
 ### Start Edge Craft RAG Services with Docker Compose
 
-If you want to enable vLLM with OpenVINO service, please finish the steps in [Launch vLLM with OpenVINO service](#optional-launch-vllm-with-openvino-service) first.
-
 ```bash
 cd GenAIExamples/EdgeCraftRAG/docker_compose/intel/gpu/arc
 
 export MODEL_PATH="your model path for all your models"
 export DOC_PATH="your doc path for uploading a dir of files"
 export GRADIO_PATH="your gradio cache path for transferring files"
+# If you have a specific prompt template, please uncomment the following line
+# export PROMPT_PATH="your prompt path for prompt templates"
 
 # Make sure all 3 folders have 1000:1000 permission, otherwise
 # chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${GRADIO_PATH}
@@ -70,49 +70,25 @@ optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-sma
 optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task sentence-similarity
 optimum-cli export openvino -m Qwen/Qwen2-7B-Instruct ${MODEL_PATH}/Qwen/Qwen2-7B-Instruct/INT4_compressed_weights --weight-format int4
 
-docker compose up -d
-
 ```
 
-#### (Optional) Launch vLLM with OpenVINO service
+#### Launch services with local inference
 
-1. Set up Environment Variables
+```bash
+docker compose -f compose.yaml up -d
+```
+
+#### Launch services with vLLM + OpenVINO inference service
+
+Set up Additional Environment Variables and start with compose_vllm.yaml
 
 ```bash
 export LLM_MODEL=#your model id
 export VLLM_SERVICE_PORT=8008
 export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
 export HUGGINGFACEHUB_API_TOKEN=#your HF token
-```
 
-2. Uncomment below code in 'GenAIExamples/EdgeCraftRAG/docker_compose/intel/gpu/arc/compose.yaml'
-
-```bash
-  # vllm-openvino-server:
-  #   container_name: vllm-openvino-server
-  #   image: opea/vllm-arc:latest
-  #   ports:
-  #     - ${VLLM_SERVICE_PORT:-8008}:80
-  #   environment:
-  #     HTTPS_PROXY: ${https_proxy}
-  #     HTTP_PROXY: ${https_proxy}
-  #     VLLM_OPENVINO_DEVICE: GPU
-  #     HF_ENDPOINT: ${HF_ENDPOINT}
-  #     HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-  #   volumes:
-  #     - /dev/dri/by-path:/dev/dri/by-path
-  #     - $HOME/.cache/huggingface:/root/.cache/huggingface
-  #   devices:
-  #     - /dev/dri
-  #   entrypoint: /bin/bash -c "\
-  #     cd / && \
-  #     export VLLM_CPU_KVCACHE_SPACE=50 && \
-  #     export VLLM_OPENVINO_ENABLE_QUANTIZED_WEIGHTS=ON && \
-  #     python3 -m vllm.entrypoints.openai.api_server \
-  #       --model '${LLM_MODEL}' \
-  #       --max_model_len=1024 \
-  #       --host 0.0.0.0 \
-  #       --port 80"
+docker compose -f compose_vllm.yaml up -d
 ```
 
 ### ChatQnA with LLM Example (Command Line)
