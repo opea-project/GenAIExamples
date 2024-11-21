@@ -7,10 +7,12 @@ langchain-core
 langchain-huggingface
 opentelemetry-api
 opentelemetry-exporter-otlp
+opentelemetry-proto==1.23.0
 opentelemetry-sdk
 prometheus-fastapi-instrumentator
+protobuf==4.24.2
 pymupdf
 sentence_transformers
 shortuuid
 uvicorn
-vdms
+vdms>=0.0.20
