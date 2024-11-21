@@ -47,6 +47,7 @@ export CHATQNA_LLM_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_NGINX_PORT=8081
 export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export PATH="/home/huggingface/miniconda3/bin:$PATH"
+export DATAPREP_TEST_FILE_PREFIX=${RANDOM}
 
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build
@@ -89,7 +90,7 @@ function validate_service() {
 
     if [[ $SERVICE_NAME == *"chatqna-dataprep-redis-service"* ]]; then
         cd "$LOG_PATH"
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./${DATAPREP_TEST_FILE_PREFIX}_dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"chatqna-dataprep-redis-service"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'link_list=["https://www.ces.tech/"]' "$URL")
     elif [[ $SERVICE_NAME == *"chatqna-dataprep-redis-service"* ]]; then
@@ -136,7 +137,7 @@ function validate_microservices() {
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # test /v1/dataprep upload file
-    echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > "$LOG_PATH"/dataprep_file_${RANDOM}.txt
+    echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > "$LOG_PATH"/${DATAPREP_TEST_FILE_PREFIX}_dataprep_file.txt
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
