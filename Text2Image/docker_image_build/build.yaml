@@ -15,5 +15,4 @@ services:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile
-      extends: text2image
     image: ${REGISTRY:-opea}/text2image-ui:${TAG:-latest}
