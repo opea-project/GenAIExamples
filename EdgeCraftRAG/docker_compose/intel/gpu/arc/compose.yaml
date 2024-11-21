@@ -16,6 +16,7 @@ services:
       - ${DOC_PATH:-${PWD}}:/home/user/docs
       - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
       - ${HF_CACHE:-${HOME}/.cache}:/home/user/.cache
+      - ${PROMPT_PATH:-${PWD}}:/templates/custom
     ports:
       - ${PIPELINE_SERVICE_PORT:-16010}:${PIPELINE_SERVICE_PORT:-16010}
     devices:
