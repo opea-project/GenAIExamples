@@ -141,28 +141,28 @@ function validate_microservices() {
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
-        "chatqna-dataprep-redis-service" \
+        "dataprep_upload_file" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep upload link
     validate_service \
         "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
-        "chatqna-dataprep-redis-service" \
+        "dataprep_upload_link" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep/get_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/get_file" \
         '{"name":' \
-        "chatqna-dataprep-redis-service" \
+        "dataprep_get" \
         "chatqna-dataprep-redis-service"
 
     # test /v1/dataprep/delete_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/delete_file" \
         '{"status":true}' \
-        "chatqna-dataprep-redis-service" \
+        "dataprep_del" \
         "chatqna-dataprep-redis-service"
 
     # retrieval microservice
