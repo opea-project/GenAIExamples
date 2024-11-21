@@ -182,36 +182,35 @@ Change the `xxx_MODEL_ID` below for your needs.
    export CHATQNA_HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export HOST_IP=${host_ip}
-   export NGINX_PORT=${your_nginx_port}
-   export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
    export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
    export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
-   export CHATQNA_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-   export CHATQNA_TGI_SERVICE_PORT=8008
+   export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+   export CHATQNA_VLLM_SERVICE_PORT=9009
    export CHATQNA_TEI_EMBEDDING_PORT=8090
    export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"
    export CHATQNA_TEI_RERANKING_PORT=8808
-   export CHATQNA_REDIS_VECTOR_PORT=16379
+   export CHATQNA_REDIS_VECTOR_PORT=6379
    export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8001
    export CHATQNA_REDIS_DATAPREP_PORT=6007
    export CHATQNA_REDIS_RETRIEVER_PORT=7000
    export CHATQNA_INDEX_NAME="rag-redis"
    export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
    export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
-   export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
-   export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep"
-   export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get_file"
-   export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete_file"
    export CHATQNA_FRONTEND_SERVICE_IP=${HOST_IP}
    export CHATQNA_FRONTEND_SERVICE_PORT=5173
    export CHATQNA_BACKEND_SERVICE_NAME=chatqna
    export CHATQNA_BACKEND_SERVICE_IP=${HOST_IP}
    export CHATQNA_BACKEND_SERVICE_PORT=8888
+   export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
+   export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep"
+   export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get_file"
+   export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete_file"
    export CHATQNA_REDIS_URL="redis://${HOST_IP}:${CHATQNA_REDIS_VECTOR_PORT}"
    export CHATQNA_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
    export CHATQNA_RERANK_SERVICE_HOST_IP=${HOST_IP}
    export CHATQNA_LLM_SERVICE_HOST_IP=${HOST_IP}
-   export CHATQNA_NGINX_PORT=5176
+   export CHATQNA_NGINX_PORT=8081
+   export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -298,12 +297,16 @@ docker compose up -d
 
    ```bash
    docker logs ${CONTAINER_ID} | grep "Application startup complete"
+   
+   curl http://${host_ip}:9009/v1/chat/completions \
+   -H "Content-Type: application/json" \
+   -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
    ```
 
    If the service is ready, you will get the response like below.
 
    ```
-   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   INFO:     Application startup complete.
    ```
 
    Then try the `cURL` command below to validate TGI.
