@@ -297,7 +297,7 @@ docker compose up -d
 
    ```bash
    docker logs ${CONTAINER_ID} | grep "Application startup complete"
-   
+
    curl http://${host_ip}:9009/v1/chat/completions \
    -H "Content-Type: application/json" \
    -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
