@@ -11,7 +11,7 @@ check_list=("docker stop" "docker rm" "docker kill" "sudo rm" "git .* -f")
 # exclude path
 exclude_check_path="${WORKSPACE}/.github/workflows/scripts"
 
-# get change file lists (exclue delete files)
+# get change file lists (exclude delete files)
 change_files=$(git diff main --name-status -- :^$exclude_check_path | grep -v "D" | awk '{print $2}')
 
 status="success"
@@ -26,14 +26,14 @@ do
     fi
     # get added command
     git diff main ${file} | grep "^\+.*" | grep -v "^+++" | sed "s|\+||g" > ${WORKSPACE}/diff_file
-    cat diff_file | while read line; do 
-        echo $line; 
-        for (( i=0; i<${#check_list[@]}; i++)); do 
+    cat diff_file | while read line; do
+        echo $line;
+        for (( i=0; i<${#check_list[@]}; i++)); do
             if [[ $line == *"${check_list[$i]}"* ]]; then
                 echo "Found Dangerous Command: $line in $file, Please Check"
                 status="failed"
-            fi; 
-        done; 
+            fi;
+        done;
     done
 done
 [[ -f ${WORKSPACE}/diff_file ]] && rm -f ${WORKSPACE}/diff_file
