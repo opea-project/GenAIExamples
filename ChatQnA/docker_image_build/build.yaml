@@ -91,7 +91,7 @@ services:
     image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
   llm-vllm-rocm:
     build:
-      context: ./
+      context: GenAIExamples
       dockerfile: ../docker_compose/amd/gpu/rocm-vllm/Dockerfile-vllm
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-vllm-rocm:${TAG:-latest}
