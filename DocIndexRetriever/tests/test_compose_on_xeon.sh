@@ -15,8 +15,10 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    echo "Building Docker Images...."
     cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
+        echo "Cloning GenAIComps repository"
         git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
     service_list="dataprep-redis embedding-tei retriever-redis reranking-tei doc-index-retriever"
@@ -25,9 +27,12 @@ function build_docker_images() {
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull redis/redis-stack:7.2.0-v9
     docker images && sleep 1s
+
+    echo "Docker images built!"
 }
 
 function start_services() {
+    echo "Starting Docker Services...."
     cd $WORKPATH/docker_compose/intel/cpu/xeon
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -45,7 +50,8 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d
-    sleep 20
+    sleep 5m
+    echo "Docker services started!"
 }
 
 function validate() {
@@ -66,7 +72,7 @@ function validate_megaservice() {
     echo "===========Ingest data=================="
     local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
-     -F 'link_list=["https://opea.dev"]')
+     -F 'link_list=["https://opea.dev/"]')
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
@@ -77,19 +83,26 @@ function validate_megaservice() {
     fi
 
     # Curl the Mega Service
-    echo "================Testing retriever service: Default params================"
-
-    local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-     "messages": "Explain the OPEA project?"
+    echo "================Testing retriever service: Text Request ================"
+    cd $WORKPATH/tests
+    local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
+     "text": "Explain the OPEA project?"
     }')
+    # local CONTENT=$(python test.py --host_ip ${ip_address} --request_type text)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
-        docker logs tei-embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Embedding container log=================="
+        docker logs embedding-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Retriever container log=================="
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============TEI Reranking log=================="
+        docker logs tei-reranking-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Reranking container log=================="
+        docker logs reranking-tei-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Doc-index-retriever container log=================="
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         exit 1
     fi
@@ -102,9 +115,15 @@ function validate_megaservice() {
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
-        docker logs tei-embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Embedding container log=================="
+        docker logs embedding-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Retriever container log=================="
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============TEI Reranking log=================="
+        docker logs tei-reranking-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Reranking container log=================="
+        docker logs reranking-tei-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        echo "=============Doc-index-retriever container log=================="
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         exit 1
     fi
