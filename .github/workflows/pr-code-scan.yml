@@ -33,6 +33,9 @@ jobs:
     steps:
       - name: Checkout out Repo
         uses: actions/checkout@v4
+        
+      - name: Check Dangerous Command Injection
+        run: cd ${{ github.workspace }} && bash -x .github/workflows/scripts/check_cmd_injection.sh
 
       - name: Docker Build
         run: |

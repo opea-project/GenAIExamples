@@ -68,6 +68,9 @@ jobs:
         with:
           ref: ${{ env.CHECKOUT_REF }}
           fetch-depth: 0
+      
+      - name: Check Dangerous Command Injection
+        run: cd ${{ github.workspace }} && bash -x .github/workflows/scripts/check_cmd_injection.sh
 
       - name: Clone Required Repo
         run: |
