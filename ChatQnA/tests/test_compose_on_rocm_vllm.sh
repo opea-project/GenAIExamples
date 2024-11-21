@@ -205,7 +205,7 @@ function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
     cd "$WORKPATH"/ui/svelte
     local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
+    export PATH=${HOME}/miniconda3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
         echo "$conda_env_name exist!"
     else
