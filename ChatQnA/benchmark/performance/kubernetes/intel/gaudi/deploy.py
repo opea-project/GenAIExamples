@@ -112,14 +112,14 @@ def install_helm_release(release_name, chart_name, namespace, values_file, devic
     if device_type == "gaudi":
         print("Device type is gaudi. Pulling Helm chart to get gaudi-values.yaml...")
 
+        # Combine chart_name with fixed prefix
+        chart_pull_url = f"oci://ghcr.io/opea-project/charts/{chart_name}"
+
         # Pull and untar the chart
-        subprocess.run(["helm", "pull", chart_name, "--untar"], check=True)
+        subprocess.run(["helm", "pull", chart_pull_url, "--untar"], check=True)
 
-        # Determine the directory name (get the actual chart_name if chart_name is in the format 'repo_name/chart_name', else use chart_name directly)
-        chart_dir_name = chart_name.split("/")[-1] if "/" in chart_name else chart_name
-
-        # Find the untarred directory (assumes only one directory matches chart_dir_name)
-        untar_dirs = glob.glob(f"{chart_dir_name}*")
+        # Find the untarred directory
+        untar_dirs = glob.glob(f"{chart_name}*")
         if untar_dirs:
             untar_dir = untar_dirs[0]
             hw_values_file = os.path.join(untar_dir, "gaudi-values.yaml")
@@ -190,8 +190,8 @@ def main():
     parser.add_argument(
         "--chart-name",
         type=str,
-        default="opea/chatqna",
-        help="The chart name to deploy, composed of repo name and chart name (default: opea/chatqna).",
+        default="chatqna",
+        help="The chart name to deploy, composed of repo name and chart name (default: chatqna).",
     )
     parser.add_argument("--namespace", default="default", help="Kubernetes namespace (default: default).")
     parser.add_argument("--hf-token", help="Hugging Face API token.")
