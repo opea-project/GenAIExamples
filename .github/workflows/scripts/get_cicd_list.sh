@@ -4,7 +4,9 @@
 
 WORKPATH=$PWD
 # echo "mode is: "$1 "compose file is: "$2
-git clone https://github.com/opea-project/GenAIExamples.git
+if [ ! -d GenAIExamples ]; then
+    git clone https://github.com/opea-project/GenAIExamples.git
+fi
 all_ci_yaml=$(find GenAIExamples -name "build.yaml")
 all_ci_lists=$(grep '^[[:space:]]\{2\}[a-zA-Z0-9_-]\+:' $all_ci_yaml | awk -F: '{print$2}' | sed 's/^[[:space:]]\+//' | tr '\n' ',' | sed 's/,$//')
 
