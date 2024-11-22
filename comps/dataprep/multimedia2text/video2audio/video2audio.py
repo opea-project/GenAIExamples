@@ -6,7 +6,7 @@ import base64
 import uuid
 from os import path, remove
 
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 
 # Get the root folder of the current script
 root_folder = path.dirname(path.abspath(__file__))

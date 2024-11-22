@@ -12,7 +12,7 @@ import cv2
 import requests
 import webvtt
 import whisper
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 
 
 def create_upload_folder(upload_path):

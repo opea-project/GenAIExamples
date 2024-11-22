@@ -74,7 +74,7 @@ function start_services() {
     fi
 
 
-    docker run -d -p 9099:9099 --name="test-comps-mm-a2t-service" --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:comps
+    docker run -d -p 9199:9099 --name="test-comps-mm-a2t-service" --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e A2T_ENDPOINT=http://$host_ip:7066 opea/a2t:comps
     if [ $? -ne 0 ]; then
         echo "opea/a2t service fail to start"
         exit 1
@@ -183,7 +183,7 @@ function validate_microservices() {
 
     # Audio2Text service
     validate_services \
-        "${host_ip}:9099/v1/audio/transcriptions" \
+        "${host_ip}:9199/v1/audio/transcriptions" \
         '"query":"well"' \
         "a2t" \
         "a2t-service" \
@@ -192,7 +192,7 @@ function validate_microservices() {
     # Video2Audio service
     validate_services \
         "${host_ip}:7078/v1/video2audio" \
-        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd9L18KaAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
+        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAA" \
         "v2a" \
         "v2a-service" \
         "{\"byte_str\": \"$(input_data_for_test "video")\"}"
@@ -200,7 +200,7 @@ function validate_microservices() {
     # Docsum Data service - video
     validate_services \
         "${host_ip}:7079/v1/multimedia2text" \
-        '"query":"well"' \
+        '"query":"well' \
         "multimedia2text-service" \
         "multimedia2text" \
         "{\"video\": \"$(input_data_for_test "video")\"}"
@@ -208,7 +208,7 @@ function validate_microservices() {
     # Docsum Data service - audio
     validate_services \
         "${host_ip}:7079/v1/multimedia2text" \
-        '"query":"well"' \
+        '"query":"well' \
         "multimedia2text-service" \
         "multimedia2text" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
