@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-#export WORKSPACE=${{ github.workspace }}
+set -e
 cd ${WORKSPACE}
 [[ -f ${WORKSPACE}/diff_file ]] && rm -f ${WORKSPACE}/diff_file
 # docker control/rm/scp/rsync/git cmd
@@ -12,6 +12,7 @@ check_list=("docker stop" "docker rm" "docker kill" "sudo rm" "git .* -f")
 exclude_check_path="${WORKSPACE}/.github/workflows/scripts"
 
 # get change file lists (exclude delete files)
+git fetch origin main
 change_files=$(git diff main --name-status -- :^$exclude_check_path | grep -v "D" | awk '{print $2}')
 
 status="success"
