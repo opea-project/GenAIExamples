@@ -68,7 +68,7 @@ jobs:
         with:
           ref: ${{ env.CHECKOUT_REF }}
           fetch-depth: 0
-      
+
       - name: Check Dangerous Command Injection
         run: |
             export WORKSPACE=${{ github.workspace }}

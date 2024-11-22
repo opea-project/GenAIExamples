@@ -11,7 +11,7 @@ check_list=("docker stop" "docker rm" "docker kill" "sudo rm" "git .* -f")
 # exclude path
 exclude_check_path="${WORKSPACE}/.github/workflows/scripts"
 
-# get change file lists (exclue delete files)
+# get change file lists (exclude delete files)
 change_files=$(git diff main --name-status -- :^$exclude_check_path | grep -v "D" | awk '{print $2}')
 
 status="success"
