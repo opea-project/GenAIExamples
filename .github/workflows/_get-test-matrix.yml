@@ -41,14 +41,14 @@ jobs:
         with:
           ref: ${{ env.CHECKOUT_REF }}
           fetch-depth: 0
-      
+
       - name: Check Dangerous Command Injection
         if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
         run: |
               export WORKSPACE=${{ github.workspace }}
               cd ${{ github.workspace }}
               bash -x .github/workflows/scripts/check_cmd_injection.sh
-              
+
       - name: Get test matrix
         id: get-test-matrix
         run: |
