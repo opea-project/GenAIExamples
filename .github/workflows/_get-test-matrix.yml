@@ -44,10 +44,9 @@ jobs:
 
       - name: Check Dangerous Command Injection
         if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
-        run: |
-              export WORKSPACE=${{ github.workspace }}
-              cd ${{ github.workspace }}
-              bash .github/workflows/scripts/check_cmd_injection.sh
+        uses: opea-project/validation/actions/check_cmd@add_cmd_check_action
+        with:
+          work_dir: ${{ github.workspace }}
 
       - name: Get test matrix
         id: get-test-matrix
