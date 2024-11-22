@@ -22,6 +22,7 @@ env:
   REPO_TAG: "1.0"
   DOCKER_FILE_NAME: "code-scan"
   CONTAINER_NAME: "code-scan"
+  WORKSPACE: ${{ github.workspace }}
 
 jobs:
   code-scan:
@@ -33,7 +34,7 @@ jobs:
     steps:
       - name: Checkout out Repo
         uses: actions/checkout@v4
-        
+
       - name: Check Dangerous Command Injection
         run: cd ${{ github.workspace }} && bash -x .github/workflows/scripts/check_cmd_injection.sh
 

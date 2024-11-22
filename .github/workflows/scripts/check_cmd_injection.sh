@@ -26,15 +26,21 @@ do
     fi
     # get added command
     git diff main ${file} | grep "^\+.*" | grep -v "^+++" | sed "s|\+||g" > ${WORKSPACE}/diff_file
-    cat diff_file | while read line; do 
-        echo $line; 
-        for (( i=0; i<${#check_list[@]}; i++)); do 
-            if [[ $line == *"${check_list[$i]}"* ]]; then
-                echo "Found Dangerous Command: $line in $file, Please Check"
-                status="failed"
-            fi; 
-        done; 
-    done
+    #cat diff_file | while read line; do 
+    #    echo $line; 
+    #    for (( i=0; i<${#check_list[@]}; i++)); do 
+    #        if [[ $line == *"${check_list[$i]}"* ]]; then
+    #            echo "Found Dangerous Command: $line in $file, Please Check"
+    #            status="failed"
+    #        fi; 
+    #    done; 
+    #done
+    for (( i=0; i<${#check_list[@]}; i++)); do 
+        if [[ $(cat diff_file | grep -c "${check_list[$i]}") != 0 ]]; then
+            echo "Found Dangerous Command: $line in $file, Please Check"
+            status="failed"
+        fi; 
+    done; 
 done
 [[ -f ${WORKSPACE}/diff_file ]] && rm -f ${WORKSPACE}/diff_file
 [[ $status == "failed" ]] && exit 1 || exit 0
