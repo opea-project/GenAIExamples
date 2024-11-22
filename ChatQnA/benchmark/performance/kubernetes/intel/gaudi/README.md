@@ -69,10 +69,6 @@ Results will be displayed in the terminal and saved as CSV file named `1_stats.c
   - Persistent Volume Claim (PVC): This is the recommended approach for production setups. For more details on using PVC, refer to [PVC](https://github.com/opea-project/GenAIInfra/blob/main/helm-charts/README.md#using-persistent-volume).
   - Local Host Path: For simpler testing, ensure that each node involved in the deployment follows the steps above to locally prepare the models. After preparing the models, use `--set global.modelUseHostPath=${MODELDIR}` in the deployment command.
 
-- Add OPEA Helm Repository:
-  ```bash
-  python deploy.py --add-repo
-  ```
 - Label Nodes
   ```base
   python deploy.py --add-label --num-nodes 2
@@ -192,13 +188,9 @@ All the test results will come to the folder `GenAIEval/evals/benchmark/benchmar
 
 ## Teardown
 
-After completing the benchmark, use the following commands to clean up the environment:
+After completing the benchmark, use the following command to clean up the environment:
 
 Remove Node Labels:
-```base
-python deploy.py --delete-label
-```
-Delete the OPEA Helm Repository:
 ```bash
-python deploy.py --delete-repo
+python deploy.py --delete-label
 ```
