@@ -2,13 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+
 from ruamel.yaml import YAML
+
 
 def parse_yaml_file(file_path):
     yaml = YAML()
     with open(file_path, "r") as file:
         data = yaml.load(file)
     return data
+
 
 def check_service_image_consistency(data):
     inconsistencies = []
@@ -23,6 +26,7 @@ def check_service_image_consistency(data):
             inconsistencies.append((service_name, image_name, line_number))
     return inconsistencies
 
+
 def main():
     parser = argparse.ArgumentParser(description="Check service name and image name consistency in a YAML file.")
     parser.add_argument("file_path", type=str, help="The path to the YAML file.")
@@ -36,6 +40,7 @@ def main():
             print(f"Service name: {service_name}, Image name: {image_name}, Line number: {line_number}")
     else:
         print("All consistent")
+
 
 if __name__ == "__main__":
     main()
