@@ -6,7 +6,8 @@ import os
 
 import pathway as pw
 from langchain import text_splitter
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from pathway.xpacks.llm.parsers import ParseUnstructured
 from pathway.xpacks.llm.vector_store import VectorStoreServer
 
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     if tei_embedding_endpoint:
         # create embeddings using TEI endpoint service
         logging.info(f"Initializing the embedder from tei_embedding_endpoint: {tei_embedding_endpoint}")
-        embeddings = HuggingFaceHubEmbeddings(model=tei_embedding_endpoint)
+        embeddings = HuggingFaceEndpointEmbeddings(model=tei_embedding_endpoint)
     else:
         # create embeddings using local embedding model
         embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)

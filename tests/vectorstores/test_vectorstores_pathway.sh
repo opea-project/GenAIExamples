@@ -47,7 +47,7 @@ function start_service() {
 
     docker run -d --name="test-comps-vectorstore-pathway-ms" -e PATHWAY_HOST=${PATHWAY_HOST} -e PATHWAY_PORT=${PATHWAY_PORT} -e TEI_EMBEDDING_ENDPOINT=${TEI_EMBEDDING_ENDPOINT} -e http_proxy=$http_proxy -e https_proxy=$https_proxy -v $WORKPATH/comps/vectorstores/pathway/README.md:/app/data/README.md -p ${PATHWAY_PORT}:${PATHWAY_PORT} --network="host" opea/vectorstore-pathway:comps
 
-    sleep 45s
+    sleep 70s
 
     export PATHWAY_HOST=$ip_address  # needed in order to reach to vector store
 
@@ -60,8 +60,15 @@ function validate_microservice() {
     result=$(http_proxy=''
     curl http://${PATHWAY_HOST}:$PATHWAY_PORT/v1/retrieve \
         -X POST \
-        -d "{\"query\":\"test\",\"k\":3}" \
+        -d "{\"query\":\"pathway\",\"k\":5}" \
         -H 'Content-Type: application/json')
+
+    docs=$(http_proxy=''
+    curl http://${PATHWAY_HOST}:$PATHWAY_PORT/v1/inputs \
+        -X POST \
+        -H 'Content-Type: application/json')
+
+    echo "Indexed documents: $docs"
     if [[ $result == *"Pathway"* ]]; then
         echo "Result correct."
     else
