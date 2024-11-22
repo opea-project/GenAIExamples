@@ -273,7 +273,7 @@ docker compose up -d
    Try the command below to check whether the TGI service is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs tgi-server | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
@@ -285,7 +285,7 @@ docker compose up -d
    Then try the `cURL` command below to validate TGI.
 
    ```bash
-   curl http://${host_ip}:9009/v1/chat/completions \
+   curl http://${host_ip}:8008/v1/chat/completions \
      -X POST \
      -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'

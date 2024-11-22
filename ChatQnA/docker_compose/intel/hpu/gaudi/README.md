@@ -314,7 +314,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
-   docker logs tgi-service | grep Connected
+   docker logs tgi-gaudi-server | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
@@ -327,7 +327,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
 
    ```bash
    # TGI service
-   curl http://${host_ip}:9009/v1/chat/completions \
+   curl http://${host_ip}:8005/v1/chat/completions \
      -X POST \
      -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
@@ -335,7 +335,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
 
    ```bash
    # vLLM Service
-   curl http://${host_ip}:9009/v1/chat/completions \
+   curl http://${host_ip}:8007/v1/chat/completions \
      -H "Content-Type: application/json" \
      -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
    ```
