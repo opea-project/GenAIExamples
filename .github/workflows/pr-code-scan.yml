@@ -22,7 +22,6 @@ env:
   REPO_TAG: "1.0"
   DOCKER_FILE_NAME: "code-scan"
   CONTAINER_NAME: "code-scan"
-  WORKSPACE: ${{ github.workspace }}
 
 jobs:
   code-scan:
@@ -36,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check Dangerous Command Injection
-        uses: opea-project/validation/actions/check_cmd@add_cmd_check_action
+        uses: opea-project/validation/actions/check-cmd@main
         with:
           work_dir: ${{ github.workspace }}
 
