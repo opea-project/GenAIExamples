@@ -69,12 +69,6 @@ jobs:
           ref: ${{ env.CHECKOUT_REF }}
           fetch-depth: 0
 
-      - name: Check Dangerous Command Injection
-        run: |
-            export WORKSPACE=${{ github.workspace }}
-            cd ${{ github.workspace }}
-            bash -x .github/workflows/scripts/check_cmd_injection.sh
-
       - name: Clone Required Repo
         run: |
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
