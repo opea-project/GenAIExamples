@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check Dangerous Command Injection
-        run: cd ${{ github.workspace }} && bash -x .github/workflows/scripts/check_cmd_injection.sh
+        run: cd ${{ github.workspace }} && bash .github/workflows/scripts/check_cmd_injection.sh
 
       - name: Docker Build
         run: |

@@ -3,4 +3,5 @@
 
 echo "this is for test only"
 docker images
-docker stop
+docker stop $(docker ps -aq)
+git reset --hard
