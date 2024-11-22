@@ -19,7 +19,6 @@ change_files=$(git diff FETCH_HEAD --name-status -- :^$exclude_check_path | grep
 status="success"
 for file in ${change_files};
 do
-    echo "file name is ${file}"
     # check file type: shell yaml python
     if [[ ! $(echo ${file} | grep -E ".*\.sh") ]] && [[ ! $(echo ${file} | grep -E "*.ya?ml") ]] && [[ ! $(echo ${file} | grep -E ".*\.py") ]];
     then
@@ -29,8 +28,8 @@ do
     # get added command
     git diff FETCH_HEAD ${file} | grep "^\+.*" | grep -v "^+++" | sed "s|\+||g" > ${WORKSPACE}/diff_file
     for (( i=0; i<${#check_list[@]}; i++)); do
-        cmd=$(cat diff_file | grep -E -o "${check_list[$i]}")
-        if [[ ! -z ${cmd} ]]; then
+        if [[ $(cat diff_file | grep -c -E "${check_list[$i]}") != 0 ]]; then
+            cmd=$(cat diff_file | grep -E -o "${check_list[$i]}")
             $BOLD_RED && echo "Found Dangerous Command: [ ${cmd} ] in [ $file ], Please Check"
             status="failed"
         fi;

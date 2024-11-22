@@ -41,7 +41,7 @@ jobs:
         with:
           ref: ${{ env.CHECKOUT_REF }}
           fetch-depth: 0
-      
+
       - name: Check Dangerous Command Injection
         if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
         run: |
