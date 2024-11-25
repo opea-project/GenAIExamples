@@ -85,8 +85,11 @@ docker run -p 9088:9088 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$htt
 #### 2.2.3 Test
 
 ```bash
-# curl
 curl http://localhost:7055/v1/tts -XPOST -d '{"text": "Who are you?"}' -H 'Content-Type: application/json'
+
+# openai protocol compatible
+# voice can be 'male' or 'default'
+curl http://localhost:7055/v1/audio/speech -XPOST -d '{"input":"Who are you?", "voice": "male"}' -H 'Content-Type: application/json' --output speech.wav
 
 curl http://localhost:9088/v1/audio/speech -XPOST -d '{"text": "Who are you?"}' -H 'Content-Type: application/json'
 ```

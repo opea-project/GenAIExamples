@@ -38,6 +38,14 @@ pip install optimum[habana]
 cd dependency/
 nohup python whisper_server.py --device=hpu &
 python check_whisper_server.py
+
+# Or use openai protocol compatible curl command
+# Please refer to https://platform.openai.com/docs/api-reference/audio/createTranscription
+wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
+curl http://localhost:7066/v1/audio/transcriptions \
+  -H "Content-Type: multipart/form-data" \
+  -F file="@./sample.wav" \
+  -F model="openai/whisper-small"
 ```
 
 ### 1.3 Start ASR Service/Test
@@ -113,6 +121,7 @@ docker run -d -p 9099:9099 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$
 
 # curl
 http_proxy="" curl http://localhost:9099/v1/audio/transcriptions -XPOST -d '{"byte_str": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' -H 'Content-Type: application/json'
+
 
 # python
 python check_asr_server.py

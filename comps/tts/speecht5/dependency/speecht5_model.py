@@ -17,33 +17,34 @@ class SpeechT5Model:
 
             adapt_transformers_to_gaudi()
 
-        model_name_or_path = "microsoft/speecht5_tts"
+        self.model_name_or_path = "microsoft/speecht5_tts"
         vocoder_model_name_or_path = "microsoft/speecht5_hifigan"
-        self.model = SpeechT5ForTextToSpeech.from_pretrained(model_name_or_path).to(device)
+        self.model = SpeechT5ForTextToSpeech.from_pretrained(self.model_name_or_path).to(device)
         self.model.eval()
-        self.processor = SpeechT5Processor.from_pretrained(model_name_or_path, normalize=True)
+        self.processor = SpeechT5Processor.from_pretrained(self.model_name_or_path, normalize=True)
         self.vocoder = SpeechT5HifiGan.from_pretrained(vocoder_model_name_or_path).to(device)
         self.vocoder.eval()
 
         # fetch default speaker embedding
-        if os.path.exists("spk_embed_default.pt"):
-            self.default_speaker_embedding = torch.load("spk_embed_default.pt")
-        else:
-            try:
+        try:
+            for spk_embed in ["spk_embed_default.pt", "spk_embed_male.pt"]:
+                if os.path.exists(spk_embed):
+                    continue
+
                 p = subprocess.Popen(
                     [
                         "curl",
                         "-O",
                         "https://raw.githubusercontent.com/intel/intel-extension-for-transformers/main/"
-                        "intel_extension_for_transformers/neural_chat/assets/speaker_embeddings/"
-                        "spk_embed_default.pt",
+                        "intel_extension_for_transformers/neural_chat/assets/speaker_embeddings/" + spk_embed,
                     ]
                 )
+
                 p.wait()
-                self.default_speaker_embedding = torch.load("spk_embed_default.pt")
-            except Exception as e:
-                print("Warning! Need to prepare speaker_embeddings, will use the backup embedding.")
-                self.default_speaker_embedding = torch.zeros((1, 512))
+            self.default_speaker_embedding = torch.load("spk_embed_default.pt")
+        except Exception as e:
+            print("Warning! Need to prepare speaker_embeddings, will use the backup embedding.")
+            self.default_speaker_embedding = torch.zeros((1, 512))
 
         if self.device == "hpu":
             # do hpu graph warmup with variable inputs
@@ -87,7 +88,9 @@ class SpeechT5Model:
             "OPEA is an ecosystem orchestration framework to integrate performant GenAI technologies & workflows leading to quicker GenAI adoption and business value."
         )
 
-    def t2s(self, text):
+    def t2s(self, text, voice="default"):
+        if voice == "male":
+            self.default_speaker_embedding = torch.load("spk_embed_male.pt")
         if self.device == "hpu":
             # See https://github.com/huggingface/optimum-habana/pull/824
             from optimum.habana.utils import set_seed

@@ -30,10 +30,10 @@ class WhisperModel:
         from transformers import WhisperForConditionalGeneration, WhisperProcessor
 
         self.device = device
-        asr_model_name_or_path = os.environ.get("ASR_MODEL_PATH", model_name_or_path)
-        print("Downloading model: {}".format(asr_model_name_or_path))
-        self.model = WhisperForConditionalGeneration.from_pretrained(asr_model_name_or_path).to(self.device)
-        self.processor = WhisperProcessor.from_pretrained(asr_model_name_or_path)
+        self.asr_model_name_or_path = os.environ.get("ASR_MODEL_PATH", model_name_or_path)
+        print("Downloading model: {}".format(self.asr_model_name_or_path))
+        self.model = WhisperForConditionalGeneration.from_pretrained(self.asr_model_name_or_path).to(self.device)
+        self.processor = WhisperProcessor.from_pretrained(self.asr_model_name_or_path)
         self.model.eval()
 
         self.language = language

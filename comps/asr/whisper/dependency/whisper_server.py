@@ -5,13 +5,20 @@ import argparse
 import base64
 import os
 import uuid
+from typing import List, Optional, Union
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.responses import Response
 from pydub import AudioSegment
 from starlette.middleware.cors import CORSMiddleware
 from whisper_model import WhisperModel
+
+from comps import CustomLogger
+from comps.cores.proto.api_protocol import AudioTranscriptionResponse
+
+logger = CustomLogger("whisper")
+logflag = os.getenv("LOGFLAG", False)
 
 app = FastAPI()
 asr = None
@@ -29,7 +36,7 @@ async def health() -> Response:
 
 @app.post("/v1/asr")
 async def audio_to_text(request: Request):
-    print("Whisper generation begin.")
+    logger.info("Whisper generation begin.")
     uid = str(uuid.uuid4())
     file_name = uid + ".wav"
     request_dict = await request.json()
@@ -44,11 +51,56 @@ async def audio_to_text(request: Request):
     try:
         asr_result = asr.audio2text(file_name)
     except Exception as e:
-        print(e)
+        logger.error(e)
         asr_result = e
     finally:
         os.remove(file_name)
     return {"asr_result": asr_result}
+
+
+@app.post("/v1/audio/transcriptions")
+async def audio_transcriptions(
+    file: UploadFile = File(...),  # Handling the uploaded file directly
+    model: str = Form("openai/whisper-small"),
+    language: str = Form("english"),
+    prompt: str = Form(None),
+    response_format: str = Form("json"),
+    temperature: float = Form(0),
+    timestamp_granularities: List[str] = Form(None),
+):
+    logger.info("Whisper generation begin.")
+    audio_content = await file.read()
+    # validate the request parameters
+    if model != asr.asr_model_name_or_path:
+        raise Exception(
+            f"ASR model mismatch! Please make sure you pass --model_name_or_path or set environment variable ASR_MODEL_PATH to {model}"
+        )
+    asr.language = language
+    if prompt is not None or response_format != "json" or temperature != 0 or timestamp_granularities is not None:
+        logger.warning(
+            "Currently parameters 'language', 'response_format', 'temperature', 'timestamp_granularities' are not supported!"
+        )
+
+    uid = str(uuid.uuid4())
+    file_name = uid + ".wav"
+    # Save the uploaded file
+    with open(file_name, "wb") as buffer:
+        buffer.write(audio_content)
+
+    audio = AudioSegment.from_file(file_name)
+    audio = audio.set_frame_rate(16000)
+
+    audio.export(f"{file_name}", format="wav")
+
+    try:
+        asr_result = asr.audio2text(file_name)
+    except Exception as e:
+        logger.error(e)
+        asr_result = e
+    finally:
+        os.remove(file_name)
+
+    return AudioTranscriptionResponse(text=asr_result)
 
 
 if __name__ == "__main__":

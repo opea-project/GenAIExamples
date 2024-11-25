@@ -300,6 +300,38 @@ class AudioChatCompletionRequest(BaseModel):
     user: Optional[str] = None
 
 
+# Pydantic does not support UploadFile directly
+# class AudioTranscriptionRequest(BaseModel):
+#     # Ordered by official OpenAI API documentation
+#     # default values are same with
+#     # https://platform.openai.com/docs/api-reference/audio/createTranscription
+#     file: UploadFile = File(...)
+#     model: Optional[str] = "openai/whisper-small"
+#     language: Optional[str] = "english"
+#     prompt: Optional[str] = None
+#     response_format: Optional[str] = "json"
+#     temperature: Optional[str] = 0
+#     timestamp_granularities: Optional[List] = None
+
+
+class AudioTranscriptionResponse(BaseModel):
+    # Ordered by official OpenAI API documentation
+    # default values are same with
+    # https://platform.openai.com/docs/api-reference/audio/json-object
+    text: str
+
+
+class AudioSpeechRequest(BaseModel):
+    # Ordered by official OpenAI API documentation
+    # default values are same with
+    # https://platform.openai.com/docs/api-reference/audio/createSpeech
+    input: str
+    model: Optional[str] = "microsoft/speecht5_tts"
+    voice: Optional[str] = "default"
+    response_format: Optional[str] = "mp3"
+    speed: Optional[float] = 1.0
+
+
 class ChatMessage(BaseModel):
     role: str
     content: str

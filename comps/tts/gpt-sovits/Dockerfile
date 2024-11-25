@@ -16,7 +16,7 @@ ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libiomp5.so:/usr/lib/x86_64-linux-gnu/l
 ENV MALLOC_CONF="oversize_threshold:1,background_thread:true,metadata_thp:auto,dirty_decay_ms:9000000000,muzzy_decay_ms:9000000000"
 
 # Clone source repo
-RUN git clone https://github.com/RVC-Boss/GPT-SoVITS.git
+RUN git clone --branch openai_compat --single-branch https://github.com/Spycsh/GPT-SoVITS.git
 # Download pre-trained models, and prepare env
 RUN git clone https://huggingface.co/lj1995/GPT-SoVITS pretrained_models
 RUN mv pretrained_models/*  GPT-SoVITS/GPT_SoVITS/pretrained_models/ && \

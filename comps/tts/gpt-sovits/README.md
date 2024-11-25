@@ -54,9 +54,15 @@ wget https://github.com/OpenTalker/SadTalker/blob/main/examples/driven_audio/chi
 
 docker cp chinese_poem1.wav gpt-sovits-service:/home/user/chinese_poem1.wav
 
-http_proxy="" curl localhost:9880/change_refer -d '{
+curl localhost:9880/change_refer -d '{
     "refer_wav_path": "/home/user/chinese_poem1.wav",
     "prompt_text": "窗前明月光，疑是地上霜，举头望明月，低头思故乡。",
     "prompt_language": "zh"
 }'
+```
+
+- openai protocol compatible request
+
+```bash
+curl localhost:9880/v1/audio/speech -XPOST -d '{"input":"你好呀，你是谁. Hello, who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
 ```
