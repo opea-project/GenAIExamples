@@ -6,7 +6,7 @@ services:
     image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     container_name: translation-tgi-service
     ports:
-      - "${TRANSLATIONS_TGI_SERVICE_PORT:-8008}:80"
+      - "${TRANSLATION_TGI_SERVICE_PORT:-8008}:80"
     volumes:
       - "/var/lib/GenAI/translation/data:/data"
     shm_size: 8g
@@ -14,9 +14,9 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TRANSLATIONS_TGI_LLM_ENDPOINT}
-      HUGGING_FACE_HUB_TOKEN: ${TRANSLATIONS_HUGGINGFACEHUB_API_TOKEN}
-      HUGGINGFACEHUB_API_TOKEN: ${TRANSLATIONS_HUGGINGFACEHUB_API_TOKEN}
+      TGI_LLM_ENDPOINT: ${TRANSLATION_TGI_LLM_ENDPOINT}
+      HUGGING_FACE_HUB_TOKEN: ${TRANSLATION_HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${TRANSLATION_HUGGINGFACEHUB_API_TOKEN}
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri/:/dev/dri/
@@ -27,7 +27,7 @@ services:
     security_opt:
       - seccomp:unconfined
     ipc: host
-    command: --model-id ${TRANSLATIONS_LLM_MODEL_ID}
+    command: --model-id ${TRANSLATION_LLM_MODEL_ID}
   translation-llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: translation-llm-tgi-server
