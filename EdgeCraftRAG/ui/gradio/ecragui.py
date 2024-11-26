@@ -92,7 +92,7 @@ def build_app(cfg, args):
         chunk_size,
         chunk_overlap,
         vector_search_top_k,
-        vector_search_top_n,
+        vector_rerank_top_n,
         run_rerank,
         search_method,
         score_threshold,
@@ -108,8 +108,13 @@ def build_app(cfg, args):
         repetition_penalty: parameter for penalizing tokens based on how frequently they occur in the text.
         conversation_id: unique conversation identifier.
         """
+        if history[-1][0] == "" or len(history[-1][0]) == 0:
+            yield history[:-1]
+            return
+        
         stream_opt = True
-        new_req = {"messages": history[-1][0], "stream": stream_opt, "max_tokens": max_tokens}
+        new_req = {"messages": history[-1][0], "stream": stream_opt, "max_tokens": max_tokens, "top_n": vector_rerank_top_n, "temperature": temperature,
+                    "top_p": top_p, "top_k": top_k, "repetition_penalty": repetition_penalty}
         server_addr = f"http://{MEGA_SERVICE_HOST_IP}:{MEGA_SERVICE_PORT}"
 
         # Async for streaming response
