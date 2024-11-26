@@ -1,6 +1,3 @@
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 # SPDX-License-Identifier: Apache-2.0
 
 services:
@@ -10,7 +7,7 @@ services:
     ports:
       - "3001:80"
     volumes:
-      - "./data:/data"
+      - "/var/lib/GenAI/search/data:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
