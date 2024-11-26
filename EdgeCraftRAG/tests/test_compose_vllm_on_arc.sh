@@ -31,8 +31,7 @@ vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="server ui ecrag"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     echo "Build vllm_openvino image from GenAIComps..."
     cd $WORKPATH && git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}"

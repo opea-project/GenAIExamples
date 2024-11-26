@@ -290,7 +290,7 @@ docker compose up -d
    Try the command below to check whether the TGI service is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs chatqna-tgi-server | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
