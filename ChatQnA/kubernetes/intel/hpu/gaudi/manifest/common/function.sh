@@ -61,4 +61,8 @@ case "$1" in
     *)
         echo "Unknown function: $1"
         ;;
+<<<<<<< HEAD
 esac
+=======
+esac
+>>>>>>> 8713ca866731ab8b4378637f068047b5b4e9a485
