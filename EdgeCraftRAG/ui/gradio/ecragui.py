@@ -87,15 +87,11 @@ def build_app(cfg, args):
         top_k,
         repetition_penalty,
         max_tokens,
-        hide_full_prompt,
         docs,
         chunk_size,
         chunk_overlap,
         vector_search_top_k,
         vector_rerank_top_n,
-        run_rerank,
-        search_method,
-        score_threshold,
     ):
         """Callback function for running chatbot on submit button click.
 
@@ -748,39 +744,9 @@ def build_app(cfg, args):
                             with gr.Row():
                                 submit = gr.Button("Submit")
                                 clear = gr.Button("Clear")
-                    retriever_argument = gr.Accordion("Retriever Configuration", open=True)
+                    retriever_argument = gr.Accordion("Retriever Configuration", open=False)
                     with retriever_argument:
                         with gr.Row():
-                            with gr.Row():
-                                do_rerank = gr.Checkbox(
-                                    value=True,
-                                    label="Rerank searching result",
-                                    interactive=True,
-                                )
-                                hide_context = gr.Checkbox(
-                                    value=True,
-                                    label="Hide searching result in prompt",
-                                    interactive=True,
-                                )
-                            with gr.Row():
-                                search_method = gr.Dropdown(
-                                    ["similarity_score_threshold", "similarity", "mmr"],
-                                    value=cfg.search_method,
-                                    label="Searching Method",
-                                    info="Method used to search vector store",
-                                    multiselect=False,
-                                    interactive=True,
-                                )
-                            with gr.Row():
-                                score_threshold = gr.Slider(
-                                    0.01,
-                                    0.99,
-                                    value=cfg.score_threshold,
-                                    step=0.01,
-                                    label="Similarity Threshold",
-                                    info="Only working for 'similarity score threshold' method",
-                                    interactive=True,
-                                )
                             with gr.Row():
                                 vector_rerank_top_n = gr.Slider(
                                     1,
@@ -824,15 +790,11 @@ def build_app(cfg, args):
                 top_k,
                 repetition_penalty,
                 u_max_tokens,
-                hide_context,
                 docs,
                 u_chunk_size,
                 u_chunk_overlap,
                 u_vector_search_top_k,
                 vector_rerank_top_n,
-                do_rerank,
-                search_method,
-                score_threshold,
             ],
             chatbot,
             queue=True,
@@ -846,15 +808,11 @@ def build_app(cfg, args):
                 top_k,
                 repetition_penalty,
                 u_max_tokens,
-                hide_context,
                 docs,
                 u_chunk_size,
                 u_chunk_overlap,
                 u_vector_search_top_k,
                 vector_rerank_top_n,
-                do_rerank,
-                search_method,
-                score_threshold,
             ],
             chatbot,
             queue=True,
