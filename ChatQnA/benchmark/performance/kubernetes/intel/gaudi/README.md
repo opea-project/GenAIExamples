@@ -146,7 +146,6 @@ Before testing, upload a specified file to make sure the llm input have the toke
 Get files:
 
 ```bash
-wget https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/data/upload_file_no_rerank.txt
 wget https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/data/upload_file.txt
 ```
 
@@ -164,14 +163,10 @@ Use the following `cURL` command to upload file:
 
 ```bash
 cd GenAIEval/evals/benchmark/data
-# RAG with Rerank
 curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
+     -F "chunk_size=3800" \
      -F "files=@./upload_file.txt"
-# RAG without Rerank
-curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F "files=@./upload_file_no_rerank.txt"
 ```
 
 #### Run Benchmark Test
