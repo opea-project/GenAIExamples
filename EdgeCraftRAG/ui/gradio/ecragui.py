@@ -107,18 +107,10 @@ def build_app(cfg, args):
         if history[-1][0] == "" or len(history[-1][0]) == 0:
             yield history[:-1]
             return
-
+        
         stream_opt = True
-        new_req = {
-            "messages": history[-1][0],
-            "stream": stream_opt,
-            "max_tokens": max_tokens,
-            "top_n": vector_rerank_top_n,
-            "temperature": temperature,
-            "top_p": top_p,
-            "top_k": top_k,
-            "repetition_penalty": repetition_penalty,
-        }
+        new_req = {"messages": history[-1][0], "stream": stream_opt, "max_tokens": max_tokens, "top_n": vector_rerank_top_n, "temperature": temperature,
+                    "top_p": top_p, "top_k": top_k, "repetition_penalty": repetition_penalty}
         server_addr = f"http://{MEGA_SERVICE_HOST_IP}:{MEGA_SERVICE_PORT}"
 
         # Async for streaming response
@@ -371,7 +363,7 @@ def build_app(cfg, args):
                                     choices=avail_llm_inference_type, label="LLM Inference Type", value="local"
                                 )
 
-                                with gr.Accordion("LLM Configuration", open=True):
+                                with gr.Accordion("LLM Configuration", open=True) as accordion:
                                     u_llm_model_id = gr.Dropdown(
                                         choices=avail_llms,
                                         value=cfg.llm_model_id,
@@ -402,6 +394,12 @@ def build_app(cfg, args):
         # RAG Settings Events
         # -------------------
         # Event handlers
+        def update_visibility(selected_value):  # Accept the event argument, even if not used
+            if selected_value == "vllm":
+                return gr.Accordion(visible=False)
+            else:
+                return gr.Accordion(visible=True)
+            
         def show_pipeline_detail(evt: gr.SelectData):
             # get selected pipeline id
             # Dataframe: {'headers': '', 'data': [[x00, x01], [x10, x11]}
@@ -479,6 +477,8 @@ def build_app(cfg, args):
             return res, get_pipeline_df()
 
         # Events
+        u_llm_infertype.change(update_visibility, inputs=u_llm_infertype, outputs=accordion)
+
         u_pipelines.select(
             show_pipeline_detail,
             inputs=None,
