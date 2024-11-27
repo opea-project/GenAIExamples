@@ -34,6 +34,11 @@ jobs:
       - name: Checkout out Repo
         uses: actions/checkout@v4
 
+      - name: Check Dangerous Command Injection
+        uses: opea-project/validation/actions/check-cmd@main
+        with:
+          work_dir: ${{ github.workspace }}
+
       - name: Docker Build
         run: |
           docker build -f ${{ github.workspace }}/.github/workflows/docker/${{ env.DOCKER_FILE_NAME }}.dockerfile -t ${{ env.REPO_NAME }}:${{ env.REPO_TAG }} .
