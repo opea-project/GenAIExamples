@@ -107,10 +107,18 @@ def build_app(cfg, args):
         if history[-1][0] == "" or len(history[-1][0]) == 0:
             yield history[:-1]
             return
-        
+
         stream_opt = True
-        new_req = {"messages": history[-1][0], "stream": stream_opt, "max_tokens": max_tokens, "top_n": vector_rerank_top_n, "temperature": temperature,
-                    "top_p": top_p, "top_k": top_k, "repetition_penalty": repetition_penalty}
+        new_req = {
+            "messages": history[-1][0],
+            "stream": stream_opt,
+            "max_tokens": max_tokens,
+            "top_n": vector_rerank_top_n,
+            "temperature": temperature,
+            "top_p": top_p,
+            "top_k": top_k,
+            "repetition_penalty": repetition_penalty,
+        }
         server_addr = f"http://{MEGA_SERVICE_HOST_IP}:{MEGA_SERVICE_PORT}"
 
         # Async for streaming response
@@ -399,7 +407,7 @@ def build_app(cfg, args):
                 return gr.Accordion(visible=False)
             else:
                 return gr.Accordion(visible=True)
-            
+
         def show_pipeline_detail(evt: gr.SelectData):
             # get selected pipeline id
             # Dataframe: {'headers': '', 'data': [[x00, x01], [x10, x11]}
