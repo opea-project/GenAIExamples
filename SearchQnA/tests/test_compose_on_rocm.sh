@@ -50,8 +50,8 @@ function start_services() {
     export SEARCH_FRONTEND_SERVICE_PORT=5173
     export SEARCH_BACKEND_SERVICE_PORT=3008
     export SEARCH_BACKEND_SERVICE_ENDPOINT=http://${SEARCH_HOST_IP}:${SEARCH_BACKEND_SERVICE_PORT}/v1/searchqna
-    export SEARCH_GOOGLE_API_KEY='AIzaSyA8elfT2YWgF8OzGOLDJNATchMPaInzdLg'
-    export SEARCH_GOOGLE_CSE_ID='a2f12a53bdfc04a8a'
+    export SEARCH_GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    export SEARCH_GOOGLE_CSE_ID=${GOOGLE_CSE_ID}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
