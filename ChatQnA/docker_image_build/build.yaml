@@ -113,12 +113,12 @@ services:
       dockerfile: comps/guardrails/llama_guard/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/guardrails-tgi:${TAG:-latest}
-  vllm:
-    build:
-      context: vllm
-      dockerfile: Dockerfile.cpu
-    extends: chatqna
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  # vllm:
+  #   build:
+  #     context: vllm
+  #     dockerfile: Dockerfile.cpu
+  #   extends: chatqna
+  #   image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   vllm-gaudi:
     build:
       context: vllm-fork
