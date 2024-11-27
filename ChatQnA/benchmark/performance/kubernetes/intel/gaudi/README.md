@@ -165,6 +165,7 @@ Use the following `cURL` command to upload file:
 cd GenAIEval/evals/benchmark/data
 curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
      -H "Content-Type: multipart/form-data" \
+     -F "chunk_size=3800" \
      -F "files=@./upload_file.txt"
 ```
 
