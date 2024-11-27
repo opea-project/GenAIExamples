@@ -14,7 +14,7 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
   llm:
-    image: opea/llm-tgi:latest
+    image: opea/intent-detection-tgi:latest
     container_name: intent-tgi-server
     ports:
       - "9000:9000"

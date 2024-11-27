@@ -10,7 +10,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH
-    docker build --no-cache -t opea/intent-detection:comps -f comps/intent_detection/langchain/Dockerfile .
+    docker build --no-cache -t opea/intent-detection-tgi:comps -f comps/intent_detection/langchain/Dockerfile .
 }
 
 function start_service() {
@@ -23,7 +23,7 @@ function start_service() {
     export TGI_LLM_ENDPOINT="http://${ip_address}:${tgi_endpoint}"
     intent_port=5043
     unset http_proxy
-    docker run -d --name="test-comps-intent-server" -p ${intent_port}:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/intent-detection:comps
+    docker run -d --name="test-comps-intent-server" -p ${intent_port}:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/intent-detection-tgi:comps
 
     # check whether tgi is fully ready
     n=0
