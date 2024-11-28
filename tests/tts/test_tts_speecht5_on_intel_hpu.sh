@@ -10,12 +10,12 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t opea/speecht5:comps -f comps/tts/speecht5/dependency/Dockerfile .
+    docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t opea/speecht5-gaudi:comps -f comps/tts/speecht5/dependency/Dockerfile.intel_hpu .
     if [ $? -ne 0 ]; then
-        echo "opea/speecht5 built fail"
+        echo "opea/speecht5-gaudi built fail"
         exit 1
     else
-        echo "opea/speecht5 built successful"
+        echo "opea/speecht5-gaudi built successful"
     fi
     docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t opea/tts:comps -f comps/tts/speecht5/Dockerfile .
     if [ $? -ne 0 ]; then
@@ -28,7 +28,7 @@ function build_docker_images() {
 
 function start_service() {
     unset http_proxy
-    docker run -d --name="test-comps-tts-speecht5" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 5017:7055 --ipc=host opea/speecht5:comps
+    docker run -d --name="test-comps-tts-speecht5" --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 5017:7055 --ipc=host opea/speecht5-gaudi:comps
     docker run -d --name="test-comps-tts" -e TTS_ENDPOINT=http://$ip_address:5017 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 5016:9088 --ipc=host opea/tts:comps
     sleep 3m
 }
