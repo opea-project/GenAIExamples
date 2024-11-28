@@ -10,6 +10,7 @@ on:
       - comps/**
       - "!**.md"
       - "!**.txt"
+      - "**requirements.txt"
       - .github/workflows/push-image-build.yml
 
 concurrency:
