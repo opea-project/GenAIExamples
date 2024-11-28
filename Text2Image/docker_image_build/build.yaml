@@ -11,3 +11,8 @@ services:
       context: GenAIComps
       dockerfile: comps/text2image/Dockerfile
     image: ${REGISTRY:-opea}/text2image:${TAG:-latest}
+  text2image-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    image: ${REGISTRY:-opea}/text2image-ui:${TAG:-latest}

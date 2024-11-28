@@ -47,3 +47,12 @@ services:
       context: ../ui
       dockerfile: ./docker/Dockerfile
     image: ${REGISTRY:-opea}/graphrag-ui:${TAG:-latest}
+  graphrag-react-ui:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.react
+    image: ${REGISTRY:-opea}/graphrag-react-ui:${TAG:-latest}
