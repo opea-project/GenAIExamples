@@ -158,9 +158,6 @@ case "$1" in
         if [ $ret -ne 0 ]; then
             exit $ret
         fi
-        pushd ChatQnA/kubernetes/intel/cpu/xeon/manifest
-        install_and_validate_chatqna_guardrail
-        popd
         ;;
     *)
         echo "Unknown function: $1"
