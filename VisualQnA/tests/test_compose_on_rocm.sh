@@ -2,11 +2,16 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-set -ex
+set -x
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+
+WORKPATH=$(dirname "$PWD")
+LOG_PATH="$WORKPATH/tests"
+ip_address=$(hostname -I | awk '{print $1}')
+
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export HOST_IP=${ip_address}
@@ -28,11 +33,6 @@ export BACKEND_SERVICE_IP=${HOST_IP}
 export BACKEND_SERVICE_PORT=8888
 export NGINX_PORT=18003
 export PATH="~/miniconda3/bin:$PATH"
-
-
-WORKPATH=$(dirname "$PWD")
-LOG_PATH="$WORKPATH/tests"
-ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
