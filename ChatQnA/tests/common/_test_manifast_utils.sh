@@ -13,13 +13,13 @@ KUBECTL_TIMEOUT_SECONDS="60s"
 
 function init_chatqna() {
     # replace the mount dir "path: /mnt/opea-models" with "path: $CHART_MOUNT"
-    find . -name '*.yaml' -type f -exec sed -i "s#path: /mnt/opea-models#path: $MOUNT_DIR#g" {} \;
+    find ../../kubernetes/intel/*/*/manifest -name '*.yaml' -type f -exec sed -i "s#path: /mnt/opea-models#path: $MOUNT_DIR#g" {} \;
     # replace microservice image tag
-    find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/\(.*\):latest#image: \"opea/\1:${IMAGE_TAG}#g" {} \;
+    find ../../kubernetes/intel/*/*/manifest -name '*.yaml' -type f -exec sed -i "s#image: \"opea/\(.*\):latest#image: \"opea/\1:${IMAGE_TAG}#g" {} \;
     # replace the repository "image: opea/*" with "image: $IMAGE_REPO/"
-    find . -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}/#g" {} \;
+    find ../../kubernetes/intel/*/*/manifest -name '*.yaml' -type f -exec sed -i "s#image: \"opea/*#image: \"${IMAGE_REPO}/#g" {} \;
     # set huggingface token
-    find . -name '*.yaml' -type f -exec sed -i "s#insert-your-huggingface-token-here#$(cat /home/$USER_ID/.cache/huggingface/token)#g" {} \;
+    find ../../kubernetes/intel/*/*/manifest -name '*.yaml' -type f -exec sed -i "s#insert-your-huggingface-token-here#$(cat /home/$USER_ID/.cache/huggingface/token)#g" {} \;
 }
 
 function get_end_point() {

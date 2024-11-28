@@ -12,7 +12,7 @@ IMAGE_TAG=${IMAGE_TAG:-latest}
 ROLLOUT_TIMEOUT_SECONDS="1800s"
 KUBECTL_TIMEOUT_SECONDS="60s"
 
-function validate_chatqna() {
+function validate_chatqna_guardrails() {
     local ns=$1
     local log=$2
     max_retry=10
@@ -21,7 +21,7 @@ function validate_chatqna() {
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     for ((i=1; i<=max_retry; i++))
     do
-        endpoint_url=$(bash common/function.sh get_end_point  "chatqna-retriever-usvc" $ns)
+        endpoint_url=$(bash ChatQnA/tests/common/_test_manifast_utils.sh get_end_point "chatqna-retriever-usvc" $ns)
         curl http://$endpoint_url/v1/retrieval -X POST \
             -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}" \
             -H 'Content-Type: application/json' && break
@@ -35,7 +35,7 @@ function validate_chatqna() {
     # make sure microservice tgi-svc is ready
     for ((i=1; i<=max_retry; i++))
     do
-        endpoint_url=$(bash common/function.sh get_end_point  "chatqna-tgi" $ns)
+        endpoint_url=$(bash ChatQnA/tests/common/_test_manifast_utils.sh get_end_point "chatqna-tgi" $ns)
         curl http://$endpoint_url/generate -X POST \
             -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
             -H 'Content-Type: application/json' && break
@@ -50,7 +50,7 @@ function validate_chatqna() {
     # check megaservice works
     # generate a random logfile name to avoid conflict among multiple runners
     LOGFILE=$LOG_PATH/curlmega_$log.log
-    endpoint_url=$(bash common/function.sh get_end_point  "chatqna" $ns)
+    endpoint_url=$(bash ChatQnA/tests/common/_test_manifast_utils.sh get_end_point "chatqna" $ns)
     curl http://$endpoint_url/v1/chatqna -H "Content-Type: application/json" -d '{"messages": "What is the revenue of Nike in 2023?"}' > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
@@ -73,31 +73,45 @@ function validate_chatqna() {
     return 0
 }
 
-function main() {
+function install_chatqna_guardrails() {
     echo "Testing manifests chatqna_guardrils"
     local ns=$1
+    bash ChatQnA/tests/common/_test_manifast_utils.sh _cleanup_ns $ns
     pushd ChatQnA/kubernetes/intel/cpu/xeon/manifest
-    bash common/function.sh _cleanup_ns $ns
-    bash common/function.sh init_chatqna
     kubectl create namespace $ns
     # install guardrail
     kubectl apply -f chatqna-guardrails.yaml -n $ns
     # Sleep enough time for chatqna_guardrail to be ready
     sleep 60
-    if kubectl rollout status deployment -n "$ns" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
-        echo "Waiting for chatqna_guardrail pod ready done!"
-    else
-        echo "Timeout waiting for chatqna_guardrail pod ready!"
-        exit 1
-    fi
-
-    # validate guardrail
-    validate_chatqna $ns chatqna-guardrails
-    local ret=$?
-    if [ $ret -ne 0 ]; then
-        exit 1
-    fi
-    popd
 }
 
-main $1
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <function_name>"
+    exit 1
+fi
+
+case "$1" in
+    init_ChatQnA_guardrails)
+        pushd ChatQnA/tests/common
+        bash _test_manifast_utils.sh init_chatqna
+        popd
+        ;;
+    install_ChatQnA_guardrails)
+        NAMESPACE=$2
+        install_chatqna_guardrails
+        popd
+        ;;
+    validate_ChatQnA_guardrails)
+        NAMESPACE=$2
+        SERVICE_NAME=chatqna-guardrails
+        validate_chatqna_guardrails $ns chatqna-guardrails
+        ret=$?
+        if [ $ret -ne 0 ]; then
+            exit $ret
+        fi
+        ;;
+
+    *)
+        echo "Unknown function: $1"
+        ;;
+esac

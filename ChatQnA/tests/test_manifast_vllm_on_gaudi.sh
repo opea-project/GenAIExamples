@@ -21,7 +21,7 @@ function validate_chatqna_vllm() {
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     for ((i=1; i<=max_retry; i++))
     do
-        endpoint_url=$(bash common/function.sh get_end_point  "chatqna-retriever-usvc" $ns)
+        endpoint_url=$(bash ChatQnA/tests/common/_test_manifast_utils.sh get_end_point  "chatqna-retriever-usvc" $ns)
         curl http://$endpoint_url/v1/retrieval -X POST \
             -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}" \
             -H 'Content-Type: application/json' && break
@@ -36,7 +36,7 @@ function validate_chatqna_vllm() {
     # make sure microservice vllm-svc is ready
     for ((i=1; i<=max_retry; i++))
     do
-        endpoint_url=$(bash common/function.sh get_end_point  "chatqna-vllm" $ns)
+        endpoint_url=$(bash ChatQnA/tests/common/_test_manifast_utils.sh get_end_point  "chatqna-vllm" $ns)
         curl http://$endpoint_url/v1/chat/completions -X POST \
             -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}' \
             -H 'Content-Type: application/json' && break
@@ -51,7 +51,7 @@ function validate_chatqna_vllm() {
     # check megaservice works
     # generate a random logfile name to avoid conflict among multiple runners
     LOGFILE=$LOG_PATH/curlmega_$log.log
-    endpoint_url=$(bash common/function.sh get_end_point  "chatqna" $ns)
+    endpoint_url=$(bash ChatQnA/tests/common/_test_manifast_utils.sh get_end_point  "chatqna" $ns)
     curl http://$endpoint_url/v1/chatqna -H "Content-Type: application/json" -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": "What is the revenue of Nike in 2023?"}' > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
@@ -74,31 +74,43 @@ function validate_chatqna_vllm() {
     return 0
 }
 
-function main() {
+function install_chatqna_vllm() {
     echo "Testing manifests chatqna_vllm"
     local ns=$1
-    pushd ChatQnA/kubernetes/intel/hpu/gaudi/manifest
-    bash common/function.sh _cleanup_ns $ns
-    bash common/function.sh init_chatqna
+    bash ChatQnA/tests/common/_test_manifast_utils.sh _cleanup_ns $ns
     kubectl create namespace $ns
     # install guardrail
     kubectl apply -f chatqna-vllm.yaml -n $ns
     # Sleep enough time for chatqna_vllm to be ready, vllm warmup takes about 5 minutes
     sleep 280
-    if kubectl rollout status deployment -n "$ns" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
-        echo "Waiting for chatqna_vllm pod ready done!"
-    else
-        echo "Timeout waiting for chatqna_vllm pod ready!"
-        exit 1
-    fi
-
-    # validate guardrail
-    validate_chatqna_vllm $ns chatqna-vllm
-    local ret=$?
-    if [ $ret -ne 0 ]; then
-        exit 1
-    fi
-    popd
 }
 
-main $1
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <function_name>"
+    exit 1
+fi
+
+case "$1" in
+    init_ChatQnA_vllm)
+        pushd ChatQnA/tests/common
+        bash _test_manifast_utils.sh init_chatqna
+        popd
+        ;;
+    install_ChatQnA_vllm)
+        NAMESPACE=$2
+        install_chatqna_vllm
+        ;;
+    validate_ChatQnA_vllm)
+        NAMESPACE=$2
+        SERVICE_NAME=chatqna-vllm
+        validate_chatqna_vllm $NAMESPACE chatqna-vllm
+        ret=$?
+        if [ $ret -ne 0 ]; then
+            exit $ret
+        fi
+        ;;
+
+    *)
+        echo "Unknown function: $1"
+        ;;
+esac
