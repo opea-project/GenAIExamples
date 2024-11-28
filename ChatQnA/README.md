@@ -247,6 +247,10 @@ docker compose up -d
 
 Refer to the [NVIDIA GPU Guide](./docker_compose/nvidia/gpu/README.md) for more instructions on building docker images from source.
 
+### Deploy ChatQnA into Kubernetes on Xeon with Intel TDX protection
+
+Refer to the [Kubernetes Guide](./kubernetes/intel/README_tdx.md) for instructions on deploying ChatQnA into Kubernetes on Xeon with services protected using Intel TDX.
+
 ### Deploy ChatQnA into Kubernetes on Xeon & Gaudi with GMC
 
 Refer to the [Kubernetes Guide](./kubernetes/intel/README_gmc.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi with GMC.
