@@ -67,36 +67,6 @@ jobs:
           make docker.build
           make docker.push
 
-      - name: Scan gmcmanager
-        if: ${{ inputs.node == 'gaudi' }}
-        uses: opea-project/validation/actions/trivy-scan@main
-        with:
-          image-ref: ${{ env.DOCKER_REGISTRY }}/gmcmanager:${{ env.VERSION }}
-          output: gmcmanager-scan.txt
-
-      - name: Upload gmcmanager scan result
-        if: ${{ inputs.node == 'gaudi' }}
-        uses: actions/upload-artifact@v4.3.4
-        with:
-          name: gmcmanager-scan
-          path: gmcmanager-scan.txt
-          overwrite: true
-
-      - name: Scan gmcrouter
-        if: ${{ inputs.node == 'gaudi' }}
-        uses: opea-project/validation/actions/trivy-scan@main
-        with:
-          image-ref: ${{ env.DOCKER_REGISTRY }}/gmcrouter:${{ env.VERSION }}
-          output: gmcrouter-scan.txt
-
-      - name: Upload gmcrouter scan result
-        if: ${{ inputs.node == 'gaudi' }}
-        uses: actions/upload-artifact@v4.3.4
-        with:
-          name: gmcrouter-scan
-          path: gmcrouter-scan.txt
-          overwrite: true
-
       - name: Clean up images
         if: always()
         run: |
