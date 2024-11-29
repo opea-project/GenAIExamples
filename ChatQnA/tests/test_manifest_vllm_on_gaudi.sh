@@ -12,7 +12,7 @@ IMAGE_TAG=${IMAGE_TAG:-latest}
 ROLLOUT_TIMEOUT_SECONDS="1800s"
 KUBECTL_TIMEOUT_SECONDS="60s"
 
-function validate_chatqna_vllm() {
+function validate_chatqna() {
     local ns=$1
     local log=$2
     max_retry=20
@@ -74,7 +74,7 @@ function validate_chatqna_vllm() {
     return 0
 }
 
-function install_chatqna_vllm() {
+function install_chatqna() {
     echo "Testing manifests chatqna_vllm"
     local ns=$1
     bash ChatQnA/tests/common/_test_manifast_utils.sh _cleanup_ns $ns
@@ -91,19 +91,19 @@ if [ $# -eq 0 ]; then
 fi
 
 case "$1" in
-    init_ChatQnA_vllm)
+    init_ChatQnA)
         pushd ChatQnA/tests/common
         bash _test_manifast_utils.sh init_chatqna
         popd
         ;;
-    install_ChatQnA_vllm)
+    install_ChatQnA)
         NAMESPACE=$2
-        install_chatqna_vllm
+        install_chatqna
         ;;
-    validate_ChatQnA_vllm)
+    validate_ChatQnA)
         NAMESPACE=$2
         SERVICE_NAME=chatqna-vllm
-        validate_chatqna_vllm $NAMESPACE chatqna-vllm
+        validate_chatqna $NAMESPACE chatqna-vllm
         ret=$?
         if [ $ret -ne 0 ]; then
             exit $ret

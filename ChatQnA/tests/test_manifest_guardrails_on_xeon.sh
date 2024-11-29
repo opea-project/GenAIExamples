@@ -12,7 +12,7 @@ IMAGE_TAG=${IMAGE_TAG:-latest}
 ROLLOUT_TIMEOUT_SECONDS="1800s"
 KUBECTL_TIMEOUT_SECONDS="60s"
 
-function validate_chatqna_guardrails() {
+function validate_chatqna() {
     local ns=$1
     local log=$2
     max_retry=10
@@ -73,15 +73,15 @@ function validate_chatqna_guardrails() {
     return 0
 }
 
-function install_chatqna_guardrails() {
-    echo "Testing manifests chatqna_guardrils"
+function install_chatqna() {
+    echo "Testing manifests chatqna_guardrails"
     local ns=$1
     bash ChatQnA/tests/common/_test_manifast_utils.sh _cleanup_ns $ns
     pushd ChatQnA/kubernetes/intel/cpu/xeon/manifest
     kubectl create namespace $ns
     # install guardrail
     kubectl apply -f chatqna-guardrails.yaml -n $ns
-    # Sleep enough time for chatqna_guardrail to be ready
+    # Sleep enough time for chatqna_guardrails to be ready
     sleep 60
 }
 
@@ -91,20 +91,20 @@ if [ $# -eq 0 ]; then
 fi
 
 case "$1" in
-    init_ChatQnA_guardrails)
+    init_ChatQnA)
         pushd ChatQnA/tests/common
         bash _test_manifast_utils.sh init_chatqna
         popd
         ;;
-    install_ChatQnA_guardrails)
+    install_ChatQnA)
         NAMESPACE=$2
-        install_chatqna_guardrails
+        install_chatqna
         popd
         ;;
-    validate_ChatQnA_guardrails)
+    validate_ChatQnA)
         NAMESPACE=$2
         SERVICE_NAME=chatqna-guardrails
-        validate_chatqna_guardrails $ns chatqna-guardrails
+        validate_chatqna $ns chatqna-guardrails
         ret=$?
         if [ $ret -ne 0 ]; then
             exit $ret
