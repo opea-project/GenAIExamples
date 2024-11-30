@@ -23,7 +23,7 @@ export async function fetchTextStream(query: string) {
 	let url = "";
 	let modelId = "Intel/neural-chat-7b-v3-3";
 
-	if(MODEL_ID) {
+	if (MODEL_ID) {
 		modelId = MODEL_ID;
 	}
 
