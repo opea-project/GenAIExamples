@@ -5,11 +5,11 @@ name: Nightly build/publish latest docker images
 
 on:
   schedule:
-    - cron: "30 13 * * *" # UTC time
+    - cron: "30 14 * * *" # UTC time
   workflow_dispatch:
 
 env:
-  EXAMPLES: "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"
+  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   TAG: "latest"
   PUBLISH_TAGS: "latest"
 
@@ -32,7 +32,7 @@ jobs:
           echo "TAG=$TAG" >> $GITHUB_OUTPUT
           echo "PUBLISH_TAGS=$PUBLISH_TAGS" >> $GITHUB_OUTPUT
 
-  build:
+  build-and-test:
     needs: get-build-matrix
     strategy:
       matrix:
@@ -42,6 +42,7 @@ jobs:
     with:
       node: gaudi
       example: ${{ matrix.example }}
+      test_compose: true
     secrets: inherit
 
   get-image-list:
@@ -51,7 +52,7 @@ jobs:
       examples: ${{ needs.get-build-matrix.outputs.EXAMPLES }}
 
   publish:
-    needs: [get-build-matrix, get-image-list, build]
+    needs: [get-build-matrix, get-image-list, build-and-test]
     strategy:
       matrix:
         image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
