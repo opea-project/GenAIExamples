@@ -4,6 +4,7 @@
 name: Report Bug
 description: Used to report bug
 title: "[Bug]"
+labels: ["bug"]
 body:
   - type: dropdown
     id: priority
