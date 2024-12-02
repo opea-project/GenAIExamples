@@ -1,0 +1,29 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Enable HorizontalPodAutoscaler (HPA)
+#
+# That will overwrite named PrometheusAdapter configMap with ChatQnA specific
+# custom metric queries for embedding, reranking, tgi services.
+#
+# Default upstream configMap is in:
+#  - https://github.com/kubernetes-sigs/prometheus-adapter/blob/master/deploy/manifests/config-map.yaml
+
+autoscaling:
+  enabled: true
+
+# Override values in specific subcharts
+
+# Enabling "autoscaling" for any of the subcharts requires enabling it also above!
+tgi:
+  autoscaling:
+    maxReplicas: 4
+    enabled: true
+teirerank:
+  autoscaling:
+    maxReplicas: 3
+    enabled: true
+tei:
+  autoscaling:
+    maxReplicas: 2
+    enabled: true
