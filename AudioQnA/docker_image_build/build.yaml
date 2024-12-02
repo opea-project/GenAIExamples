@@ -11,6 +11,18 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+  audioqna-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}
+  audioqna-multilang:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile.multilang
+    extends: audioqna
+    image: ${REGISTRY:-opea}/audioqna-multilang:${TAG:-latest}
   whisper-gaudi:
     build:
       context: GenAIComps
@@ -53,3 +65,9 @@ services:
       dockerfile: comps/tts/speecht5/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/tts:${TAG:-latest}
+  gpt-sovits:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/gpt-sovits/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}

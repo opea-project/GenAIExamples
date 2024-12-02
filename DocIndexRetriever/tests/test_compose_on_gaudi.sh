@@ -15,6 +15,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    echo "Building Docker Images...."
     cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
         git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
@@ -24,11 +25,13 @@ function build_docker_images() {
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull redis/redis-stack:7.2.0-v9
-    docker pull ghcr.io/huggingface/tei-gaudi:latest
+    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
     docker images && sleep 1s
+    echo "Docker images built!"
 }
 
 function start_services() {
+    echo "Starting Docker Services...."
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -47,6 +50,7 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
     sleep 20
+    echo "Docker services started!"
 }
 
 function validate() {

@@ -36,9 +36,9 @@ Evaluate the performance with the LLM:
 
 ```py
 # validate the offline model
-# python offline_evaluate.py
+# python offline_eval.py
 # validate the online asr microservice accuracy
-python online_evaluate.py
+python online_eval.py
 ```
 
 ### Performance Result

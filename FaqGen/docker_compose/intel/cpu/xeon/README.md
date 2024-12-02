@@ -79,6 +79,7 @@ export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
+export LLM_SERVICE_PORT=9000
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
 ```
 
@@ -114,9 +115,11 @@ docker compose up -d
 3. MegaService
 
    ```bash
-   curl http://${host_ip}:8888/v1/faqgen -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-        }'
+   curl http://${host_ip}:8888/v1/faqgen \
+      -H "Content-Type: multipart/form-data" \
+      -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+      -F "max_tokens=32" \
+      -F "stream=false"
    ```
 
    Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.

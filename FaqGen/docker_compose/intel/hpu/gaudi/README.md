@@ -11,7 +11,7 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 As TGI Gaudi has been officially published as a Docker image, we simply need to pull it:
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
 ```
 
 ### 2. Build LLM Image
@@ -28,7 +28,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/FaqGen/docker/
+cd GenAIExamples/FaqGen/
 docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
@@ -37,7 +37,7 @@ docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_pro
 Construct the frontend Docker image using the command below:
 
 ```bash
-cd GenAIExamples/FaqGen/
+cd GenAIExamples/FaqGen/ui
 docker build -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
@@ -53,7 +53,7 @@ docker build -t opea/faqgen-react-ui:latest --build-arg https_proxy=$https_proxy
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `ghcr.io/huggingface/tgi-gaudi:2.0.5`
+1. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 2. `opea/llm-faqgen-tgi:latest`
 3. `opea/faqgen:latest`
 4. `opea/faqgen-ui:latest`
@@ -80,6 +80,7 @@ export TGI_LLM_ENDPOINT="http://${your_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
+export LLM_SERVICE_PORT=9000
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
 ```
 
@@ -115,9 +116,11 @@ docker compose up -d
 3. MegaService
 
    ```bash
-   curl http://${host_ip}:8888/v1/faqgen -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-        }'
+   curl http://${host_ip}:8888/v1/faqgen \
+      -H "Content-Type: multipart/form-data" \
+      -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+      -F "max_tokens=32" \
+      -F "stream=false"
    ```
 
 ## 🚀 Launch the UI

@@ -26,8 +26,6 @@ function build_docker_images() {
 function start_service() {
     export no_proxy="localhost,127.0.0.1,"${ip_address}
     docker run -d --name="text2image-server" -p $text2image_service_port:$text2image_service_port --runtime=runc --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e MODEL=$MODEL -e no_proxy=$no_proxy ${IMAGE_REPO}/text2image:${IMAGE_TAG}
-
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
     sleep 30s
 }
 
@@ -59,7 +57,6 @@ function validate_microservice() {
     fi
 }
 
-
 function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
     cd $WORKPATH/ui/svelte
@@ -89,6 +86,7 @@ function validate_frontend() {
         echo "[TEST INFO]: ---------frontend test passed---------"
     fi
 }
+
 
 function stop_docker() {
     cid=$(docker ps -aq --filter "name=text2image-server*")

@@ -43,6 +43,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 data:
   TEI_EMBEDDING_ENDPOINT: "http://chatqna-tei"
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
   http_proxy: ""
   https_proxy: ""
   no_proxy: ""
@@ -70,9 +71,8 @@ data:
   no_proxy: ""
   LOGFLAG: ""
   vLLM_ENDPOINT: "http://chatqna-vllm"
-  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
-  LLM_MODEL: "meta-llama/Llama-3.1-70B-Instruct"
-  MODEL_ID: "meta-llama/Llama-3.1-70B-Instruct"
+  LLM_MODEL: "meta-llama/Meta-Llama-3-8B-Instruct"
+  MODEL_ID: "meta-llama/Meta-Llama-3-8B-Instruct"
 ---
 # Source: chatqna/charts/reranking-usvc/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -145,7 +145,6 @@ data:
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
-  MAX_WARMUP_SEQUENCE_LENGTH: "512"
 ---
 # Source: chatqna/charts/teirerank/templates/configmap.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -170,6 +169,7 @@ data:
   NUMBA_CACHE_DIR: "/tmp"
   TRANSFORMERS_CACHE: "/tmp/transformers_cache"
   HF_HOME: "/tmp/.cache/huggingface"
+  MAX_WARMUP_SEQUENCE_LENGTH: "512"
 ---
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -183,7 +183,7 @@ metadata:
     app.kubernetes.io/instance: chatqna
     app.kubernetes.io/version: "2.1.0"
 data:
-  MODEL_ID: "meta-llama/Llama-3.1-70B-Instruct"
+  MODEL_ID: "meta-llama/Meta-Llama-3-8B-Instruct"
   PORT: "2080"
   HF_TOKEN: "insert-your-huggingface-token-here"
   http_proxy: ""
@@ -194,6 +194,12 @@ data:
   PT_HPU_ENABLE_LAZY_COLLECTIVES: "true"
   OMPI_MCA_btl_vader_single_copy_mechanism: "none"
   HF_HOME: "/tmp/.cache/huggingface"
+  GPU_MEMORY_UTILIZATION: "0.5"
+  DTYPE: "auto"
+  TENSOR_PARALLEL_SIZE: "1"
+  BLOCK_SIZE: "128"
+  MAX_NUM_SEQS: "256"
+  MAX_SEQ_LEN_TO_CAPTURE: "2048"
 ---
 # Source: chatqna/templates/nginx-deployment.yaml
 apiVersion: v1
@@ -592,7 +598,7 @@ spec:
           securityContext:
             {}
           image: "opea/chatqna-ui:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: ui
               containerPort: 5173
@@ -649,8 +655,8 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/dataprep-redis:v0.9"
-          imagePullPolicy: IfNotPresent
+          image: "opea/dataprep-redis:latest"
+          imagePullPolicy: Always
           ports:
             - name: data-prep
               containerPort: 6007
@@ -728,7 +734,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/embedding-tei:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: embedding-usvc
               containerPort: 6000
@@ -806,7 +812,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/llm-vllm:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: llm-uservice
               containerPort: 9000
@@ -881,7 +887,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "redis/redis-stack:7.2.0-v9"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
               name: data-volume
@@ -956,7 +962,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/reranking-tei:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: reranking-usvc
               containerPort: 8000
@@ -1034,7 +1040,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/retriever-redis:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: retriever-usvc
               containerPort: 7000
@@ -1103,10 +1109,8 @@ spec:
             - configMapRef:
                 name: chatqna-tei-config
           securityContext:
-            privileged: true
-            capabilities:
-              add: ["SYS_NICE"]
-          image: "ghcr.io/huggingface/tei-gaudi:latest"
+            {}
+          image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
           imagePullPolicy: IfNotPresent
           args:
             - "--auto-truncate"
@@ -1140,16 +1144,8 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
-            limits:
-              habana.ai/gaudi: 1
-              cpu: 10
-              memory: 100Gi
-              hugepages-2Mi: 9800Mi
-            requests:
-              habana.ai/gaudi: 1
-              cpu: 10
-              memory: 100Gi
-              hugepages-2Mi: 9800Mi
+            {}
+
       volumes:
         - name: model-volume # Replace with Persistent volume claim/ host directory
           emptyDir: {}
@@ -1191,11 +1187,17 @@ spec:
             - configMapRef:
                 name: chatqna-teirerank-config
           securityContext:
-            {}
-          image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "ghcr.io/huggingface/tei-gaudi:1.5.0"
           imagePullPolicy: IfNotPresent
-          args:
-            - "--auto-truncate"
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -1228,7 +1230,8 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
-            {}
+            limits:
+              habana.ai/gaudi: 1
       volumes:
         - name: model-volume # Replace with Persistent volume claim/ host directory
           emptyDir: {}
@@ -1241,6 +1244,7 @@ spec:
 ---
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+
 
 apiVersion: apps/v1
 kind: Deployment
@@ -1271,17 +1275,37 @@ spec:
             - configMapRef:
                 name: chatqna-vllm-config
           securityContext:
-            privileged: true
+            allowPrivilegeEscalation: false
             capabilities:
-              add: ["SYS_NICE"]
-          image: "opea/llm-vllm-hpu:latest"
-          command:
-            - /bin/bash
-            - -c
-            - |
-              export VLLM_CPU_KVCACHE_SPACE=40 && \
-              python3 -m vllm.entrypoints.openai.api_server --enforce-eager --gpu-memory-utilization 0.5 --dtype auto --model $MODEL_ID --port 2080 --tensor-parallel-size 8 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
-          imagePullPolicy: IfNotPresent
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "opea/vllm-gaudi:latest"
+          args:
+            - "--enforce-eager"
+            - "--model"
+            - "$(MODEL_ID)"
+            - "--tensor-parallel-size"
+            - "1"
+            - "--gpu-memory-utilization"
+            - "$(GPU_MEMORY_UTILIZATION)"
+            - "--dtype"
+            - "$(DTYPE)"
+            - "--max-num-seqs"
+            - "$(MAX_NUM_SEQS)"
+            - "--block-size"
+            - "$(BLOCK_SIZE)"
+            - "--max-seq-len-to-capture"
+            - "$(MAX_SEQ_LEN_TO_CAPTURE)"
+            - "--host"
+            - "0.0.0.0"
+            - "--port"
+            - "$(PORT)"
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -1293,20 +1317,13 @@ spec:
               protocol: TCP
           resources:
             limits:
-              habana.ai/gaudi: 8
-              cpu: 40
-              memory: 400Gi
-              hugepages-2Mi: 9800Mi
-            requests:
-              habana.ai/gaudi: 8
-              cpu: 40
-              memory: 400Gi
-              hugepages-2Mi: 9800Mi
+              habana.ai/gaudi: 1
       volumes:
         - name: model-volume # Replace with Persistent volume claim/ host directory
           emptyDir: {}
         - name: tmp
           emptyDir: {}
+
 ---
 # Source: chatqna/templates/deployment.yaml
 # Copyright (C) 2024 Intel Corporation
@@ -1350,8 +1367,8 @@ spec:
               value: chatqna-retriever-usvc
             - name: EMBEDDING_SERVICE_HOST_IP
               value: chatqna-embedding-usvc
-            - name: GUARDRAIL_SERVICE_HOST_IP
-              value: chatqna-guardrails-usvc
+            - name: MODEL_ID
+              value: "meta-llama/Meta-Llama-3-8B-Instruct"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -1362,7 +1379,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/chatqna:latest"
+          image: "opea/chatqna-wrapper:latest"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /tmp
@@ -1404,7 +1421,7 @@ spec:
     spec:
       containers:
       - image: nginx:1.27.1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: nginx
         volumeMounts:
         - mountPath: /etc/nginx/conf.d

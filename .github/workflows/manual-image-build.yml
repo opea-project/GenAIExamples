@@ -12,7 +12,7 @@ on:
         type: string
       example:
         default: "ChatQnA"
-        description: 'Build images belong to which example?'
+        description: 'Build images belong to which example? [AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA,AvatarChatbot,Text2Image,WorkflowExecAgent,DBQnA,EdgeCraftRAG,GraphRAG]'
         required: true
         type: string
       services:
@@ -30,6 +30,12 @@ on:
         description: 'OPEA branch for image build'
         required: false
         type: string
+      inject_commit:
+        default: false
+        description: "inject commit to docker images true or false"
+        required: false
+        type: string
+
 jobs:
   get-test-matrix:
     runs-on: ubuntu-latest
@@ -56,4 +62,5 @@ jobs:
       services: ${{ inputs.services }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
+      inject_commit: ${{ inputs.inject_commit }}
     secrets: inherit

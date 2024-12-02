@@ -13,7 +13,7 @@ By default, the LLM model is set to a default value as listed below:
 
 |Service  |Model                    |
 |---------|-------------------------|
-|LLM      |HuggingFaceH4/mistral-7b-grok|
+|LLM      |mistralai/Mistral-7B-Instruct-v0.3|
 
 Change the `MODEL_ID` in `codetrans_xeon.yaml` for your needs.
 

@@ -85,12 +85,12 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 
 By default, the LLM model is set to a default value as listed below:
 
-| Service      | Model                                                                           |
-| ------------ | ------------------------------------------------------------------------------- |
-| LLM_MODEL_ID | [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) |
+| Service      | Model                                                                                   |
+| ------------ | --------------------------------------------------------------------------------------- |
+| LLM_MODEL_ID | [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) |
 
-[meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) is a gated model that requires submitting an access request through Hugging Face. You can replace it with another model.
-Change the `LLM_MODEL_ID` below for your needs, such as: [Qwen/CodeQwen1.5-7B-Chat](https://huggingface.co/Qwen/CodeQwen1.5-7B-Chat), [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
+[Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) may be a gated model that requires submitting an access request through Hugging Face. You can replace it with another model.
+Change the `LLM_MODEL_ID` below for your needs, such as: [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
 
 If you choose to use `meta-llama/CodeLlama-7b-hf` as LLM model, you will need to visit [here](https://huggingface.co/meta-llama/CodeLlama-7b-hf), click the `Expand to review and access` button to ask for model access.
 
@@ -131,8 +131,6 @@ Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.y
 cd GenAIExamples/CodeGen/docker_compose/intel/hpu/gaudi
 docker compose up -d
 ```
-
-> Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 

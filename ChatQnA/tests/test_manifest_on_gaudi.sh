@@ -99,6 +99,69 @@ function validate_chatqna() {
 }
 
 
+function validate_chatqna_vllm() {
+    local ns=$1
+    local log=$2
+    max_retry=20
+    # make sure microservice retriever-usvc is ready
+    # try to curl retriever-svc for max_retry times
+    test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+    for ((i=1; i<=max_retry; i++))
+    do
+        endpoint_url=$(get_end_point "chatqna-retriever-usvc" $ns)
+        curl http://$endpoint_url/v1/retrieval -X POST \
+            -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}" \
+            -H 'Content-Type: application/json' && break
+        sleep 30
+    done
+    # if i is bigger than max_retry, then exit with error
+    if [ $i -gt $max_retry ]; then
+        echo "Microservice retriever failed, exit with error."
+        return 1
+    fi
+
+    # make sure microservice vllm-svc is ready
+    for ((i=1; i<=max_retry; i++))
+    do
+        endpoint_url=$(get_end_point "chatqna-vllm" $ns)
+        curl http://$endpoint_url/v1/chat/completions -X POST \
+            -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}' \
+            -H 'Content-Type: application/json' && break
+        sleep 30
+    done
+    # if i is bigger than max_retry, then exit with error
+    if [ $i -gt $max_retry ]; then
+        echo "Microservice vllm failed, exit with error."
+        return 1
+    fi
+
+    # check megaservice works
+    # generate a random logfile name to avoid conflict among multiple runners
+    LOGFILE=$LOG_PATH/curlmega_$log.log
+    endpoint_url=$(get_end_point "chatqna" $ns)
+    curl http://$endpoint_url/v1/chatqna -H "Content-Type: application/json" -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": "What is the revenue of Nike in 2023?"}' > $LOGFILE
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo "Megaservice failed, please check the logs in $LOGFILE!"
+        return ${exit_code}
+    fi
+
+    echo "Checking response results, make sure the output is reasonable. "
+    local status=false
+    if [[ -f $LOGFILE ]] &&
+        [[ $(grep -c "\[DONE\]" $LOGFILE) != 0 ]]; then
+        status=true
+    fi
+    if [ $status == false ]; then
+        echo "Response check failed, please check the logs in artifacts!"
+        return 1
+    else
+        echo "Response check succeed!"
+    fi
+    return 0
+}
+
+
 function _cleanup_ns() {
     local ns=$1
     if kubectl get ns $ns; then
@@ -111,7 +174,7 @@ function _cleanup_ns() {
 
 function install_and_validate_chatqna_guardrail() {
     echo "Testing manifests chatqna_guardrils"
-    local ns=${NAMESPACE}-gaurdrails
+    local ns=${NAMESPACE}
     _cleanup_ns $ns
     kubectl create namespace $ns
     # install guardrail
@@ -119,10 +182,9 @@ function install_and_validate_chatqna_guardrail() {
     # Sleep enough time for chatqna_guardrail to be ready
     sleep 60
     if kubectl rollout status deployment -n "$ns" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
-        echo "Waiting for cahtqna_guardrail pod ready done!"
+        echo "Waiting for chatqna_guardrail pod ready done!"
     else
         echo "Timeout waiting for chatqna_guardrail pod ready!"
-        _cleanup_ns $ns
         exit 1
     fi
 
@@ -130,10 +192,32 @@ function install_and_validate_chatqna_guardrail() {
     validate_chatqna $ns chatqna-guardrails
     local ret=$?
     if [ $ret -ne 0 ]; then
-        _cleanup_ns $ns
         exit 1
     fi
+}
+
+function install_and_validate_chatqna_vllm() {
+    echo "Testing manifests chatqna_vllm"
+    local ns=${NAMESPACE}
     _cleanup_ns $ns
+    kubectl create namespace $ns
+    # install guardrail
+    kubectl apply -f chatqna-vllm.yaml -n $ns
+    # Sleep enough time for chatqna_vllm to be ready, vllm warmup takes about 5 minutes
+    sleep 280
+    if kubectl rollout status deployment -n "$ns" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
+        echo "Waiting for chatqna_vllm pod ready done!"
+    else
+        echo "Timeout waiting for chatqna_vllm pod ready!"
+        exit 1
+    fi
+
+    # validate guardrail
+    validate_chatqna_vllm $ns chatqna-vllm
+    local ret=$?
+    if [ $ret -ne 0 ]; then
+        exit 1
+    fi
 }
 
 if [ $# -eq 0 ]; then
@@ -161,11 +245,14 @@ case "$1" in
         if [ $ret -ne 0 ]; then
             exit $ret
         fi
-        pushd ChatQnA/kubernetes/intel/hpu/gaudi/manifests
-        set +e
+        pushd ChatQnA/kubernetes/intel/hpu/gaudi/manifest
         install_and_validate_chatqna_guardrail
         popd
+        pushd ChatQnA/kubernetes/intel/hpu/gaudi/manifest
+        install_and_validate_chatqna_vllm
+        popd
         ;;
+
     *)
         echo "Unknown function: $1"
         ;;
