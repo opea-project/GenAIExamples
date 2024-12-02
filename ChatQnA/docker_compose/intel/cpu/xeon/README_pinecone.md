@@ -238,7 +238,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-pinecone-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
    ```
 
-3. Set up other environment variables, make sure to update the INDEX_NAME  variable to use Pinecone Index name:
+3. Set up other environment variables, make sure to update the INDEX_NAME variable to use Pinecone Index name:
 
    ```bash
    source ./set_env.sh
@@ -258,7 +258,6 @@ If use TGI backend.
 # Start ChatQnA with Rerank Pipeline
 docker compose -f compose_pinecone.yaml up -d
 ```
-
 
 ### Validate Microservices
 
@@ -377,9 +376,7 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep" \
 
 This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-
 To delete the files/link you uploaded:
-
 
 ```bash
 # delete all uploaded files and links
