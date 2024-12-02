@@ -1,6 +1,7 @@
 {
-  "name": "sveltekit-auth-example",
+  "name": "chat-qna",
   "version": "0.0.1",
+  "private": true,
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
