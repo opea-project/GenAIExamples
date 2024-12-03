@@ -93,7 +93,7 @@ fi
 case "$1" in
     init_ChatQnA)
         pushd ChatQnA/tests/common
-        bash _test_manifast_utils.sh init_chatqna
+        bash _test_manifast_utils.sh init_ChatQnA
         popd
         ;;
     install_ChatQnA)
