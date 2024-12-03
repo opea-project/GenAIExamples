@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
 import asyncio
 import os
 
@@ -53,7 +54,36 @@ class RetrievalToolService:
         self.megaservice.flow_to(retriever, rerank)
         self.gateway = RetrievalToolGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
+    def add_remote_service_without_rerank(self):
+        embedding = MicroService(
+            name="embedding",
+            host=EMBEDDING_SERVICE_HOST_IP,
+            port=EMBEDDING_SERVICE_PORT,
+            endpoint="/v1/embeddings",
+            use_remote_service=True,
+            service_type=ServiceType.EMBEDDING,
+        )
+        retriever = MicroService(
+            name="retriever",
+            host=RETRIEVER_SERVICE_HOST_IP,
+            port=RETRIEVER_SERVICE_PORT,
+            endpoint="/v1/retrieval",
+            use_remote_service=True,
+            service_type=ServiceType.RETRIEVER,
+        )
+
+        self.megaservice.add(embedding).add(retriever)
+        self.megaservice.flow_to(embedding, retriever)
+        self.gateway = RetrievalToolGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--without-rerank", action="store_true")
+
+    args = parser.parse_args()
+
     chatqna = RetrievalToolService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
-    chatqna.add_remote_service()
+    if args.without_rerank:
+        chatqna.add_remote_service_without_rerank()
+    else:
+        chatqna.add_remote_service()
