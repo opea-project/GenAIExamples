@@ -188,8 +188,8 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 2. `opea/lvm-llava-svc:latest`
 3. `opea/lvm-llava:latest`
 4. `opea/retriever-multimodal-redis:latest`
-5. `opea/whisper-service`
-6. `opea/asr-service`
+5. `opea/whisper:latest`
+6. `opea/asr:latest`
 7. `opea/redis-vector-db`
 8. `opea/embedding-multimodal:latest`
 9. `opea/embedding-multimodal-bridgetower:latest`

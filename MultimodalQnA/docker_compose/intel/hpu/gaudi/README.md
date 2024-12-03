@@ -137,8 +137,8 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 2. `opea/lvm-tgi:latest`
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 4. `opea/retriever-multimodal-redis:latest`
-5. `opea/whisper-service`
-6. `opea/asr-service`
+5. `opea/whisper:latest`
+6. `opea/asr:latest`
 7. `opea/redis-vector-db`
 8. `opea/embedding-multimodal:latest`
 9. `opea/embedding-multimodal-bridgetower:latest`
