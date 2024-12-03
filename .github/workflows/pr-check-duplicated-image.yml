@@ -1,0 +1,40 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Check Duplicated Images
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
+    paths:
+      - "**/docker_image_build/*.yaml"
+      - ".github/workflows/pr-check-duplicated-image.yml"
+      - ".github/workflows/scripts/check_duplicated_image.py"
+  workflow_dispatch:
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-duplicated-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Check all the docker image build files
+        run: |
+          pip install PyYAML
+          cd ${{github.workspace}}
+          build_files=""
+          for f in `find . -path "*/docker_image_build/build.yaml"`; do
+              build_files="$build_files $f"
+          done
+          python3 .github/workflows/scripts/check_duplicated_image.py $build_files
+        shell: bash
