@@ -130,15 +130,16 @@ jobs:
         env:
           test_case: ${{ matrix.test_case }}
         run: |
+          set -x
           echo "test_case=$test_case"
-          if [[ ! -f ${test_case} ]]; then
+          if [[ ! -f ${{ github.workspace }}/${{ inputs.example }}/tests/${test_case} ]]; then
             echo "No test script found, exist test!"
             exit 0
           else
-            ${test_case} init_${{ inputs.example }}
+            ${{ github.workspace }}/${{ inputs.example }}/tests/${test_case} init_${{ inputs.example }}
             echo "should_cleanup=true" >> $GITHUB_ENV
             kubectl create ns $NAMESPACE
-            ${test_case} install_${{ inputs.example }} $NAMESPACE
+            ${{ github.workspace }}/${{ inputs.example }}/tests/${test_case} install_${{ inputs.example }} $NAMESPACE
             echo "Testing ${{ inputs.example }}, waiting for pod ready..."
             if kubectl rollout status deployment --namespace "$NAMESPACE" --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
               echo "Testing manifests ${{ inputs.example }}, waiting for pod ready done!"
@@ -159,7 +160,7 @@ jobs:
           if $skip_validate; then
             echo "Skip validate"
           else
-            if ${test_case} validate_${{ inputs.example }} $NAMESPACE ; then
+            if ${{ github.workspace }}/${{ inputs.example }}/tests/${test_case} validate_${{ inputs.example }} $NAMESPACE ; then
               echo "Validate ${{ inputs.example }} successful!"
             else
               echo "Validate ${{ inputs.example }} failure!!!"
