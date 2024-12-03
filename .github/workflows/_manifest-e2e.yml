@@ -161,9 +161,9 @@ jobs:
             echo "Skip validate"
           else
             if ${{ github.workspace }}/${{ inputs.example }}/tests/${test_case} validate_${{ inputs.example }} $NAMESPACE ; then
-              echo "Validate ${{ inputs.example }} successful!"
+              echo "Validate ${test_case} successful!"
             else
-              echo "Validate ${{ inputs.example }} failure!!!"
+              echo "Validate ${test_case} failure!!!"
               echo "Check the logs in 'Dump logs when e2e test failed' step!!!"
               exit 1
             fi

@@ -21,7 +21,7 @@ function validate_chatqna() {
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     for ((i=1; i<=max_retry; i++))
     do
-        endpoint_url=$(bash ChatQnA/tests/common/_test_manifast_utils.sh get_end_point "chatqna-retriever-usvc" $ns)
+        endpoint_url=$(bash ChatQnA/tests/common/_test_manifest_utils.sh get_end_point "chatqna-retriever-usvc" $ns)
         curl http://$endpoint_url/v1/retrieval -X POST \
             -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}" \
             -H 'Content-Type: application/json' && break
@@ -35,7 +35,7 @@ function validate_chatqna() {
     # make sure microservice tgi-svc is ready
     for ((i=1; i<=max_retry; i++))
     do
-        endpoint_url=$(bash ChatQnA/tests/common/_test_manifast_utils.sh get_end_point "chatqna-tgi" $ns)
+        endpoint_url=$(bash ChatQnA/tests/common/_test_manifest_utils.sh get_end_point "chatqna-tgi" $ns)
         curl http://$endpoint_url/generate -X POST \
             -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
             -H 'Content-Type: application/json' && break
@@ -50,7 +50,7 @@ function validate_chatqna() {
     # check megaservice works
     # generate a random logfile name to avoid conflict among multiple runners
     LOGFILE=$LOG_PATH/curlmega_$log.log
-    endpoint_url=$(bash ChatQnA/tests/common/_test_manifast_utils.sh get_end_point "chatqna" $ns)
+    endpoint_url=$(bash ChatQnA/tests/common/_test_manifest_utils.sh get_end_point "chatqna" $ns)
     curl http://$endpoint_url/v1/chatqna -H "Content-Type: application/json" -d '{"messages": "What is the revenue of Nike in 2023?"}' > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
@@ -76,7 +76,7 @@ function validate_chatqna() {
 function install_chatqna() {
     echo "Testing manifests chatqna_guardrails"
     local ns=$1
-    bash ChatQnA/tests/common/_test_manifast_utils.sh _cleanup_ns $ns
+    bash ChatQnA/tests/common/_test_manifest_utils.sh _cleanup_ns $ns
     pushd ChatQnA/kubernetes/intel/cpu/xeon/manifest
     kubectl create namespace $ns
     # install guardrail
@@ -93,7 +93,7 @@ fi
 case "$1" in
     init_ChatQnA)
         pushd ChatQnA/tests/common
-        bash _test_manifast_utils.sh init_ChatQnA
+        bash _test_manifest_utils.sh init_ChatQnA
         popd
         ;;
     install_ChatQnA)
@@ -104,7 +104,7 @@ case "$1" in
     validate_ChatQnA)
         NAMESPACE=$2
         SERVICE_NAME=chatqna-guardrails
-        validate_chatqna $ns chatqna-guardrails
+        validate_chatqna $NAMESPACE chatqna-guardrails
         ret=$?
         if [ $ret -ne 0 ]; then
             exit $ret
