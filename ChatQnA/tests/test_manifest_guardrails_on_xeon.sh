@@ -98,7 +98,7 @@ case "$1" in
         ;;
     install_ChatQnA)
         NAMESPACE=$2
-        install_chatqna
+        install_chatqna $NAMESPACE
         popd
         ;;
     validate_ChatQnA)

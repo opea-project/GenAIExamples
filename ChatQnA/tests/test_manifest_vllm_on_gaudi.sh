@@ -80,6 +80,7 @@ function install_chatqna() {
     bash ChatQnA/tests/common/_test_manifast_utils.sh _cleanup_ns $ns
     kubectl create namespace $ns
     # install guardrail
+    pushd ChatQnA/kubernetes/intel/hpu/gaudi/manifest
     kubectl apply -f chatqna-vllm.yaml -n $ns
     # Sleep enough time for chatqna_vllm to be ready, vllm warmup takes about 5 minutes
     sleep 280
@@ -98,7 +99,8 @@ case "$1" in
         ;;
     install_ChatQnA)
         NAMESPACE=$2
-        install_chatqna
+        install_chatqna $NAMESPACE
+        popd
         ;;
     validate_ChatQnA)
         NAMESPACE=$2

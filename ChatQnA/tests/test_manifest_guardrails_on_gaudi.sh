@@ -77,7 +77,7 @@ function install_chatqna() {
     echo "Testing manifests chatqna_guardrails"
     local ns=$1
     bash ChatQnA/tests/common/_test_manifast_utils.sh _cleanup_ns $ns
-    pushd ChatQnA/kubernetes/intel/cpu/xeon/manifest
+    pushd ChatQnA/kubernetes/intel/hpu/gaudi/manifest
     kubectl create namespace $ns
     # install guardrai
     kubectl apply -f chatqna-guardrails.yaml -n $ns
@@ -98,7 +98,7 @@ case "$1" in
         ;;
     install_ChatQnA)
         NAMESPACE=$2
-        install_chatqna
+        install_chatqna $NAMESPACE
         popd
         ;;
     validate_ChatQnA)
