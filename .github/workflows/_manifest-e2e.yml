@@ -125,17 +125,12 @@ jobs:
           echo "skip_validate=true" >> $GITHUB_ENV
           echo "NAMESPACE=$NAMESPACE"
 
-      - name: debug
-        env:
-          test_case: ${{ matrix.test_case }}
-        run: |
-          echo "test_case=$test_case"
-
       - name: Kubectl install
         id: install
         env:
           test_case: ${{ matrix.test_case }}
         run: |
+          echo "test_case=$test_case"
           if [[ ! -f ${test_case} ]]; then
             echo "No test script found, exist test!"
             exit 0
