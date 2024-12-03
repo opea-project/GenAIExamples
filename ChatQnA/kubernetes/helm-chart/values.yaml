@@ -1,0 +1,79 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Default values for chatqna.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: opea/chatqna
+  # Uncomment the following line to set desired image pull policy if needed, as one of Always, IfNotPresent, Never.
+  # pullPolicy: ""
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+port: 8888
+service:
+  type: ClusterIP
+  port: 8888
+
+nginx:
+  service:
+    type: NodePort
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+    - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# This is just to avoid Helm errors when HPA is NOT used
+# (use hpa-values.yaml files to actually enable HPA).
+autoscaling:
+  enabled: false
+
+# Override values in specific subcharts
+tgi:
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
+
+# disable guardrails-usvc by default
+# See guardrails-values.yaml for guardrail related options
+guardrails-usvc:
+  enabled: false
+
+# If you would like to switch to traditional UI image
+# Uncomment the following lines
+# chatqna-ui:
+#   image:
+#     repository: opea/chatqna-ui
+#     tag: "latest"
+#   containerPort: "5173"
+
+global:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+  HUGGINGFACEHUB_API_TOKEN: "insert-your-huggingface-token-here"
+  # set modelUseHostPath or modelUsePVC to use model cache.
+  modelUseHostPath: ""
+  # modelUseHostPath: /mnt/opea-models
+  # modelUsePVC: model-volume
+
+  # Install Prometheus serviceMonitors for service components
+  monitoring: false
+
+  # Prometheus Helm install release name needed for serviceMonitors
+  prometheusRelease: prometheus-stack

@@ -1,0 +1,18 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+{{- if .Values.global.monitoring }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "chatqna.fullname" . }}
+  labels:
+    release: {{ .Values.global.prometheusRelease }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "chatqna.selectorLabels" . | nindent 6 }}
+  endpoints:
+  - port: chatqna
+    interval: 5s
+{{- end }}

@@ -1,0 +1,41 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v2
+name: chatqna
+description: The Helm chart to deploy ChatQnA
+type: application
+dependencies:
+  - name: tgi
+    version: 0-latest
+    alias: tgi-guardrails
+    repository: "oci://ghcr.io/opea-project/charts/tgi"
+    condition: guardrails-usvc.enabled
+  - name: guardrails-usvc
+    version: 0-latest
+    repository: "oci://ghcr.io/opea-project/charts/guardrails-usvc"
+    condition: guardrails-usvc.enabled
+  - name: tgi
+    version: 0-latest
+    repository: "oci://ghcr.io/opea-project/charts/tgi"
+  - name: tei
+    version: 0-latest
+    repository: "oci://ghcr.io/opea-project/charts/tei"
+  - name: teirerank
+    version: 0-latest
+    repository: "oci://ghcr.io/opea-project/charts/teirerank"
+  - name: redis-vector-db
+    version: 0-latest
+    repository: "oci://ghcr.io/opea-project/charts/redis-vector-db"
+  - name: retriever-usvc
+    version: 0-latest
+    repository: "oci://ghcr.io/opea-project/charts/retriever-usvc"
+  - name: data-prep
+    version: 0-latest
+    repository: "oci://ghcr.io/opea-project/charts/data-prep"
+  - name: ui
+    alias: chatqna-ui
+    version: 0-latest
+    repository: "oci://ghcr.io/opea-project/charts/ui"
+version: 0-latest
+appVersion: "v1.0"

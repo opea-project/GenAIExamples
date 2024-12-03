@@ -1,0 +1,130 @@
+apiVersion: v1
+data:
+  default.conf: |+
+    # Copyright (C) 2024 Intel Corporation
+    # SPDX-License-Identifier: Apache-2.0
+
+
+    server {
+        listen       80;
+        listen  [::]:80;
+
+        location /home {
+            alias  /usr/share/nginx/html/index.html;
+        }
+
+        proxy_connect_timeout 600;
+        proxy_send_timeout 600;
+        proxy_read_timeout 600;
+        send_timeout 600;
+        client_max_body_size 10G;
+
+        location / {
+            proxy_pass http://{{ include "ui.fullname" (index .Subcharts "chatqna-ui") }}:{{ index .Values "chatqna-ui" "service" "port" }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/chatqna {
+            proxy_pass http://{{ include "chatqna.fullname" . }}:{{ .Values.service.port }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_buffering off;
+            proxy_cache off;
+            proxy_request_buffering off;
+            gzip off;
+        }
+
+        location /v1/dataprep {
+            proxy_pass http://{{ include "data-prep.fullname" (index .Subcharts "data-prep") }}:{{ index .Values "data-prep" "service" "port" }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/dataprep/get_file {
+            proxy_pass http://{{ include "data-prep.fullname" (index .Subcharts "data-prep") }}:{{ index .Values "data-prep" "service" "port" }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /v1/dataprep/delete_file {
+            proxy_pass http://{{ include "data-prep.fullname" (index .Subcharts "data-prep") }}:{{ index .Values "data-prep" "service" "port" }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+
+kind: ConfigMap
+metadata:
+  name: {{ include "chatqna.fullname" . }}-nginx-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chatqna.fullname" . }}-nginx
+  labels:
+    {{- include "chatqna.labels" . | nindent 4 }}
+    app: {{ include "chatqna.fullname" . }}-nginx
+spec:
+  selector:
+    matchLabels:
+      {{- include "chatqna.selectorLabels" . | nindent 6 }}
+      app: {{ include "chatqna.fullname" . }}-nginx
+  template:
+    metadata:
+      labels:
+        {{- include "chatqna.selectorLabels" . | nindent 8 }}
+        app: {{ include "chatqna.fullname" . }}-nginx
+    spec:
+      containers:
+      - image: nginx:1.27.1
+        {{- if .Values.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- end }}
+        name: nginx
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-config-volume
+      securityContext: {}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: {{ include "chatqna.fullname" . }}-nginx-config
+        name: nginx-config-volume
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chatqna.fullname" . }}-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    {{- include "chatqna.selectorLabels" . | nindent 4 }}
+    app: {{ include "chatqna.fullname" . }}-nginx
+  type: {{ .Values.nginx.service.type }}
