@@ -463,6 +463,9 @@ spec:
         {}
       containers:
         - name: chatqna-ui
+          env:
+            - name: MODEL_ID
+              value: "meta-llama/Meta-Llama-3.1-70B-Instruct"
           securityContext:
             {}
           image: "opea/chatqna-ui:latest"
