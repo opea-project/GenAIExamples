@@ -208,6 +208,7 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
     -H "Content-Type: application/json" \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
+
 4. asr
 
 ```bash
@@ -216,6 +217,7 @@ curl ${ASR_SERVICE_ENDPOINT} \
     -H "Content-Type: application/json" \
     -d '{"byte_str" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
 ```
+
 5. TGI LLaVA Gaudi Server
 
 ```bash

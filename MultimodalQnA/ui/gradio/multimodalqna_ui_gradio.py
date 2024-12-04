@@ -95,7 +95,7 @@ def http_bot(state, request: gr.Request):
         new_state.append_message(new_state.roles[1], None)
         new_state.audio_query_file = state.audio_query_file
         state = new_state
-    
+
     # Construct prompt
     prompt = state.get_prompt()
 
@@ -168,9 +168,12 @@ def http_bot(state, request: gr.Request):
         state.messages[-2][-1] = metadata.get("audio", "--transcribed audio not available--")
         state.audio_query_file = None
 
-    yield (state, state.to_gradio_chatbot(),
-           gr.Video(state.split_video, visible=state.split_video is not None),
-           gr.Image(state.image, visible=state.image is not None)) + (enable_btn,) * 1
+    yield (
+        state,
+        state.to_gradio_chatbot(),
+        gr.Video(state.split_video, visible=state.split_video is not None),
+        gr.Image(state.image, visible=state.image is not None),
+    ) + (enable_btn,) * 1
 
     logger.info(f"{state.messages[-1][-1]}")
     return

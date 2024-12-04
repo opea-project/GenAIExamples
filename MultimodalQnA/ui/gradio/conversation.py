@@ -5,7 +5,7 @@ import dataclasses
 from enum import Enum, auto
 from typing import List
 
-from utils import get_b64_frame_from_timestamp, convert_audio_to_base64
+from utils import convert_audio_to_base64, get_b64_frame_from_timestamp
 
 
 class SeparatorStyle(Enum):
@@ -58,8 +58,12 @@ class Conversation:
                             content = [{"type": "audio", "audio": self.get_b64_audio_query()}]
                         else:
                             content = [{"type": "text", "text": message}]
-                        if i == 0 and self.time_of_frame_ms and self.video_file:    
-                            base64_frame = self.base64_frame if self.base64_frame else get_b64_frame_from_timestamp(self.video_file, self.time_of_frame_ms)
+                        if i == 0 and self.time_of_frame_ms and self.video_file:
+                            base64_frame = (
+                                self.base64_frame
+                                if self.base64_frame
+                                else get_b64_frame_from_timestamp(self.video_file, self.time_of_frame_ms)
+                            )
                             if base64_frame is None:
                                 base64_frame = ""
                             content.append({"type": "image_url", "image_url": {"url": base64_frame}})
@@ -80,7 +84,7 @@ class Conversation:
             video_file = self.video_file
             b64_img = get_b64_frame_from_timestamp(video_file, time_of_frame_ms)
         return b64_img
-    
+
     def get_b64_audio_query(self):
         b64_audio = None
         if self.audio_query_file:

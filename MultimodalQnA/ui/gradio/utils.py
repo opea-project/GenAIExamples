@@ -163,7 +163,7 @@ def delete_split_video(video_path):
 
 
 def convert_img_to_base64(image):
-    """Convert image to base64 string"""
+    """Convert image to base64 string."""
     _, buffer = cv2.imencode(".png", image)
     encoded_string = base64.b64encode(buffer)
     return encoded_string.decode("utf-8")
@@ -183,6 +183,6 @@ def get_b64_frame_from_timestamp(video_path, timestamp_in_ms, maintain_aspect_ra
 
 
 def convert_audio_to_base64(audio_path):
-    """Convert .wav file to base64 string"""
+    """Convert .wav file to base64 string."""
     encoded_string = base64.b64encode(open(audio_path, "rb").read())
     return encoded_string.decode("utf-8")
