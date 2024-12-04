@@ -96,7 +96,7 @@ services:
     restart: always
 
   docsum-ui:
-    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
     container_name: docsum-xeon-ui-server
     depends_on:
       - docsum-xeon-backend-server
