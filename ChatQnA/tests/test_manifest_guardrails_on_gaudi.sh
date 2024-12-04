@@ -12,17 +12,10 @@ IMAGE_TAG=${IMAGE_TAG:-latest}
 ROLLOUT_TIMEOUT_SECONDS="1800s"
 KUBECTL_TIMEOUT_SECONDS="60s"
 
-function install_chatqna {
-    echo "namespace is $NAMESPACE"
-    kubectl apply -f chatqna.yaml -n $NAMESPACE
-    # Sleep enough time for retreiver-usvc to be ready
-    sleep 60
-}
-
 function validate_chatqna() {
     local ns=$1
     local log=$2
-    max_retry=10
+    max_retry=20
     # make sure microservice retriever-usvc is ready
     # try to curl retriever-svc for max_retry times
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -71,13 +64,25 @@ function validate_chatqna() {
         [[ $(grep -c "\[DONE\]" $LOGFILE) != 0 ]]; then
         status=true
     fi
-    if [ $status == false ]; then
+    if [[ $status == false ]]; then
         echo "Response check failed, please check the logs in artifacts!"
         return 1
     else
         echo "Response check succeed!"
     fi
     return 0
+}
+
+function install_chatqna() {
+    echo "Testing manifests chatqna_guardrails"
+    local ns=$1
+    bash ChatQnA/tests/common/_test_manifest_utils.sh _cleanup_ns $ns
+    pushd ChatQnA/kubernetes/intel/hpu/gaudi/manifest
+    kubectl create namespace $ns
+    # install guardrails
+    kubectl apply -f chatqna-guardrails.yaml -n $ns
+    # Sleep enough time for chatqna_guardrails to be ready
+    sleep 60
 }
 
 if [ $# -eq 0 ]; then
@@ -92,20 +97,20 @@ case "$1" in
         popd
         ;;
     install_ChatQnA)
-        pushd ChatQnA/kubernetes/intel/cpu/xeon/manifest
         NAMESPACE=$2
-        install_chatqna
+        install_chatqna $NAMESPACE
         popd
         ;;
     validate_ChatQnA)
         NAMESPACE=$2
-        SERVICE_NAME=chatqna
-        validate_chatqna $NAMESPACE chatqna
+        SERVICE_NAME=chatqna-guardrails
+        validate_chatqna $NAMESPACE chatqna-guardrails
         ret=$?
         if [ $ret -ne 0 ]; then
             exit $ret
         fi
         ;;
+
     *)
         echo "Unknown function: $1"
         ;;

@@ -12,13 +12,6 @@ IMAGE_TAG=${IMAGE_TAG:-latest}
 ROLLOUT_TIMEOUT_SECONDS="1800s"
 KUBECTL_TIMEOUT_SECONDS="60s"
 
-function install_chatqna {
-    echo "namespace is $NAMESPACE"
-    kubectl apply -f chatqna.yaml -n $NAMESPACE
-    # Sleep enough time for retreiver-usvc to be ready
-    sleep 60
-}
-
 function validate_chatqna() {
     local ns=$1
     local log=$2
@@ -80,6 +73,18 @@ function validate_chatqna() {
     return 0
 }
 
+function install_chatqna() {
+    echo "Testing manifests chatqna_guardrails"
+    local ns=$1
+    bash ChatQnA/tests/common/_test_manifest_utils.sh _cleanup_ns $ns
+    pushd ChatQnA/kubernetes/intel/cpu/xeon/manifest
+    kubectl create namespace $ns
+    # install guardrail
+    kubectl apply -f chatqna-guardrails.yaml -n $ns
+    # Sleep enough time for chatqna_guardrails to be ready
+    sleep 60
+}
+
 if [ $# -eq 0 ]; then
     echo "Usage: $0 <function_name>"
     exit 1
@@ -92,20 +97,20 @@ case "$1" in
         popd
         ;;
     install_ChatQnA)
-        pushd ChatQnA/kubernetes/intel/cpu/xeon/manifest
         NAMESPACE=$2
-        install_chatqna
+        install_chatqna $NAMESPACE
         popd
         ;;
     validate_ChatQnA)
         NAMESPACE=$2
-        SERVICE_NAME=chatqna
-        validate_chatqna $NAMESPACE chatqna
+        SERVICE_NAME=chatqna-guardrails
+        validate_chatqna $NAMESPACE chatqna-guardrails
         ret=$?
         if [ $ret -ne 0 ]; then
             exit $ret
         fi
         ;;
+
     *)
         echo "Unknown function: $1"
         ;;
