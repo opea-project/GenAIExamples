@@ -993,7 +993,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/chatqna-wrapper:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /tmp
               name: tmp
