@@ -1,4 +1,4 @@
-aiohttp==3.10.10
+aiohttp==3.10.11
 basicsr==1.4.2
 docarray[full]
 facexlib==0.3.0
