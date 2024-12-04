@@ -76,6 +76,7 @@ class RetrievalToolService:
         self.megaservice.flow_to(embedding, retriever)
         self.gateway = RetrievalToolGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--without-rerank", action="store_true")
