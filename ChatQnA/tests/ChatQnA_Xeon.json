@@ -29,7 +29,7 @@
       "output": "Data preparation succeeded"
     },
     {
-      "service": "retrival",
+      "service": "retrieval",
       "port": "7000",
       "endpoint": "/v1/retrieval",
       "text": "test",
