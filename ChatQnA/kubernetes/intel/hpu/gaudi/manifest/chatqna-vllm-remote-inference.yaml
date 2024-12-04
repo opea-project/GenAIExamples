@@ -76,8 +76,8 @@ data:
   no_proxy: ""
   LOGFLAG: ""
   vLLM_ENDPOINT: "insert-your-remote-vllm-inference-endpoint"
-  LLM_MODEL: "meta-llama/Meta-Llama-3.1-8B-Instruct"
-  MODEL_ID: "meta-llama/Meta-Llama-3.1-8B-Instruct"
+  LLM_MODEL: "meta-llama/Meta-Llama-3.1-70B-Instruct"
+  MODEL_ID: "meta-llama/Meta-Llama-3.1-70B-Instruct"
   CLIENTID: ""
   CLIENT_SECRET: ""
   TOKEN_URL: ""
@@ -981,7 +981,7 @@ spec:
             - name: EMBEDDING_SERVICE_HOST_IP
               value: chatqna-embedding-usvc
             - name: MODEL_ID
-              value: "meta-llama/Meta-Llama-3.1-8B-Instruct"
+              value: "meta-llama/Meta-Llama-3.1-70B-Instruct"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
