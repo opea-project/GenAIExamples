@@ -13,8 +13,9 @@ from comps.cores.proto.api_protocol import (
     UsageInfo,
 )
 from comps.cores.proto.docarray import LLMParams
-from fastapi import Request
+from fastapi import File, Request, UploadFile
 from fastapi.responses import StreamingResponse
+from typing import List
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
@@ -38,11 +39,31 @@ class FaqGenService(Gateway):
         )
         self.megaservice.add(llm)
 
-    async def handle_request(self, request: Request):
-        data = await request.json()
+    async def handle_request(self, request: Request, files: List[UploadFile] = File(default=None)):
+        data = await request.form()
         stream_opt = data.get("stream", True)
         chat_request = ChatCompletionRequest.parse_obj(data)
-        prompt = self._handle_message(chat_request.messages)
+        file_summaries = []
+        if files:
+            for file in files:
+                file_path = f"/tmp/{file.filename}"
+
+                import aiofiles
+
+                async with aiofiles.open(file_path, "wb") as f:
+                    await f.write(await file.read())
+                docs = read_text_from_file(file, file_path)
+                os.remove(file_path)
+                if isinstance(docs, list):
+                    file_summaries.extend(docs)
+                else:
+                    file_summaries.append(docs)
+
+        if file_summaries:
+            prompt = self._handle_message(chat_request.messages) + "\n".join(file_summaries)
+        else:
+            prompt = self._handle_message(chat_request.messages)
+
         parameters = LLMParams(
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
@@ -52,6 +73,7 @@ class FaqGenService(Gateway):
             presence_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 0.0,
             repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
             streaming=stream_opt,
+            model=chat_request.model if chat_request.model else None,
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
             initial_inputs={"query": prompt}, llm_parameters=parameters
