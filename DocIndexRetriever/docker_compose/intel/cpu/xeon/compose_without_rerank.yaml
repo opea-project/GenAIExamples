@@ -75,8 +75,7 @@ services:
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
     restart: unless-stopped
   doc-index-retriever-server:
-#    image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
-    image: opea/kb:dev
+    image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
     container_name: doc-index-retriever-server
     depends_on:
       - redis-vector-db
