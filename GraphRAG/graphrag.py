@@ -12,10 +12,10 @@ from comps.cores.proto.api_protocol import (
     ChatCompletionResponse,
     ChatCompletionResponseChoice,
     ChatMessage,
-    UsageInfo,
     EmbeddingRequest,
+    UsageInfo,
 )
-from comps.cores.proto.docarray import TextDoc, LLMParams, RetrieverParms
+from comps.cores.proto.docarray import LLMParams, RetrieverParms, TextDoc
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
@@ -156,7 +156,6 @@ class GraphRAGService(Gateway):
         )
         self.megaservice.add(retriever).add(llm)
         self.megaservice.flow_to(retriever, llm)
-
 
     async def handle_request(self, request: Request):
         data = await request.json()
