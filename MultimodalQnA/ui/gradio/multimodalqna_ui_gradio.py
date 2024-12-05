@@ -352,7 +352,7 @@ def hide_text(request: gr.Request):
 
 
 def clear_text(request: gr.Request):
-    return {}
+    return None
 
 
 with gr.Blocks() as upload_video:
