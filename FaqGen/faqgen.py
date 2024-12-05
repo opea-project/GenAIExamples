@@ -3,6 +3,7 @@
 
 import asyncio
 import os
+from typing import List
 
 from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
 from comps.cores.proto.api_protocol import (
@@ -15,7 +16,6 @@ from comps.cores.proto.api_protocol import (
 from comps.cores.proto.docarray import LLMParams
 from fastapi import File, Request, UploadFile
 from fastapi.responses import StreamingResponse
-from typing import List
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")

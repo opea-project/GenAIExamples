@@ -3,6 +3,7 @@
 
 import asyncio
 import os
+from typing import List
 
 from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
 from comps.cores.proto.api_protocol import (
@@ -15,7 +16,6 @@ from comps.cores.proto.api_protocol import (
 from comps.cores.proto.docarray import LLMParams
 from fastapi import File, Request, UploadFile
 from fastapi.responses import StreamingResponse
-from typing import List
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 
@@ -52,7 +52,6 @@ class DocSumService(Gateway):
             service_type=ServiceType.LLM,
         )
         self.megaservice.add(llm)
-
 
     async def handle_request(self, request: Request, files: List[UploadFile] = File(default=None)):
 
