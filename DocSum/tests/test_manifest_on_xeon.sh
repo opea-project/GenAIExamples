@@ -36,6 +36,7 @@ function validate_docsum() {
     # Curl the Mega Service
     curl http://${ip_address}:${port}/v1/docsum \
     -H 'Content-Type: multipart/form-data' \
+    -F 'type=text' \
     -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." > $LOGFILE
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
@@ -46,12 +47,13 @@ function validate_docsum() {
     echo "Checking response results, make sure the output is reasonable. "
     local status=false
     if [[ -f $LOGFILE ]] && \
-    [[ $(grep -c "versatile toolkit" $LOGFILE) != 0 ]]; then
+    [[ $(grep -c "\[DONE\]" $LOGFILE) != 0 ]]; then
         status=true
     fi
 
     if [ $status == false ]; then
         echo "Response check failed, please check the logs in artifacts!"
+        exit 1
     else
         echo "Response check succeed!"
     fi

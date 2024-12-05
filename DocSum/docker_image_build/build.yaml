@@ -11,6 +11,15 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+  docsum-gradio-ui:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.gradio
+    extends: docsum
+    image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
   docsum-ui:
     build:
       context: ../ui
@@ -23,6 +32,42 @@ services:
       dockerfile: ./docker/Dockerfile.react
     extends: docsum
     image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
+  whisper:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/asr/whisper/dependency/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+  dataprep-multimedia2text:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/dataprep/multimedia2text/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/dataprep-multimedia2text:${TAG:-latest}
+  dataprep-audio2text:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/dataprep/multimedia2text/audio2text/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
+  dataprep-video2audio:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/dataprep/multimedia2text/video2audio/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/dataprep-video2audio:${TAG:-latest}
   llm-docsum-tgi:
     build:
       context: GenAIComps

@@ -23,7 +23,15 @@ RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/ 
 
+RUN mkdir /templates && \
+    chown -R user /templates
+COPY ./edgecraftrag/prompt_template/default_prompt.txt /templates/
+RUN chown -R user /templates/default_prompt.txt
+
 COPY ./edgecraftrag /home/user/edgecraftrag
+
+RUN mkdir -p /home/user/gradio_cache 
+ENV GRADIO_TEMP_DIR=/home/user/gradio_cache
 
 WORKDIR /home/user/edgecraftrag
 RUN pip install --no-cache-dir -r requirements.txt

@@ -78,7 +78,7 @@ services:
       MAX_WARMUP_SEQUENCE_LENGTH: 512
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm-hpu:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
     container_name: vllm-gaudi-server
     ports:
       - "8007:80"
@@ -92,6 +92,7 @@ services:
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       LLM_MODEL_ID: ${LLM_MODEL_ID}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
     runtime: habana
     cap_add:
       - SYS_NICE

@@ -6,6 +6,9 @@
 # Remember to set your private variables mentioned in README
 
 # host_ip, OPENAI_API_KEY, HUGGINGFACEHUB_API_TOKEN, proxies...
+pushd "../../../../../" > /dev/null
+source .set_env.sh
+popd > /dev/null
 
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export OPENAI_EMBEDDING_MODEL="text-embedding-3-small"
@@ -17,4 +20,4 @@ export NEO4J_URL="bolt://${host_ip}:7687"
 export NEO4J_USERNAME=neo4j
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6004/v1/dataprep"
 export LOGFLAG=True
-export RETRIEVER_SERVICE_PORT=6009
+export RETRIEVER_SERVICE_PORT=80

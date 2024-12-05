@@ -77,9 +77,9 @@ jobs:
               git clone https://github.com/vllm-project/vllm.git
               cd vllm && git rev-parse HEAD && cd ../
           fi
-          if [[ $(grep -c "vllm-hpu:" ${docker_compose_path}) != 0 ]]; then
+          if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
                git clone https://github.com/HabanaAI/vllm-fork.git
-               cd vllm-fork && git rev-parse HEAD && cd ../
+               cd vllm-fork && git checkout 3c39626 && cd ../
           fi
           git clone https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git checkout ${{ inputs.opea_branch }} && git rev-parse HEAD && cd ../

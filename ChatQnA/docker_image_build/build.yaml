@@ -11,6 +11,12 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+  chatqna-wrapper:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile.wrapper
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna-wrapper:${TAG:-latest}
   chatqna-guardrails:
     build:
       context: ../
@@ -113,12 +119,12 @@ services:
       dockerfile: Dockerfile.cpu
     extends: chatqna
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
-  vllm-hpu:
+  vllm-gaudi:
     build:
       context: vllm-fork
       dockerfile: Dockerfile.hpu
     extends: chatqna
-    image: ${REGISTRY:-opea}/vllm-hpu:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
   nginx:
     build:
       context: GenAIComps

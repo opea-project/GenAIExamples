@@ -17,6 +17,10 @@ from fastapi import Request
 from fastapi.responses import StreamingResponse
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
+
+DATA_SERVICE_HOST_IP = os.getenv("DATA_SERVICE_HOST_IP", "0.0.0.0")
+DATA_SERVICE_PORT = int(os.getenv("DATA_SERVICE_PORT", 7079))
+
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
@@ -28,6 +32,16 @@ class DocSumService(Gateway):
         self.megaservice = ServiceOrchestrator()
 
     def add_remote_service(self):
+
+        data = MicroService(
+            name="multimedia2text",
+            host=DATA_SERVICE_HOST_IP,
+            port=DATA_SERVICE_PORT,
+            endpoint="/v1/multimedia2text",
+            use_remote_service=True,
+            service_type=ServiceType.DATAPREP,
+        )
+
         llm = MicroService(
             name="llm",
             host=LLM_SERVICE_HOST_IP,
