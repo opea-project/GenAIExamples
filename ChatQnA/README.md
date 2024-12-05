@@ -196,7 +196,7 @@ In the below, we provide a table that describes for each microservice component 
 Gaudi default compose.yaml
 | MicroService | Open Source Project | HW | Port | Endpoint |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding | Langchain | Xeon | 6000 | /v1/embaddings |
+| Embedding | Langchain | Xeon | 6000 | /v1/embeddings |
 | Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
 | Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
 | LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
