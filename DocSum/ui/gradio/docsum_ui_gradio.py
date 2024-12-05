@@ -11,7 +11,8 @@ import gradio as gr
 import requests
 import uvicorn
 from fastapi import FastAPI
-from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader
+from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader, UnstructuredURLLoader
+from urllib.parse import urlparse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -90,6 +91,38 @@ class DocSumUI:
         logger.info(">>> Reading video file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
         return self.generate_summary(base64_str, document_type="video")
+    
+    def is_valid_url(self, url):
+        try:
+            result = urlparse(url)
+            return all([result.scheme, result.netloc])
+        except ValueError:
+            return False
+
+    def read_url(self, url):
+        """Read and process the content of a url.
+
+        Args:
+            url: The url to be read as a document.
+
+        Returns:
+            str: The content of the website or an error message if the url is unsupported.
+        """
+
+        self.page_content = ""
+
+        logger.info(">>> Reading url: %s", url)
+        if self.is_valid_url(url=url):
+            loader = UnstructuredURLLoader([url])
+            page = loader.load()
+            self.page_content = [content.page_content for content in page][0]
+        else:
+            msg = f"Invalid URL '{url}'. Make sure the link provided is a valid URL.url"
+            logger.error(msg)
+            return msg
+        
+        return self.page_content
+
 
     def generate_summary(self, doc_content, document_type="text"):
         """Generate a summary for the given document content.
@@ -220,6 +253,11 @@ class DocSumUI:
             label="Please upload Video file (.mp4)", file_types=[".mp4"], process_function=self.read_video_file
         )
 
+        # URL Upload UI
+        url_ui = self.create_upload_ui(
+            label="Please upload a url", file_types=[], process_function=self.read_url
+        )
+
         # Render all the UI in separate tabs
         with gr.Blocks() as self.demo:
             gr.Markdown("# Doc Summary")
@@ -232,6 +270,8 @@ class DocSumUI:
                     audio_ui.render()
                 with gr.TabItem("Upload Video"):
                     video_ui.render()
+                with gr.TabItem("Upload URL"):
+                    url_ui.render()
 
         return self.demo
 
