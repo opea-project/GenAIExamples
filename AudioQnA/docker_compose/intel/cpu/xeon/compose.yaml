@@ -91,6 +91,20 @@ services:
       - TTS_SERVICE_PORT=${TTS_SERVICE_PORT}
     ipc: host
     restart: always
+  audioqna-xeon-ui-server:
+    image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}
+    container_name: audioqna-xeon-ui-server
+    depends_on:
+      - audioqna-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
 
 networks:
   default:
