@@ -31,6 +31,17 @@ export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 export DOCSUM_CARD_ID="card1"
 export DOCSUM_RENDER_ID="renderD136"
 
+export V2A_SERVICE_HOST_IP=${host_ip}
+export V2A_ENDPOINT=http://$host_ip:7078
+
+export A2T_ENDPOINT=http://$host_ip:7066
+export A2T_SERVICE_HOST_IP=${host_ip}
+export A2T_SERVICE_PORT=9099
+
+export DATA_ENDPOINT=http://$host_ip:7079
+export DATA_SERVICE_HOST_IP=${host_ip}
+export DATA_SERVICE_PORT=7079
+
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
