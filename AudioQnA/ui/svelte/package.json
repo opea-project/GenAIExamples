@@ -25,6 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
     "autoprefixer": "^10.4.16",
+    "daisyui": "^3.5.0",
     "debug": "4.3.4",
     "neverthrow": "5.0.0",
     "pocketbase": "0.7.0",
