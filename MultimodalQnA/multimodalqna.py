@@ -161,7 +161,7 @@ class MultimodalQnAService(Gateway):
         data = await request.json()
         stream_opt = bool(data.get("stream", False))
         if stream_opt:
-            print("[ MultimodalQnAGateway ] stream=True not used, this has not support streaming yet!")
+            print("[ MultimodalQnAService ] stream=True not used, this has not support streaming yet!")
             stream_opt = False
         chat_request = ChatCompletionRequest.model_validate(data)
         # Multimodal RAG QnA With Videos has not yet accepts image as input during QnA.
