@@ -19,11 +19,14 @@ class RunCmd:
         #print("Command exit status/return code : ", p_status)
         return p_status, output
 
+
 class TriageUtility:
+
   def __init__(self, filename):
     self.class_name = filename.split('.')[0]
     self.filename = filename #self.__class__.__name__
     return
+
   def load_input_data(self,  service):
     class_name = self.class_name
     with open(self.filename, "r") as file:
@@ -42,6 +45,7 @@ class TriageUtility:
             output = i.pop("output")
             return i, port, endpoint, output
     return None
+
   def service_health_check(self, ip, port, triage_report, triage_level):
     # Health Check
     if triage_level < 1:
@@ -52,6 +56,7 @@ class TriageUtility:
     )
     triage_report.update_docker_report(port, "Health", response.status_code == 200)
     return response.status_code
+
   def service_test(self, ip, port, endpoint_name, data, triage_report, triage_level):
     if triage_level < 2:
         return
@@ -64,6 +69,7 @@ class TriageUtility:
     log_fname = triage_report.dump_docker_logs(port)     
     triage_report.update_docker_report(port, "Log", log_fname)
     return response.status_code
+
   def service_statistics(self, ip, port, triage_report, triage_level):
     # statistics
     if triage_level < 1:
@@ -74,6 +80,7 @@ class TriageUtility:
     )
     triage_report.update_docker_report(port, "Stats", response.status_code == 200)
     return response.status_code
+
 
 class TriageReport:
   def __init__(self, name):
@@ -297,7 +304,7 @@ class ChatQnA(unittest.TestCase):
 
         # Health Check
         response_status_code = self.utils.service_health_check(self.ip, port, self.triage_report, self.triage_level)
-        #self.assertEqual(response_status_code, 200)
+        self.assertEqual(response_status_code, 200)
 
         # Testing
         #response_status_code  = utils.service_test(self.ip, port, endpoint_name, data, self.triage_report, self.triage_level)
@@ -309,7 +316,7 @@ class ChatQnA(unittest.TestCase):
 
 
     def test_5_retrival(self):
-        service_name = "retrival"
+        service_name = "retrieval"
         #Get configs/data
         data, port, endpoint_name, output = self.utils.load_input_data(service_name)
         import random
@@ -319,7 +326,7 @@ class ChatQnA(unittest.TestCase):
 
         # Health Check
         response_status_code = self.utils.service_health_check(self.ip, port, self.triage_report, self.triage_level)
-        #self.assertEqual(response_status_code, 200)
+        self.assertEqual(response_status_code, 200)
 
         # Testing
         response_status_code  = self.utils.service_test(self.ip, port, endpoint_name, data, self.triage_report, self.triage_level)
@@ -336,10 +343,6 @@ class ChatQnA(unittest.TestCase):
         data, port, endpoint_name, output = self.utils.load_input_data(service_name)
         self.assertNotEqual(data, None)
 
-        # Health Check
-        response_status_code = self.utils.service_health_check(self.ip, port, self.triage_report, self.triage_level)
-        #self.assertEqual(response_status_code, 200)
-
         # Testing
         response_status_code  = self.utils.service_test(self.ip, port, endpoint_name, data, self.triage_report, self.triage_level)
         self.assertEqual(response_status_code, 200)
@@ -351,10 +354,6 @@ class ChatQnA(unittest.TestCase):
         data, port, endpoint_name, output = self.utils.load_input_data(service_name)
         self.assertNotEqual(data, None)
 
-        # Health Check
-        response_status_code = self.utils.service_health_check(self.ip, port, self.triage_report, self.triage_level)
-        #self.assertEqual(response_status_code, 200)
-
         # Testing
         response_status_code  = self.utils.service_test(self.ip, port, endpoint_name, data, self.triage_report, self.triage_level)
         self.assertEqual(response_status_code, 200)
@@ -365,10 +364,6 @@ class ChatQnA(unittest.TestCase):
         #Get configs/data
         data, port, endpoint_name, output = self.utils.load_input_data(service_name)
         self.assertNotEqual(data, None)
-
-        # Health Check
-        response_status_code = self.utils.service_health_check(self.ip, port, self.triage_report, self.triage_level)
-        #self.assertEqual(response_status_code, 200)
 
         # Testing
         response_status_code  = self.utils.service_test(self.ip, port, endpoint_name, data, self.triage_report, self.triage_level)
@@ -383,7 +378,7 @@ class ChatQnA(unittest.TestCase):
 
         # Health Check
         response_status_code = self.utils.service_health_check(self.ip, port, self.triage_report, self.triage_level)
-        #self.assertEqual(response_status_code, 200)
+        self.assertEqual(response_status_code, 200)
 
         # Testing
         response_status_code  = self.utils.service_test(self.ip, port, endpoint_name, data, self.triage_report, self.triage_level)
