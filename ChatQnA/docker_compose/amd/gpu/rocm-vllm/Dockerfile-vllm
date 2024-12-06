@@ -1,0 +1,18 @@
+FROM rocm/vllm:rocm6.2_mi300_ubuntu20.04_py3.9_vllm_0.6.4
+
+# Set the working directory
+WORKDIR /workspace
+
+# Copy the api_server.py into the image
+ADD https://raw.githubusercontent.com/ROCm/vllm/a466f09d7f20ca073f21e3f64b8c9487e4c4ff4b/vllm/entrypoints/sync_openai/api_server.py /workspace/api_server.py
+
+# Expose the port used by the API server
+EXPOSE 8011
+
+# Set environment variables
+ENV HUGGINGFACE_HUB_CACHE=/workspace
+ENV WILM_USE_TRITON_FLASH_ATTENTION=0
+ENV PYTORCH_JIT=0
+
+# Set the entrypoint to the api_server.py script
+ENTRYPOINT ["python3", "/workspace/api_server.py"]
