@@ -13,7 +13,7 @@ services:
     container_name: dataprep-multimodal-redis
     depends_on:
       - redis-vector-db
-      - lvm-llava-svc
+      - lvm-tgi
     ports:
       - "6007:6007"
     environment:
@@ -95,9 +95,9 @@ services:
     ipc: host
     command: --model-id ${LVM_MODEL_ID} --max-input-tokens 3048 --max-total-tokens 4096
     restart: unless-stopped
-  lvm-llava-svc:
-    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
-    container_name: lvm-llava-svc
+  lvm-tgi:
+    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+    container_name: lvm-tgi
     depends_on:
       - tgi-rocm
     ports:
@@ -119,7 +119,7 @@ services:
       - dataprep-multimodal-redis
       - embedding-multimodal
       - retriever-multimodal-redis
-      - lvm-llava-svc
+      - lvm-tgi
     ports:
       - "8888:8888"
     environment:
