@@ -1,11 +1,10 @@
 # Build Mega Service of MultimodalQnA for AMD ROCm
 
-This document outlines the deployment process for a MultimodalQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD server wit ROCm GPUs. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `multimodal_embedding` that employs [BridgeTower](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) model as embedding model, `multimodal_retriever`, `lvm`, and `multimodal-data-prep`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for a MultimodalQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD server with ROCm GPUs. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `multimodal_embedding` that employs [BridgeTower](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) model as embedding model, `multimodal_retriever`, `lvm`, and `multimodal-data-prep`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
 For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
-
 
 ## Setup Environment Variables
 
@@ -140,12 +139,11 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 | -------------------- | ------------------------------------------- |
 | embedding-multimodal | BridgeTower/bridgetower-large-itm-mlm-gaudi |
 | LVM                  | llava-hf/llava-1.5-7b-hf                    |
-| LVM                  | Xkev/Llama-3.2V-11B-cot                   |
+| LVM                  | Xkev/Llama-3.2V-11B-cot                     |
 
+Note:
 
-Note: 
-
-For AMD ROCm System "Xkev/Llama-3.2V-11B-cot" is recomended to run on ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
+For AMD ROCm System "Xkev/Llama-3.2V-11B-cot" is recommended to run on ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
 
 ### Start all the services Docker Containers
 
