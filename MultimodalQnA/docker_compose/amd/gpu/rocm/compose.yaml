@@ -119,7 +119,7 @@ services:
       - dataprep-multimodal-redis
       - embedding-multimodal
       - retriever-multimodal-redis
-      - lvm-tgi
+      - lvm-llava-svc
     ports:
       - "8888:8888"
     environment:
