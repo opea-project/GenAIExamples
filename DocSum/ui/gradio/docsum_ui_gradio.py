@@ -234,6 +234,21 @@ class DocSumUI:
                     )
             submit_btn.click(fn=self.generate_summary, inputs=[input_text], outputs=[generated_text])
 
+        with gr.Blocks() as url_ui:
+            # URL text UI
+            with gr.Row():
+                with gr.Column():
+                    input_text = gr.TextArea(
+                        label="Please paste a URL for summarization",
+                        placeholder="Paste a URL for the information you need to summarize",
+                    )
+                    submit_btn = gr.Button("Generate Summary")
+                with gr.Column():
+                    generated_text = gr.TextArea(
+                        label="Text Summary", placeholder="Summarized text will be displayed here"
+                    )
+            submit_btn.click(fn=self.generate_summary, inputs=[input_text], outputs=[generated_text])
+
         # File Upload UI
         file_ui = self.create_upload_ui(
             label="Please upload a document (.pdf, .doc, .docx)",
@@ -253,11 +268,6 @@ class DocSumUI:
             label="Please upload Video file (.mp4)", file_types=[".mp4"], process_function=self.read_video_file
         )
 
-        # URL Upload UI
-        url_ui = self.create_upload_ui(
-            label="Please upload a url", file_types=[], process_function=self.read_url
-        )
-
         # Render all the UI in separate tabs
         with gr.Blocks() as self.demo:
             gr.Markdown("# Doc Summary")
@@ -270,7 +280,7 @@ class DocSumUI:
                     audio_ui.render()
                 with gr.TabItem("Upload Video"):
                     video_ui.render()
-                with gr.TabItem("Upload URL"):
+                with gr.TabItem("Enter URL"):
                     url_ui.render()
 
         return self.demo
