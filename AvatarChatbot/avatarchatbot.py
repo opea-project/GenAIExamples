@@ -5,9 +5,11 @@ import asyncio
 import os
 import sys
 
-from comps import AvatarChatbotGateway, MicroService, ServiceOrchestrator, ServiceType
+from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
+from comps.cores.proto.api_protocol import AudioChatCompletionRequest, ChatCompletionResponse
+from comps.cores.proto.docarray import LLMParams
+from fastapi import Request
 
-MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "0.0.0.0")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 ASR_SERVICE_HOST_IP = os.getenv("ASR_SERVICE_HOST_IP", "0.0.0.0")
 ASR_SERVICE_PORT = int(os.getenv("ASR_SERVICE_PORT", 9099))
@@ -27,7 +29,7 @@ def check_env_vars(env_var_list):
     print("All environment variables are set.")
 
 
-class AvatarChatbotService:
+class AvatarChatbotService(Gateway):
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
@@ -70,7 +72,39 @@ class AvatarChatbotService:
         self.megaservice.flow_to(asr, llm)
         self.megaservice.flow_to(llm, tts)
         self.megaservice.flow_to(tts, animation)
-        self.gateway = AvatarChatbotGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+
+    async def handle_request(self, request: Request):
+        data = await request.json()
+
+        chat_request = AudioChatCompletionRequest.model_validate(data)
+        parameters = LLMParams(
+            # relatively lower max_tokens for audio conversation
+            max_tokens=chat_request.max_tokens if chat_request.max_tokens else 128,
+            top_k=chat_request.top_k if chat_request.top_k else 10,
+            top_p=chat_request.top_p if chat_request.top_p else 0.95,
+            temperature=chat_request.temperature if chat_request.temperature else 0.01,
+            repetition_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 1.03,
+            streaming=False,  # TODO add streaming LLM output as input to TTS
+        )
+        # print(parameters)
+
+        result_dict, runtime_graph = await self.megaservice.schedule(
+            initial_inputs={"byte_str": chat_request.audio}, llm_parameters=parameters
+        )
+
+        last_node = runtime_graph.all_leaves()[-1]
+        response = result_dict[last_node]["video_path"]
+        return response
+
+    def start(self):
+        super().__init__(
+            megaservice=self.megaservice,
+            host=self.host,
+            port=self.port,
+            endpoint=str(MegaServiceEndpoint.AVATAR_CHATBOT),
+            input_datatype=AudioChatCompletionRequest,
+            output_datatype=ChatCompletionResponse,
+        )
 
 
 if __name__ == "__main__":
@@ -89,5 +123,6 @@ if __name__ == "__main__":
         ]
     )
 
-    avatarchatbot = AvatarChatbotService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    avatarchatbot = AvatarChatbotService(port=MEGA_SERVICE_PORT)
     avatarchatbot.add_remote_service()
+    avatarchatbot.start()
