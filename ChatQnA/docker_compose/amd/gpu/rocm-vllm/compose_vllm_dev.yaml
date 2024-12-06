@@ -89,8 +89,9 @@ services:
       - "/var/opea/chatqna-service/data:/data"
     shm_size: 128G
     devices:
-      - /dev/kfd:/dev/kfd
-      - /dev/dri/:/dev/dri/
+      - "/dev/kfd:/dev/kfd"
+      - "/dev/dri/${AMD_GPU_CARD_ID}:/dev/dri/${AMD_GPU_CARD_ID}"
+      - "/dev/dri/${AMD_GPU_RENDER_ID}:/dev/dri/${AMD_GPU_RENDER_ID}"
     cap_add:
       - SYS_PTRACE
     group_add:
