@@ -31,23 +31,12 @@ export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 export DOCSUM_CARD_ID="card1"
 export DOCSUM_RENDER_ID="renderD136"
 
-export V2A_SERVICE_HOST_IP=${host_ip}
-export V2A_ENDPOINT=http://$host_ip:7078
-
-export A2T_ENDPOINT=http://$host_ip:7066
-export A2T_SERVICE_HOST_IP=${host_ip}
-export A2T_SERVICE_PORT=9099
-
-export DATA_ENDPOINT=http://$host_ip:7079
-export DATA_SERVICE_HOST_IP=${host_ip}
-export DATA_SERVICE_PORT=7079
-
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-ui whisper dataprep-multimedia2text dataprep-audio2text dataprep-video2audio llm-docsum-tgi"
+    service_list="docsum docsum-ui llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
@@ -125,13 +114,11 @@ function validate_microservices() {
 function validate_megaservice() {
     local SERVICE_NAME="mega-docsum"
     local DOCKER_NAME="docsum-backend-server"
-    local EXPECTED_RESULT="[DONE]"
+    local EXPECTED_RESULT="embedding"
     local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
     local URL="${ip_address}:8888/v1/docsum"
-    local DATA_TYPE="type=text"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$DATA_TYPE" -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
-
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
