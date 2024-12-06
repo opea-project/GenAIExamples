@@ -429,6 +429,7 @@ class ChatQnAService(Gateway):
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, llm)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--without-rerank", action="store_true")
