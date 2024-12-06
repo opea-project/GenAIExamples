@@ -85,8 +85,8 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
     next_data = {}
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         if EMBEDDINGS_USE_VLLM == "true":
-            assert isinstance(data['data'][0]['embedding'], list)
-            next_data = {"text": inputs["input"], "embedding": data['data'][0]['embedding']}
+            assert isinstance(data["data"][0]["embedding"], list)
+            next_data = {"text": inputs["input"], "embedding": data["data"][0]["embedding"]}
         else:
             next_data = {"text": inputs["inputs"], "embedding": data[0]}
     elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
@@ -362,6 +362,7 @@ class ChatQnAService:
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, llm)
         self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
