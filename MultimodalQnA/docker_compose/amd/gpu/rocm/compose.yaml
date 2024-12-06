@@ -13,7 +13,7 @@ services:
     container_name: dataprep-multimodal-redis
     depends_on:
       - redis-vector-db
-      - lvm-tgi
+      - lvm-llava-svc
     ports:
       - "6007:6007"
     environment:
