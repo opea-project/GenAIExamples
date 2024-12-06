@@ -144,7 +144,7 @@ function validate_microservices() {
         "dataprep-audio2text" \
         "dataprep-audio2text-service" \
         "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
-    
+
     # Video2Audio service
     validate_services \
         "${host_ip}:7078/v1/video2audio" \
