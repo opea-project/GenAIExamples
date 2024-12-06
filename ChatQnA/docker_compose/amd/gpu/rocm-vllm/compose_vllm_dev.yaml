@@ -42,7 +42,7 @@ services:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
     container_name: chatqna-retriever-dev
     depends_on:
-      - chatqna-redis-vector-db
+      - chatqna-redis-vector-db-dev
     ports:
       - "${CHATQNA_REDIS_RETRIEVER_PORT}:7000"
     ipc: host
@@ -104,11 +104,11 @@ services:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-backend-server-dev
     depends_on:
-      - chatqna-redis-vector-db
-      - chatqna-tei-embedding-service
-      - chatqna-retriever
-      - chatqna-tei-reranking-service
-      - chatqna-vllm-service
+      - chatqna-redis-vector-db-dev
+      - chatqna-tei-embedding-service-dev
+      - chatqna-retriever-dev
+      - chatqna-tei-reranking-service-dev
+      - chatqna-vllm-service-dev
     ports:
       - "${CHATQNA_BACKEND_SERVICE_PORT}:8888"
     environment:
@@ -130,7 +130,7 @@ services:
     image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     container_name: chatqna-ui-server-dev
     depends_on:
-      - chatqna-backend-server
+      - chatqna-backend-server-dev
     ports:
       - "${CHATQNA_FRONTEND_SERVICE_PORT}:5173"
     environment:
@@ -147,8 +147,8 @@ services:
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
     container_name: chatqna-nginx-server-dev
     depends_on:
-      - chatqna-backend-server
-      - chatqna-ui-server
+      - chatqna-backend-server-dev
+      - chatqna-ui-server-dev
     ports:
       - "${CHATQNA_NGINX_PORT}:80"
     environment:
