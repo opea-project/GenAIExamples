@@ -428,8 +428,6 @@ class ChatQnAService(Gateway):
         self.megaservice.add(embedding).add(retriever).add(llm)
         self.megaservice.flow_to(embedding, retriever)
         self.megaservice.flow_to(retriever, llm)
-        self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
