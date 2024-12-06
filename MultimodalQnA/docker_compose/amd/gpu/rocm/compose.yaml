@@ -95,9 +95,9 @@ services:
     ipc: host
     command: --model-id ${LVM_MODEL_ID} --max-input-tokens 3048 --max-total-tokens 4096
     restart: unless-stopped
-  lvm-tgi:
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-    container_name: lvm-tgi
+  lvm-llava-svc:
+    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
+    container_name: lvm-llava-svc
     depends_on:
       - tgi-rocm
     ports:
