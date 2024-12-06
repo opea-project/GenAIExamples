@@ -36,7 +36,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-ui llm-docsum-tgi"
+    service_list="docsum docsum-ui whisper dataprep-multimedia2text dataprep-audio2text dataprep-video2audio llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
@@ -114,7 +114,7 @@ function validate_microservices() {
 function validate_megaservice() {
     local SERVICE_NAME="mega-docsum"
     local DOCKER_NAME="docsum-backend-server"
-    local EXPECTED_RESULT="embedding"
+    local EXPECTED_RESULT="[DONE]"
     local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
     local URL="${ip_address}:8888/v1/docsum"
     local DATA_TYPE="type=text"
