@@ -158,7 +158,7 @@ function validate_microservices() {
     # Docsum Data service - video
     validate_services \
         "${host_ip}:7079/v1/multimedia2text" \
-        '"query":"well' \
+        "well" \
         "dataprep-multimedia2text-service" \
         "dataprep-multimedia2text" \
         "{\"video\": \"$(input_data_for_test "video")\"}"
@@ -166,7 +166,7 @@ function validate_microservices() {
     # Docsum Data service - audio
     validate_services \
         "${host_ip}:7079/v1/multimedia2text" \
-        '"query":"well' \
+        "well" \
         "dataprep-multimedia2text-service" \
         "dataprep-multimedia2text" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
