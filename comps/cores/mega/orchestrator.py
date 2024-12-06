@@ -237,8 +237,8 @@ class ServiceOrchestrator(DAG):
                                     )
                                     token_start = time.time()
                             else:
-                                yield chunk
                                 token_start = self.metrics.token_update(token_start, is_first)
+                                yield chunk
                             is_first = False
                     self.metrics.request_update(req_start)
                     self.metrics.pending_update(False)
@@ -306,7 +306,7 @@ class ServiceOrchestrator(DAG):
         suffix = "\n\n"
         tokens = re.findall(r"\s?\S+\s?", sentence, re.UNICODE)
         for token in tokens:
-            yield prefix + repr(token.replace("\\n", "\n").encode("utf-8")) + suffix
             token_start = self.metrics.token_update(token_start, is_first)
+            yield prefix + repr(token.replace("\\n", "\n").encode("utf-8")) + suffix
         if is_last:
             yield "data: [DONE]\n\n"
