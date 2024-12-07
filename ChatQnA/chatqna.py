@@ -428,6 +428,7 @@ class ChatQnAService(Gateway):
             output_datatype=ChatCompletionResponse,
         )
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--without-rerank", action="store_true")
