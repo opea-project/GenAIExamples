@@ -52,7 +52,9 @@ class DocSumService(Gateway):
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )
-        self.megaservice.add(llm)
+
+        self.megaservice.add(data).add(llm)
+        self.megaservice.flow_to(data, llm)
 
     async def handle_request(self, request: Request, files: List[UploadFile] = File(default=None)):
 
