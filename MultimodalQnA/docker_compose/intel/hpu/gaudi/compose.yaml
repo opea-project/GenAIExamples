@@ -8,6 +8,27 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  asr:
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+    container_name: asr-service
+    ports:
+      - "${ASR_SERVICE_PORT}:9099"
+    ipc: host
+    environment:
+      ASR_ENDPOINT: ${ASR_ENDPOINT}
+      ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
+      ASR_SERVICE_ENDPOINT: ${ASR_SERVICE_ENDPOINT}
   dataprep-multimodal-redis:
     image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
     container_name: dataprep-multimodal-redis
@@ -119,6 +140,7 @@ services:
       - embedding-multimodal
       - retriever-multimodal-redis
       - lvm-tgi
+      - asr
     ports:
       - "8888:8888"
     environment:
@@ -130,6 +152,8 @@ services:
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
       MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
+      ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
+      ASR_SERVICE_ENDPOINT: ${ASR_SERVICE_ENDPOINT}
     ipc: host
     restart: always
   multimodalqna-ui:
