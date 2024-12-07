@@ -337,6 +337,37 @@ class ChatQnAService(Gateway):
         self.megaservice.flow_to(rerank, llm)
         # self.megaservice.flow_to(llm, guardrail_out)
 
+    def add_remote_service_with_vllm_embeddings(self):
+        embedding = MicroService(
+            name="embedding",
+            host=EMBEDDING_SERVER_HOST_IP,
+            port=EMBEDDING_SERVER_PORT,
+            endpoint="/v1/embeddings",
+            use_remote_service=True,
+            service_type=ServiceType.EMBEDDING,
+        )
+
+        retriever = MicroService(
+            name="retriever",
+            host=RETRIEVER_SERVICE_HOST_IP,
+            port=RETRIEVER_SERVICE_PORT,
+            endpoint="/v1/retrieval",
+            use_remote_service=True,
+            service_type=ServiceType.RETRIEVER,
+        )
+
+        llm = MicroService(
+            name="llm",
+            host=LLM_SERVER_HOST_IP,
+            port=LLM_SERVER_PORT,
+            endpoint="/v1/chat/completions",
+            use_remote_service=True,
+            service_type=ServiceType.LLM,
+        )
+        self.megaservice.add(embedding).add(retriever).add(llm)
+        self.megaservice.flow_to(embedding, retriever)
+        self.megaservice.flow_to(retriever, llm)
+
     async def handle_request(self, request: Request):
         data = await request.json()
         stream_opt = data.get("stream", True)
@@ -396,39 +427,6 @@ class ChatQnAService(Gateway):
             input_datatype=ChatCompletionRequest,
             output_datatype=ChatCompletionResponse,
         )
-
-    def add_remote_service_with_vllm_embeddings(self):
-
-        embedding = MicroService(
-            name="embedding",
-            host=EMBEDDING_SERVER_HOST_IP,
-            port=EMBEDDING_SERVER_PORT,
-            endpoint="/v1/embeddings",
-            use_remote_service=True,
-            service_type=ServiceType.EMBEDDING,
-        )
-
-        retriever = MicroService(
-            name="retriever",
-            host=RETRIEVER_SERVICE_HOST_IP,
-            port=RETRIEVER_SERVICE_PORT,
-            endpoint="/v1/retrieval",
-            use_remote_service=True,
-            service_type=ServiceType.RETRIEVER,
-        )
-
-        llm = MicroService(
-            name="llm",
-            host=LLM_SERVER_HOST_IP,
-            port=LLM_SERVER_PORT,
-            endpoint="/v1/chat/completions",
-            use_remote_service=True,
-            service_type=ServiceType.LLM,
-        )
-        self.megaservice.add(embedding).add(retriever).add(llm)
-        self.megaservice.flow_to(embedding, retriever)
-        self.megaservice.flow_to(retriever, llm)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
