@@ -59,7 +59,7 @@ services:
       dockerfile: comps/dataprep/multimodal/redis/langchain/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
-  whisper-service:
+  whisper:
     build:
       context: GenAIComps
       dockerfile: comps/asr/whisper/dependency/Dockerfile
