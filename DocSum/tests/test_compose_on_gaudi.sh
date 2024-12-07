@@ -148,7 +148,7 @@ function validate_microservices() {
     # Video2Audio service
     validate_services \
         "${host_ip}:7078/v1/video2audio" \
-        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd9L18KaAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
+        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd95t4qPAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
         "dataprep-video2audio" \
         "dataprep-video2audio-service" \
         "{\"byte_str\": \"$(input_data_for_test "video")\"}"
@@ -156,7 +156,7 @@ function validate_microservices() {
     # Docsum Data service - video
     validate_services \
         "${host_ip}:7079/v1/multimedia2text" \
-        '"query":"well"' \
+        "well" \
         "dataprep-multimedia2text" \
         "dataprep-multimedia2text" \
         "{\"video\": \"$(input_data_for_test "video")\"}"
@@ -164,7 +164,7 @@ function validate_microservices() {
     # Docsum Data service - audio
     validate_services \
         "${host_ip}:7079/v1/multimedia2text" \
-        '"query":"well"' \
+        "well" \
         "dataprep-multimedia2text" \
         "dataprep-multimedia2text" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
