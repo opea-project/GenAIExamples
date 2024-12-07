@@ -19,12 +19,67 @@ class RunCmd:
         #print("Command exit status/return code : ", p_status)
         return p_status, output
 
+class ProfileUtility:
+
+  def __init__(self):
+    #self.servicename = service_name
+    self.docker_name = ""
+    self.start_profile_func = None 
+    self.stop_profile_func = None 
+    return
+
+  def set_profile_funcs(self,  docker_name):
+    if docker_name == "vllm-service":
+        self.docker_name = docker_name
+        self.start_profile_func = self.vllm_start_profile 
+        self.stop_profile_func = self.vllm_stop_profile
+        self.get_profile_result_func = self.vllm_get_profile_result
+    else:
+        self.start_profile_func = None 
+        self.stop_profile_func = None
+        self.docker_name = ""
+
+  def vllm_start_profile(self, ip, port, data):
+      print("vllm_start_profile")
+      # Send out test request
+      endpoint = ip + ':' + port + '/' + "start_profile"
+      data.pop("messages")
+      print(data)
+      response = requests.post(
+          url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None}
+      )
+      return
+
+  def vllm_stop_profile(self, ip, port, data):
+      print("vllm_stop_profile")
+      endpoint = ip + ':' + port + '/' + "stop_profile"
+      data.pop("messages")
+      print(data)
+      response = requests.post(
+          url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None}
+      )
+      return
+
+  def vllm_get_profile_result(self, result_folder):
+      print("vllm_get_profile_result")
+      result_folder_path = "./" + result_folder
+      cmd = "docker cp " + self.docker_name + ":/mnt " + result_folder_path
+      status, output = RunCmd().run(cmd)
+
+      pattern = r".*\.pt.trace.json.gz $"  # Match all files ending with ".txt"
+      files_list = []
+      for filename in os.listdir(result_folder_path):
+        if re.search(pattern, filename):
+            print(filename)
+            files_list.append(filename)
+      return files_list
 
 class TriageUtility:
 
   def __init__(self, filename):
     self.class_name = filename.split('.')[0]
     self.filename = filename #self.__class__.__name__
+    self.prof_utils = ProfileUtility()
     return
 
   def load_input_data(self,  service):
@@ -60,10 +115,30 @@ class TriageUtility:
   def service_test(self, ip, port, endpoint_name, data, triage_report, triage_level):
     if triage_level < 2:
         return
+
+    # Start Profiling
+    docker_name = triage_report.get_docker_name(port)
+    self.prof_utils.set_profile_funcs(docker_name)
+    if triage_level > 2 and self.prof_utils.start_profile_func != None:
+        print("start profiling")
+        tmp_data = data.copy()
+        self.prof_utils.start_profile_func(ip, port, tmp_data)
+
+    # Send out test request
     endpoint = ip + ':' + port + '/' + endpoint_name
     response = requests.post(
         url=endpoint, json=data, headers={"Content-Type": "application/json"}, proxies={"http": None}
     )
+
+    # End Profiling
+    if triage_level > 2 and self.prof_utils.stop_profile_func != None:
+        print("end profiling")
+        tmp_data = data.copy()
+        self.prof_utils.stop_profile_func(ip, port, tmp_data)
+        # Save Profile results
+        profile_files_list = self.prof_utils.get_profile_result_func(triage_report.result_folder_name)
+        if profile_files_list != []:
+            triage_report.update_docker_report(port, "Profile", profile_files_list[0])
 
     triage_report.update_docker_report(port, "Test", response.status_code == 200)
     log_fname = triage_report.dump_docker_logs(port)     
@@ -146,6 +221,12 @@ class TriageReport:
     df.at[index_list[0], key] = value
     #print(df)
     return
+
+  def get_docker_name(self, port):
+
+    df =self.docker_ps_df 
+    docker_name = df.loc[df['PORTS'] == port,"NAMES"].values[0]
+    return docker_name
 
   def dump_docker_logs(self, port):
 
