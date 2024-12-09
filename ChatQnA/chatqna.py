@@ -6,13 +6,7 @@ import json
 import os
 import re
 
-from comps import (
-    MegaServiceEndpoint,
-    MicroService,
-    ServiceOrchestrator,
-    ServiceType,
-    ServiceRoleType,
-)
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -468,7 +462,6 @@ class ChatQnAService:
         self.service.app.router.add_api_route(self.endpoint, self.handle_request, methods=["POST"])
 
         self.service.start()
-
 
 
 if __name__ == "__main__":
