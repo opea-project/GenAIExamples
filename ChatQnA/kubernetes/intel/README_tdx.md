@@ -167,11 +167,12 @@ If you want to have more control over what is protected with Intel TDX or use a 
    done
    ```
 
-2. For each service, define the resources that must be assigned to the pod to run the service efficiently.
-   The resources must be defined in the `resources` section of the pod's container definition.
-   The `memory` must be at least 2x the image size.
-   The `cpu` and `memory` resources must be defined at least in `limits` sections.
-   By default, the pod will be assigned 1 CPU and 2048 MiB of memory, but half of it will be used for filesystem.
+2. For each service, edit the deployment file to define the resources that must be assigned to the pod to run the service efficiently:
+   
+   - The resources must be defined in the `resources` section of the pod's container definition.
+   - The `memory` must be at least 2x the image size.
+   - The `cpu` and `memory` resources must be defined at least in `limits` sections.
+   - By default, the pod will be assigned 1 CPU and 2048 MiB of memory, but half of it will be used for filesystem.
 
 3. Apply the changes to the deployment configuration:
 
