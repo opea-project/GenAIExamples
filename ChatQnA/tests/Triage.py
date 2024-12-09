@@ -61,16 +61,17 @@ class ProfileUtility:
       return
 
   def vllm_get_profile_result(self, result_folder):
-      print("vllm_get_profile_result")
+      print("vllm_get_profile_result, result folder : " + result_folder)
       result_folder_path = "./" + result_folder
-      cmd = "docker cp " + self.docker_name + ":/mnt " + result_folder_path
+      cmd = "docker cp " + self.docker_name + ":/mnt/ " + result_folder_path
       status, output = RunCmd().run(cmd)
 
-      pattern = r".*\.pt.trace.json.gz $"  # Match all files ending with ".txt"
+      pattern = r".*\.pt.trace.json.gz$"  # Match all files ending with ".txt"
       files_list = []
-      for filename in os.listdir(result_folder_path):
+      import os
+      import re
+      for filename in os.listdir(result_folder_path + os.sep + "mnt/"):
         if re.search(pattern, filename):
-            print(filename)
             files_list.append(filename)
       return files_list
 
@@ -470,7 +471,7 @@ if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
         raise IndexError("Please provide data json file.") 
-    triage_level = 2 # low, medium, high
+    triage_level = 3 # low, medium, high
     DataJsonFileName = sys.argv[1]  #"ChatQnA_Xeon.json"
     triage_report = TriageReport(DataJsonFileName)
     test_loader = unittest.TestLoader()
