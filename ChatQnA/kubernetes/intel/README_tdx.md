@@ -1,9 +1,8 @@
-# Deploy ChatQnA in Kubernetes Cluster on Xeon with Intel TDX
+# Deploy example application in Kubernetes Cluster on Xeon with Intel TDX
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline components on Intel Xeon server where the microservices are protected by [Intel TDX](https://www.intel.com/content/www/us/en/developer/tools/trust-domain-extensions/overview.html).
-The guide references the project [GenAIInfra](https://github.com/opea-project/GenAIInfra.git) to prepare the infrastructure. 
+This document outlines the deployment process for an example application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline components on Intel Xeon server where the microservices are protected by [Intel TDX](https://www.intel.com/content/www/us/en/developer/tools/trust-domain-extensions/overview.html).
 
-The deployment process is intended for users who want to deploy ChatQnA services:
+The deployment process is intended for users who want to deploy an example application:
 
 - with pods protected by Intel TDX,
 - on a single node in a cluster (acting as a master and worker) that is a Xeon 5th Gen platform or later,
@@ -14,7 +13,7 @@ It's split into 3 sections:
 
 1. [Cluster Configuration](#cluster-configuration) - steps required to prepare components in the cluster required to use Intel TDX.
 2. [Node configuration](#node-configuration) - additional steps to be performed on the node that are required to run heavy applications like OPEA ChatQnA.
-3. [ChatQnA Services Configuration and Deployment](#chatqna-services-configuration-and-deployment) - describes how to deploy ChatQnA services with Intel TDX protection.
+3. [Deployment of services protected with Intel TDX](#deployment-of-services-protected-with-intel-tdx) - describes how to deploy an example application with services protected using Intel TDX.
 
 > [!NOTE]
 > Running TDX-protected services requires the user to define the pod's resources request (cpu, memory).
@@ -30,6 +29,9 @@ To prepare cluster to run Intel TDX-protected workloads, follow [Intel Confident
 
 
 ## Node Configuration
+
+This section outlines required changes to be performed on each node.
+These steps might be automated with various configuration management tools like Ansible, Puppet, Chef, etc.
 
 
 ### Kubelet Configuration
@@ -67,101 +69,116 @@ fi
 >
 > After kubelet restart, some of the internal pods from `kube-system` namespace might be reloaded automatically.
 
+All kubelet configuration options can be found [here](https://kubernetes.io/docs/tasks/administer-cluster/kubelet-config-file/).
 
-## ChatQnA Services Configuration and Deployment
+
+## Deployment of services protected with Intel TDX
+
+This section describes how to deploy an example application with services protected using Intel TDX:
+
+1. [Overview of the changes needed](#overview-of-the-changes-needed) - describes the changes required to protect a single component with Intel TDX.
+2. [Example deployment of ChatQnA with TDX protection](#example-deployment-of-chatqna-with-tdx-protection) - provides a quick start to run ChatQnA example application with all services protected with Intel TDX.
+3. [Customization of deployment configuration](#customization-of-deployment-configuration) - describes how to manually modify the deployment configuration to protect a single component with Intel TDX.
+
+
+### Overview of the changes needed
 
 To protect a single component with Intel TDX, user must modify its manifest file.
 The process is described in details in the [Demo Workload Deployment](https://cc-enabling.trustedservices.intel.com/intel-confidential-containers-guide/03/demo_workload_deployment/#pod-isolated-by-kata-containers-protected-with-intel-tdx-and-quote-verified-using-intel-trust-authority).
 
-As an example we will use the `llm-uservice` component from the ChatQnA pipeline and deploy it using helm charts.
+Here, we describe the required changes on the example Deployment definition below:
 
-Steps:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-uservice
+  #  (...)
+spec:
+  selector:
+      matchLabels:
+         app.kubernetes.io/name: llm-uservice
+         app.kubernetes.io/instance: llm-uservice
+  #  (...)
+  template:
+    metadata:
+      # (...)
+      annotations:
+        io.katacontainers.config.runtime.create_container_timeout: "600" # <<--- increase the timeout for container creation
+    spec:
+      runtimeClassName: kata-qemu-tdx # <<--- this is required to start the pod in Trust Domain (TD, virtual machine protected with Intel TDX)
+      containers:
+        - name: llm-uservice
+          # (...)
+          resources: # <<--- specify resources enough to run the service efficiently (memory must be at least 2x the image size)
+            limits:
+              cpu: "4"
+              memory: 4Gi
+            requests:
+              cpu: "4"
+              memory: 4Gi
+```
 
-1. Export the address of KBS deployed in previous steps.
-   If the KBS was deployed in your cluster, you can get the address by running the following command:
 
-    ```bash
-    export KBS_ADDRESS=http://$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}'):$(kubectl get svc kbs -n coco-tenant -o jsonpath='{.spec.ports[0].nodePort}'); \
-    echo $KBS_ADDRESS
-    ```
-   
-2. Find the manifest for `llm-uservice` component (e.g.: GenAIInfra/microservices-connector/config/manifests/llm-uservice.yaml).
-3. Add the following annotations to the manifest file and replace KBS_ADDRESS with actual value:
+### Example deployment of ChatQnA with TDX protection
 
-   ```yaml
-   apiVersion: apps/v1
-   kind: Deployment
-   metadata:
-     name: llm-uservice
-     #  (...)
-   spec:
-     selector:
-         matchLabels:
-            app.kubernetes.io/name: llm-uservice
-            app.kubernetes.io/instance: llm-uservice
-     #  (...)
-     template:
-       metadata:
-         # (...)
-         annotations:
-           io.katacontainers.config.hypervisor.kernel_params: "agent.guest_components_rest_api=all agent.aa_kbc_params=cc_kbc::<KBS_ADDRESS>" # <<--- enable attestation through KBS and provide the KBS address to the pod
-           io.katacontainers.config.runtime.create_container_timeout: "600" # <<--- increase the timeout for container creation
-       spec:
-         runtimeClassName: kata-qemu-tdx # <<--- this is required to start the pod in Trust Domain (TD, virtual machine protected with Intel TDX)
-         initContainers: # <<--- this is required to perform attestation before the main container starts
-           - name: init-attestation
-             image: storytel/alpine-bash-curl:latest
-             command: ["/bin/sh","-c"]
-             args:
-               - |
-                 echo starting;
-                 (curl http://127.0.0.1:8006/aa/token\?token_type\=kbs | grep -iv "get token failed" | grep -iv "error" | grep -i token && echo "ATTESTATION COMPLETED SUCCESSFULLY") || (echo "ATTESTATION FAILED" && exit 1); 
-         containers:
-           - name: llm-uservice
-             # (...)
-             resources: # <<--- specify resources enough to run the service efficiently (memory must be at least 2x the image size)
-               limits:
-                 cpu: "4"
-                 memory: 4Gi
-               requests:
-                 cpu: "4"
-                 memory: 4Gi
-   ```
+As an example we will use the ChatQnA application.
+If you want to just give it a try, simply run:
 
-   Note, that due to the nature of TDX, the resources assigned to the pod cannot be shared with any other pod.
+```bash
+kubectl apply -f chatqna_tdx.yaml
+```
 
-4. Deploy the GMC as usual using helm:
+After a few minutes, the ChatQnA services should be up and running in the cluster and all of them will be protected with Intel TDX.
+You may verify, that the pods are running with the TDX-protection by checking the runtime class name, e.g.:
 
-    ```bash
-    helm install -n system --create-namespace gmc .
-    ```
-   
-5. After the `gmc-controller` pod is running, deploy the chatqna:
+```bash
+POD_NAME=$(kubectl get pods | grep 'chatqna-tgi' | awk '{print $1}')
+kubectl get pod $POD_NAME -o jsonpath='{.spec.runtimeClassName}'
+```
+
+In the output you should see:
+
+```text
+kata-qemu-tdx
+```
+
+This is a simple indicator that the pod is running in a Trust Domain protected by Intel TDX.
+However, for a production use-case, the attestation process is crucial to verify the integrity of the pod.
+You may read more about how to enable attestation [here](https://cc-enabling.trustedservices.intel.com/intel-confidential-containers-guide/03/demo_workload_deployment/#pod-isolated-by-kata-containers-protected-with-intel-tdx-and-quote-verified-using-intel-trust-authority).
+
+
+### Customization of deployment configuration
+
+If you want to have more control over what is protected with Intel TDX or use a different deployment file, you can manually modify the deployment configuration, by following the steps below: 
+
+1. Run the script to modify the chosen services with the changes described in [previous section](#overview-of-the-changes-needed):
 
    ```bash
-   kubectl create ns chatqa; \
-   kubectl apply -f cpu/xeon/gmc/chatQnA_xeon.yaml
-   ```
-   
-6. After the services are up, you may verify that the `llm-uservice` is running in a Trust Domain by checking the pod's status:
-
-    ```bash
-    # Find the pod name
-    POD_NAME=$(kubectl get pods -n chatqa | grep 'llm-svc-deployment-' | awk '{print $1}')
-    # Print the runtimeClassName
-    kubectl get pod $POD_NAME -n chatqa -o jsonpath='{.spec.runtimeClassName}'
-    echo ""
-    # Find the initContainer name
-    INIT_CONTAINER_NAME=$(kubectl get pod $POD_NAME -n chatqa -o jsonpath='{.spec.initContainers[0].name}')
-    # Print the logs of the initContainer
-    kubectl logs $POD_NAME -n chatqa -c $INIT_CONTAINER_NAME | grep -i attestation
-    ```
-   
-   The output should contain the `kata-qemu-tdx` runtimeClassName and the `ATTESTATION COMPLETED SUCCESSFULLY` message.
-   
-   ```text
-   kata-qemu-tdx
-   ATTESTATION COMPLETED SUCCESSFULLY
+   SERVICES=("llm-uservice")
+   FILE=chatqna.yaml
+   for SERVICE in "${SERVICES[@]}"; do
+      yq eval '
+      (select(.kind == "Deployment" and .metadata.name == "'"$SERVICE"'") | .spec.template.metadata.annotations."io.katacontainers.config.runtime.create_container_timeout") = "800"
+      ' "$FILE" -i;
+      yq eval '
+      (select(.kind == "Deployment" and .metadata.name == "'"$SERVICE"'") | .spec.template.spec.runtimeClassName) = "kata-qemu-tdx"
+      ' "$FILE" -i;
+   done
    ```
 
-At this point you have successfully deployed the ChatQnA services with the `llm-uservice` component running in a Trust Domain protected by Intel TDX. 
+2. For each service, define the resources that must be assigned to the pod to run the service efficiently.
+   The resources must be defined in the `resources` section of the pod's container definition.
+   The `memory` must be at least 2x the image size.
+   The `cpu` and `memory` resources must be defined at least in `limits` sections.
+   By default, the pod will be assigned 1 CPU and 2048 MiB of memory, but half of it will be used for filesystem.
+
+3. Apply the changes to the deployment configuration:
+
+   ```bash
+   kubectl apply -f chatqna.yaml
+   ```
+
+### Troubleshoting
+
+In case of any problems regarding pod creation, refer to [Troubleshooting guide](https://cc-enabling.trustedservices.intel.com/intel-confidential-containers-guide/04/troubleshooting/).
