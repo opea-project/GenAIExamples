@@ -126,7 +126,7 @@ As an example we will use the ChatQnA application.
 If you want to just give it a try, simply run:
 
 ```bash
-kubectl apply -f chatqna_tdx.yaml
+kubectl apply -f cpu/xeon/manifest/chatqna_tdx.yaml
 ```
 
 After a few minutes, the ChatQnA services should be up and running in the cluster and all of them will be protected with Intel TDX.
@@ -156,7 +156,7 @@ If you want to have more control over what is protected with Intel TDX or use a 
 
    ```bash
    SERVICES=("llm-uservice")
-   FILE=chatqna.yaml
+   FILE=cpu/xeon/manifest/chatqna.yaml
    for SERVICE in "${SERVICES[@]}"; do
       yq eval '
       (select(.kind == "Deployment" and .metadata.name == "'"$SERVICE"'") | .spec.template.metadata.annotations."io.katacontainers.config.runtime.create_container_timeout") = "800"
