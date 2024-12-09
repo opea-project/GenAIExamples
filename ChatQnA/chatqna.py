@@ -189,8 +189,11 @@ def align_generator(self, gen, **kwargs):
 
 import base64
 from io import BytesIO
+
 import requests
 from PIL import Image
+
+
 def _handle_message(messages):
     images = []
     if isinstance(messages, str):
