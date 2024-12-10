@@ -37,6 +37,9 @@ export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
 export WHISPER_MODEL="base"
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
+export ASR_ENDPOINT=http://$host_ip:7066
+export ASR_SERVICE_PORT=3001
+export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
@@ -95,7 +98,21 @@ docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_pr
 docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
 ```
 
-### 5. Build MegaService Docker Image
+### 5. Build asr images
+
+Build whisper server image
+
+```bash
+docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
+```
+
+Build asr image
+
+```bash
+docker build --no-cache -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile .
+```
+
+### 6. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalqna.py](../../../../multimodalqna.py) Python script. Build MegaService Docker image via below command:
 
@@ -114,16 +131,19 @@ cd  GenAIExamples/MultimodalQnA/ui/
 docker build --no-cache -t opea/multimodalqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 8 Docker Images:
+Then run the command `docker images`, you will have the following 11 Docker Images:
 
 1. `opea/dataprep-multimodal-redis:latest`
 2. `opea/lvm-tgi:latest`
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 4. `opea/retriever-multimodal-redis:latest`
-5. `opea/embedding-multimodal:latest`
-6. `opea/embedding-multimodal-bridgetower:latest`
-7. `opea/multimodalqna:latest`
-8. `opea/multimodalqna-ui:latest`
+5. `opea/whisper:latest`
+6. `opea/asr:latest`
+7. `opea/redis-vector-db`
+8. `opea/embedding-multimodal:latest`
+9. `opea/embedding-multimodal-bridgetower:latest`
+10. `opea/multimodalqna:latest`
+11. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -189,7 +209,16 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
 
-4. TGI LLaVA Gaudi Server
+4. asr
+
+```bash
+curl ${ASR_SERVICE_ENDPOINT} \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"byte_str" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
+```
+
+5. TGI LLaVA Gaudi Server
 
 ```bash
 curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
@@ -198,7 +227,7 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
     -H 'Content-Type: application/json'
 ```
 
-5. lvm-tgi
+6. lvm-tgi
 
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
@@ -223,7 +252,7 @@ curl http://${host_ip}:9399/v1/lvm \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
-6. Multimodal Dataprep Microservice
+7. Multimodal Dataprep Microservice
 
 Download a sample video, image, and audio file and create a caption
 
@@ -297,7 +326,7 @@ curl -X POST \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
-7. MegaService
+8. MegaService
 
 ```bash
 curl http://${host_ip}:8888/v1/multimodalqna \
