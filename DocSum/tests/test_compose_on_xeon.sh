@@ -287,14 +287,14 @@ function main() {
     validate_megaservice_json
 
     echo "==========================================="
-    # echo ">>>> Stopping Docker containers..."
-    # stop_docker
+    echo ">>>> Stopping Docker containers..."
+    stop_docker
 
-    # echo "==========================================="
-    # echo ">>>> Pruning Docker system..."
-    # echo y | docker system prune
-    # echo ">>>> Docker system pruned successfully."
-    # echo "==========================================="
+    echo "==========================================="
+    echo ">>>> Pruning Docker system..."
+    echo y | docker system prune
+    echo ">>>> Docker system pruned successfully."
+    echo "==========================================="
 }
 
 main
