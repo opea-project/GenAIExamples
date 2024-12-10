@@ -6,7 +6,6 @@ import os
 from typing import List
 
 from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
-from comps.cores.mega.gateway import read_text_from_file
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -25,6 +24,41 @@ DATA_SERVICE_PORT = int(os.getenv("DATA_SERVICE_PORT", 7079))
 
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
+
+
+def read_pdf(file):
+    from langchain.document_loaders import PyPDFLoader
+
+    loader = PyPDFLoader(file)
+    docs = loader.load_and_split()
+    return docs
+
+
+def read_text_from_file(file, save_file_name):
+    import docx2txt
+    from langchain.text_splitter import CharacterTextSplitter
+
+    # read text file
+    if file.headers["content-type"] == "text/plain":
+        file.file.seek(0)
+        content = file.file.read().decode("utf-8")
+        # Split text
+        text_splitter = CharacterTextSplitter()
+        texts = text_splitter.split_text(content)
+        # Create multiple documents
+        file_content = texts
+    # read pdf file
+    elif file.headers["content-type"] == "application/pdf":
+        documents = read_pdf(save_file_name)
+        file_content = [doc.page_content for doc in documents]
+    # read docx file
+    elif (
+        file.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        or file.headers["content-type"] == "application/octet-stream"
+    ):
+        file_content = docx2txt.process(save_file_name)
+
+    return file_content
 
 
 class DocSumService(Gateway):
