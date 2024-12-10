@@ -193,7 +193,7 @@ class MultimodalQnAService(Gateway):
         else:
             input_dict = {"byte_str": audio[0]}
 
-        response = requests.post(self.asr_endpoint, data=json.dumps(input_dict), proxies={"http": None})
+        response = requests.post(self.asr_endpoint, data=json.dumps(input_dict))
 
         if response.status_code != 200:
             return JSONResponse(
