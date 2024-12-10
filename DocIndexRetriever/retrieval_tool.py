@@ -145,7 +145,6 @@ class RetrievalToolService(Gateway):
 
         self.megaservice.add(embedding).add(retriever)
         self.megaservice.flow_to(embedding, retriever)
-        self.gateway = RetrievalToolGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
 
 
 if __name__ == "__main__":
