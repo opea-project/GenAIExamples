@@ -48,7 +48,7 @@ function start_service() {
         --ipc=host \
         -e HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN} \
         opea/vllm-gaudi:comps \
-        --enforce-eager --model $LLM_MODEL  --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
+        --model $LLM_MODEL  --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
 
     export vLLM_ENDPOINT="http://${ip_address}:${port_number}"
     docker run -d --rm \
@@ -62,7 +62,7 @@ function start_service() {
 
     # check whether vllm ray is fully ready
     n=0
-    until [[ "$n" -ge 120 ]] || [[ $ready == true ]]; do
+    until [[ "$n" -ge 160 ]] || [[ $ready == true ]]; do
         docker logs test-comps-vllm-service > ${WORKPATH}/tests/test-comps-vllm-service.log
         n=$((n+1))
         if grep -q throughput ${WORKPATH}/tests/test-comps-vllm-service.log; then
