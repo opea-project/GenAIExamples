@@ -1,0 +1,41 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3"
+services:
+  elasticsearch-vector-db:
+    hostname: db
+    container_name: elasticsearch-vector-db
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    restart: always
+    ipc: host
+    environment:
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - bootstrap.memory_lock=false
+      - no_proxy= ${no_proxy}
+      - http_proxy= ${http_proxy}
+      - https_proxy= ${https_proxy}
+
+  dataprep-elasticsearch:
+    image: opea/dataprep-elasticsearch:latest
+    container_name: dataprep-elasticsearch
+    ports:
+      - "6011:6011"
+    ipc: host
+    environment:
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      ES_CONNECTION_STRING: ${ES_CONNECTION_STRING}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

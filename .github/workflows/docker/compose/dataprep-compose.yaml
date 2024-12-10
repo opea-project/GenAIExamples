@@ -63,3 +63,7 @@ services:
     build:
       dockerfile: comps/dataprep/multimedia2text/audio2text/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
+  dataprep-elasticsearch:
+    build:
+      dockerfile: comps/dataprep/elasticsearch/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-elasticsearch:${TAG:-latest}

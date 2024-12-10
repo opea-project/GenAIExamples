@@ -47,3 +47,7 @@ services:
     build:
       dockerfile: comps/retrievers/neo4j/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/retriever-neo4j-llamaindex:${TAG:-latest}
+  retriever-elasticsearch:
+    build:
+      dockerfile: comps/retrievers/elasticsearch/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-elasticsearch:${TAG:-latest}
