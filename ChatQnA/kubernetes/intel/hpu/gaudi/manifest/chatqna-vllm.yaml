@@ -1286,7 +1286,6 @@ spec:
               type: RuntimeDefault
           image: "opea/vllm-gaudi:latest"
           args:
-            - "--enforce-eager"
             - "--model"
             - "$(MODEL_ID)"
             - "--tensor-parallel-size"
