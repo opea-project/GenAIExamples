@@ -95,7 +95,7 @@ services:
     ipc: host
     restart: always
 
-  docsum-ui:
+  docsum-gradio-ui:
     image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
     container_name: docsum-xeon-ui-server
     depends_on:
