@@ -68,6 +68,9 @@ from comps.cores.mega.gateway import (
 # Telemetry
 from comps.cores.telemetry.opea_telemetry import opea_telemetry
 
+# Common
+from comps.cores.common.component import OpeaComponent, OpeaComponentController
+
 # Statistics
 from comps.cores.mega.base_statistics import statistics_dict, register_statistics
 
