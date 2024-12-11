@@ -247,7 +247,8 @@ class DocSumUI:
                     generated_text = gr.TextArea(
                         label="Text Summary", placeholder="Summarized text will be displayed here"
                     )
-            submit_btn.click(fn=self.generate_summary, inputs=[input_text], outputs=[generated_text])
+            submit_btn.click(lambda input_text: self.generate_summary(self.read_url(input_text)), inputs=input_text, outputs=generated_text)
+            # submit_btn.click(fn=self.generate_summary, inputs=[input_text], outputs=[generated_text])
 
         # File Upload UI
         file_ui = self.create_upload_ui(
