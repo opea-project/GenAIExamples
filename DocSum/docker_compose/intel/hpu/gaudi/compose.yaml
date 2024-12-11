@@ -108,8 +108,8 @@ services:
     ipc: host
     restart: always
 
-  docsum-ui:
-    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+  docsum-gradio-ui:
+    image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
     container_name: docsum-gaudi-ui-server
     depends_on:
       - docsum-gaudi-backend-server
