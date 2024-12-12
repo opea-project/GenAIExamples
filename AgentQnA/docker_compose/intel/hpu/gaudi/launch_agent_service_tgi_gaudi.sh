@@ -30,6 +30,6 @@ export SQL_AGENT_URL="http://${ip_address}:9096/v1/chat/completions"
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
 export CRAG_SERVER=http://${ip_address}:8080
 export db_name=california_schools
-export db_path=/home/user/TAG-Bench/dev_folder/dev_databases/${db_name}/${db_name}.sqlite
+export db_path="sqlite:////home/user/TAG-Bench/dev_folder/dev_databases/${db_name}/${db_name}.sqlite"
 
 docker compose -f compose.yaml up -d

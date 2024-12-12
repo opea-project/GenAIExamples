@@ -55,35 +55,35 @@ function stop_retrieval_tool() {
 }
 echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
-# stop_crag
-# stop_llm
+stop_crag
+stop_llm
 stop_agent_docker
-# stop_retrieval_tool
+stop_retrieval_tool
 
 cd $WORKPATH/tests
 
-# echo "=================== #1 Building docker images===================="
-# bash step1_build_images.sh
-# echo "=================== #1 Building docker images completed===================="
+echo "=================== #1 Building docker images===================="
+bash step1_build_images.sh
+echo "=================== #1 Building docker images completed===================="
 
-# echo "=================== #2 Start retrieval tool===================="
-# bash step2_start_retrieval_tool.sh
-# echo "=================== #2 Retrieval tool started===================="
+echo "=================== #2 Start retrieval tool===================="
+bash step2_start_retrieval_tool.sh
+echo "=================== #2 Retrieval tool started===================="
 
-# echo "=================== #3 Ingest data and validate retrieval===================="
-# bash step3_ingest_data_and_validate_retrieval.sh
-# echo "=================== #3 Data ingestion and validation completed===================="
+echo "=================== #3 Ingest data and validate retrieval===================="
+bash step3_ingest_data_and_validate_retrieval.sh
+echo "=================== #3 Data ingestion and validation completed===================="
 
 echo "=================== #4 Start agent and API server===================="
 bash step4_launch_and_validate_agent_tgi.sh
 echo "=================== #4 Agent test passed ===================="
 
-# echo "=================== #5 Stop agent and API server===================="
-# stop_crag
-# stop_agent_docker
-# stop_retrieval_tool
-# echo "=================== #5 Agent and API server stopped===================="
+echo "=================== #5 Stop agent and API server===================="
+stop_crag
+stop_agent_docker
+stop_retrieval_tool
+echo "=================== #5 Agent and API server stopped===================="
 
-# echo y | docker system prune
+echo y | docker system prune
 
 echo "ALL DONE!"

@@ -33,7 +33,6 @@ function start_vllm_service_70B() {
     # redis endpoint
     echo "token is ${HF_TOKEN}"
 
-    #single card
     echo "start vllm gaudi service"
     echo "**************model is $model**************"
     docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:80 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:comps --model ${model} --host 0.0.0.0 --port 80 --block-size 128 --max-seq-len-to-capture 16384 --tensor-parallel-size 4
@@ -74,8 +73,8 @@ function prepare_data() {
 }
 
 function start_agent_and_api_server() {
-    # echo "Starting CRAG server"
-    # docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+    echo "Starting CRAG server"
+    docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
 
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
@@ -99,29 +98,30 @@ function validate() {
 
 function validate_agent_service() {
     # test worker rag agent
-    # echo "======================Testing worker rag agent======================"
-    # export agent_port="9095"
-    # prompt="Tell me about Michael Jackson song Thriller"
-    # local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    # echo $CONTENT
-    # local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
-    # echo $EXIT_CODE
-    # if [ "$EXIT_CODE" == "1" ]; then
-    #     docker logs rag-agent-endpoint
-    #     exit 1
-    # fi
+    echo "======================Testing worker rag agent======================"
+    export agent_port="9095"
+    prompt="Tell me about Michael Jackson song Thriller"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
+    echo $CONTENT
+    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
+    echo $EXIT_CODE
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs rag-agent-endpoint
+        exit 1
+    fi
 
-    # echo "======================Testing worker sql agent======================"
-    # export agent_port="9096"
-    # prompt="How many schools have average math score greater than 560?"
-    # local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    # local EXIT_CODE=$(validate "$CONTENT" "173" "sql-agent-endpoint")
-    # echo $CONTENT
-    # echo $EXIT_CODE
-    # if [ "$EXIT_CODE" == "1" ]; then
-    #     docker logs sql-agent-endpoint
-    #     exit 1
-    # fi
+    # test worker sql agent
+    echo "======================Testing worker sql agent======================"
+    export agent_port="9096"
+    prompt="How many schools have average math score greater than 560?"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
+    local EXIT_CODE=$(validate "$CONTENT" "173" "sql-agent-endpoint")
+    echo $CONTENT
+    echo $EXIT_CODE
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs sql-agent-endpoint
+        exit 1
+    fi
 
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
