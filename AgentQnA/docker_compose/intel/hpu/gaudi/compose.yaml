@@ -15,7 +15,7 @@ services:
       ip_address: ${ip_address}
       strategy: rag_agent_llama
       recursion_limit: ${recursion_limit_worker}
-      llm_engine: tgi
+      llm_engine: vllm
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
       model: ${LLM_MODEL_ID}
@@ -37,7 +37,6 @@ services:
     image: opea/agent-langchain:latest
     container_name: sql-agent-endpoint
     volumes:
-      - ${TOOLSET_PATH}:/home/user/tools/ # tools
       # - ${WORKDIR}/GenAIComps/comps:/home/user/comps # code
       - ${WORKDIR}/TAG-Bench/:/home/user/TAG-Bench # SQL database and hints_file
     ports:
@@ -48,9 +47,9 @@ services:
       strategy: sql_agent_llama
       db_name: ${db_name}
       db_path: ${db_path}
-      use_hints: false #true
+      use_hints: false
       hints_file: /home/user/TAG-Bench/${db_name}_hints.csv
-      recursion_limit: ${recursion_limit}
+      recursion_limit: ${recursion_limit_worker}
       llm_engine: vllm
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
@@ -58,7 +57,6 @@ services:
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
       streaming: false
-      tools: /home/user/tools/custom_tools.yaml #/home/user/tools/sql_agent_tools.yaml # change back to custom_tools.yaml
       require_human_feedback: false
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -98,4 +96,5 @@ services:
       LANGCHAIN_PROJECT: "opea-supervisor-agent-service"
       CRAG_SERVER: $CRAG_SERVER
       WORKER_AGENT_URL: $WORKER_AGENT_URL
+      SQL_AGENT_URL: $SQL_AGENT_URL
       port: 9090

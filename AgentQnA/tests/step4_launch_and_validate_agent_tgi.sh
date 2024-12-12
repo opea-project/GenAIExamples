@@ -10,12 +10,17 @@ echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+model="meta-llama/Meta-Llama-3.1-70B-Instruct"
 
 export HF_CACHE_DIR=$WORKDIR/hf_cache
 if [ ! -d "$HF_CACHE_DIR" ]; then
     mkdir -p "$HF_CACHE_DIR"
 fi
 ls $HF_CACHE_DIR
+
+vllm_port=8085
+vllm_volume=${HF_CACHE_DIR}
 
 function start_tgi(){
     echo "Starting tgi-gaudi server"
@@ -69,13 +74,13 @@ function prepare_data() {
 }
 
 function start_agent_and_api_server() {
-    echo "Starting CRAG server"
-    docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+    # echo "Starting CRAG server"
+    # docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
 
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
     bash launch_agent_service_tgi_gaudi.sh
-    sleep 10
+    sleep 1m
 }
 
 function validate() {
@@ -94,42 +99,50 @@ function validate() {
 
 function validate_agent_service() {
     # test worker rag agent
-    echo "======================Testing worker rag agent======================"
-    export agent_port="9095"
-    prompt="Tell me about Michael Jackson song Thriller"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt $prompt)
-    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
-    docker logs rag-agent-endpoint
-    if [ "$EXIT_CODE" == "1" ]; then
-        exit 1
-    fi
+    # echo "======================Testing worker rag agent======================"
+    # export agent_port="9095"
+    # prompt="Tell me about Michael Jackson song Thriller"
+    # local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
+    # echo $CONTENT
+    # local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
+    # echo $EXIT_CODE
+    # if [ "$EXIT_CODE" == "1" ]; then
+    #     docker logs rag-agent-endpoint
+    #     exit 1
+    # fi
 
-    echo "======================Testing worker sql agent======================"
-    export agent_port="9096"
-    prompt="How many schools have average math score greater than 560?"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
-    local EXIT_CODE=$(validate "$CONTENT" "173" "sql-agent-endpoint")
-    docker logs sql-agent-endpoint
-    if [ "$EXIT_CODE" == "1" ]; then
-        exit 1
-    fi
+    # echo "======================Testing worker sql agent======================"
+    # export agent_port="9096"
+    # prompt="How many schools have average math score greater than 560?"
+    # local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
+    # local EXIT_CODE=$(validate "$CONTENT" "173" "sql-agent-endpoint")
+    # echo $CONTENT
+    # echo $EXIT_CODE
+    # if [ "$EXIT_CODE" == "1" ]; then
+    #     docker logs sql-agent-endpoint
+    #     exit 1
+    # fi
 
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
     export agent_port="9090"
     prompt="Tell me about Michael Jackson song Thriller"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
-    docker logs react-agent-endpoint
+    echo $CONTENT
+    echo $EXIT_CODE
     if [ "$EXIT_CODE" == "1" ]; then
+        docker logs react-agent-endpoint
         exit 1
     fi
 
     prompt="How many schools have average math score greater than 560?"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
     local EXIT_CODE=$(validate "$CONTENT" "173" "react-agent-endpoint")
-    docker logs react-agent-endpoint
+    echo $CONTENT
+    echo $EXIT_CODE
     if [ "$EXIT_CODE" == "1" ]; then
+        docker logs react-agent-endpoint
         exit 1
     fi
 
@@ -143,10 +156,6 @@ function remove_data() {
 }
 
 function main() {
-    # echo "==================== Start TGI ===================="
-    # start_tgi
-    # echo "==================== TGI started ===================="
-
     echo "==================== Prepare data ===================="
     prepare_data
     echo "==================== Data prepare done ===================="

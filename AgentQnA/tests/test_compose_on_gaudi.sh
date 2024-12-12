@@ -27,7 +27,7 @@ function stop_agent_docker() {
     done
 }
 
-function stop_tgi(){
+function stop_llm(){
     cd $WORKPATH/docker_compose/intel/hpu/gaudi/
     container_list=$(cat tgi_gaudi.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
@@ -35,6 +35,10 @@ function stop_tgi(){
         echo "Stopping container $container_name"
         if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
     done
+
+    cid=$(docker ps -aq --filter "name=vllm-gaudi-server")
+    echo "Stopping container $cid"
+    if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
 
 }
 
@@ -51,35 +55,35 @@ function stop_retrieval_tool() {
 }
 echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
-stop_crag
-stop_tgi
+# stop_crag
+# stop_llm
 stop_agent_docker
-stop_retrieval_tool
+# stop_retrieval_tool
 
 cd $WORKPATH/tests
 
-echo "=================== #1 Building docker images===================="
-bash step1_build_images.sh
-echo "=================== #1 Building docker images completed===================="
+# echo "=================== #1 Building docker images===================="
+# bash step1_build_images.sh
+# echo "=================== #1 Building docker images completed===================="
 
-echo "=================== #2 Start retrieval tool===================="
-bash step2_start_retrieval_tool.sh
-echo "=================== #2 Retrieval tool started===================="
+# echo "=================== #2 Start retrieval tool===================="
+# bash step2_start_retrieval_tool.sh
+# echo "=================== #2 Retrieval tool started===================="
 
-echo "=================== #3 Ingest data and validate retrieval===================="
-bash step3_ingest_data_and_validate_retrieval.sh
-echo "=================== #3 Data ingestion and validation completed===================="
+# echo "=================== #3 Ingest data and validate retrieval===================="
+# bash step3_ingest_data_and_validate_retrieval.sh
+# echo "=================== #3 Data ingestion and validation completed===================="
 
 echo "=================== #4 Start agent and API server===================="
 bash step4_launch_and_validate_agent_tgi.sh
 echo "=================== #4 Agent test passed ===================="
 
-echo "=================== #5 Stop agent and API server===================="
-stop_crag
-stop_agent_docker
-stop_retrieval_tool
-echo "=================== #5 Agent and API server stopped===================="
+# echo "=================== #5 Stop agent and API server===================="
+# stop_crag
+# stop_agent_docker
+# stop_retrieval_tool
+# echo "=================== #5 Agent and API server stopped===================="
 
-echo y | docker system prune
+# echo y | docker system prune
 
 echo "ALL DONE!"

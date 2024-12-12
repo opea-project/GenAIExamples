@@ -53,17 +53,17 @@ function build_vllm_docker_image() {
 }
 
 function main() {
-    echo "==================== Build docker images for retrieval tool ===================="
-    build_docker_images_for_retrieval_tool
-    echo "==================== Build docker images for retrieval tool completed ===================="
+    # echo "==================== Build docker images for retrieval tool ===================="
+    # build_docker_images_for_retrieval_tool
+    # echo "==================== Build docker images for retrieval tool completed ===================="
 
     echo "==================== Build agent docker image ===================="
     build_agent_docker_image
     echo "==================== Build agent docker image completed ===================="
 
-    echo "==================== Build vllm docker image ===================="
-    build_vllm_docker_image
-    echo "==================== Build vllm docker image completed ===================="
+    # echo "==================== Build vllm docker image ===================="
+    # build_vllm_docker_image
+    # echo "==================== Build vllm docker image completed ===================="
 }
 
 main

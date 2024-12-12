@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to the worker agent and other tools to gather information and come up with answers. The worker agent uses the retrieval tool to generate answers to the queries posted by the supervisor agent. Other tools used by the supervisor agent may include APIs to interface knowledge graphs, SQL databases, external knowledge bases, etc.
+This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from the knowledge base (a vector database). The worker SQL agent retrieve relevant data from the SQL database. Although not included in this example, but other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
 ![Architecture Overview](assets/agent_qna_arch.png)
 
 The AgentQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
@@ -75,11 +75,11 @@ flowchart LR
 ### Why Agent for question answering?
 
 1. Improve relevancy of retrieved context.
-   Agent can rephrase user queries, decompose user queries, and iterate to get the most relevant context for answering user's questions. Compared to conventional RAG, RAG agent can significantly improve the correctness and relevancy of the answer.
-2. Use tools to get additional knowledge.
-   For example, knowledge graphs and SQL databases can be exposed as APIs for Agents to gather knowledge that may be missing in the retrieval vector database.
-3. Hierarchical agent can further improve performance.
-   Expert worker agents, such as retrieval agent, knowledge graph agent, SQL agent, etc., can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information together to provide a comprehensive answer.
+   RAG agent can rephrase user queries, decompose user queries, and iterate to get the most relevant context for answering user's questions. Compared to conventional RAG, RAG agent can significantly improve the correctness and relevancy of the answer.
+2. Expand scope of the agent.
+   The supervisor agent can interact with multiple worker agents that specialize in different domains with different skills (e.g., retrieve documents, write SQL queries, etc.), and thus can answer questions in multiple domains. 
+3. Hierarchical multi-agents can further improve performance.
+   Expert worker agents, such as RAG agent and SQL agent, can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information together to provide a comprehensive answer. If we only use one agent and provide all the tools to this single agent, it may get overwhelmed and not able to provide accurate answers.
 
 ## Deployment with docker
 
@@ -148,14 +148,26 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
    bash run_ingest_data.sh
    ```
 
-4. Launch other tools. </br>
+4. Prepare SQL database
+   In this example, we will use the SQLite database provided in the [TAG-Bench](https://github.com/TAG-Research/TAG-Bench/tree/main). Run the commands below.
+
+   ```
+   # Download data
+   cd $WORKDIR
+   git clone https://github.com/TAG-Research/TAG-Bench.git
+   cd TAG-Bench/setup
+   chmod +x get_dbs.sh
+   ./get_dbs.sh
+   ```
+
+5. Launch other tools. </br>
    In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
 
    ```
    docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
    ```
 
-5. Launch agent services</br>
+6. Launch agent services</br>
    We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
 
    Deploy it on Gaudi or Xeon respectively
@@ -164,12 +176,25 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
    :::{tab-item} Gaudi
    :sync: Gaudi
 
-   To use open-source LLMs on Gaudi2, run commands below.
+   We provide instructions on two methods to server LLM on Gaudi2: 1) tgi-gaudi, 2) vllm. To use open-source LLMs on Gaudi2 with tgi-gaudi, run commands below. By default, we will server `meta-llama/Meta-Llama-3.1-70B-Instruct`.
 
    ```
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
    bash launch_tgi_gaudi.sh
    bash launch_agent_service_tgi_gaudi.sh
+   ```
+   To use open-source LLMs on Gaudi2 with vllm, run commands below. First build vllm-gaudi docker image.
+   ```
+   cd $WORKDIR
+   git clone https://github.com/HabanaAI/vllm-fork.git
+   cd ./vllm-fork
+   docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+   ```
+   Then launch vllm on Gaudi2 with the command below.
+   ```bash
+   vllm_port=8086 # choose a port that is available
+   model="meta-llama/Meta-Llama-3.1-70B-Instruct"
+   docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:80 -v $HF_CACHE_DIR:/data -e HF_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model ${model} --host 0.0.0.0 --port 80 --block-size 128 --max-seq-len-to-capture 16384 --tensor-parallel-size 4
    ```
 
    :::
@@ -206,7 +231,7 @@ Second, validate worker agent:
 
 ```
 curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Most recent album by Taylor Swift"
+     "query": "Michael Jackson song Thriller"
     }'
 ```
 
@@ -214,7 +239,7 @@ Third, validate supervisor agent:
 
 ```
 curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Most recent album by Taylor Swift"
+     "query": "Michael Jackson song Thriller"
     }'
 ```
 
