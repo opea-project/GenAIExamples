@@ -113,9 +113,14 @@ class DocSumUI:
 
         logger.info(">>> Reading url: %s", url)
         if self.is_valid_url(url=url):
-            loader = UnstructuredURLLoader([url])
-            page = loader.load()
-            self.page_content = [content.page_content for content in page][0]
+            os.environ['no_proxy'] = f"{os.environ.get('no_proxy', '')},{url}".strip(',')
+            try:
+                loader = UnstructuredURLLoader([url])
+                page = loader.load()
+                self.page_content = [content.page_content for content in page][0]
+            except Exception as e:
+                msg = f"There was an error trying to read '{url}' --> '{e}'\nTry adding the domain name to your `no_proxy` variable and try again. Example: example.com*"
+                logger.error(msg)
         else:
             msg = f"Invalid URL '{url}'. Make sure the link provided is a valid URL.url"
             logger.error(msg)
@@ -185,6 +190,7 @@ class DocSumUI:
 
         except requests.exceptions.RequestException as e:
             logger.error("Request exception: %s", e)
+            print("")
             return str(e)
 
         return str(response.status_code)
@@ -248,7 +254,6 @@ class DocSumUI:
                         label="Text Summary", placeholder="Summarized text will be displayed here"
                     )
             submit_btn.click(lambda input_text: self.generate_summary(self.read_url(input_text)), inputs=input_text, outputs=generated_text)
-            # submit_btn.click(fn=self.generate_summary, inputs=[input_text], outputs=[generated_text])
 
         # File Upload UI
         file_ui = self.create_upload_ui(
