@@ -24,6 +24,50 @@ function start_tgi(){
 
 }
 
+function start_vllm_service_70B() {
+    # redis endpoint
+    echo "token is ${HF_TOKEN}"
+
+    #single card
+    echo "start vllm gaudi service"
+    echo "**************model is $model**************"
+    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:80 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:comps --model ${model} --host 0.0.0.0 --port 80 --block-size 128 --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+    sleep 5s
+    echo "Waiting vllm gaudi ready"
+    n=0
+    until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+        docker logs vllm-gaudi-server &> ${WORKPATH}/vllm-gaudi-service.log
+        n=$((n+1))
+        if grep -q "Uvicorn running on" ${WORKPATH}/vllm-gaudi-service.log; then
+            break
+        fi
+        if grep -q "No such container" ${WORKPATH}/vllm-gaudi-service.log; then
+            echo "container vllm-gaudi-server not found"
+            exit 1
+        fi
+        sleep 5s
+    done
+    sleep 5s
+    echo "Service started successfully"
+}
+
+
+function prepare_data() {
+    cd $WORKDIR
+
+    echo "Downloading data..."
+    git clone https://github.com/TAG-Research/TAG-Bench.git
+    cd TAG-Bench/setup
+    chmod +x get_dbs.sh
+    ./get_dbs.sh
+
+    echo "Split data..."
+    cd $WORKPATH/tests/sql_agent_test
+    bash run_data_split.sh
+
+    echo "Data preparation done!"
+}
+
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
     docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
@@ -49,22 +93,31 @@ function validate() {
 }
 
 function validate_agent_service() {
-    echo "----------------Test agent ----------------"
-    # local CONTENT=$(http_proxy="" curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-    #  "query": "Tell me about Michael Jackson song thriller"
-    # }')
+    # test worker rag agent
+    echo "======================Testing worker rag agent======================"
     export agent_port="9095"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
+    prompt="Tell me about Michael Jackson song Thriller"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt $prompt)
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
     docker logs rag-agent-endpoint
     if [ "$EXIT_CODE" == "1" ]; then
         exit 1
     fi
 
-    # local CONTENT=$(http_proxy="" curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-    #  "query": "Tell me about Michael Jackson song thriller"
-    # }')
+    echo "======================Testing worker sql agent======================"
+    export agent_port="9096"
+    prompt="How many schools have average math score greater than 560?"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
+    local EXIT_CODE=$(validate "$CONTENT" "173" "sql-agent-endpoint")
+    docker logs sql-agent-endpoint
+    if [ "$EXIT_CODE" == "1" ]; then
+        exit 1
+    fi
+
+    # test supervisor react agent
+    echo "======================Testing supervisor react agent======================"
     export agent_port="9090"
+    prompt="Tell me about Michael Jackson song Thriller"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
     docker logs react-agent-endpoint
@@ -72,12 +125,35 @@ function validate_agent_service() {
         exit 1
     fi
 
+    prompt="How many schools have average math score greater than 560?"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py)
+    local EXIT_CODE=$(validate "$CONTENT" "173" "react-agent-endpoint")
+    docker logs react-agent-endpoint
+    if [ "$EXIT_CODE" == "1" ]; then
+        exit 1
+    fi
+
+}
+
+function remove_data() {
+    echo "Removing data..."
+    cd $WORKDIR
+    rm -rf TAG-Bench
+    echo "Data removed!"
 }
 
 function main() {
-    echo "==================== Start TGI ===================="
-    start_tgi
-    echo "==================== TGI started ===================="
+    # echo "==================== Start TGI ===================="
+    # start_tgi
+    # echo "==================== TGI started ===================="
+
+    echo "==================== Prepare data ===================="
+    prepare_data
+    echo "==================== Data prepare done ===================="
+
+    echo "==================== Start VLLM service ===================="
+    start_vllm_service_70B
+    echo "==================== VLLM service started ===================="
 
     echo "==================== Start agent ===================="
     start_agent_and_api_server
@@ -89,3 +165,4 @@ function main() {
 }
 
 main
+remove_data
