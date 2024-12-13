@@ -6,6 +6,7 @@ import os
 from typing import List
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
+from comps.cores.mega.utils import handle_message
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -14,7 +15,6 @@ from comps.cores.proto.api_protocol import (
     UsageInfo,
 )
 from comps.cores.proto.docarray import LLMParams
-from comps.cores.mega.utils import handle_message
 from fastapi import File, Request, UploadFile
 from fastapi.responses import StreamingResponse
 
