@@ -5,7 +5,7 @@ import asyncio
 import os
 from typing import List
 
-from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType, ServiceRoleType
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -14,6 +14,7 @@ from comps.cores.proto.api_protocol import (
     UsageInfo,
 )
 from comps.cores.proto.docarray import LLMParams
+from comps.cores.proto.mega.utils import handle_message
 from fastapi import File, Request, UploadFile
 from fastapi.responses import StreamingResponse
 
@@ -57,11 +58,12 @@ def read_text_from_file(file, save_file_name):
     return file_content
 
 
-class FaqGenService(Gateway):
+class FaqGenService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
         self.megaservice = ServiceOrchestrator()
+        self.endpoint = str(MegaServiceEndpoint.FAQ_GEN)
 
     def add_remote_service(self):
         llm = MicroService(
@@ -95,9 +97,9 @@ class FaqGenService(Gateway):
                     file_summaries.append(docs)
 
         if file_summaries:
-            prompt = self._handle_message(chat_request.messages) + "\n".join(file_summaries)
+            prompt = handle_message(chat_request.messages) + "\n".join(file_summaries)
         else:
-            prompt = self._handle_message(chat_request.messages)
+            prompt = handle_message(chat_request.messages)
 
         parameters = LLMParams(
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
@@ -135,14 +137,17 @@ class FaqGenService(Gateway):
         return ChatCompletionResponse(model="faqgen", choices=choices, usage=usage)
 
     def start(self):
-        super().__init__(
-            megaservice=self.megaservice,
+        self.service = MicroService(
+            self.__class__.__name__,
+            service_role=ServiceRoleType.MEGASERVICE,
             host=self.host,
             port=self.port,
-            endpoint=str(MegaServiceEndpoint.FAQ_GEN),
+            endpoint=self.endpoint,
             input_datatype=ChatCompletionRequest,
             output_datatype=ChatCompletionResponse,
         )
+        self.service.add_route(self.endpoint, self.handle_request, methods=["POST"])
+        self.service.start()
 
 
 if __name__ == "__main__":

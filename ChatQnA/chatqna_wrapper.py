@@ -3,7 +3,7 @@
 
 import os
 
-from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType, ServiceRoleType
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -12,6 +12,7 @@ from comps.cores.proto.api_protocol import (
     UsageInfo,
 )
 from comps.cores.proto.docarray import LLMParams, RerankerParms, RetrieverParms
+from comps.cores.proto.mega.utils import handle_message
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
@@ -27,11 +28,12 @@ LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
 
-class ChatQnAService(Gateway):
+class ChatQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
         self.megaservice = ServiceOrchestrator()
+        self.endpoint = str(MegaServiceEndpoint.CHAT_QNA)
 
     def add_remote_service(self):
         embedding = MicroService(
@@ -75,7 +77,7 @@ class ChatQnAService(Gateway):
         data = await request.json()
         stream_opt = data.get("stream", True)
         chat_request = ChatCompletionRequest.parse_obj(data)
-        prompt = self._handle_message(chat_request.messages)
+        prompt = handle_message(chat_request.messages)
         parameters = LLMParams(
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
@@ -121,15 +123,17 @@ class ChatQnAService(Gateway):
         return ChatCompletionResponse(model="chatqna", choices=choices, usage=usage)
 
     def start(self):
-
-        super().__init__(
-            megaservice=self.megaservice,
+        self.service = MicroService(
+            self.__class__.__name__,
+            service_role=ServiceRoleType.MEGASERVICE,
             host=self.host,
             port=self.port,
-            endpoint=str(MegaServiceEndpoint.CHAT_QNA),
+            endpoint=self.endpoint,
             input_datatype=ChatCompletionRequest,
             output_datatype=ChatCompletionResponse,
         )
+        self.service.add_route(self.endpoint, self.handle_request, methods=["POST"])
+        self.service.start()
 
 
 if __name__ == "__main__":
