@@ -12,7 +12,7 @@ from comps.cores.proto.api_protocol import (
     UsageInfo,
 )
 from comps.cores.proto.docarray import LLMParams, RerankerParms, RetrieverParms
-from comps.cores.proto.mega.utils import handle_message
+from comps.cores.mega.utils import handle_message
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
