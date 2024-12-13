@@ -6,13 +6,13 @@ import base64
 import json
 import logging
 import os
+from urllib.parse import urlparse
 
 import gradio as gr
 import requests
 import uvicorn
 from fastapi import FastAPI
 from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader, UnstructuredURLLoader
-from urllib.parse import urlparse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -91,7 +91,7 @@ class DocSumUI:
         logger.info(">>> Reading video file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
         return self.generate_summary(base64_str, document_type="video")
-    
+
     def is_valid_url(self, url):
         try:
             result = urlparse(url)
@@ -113,7 +113,7 @@ class DocSumUI:
 
         logger.info(">>> Reading url: %s", url)
         if self.is_valid_url(url=url):
-            os.environ['no_proxy'] = f"{os.environ.get('no_proxy', '')},{url}".strip(',')
+            os.environ["no_proxy"] = f"{os.environ.get('no_proxy', '')},{url}".strip(",")
             try:
                 loader = UnstructuredURLLoader([url])
                 page = loader.load()
@@ -125,9 +125,8 @@ class DocSumUI:
             msg = f"Invalid URL '{url}'. Make sure the link provided is a valid URL.url"
             logger.error(msg)
             return msg
-        
-        return self.page_content
 
+        return self.page_content
 
     def generate_summary(self, doc_content, document_type="text"):
         """Generate a summary for the given document content.
@@ -253,7 +252,11 @@ class DocSumUI:
                     generated_text = gr.TextArea(
                         label="Text Summary", placeholder="Summarized text will be displayed here"
                     )
-            submit_btn.click(lambda input_text: self.generate_summary(self.read_url(input_text)), inputs=input_text, outputs=generated_text)
+            submit_btn.click(
+                lambda input_text: self.generate_summary(self.read_url(input_text)),
+                inputs=input_text,
+                outputs=generated_text,
+            )
 
         # File Upload UI
         file_ui = self.create_upload_ui(
