@@ -3,6 +3,7 @@
 
 import asyncio
 import json
+import multiprocessing
 import time
 import unittest
 
@@ -34,13 +35,15 @@ async def s1_add(request: TextDoc) -> TextDoc:
 class TestBaseStatistics(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.s1 = opea_microservices["s1"]
-        self.s1.start()
+        self.process1 = multiprocessing.Process(target=self.s1.start, daemon=False, name="s1")
+        self.process1.start()
 
         self.service_builder = ServiceOrchestrator()
         self.service_builder.add(opea_microservices["s1"])
 
     def tearDown(self):
         self.s1.stop()
+        self.process1.terminate()
 
     async def test_base_statistics(self):
         for _ in range(2):

@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import multiprocessing
 import unittest
 
 from comps import ServiceOrchestrator, opea_microservices, register_microservice
@@ -16,7 +17,8 @@ async def s1_add(request: ChatCompletionRequest) -> ChatCompletionRequest:
 class TestServiceOrchestratorProtocol(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.s1 = opea_microservices["s1"]
-        self.s1.start()
+        self.process1 = multiprocessing.Process(target=self.s1.start, daemon=False, name="s1")
+        self.process1.start()
 
         self.service_builder = ServiceOrchestrator()
 
@@ -24,6 +26,7 @@ class TestServiceOrchestratorProtocol(unittest.IsolatedAsyncioTestCase):
 
     def tearDown(self):
         self.s1.stop()
+        self.process1.terminate()
 
     async def test_schedule(self):
         input_data = ChatCompletionRequest(messages=[{"role": "user", "content": "What's up man?"}], seed=None)

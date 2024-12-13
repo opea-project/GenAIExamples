@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
+import multiprocessing
 import unittest
 from enum import Enum
 
@@ -67,10 +68,12 @@ async def fetch(session, url, data):
 
 class TestMicroService(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        opea_microservices["s1"].start()
+        self.process1 = multiprocessing.Process(target=opea_microservices["s1"].start, daemon=False, name="s1")
+        self.process1.start()
 
     def tearDown(self):
         opea_microservices["s1"].stop()
+        self.process1.terminate()
 
     async def test_dynamic_batching(self):
         url1 = "http://localhost:8080/v1/add1"

@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import multiprocessing
 import unittest
 
-from comps import EmbedDoc, Gateway, ServiceOrchestrator, TextDoc, opea_microservices, register_microservice
+from comps import EmbedDoc, ServiceOrchestrator, TextDoc, opea_microservices, register_microservice
 from comps.cores.mega.constants import ServiceType
 from comps.cores.proto.docarray import RerankerParms, RetrieverParms
 
@@ -45,8 +46,12 @@ class TestServiceOrchestratorParams(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.s1 = opea_microservices["s1"]
         self.s2 = opea_microservices["s2"]
-        self.s1.start()
-        self.s2.start()
+
+        self.process1 = multiprocessing.Process(target=self.s1.start, daemon=False, name="s1")
+        self.process2 = multiprocessing.Process(target=self.s2.start, daemon=False, name="s2")
+
+        self.process1.start()
+        self.process2.start()
 
         ServiceOrchestrator.align_inputs = align_inputs
         ServiceOrchestrator.align_outputs = align_outputs
@@ -54,12 +59,12 @@ class TestServiceOrchestratorParams(unittest.IsolatedAsyncioTestCase):
 
         self.service_builder.add(opea_microservices["s1"]).add(opea_microservices["s2"])
         self.service_builder.flow_to(self.s1, self.s2)
-        self.gateway = Gateway(self.service_builder, port=9898)
 
     def tearDown(self):
         self.s1.stop()
         self.s2.stop()
-        self.gateway.stop()
+        self.process1.terminate()
+        self.process2.terminate()
 
     async def test_retriever_schedule(self):
         result_dict, _ = await self.service_builder.schedule(

@@ -14,6 +14,7 @@
 
 import asyncio
 import json
+import multiprocessing
 import time
 import unittest
 
@@ -55,9 +56,14 @@ class TestServiceOrchestrator(unittest.IsolatedAsyncioTestCase):
         self.s1 = opea_microservices["s1"]
         self.s2 = opea_microservices["s2"]
         self.s3 = opea_microservices["s3"]
-        self.s1.start()
-        self.s2.start()
-        self.s3.start()
+
+        self.process1 = multiprocessing.Process(target=self.s1.start, daemon=False, name="s1")
+        self.process2 = multiprocessing.Process(target=self.s2.start, daemon=False, name="s2")
+        self.process3 = multiprocessing.Process(target=self.s3.start, daemon=False, name="s2")
+
+        self.process1.start()
+        self.process2.start()
+        self.process3.start()
 
         self.service_builder = ServiceOrchestrator()
 
@@ -69,6 +75,10 @@ class TestServiceOrchestrator(unittest.IsolatedAsyncioTestCase):
         self.s1.stop()
         self.s2.stop()
         self.s3.stop()
+
+        self.process1.terminate()
+        self.process2.terminate()
+        self.process3.terminate()
 
     async def test_schedule(self):
         t = time.time()

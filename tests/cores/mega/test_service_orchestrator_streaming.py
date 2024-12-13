@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import multiprocessing
 import time
 import unittest
 
@@ -38,8 +39,10 @@ class TestServiceOrchestratorStreaming(unittest.IsolatedAsyncioTestCase):
     def setUpClass(cls):
         cls.s0 = opea_microservices["s0"]
         cls.s1 = opea_microservices["s1"]
-        cls.s0.start()
-        cls.s1.start()
+        cls.process1 = multiprocessing.Process(target=cls.s0.start, daemon=False, name="s0")
+        cls.process2 = multiprocessing.Process(target=cls.s1.start, daemon=False, name="s1")
+        cls.process1.start()
+        cls.process2.start()
 
         cls.service_builder = ServiceOrchestrator()
 
@@ -50,6 +53,8 @@ class TestServiceOrchestratorStreaming(unittest.IsolatedAsyncioTestCase):
     def tearDownClass(cls):
         cls.s0.stop()
         cls.s1.stop()
+        cls.process1.terminate()
+        cls.process2.terminate()
 
     async def test_schedule(self):
         result_dict, _ = await self.service_builder.schedule(initial_inputs={"text": "hello, "})

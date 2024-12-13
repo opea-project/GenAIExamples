@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import multiprocessing
 import unittest
 
 from fastapi.testclient import TestClient
@@ -54,10 +55,15 @@ class TestMicroService(unittest.IsolatedAsyncioTestCase):
         self.s3 = opea_microservices["s3"]
         self.s4 = opea_microservices["s4"]
 
-        self.s1.start()
-        self.s2.start()
-        self.s3.start()
-        self.s4.start()
+        self.process1 = multiprocessing.Process(target=self.s1.start, daemon=False, name="s1")
+        self.process2 = multiprocessing.Process(target=self.s2.start, daemon=False, name="s2")
+        self.process3 = multiprocessing.Process(target=self.s3.start, daemon=False, name="s3")
+        self.process4 = multiprocessing.Process(target=self.s4.start, daemon=False, name="s4")
+
+        self.process1.start()
+        self.process2.start()
+        self.process3.start()
+        self.process4.start()
 
         self.service_builder = ServiceOrchestrator()
         self.service_builder.add(self.s1).add(self.s2).add(self.s3).add(self.s4)
@@ -70,6 +76,10 @@ class TestMicroService(unittest.IsolatedAsyncioTestCase):
         self.s2.stop()
         self.s3.stop()
         self.s4.stop()
+        self.process1.terminate()
+        self.process2.terminate()
+        self.process3.terminate()
+        self.process4.terminate()
 
     async def test_add_route(self):
         result_dict, runtime_graph = await self.service_builder.schedule(initial_inputs={"text": "Hi!"})

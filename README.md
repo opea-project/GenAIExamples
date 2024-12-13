@@ -125,20 +125,6 @@ class ExampleService:
         self.megaservice.flow_to(embedding, llm)
 ```
 
-## Gateway
-
-The `Gateway` serves as the interface for users to access the `Megaservice`, providing customized access based on user requirements. It acts as the entry point for incoming requests, routing them to the appropriate `Microservices` within the `Megaservice` architecture.
-
-`Gateways` support API definition, API versioning, rate limiting, and request transformation, allowing for fine-grained control over how users interact with the underlying `Microservices`. By abstracting the complexity of the underlying infrastructure, `Gateways` provide a seamless and user-friendly experience for interacting with the `Megaservice`.
-
-For example, the `Gateway` for `ChatQnA` can be built like this:
-
-```python
-from comps import ChatQnAGateway
-
-self.gateway = ChatQnAGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
-```
-
 ## Contributing to OPEA
 
 Welcome to the OPEA open-source community! We are thrilled to have you here and excited about the potential contributions you can bring to the OPEA platform. Whether you are fixing bugs, adding new GenAI components, improving documentation, or sharing your unique use cases, your contributions are invaluable.

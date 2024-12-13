@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import multiprocessing
 import unittest
 
 from comps import ServiceOrchestratorWithYaml, TextDoc, opea_microservices, register_microservice
@@ -19,10 +20,12 @@ async def s1_add(request: TextDoc) -> TextDoc:
 class TestYAMLOrchestrator(unittest.TestCase):
     def setUp(self) -> None:
         self.s1 = opea_microservices["s1"]
-        self.s1.start()
+        self.process1 = multiprocessing.Process(target=self.s1.start, daemon=False, name="s1")
+        self.process1.start()
 
     def tearDown(self):
         self.s1.stop()
+        self.process1.terminate()
 
     def test_add_remote_service(self):
         service_builder = ServiceOrchestratorWithYaml(yaml_file_path="megaservice_hybrid.yaml")
