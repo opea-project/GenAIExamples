@@ -76,7 +76,7 @@ class VideoQnAService:
         data = await request.json()
         stream_opt = data.get("stream", False)
         chat_request = ChatCompletionRequest.parse_obj(data)
-        prompt = self._handle_message(chat_request.messages)
+        prompt = handle_message(chat_request.messages)
         parameters = LLMParams(
             max_new_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
