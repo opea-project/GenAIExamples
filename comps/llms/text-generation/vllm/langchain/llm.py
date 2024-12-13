@@ -7,6 +7,7 @@ from typing import Union
 from fastapi.responses import StreamingResponse
 from langchain_community.llms import VLLMOpenAI
 from langchain_core.prompts import PromptTemplate
+from openai import OpenAI
 from template import ChatTemplate
 
 from comps import (
@@ -194,6 +195,98 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
                 logger.info(response)
 
             return GeneratedDoc(text=response, prompt=input.query)
+    else:
+        if logflag:
+            logger.info("[ ChatCompletionRequest ] input in opea format")
+        client = OpenAI(
+            api_key="EMPTY",
+            base_url=llm_endpoint + "/v1",
+        )
+
+        if isinstance(input.messages, str):
+            prompt = input.messages
+            if prompt_template:
+                if sorted(input_variables) == ["context", "question"]:
+                    prompt = prompt_template.format(question=input.messages, context="\n".join(input.documents))
+                elif input_variables == ["question"]:
+                    prompt = prompt_template.format(question=input.messages)
+                else:
+                    logger.info(
+                        f"[ ChatCompletionRequest ] {prompt_template} not used, we only support 2 input variables ['question', 'context']"
+                    )
+            else:
+                if input.documents:
+                    # use rag default template
+                    prompt = ChatTemplate.generate_rag_prompt(input.messages, input.documents, input.model)
+
+            chat_completion = client.completions.create(
+                model=model_name,
+                prompt=prompt,
+                echo=input.echo,
+                frequency_penalty=input.frequency_penalty,
+                max_tokens=input.max_tokens,
+                n=input.n,
+                presence_penalty=input.presence_penalty,
+                seed=input.seed,
+                stop=input.stop,
+                stream=input.stream,
+                suffix=input.suffix,
+                temperature=input.temperature,
+                top_p=input.top_p,
+                user=input.user,
+            )
+        else:
+            if input.messages[0]["role"] == "system":
+                if "{context}" in input.messages[0]["content"]:
+                    if input.documents is None or input.documents == []:
+                        input.messages[0]["content"].format(context="")
+                    else:
+                        input.messages[0]["content"].format(context="\n".join(input.documents))
+            else:
+                if prompt_template:
+                    system_prompt = prompt_template
+                    if input_variables == ["context"]:
+                        system_prompt = prompt_template.format(context="\n".join(input.documents))
+                    else:
+                        logger.info(
+                            f"[ ChatCompletionRequest ] {prompt_template} not used, only support 1 input variables ['context']"
+                        )
+
+                    input.messages.insert(0, {"role": "system", "content": system_prompt})
+
+            chat_completion = client.chat.completions.create(
+                model=model_name,
+                messages=input.messages,
+                frequency_penalty=input.frequency_penalty,
+                max_tokens=input.max_tokens,
+                n=input.n,
+                presence_penalty=input.presence_penalty,
+                response_format=input.response_format,
+                seed=input.seed,
+                stop=input.stop,
+                stream=input.stream,
+                stream_options=input.stream_options,
+                temperature=input.temperature,
+                top_p=input.top_p,
+                user=input.user,
+            )
+
+        if input.stream:
+
+            def stream_generator():
+                for c in chat_completion:
+                    if logflag:
+                        logger.info(c)
+                    chunk = c.model_dump_json()
+                    if chunk not in ["<|im_end|>", "<|endoftext|>"]:
+                        yield f"data: {chunk}\n\n"
+                yield "data: [DONE]\n\n"
+
+            return StreamingResponse(stream_generator(), media_type="text/event-stream")
+        else:
+            if logflag:
+                logger.info(chat_completion)
+            return chat_completion
 
 
 if __name__ == "__main__":
