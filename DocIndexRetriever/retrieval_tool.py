@@ -6,7 +6,7 @@ import asyncio
 import os
 from typing import Union
 
-from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType, ServiceRoleType
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.proto.api_protocol import ChatCompletionRequest, EmbeddingRequest
 from comps.cores.proto.docarray import LLMParamsDoc, RerankedDoc, RerankerParms, RetrieverParms, TextDoc
 from fastapi import Request

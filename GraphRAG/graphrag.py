@@ -6,7 +6,8 @@ import json
 import os
 import re
 
-from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType, ServiceRoleType
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
+from comps.cores.mega.utils import handle_message
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -16,7 +17,6 @@ from comps.cores.proto.api_protocol import (
     UsageInfo,
 )
 from comps.cores.proto.docarray import LLMParams, RetrieverParms, TextDoc
-from comps.cores.mega.utils import handle_message
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
