@@ -24,13 +24,19 @@ Follow the below steps on the Xeon server node to deploy the example application
    sudo systemctl daemon-reload && sudo systemctl restart kubelet
    ```
    
-5. Deploy ChatQnA:
+5. Change directory:
 
    ```bash
-   kubectl apply -f cpu/xeon/manifest/chatqna_tdx.yaml
+   cd GenAIExamples/ChatQnA/kubernetes/intel/cpu/xeon/manifest
+   ```
+
+6. Deploy ChatQnA:
+
+   ```bash
+   kubectl apply -f chatqna_tdx.yaml
    ```
    
-6. Verify all pods are running:
+7. Verify all pods are running:
 
    ```bash
    kubectl get pods
@@ -78,13 +84,29 @@ spec:
 
 ### Customization of deployment configuration
 
-If you want to have more control over what is protected with Intel TDX or use a different deployment file, you can manually modify the deployment configuration, by following the steps below: 
+If you want to have more control over what is protected with Intel TDX or use a different deployment file, you can manually modify the deployment configuration, by following steps below: 
 
-1. Run the script to apply changes only to the chosen `SERVICES` on the `FILE` of your choice:
+1. Change directory:
+
+   ```bash
+   cd GenAIExamples/ChatQnA/kubernetes/intel/cpu/xeon/manifest
+   ```
+
+2. Define the services you want to protect with Intel TDX:
 
    ```bash
    SERVICES=("llm-uservice")
-   FILE=cpu/xeon/manifest/chatqna.yaml
+   ```
+
+3. Define the pipeline you want to deploy:
+
+   ```bash
+   FILE=chatqna.yaml
+   ```
+
+4. Run the script to add `runtimeClassName` and required annotation only to the chosen `SERVICES` in the `FILE` you defined above:
+
+   ```bash
    for SERVICE in "${SERVICES[@]}"; do
       yq eval '
       (select(.kind == "Deployment" and .metadata.name == "'"$SERVICE"'") | .spec.template.metadata.annotations."io.katacontainers.config.runtime.create_container_timeout") = "800"
@@ -95,16 +117,14 @@ If you want to have more control over what is protected with Intel TDX or use a 
    done
    ```
 
-2. For each service from `SERVICES`, edit the deployment `FILE` to define the resources that must be assigned to the pod to run the service efficiently:
-   
-   - The resources must be defined in the `resources` section of the pod's container definition.
-   - The `memory` must be at least 2x the image size.
-   - By default, the pod will be assigned 1 CPU and 2048 MiB of memory, but half of it will be used for filesystem.
+5. For each service from `SERVICES`, edit the deployment `FILE` to define the resources that must be assigned to the pod to run the service efficiently.
+   The `memory` must be at least 2x the image size.
+   By default, the pod will be assigned `1 CPU` and `2048 MiB` of memory, but half of it will be used for filesystem.
 
-3. Apply the changes to the deployment configuration:
+6. Apply the changes to the deployment configuration:
 
    ```bash
-   kubectl apply -f chatqna.yaml
+   kubectl apply -f $FILE
    ```
 
 > [!IMPORTANT]
