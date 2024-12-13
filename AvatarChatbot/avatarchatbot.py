@@ -5,7 +5,7 @@ import asyncio
 import os
 import sys
 
-from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType, ServiceRoleType
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.proto.api_protocol import AudioChatCompletionRequest, ChatCompletionResponse
 from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
