@@ -1,11 +1,11 @@
 # used by microservice
 docarray[full]
+
+#used by tools
+duckduckgo-search
 fastapi
 huggingface_hub
 langchain
-
-#used by tools
-langchain-google-community
 langchain-huggingface
 langchain-openai
 langchain_community

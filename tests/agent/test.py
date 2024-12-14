@@ -45,16 +45,11 @@ def process_request(url, query, is_stream=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--stream", action="store_true", help="Stream the response")
-    parser.add_argument("--test-sql-agent", action="store_true", help="Test the SQL agent")
     args = parser.parse_args()
 
     ip_address = os.getenv("ip_address", "localhost")
     url = f"http://{ip_address}:9095/v1/chat/completions"
-    if args.test_sql_agent:
-        prompt = "How many schools have the average score in Math over 560 in the SAT test?"
-    else:
-        prompt = "What is OPEA?"
-
+    prompt = "What is OPEA?"
     if args.stream:
         process_request(url, prompt, is_stream=True)
     else:

@@ -139,14 +139,8 @@ def get_args():
     parser.add_argument("--with_store", type=bool, default=False)
     parser.add_argument("--timeout", type=int, default=60)
 
-    # for sql agent
-    parser.add_argument("--db_path", type=str, help="database path")
-    parser.add_argument("--db_name", type=str, help="database name")
-    parser.add_argument("--use_hints", type=str, default="false", help="If this agent uses hints")
-    parser.add_argument("--hints_file", type=str, help="path to the hints file")
-
     sys_args, unknown_args = parser.parse_known_args()
-    print("env_config: ", env_config)
+    # print("env_config: ", env_config)
     if env_config != []:
         env_args, env_unknown_args = parser.parse_known_args(env_config)
         unknown_args += env_unknown_args
@@ -157,12 +151,5 @@ def get_args():
         sys_args.streaming = True
     else:
         sys_args.streaming = False
-
-    if sys_args.use_hints == "true":
-        print("SQL agent will use hints")
-        sys_args.use_hints = True
-    else:
-        sys_args.use_hints = False
-
     print("==========sys_args==========:\n", sys_args)
     return sys_args, unknown_args
