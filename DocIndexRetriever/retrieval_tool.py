@@ -6,7 +6,7 @@ import asyncio
 import os
 from typing import Union
 
-from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.proto.api_protocol import ChatCompletionRequest, EmbeddingRequest
 from comps.cores.proto.docarray import LLMParamsDoc, RerankedDoc, RerankerParms, RetrieverParms, TextDoc
 from fastapi import Request
@@ -21,11 +21,12 @@ RERANK_SERVICE_HOST_IP = os.getenv("RERANK_SERVICE_HOST_IP", "0.0.0.0")
 RERANK_SERVICE_PORT = os.getenv("RERANK_SERVICE_PORT", 8000)
 
 
-class RetrievalToolService(Gateway):
+class RetrievalToolService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
         self.megaservice = ServiceOrchestrator()
+        self.endpoint = str(MegaServiceEndpoint.RETRIEVALTOOL)
 
     def add_remote_service(self):
         embedding = MicroService(
@@ -116,14 +117,17 @@ class RetrievalToolService(Gateway):
         return response
 
     def start(self):
-        super().__init__(
-            megaservice=self.megaservice,
+        self.service = MicroService(
+            self.__class__.__name__,
+            service_role=ServiceRoleType.MEGASERVICE,
             host=self.host,
             port=self.port,
-            endpoint=str(MegaServiceEndpoint.RETRIEVALTOOL),
+            endpoint=self.endpoint,
             input_datatype=Union[TextDoc, EmbeddingRequest, ChatCompletionRequest],
             output_datatype=Union[RerankedDoc, LLMParamsDoc],
         )
+        self.service.add_route(self.endpoint, self.handle_request, methods=["POST"])
+        self.service.start()
 
     def add_remote_service_without_rerank(self):
         embedding = MicroService(
