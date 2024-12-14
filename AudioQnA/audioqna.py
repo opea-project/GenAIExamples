@@ -4,7 +4,7 @@
 import asyncio
 import os
 
-from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.proto.api_protocol import AudioChatCompletionRequest, ChatCompletionResponse
 from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
@@ -18,11 +18,12 @@ TTS_SERVICE_HOST_IP = os.getenv("TTS_SERVICE_HOST_IP", "0.0.0.0")
 TTS_SERVICE_PORT = int(os.getenv("TTS_SERVICE_PORT", 9088))
 
 
-class AudioQnAService(Gateway):
+class AudioQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
         self.megaservice = ServiceOrchestrator()
+        self.endpoint = str(MegaServiceEndpoint.AUDIO_QNA)
 
     def add_remote_service(self):
         asr = MicroService(
@@ -78,14 +79,17 @@ class AudioQnAService(Gateway):
         return response
 
     def start(self):
-        super().__init__(
-            megaservice=self.megaservice,
+        self.service = MicroService(
+            self.__class__.__name__,
+            service_role=ServiceRoleType.MEGASERVICE,
             host=self.host,
             port=self.port,
-            endpoint=str(MegaServiceEndpoint.AUDIO_QNA),
+            endpoint=self.endpoint,
             input_datatype=AudioChatCompletionRequest,
             output_datatype=ChatCompletionResponse,
         )
+        self.service.add_route(self.endpoint, self.handle_request, methods=["POST"])
+        self.service.start()
 
 
 if __name__ == "__main__":
