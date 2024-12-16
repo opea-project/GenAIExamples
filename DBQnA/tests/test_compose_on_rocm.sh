@@ -108,7 +108,7 @@ function main() {
 
     build_docker_images
     start_service
-
+    sleep 10s
     validate_microservice
     validate_frontend
 
