@@ -113,6 +113,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
+      MAX_IMAGES: ${MAX_IMAGES:-1}
     restart: unless-stopped
   multimodalqna:
     image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
@@ -135,6 +136,7 @@ services:
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
       MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
+      LVM_MODEL_ID: ${LVM_MODEL_ID}
       ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
       ASR_SERVICE_ENDPOINT: ${ASR_SERVICE_ENDPOINT}
     ipc: host

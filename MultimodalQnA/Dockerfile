@@ -13,7 +13,8 @@ RUN useradd -m -s /bin/bash user && \
     chown -R user /home/user/
 
 WORKDIR /home/user/
-RUN git clone https://github.com/opea-project/GenAIComps.git
+#RUN git clone https://github.com/opea-project/GenAIComps.git
+RUN git clone https://github.com/mhbuehler/GenAIComps.git --single-branch --branch dina/image_query
 
 WORKDIR /home/user/GenAIComps
 RUN pip install --no-cache-dir --upgrade pip setuptools && \

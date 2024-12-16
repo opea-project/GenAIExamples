@@ -88,6 +88,7 @@ export LLAVA_SERVER_PORT=8399
 export LVM_ENDPOINT="http://${host_ip}:8399"
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
 export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
+export MAX_IMAGES=1
 export WHISPER_MODEL="base"
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
@@ -102,6 +103,11 @@ export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+
+> Note: The `MAX_IMAGES` environment variable is used to specify the maximum number of images that will be sent from the LVM service to the LLaVA server.
+> If an image list longer than `MAX_IMAGES` is sent to the LVM server, a shortened image list will be sent to the LLaVA service. If the image list
+> needs to be shortened, the most recent images (the ones at the end of the list) are prioritized to send to the LLaVA service. Some LLaVA models have not
+> been trained with multiple images and may lead to inaccurate results. If `MAX_IMAGES` is not set, it will default to `1`.
 
 ## 🚀 Build Docker Images
 
@@ -379,6 +385,7 @@ curl -X POST \
 
 8. MegaService
 
+Test the MegaService with a text query:
 ```bash
 curl http://${host_ip}:8888/v1/multimodalqna \
     -H "Content-Type: application/json" \
@@ -386,6 +393,21 @@ curl http://${host_ip}:8888/v1/multimodalqna \
     -d '{"messages": "What is the revenue of Nike in 2023?"}'
 ```
 
+Test the MegaService with an audio query:
+```bash
+curl http://${host_ip}:8888/v1/multimodalqna  \
+    -H "Content-Type: application/json"  \
+    -d '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
+```
+
+Test the MegaService with a text and image query:
+```bash
+curl http://${host_ip}:8888/v1/multimodalqna \
+    -H "Content-Type: application/json" \
+    -d  '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Green bananas in a tree"}, {"type": "image_url", "image_url": {"url": "http://images.cocodataset.org/test-stuff2017/000000004248.jpg"}}]}]}'
+```
+
+Test the MegaService with a back and forth conversation between the user and assistant:
 ```bash
 curl http://${host_ip}:8888/v1/multimodalqna  \
     -H "Content-Type: application/json"  \

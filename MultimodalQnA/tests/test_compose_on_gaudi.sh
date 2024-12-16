@@ -20,7 +20,7 @@ export caption_fn="apple.txt"
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone https://github.com/mhbuehler/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"dina/image_query"}" && cd ../
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-multimodal-redis lvm-tgi dataprep-multimodal-redis whisper asr"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
@@ -45,6 +45,7 @@ function setup_env() {
     export LVM_ENDPOINT="http://${host_ip}:8399"
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
     export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-7b-hf"
+    export MAX_IMAGES=1
     export WHISPER_MODEL="base"
     export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
     export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
@@ -212,6 +213,14 @@ function validate_microservices() {
         "tgi-llava-gaudi-server" \
         '{"inputs":"![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/rabbit.png)What is this a picture of?\n\n","parameters":{"max_new_tokens":16, "seed": 42}}'
 
+    echo "Evaluating LLAVA tgi-gaudi with multiple images"
+    validate_service \
+        "http://${host_ip}:${LLAVA_SERVER_PORT}/generate" \
+        '"generated_text":' \
+        "tgi-gaudi" \
+        "tgi-llava-gaudi-server" \
+        '{"inputs":"![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mNkYPhfz0AEYBxVSF+FAP5FDvcfRYWgAAAAAElFTkSuQmCC)![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC)What is the content of these two images?\n\n","parameters":{"max_new_tokens":32, "seed": 42}}'
+
     # lvm
     echo "Evaluating lvm-tgi"
     validate_service \
@@ -249,6 +258,14 @@ function validate_megaservice() {
         "multimodalqna" \
         "multimodalqna-backend-server" \
         '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
+
+    echo "Validate megaservice with first query with an image"
+    validate_service \
+        "http://${host_ip}:8888/v1/multimodalqna" \
+        '"time_of_frame_ms":' \
+        "multimodalqna" \
+        "multimodalqna-backend-server" \
+        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Find a similar image"}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}]}'
 
     echo "Validate megaservice with follow-up query"
     validate_service \
