@@ -4,19 +4,19 @@ import { exec } from 'child_process';
 const apiTimeOutInSeconds = 300;
 
 // Helper function to get the host IP
-const getHostIP = () => {
-  return new Promise<string>((resolve, reject) => {
-    exec('hostname -I | awk \'{print $1}\'', (error, stdout, stderr) => {
-      if (error) {
-        reject(`Error fetching IP address: ${error.message}`);
-      } else if (stderr) {
-        reject(`Stderr: ${stderr}`);
-      } else {
-        resolve(stdout.trim());
-      }
-    });
-  });
-};
+// const getHostIP = () => {
+//   return new Promise<string>((resolve, reject) => {
+//     exec('hostname -I | awk \'{print $1}\'', (error, stdout, stderr) => {
+//       if (error) {
+//         reject(`Error fetching IP address: ${error.message}`);
+//       } else if (stderr) {
+//         reject(`Stderr: ${stderr}`);
+//       } else {
+//         resolve(stdout.trim());
+//       }
+//     });
+//   });
+// };
 
 test('testing api with dynamic host', async () => {
   // Get the dynamic host IP
