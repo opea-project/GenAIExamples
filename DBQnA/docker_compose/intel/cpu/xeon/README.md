@@ -21,9 +21,11 @@ Build the frontend Docker image based on react framework via below command:
 
 ```bash
 cd GenAIExamples/DBQnA/ui
-docker build --no-cache -t opea/texttosql-react-ui:latest -f docker/Dockerfile.react .
+docker build --no-cache -t opea/dbqna-react-ui:latest --build-arg texttosql_url=$textToSql_host:$textToSql_port/v1 -f docker/Dockerfile.react .
 
 ```
+
+Attention! Replace $textToSql_host and $textToSql_port with your own value.
 
 Then run the command `docker images`, you will have the following Docker Images:
 
