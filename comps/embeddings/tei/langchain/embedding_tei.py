@@ -4,7 +4,7 @@
 import json
 import os
 import time
-from typing import List, Union
+from typing import Dict, List, Union
 
 from huggingface_hub import AsyncInferenceClient
 
@@ -19,12 +19,7 @@ from comps import (
     statistics_dict,
 )
 from comps.cores.mega.utils import get_access_token
-from comps.cores.proto.api_protocol import (
-    ChatCompletionRequest,
-    EmbeddingRequest,
-    EmbeddingResponse,
-    EmbeddingResponseData,
-)
+from comps.cores.proto.api_protocol import EmbeddingRequest, EmbeddingResponse, EmbeddingResponseData
 
 logger = CustomLogger("embedding_tei_langchain")
 logflag = os.getenv("LOGFLAG", False)
@@ -45,9 +40,7 @@ TEI_EMBEDDING_ENDPOINT = os.getenv("TEI_EMBEDDING_ENDPOINT", "http://localhost:8
     port=6000,
 )
 @register_statistics(names=["opea_service@embedding_tei_langchain"])
-async def embedding(
-    input: Union[TextDoc, EmbeddingRequest, ChatCompletionRequest]
-) -> Union[EmbedDoc, EmbeddingResponse, ChatCompletionRequest]:
+async def embedding(input: Union[TextDoc, EmbeddingRequest]) -> Union[EmbedDoc, EmbeddingResponse]:
     start = time.time()
     access_token = (
         get_access_token(TOKEN_URL, CLIENTID, CLIENT_SECRET) if TOKEN_URL and CLIENTID and CLIENT_SECRET else None
@@ -55,24 +48,18 @@ async def embedding(
     async_client = get_async_inference_client(access_token)
     if logflag:
         logger.info(input)
+
     if isinstance(input, TextDoc):
-        embed_vector = await aembed_query(input.text, async_client)
-        embedding_res = embed_vector[0] if isinstance(input.text, str) else embed_vector
-        res = EmbedDoc(text=input.text, embedding=embedding_res)
+        embedding_res = await aembed_query({"input": input.text}, async_client)
+        embedding_vec = [data["embedding"] for data in embedding_res["data"]]
+        embedding_vec = embedding_vec[0] if isinstance(input.text, str) else embedding_vec
+        res = EmbedDoc(text=input.text, embedding=embedding_vec)
     else:
-        embed_vector = await aembed_query(input.input, async_client)
-        if input.dimensions is not None:
-            embed_vector = [embed_vector[i][: input.dimensions] for i in range(len(embed_vector))]
-
-        # for standard openai embedding format
-        res = EmbeddingResponse(
-            data=[EmbeddingResponseData(index=i, embedding=embed_vector[i]) for i in range(len(embed_vector))]
+        embedding_res = await aembed_query(
+            {"input": input.input, "encoding_format": input.encoding_format, "model": input.model, "user": input.user},
+            async_client,
         )
-
-        if isinstance(input, ChatCompletionRequest):
-            input.embedding = res
-            # keep
-            res = input
+        res = EmbeddingResponse(**embedding_res)
 
     statistics_dict["opea_service@embedding_tei_langchain"].append_latency(time.time() - start, None)
     if logflag:
@@ -80,21 +67,9 @@ async def embedding(
     return res
 
 
-async def aembed_query(
-    text: Union[str, List[str]], async_client: AsyncInferenceClient, model_kwargs=None, task=None
-) -> List[List[float]]:
-    texts = [text] if isinstance(text, str) else text
-    response = await aembed_documents(texts, async_client, model_kwargs=model_kwargs, task=task)
-    return response
-
-
-async def aembed_documents(
-    texts: List[str], async_client: AsyncInferenceClient, model_kwargs=None, task=None
-) -> List[List[float]]:
-    texts = [text.replace("\n", " ") for text in texts]
-    _model_kwargs = model_kwargs or {}
-    responses = await async_client.post(json={"inputs": texts, **_model_kwargs}, task=task)
-    return json.loads(responses.decode())
+async def aembed_query(request: Dict, async_client: AsyncInferenceClient) -> Union[Dict, List[List[float]]]:
+    response = await async_client.post(json=request)
+    return json.loads(response.decode())
 
 
 def get_async_inference_client(access_token: str) -> AsyncInferenceClient:

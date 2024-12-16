@@ -24,7 +24,7 @@ function start_service() {
     model="BAAI/bge-base-en-v1.5"
     unset http_proxy
     docker run -d --name="test-comps-embedding-tei-endpoint" -p $tei_endpoint:80 -v ./data:/data --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $model
-    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:${tei_endpoint}"
+    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:${tei_endpoint}/v1/embeddings"
     tei_service_port=5002
     docker run -d --name="test-comps-embedding-tei-server" -e LOGFLAG=True -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p ${tei_service_port}:6000 --ipc=host -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT  opea/embedding-tei:comps
     sleep 3m
