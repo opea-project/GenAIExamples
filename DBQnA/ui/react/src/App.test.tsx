@@ -20,7 +20,7 @@ const getHostIP = () => {
 
 test('testing api with dynamic host', async () => {
   // Get the dynamic host IP
-  const host = await getHostIP();
+  // const host = await getHostIP();
   const endpointUrl = `http://texttosql-service:9090/v1/texttosql`;
 
   const formData = {
