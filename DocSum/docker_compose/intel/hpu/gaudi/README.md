@@ -314,12 +314,12 @@ You will have the following Docker Images:
 
    In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - 2 * input.max_tokens - 128, MAX_INPUT_TOKENS)`.
 
-   ```bash
+   ````bash
       ```bash
    curl -X POST http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: application/json" \
       -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "summary_type": "refine", "chunk_size": 2000}'
-   ```
+   ````
 
 > More detailed tests can be found here `cd GenAIExamples/DocSum/test`
 

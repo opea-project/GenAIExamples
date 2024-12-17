@@ -234,7 +234,7 @@ function validate_megaservice_json() {
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
-    
+
     echo ">>> Checking text data in truncate mode with Content-Type: application/json"
     validate_services \
         "${host_ip}:8888/v1/docsum" \
