@@ -54,11 +54,20 @@ def clear_history(state, request: gr.Request):
     return (state, state.to_gradio_chatbot(), None, None, None, None) + (disable_btn,) * 1
 
 
-def add_text(state, text, audio, request: gr.Request):
+def add_text(state, textbox, audio, request: gr.Request):
+    text = textbox['text']
     logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
     if audio:
         state.audio_query_file = audio
         state.append_message(state.roles[0], "--input placeholder--")
+        state.append_message(state.roles[1], None)
+        state.skip_next = False
+        return (state, state.to_gradio_chatbot(), None, None) + (disable_btn,) * 1
+    elif textbox['files']:
+        image_file = textbox['files'][0]
+        state.image_query_file = image_file
+        state.image_query_files[len(state.messages)] = image_file
+        state.append_message(state.roles[0], text)
         state.append_message(state.roles[1], None)
         state.skip_next = False
         return (state, state.to_gradio_chatbot(), None, None) + (disable_btn,) * 1
@@ -94,6 +103,8 @@ def http_bot(state, request: gr.Request):
         new_state.append_message(new_state.roles[0], state.messages[-2][1])
         new_state.append_message(new_state.roles[1], None)
         new_state.audio_query_file = state.audio_query_file
+        new_state.image_query_file = state.image_query_file
+        new_state.image_query_files = state.image_query_files
         state = new_state
 
     # Construct prompt
@@ -464,9 +475,11 @@ with gr.Blocks() as qna:
                 with gr.Column(scale=8):
                     with gr.Tabs():
                         with gr.TabItem("Text Query"):
-                            textbox = gr.Textbox(
+                            textbox = gr.MultimodalTextbox(
                                 show_label=False,
                                 container=True,
+                                submit_btn=False,
+                                file_types=['image']
                             )
                         with gr.TabItem("Audio Query"):
                             audio = gr.Audio(
@@ -546,3 +559,4 @@ if __name__ == "__main__":
     dataprep_gen_caption_addr = dataprep_gen_caption_endpoint
 
     uvicorn.run(app, host=args.host, port=args.port)
+    
