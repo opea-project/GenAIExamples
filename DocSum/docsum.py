@@ -26,6 +26,13 @@ DATA_SERVICE_PORT = int(os.getenv("DATA_SERVICE_PORT", 7079))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.LLM:
+        docsum_parameters = kwargs.get("docsum_parameters", None)
+        if docsum_parameters:
+            del docsum_parameters["query"]
+            inputs.update(docsum_parameters.dict())
+    return inputs
 
 def read_pdf(file):
     from langchain.document_loaders import PyPDFLoader
@@ -66,6 +73,7 @@ class DocSumService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_inputs = align_inputs
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.DOC_SUMMARY)
 
@@ -154,7 +162,8 @@ class DocSumService:
         else:
             raise ValueError(f"Unknown request type: {request.headers.get('content-type')}")
 
-        parameters = DocSumLLMParams(
+        docsum_parameters = DocSumLLMParams(
+            query=None,
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
             top_p=chat_request.top_p if chat_request.top_p else 0.95,
@@ -171,7 +180,7 @@ class DocSumService:
         )
 
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs=initial_inputs_data, llm_parameters=parameters
+            initial_inputs=initial_inputs_data, docsum_parameters=docsum_parameters
         )
 
         for node, response in result_dict.items():
