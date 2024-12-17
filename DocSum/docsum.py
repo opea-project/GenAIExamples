@@ -163,7 +163,7 @@ class DocSumService:
             raise ValueError(f"Unknown request type: {request.headers.get('content-type')}")
 
         docsum_parameters = DocSumLLMParams(
-            query=None,
+            query="",
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
             top_p=chat_request.top_p if chat_request.top_p else 0.95,
