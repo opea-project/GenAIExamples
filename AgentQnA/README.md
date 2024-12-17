@@ -38,6 +38,7 @@ flowchart LR
     end
     AG_REACT([Agent MicroService - react]):::blue
     AG_RAG([Agent MicroService - rag]):::blue
+    AG_SQL([Agent MicroService - sql]):::blue
     LLM_gen{{LLM Service <br>}}
     DP([Data Preparation MicroService]):::blue
     TEI_RER{{Reranking service<br>}}
@@ -51,6 +52,7 @@ flowchart LR
     direction LR
     a[User Input Query] --> AG_REACT
     AG_REACT --> AG_RAG
+    AG_REACT --> AG_SQL
     AG_RAG --> DocIndexRetriever-MegaService
     EM ==> RET
     RET ==> RER
@@ -59,6 +61,7 @@ flowchart LR
     %% Embedding service flow
     direction LR
     AG_RAG <-.-> LLM_gen
+    AG_SQL <-.-> LLM_gen
     AG_REACT <-.-> LLM_gen
     EM <-.-> TEI_EM
     RET <-.-> R_RET
@@ -167,34 +170,32 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
    docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
    ```
 
-6. Launch agent services</br>
-   We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
-
-   Deploy it on Gaudi or Xeon respectively
+6. Launch multi-agent system. </br>
+   We provide two options for `llm_engine` of the agents: 1. open-source LLMs on Intel Gaudi2, 2. OpenAI models via API calls.
 
    ::::{tab-set}
    :::{tab-item} Gaudi
    :sync: Gaudi
 
-   We provide instructions on two methods to server LLM on Gaudi2: 1) tgi-gaudi, 2) vllm. To use open-source LLMs on Gaudi2 with tgi-gaudi, run commands below. By default, we will server `meta-llama/Meta-Llama-3.1-70B-Instruct`.
+   On Gaudi2 we will serve `meta-llama/Meta-Llama-3.1-70B-Instruct` using vllm.
 
-   ```
-   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
-   bash launch_tgi_gaudi.sh
-   bash launch_agent_service_tgi_gaudi.sh
-   ```
-   To use open-source LLMs on Gaudi2 with vllm, run commands below. First build vllm-gaudi docker image.
-   ```
+   First build vllm-gaudi docker image.
+   ```bash
    cd $WORKDIR
-   git clone https://github.com/HabanaAI/vllm-fork.git
-   cd ./vllm-fork
+   git clone https://github.com/vllm-project/vllm.git
+   cd ./vllm
    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
    ```
    Then launch vllm on Gaudi2 with the command below.
    ```bash
-   vllm_port=8086 # choose a port that is available
+   vllm_port=8085
    model="meta-llama/Meta-Llama-3.1-70B-Instruct"
-   docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:80 -v $HF_CACHE_DIR:/data -e HF_TOKEN=$HUGGINGFACEHUB_API_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model ${model} --host 0.0.0.0 --port 80 --block-size 128 --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+   docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+   ```
+   Then launch Agent microservices.
+   ```bash
+   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+   bash launch_agent_service_gaudi.sh
    ```
 
    :::
@@ -204,6 +205,7 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
    To use OpenAI models, run commands below.
 
    ```
+   export OPENAI_API_KEY=<your-openai-key>
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
    bash launch_agent_service_openai.sh
    ```
@@ -216,8 +218,11 @@ docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy
 First look at logs of the agent docker containers:
 
 ```
-# worker agent
+# worker RAG agent
 docker logs rag-agent-endpoint
+
+# worker SQL agent
+docker logs sql-agent-endpoint
 ```
 
 ```
@@ -227,7 +232,7 @@ docker logs react-agent-endpoint
 
 You should see something like "HTTP server setup successful" if the docker containers are started successfully.</p>
 
-Second, validate worker agent:
+Second, validate worker RAG agent:
 
 ```
 curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
@@ -235,11 +240,23 @@ curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: applic
     }'
 ```
 
-Third, validate supervisor agent:
+Third, validate worker SQL agent:
+```
+curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+     "query": "How many schools have average math score higher than 560?"
+    }'
+```
+
+Finally, validate supervisor agent:
 
 ```
 curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "Michael Jackson song Thriller"
+    }'
+```
+```
+curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+     "query": "How many schools have average math score higher than 560?"
     }'
 ```
 

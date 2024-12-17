@@ -30,22 +30,22 @@ function start_tgi(){
 }
 
 function start_vllm_service_70B() {
-    # redis endpoint
+
     echo "token is ${HF_TOKEN}"
 
     echo "start vllm gaudi service"
     echo "**************model is $model**************"
-    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:80 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:comps --model ${model} --host 0.0.0.0 --port 80 --block-size 128 --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:comps --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
     sleep 5s
     echo "Waiting vllm gaudi ready"
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
-        docker logs vllm-gaudi-server &> ${WORKPATH}/vllm-gaudi-service.log
+        docker logs vllm-gaudi-server &> ${LOG_PATH}/vllm-gaudi-service.log
         n=$((n+1))
-        if grep -q "Uvicorn running on" ${WORKPATH}/vllm-gaudi-service.log; then
+        if grep -q "Uvicorn running on" ${LOG_PATH}/vllm-gaudi-service.log; then
             break
         fi
-        if grep -q "No such container" ${WORKPATH}/vllm-gaudi-service.log; then
+        if grep -q "No such container" ${LOG_PATH}/vllm-gaudi-service.log; then
             echo "container vllm-gaudi-server not found"
             exit 1
         fi
@@ -79,7 +79,7 @@ function start_agent_and_api_server() {
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
     bash launch_agent_service_tgi_gaudi.sh
-    sleep 1m
+    sleep 2m
 }
 
 function validate() {

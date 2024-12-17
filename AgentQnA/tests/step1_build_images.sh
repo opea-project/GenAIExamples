@@ -38,11 +38,12 @@ function build_agent_docker_image() {
 function build_vllm_docker_image() {
     echo "Building the vllm docker image"
     cd $WORKPATH
-    echo "Downloading vllm-fork in $WORKPATH"
-    if [ ! -d "./vllm-fork" ]; then
-        git clone https://github.com/HabanaAI/vllm-fork.git
+    echo $WORKPATH
+    if [ ! -d "./vllm" ]; then
+        git clone https://github.com/vllm-project/vllm.git
     fi
-    cd ./vllm-fork
+    cd ./vllm
+    git checkout main
     docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:comps --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
         echo "opea/vllm-gaudi:comps failed"
@@ -52,18 +53,19 @@ function build_vllm_docker_image() {
     fi
 }
 
+
 function main() {
-    # echo "==================== Build docker images for retrieval tool ===================="
-    # build_docker_images_for_retrieval_tool
-    # echo "==================== Build docker images for retrieval tool completed ===================="
+    echo "==================== Build docker images for retrieval tool ===================="
+    build_docker_images_for_retrieval_tool
+    echo "==================== Build docker images for retrieval tool completed ===================="
 
     echo "==================== Build agent docker image ===================="
     build_agent_docker_image
     echo "==================== Build agent docker image completed ===================="
 
-    # echo "==================== Build vllm docker image ===================="
-    # build_vllm_docker_image
-    # echo "==================== Build vllm docker image completed ===================="
+    echo "==================== Build vllm docker image ===================="
+    build_vllm_docker_image
+    echo "==================== Build vllm docker image completed ===================="
 }
 
 main
