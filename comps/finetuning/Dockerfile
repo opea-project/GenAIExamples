@@ -23,7 +23,7 @@ ENV PATH=$PATH:/home/user/.local/bin
 RUN python -m pip install --no-cache-dir --upgrade pip && \
     python -m pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && \
     python -m pip install --no-cache-dir intel-extension-for-pytorch && \
-    python -m pip install --no-cache-dir oneccl_bind_pt --extra-index-url https://pytorch-extension.intel.com/release-whl/stable/cpu/us/ && \
+    python -m pip install --no-cache-dir oneccl_bind_pt --extra-index-url https://pytorch-extension.intel.com/release-whl/stable/cpu/cn/ && \
     python -m pip install --no-cache-dir -r /home/user/comps/finetuning/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
