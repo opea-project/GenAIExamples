@@ -8,12 +8,14 @@ from typing import Union
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_community.vectorstores import Redis
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
-from redis_config import EMBED_MODEL, INDEX_NAME, REDIS_URL
+from redis_config import EMBED_MODEL, INDEX_NAME, INDEX_SCHEMA, REDIS_URL
 
 from comps import (
     CustomLogger,
     EmbedDoc,
+    EmbedMultimodalDoc,
     SearchedDoc,
+    SearchedMultimodalDoc,
     ServiceType,
     TextDoc,
     opea_microservices,
@@ -28,11 +30,13 @@ from comps.cores.proto.api_protocol import (
     RetrievalResponse,
     RetrievalResponseData,
 )
+from comps.embeddings.multimodal.bridgetower import BridgeTowerEmbedding
 
 logger = CustomLogger("retriever_redis")
 logflag = os.getenv("LOGFLAG", False)
 
 tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
+bridge_tower_embedding = os.getenv("BRIDGE_TOWER_EMBEDDING")
 
 
 @register_microservice(
@@ -44,8 +48,8 @@ tei_embedding_endpoint = os.getenv("TEI_EMBEDDING_ENDPOINT")
 )
 @register_statistics(names=["opea_service@retriever_redis"])
 async def retrieve(
-    input: Union[EmbedDoc, RetrievalRequest, ChatCompletionRequest]
-) -> Union[SearchedDoc, RetrievalResponse, ChatCompletionRequest]:
+    input: Union[EmbedDoc, EmbedMultimodalDoc, RetrievalRequest, ChatCompletionRequest]
+) -> Union[SearchedDoc, SearchedMultimodalDoc, RetrievalResponse, ChatCompletionRequest]:
     if logflag:
         logger.info(input)
     start = time.time()
@@ -53,21 +57,16 @@ async def retrieve(
     if vector_db.client.keys() == []:
         search_res = []
     else:
-        if isinstance(input, EmbedDoc):
-            query = input.text
+        if isinstance(input, EmbedDoc) or isinstance(input, EmbedMultimodalDoc):
             embedding_data_input = input.embedding
         else:
             # for RetrievalRequest, ChatCompletionRequest
-            query = input.input
             if isinstance(input.embedding, EmbeddingResponse):
                 embeddings = input.embedding.data
                 embedding_data_input = []
                 for emb in embeddings:
                     # each emb is EmbeddingResponseData
-                    # print("Embedding data: ", emb.embedding)
-                    # print("Embedding data length: ",len(emb.embedding))
                     embedding_data_input.append(emb.embedding)
-                # print("All Embedding data length: ",len(embedding_data_input))
             else:
                 embedding_data_input = input.embedding
 
@@ -98,6 +97,12 @@ async def retrieve(
         for r in search_res:
             retrieved_docs.append(TextDoc(text=r.page_content))
         result = SearchedDoc(retrieved_docs=retrieved_docs, initial_query=input.text)
+    elif isinstance(input, EmbedMultimodalDoc):
+        metadata_list = []
+        for r in search_res:
+            metadata_list.append(r.metadata)
+            retrieved_docs.append(TextDoc(text=r.page_content))
+        result = SearchedMultimodalDoc(retrieved_docs=retrieved_docs, initial_query=input.text, metadata=metadata_list)
     else:
         for r in search_res:
             retrieved_docs.append(RetrievalResponseData(text=r.page_content, metadata=r.metadata))
@@ -119,9 +124,14 @@ if __name__ == "__main__":
     if tei_embedding_endpoint:
         # create embeddings using TEI endpoint service
         embeddings = HuggingFaceEndpointEmbeddings(model=tei_embedding_endpoint)
+        vector_db = Redis(embedding=embeddings, index_name=INDEX_NAME, redis_url=REDIS_URL)
+    elif bridge_tower_embedding:
+        # create embeddings using BridgeTower service
+        embeddings = BridgeTowerEmbedding()
+        vector_db = Redis(embedding=embeddings, index_name=INDEX_NAME, index_schema=INDEX_SCHEMA, redis_url=REDIS_URL)
     else:
         # create embeddings using local embedding model
         embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
+        vector_db = Redis(embedding=embeddings, index_name=INDEX_NAME, redis_url=REDIS_URL)
 
-    vector_db = Redis(embedding=embeddings, index_name=INDEX_NAME, redis_url=REDIS_URL)
     opea_microservices["opea_service@retriever_redis"].start()

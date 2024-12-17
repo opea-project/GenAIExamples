@@ -11,4 +11,5 @@ pymupdf
 redis
 sentence_transformers
 shortuuid
+transformers
 uvicorn

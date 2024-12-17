@@ -57,12 +57,24 @@ python retriever_redis.py
 
 ### 2.1 Setup Environment Variables
 
+Two versions of retriever are supported for redis: text retriever and multimodal retriever.
+Users need to setup different environment variables for each type of retriever as below.
+
 ```bash
+# for text retriever
+export your_ip=$(hostname -I | awk '{print $1}')
 export RETRIEVE_MODEL_ID="BAAI/bge-base-en-v1.5"
 export REDIS_URL="redis://${your_ip}:6379"
 export INDEX_NAME=${your_index_name}
 export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:6060"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_token}
+
+# for multimodal retriever
+export your_ip=$(hostname -I | awk '{print $1}')
+export RETRIEVE_MODEL_ID="BAAI/bge-base-en-v1.5"
+export REDIS_URL="redis://${your_ip}:6379"
+export INDEX_NAME=${your_index_name}
+export BRIDGE_TOWER_EMBEDDING=true
 ```
 
 ### 2.2 Build Docker Image
@@ -82,7 +94,10 @@ You can choose one as needed.
 ### 2.3 Run Docker with CLI (Option A)
 
 ```bash
+# Start a text retriever server
 docker run -d --name="retriever-redis-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN opea/retriever-redis:latest
+# start a multimodal retriever server
+docker run -d --name="retriever-multimodal-redis-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e BRIDGE_TOWER_EMBEDDING=${BRIDGE_TOWER_EMBEDDING} opea/retriever-redis:latest
 ```
 
 ### 2.4 Run Docker with Docker Compose (Option B)
@@ -103,10 +118,20 @@ curl http://localhost:7000/v1/health_check \
 
 ### 3.2 Consume Embedding Service
 
-To consume the Retriever Microservice, you can generate a mock embedding vector of length 768 with Python.
+To consume the Retriever Microservice, you can generate a mock embedding vector with Python.
+
+Same here, users need to validate text/multimodal embedding service with different lengths of vectors. Then use the `curl` command to validate.
 
 ```bash
+# for text retriever
 export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+# for multimodal retriever
+export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+```
+
+Default validation.
+
+```bash
 curl http://${your_ip}:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding}}" \
@@ -116,7 +141,6 @@ curl http://${your_ip}:7000/v1/retrieval \
 You can set the parameters for the retriever.
 
 ```bash
-export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://localhost:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"similarity\", \"k\":4}" \
@@ -124,7 +148,6 @@ curl http://localhost:7000/v1/retrieval \
 ```
 
 ```bash
-export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://localhost:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"similarity_distance_threshold\", \"k\":4, \"distance_threshold\":1.0}" \
@@ -132,7 +155,6 @@ curl http://localhost:7000/v1/retrieval \
 ```
 
 ```bash
-export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://localhost:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"similarity_score_threshold\", \"k\":4, \"score_threshold\":0.2}" \
@@ -140,7 +162,6 @@ curl http://localhost:7000/v1/retrieval \
 ```
 
 ```bash
-export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 curl http://localhost:7000/v1/retrieval \
   -X POST \
   -d "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${your_embedding},\"search_type\":\"mmr\", \"k\":4, \"fetch_k\":20, \"lambda_mult\":0.5}" \

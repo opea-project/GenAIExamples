@@ -42,13 +42,28 @@ function start_service() {
     sleep 3m
 }
 
+function start_multimodal_service() {
+    # redis
+    docker run -d --name test-comps-retriever-redis-vector-db -p 5689:6379 -p 5011:8001 -e HTTPS_PROXY=$https_proxy -e HTTP_PROXY=$https_proxy redis/redis-stack:7.2.0-v9
+    sleep 10s
+
+    # redis retriever
+    export REDIS_URL="redis://${ip_address}:5689"
+    export INDEX_NAME="rag-redis"
+    retriever_port=5435
+    unset http_proxy
+    docker run -d --name="test-comps-retriever-redis-server" -p ${retriever_port}:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e BRIDGE_TOWER_EMBEDDING=true opea/retriever-redis:comps
+
+    sleep 2m
+}
+
 function validate_microservice() {
+    local test_embedding="$1"
+
     retriever_port=5435
     export PATH="${HOME}/miniforge3/bin:$PATH"
     source activate
     URL="http://${ip_address}:$retriever_port/v1/retrieval"
-
-    test_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
 
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "{\"text\":\"test\",\"embedding\":${test_embedding}}" -H 'Content-Type: application/json' "$URL")
     if [ "$HTTP_STATUS" -eq 200 ]; then
@@ -60,13 +75,11 @@ function validate_microservice() {
         else
             echo "[ retriever ] Content does not match the expected result: $CONTENT"
             docker logs test-comps-retriever-redis-server >> ${LOG_PATH}/retriever.log
-            docker logs test-comps-retriever-redis-tei-endpoint >> ${LOG_PATH}/tei.log
             exit 1
         fi
     else
         echo "[ retriever ] HTTP status is not 200. Received status was $HTTP_STATUS"
         docker logs test-comps-retriever-redis-server >> ${LOG_PATH}/retriever.log
-        docker logs test-comps-retriever-redis-tei-endpoint >> ${LOG_PATH}/tei.log
         exit 1
     fi
 }
@@ -81,12 +94,20 @@ function stop_docker() {
 function main() {
 
     stop_docker
-
     build_docker_images
+
+    # test text retriever
     start_service
+    test_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+    validate_microservice "$test_embedding"
+    stop_docker
 
-    validate_microservice
+    # test multimodal retriever
+    start_multimodal_service
+    test_embedding_multi=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+    validate_microservice "$test_embedding_multi"
 
+    # clean env
     stop_docker
     echo y | docker system prune
 
