@@ -14,7 +14,7 @@ from comps.cores.proto.api_protocol import (
     ChatMessage,
     UsageInfo,
 )
-from comps.cores.proto.docarray import LLMParams
+from comps.cores.proto.docarray import DocSumLLMParams
 from fastapi import File, Request, UploadFile
 from fastapi.responses import StreamingResponse
 
@@ -97,6 +97,9 @@ class DocSumService:
         if "application/json" in request.headers.get("content-type"):
             data = await request.json()
             stream_opt = data.get("stream", True)
+            summary_type = data.get("summary_type", "stuff")
+            chunk_size = data.get("chunk_size", -1)
+            chunk_overlap = data.get("chunk_overlap", -1)
             chat_request = ChatCompletionRequest.model_validate(data)
             prompt = handle_message(chat_request.messages)
 
@@ -105,6 +108,9 @@ class DocSumService:
         elif "multipart/form-data" in request.headers.get("content-type"):
             data = await request.form()
             stream_opt = data.get("stream", True)
+            summary_type = data.get("summary_type", "stuff")
+            chunk_size = data.get("chunk_size", -1)
+            chunk_overlap = data.get("chunk_overlap", -1)
             chat_request = ChatCompletionRequest.model_validate(data)
 
             data_type = data.get("type")
@@ -148,7 +154,7 @@ class DocSumService:
         else:
             raise ValueError(f"Unknown request type: {request.headers.get('content-type')}")
 
-        parameters = LLMParams(
+        parameters = DocSumLLMParams(
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
             top_p=chat_request.top_p if chat_request.top_p else 0.95,
@@ -159,6 +165,9 @@ class DocSumService:
             streaming=stream_opt,
             model=chat_request.model if chat_request.model else None,
             language=chat_request.language if chat_request.language else "auto",
+            summary_type=summary_type,
+            chunk_overlap=chunk_overlap,
+            chunk_size=chunk_size,
         )
 
         result_dict, runtime_graph = await self.megaservice.schedule(
