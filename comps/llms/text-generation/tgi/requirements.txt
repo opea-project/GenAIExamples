@@ -3,7 +3,7 @@ docarray[full]
 fastapi
 httpx
 huggingface_hub
-openai==1.35.13
+openai==1.57.4
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk

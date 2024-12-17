@@ -46,11 +46,12 @@ function start_service() {
 
 function validate_microservice() {
     llm_port=5005
+
     result=$(http_proxy="" curl http://${ip_address}:${llm_port}/v1/chat/completions \
         -X POST \
-        -d '{"query":"What is Deep Learning?", "max_tokens": 128}' \
+        -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17, "stream":false}' \
         -H 'Content-Type: application/json')
-    if [[ $result == *"DONE"* ]]; then
+    if [[ $result == *"content"* ]]; then
         echo "Result correct."
     else
         echo "Result wrong. Received was $result"

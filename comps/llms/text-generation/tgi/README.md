@@ -16,7 +16,8 @@ pip install -r requirements.txt
 
 ```bash
 export HF_TOKEN=${your_hf_api_token}
-docker run -p 8008:80 -v ./data:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id ${your_hf_llm_model}
+export LLM_MODEL_ID=${your_hf_llm_model}
+docker run -p 8008:80 -v ./data:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $LLM_MODEL_ID
 ```
 
 ### 1.3 Verify the TGI Service
@@ -24,7 +25,7 @@ docker run -p 8008:80 -v ./data:/data --name tgi_service --shm-size 1g ghcr.io/h
 ```bash
 curl http://${your_ip}:8008/v1/chat/completions \
      -X POST \
-     -d '{"model": ${your_hf_llm_model}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
 ```
 
@@ -93,33 +94,22 @@ You can set the following model parameters according to your actual needs, such 
 The `streaming` parameter determines the format of the data returned by the API. It will return text string with `streaming=false`, return text streaming flow with `streaming=true`.
 
 ```bash
-# non-streaming mode
+# stream mode
 curl http://${your_ip}:9000/v1/chat/completions \
-  -X POST \
-  -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":false}' \
-  -H 'Content-Type: application/json'
+    -X POST \
+    -d '{"model": "${LLM_MODEL_ID}", "messages": "What is Deep Learning?", "max_tokens":17}' \
+    -H 'Content-Type: application/json'
 
-# streaming mode
 curl http://${your_ip}:9000/v1/chat/completions \
-  -X POST \
-  -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
-  -H 'Content-Type: application/json'
+    -X POST \
+    -d '{"model": "${LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+    -H 'Content-Type: application/json'
 
-# consume with SearchedDoc
+#Non-stream mode
 curl http://${your_ip}:9000/v1/chat/completions \
-  -X POST \
-  -d '{"initial_query":"What is Deep Learning?","retrieved_docs":[{"text":"Deep Learning is a ..."},{"text":"Deep Learning is b ..."}]}' \
-  -H 'Content-Type: application/json'
-```
-
-For parameters in above modes, please refer to [HuggingFace InferenceClient API](https://huggingface.co/docs/huggingface_hub/package_reference/inference_client#huggingface_hub.InferenceClient.text_generation) (except we rename 'max_new_tokens' to 'max_tokens')
-
-```bash
-# custom chat template
-curl http://${your_ip}:9000/v1/chat/completions \
-  -X POST \
-  -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"presence_penalty":1.03", frequency_penalty":0.0, "streaming":true, "chat_template":"### You are a helpful, respectful and honest assistant to help the user with questions.\n### Context: {context}\n### Question: {question}\n### Answer:"}' \
-  -H 'Content-Type: application/json'
+    -X POST \
+    -d '{"model": "${LLM_MODEL_ID}", "messages": "What is Deep Learning?", "max_tokens":17, "stream":false}' \
+    -H 'Content-Type: application/json'
 ```
 
 For parameters in Chat mode, please refer to [OpenAI API](https://platform.openai.com/docs/api-reference/chat/create)
