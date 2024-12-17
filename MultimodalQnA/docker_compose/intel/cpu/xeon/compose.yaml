@@ -74,9 +74,9 @@ services:
       MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
     restart: unless-stopped
-  retriever-multimodal-redis:
-    image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}
-    container_name: retriever-multimodal-redis
+  retriever-redis:
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    container_name: retriever-redis
     depends_on:
       - redis-vector-db
     ports:
@@ -88,6 +88,7 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
     restart: unless-stopped
   lvm-llava:
     image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
@@ -121,7 +122,7 @@ services:
       - redis-vector-db
       - dataprep-multimodal-redis
       - embedding-multimodal
-      - retriever-multimodal-redis
+      - retriever-redis
       - lvm-llava-svc
       - asr
     ports:
