@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # SPDX-License-Identifier: Apache-2.0
 
 export host_ip="192.165.1.21"
