@@ -93,11 +93,7 @@ async def retrieve(
 
     # return different response format
     retrieved_docs = []
-    if isinstance(input, EmbedDoc):
-        for r in search_res:
-            retrieved_docs.append(TextDoc(text=r.page_content))
-        result = SearchedDoc(retrieved_docs=retrieved_docs, initial_query=input.text)
-    elif isinstance(input, EmbedMultimodalDoc):
+    if isinstance(input, EmbedDoc) or isinstance(input, EmbedMultimodalDoc):
         metadata_list = []
         for r in search_res:
             metadata_list.append(r.metadata)
