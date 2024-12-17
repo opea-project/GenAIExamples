@@ -3,7 +3,8 @@
 
 import dataclasses
 from enum import Enum, auto
-from typing import List
+from typing import List, Dict
+from PIL import Image
 
 from utils import convert_audio_to_base64, get_b64_frame_from_timestamp
 
@@ -21,6 +22,7 @@ class Conversation:
     system: str
     roles: List[str]
     messages: List[List[str]]
+    image_query_files: Dict[int, str]
     offset: int
     sep_style: SeparatorStyle = SeparatorStyle.SINGLE
     sep: str = "\n"
@@ -32,6 +34,7 @@ class Conversation:
     split_video: str = None
     image: str = None
     audio_query_file: str = None
+    image_query_file: str = None
 
     def _template_caption(self):
         out = ""
@@ -45,6 +48,9 @@ class Conversation:
             # Need to do RAG. If the query is text, prompt is the query only
             if self.audio_query_file:
                 ret = [{"role": "user", "content": [{"type": "audio", "audio": self.get_b64_audio_query()}]}]
+            elif self.image_query_file:
+                b64_image = get_b64_frame_from_timestamp(self.image_query_file, 0)
+                ret = [{"role": "user", "content": [{"type": "text", "text": self.messages[0][1]},{"type": "image_url", "image_url": {"url": b64_image}}]}]
             else:
                 ret = messages[0][1]
         else:
@@ -56,6 +62,8 @@ class Conversation:
                         dic = {"role": role}
                         if self.audio_query_file:
                             content = [{"type": "audio", "audio": self.get_b64_audio_query()}]
+                        elif self.image:
+                            content = [{"type": "image_url", "image_url": {"url": self.image_query_file}}]
                         else:
                             content = [{"type": "text", "text": message}]
                         if i == 0 and self.time_of_frame_ms and self.video_file:
@@ -117,6 +125,31 @@ class Conversation:
                     img_str = f'<img src="data:image/png;base64,{img_b64_str}" alt="user upload image" />'
                     msg = img_str + msg.replace("<image>", "").strip()
                     ret.append([msg, None])
+                elif self.image_query_file:
+                    import base64
+                    from io import BytesIO
+                    
+                    image = Image.open(self.image_query_files[i])
+                    max_hw, min_hw = max(image.size), min(image.size)
+                    aspect_ratio = max_hw / min_hw
+                    max_len, min_len = 800, 400
+                    shortest_edge = int(min(max_len / aspect_ratio, min_len, min_hw))
+                    longest_edge = int(shortest_edge * aspect_ratio)
+                    W, H = image.size
+                    if H > W:
+                        H, W = longest_edge, shortest_edge
+                    else:
+                        H, W = shortest_edge, longest_edge
+                    image = image.resize((W, H))
+                    buffered = BytesIO()
+                    if image.format not in ['JPEG', 'JPG']:
+                        image = image.convert('RGB')
+                    image.save(buffered, format="JPEG")
+                    img_b64_str = base64.b64encode(buffered.getvalue()).decode()
+                    img_str = f'<img src="data:image/png;base64,{img_b64_str}" alt="user upload image" />'
+                    msg = img_str + msg.replace("<image>", "").strip()
+                    ret.append([msg, None])
+                    
                 else:
                     ret.append([msg, None])
             else:
@@ -128,6 +161,7 @@ class Conversation:
             system=self.system,
             roles=self.roles,
             messages=[[x, y] for x, y in self.messages],
+            image_query_files=self.image_query_files,
             offset=self.offset,
             sep_style=self.sep_style,
             sep=self.sep,
@@ -157,6 +191,7 @@ multimodalqna_conv = Conversation(
     system="",
     roles=("user", "assistant"),
     messages=(),
+    image_query_files={},
     offset=0,
     sep_style=SeparatorStyle.SINGLE,
     sep="\n",
