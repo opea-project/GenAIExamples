@@ -14,7 +14,7 @@ services:
     environment:
       HF_TOKEN: ${HF_TOKEN}
     shm_size: 1g
-    command: --model-id ${LLM_MODEL_ID}
+    command: --model-id ${LLM_MODEL_ID} --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
   llm:
     image: opea/llm-docsum-tgi:latest
     container_name: llm-docsum-tgi-server
@@ -27,6 +27,9 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
     restart: unless-stopped
 
 networks:
