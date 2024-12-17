@@ -3,9 +3,9 @@
 
 import dataclasses
 from enum import Enum, auto
-from typing import List, Dict
-from PIL import Image
+from typing import Dict, List
 
+from PIL import Image
 from utils import convert_audio_to_base64, get_b64_frame_from_timestamp
 
 
@@ -50,7 +50,15 @@ class Conversation:
                 ret = [{"role": "user", "content": [{"type": "audio", "audio": self.get_b64_audio_query()}]}]
             elif self.image_query_file:
                 b64_image = get_b64_frame_from_timestamp(self.image_query_file, 0)
-                ret = [{"role": "user", "content": [{"type": "text", "text": self.messages[0][1]},{"type": "image_url", "image_url": {"url": b64_image}}]}]
+                ret = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": self.messages[0][1]},
+                            {"type": "image_url", "image_url": {"url": b64_image}},
+                        ],
+                    }
+                ]
             else:
                 ret = messages[0][1]
         else:
@@ -128,7 +136,7 @@ class Conversation:
                 elif self.image_query_file:
                     import base64
                     from io import BytesIO
-                    
+
                     image = Image.open(self.image_query_files[i])
                     max_hw, min_hw = max(image.size), min(image.size)
                     aspect_ratio = max_hw / min_hw
@@ -142,14 +150,14 @@ class Conversation:
                         H, W = shortest_edge, longest_edge
                     image = image.resize((W, H))
                     buffered = BytesIO()
-                    if image.format not in ['JPEG', 'JPG']:
-                        image = image.convert('RGB')
+                    if image.format not in ["JPEG", "JPG"]:
+                        image = image.convert("RGB")
                     image.save(buffered, format="JPEG")
                     img_b64_str = base64.b64encode(buffered.getvalue()).decode()
                     img_str = f'<img src="data:image/png;base64,{img_b64_str}" alt="user upload image" />'
                     msg = img_str + msg.replace("<image>", "").strip()
                     ret.append([msg, None])
-                    
+
                 else:
                     ret.append([msg, None])
             else:

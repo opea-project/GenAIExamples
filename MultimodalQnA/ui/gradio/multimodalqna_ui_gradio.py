@@ -55,7 +55,7 @@ def clear_history(state, request: gr.Request):
 
 
 def add_text(state, textbox, audio, request: gr.Request):
-    text = textbox['text']
+    text = textbox["text"]
     logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
     if audio:
         state.audio_query_file = audio
@@ -63,8 +63,8 @@ def add_text(state, textbox, audio, request: gr.Request):
         state.append_message(state.roles[1], None)
         state.skip_next = False
         return (state, state.to_gradio_chatbot(), None, None) + (disable_btn,) * 1
-    elif textbox['files']:
-        image_file = textbox['files'][0]
+    elif textbox["files"]:
+        image_file = textbox["files"][0]
         state.image_query_file = image_file
         state.image_query_files[len(state.messages)] = image_file
         state.append_message(state.roles[0], text)
@@ -476,10 +476,7 @@ with gr.Blocks() as qna:
                     with gr.Tabs():
                         with gr.TabItem("Text Query"):
                             textbox = gr.MultimodalTextbox(
-                                show_label=False,
-                                container=True,
-                                submit_btn=False,
-                                file_types=['image']
+                                show_label=False, container=True, submit_btn=False, file_types=["image"]
                             )
                         with gr.TabItem("Audio Query"):
                             audio = gr.Audio(
@@ -559,4 +556,3 @@ if __name__ == "__main__":
     dataprep_gen_caption_addr = dataprep_gen_caption_endpoint
 
     uvicorn.run(app, host=args.host, port=args.port)
-    
