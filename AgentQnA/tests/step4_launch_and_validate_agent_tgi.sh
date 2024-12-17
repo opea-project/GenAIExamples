@@ -78,7 +78,7 @@ function start_agent_and_api_server() {
 
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
-    bash launch_agent_service_tgi_gaudi.sh
+    bash launch_agent_service_gaudi.sh
     sleep 2m
 }
 

@@ -242,7 +242,7 @@ curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: applic
 
 Third, validate worker SQL agent:
 ```
-curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:9096/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "How many schools have average math score higher than 560?"
     }'
 ```
