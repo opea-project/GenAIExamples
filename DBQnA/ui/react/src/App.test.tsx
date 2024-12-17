@@ -44,6 +44,8 @@ test('testing api with dynamic host', async () => {
     conn_str: formData,
   };
 
+  console.log(payload)
+
   const response = await axios.post(endpointUrl, payload);
 
   expect(response.status).toBe(200);
