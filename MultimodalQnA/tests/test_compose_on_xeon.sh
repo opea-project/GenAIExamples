@@ -22,7 +22,7 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-multimodal-redis lvm-llava lvm-llava-svc dataprep-multimodal-redis whisper asr"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-redis lvm-llava lvm-llava-svc dataprep-multimodal-redis whisper asr"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -190,13 +190,13 @@ function validate_microservices() {
     sleep 1m
 
     # multimodal retrieval microservice
-    echo "Validating retriever-multimodal-redis"
+    echo "Validating retriever-redis"
     your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
     validate_service \
-        "http://${host_ip}:7000/v1/multimodal_retrieval" \
+        "http://${host_ip}:7000/v1/retrieval" \
         "retrieved_docs" \
-        "retriever-multimodal-redis" \
-        "retriever-multimodal-redis" \
+        "retriever-redis" \
+        "retriever-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
     sleep 3m
