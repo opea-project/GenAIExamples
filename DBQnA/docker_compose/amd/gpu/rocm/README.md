@@ -70,7 +70,7 @@ cd GenAIExamples/DBQnA/docker_compose/amd/gpu/rocm
 docker compose up -d
 ```
 
-```
+````
 
 ## 🚀 Validate Microservices
 
@@ -82,7 +82,7 @@ curl http://${host_ip}:$DBQNA_TGI_SERVICE_PORT/generate \
     -X POST \
     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
     -H 'Content-Type: application/json'
-```
+````
 
 ### 3.2 Postgres Microservice
 
