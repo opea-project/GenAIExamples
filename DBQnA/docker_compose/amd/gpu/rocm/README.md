@@ -99,7 +99,7 @@ curl --location http://${host_ip}:${DBQNA_TEXT_TO_SQL_PORT}/v1/postgres/health \
 #### 3.2.2 Invoke the microservice.
 
 ```bash
-curl http://${host_ip}:${DBQNA_TEXT_TO_SQL_PORT}/v1/texttosql\
+curl http://${host_ip}:${DBQNA_TEXT_TO_SQL_PORT}/v1/texttosql \
     -X POST \
     -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${host_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}}' \
     -H 'Content-Type: application/json'
