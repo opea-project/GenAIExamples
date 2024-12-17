@@ -3,7 +3,7 @@ import { exec } from 'child_process';
 
 const apiTimeOutInSeconds = 300;
 
-Helper function to get the host IP
+// Helper function to get the host IP
 const getHostIP = () => {
   return new Promise<string>((resolve, reject) => {
     exec('hostname -I | awk \'{print $1}\'', (error, stdout, stderr) => {
