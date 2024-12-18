@@ -258,7 +258,7 @@ function validate_megaservice_json() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    cd $WORKPATH/docker_compose/amd/gpu/rocm/
     docker compose stop && docker compose rm -f
 }
 
