@@ -42,7 +42,7 @@ curl localhost:$your_port/v1/embeddings \
 Start the embedding service with the TEI_EMBEDDING_ENDPOINT.
 
 ```bash
-export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport/v1/embeddings"
+export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
 export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-large-en-v1.5"
 python embedding_tei.py
 ```
@@ -71,7 +71,7 @@ curl localhost:$your_port/embed/v1/embeddings \
 Export the `TEI_EMBEDDING_ENDPOINT` for later usage:
 
 ```bash
-export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport/v1/embeddings"
+export TEI_EMBEDDING_ENDPOINT="http://localhost:$yourport"
 export TEI_EMBEDDING_MODEL_NAME="BAAI/bge-large-en-v1.5"
 ```
 

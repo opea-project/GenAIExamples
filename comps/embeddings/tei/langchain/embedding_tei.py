@@ -74,7 +74,9 @@ async def aembed_query(request: Dict, async_client: AsyncInferenceClient) -> Uni
 
 def get_async_inference_client(access_token: str) -> AsyncInferenceClient:
     headers = {"Authorization": f"Bearer {access_token}"} if access_token else {}
-    return AsyncInferenceClient(model=TEI_EMBEDDING_ENDPOINT, token=HUGGINGFACEHUB_API_TOKEN, headers=headers)
+    return AsyncInferenceClient(
+        model=f"{TEI_EMBEDDING_ENDPOINT}/v1/embeddings", token=HUGGINGFACEHUB_API_TOKEN, headers=headers
+    )
 
 
 if __name__ == "__main__":
