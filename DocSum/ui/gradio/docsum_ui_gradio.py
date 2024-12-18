@@ -122,7 +122,7 @@ class DocSumUI:
                 msg = f"There was an error trying to read '{url}' --> '{e}'\nTry adding the domain name to your `no_proxy` variable and try again. Example: example.com*"
                 logger.error(msg)
         else:
-            msg = f"Invalid URL '{url}'. Make sure the link provided is a valid URL.url"
+            msg = f"Invalid URL '{url}'. Make sure the link provided is a valid URL"
             logger.error(msg)
             return msg
 
@@ -189,7 +189,6 @@ class DocSumUI:
 
         except requests.exceptions.RequestException as e:
             logger.error("Request exception: %s", e)
-            print("")
             return str(e)
 
         return str(response.status_code)
