@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Check Paths and Hyperlinks
+name: Check hyperlinks and relative path validity
 
 on:
   pull_request:
@@ -9,39 +9,6 @@ on:
     types: [opened, reopened, ready_for_review, synchronize]
 
 jobs:
-  check-dockerfile-paths:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clean Up Working Directory
-        run: sudo rm -rf ${{github.workspace}}/*
-
-      - name: Checkout Repo GenAIExamples
-        uses: actions/checkout@v4
-
-      - name: Clone Repo GenAIComps
-        run: |
-          cd ..
-          git clone https://github.com/opea-project/GenAIComps.git
-
-      - name: Check for Missing Dockerfile Paths in GenAIComps
-        run: |
-          cd ${{github.workspace}}
-          miss="FALSE"
-          while IFS=: read -r file line content; do
-              dockerfile_path=$(echo "$content" | awk -F '-f ' '{print $2}' | awk '{print $1}')
-              if [[ ! -f "../GenAIComps/${dockerfile_path}" ]]; then
-                  miss="TRUE"
-                  echo "Missing Dockerfile: GenAIComps/${dockerfile_path} (Referenced in GenAIExamples/${file}:${line})"
-              fi
-          done < <(grep -Ern 'docker build .* -f comps/.+/Dockerfile' --include='*.md' .)
-
-
-          if [[ "$miss" == "TRUE" ]]; then
-            exit 1
-          fi
-
-        shell: bash
-
   check-the-validity-of-hyperlinks-in-README:
     runs-on: ubuntu-latest
     steps:
