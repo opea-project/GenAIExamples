@@ -30,7 +30,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
     export SEARCH_HOST_IP=${ip_address}
-    export SEARCH_EXTERNAL_HOST_IP='direct-supercomputer1.powerml.co'
+    export SEARCH_EXTERNAL_HOST_IP=${ip_address}
     export SEARCH_EMBEDDING_MODEL_ID='BAAI/bge-base-en-v1.5'
     export SEARCH_TEI_EMBEDDING_ENDPOINT=http://${SEARCH_HOST_IP}:3001
     export SEARCH_RERANK_MODEL_ID='BAAI/bge-reranker-base'
