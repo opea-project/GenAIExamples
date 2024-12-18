@@ -1,6 +1,5 @@
 # Build and deploy Translation Application on AMD GPU (ROCm)
 
-
 ## Build images
 
 ### Build the LLM Docker Image
