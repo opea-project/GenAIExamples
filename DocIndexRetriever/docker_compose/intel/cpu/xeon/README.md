@@ -62,6 +62,17 @@ cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
 docker compose up -d
 ```
 
+Two types of DocRetriever pipeline are supported now: `DocRetriever with/without Rerank`. And the `DocRetriever without Rerank` pipeline (including Embedding and Retrieval) is offered for customers who expect to handle all retrieved documents by LLM, and require high performance of DocRetriever.
+In that case, start Docker Containers with compose_without_rerank.yaml
+
+```bash
+export host_ip="YOUR IP ADDR"
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+docker compose -f compose_without_rerank.yaml up -d
+```
+
 ## 4. Validation
 
 Add Knowledge Base via HTTP Links:

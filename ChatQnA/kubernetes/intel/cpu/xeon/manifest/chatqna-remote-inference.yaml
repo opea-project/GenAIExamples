@@ -70,9 +70,8 @@ data:
   no_proxy: ""
   LOGFLAG: ""
   vLLM_ENDPOINT: "insert-your-remote-inference-endpoint"
-  LLM_MODEL: "meta-llama/Meta-Llama-3.1-8B-Instruct"
-  LLM_MODEL_ID: "meta-llama/Meta-Llama-3.1-8B-Instruct"
-  MODEL_ID: "meta-llama/Meta-Llama-3.1-8B-Instruct"
+  LLM_MODEL: "meta-llama/Meta-Llama-3.1-70B-Instruct"
+  MODEL_ID: "meta-llama/Meta-Llama-3.1-70B-Instruct"
   CLIENTID: ""
   CLIENT_SECRET: ""
   TOKEN_URL: ""
@@ -216,6 +215,10 @@ data:
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_buffering off;
+            proxy_cache off;
+            proxy_request_buffering off;
+            gzip off;
         }
 
         location /v1/dataprep {
@@ -552,6 +555,9 @@ spec:
         {}
       containers:
         - name: chatqna-ui
+          env:
+            - name: MODEL_ID
+              value: "meta-llama/Meta-Llama-3.1-70B-Instruct"
           securityContext:
             {}
           image: "opea/chatqna-ui:latest"
@@ -691,7 +697,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/embedding-tei:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: embedding-usvc
               containerPort: 6000
@@ -769,7 +775,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/llm-vllm:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: llm-uservice
               containerPort: 9000
@@ -919,7 +925,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/reranking-tei:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: reranking-usvc
               containerPort: 8000
@@ -1257,7 +1263,7 @@ spec:
             - name: EMBEDDING_SERVICE_HOST_IP
               value: chatqna-embedding-usvc
             - name: MODEL_ID
-              value: "meta-llama/Meta-Llama-3.1-8B-Instruct"
+              value: "meta-llama/Meta-Llama-3.1-70B-Instruct"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -1269,7 +1275,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/chatqna-wrapper:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /tmp
               name: tmp

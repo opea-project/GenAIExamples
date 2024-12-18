@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from utils import build_logger, make_temp_image, moderation_msg, server_error_msg, split_video
 
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
+logflag = os.getenv("LOGFLAG", False)
 
 headers = {"Content-Type": "application/json"}
 
@@ -50,21 +51,28 @@ def clear_history(state, request: gr.Request):
     if state.image and os.path.exists(state.image):
         os.remove(state.image)
     state = multimodalqna_conv.copy()
-    return (state, state.to_gradio_chatbot(), None, None, None) + (disable_btn,) * 1
+    return (state, state.to_gradio_chatbot(), None, None, None, None) + (disable_btn,) * 1
 
 
-def add_text(state, text, request: gr.Request):
+def add_text(state, text, audio, request: gr.Request):
     logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
-    if len(text) <= 0:
+    if audio:
+        state.audio_query_file = audio
+        state.append_message(state.roles[0], "--input placeholder--")
+        state.append_message(state.roles[1], None)
+        state.skip_next = False
+        return (state, state.to_gradio_chatbot(), None, None) + (disable_btn,) * 1
+    elif len(text) <= 0:
         state.skip_next = True
-        return (state, state.to_gradio_chatbot(), None) + (no_change_btn,) * 1
+        return (state, state.to_gradio_chatbot(), None, None) + (no_change_btn,) * 1
 
     text = text[:2000]  # Hard cut-off
 
     state.append_message(state.roles[0], text)
     state.append_message(state.roles[1], None)
     state.skip_next = False
-    return (state, state.to_gradio_chatbot(), None) + (disable_btn,) * 1
+
+    return (state, state.to_gradio_chatbot(), None, None) + (disable_btn,) * 1
 
 
 def http_bot(state, request: gr.Request):
@@ -72,6 +80,7 @@ def http_bot(state, request: gr.Request):
     logger.info(f"http_bot. ip: {request.client.host}")
     url = gateway_addr
     is_very_first_query = False
+    is_audio_query = state.audio_query_file is not None
     if state.skip_next:
         # This generate call is skipped due to invalid inputs
         path_to_sub_videos = state.get_path_to_subvideos()
@@ -84,13 +93,13 @@ def http_bot(state, request: gr.Request):
         new_state = multimodalqna_conv.copy()
         new_state.append_message(new_state.roles[0], state.messages[-2][1])
         new_state.append_message(new_state.roles[1], None)
+        new_state.audio_query_file = state.audio_query_file
         state = new_state
 
     # Construct prompt
     prompt = state.get_prompt()
 
     # Make requests
-
     pload = {
         "messages": prompt,
     }
@@ -99,6 +108,7 @@ def http_bot(state, request: gr.Request):
     logger.info(f"==== url request ====\n{gateway_addr}")
 
     state.messages[-1][-1] = "▌"
+
     yield (state, state.to_gradio_chatbot(), state.split_video, state.image) + (disable_btn,) * 1
 
     try:
@@ -108,8 +118,9 @@ def http_bot(state, request: gr.Request):
             json=pload,
             timeout=100,
         )
-        print(response.status_code)
-        print(response.json())
+        logger.info(response.status_code)
+        if logflag:
+            logger.info(response.json())
 
         if response.status_code == 200:
             response = response.json()
@@ -152,6 +163,11 @@ def http_bot(state, request: gr.Request):
         return
 
     state.messages[-1][-1] = message
+
+    if is_audio_query:
+        state.messages[-2][-1] = metadata.get("audio", "--transcribed audio not available--")
+        state.audio_query_file = None
+
     yield (
         state,
         state.to_gradio_chatbot(),
@@ -188,10 +204,11 @@ def ingest_gen_transcript(filepath, filetype, request: gr.Request):
         "files": open(dest, "rb"),
     }
     response = requests.post(dataprep_gen_transcript_addr, headers=headers, files=files)
-    print(response.status_code)
+    logger.info(response.status_code)
     if response.status_code == 200:
         response = response.json()
-        print(response)
+        if logflag:
+            logger.info(response)
         yield (gr.Textbox(visible=True, value=f"The {filetype} ingestion is done. Saving your uploaded {filetype}..."))
         time.sleep(2)
         fn_no_ext = Path(dest).stem
@@ -242,10 +259,11 @@ def ingest_gen_caption(filepath, filetype, request: gr.Request):
         "files": open(dest, "rb"),
     }
     response = requests.post(dataprep_gen_caption_addr, headers=headers, files=files)
-    print(response.status_code)
+    logger.info(response.status_code)
     if response.status_code == 200:
         response = response.json()
-        print(response)
+        if logflag:
+            logger.info(response)
         yield (gr.Textbox(visible=True, value=f"The {filetype} ingestion is done. Saving your uploaded {filetype}..."))
         time.sleep(2)
         fn_no_ext = Path(dest).stem
@@ -299,10 +317,11 @@ def ingest_with_text(filepath, text, request: gr.Request):
         response = requests.post(dataprep_ingest_addr, headers=headers, files=files)
     finally:
         os.remove(text_dest)
-    print(response.status_code)
+    logger.info(response.status_code)
     if response.status_code == 200:
         response = response.json()
-        print(response)
+        if logflag:
+            logger.info(response)
         yield (gr.Textbox(visible=True, value="Image ingestion is done. Saving your uploaded image..."))
         time.sleep(2)
         fn_no_ext = Path(dest).stem
@@ -436,21 +455,26 @@ with gr.Blocks() as upload_pdf:
 with gr.Blocks() as qna:
     state = gr.State(multimodalqna_conv.copy())
     with gr.Row():
-        with gr.Column(scale=4):
+        with gr.Column(scale=2):
             video = gr.Video(height=512, width=512, elem_id="video", visible=True, label="Media")
             image = gr.Image(height=512, width=512, elem_id="image", visible=False, label="Media")
-        with gr.Column(scale=7):
+        with gr.Column(scale=9):
             chatbot = gr.Chatbot(elem_id="chatbot", label="MultimodalQnA Chatbot", height=390)
             with gr.Row():
-                with gr.Column(scale=6):
-                    # textbox.render()
-                    textbox = gr.Textbox(
-                        # show_label=False,
-                        # container=False,
-                        label="Query",
-                        info="Enter a text query below",
-                        # submit_btn=False,
-                    )
+                with gr.Column(scale=8):
+                    with gr.Tabs():
+                        with gr.TabItem("Text Query"):
+                            textbox = gr.Textbox(
+                                show_label=False,
+                                container=True,
+                            )
+                        with gr.TabItem("Audio Query"):
+                            audio = gr.Audio(
+                                type="filepath",
+                                sources=["microphone", "upload"],
+                                show_label=False,
+                                container=False,
+                            )
                 with gr.Column(scale=1, min_width=100):
                     with gr.Row():
                         submit_btn = gr.Button(value="Send", variant="primary", interactive=True)
@@ -462,13 +486,13 @@ with gr.Blocks() as qna:
         [
             state,
         ],
-        [state, chatbot, textbox, video, image, clear_btn],
+        [state, chatbot, textbox, audio, video, image, clear_btn],
     )
 
     submit_btn.click(
         add_text,
-        [state, textbox],
-        [state, chatbot, textbox, clear_btn],
+        [state, textbox, audio],
+        [state, chatbot, textbox, audio, clear_btn],
     ).then(
         http_bot,
         [

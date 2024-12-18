@@ -2,6 +2,27 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  asr:
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+    container_name: asr-service
+    ports:
+      - "${ASR_SERVICE_PORT}:9099"
+    ipc: host
+    environment:
+      ASR_ENDPOINT: ${ASR_ENDPOINT}
+      ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
+      ASR_SERVICE_ENDPOINT: ${ASR_SERVICE_ENDPOINT}
   redis-vector-db:
     image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
@@ -53,9 +74,9 @@ services:
       MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
     restart: unless-stopped
-  retriever-multimodal-redis:
-    image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}
-    container_name: retriever-multimodal-redis
+  retriever-redis:
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    container_name: retriever-redis
     depends_on:
       - redis-vector-db
     ports:
@@ -67,6 +88,7 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
     restart: unless-stopped
   lvm-llava:
     image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
@@ -100,8 +122,9 @@ services:
       - redis-vector-db
       - dataprep-multimodal-redis
       - embedding-multimodal
-      - retriever-multimodal-redis
+      - retriever-redis
       - lvm-llava-svc
+      - asr
     ports:
       - "8888:8888"
     environment:
@@ -113,6 +136,8 @@ services:
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
       MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
+      ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
+      ASR_SERVICE_ENDPOINT: ${ASR_SERVICE_ENDPOINT}
     ipc: host
     restart: always
   multimodalqna-ui:

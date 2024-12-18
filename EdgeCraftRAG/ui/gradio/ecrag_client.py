@@ -67,7 +67,7 @@ def create_update_pipeline(
                 weight=llm_weights,
             ),
         ),
-        retriever=api_schema.RetrieverIn(retriever_type=retriever, retriever_topk=vector_search_top_k),
+        retriever=api_schema.RetrieverIn(retriever_type=retriever, retrieve_topk=vector_search_top_k),
         postprocessor=[
             api_schema.PostProcessorIn(
                 processor_type=postprocessor[0],

@@ -66,6 +66,7 @@ class QnAGenerator(BaseComponent):
             repetition_penalty=chat_request.repetition_penalty,
         )
         self.llm().generate_kwargs = generate_kwargs
+        self.llm().max_new_tokens = chat_request.max_tokens
         if chat_request.stream:
 
             async def stream_generator():
@@ -99,8 +100,10 @@ class QnAGenerator(BaseComponent):
             max_tokens=chat_request.max_tokens,
             model=model_name,
             top_p=chat_request.top_p,
+            top_k=chat_request.top_k,
             temperature=chat_request.temperature,
             streaming=chat_request.stream,
+            repetition_penalty=chat_request.repetition_penalty,
         )
 
         if chat_request.stream:
