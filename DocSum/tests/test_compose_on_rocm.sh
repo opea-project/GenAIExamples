@@ -18,6 +18,7 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
 export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export HOST_IP=${ip_address}
 export host_ip=${ip_address}
 export DOCSUM_TGI_SERVICE_PORT="8008"
 export DOCSUM_TGI_LLM_ENDPOINT="http://${host_ip}:8008"
