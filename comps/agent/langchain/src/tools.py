@@ -125,18 +125,19 @@ def load_python_tools(file_dir_path: str):
 
 def get_tools_descriptions(file_dir_path: str):
     tools = []
-    file_path_list = []
-    if os.path.isdir(file_dir_path):
-        file_path_list += glob.glob(file_dir_path + "/*")
-    else:
-        file_path_list.append(file_dir_path)
-    for file in file_path_list:
-        if os.path.basename(file).endswith(".yaml"):
-            tools += load_yaml_tools(file)
-        elif os.path.basename(file).endswith(".yml"):
-            tools += load_yaml_tools(file)
-        elif os.path.basename(file).endswith(".py"):
-            tools += load_python_tools(file)
+    if file_dir_path:
+        file_path_list = []
+        if os.path.isdir(file_dir_path):
+            file_path_list += glob.glob(file_dir_path + "/*")
         else:
-            pass
+            file_path_list.append(file_dir_path)
+        for file in file_path_list:
+            if os.path.basename(file).endswith(".yaml"):
+                tools += load_yaml_tools(file)
+            elif os.path.basename(file).endswith(".yml"):
+                tools += load_yaml_tools(file)
+            elif os.path.basename(file).endswith(".py"):
+                tools += load_python_tools(file)
+            else:
+                pass
     return tools
