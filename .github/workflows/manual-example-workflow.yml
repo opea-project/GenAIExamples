@@ -12,7 +12,7 @@ on:
         type: string
       examples:
         default: "ChatQnA"
-        description: 'List of examples to test [AudioQnA,ChatQnA,CodeGen,CodeTrans,DocSum,FaqGen,SearchQnA,Translation]'
+        description: 'List of examples to test [AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA,AvatarChatbot,Text2Image,WorkflowExecAgent,DBQnA,EdgeCraftRAG,GraphRAG]'
         required: true
         type: string
       tag:
@@ -51,7 +51,7 @@ on:
         required: false
         type: string
       inject_commit:
-        default: true
+        default: false
         description: "inject commit to docker images true or false"
         required: false
         type: string

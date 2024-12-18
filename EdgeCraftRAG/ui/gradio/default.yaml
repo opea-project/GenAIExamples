@@ -14,7 +14,7 @@ name: "default"
 
 # Node parser
 node_parser: "simple"
-chunk_size: 192
+chunk_size: 400
 chunk_overlap: 48
 
 # Indexer

@@ -37,7 +37,7 @@ test_cases:
       service_name: "chatqna-retriever-usvc"  # Replace with your service name
       parameters:
         search_type: "similarity"
-        k: 4
+        k: 1
         fetch_k: 20
         lambda_mult: 0.5
         score_threshold: 0.2
@@ -65,3 +65,4 @@ test_cases:
     e2e:
       run_test: true
       service_name: "chatqna"  # Replace with your service name
+      k: 1

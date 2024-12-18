@@ -5,7 +5,7 @@ import dataclasses
 from enum import Enum, auto
 from typing import List
 
-from utils import get_b64_frame_from_timestamp
+from utils import convert_audio_to_base64, get_b64_frame_from_timestamp
 
 
 class SeparatorStyle(Enum):
@@ -31,6 +31,7 @@ class Conversation:
     skip_next: bool = False
     split_video: str = None
     image: str = None
+    audio_query_file: str = None
 
     def _template_caption(self):
         out = ""
@@ -41,31 +42,32 @@ class Conversation:
     def get_prompt(self):
         messages = self.messages
         if len(messages) > 1 and messages[1][1] is None:
-            # Need to do RAG. prompt is the query only
-            ret = messages[0][1]
+            # Need to do RAG. If the query is text, prompt is the query only
+            if self.audio_query_file:
+                ret = [{"role": "user", "content": [{"type": "audio", "audio": self.get_b64_audio_query()}]}]
+            else:
+                ret = messages[0][1]
         else:
             # No need to do RAG. Thus, prompt of chatcompletion format
             conv_dict = []
             if self.sep_style == SeparatorStyle.SINGLE:
                 for i, (role, message) in enumerate(messages):
                     if message:
-                        if i != 0:
-                            dic = {"role": role, "content": message}
+                        dic = {"role": role}
+                        if self.audio_query_file:
+                            content = [{"type": "audio", "audio": self.get_b64_audio_query()}]
                         else:
-                            dic = {"role": role}
-                            if self.time_of_frame_ms and self.video_file:
-                                content = [{"type": "text", "text": message}]
-                                if self.base64_frame:
-                                    base64_frame = self.base64_frame
-                                else:
-                                    base64_frame = get_b64_frame_from_timestamp(self.video_file, self.time_of_frame_ms)
-                                    self.base64_frame = base64_frame
-                                if base64_frame is None:
-                                    base64_frame = ""
-                                content.append({"type": "image_url", "image_url": {"url": base64_frame}})
-                            else:
-                                content = message
-                            dic["content"] = content
+                            content = [{"type": "text", "text": message}]
+                        if i == 0 and self.time_of_frame_ms and self.video_file:
+                            base64_frame = (
+                                self.base64_frame
+                                if self.base64_frame
+                                else get_b64_frame_from_timestamp(self.video_file, self.time_of_frame_ms)
+                            )
+                            if base64_frame is None:
+                                base64_frame = ""
+                            content.append({"type": "image_url", "image_url": {"url": base64_frame}})
+                        dic["content"] = content
                         conv_dict.append(dic)
             else:
                 raise ValueError(f"Invalid style: {self.sep_style}")
@@ -82,6 +84,12 @@ class Conversation:
             video_file = self.video_file
             b64_img = get_b64_frame_from_timestamp(video_file, time_of_frame_ms)
         return b64_img
+
+    def get_b64_audio_query(self):
+        b64_audio = None
+        if self.audio_query_file:
+            b64_audio = convert_audio_to_base64(self.audio_query_file)
+        return b64_audio
 
     def to_gradio_chatbot(self):
         ret = []
@@ -141,6 +149,7 @@ class Conversation:
             "base64_frame": self.base64_frame,
             "split_video": self.split_video,
             "image": self.image,
+            "audio_query_file": self.audio_query_file,
         }
 
 
@@ -157,4 +166,5 @@ multimodalqna_conv = Conversation(
     base64_frame=None,
     split_video=None,
     image=None,
+    audio_query_file=None,
 )

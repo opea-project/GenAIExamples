@@ -11,6 +11,18 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+  audioqna-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}
+  audioqna-multilang:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile.multilang
+    extends: audioqna
+    image: ${REGISTRY:-opea}/audioqna-multilang:${TAG:-latest}
   whisper-gaudi:
     build:
       context: GenAIComps
