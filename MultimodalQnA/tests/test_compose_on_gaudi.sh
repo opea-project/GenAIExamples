@@ -18,6 +18,29 @@ export image_fn="apple.png"
 export video_fn="WeAreGoingOnBullrun.mp4"
 export caption_fn="apple.txt"
 
+function check_service_ready() {
+    local container_name="$1"
+    local max_retries="$2"
+    local log_string="$3"
+
+    for i in $(seq 1 "$max_retries")
+    do
+        service_logs=$(docker logs "$container_name" 2>&1 | grep "$log_string" || true)
+        if [[ -z "$service_logs" ]]; then
+            echo "The $container_name service is not ready yet, sleeping 30s..."
+            sleep 30s
+        else
+            echo "$container_name service is ready"
+            break
+        fi
+    done
+
+    if [[ $i -ge $max_retries ]]; then
+        echo "WARNING: Max retries reached when waiting for the $container_name service to be ready"
+        docker logs "$container_name" >> "${LOG_PATH}/$container_name_file.log"
+    fi
+}
+
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/mhbuehler/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"dina/image_query"}" && cd ../
@@ -202,7 +225,8 @@ function validate_microservices() {
         "retriever-multimodal-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
-    sleep 3m
+    echo "Wait for tgi-llava-gaudi-server service to be ready"
+    check_service_ready "tgi-llava-gaudi-server" 10 "Connected"
 
     # llava server
     echo "Evaluating LLAVA tgi-gaudi"
