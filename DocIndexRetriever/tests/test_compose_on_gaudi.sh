@@ -93,7 +93,7 @@ function validate_megaservice() {
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs tei-embedding-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs reranking-tei-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         exit 1
     fi
@@ -108,7 +108,7 @@ function validate_megaservice() {
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs tei-embedding-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs reranking-tei-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         exit 1
     fi
