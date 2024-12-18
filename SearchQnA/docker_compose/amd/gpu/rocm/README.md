@@ -1,5 +1,6 @@
 # Build and deploy SearchQnA Application on AMD GPU (ROCm)
 
+
 ## Build images
 
 ### Build Embedding Image
