@@ -49,7 +49,7 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d
-    sleep 20
+    sleep 30
     echo "Docker services started!"
 }
 
