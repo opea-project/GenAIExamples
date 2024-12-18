@@ -67,7 +67,7 @@ def create_update_pipeline(
                 weight=llm_weights,
             ),
         ),
-        retriever=api_schema.RetrieverIn(retriever_type=retriever, retriever_topk=vector_search_top_k),
+        retriever=api_schema.RetrieverIn(retriever_type=retriever, retrieve_topk=vector_search_top_k),
         postprocessor=[
             api_schema.PostProcessorIn(
                 processor_type=postprocessor[0],
@@ -78,7 +78,7 @@ def create_update_pipeline(
         ],
         generator=api_schema.GeneratorIn(
             # TODO: remove hardcoding
-            prompt_path="./edgecraftrag/prompt_template/default_prompt.txt",
+            prompt_path="./default_prompt.txt",
             model=api_schema.ModelIn(model_id=llm_id, model_path=llm_path, device=llm_device, weight=llm_weights),
             inference_type=llm_infertype,
         ),

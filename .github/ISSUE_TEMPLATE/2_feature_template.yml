@@ -4,6 +4,7 @@
 name: Report Feature
 description: Used to report feature
 title: "[Feature]"
+labels: ["feature"]
 body:
   - type: dropdown
     id: priority

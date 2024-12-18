@@ -1284,9 +1284,8 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/vllm-hpu:latest"
+          image: "opea/vllm-gaudi:latest"
           args:
-            - "--enforce-eager"
             - "--model"
             - "$(MODEL_ID)"
             - "--tensor-parallel-size"

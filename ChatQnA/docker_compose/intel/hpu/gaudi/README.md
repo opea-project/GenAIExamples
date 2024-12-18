@@ -26,7 +26,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,guardrails
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
    ```
 
 3. Set up other environment variables:
@@ -227,7 +227,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,guardrails
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
    ```
 
 3. Set up other environment variables:
@@ -314,7 +314,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
-   docker logs tgi-service | grep Connected
+   docker logs tgi-gaudi-server | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
@@ -327,7 +327,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
 
    ```bash
    # TGI service
-   curl http://${host_ip}:9009/v1/chat/completions \
+   curl http://${host_ip}:8005/v1/chat/completions \
      -X POST \
      -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
@@ -335,7 +335,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
 
    ```bash
    # vLLM Service
-   curl http://${host_ip}:9009/v1/chat/completions \
+   curl http://${host_ip}:8007/v1/chat/completions \
      -H "Content-Type: application/json" \
      -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
    ```

@@ -5,12 +5,11 @@ import os
 
 from comps import MicroService, ServiceOrchestrator, ServiceType
 
-MEGA_SERVICE_HOST_IP = os.getenv("MEGA_SERVICE_HOST_IP", "127.0.0.1")
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 16011))
 PIPELINE_SERVICE_HOST_IP = os.getenv("PIPELINE_SERVICE_HOST_IP", "127.0.0.1")
 PIPELINE_SERVICE_PORT = int(os.getenv("PIPELINE_SERVICE_PORT", 16010))
 
-from comps import Gateway, MegaServiceEndpoint
+from comps import MegaServiceEndpoint, ServiceRoleType
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -23,11 +22,23 @@ from fastapi import Request
 from fastapi.responses import StreamingResponse
 
 
-class EdgeCraftRagGateway(Gateway):
-    def __init__(self, megaservice, host="0.0.0.0", port=16011):
-        super().__init__(
-            megaservice, host, port, str(MegaServiceEndpoint.CHAT_QNA), ChatCompletionRequest, ChatCompletionResponse
+class EdgeCraftRagService:
+    def __init__(self, host="0.0.0.0", port=16010):
+        self.host = host
+        self.port = port
+        self.megaservice = ServiceOrchestrator()
+        self.endpoint = str(MegaServiceEndpoint.CHAT_QNA)
+
+    def add_remote_service(self):
+        edgecraftrag = MicroService(
+            name="pipeline",
+            host=PIPELINE_SERVICE_HOST_IP,
+            port=PIPELINE_SERVICE_PORT,
+            endpoint="/v1/chatqna",
+            use_remote_service=True,
+            service_type=ServiceType.LLM,
         )
+        self.megaservice.add(edgecraftrag)
 
     async def handle_request(self, request: Request):
         input = await request.json()
@@ -61,26 +72,21 @@ class EdgeCraftRagGateway(Gateway):
         )
         return ChatCompletionResponse(model="edgecraftrag", choices=choices, usage=usage)
 
-
-class EdgeCraftRagService:
-    def __init__(self, host="0.0.0.0", port=16010):
-        self.host = host
-        self.port = port
-        self.megaservice = ServiceOrchestrator()
-
-    def add_remote_service(self):
-        edgecraftrag = MicroService(
-            name="pipeline",
-            host=PIPELINE_SERVICE_HOST_IP,
-            port=PIPELINE_SERVICE_PORT,
-            endpoint="/v1/chatqna",
-            use_remote_service=True,
-            service_type=ServiceType.LLM,
+    def start(self):
+        self.service = MicroService(
+            self.__class__.__name__,
+            service_role=ServiceRoleType.MEGASERVICE,
+            host=self.host,
+            port=self.port,
+            endpoint=self.endpoint,
+            input_datatype=ChatCompletionRequest,
+            output_datatype=ChatCompletionResponse,
         )
-        self.megaservice.add(edgecraftrag)
-        self.gateway = EdgeCraftRagGateway(megaservice=self.megaservice, host="0.0.0.0", port=self.port)
+        self.service.add_route(self.endpoint, self.handle_request, methods=["POST"])
+        self.service.start()
 
 
 if __name__ == "__main__":
-    edgecraftrag = EdgeCraftRagService(host=MEGA_SERVICE_HOST_IP, port=MEGA_SERVICE_PORT)
+    edgecraftrag = EdgeCraftRagService(port=MEGA_SERVICE_PORT)
     edgecraftrag.add_remote_service()
+    edgecraftrag.start()

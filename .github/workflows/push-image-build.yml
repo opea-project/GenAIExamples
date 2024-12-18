@@ -8,7 +8,8 @@ on:
     branches: [ 'main' ]
     paths:
       - "**.py"
-      - "**Dockerfile"
+      - "**Dockerfile*"
+      - "**docker_image_build/build.yaml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-on-push
