@@ -26,19 +26,19 @@ services:
   whisper-gaudi:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/dependency/Dockerfile.intel_hpu
+      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile.intel_hpu
     extends: audioqna
     image: ${REGISTRY:-opea}/whisper-gaudi:${TAG:-latest}
   whisper:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/dependency/Dockerfile
+      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
   asr:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/Dockerfile
+      dockerfile: comps/asr/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/asr:${TAG:-latest}
   llm-tgi:
