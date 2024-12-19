@@ -31,7 +31,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
     if self.services[cur_node].service_type == ServiceType.LLM:
         docsum_parameters = kwargs.get("docsum_parameters", None)
         if docsum_parameters:
-            docsum_parameters = docsum_parameters.dict()
+            docsum_parameters = docsum_parameters.model_dump()
             del docsum_parameters["query"]
             inputs.update(docsum_parameters)
     return inputs
