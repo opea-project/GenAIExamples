@@ -29,12 +29,12 @@ services:
       dockerfile: comps/embeddings/multimodal/multimodal_langchain/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
-  retriever-multimodal-redis:
+  retriever-redis:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/multimodal/redis/langchain/Dockerfile
+      dockerfile: comps/retrievers/redis/langchain/Dockerfile
     extends: multimodalqna
-    image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
   lvm-llava:
     build:
       context: GenAIComps
