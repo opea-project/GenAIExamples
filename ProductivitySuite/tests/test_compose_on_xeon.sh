@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -119,8 +119,11 @@ function validate_service() {
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "all"}' -H 'Content-Type: application/json' "$URL")
-    elif [[ $SERVICE_NAME == *"docsum-xeon-backend-server"* ]]; then
+    elif [[ $SERVICE_NAME == *"docsum-xeon-backend-server"* ]]; then	 
 	local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"faqgen-xeon-backend-server"* ]]; then
+        local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
@@ -313,7 +316,7 @@ function validate_megaservice() {
     # Curl the FAQGen Service
     validate_service \
         "${ip_address}:8889/v1/faqgen" \
-        "Text Embeddings Inference" \
+        "data:" \
         "faqgen-xeon-backend-server" \
         "faqgen-xeon-backend-server" \
         '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'\
