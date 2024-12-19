@@ -442,7 +442,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: chatqna-ui
-        app.kubernetes.io/instance: chatqna        
+        app.kubernetes.io/instance: chatqna
     spec:
       securityContext:
         {}
