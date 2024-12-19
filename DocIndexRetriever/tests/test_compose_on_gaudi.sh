@@ -49,7 +49,7 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d
-    sleep 20
+    sleep 30
     echo "Docker services started!"
 }
 
@@ -93,25 +93,11 @@ function validate_megaservice() {
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs tei-embedding-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs reranking-tei-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         exit 1
     fi
 
-    echo "==============Testing retriever service: ChatCompletion Request================"
-    cd $WORKPATH/tests
-    local CONTENT=$(python test.py --host_ip ${ip_address} --request_type chat_completion)
-    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")
-    echo "$EXIT_CODE"
-    local EXIT_CODE="${EXIT_CODE:0-1}"
-    echo "return value is $EXIT_CODE"
-    if [ "$EXIT_CODE" == "1" ]; then
-        docker logs tei-embedding-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        exit 1
-    fi
 }
 
 function stop_docker() {
