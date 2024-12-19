@@ -1,5 +1,6 @@
 # Deploy on AMD GPU
 
+
 This document outlines the deployment process for DBQnA application which helps generating a SQL query and its output given a NLP question, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an AMD GPU. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
 
 ## 🚀 Build Docker Images
