@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: "Dependency Review"
-on: [pull_request]
+on: [pull_request_target]
 
 permissions:
   contents: read
