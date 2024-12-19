@@ -60,7 +60,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 3. Set up other environment variables:
 
-   > Notice that you can only choose **one** hardware option below to set up envs according to your hardware. Other that the port numbers may be set incorrectly.
+   > Notice that you can only choose **one** hardware option below to set up envs according to your hardware. Make sure port numbers are set correctly as well. 
 
    ```bash
    # on Gaudi
