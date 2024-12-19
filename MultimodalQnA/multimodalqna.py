@@ -54,7 +54,7 @@ class MultimodalQnAService:
             name="retriever",
             host=MM_RETRIEVER_SERVICE_HOST_IP,
             port=MM_RETRIEVER_SERVICE_PORT,
-            endpoint="/v1/multimodal_retrieval",
+            endpoint="/v1/retrieval",
             use_remote_service=True,
             service_type=ServiceType.RETRIEVER,
         )
