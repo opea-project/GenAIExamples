@@ -3,6 +3,8 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
+export MAX_INPUT_TOKENS=2048
+export MAX_TOTAL_TOKENS=4096
 export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
 export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HOST_IP=${host_ip}

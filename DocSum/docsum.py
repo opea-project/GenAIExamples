@@ -14,7 +14,7 @@ from comps.cores.proto.api_protocol import (
     ChatMessage,
     UsageInfo,
 )
-from comps.cores.proto.docarray import LLMParams
+from comps.cores.proto.docarray import DocSumLLMParams
 from fastapi import File, Request, UploadFile
 from fastapi.responses import StreamingResponse
 
@@ -25,6 +25,16 @@ DATA_SERVICE_PORT = int(os.getenv("DATA_SERVICE_PORT", 7079))
 
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
+
+
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.LLM:
+        docsum_parameters = kwargs.get("docsum_parameters", None)
+        if docsum_parameters:
+            docsum_parameters = docsum_parameters.model_dump()
+            del docsum_parameters["query"]
+            inputs.update(docsum_parameters)
+    return inputs
 
 
 def read_pdf(file):
@@ -66,6 +76,7 @@ class DocSumService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_inputs = align_inputs
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.DOC_SUMMARY)
 
@@ -97,6 +108,9 @@ class DocSumService:
         if "application/json" in request.headers.get("content-type"):
             data = await request.json()
             stream_opt = data.get("stream", True)
+            summary_type = data.get("summary_type", "auto")
+            chunk_size = data.get("chunk_size", -1)
+            chunk_overlap = data.get("chunk_overlap", -1)
             chat_request = ChatCompletionRequest.model_validate(data)
             prompt = handle_message(chat_request.messages)
 
@@ -105,6 +119,9 @@ class DocSumService:
         elif "multipart/form-data" in request.headers.get("content-type"):
             data = await request.form()
             stream_opt = data.get("stream", True)
+            summary_type = data.get("summary_type", "auto")
+            chunk_size = data.get("chunk_size", -1)
+            chunk_overlap = data.get("chunk_overlap", -1)
             chat_request = ChatCompletionRequest.model_validate(data)
 
             data_type = data.get("type")
@@ -148,7 +165,8 @@ class DocSumService:
         else:
             raise ValueError(f"Unknown request type: {request.headers.get('content-type')}")
 
-        parameters = LLMParams(
+        docsum_parameters = DocSumLLMParams(
+            query="",
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
             top_p=chat_request.top_p if chat_request.top_p else 0.95,
@@ -159,10 +177,13 @@ class DocSumService:
             streaming=stream_opt,
             model=chat_request.model if chat_request.model else None,
             language=chat_request.language if chat_request.language else "auto",
+            summary_type=summary_type,
+            chunk_overlap=chunk_overlap,
+            chunk_size=chunk_size,
         )
 
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs=initial_inputs_data, llm_parameters=parameters
+            initial_inputs=initial_inputs_data, docsum_parameters=docsum_parameters
         )
 
         for node, response in result_dict.items():

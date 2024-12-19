@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
@@ -14,7 +14,8 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-
+export MAX_INPUT_TOKENS=1024
+export MAX_TOTAL_TOKENS=2048
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -84,6 +85,8 @@ function validate_services() {
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
         local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        echo $CONTENT
 
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
@@ -234,6 +237,30 @@ function validate_megaservice_json() {
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+
+    echo ">>> Checking text data in truncate mode with Content-Type: application/json"
+    validate_services \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "summary_type": "truncate"}'
+
+    echo ">>> Checking text data in map_reduce mode with Content-Type: application/json"
+    validate_services \
+        "${host_ip}:8888/v1/docsum" \
+        "text" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "summary_type": "map_reduce"}'
+
+    echo ">>> Checking text data in refine mode with Content-Type: application/json"
+    validate_services \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "summary_type": "refine"}'
 
     echo ">>> Checking audio data"
     validate_services \
