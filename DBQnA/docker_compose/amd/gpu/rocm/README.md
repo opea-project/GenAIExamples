@@ -70,7 +70,6 @@ cd GenAIExamples/DBQnA/docker_compose/amd/gpu/rocm
 docker compose up -d
 ```
 
-
 ## 🚀 Validate Microservices
 
 ### 3.1 TGI Service
