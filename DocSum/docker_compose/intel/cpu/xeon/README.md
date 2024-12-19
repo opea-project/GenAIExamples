@@ -294,13 +294,17 @@ You will have the following Docker Images:
 
    If you want to deal with long context, can set following parameters and select suitable summary type.
 
-   - "summary_type": can be "stuff", "truncate", "map_reduce", "refine", default is "stuff"
+   - "summary_type": can be "auto", "stuff", "truncate", "map_reduce", "refine", default is "auto"
    - "chunk_size": max token length for each chunk. Set to be different default value according to "summary_type".
    - "chunk_overlap": overlap token length between each chunk, default is 0.1\*chunk_size
 
-   "summary_type" is set to be "stuff" by default, which will let LLM generate summary based on complete input text. In this case please carefully set `MAX_INPUT_TOKENS` and `MAX_TOTAL_TOKENS` according to your model and device memory, otherwise it may exceed LLM context limit and raise error when meet long context.
+   **summary_type=auto**
 
-   When deal with long context, you can set "summary_type" to one of "truncate", "map_reduce" and "refine" for better performance.
+   "summary_type" is set to be "auto" by default, in this mode we will check input token length, if it exceed `MAX_INPUT_TOKENS`, `summary_type` will automatically be set to `refine` mode, otherwise will be set to `stuff` mode.
+
+   **summary_type=stuff**
+
+   In this mode LLM generate summary based on complete input text. In this case please carefully set `MAX_INPUT_TOKENS` and `MAX_TOTAL_TOKENS` according to your model and device memory, otherwise it may exceed LLM context limit and raise error when meet long context.
 
    **summary_type=truncate**
 
