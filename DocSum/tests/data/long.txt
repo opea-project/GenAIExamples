@@ -1,0 +1,99 @@
+Intel Corporation[note 1] is an American multinational corporation and technology company headquartered in Santa Clara, California, and incorporated in Delaware.[5] Intel designs, manufactures, and sells computer components and related products for business and consumer markets. It is considered one of the world's largest semiconductor chip manufacturers by revenue[6][7] and ranked in the Fortune 500 list of the largest United States corporations by revenue for nearly a decade, from 2007 to 2016 fiscal years, until it was removed from the ranking in 2018.[8] In 2020, it was reinstated and ranked 45th, being the 7th-largest technology company in the ranking.
+
+Intel supplies microprocessors for most manufacturers of computer systems, and is one of the developers of the x86 series of instruction sets found in most personal computers (PCs). It also manufactures chipsets, network interface controllers, flash memory, graphics processing units (GPUs), field-programmable gate arrays (FPGAs), and other devices related to communications and computing. Intel has a strong presence in the high-performance general-purpose and gaming PC market with its Intel Core line of CPUs, whose high-end models are among the fastest consumer CPUs, as well as its Intel Arc series of GPUs. The Open Source Technology Center at Intel hosts PowerTOP and LatencyTOP, and supports other open source projects such as Wayland, Mesa, Threading Building Blocks (TBB), and Xen.[9]
+
+Intel was founded on July 18, 1968, by semiconductor pioneers Gordon Moore (of Moore's law) and Robert Noyce, along with investor Arthur Rock, and is associated with the executive leadership and vision of Andrew Grove.[10] The company was a key component of the rise of Silicon Valley as a high-tech center,[11] as well as being an early developer of SRAM and DRAM memory chips, which represented the majority of its business until 1981. Although Intel created the world's first commercial microprocessor chip—the Intel 4004—in 1971, it was not until the success of the PC in the early 1990s that this became its primary business.
+
+During the 1990s, the partnership between Microsoft Windows and Intel, known as "Wintel", became instrumental in shaping the PC landscape[12][13] and solidified Intel's position on the market. As a result, Intel invested heavily in new microprocessor designs in the mid to late 1990s, fostering the rapid growth of the computer industry. During this period, it became the dominant supplier of PC microprocessors, with a market share of 90%,[14] and was known for aggressive and anti-competitive tactics in defense of its market position, particularly against AMD, as well as a struggle with Microsoft for control over the direction of the PC industry.[15][16]
+
+Since the 2000s and especially since the late 2010s, Intel has faced increasing competition, which has led to a reduction in Intel's dominance and market share in the PC market.[17] Nevertheless, with a 68.4% market share as of 2023, Intel still leads the x86 market by a wide margin.[18] In addition, Intel's ability to design and manufacture its own chips is considered a rarity in the semiconductor industry,[19] as most chip designers do not have their own production facilities and instead rely on contract manufacturers (e.g. TSMC, Foxconn and Samsung ).[20]
+
+Industries
+Operating segments
+Client Computing Group – 51.8% of 2020 revenues – produces PC processors and related components.[21][22]
+Data Center Group – 33.7% of 2020 revenues – produces hardware components used in server, network, and storage platforms.[21]
+Internet of Things Group – 5.2% of 2020 revenues – offers platforms designed for retail, transportation, industrial, buildings and home use.[21]
+Programmable Solutions Group – 2.4% of 2020 revenues – manufactures programmable semiconductors (primarily FPGAs).[21]
+Customers
+In 2023, Dell accounted for about 19% of Intel's total revenues, Lenovo accounted for 11% of total revenues, and HP Inc. accounted for 10% of total revenues.[3] As of May 2024, the U.S. Department of Defense is another large customer for Intel.[23][24][25][26] In September 2024, Intel reportedly qualified for as much as $3.5 billion in federal grants to make semiconductors for the Defense Department.[27]
+
+Market share
+According to IDC, while Intel enjoyed the biggest market share in both the overall worldwide PC microprocessor market (73.3%) and the mobile PC microprocessor (80.4%) in the second quarter of 2011, the numbers decreased by 1.5% and 1.9% compared to the first quarter of 2011.[28][29]
+
+Intel's market share decreased significantly in the enthusiast market as of 2019,[30] and they have faced delays for their 10 nm products. According to former Intel CEO Bob Swan, the delay was caused by the company's overly aggressive strategy for moving to its next node.[31]
+
+Historical market share
+In the 1980s, Intel was among the world's top ten sellers of semiconductors (10th in 1987[32]). Along with Microsoft Windows, it was part of the "Wintel" personal computer domination in the 1990s and early 2000s. In 1992, Intel became the biggest semiconductor chip maker by revenue and held the position until 2018 when Samsung Electronics surpassed it, but Intel returned to its former position the year after.[33][34] Other major semiconductor companies include TSMC, GlobalFoundries, Texas Instruments, ASML, STMicroelectronics, United Microelectronics Corporation (UMC), Micron, SK Hynix, Kioxia, and SMIC.
+
+Major competitors
+Intel's competitors in PC chipsets included AMD, VIA Technologies, Silicon Integrated Systems, and Nvidia. Intel's competitors in networking include NXP Semiconductors, Infineon,[needs update] Broadcom Limited, Marvell Technology Group and Applied Micro Circuits Corporation, and competitors in flash memory included Spansion, Samsung Electronics, Qimonda, Kioxia, STMicroelectronics, Micron, and SK Hynix.
+
+The only major competitor in the x86 processor market is AMD, with which Intel has had full cross-licensing agreements since 1976: each partner can use the other's patented technological innovations without charge after a certain time.[35] However, the cross-licensing agreement is canceled in the event of an AMD bankruptcy or takeover.[36]
+
+Some smaller competitors, such as VIA Technologies, produce low-power x86 processors for small factor computers and portable equipment. However, the advent of such mobile computing devices, in particular, smartphones, has led to a decline in PC sales.[37] Since over 95% of the world's smartphones currently use processors cores designed by Arm, using the Arm instruction set, Arm has become a major competitor for Intel's processor market. Arm is also planning to make attempts at setting foot into the PC and server market, with Ampere and IBM each individually designing CPUs for servers and supercomputers.[38] The only other major competitor in processor instruction sets is RISC-V, which is an open source CPU instruction set. The major Chinese phone and telecommunications manufacturer Huawei has released chips based on the RISC-V instruction set due to US sanctions against China.[39]
+
+Intel has been involved in several disputes regarding the violation of antitrust laws, which are noted below.
+
+Carbon footprint
+Intel reported total CO2e emissions (direct + indirect) for the twelve months ending December 31, 2020, at 2,882 Kt (+94/+3.4% y-o-y).[40] Intel plans to reduce carbon emissions 10% by 2030 from a 2020 base year.[41]
+
+Intel's annual total CO2e emissions (direct + indirect) in kilotonnes
+Dec. 2017	Dec. 2018	Dec. 2019	Dec. 2020	Dec. 2021
+2,461[42]	2,578[43]	2,788[44]	2,882[40]	3,274[45]
+Manufacturing locations
+Intel has self-reported that they have Wafer fabrication plants in the United States, Ireland, and Israel. They have also self-reported that they have assembly and testing sites mostly in China, Costa Rica, Malaysia, and Vietnam, and one site in the United States.[46][47]
+
+Corporate history
+For a chronological guide, see Timeline of Intel.
+Origins
+
+Andy Grove, Robert Noyce and Gordon Moore in 1978
+Intel was incorporated in Mountain View, California, on July 18, 1968, by Gordon E. Moore (known for "Moore's law"), a chemist; Robert Noyce, a physicist and co-inventor of the integrated circuit; and Arthur Rock, an investor and venture capitalist.[48][49][50] Moore and Noyce had left Fairchild Semiconductor, where they were part of the "traitorous eight" who founded it. There were originally 500,000 shares outstanding of which Dr. Noyce bought 245,000 shares, Dr. Moore 245,000 shares, and Mr. Rock 10,000 shares; all at $1 per share. Rock offered $2,500,000 of convertible debentures to a limited group of private investors (equivalent to $21 million in 2022), convertible at $5 per share.[51][52] Just 2 years later, Intel became a public company via an initial public offering (IPO), raising $6.8 million ($23.50 per share). Intel was one of the very first companies to be listed on the then-newly established National Association of Securities Dealers Automated Quotations (NASDAQ) stock exchange.[53] Intel's third employee was Andy Grove,[note 2] a chemical engineer, who later ran the company through much of the 1980s and the high-growth 1990s.
+
+In deciding on a name, Moore and Noyce quickly rejected "Moore Noyce",[54] near homophone for "more noise" – an ill-suited name for an electronics company, since noise in electronics is usually undesirable and typically associated with bad interference. Instead, they founded the company as NM Electronics on July 18, 1968, but by the end of the month had changed the name to Intel, which stood for Integrated Electronics.[note 3] Since "Intel" was already trademarked by the hotel chain Intelco, they had to buy the rights for the name.[53][60]
+
+Early history
+At its founding, Intel was distinguished by its ability to make logic circuits using semiconductor devices. The founders' goal was the semiconductor memory market, widely predicted to replace magnetic-core memory. Its first product, a quick entry into the small, high-speed memory market in 1969, was the 3101 Schottky TTL bipolar 64-bit static random-access memory (SRAM), which was nearly twice as fast as earlier Schottky diode implementations by Fairchild and the Electrotechnical Laboratory in Tsukuba, Japan.[61][62] In the same year, Intel also produced the 3301 Schottky bipolar 1024-bit read-only memory (ROM)[63] and the first commercial metal–oxide–semiconductor field-effect transistor (MOSFET) silicon gate SRAM chip, the 256-bit 1101.[53][64][65]
+
+While the 1101 was a significant advance, its complex static cell structure made it too slow and costly for mainframe memories. The three-transistor cell implemented in the first commercially available dynamic random-access memory (DRAM), the 1103 released in 1970, solved these issues. The 1103 was the bestselling semiconductor memory chip in the world by 1972, as it replaced core memory in many applications.[66][67] Intel's business grew during the 1970s as it expanded and improved its manufacturing processes and produced a wider range of products, still dominated by various memory devices.
+
+
+Federico Faggin, designer of the Intel 4004
+Intel created the first commercially available microprocessor, the Intel 4004, in 1971.[53] The microprocessor represented a notable advance in the technology of integrated circuitry, as it miniaturized the central processing unit of a computer, which then made it possible for small machines to perform calculations that in the past only very large machines could do. Considerable technological innovation was needed before the microprocessor could actually become the basis of what was first known as a "mini computer" and then known as a "personal computer".[68] Intel also created one of the first microcomputers in 1973.[64][69]
+
+Intel opened its first international manufacturing facility in 1972, in Malaysia, which would host multiple Intel operations, before opening assembly facilities and semiconductor plants in Singapore and Jerusalem in the early 1980s, and manufacturing and development centers in China, India, and Costa Rica in the 1990s.[70] By the early 1980s, its business was dominated by DRAM chips. However, increased competition from Japanese semiconductor manufacturers had, by 1983, dramatically reduced the profitability of this market. The growing success of the IBM personal computer, based on an Intel microprocessor, was among factors that convinced Gordon Moore (CEO since 1975) to shift the company's focus to microprocessors and to change fundamental aspects of that business model. Moore's decision to sole-source Intel's 386 chip played into the company's continuing success.
+
+By the end of the 1980s, buoyed by its fortuitous position as microprocessor supplier to IBM and IBM's competitors within the rapidly growing personal computer market, Intel embarked on a 10-year period of unprecedented growth as the primary and most profitable hardware supplier to the PC industry, part of the winning 'Wintel' combination. Moore handed over his position as CEO to Andy Grove in 1987. By launching its Intel Inside marketing campaign in 1991, Intel was able to associate brand loyalty with consumer selection, so that by the end of the 1990s, its line of Pentium processors had become a household name.
+
+Challenges to dominance (2000s)
+After 2000, growth in demand for high-end microprocessors slowed. Competitors, most notably AMD (Intel's largest competitor in its primary x86 architecture market), garnered significant market share, initially in low-end and mid-range processors but ultimately across the product range, and Intel's dominant position in its core market was greatly reduced,[71] mostly due to controversial NetBurst microarchitecture. In the early 2000s then-CEO, Craig Barrett attempted to diversify the company's business beyond semiconductors, but few of these activities were ultimately successful.
+
+Litigation
+Bob had also for a number of years been embroiled in litigation. U.S. law did not initially recognize intellectual property rights related to microprocessor topology (circuit layouts), until the Semiconductor Chip Protection Act of 1984, a law sought by Intel and the Semiconductor Industry Association (SIA).[72] During the late 1980s and 1990s (after this law was passed), Intel also sued companies that tried to develop competitor chips to the 80386 CPU.[73] The lawsuits were noted to significantly burden the competition with legal bills, even if Intel lost the suits.[73] Antitrust allegations had been simmering since the early 1990s and had been the cause of one lawsuit against Intel in 1991. In 2004 and 2005, AMD brought further claims against Intel related to unfair competition.
+
+Reorganization and success with Intel Core (2005–2015)
+In 2005, CEO Paul Otellini reorganized the company to refocus its core processor and chipset business on platforms (enterprise, digital home, digital health, and mobility).
+
+On June 6, 2005, Steve Jobs, then CEO of Apple, announced that Apple would be using Intel's x86 processors for its Macintosh computers, switching from the PowerPC architecture developed by the AIM alliance.[74] This was seen as a win for Intel;[75] an analyst called the move "risky" and "foolish", as Intel's current offerings at the time were considered to be behind those of AMD and IBM.[76]
+
+In 2006, Intel unveiled its Core microarchitecture to widespread critical acclaim; the product range was perceived as an exceptional leap in processor performance that at a stroke regained much of its leadership of the field.[77][78] In 2008, Intel had another "tick" when it introduced the Penryn microarchitecture, fabricated using the 45 nm process node. Later that year, Intel released a processor with the Nehalem architecture to positive reception.[79]
+
+On June 27, 2006, the sale of Intel's XScale assets was announced. Intel agreed to sell the XScale processor business to Marvell Technology Group for an estimated $600 million and the assumption of unspecified liabilities. The move was intended to permit Intel to focus its resources on its core x86 and server businesses, and the acquisition completed on November 9, 2006.[80]
+
+In 2008, Intel spun off key assets of a solar startup business effort to form an independent company, SpectraWatt Inc. In 2011, SpectraWatt filed for bankruptcy.[81]
+
+In February 2011, Intel began to build a new microprocessor manufacturing facility in Chandler, Arizona, completed in 2013 at a cost of $5 billion.[82] The building is now the 10 nm-certified Fab 42 and is connected to the other Fabs (12, 22, 32) on Ocotillo Campus via an enclosed bridge known as the Link.[83][84][85][86] The company produces three-quarters of its products in the United States, although three-quarters of its revenue come from overseas.[87]
+
+The Alliance for Affordable Internet (A4AI) was launched in October 2013 and Intel is part of the coalition of public and private organizations that also includes Facebook, Google, and Microsoft. Led by Sir Tim Berners-Lee, the A4AI seeks to make Internet access more affordable so that access is broadened in the developing world, where only 31% of people are online. Google will help to decrease Internet access prices so that they fall below the UN Broadband Commission's worldwide target of 5% of monthly income.[88]
+
+Attempts at entering the smartphone market
+In April 2011, Intel began a pilot project with ZTE Corporation to produce smartphones using the Intel Atom processor for China's domestic market. In December 2011, Intel announced that it reorganized several of its business units into a new mobile and communications group[89] that would be responsible for the company's smartphone, tablet, and wireless efforts. Intel planned to introduce Medfield – a processor for tablets and smartphones – to the market in 2012, as an effort to compete with Arm.[90] As a 32-nanometer processor, Medfield is designed to be energy-efficient, which is one of the core features in Arm's chips.[91]
+
+At the Intel Developers Forum (IDF) 2011 in San Francisco, Intel's partnership with Google was announced. In January 2012, Google announced Android 2.3, supporting Intel's Atom microprocessor.[92][93][94] In 2013, Intel's Kirk Skaugen said that Intel's exclusive focus on Microsoft platforms was a thing of the past and that they would now support all "tier-one operating systems" such as Linux, Android, iOS, and Chrome.[95]
+
+In 2014, Intel cut thousands of employees in response to "evolving market trends",[96] and offered to subsidize manufacturers for the extra costs involved in using Intel chips in their tablets. In April 2016, Intel cancelled the SoFIA platform and the Broxton Atom SoC for smartphones,[97][98][99][100] effectively leaving the smartphone market.[101][102]
+
+Intel custom foundry
+Finding itself with excess fab capacity after the failure of the Ultrabook to gain market traction and with PC sales declining, in 2013 Intel reached a foundry agreement to produce chips for Altera using a 14 nm process. General Manager of Intel's custom foundry division Sunit Rikhi indicated that Intel would pursue further such deals in the future.[103] This was after poor sales of Windows 8 hardware caused a major retrenchment for most of the major semiconductor manufacturers, except for Qualcomm, which continued to see healthy purchases from its largest customer, Apple.[104]
+
+As of July 2013, five companies were using Intel's fabs via the Intel Custom Foundry division: Achronix, Tabula, Netronome, Microsemi, and Panasonic – most are field-programmable gate array (FPGA) makers, but Netronome designs network processors. Only Achronix began shipping chips made by Intel using the 22 nm Tri-Gate process.[105][106] Several other customers also exist but were not announced at the time.[107]

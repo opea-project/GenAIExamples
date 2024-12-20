@@ -6,6 +6,9 @@ pushd "../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
+export MAX_INPUT_TOKENS=1024
+export MAX_TOTAL_TOKENS=2048
+
 export no_proxy="${no_proxy},${host_ip}"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export MEGA_SERVICE_HOST_IP=${host_ip}
