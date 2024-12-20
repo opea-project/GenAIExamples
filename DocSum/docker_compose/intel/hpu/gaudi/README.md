@@ -294,7 +294,7 @@ You will have the following Docker Images:
       -F "max_tokens=32" \
       -F "files=@/path to your file (.txt, .docx, .pdf)" \
       -F "language=en" \
-      -F "summary_type=auto" 
+      -F "summary_type=auto"
    ```
 
    **summary_type=stuff**
@@ -309,7 +309,7 @@ You will have the following Docker Images:
       -F "max_tokens=32" \
       -F "files=@/path to your file (.txt, .docx, .pdf)" \
       -F "language=en" \
-      -F "summary_type=stuff" 
+      -F "summary_type=stuff"
    ```
 
    **summary_type=truncate**
@@ -324,7 +324,7 @@ You will have the following Docker Images:
       -F "max_tokens=32" \
       -F "files=@/path to your file (.txt, .docx, .pdf)" \
       -F "language=en" \
-      -F "summary_type=truncate" 
+      -F "summary_type=truncate"
    ```
 
    **summary_type=map_reduce**
@@ -341,7 +341,7 @@ You will have the following Docker Images:
       -F "max_tokens=32" \
       -F "files=@/path to your file (.txt, .docx, .pdf)" \
       -F "language=en" \
-      -F "summary_type=map_reduce" 
+      -F "summary_type=map_reduce"
    ```
 
    **summary_type=refine**
@@ -358,7 +358,7 @@ You will have the following Docker Images:
       -F "max_tokens=32" \
       -F "files=@/path to your file (.txt, .docx, .pdf)" \
       -F "language=en" \
-      -F "summary_type=refine" 
+      -F "summary_type=refine"
    ```
 
 > More detailed tests can be found here `cd GenAIExamples/DocSum/test`
