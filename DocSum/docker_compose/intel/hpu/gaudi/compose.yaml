@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tgi-service:
+  tgi-server:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.6
     container_name: tgi-gaudi-server
     ports:
@@ -29,7 +29,7 @@ services:
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
     container_name: llm-docsum-gaudi-server
     depends_on:
-      - tgi-service
+      - tgi-server
     ports:
       - "9000:9000"
     ipc: host
@@ -42,11 +42,12 @@ services:
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LOGFLAG: True
     restart: unless-stopped
 
   whisper:
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-    container_name: whisper-service
+    container_name: whisper-server
     ports:
       - "7066:7066"
     ipc: host
@@ -63,16 +64,16 @@ services:
 
   dataprep-audio2text:
     image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
-    container_name: dataprep-audio2text-service
+    container_name: dataprep-audio2text-server
     ports:
-      - "9199:9099"
+      - "9099:9099"
     ipc: host
     environment:
       A2T_ENDPOINT: ${A2T_ENDPOINT}
 
   dataprep-video2audio:
     image: ${REGISTRY:-opea}/dataprep-video2audio:${TAG:-latest}
-    container_name: dataprep-video2audio-service
+    container_name: dataprep-video2audio-server
     ports:
       - "7078:7078"
     ipc: host
@@ -93,7 +94,7 @@ services:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-gaudi-backend-server
     depends_on:
-      - tgi-service
+      - tgi-server
       - llm-docsum-tgi
       - dataprep-multimedia2text
       - dataprep-video2audio
