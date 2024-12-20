@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -x
+set -xe
 
 WORKPATH=$(dirname "$PWD")
 ip_address=$(hostname -I | awk '{print $1}')
@@ -30,7 +30,7 @@ function start_service() {
     export TGI_LLM_ENDPOINT="http://${ip_address}:${tgi_endpoint_port}"
 
     sum_port=5076
-    docker run -d --name="test-comps-llm-sum-tgi-server" -p ${sum_port}:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e LLM_MODEL_ID=$LLM_MODEL_ID -e MAX_INPUT_TOKENS=$MAX_INPUT_TOKENS -e MAX_TOTAL_TOKENS=$MAX_TOTAL_TOKENS -e HUGGINGFACEHUB_API_TOKEN=$HF_TOKEN opea/llm-sum-tgi:comps
+    docker run -d --name="test-comps-llm-sum-tgi-server" -p ${sum_port}:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e LLM_MODEL_ID=$LLM_MODEL_ID -e MAX_INPUT_TOKENS=$MAX_INPUT_TOKENS -e MAX_TOTAL_TOKENS=$MAX_TOTAL_TOKENS -e HUGGINGFACEHUB_API_TOKEN=$HF_TOKEN -e LOGFLAG=True opea/llm-sum-tgi:comps
 
     # check whether tgi is fully ready
     n=0
@@ -61,10 +61,12 @@ function validate_services() {
 
         local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
 
+        echo $CONTENT
+
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            echo "[ $SERVICE_NAME ] Content does not match the expected result"
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             exit 1
         fi

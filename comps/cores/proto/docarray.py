@@ -213,7 +213,7 @@ class LLMParamsDoc(BaseDoc):
 
 
 class DocSumLLMParams(LLMParamsDoc):
-    summary_type: str = "stuff"  # can be "truncate", "map_reduce", "refine"
+    summary_type: str = "auto"  # can be "auto", "stuff", "truncate", "map_reduce", "refine"
     chunk_size: int = -1
     chunk_overlap: int = -1
 

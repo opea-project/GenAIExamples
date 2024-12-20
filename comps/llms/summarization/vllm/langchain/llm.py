@@ -43,26 +43,43 @@ templ_zh = """请简要概括以下内容:
 概况:"""
 
 
-templ_refine_en = """\
-Your job is to produce a final summary.
-We have provided an existing summary up to a certain point: {existing_answer}
-We have the opportunity to refine the existing summary (only if needed) with some more context below.
-------------
-{text}
-------------
-Given the new context, refine the original summary.
-If the context isn't useful, return the original summary.\
+templ_refine_en = """Your job is to produce a final summary.
+We have provided an existing summary up to a certain point, then we will provide more context.
+You need to refine the existing summary (only if needed) with new context and generate a final summary.
+
+
+Existing Summary:
+"{existing_answer}"
+
+
+
+New Context:
+"{text}"
+
+
+
+Final Summary:
+
 """
 
 templ_refine_zh = """\
 你的任务是生成一个最终摘要。
-我们已经提供了部分摘要：{existing_answer}
-如果有需要的话，可以通过以下更多上下文来完善现有摘要。
-------------
-{text}
-------------
-根据新上下文，完善原始摘要。
-如果上下文无用，则返回原始摘要。\
+我们已经处理好部分文本并生成初始摘要, 并提供了新的未处理文本
+你需要根据新提供的文本，结合初始摘要，生成一个最终摘要。
+
+
+初始摘要:
+"{existing_answer}"
+
+
+
+新的文本:
+"{text}"
+
+
+
+最终摘要:
+
 """
 
 
@@ -76,6 +93,25 @@ templ_refine_zh = """\
 async def llm_generate(input: DocSumLLMParams):
     if logflag:
         logger.info(input)
+
+    ### check summary type
+    summary_types = ["auto", "stuff", "truncate", "map_reduce", "refine"]
+    if input.summary_type not in summary_types:
+        raise NotImplementedError(f"Please specify the summary_type in {summary_types}")
+    if input.summary_type == "auto":  ### Check input token length in auto mode
+        token_len = len(tokenizer.encode(input.query))
+        if token_len > MAX_INPUT_TOKENS + 50:
+            input.summary_type = "refine"
+            if logflag:
+                logger.info(
+                    f"Input token length {token_len} exceed MAX_INPUT_TOKENS + 50 {MAX_INPUT_TOKENS+50}, auto switch to 'refine' mode."
+                )
+        else:
+            input.summary_type = "stuff"
+            if logflag:
+                logger.info(
+                    f"Input token length {token_len} not exceed MAX_INPUT_TOKENS + 50 {MAX_INPUT_TOKENS+50}, auto switch to 'stuff' mode."
+                )
 
     if input.language in ["en", "auto"]:
         templ = templ_en
@@ -99,7 +135,7 @@ async def llm_generate(input: DocSumLLMParams):
     ## Split text
     if input.summary_type == "stuff":
         text_splitter = CharacterTextSplitter()
-    elif input.summary_type in ["truncate", "map_reduce", "refine"]:
+    else:
         if input.summary_type == "refine":
             if MAX_TOTAL_TOKENS <= 2 * input.max_tokens + 128:
                 raise RuntimeError("In Refine mode, Please set MAX_TOTAL_TOKENS larger than (max_tokens * 2 + 128)")
@@ -120,8 +156,7 @@ async def llm_generate(input: DocSumLLMParams):
         if logflag:
             logger.info(f"set chunk size to: {chunk_size}")
             logger.info(f"set chunk overlap to: {chunk_overlap}")
-    else:
-        raise NotImplementedError('Please specify the summary_type in "stuff", "truncate", "map_reduce", "refine"')
+
     texts = text_splitter.split_text(input.query)
     docs = [Document(page_content=t) for t in texts]
     if logflag:
