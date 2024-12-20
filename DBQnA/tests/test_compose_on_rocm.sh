@@ -61,8 +61,8 @@ function validate_microservice() {
         echo "Result correct."
     else
         echo "Result wrong. Received was $result"
-        docker logs test-texttosql-server > ${LOG_PATH}/texttosql.log
-        docker logs test-texttosql-tgi-endpoint > ${LOG_PATH}/tgi.log
+        docker logs texttosql-service > ${LOG_PATH}/texttosql.log
+        docker logs dbqna-tgi-service > ${LOG_PATH}/tgi.log
         exit 1
     fi
 
@@ -98,8 +98,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cid=$(docker ps -aq --filter "name=test-*")
-    if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+    cd $WORKPATH/docker_compose/amd/gpu/rocm/
+    docker compose stop && docker compose rm -f
 }
 
 function main() {
