@@ -29,7 +29,7 @@ export V2A_ENDPOINT=http://$host_ip:7078
 
 export A2T_ENDPOINT=http://$host_ip:7066
 export A2T_SERVICE_HOST_IP=${host_ip}
-export A2T_SERVICE_PORT=9099
+export A2T_SERVICE_PORT=9199
 
 export DATA_ENDPOINT=http://$host_ip:7079
 export DATA_SERVICE_HOST_IP=${host_ip}
@@ -189,7 +189,7 @@ function validate_microservices() {
 
     # Audio2Text service
     validate_services_json \
-        "${host_ip}:9099/v1/audio/transcriptions" \
+        "${host_ip}:9199/v1/audio/transcriptions" \
         '"query":"well"' \
         "dataprep-audio2text" \
         "dataprep-audio2text-server" \
