@@ -274,7 +274,7 @@ function validate_megaservice_text() {
         "messages=" \
         "files=@$ROOT_FOLDER/data/short.txt" \
         "max_tokens=32" \
-        "language=en" 
+        "language=en"
 }
 
 function validate_megaservice_multimedia() {
@@ -355,7 +355,7 @@ function validate_megaservice_long_text() {
         "files=@$ROOT_FOLDER/data/long.txt" \
         "max_tokens=128" \
         "summary_type=truncate"
-    
+
     echo ">>> Checking long text data in form format, set summary_type=map_reduce"
     validate_services_form \
         "${host_ip}:8888/v1/docsum" \
@@ -367,7 +367,7 @@ function validate_megaservice_long_text() {
         "files=@$ROOT_FOLDER/data/long.txt" \
         "max_tokens=128" \
         "summary_type=map_reduce"
-    
+
     echo ">>> Checking long text data in form format, set summary_type=refine"
     validate_services_form \
         "${host_ip}:8888/v1/docsum" \
