@@ -5,8 +5,8 @@ import asyncio
 import os
 from typing import List
 
-from comps import Gateway, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
-from comps.cores.mega.gateway import read_text_from_file
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
+from comps.cores.mega.utils import handle_message
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -14,7 +14,7 @@ from comps.cores.proto.api_protocol import (
     ChatMessage,
     UsageInfo,
 )
-from comps.cores.proto.docarray import LLMParams
+from comps.cores.proto.docarray import DocSumLLMParams
 from fastapi import File, Request, UploadFile
 from fastapi.responses import StreamingResponse
 
@@ -27,11 +27,58 @@ LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
 
-class DocSumService(Gateway):
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.LLM:
+        docsum_parameters = kwargs.get("docsum_parameters", None)
+        if docsum_parameters:
+            docsum_parameters = docsum_parameters.model_dump()
+            del docsum_parameters["query"]
+            inputs.update(docsum_parameters)
+    return inputs
+
+
+def read_pdf(file):
+    from langchain.document_loaders import PyPDFLoader
+
+    loader = PyPDFLoader(file)
+    docs = loader.load_and_split()
+    return docs
+
+
+def read_text_from_file(file, save_file_name):
+    import docx2txt
+    from langchain.text_splitter import CharacterTextSplitter
+
+    # read text file
+    if file.headers["content-type"] == "text/plain":
+        file.file.seek(0)
+        content = file.file.read().decode("utf-8")
+        # Split text
+        text_splitter = CharacterTextSplitter()
+        texts = text_splitter.split_text(content)
+        # Create multiple documents
+        file_content = texts
+    # read pdf file
+    elif file.headers["content-type"] == "application/pdf":
+        documents = read_pdf(save_file_name)
+        file_content = [doc.page_content for doc in documents]
+    # read docx file
+    elif (
+        file.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        or file.headers["content-type"] == "application/octet-stream"
+    ):
+        file_content = docx2txt.process(save_file_name)
+
+    return file_content
+
+
+class DocSumService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_inputs = align_inputs
         self.megaservice = ServiceOrchestrator()
+        self.endpoint = str(MegaServiceEndpoint.DOC_SUMMARY)
 
     def add_remote_service(self):
 
@@ -61,14 +108,20 @@ class DocSumService(Gateway):
         if "application/json" in request.headers.get("content-type"):
             data = await request.json()
             stream_opt = data.get("stream", True)
+            summary_type = data.get("summary_type", "auto")
+            chunk_size = data.get("chunk_size", -1)
+            chunk_overlap = data.get("chunk_overlap", -1)
             chat_request = ChatCompletionRequest.model_validate(data)
-            prompt = self._handle_message(chat_request.messages)
+            prompt = handle_message(chat_request.messages)
 
             initial_inputs_data = {data["type"]: prompt}
 
         elif "multipart/form-data" in request.headers.get("content-type"):
             data = await request.form()
             stream_opt = data.get("stream", True)
+            summary_type = data.get("summary_type", "auto")
+            chunk_size = data.get("chunk_size", -1)
+            chunk_overlap = data.get("chunk_overlap", -1)
             chat_request = ChatCompletionRequest.model_validate(data)
 
             data_type = data.get("type")
@@ -98,9 +151,9 @@ class DocSumService(Gateway):
                             file_summaries.append(docs)
 
             if file_summaries:
-                prompt = self._handle_message(chat_request.messages) + "\n".join(file_summaries)
+                prompt = handle_message(chat_request.messages) + "\n".join(file_summaries)
             else:
-                prompt = self._handle_message(chat_request.messages)
+                prompt = handle_message(chat_request.messages)
 
             data_type = data.get("type")
             if data_type is not None:
@@ -112,7 +165,8 @@ class DocSumService(Gateway):
         else:
             raise ValueError(f"Unknown request type: {request.headers.get('content-type')}")
 
-        parameters = LLMParams(
+        docsum_parameters = DocSumLLMParams(
+            query="",
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
             top_p=chat_request.top_p if chat_request.top_p else 0.95,
@@ -123,10 +177,13 @@ class DocSumService(Gateway):
             streaming=stream_opt,
             model=chat_request.model if chat_request.model else None,
             language=chat_request.language if chat_request.language else "auto",
+            summary_type=summary_type,
+            chunk_overlap=chunk_overlap,
+            chunk_size=chunk_size,
         )
 
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs=initial_inputs_data, llm_parameters=parameters
+            initial_inputs=initial_inputs_data, docsum_parameters=docsum_parameters
         )
 
         for node, response in result_dict.items():
@@ -151,14 +208,18 @@ class DocSumService(Gateway):
         return ChatCompletionResponse(model="docsum", choices=choices, usage=usage)
 
     def start(self):
-        super().__init__(
-            megaservice=self.megaservice,
+
+        self.service = MicroService(
+            self.__class__.__name__,
+            service_role=ServiceRoleType.MEGASERVICE,
             host=self.host,
             port=self.port,
-            endpoint=str(MegaServiceEndpoint.DOC_SUMMARY),
+            endpoint=self.endpoint,
             input_datatype=ChatCompletionRequest,
             output_datatype=ChatCompletionResponse,
         )
+        self.service.add_route(self.endpoint, self.handle_request, methods=["POST"])
+        self.service.start()
 
 
 if __name__ == "__main__":

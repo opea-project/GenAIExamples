@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
@@ -14,7 +14,8 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-
+export MAX_INPUT_TOKENS=2048
+export MAX_TOTAL_TOKENS=4096
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -28,7 +29,7 @@ export V2A_ENDPOINT=http://$host_ip:7078
 
 export A2T_ENDPOINT=http://$host_ip:7066
 export A2T_SERVICE_HOST_IP=${host_ip}
-export A2T_SERVICE_PORT=9099
+export A2T_SERVICE_PORT=9199
 
 export DATA_ENDPOINT=http://$host_ip:7079
 export DATA_SERVICE_HOST_IP=${host_ip}
@@ -46,7 +47,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-ui whisper dataprep-multimedia2text dataprep-audio2text dataprep-video2audio llm-docsum-tgi"
+    service_list="docsum docsum-gradio-ui whisper dataprep-multimedia2text dataprep-audio2text dataprep-video2audio llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -69,7 +70,32 @@ function start_services() {
     done
 }
 
-function validate_services() {
+get_base64_str() {
+    local file_name=$1
+    base64 -w 0 "$file_name"
+}
+
+# Function to generate input data for testing based on the document type
+input_data_for_test() {
+    local document_type=$1
+    case $document_type in
+        ("text")
+            echo "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are."
+            ;;
+        ("audio")
+            get_base64_str "$ROOT_FOLDER/data/test.wav"
+            ;;
+        ("video")
+            get_base64_str "$ROOT_FOLDER/data/test.mp4"
+            ;;
+        (*)
+            echo "Invalid document type" >&2
+            exit 1
+            ;;
+    esac
+}
+
+function validate_services_json() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
@@ -100,115 +126,23 @@ function validate_services() {
     sleep 1s
 }
 
-get_base64_str() {
-    local file_name=$1
-    base64 -w 0 "$file_name"
-}
+function validate_services_form() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local FORM_DATA1="$5"
+    local FORM_DATA2="$6"
+    local FORM_DATA3="$7"
+    local FORM_DATA4="$8"
+    local FORM_DATA5="$9"
 
-# Function to generate input data for testing based on the document type
-input_data_for_test() {
-    local document_type=$1
-    case $document_type in
-        ("text")
-            echo "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco of education week reports it takes just 10 minutes to cross through gillette wyoming this small city sits in the northeast corner of the state surrounded by 100s of miles of prairie but schools here in campbell county are on the edge of something big the next generation science standards you are going to build a strand of dna and you are going to decode it and figure out what that dna actually says for christy mathis at sage valley junior high school the new standards are about learning to think like a scientist there is a lot of really good stuff in them every standard is a performance task it is not you know the child needs to memorize these things it is the student needs to be able to do some pretty intense stuff we are analyzing we are critiquing we are."
-            ;;
-        ("audio")
-            get_base64_str "$ROOT_FOLDER/data/test.wav"
-            ;;
-        ("video")
-            get_base64_str "$ROOT_FOLDER/data/test.mp4"
-            ;;
-        (*)
-            echo "Invalid document type" >&2
-            exit 1
-            ;;
-    esac
-}
-
-function validate_microservices() {
-    # Check if the microservices are running correctly.
-
-    # whisper microservice
-    ulimit -s 65536
-    validate_services \
-        "${host_ip}:7066/v1/asr" \
-        '{"asr_result":"well"}' \
-        "whisper" \
-        "whisper-service" \
-        "{\"audio\": \"$(input_data_for_test "audio")\"}"
-
-    # Audio2Text service
-    validate_services \
-        "${host_ip}:9199/v1/audio/transcriptions" \
-        '"query":"well"' \
-        "dataprep-audio2text" \
-        "dataprep-audio2text-service" \
-        "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
-
-    # Video2Audio service
-    validate_services \
-        "${host_ip}:7078/v1/video2audio" \
-        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd95t4qPAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
-        "dataprep-video2audio" \
-        "dataprep-video2audio-service" \
-        "{\"byte_str\": \"$(input_data_for_test "video")\"}"
-
-    # Docsum Data service - video
-    validate_services \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "well" \
-        "dataprep-multimedia2text" \
-        "dataprep-multimedia2text" \
-        "{\"video\": \"$(input_data_for_test "video")\"}"
-
-    # Docsum Data service - audio
-    validate_services \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "well" \
-        "dataprep-multimedia2text" \
-        "dataprep-multimedia2text" \
-        "{\"audio\": \"$(input_data_for_test "audio")\"}"
-
-    # Docsum Data service - text
-    validate_services \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco" \
-        "dataprep-multimedia2text" \
-        "dataprep-multimedia2text" \
-        "{\"text\": \"$(input_data_for_test "text")\"}"
-
-    # tgi for llm service
-    validate_services \
-        "${host_ip}:8008/generate" \
-        "generated_text" \
-        "tgi-gaudi" \
-        "tgi-gaudi-server" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
-    # llm microservice
-    validate_services \
-        "${host_ip}:9000/v1/chat/docsum" \
-        "data: " \
-        "llm-docsum-tgi" \
-        "llm-docsum-gaudi-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
-
-}
-
-function validate_megaservice() {
-    local SERVICE_NAME="docsum-gaudi-backend-server"
-    local DOCKER_NAME="docsum-gaudi-backend-server"
-    local EXPECTED_RESULT="[DONE]"
-    local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-    local URL="${host_ip}:8888/v1/docsum"
-    local DATA_TYPE="type=text"
-
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$DATA_TYPE" -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$FORM_DATA1" -F "$FORM_DATA2" -F "$FORM_DATA3" -F "$FORM_DATA4" -F "$FORM_DATA5" -H 'Content-Type: multipart/form-data' "$URL")
 
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
-        local CONTENT=$(curl -s -X POST -F "$DATA_TYPE" -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+        local CONTENT=$(curl -s -X POST -F "$FORM_DATA1" -F "$FORM_DATA2" -F "$FORM_DATA3" -F "$FORM_DATA4" -F "$FORM_DATA5" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
 
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
@@ -225,32 +159,224 @@ function validate_megaservice() {
     sleep 1s
 }
 
-function validate_megaservice_json() {
-    # Curl the Mega Service
-    echo ">>> Checking text data with Content-Type: application/json"
-    validate_services \
+function validate_microservices() {
+    # Check if the microservices are running correctly.
+
+    # tgi for llm service
+    validate_services_json \
+        "${host_ip}:8008/generate" \
+        "generated_text" \
+        "tgi-gaudi" \
+        "tgi-gaudi-server" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
+    # llm microservice
+    validate_services_json \
+        "${host_ip}:9000/v1/chat/docsum" \
+        "data: " \
+        "llm-docsum-tgi" \
+        "llm-docsum-gaudi-server" \
+        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+
+    # whisper microservice
+    ulimit -s 65536
+    validate_services_json \
+        "${host_ip}:7066/v1/asr" \
+        '{"asr_result":"well"}' \
+        "whisper" \
+        "whisper-server" \
+        "{\"audio\": \"$(input_data_for_test "audio")\"}"
+
+    # Audio2Text service
+    validate_services_json \
+        "${host_ip}:9199/v1/audio/transcriptions" \
+        '"query":"well"' \
+        "dataprep-audio2text" \
+        "dataprep-audio2text-server" \
+        "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
+
+    # Video2Audio service
+    validate_services_json \
+        "${host_ip}:7078/v1/video2audio" \
+        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd95t4qPAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
+        "dataprep-video2audio" \
+        "dataprep-video2audio-server" \
+        "{\"byte_str\": \"$(input_data_for_test "video")\"}"
+
+    # Docsum Data service - video
+    validate_services_json \
+        "${host_ip}:7079/v1/multimedia2text" \
+        "well" \
+        "dataprep-multimedia2text" \
+        "dataprep-multimedia2text" \
+        "{\"video\": \"$(input_data_for_test "video")\"}"
+
+    # Docsum Data service - audio
+    validate_services_json \
+        "${host_ip}:7079/v1/multimedia2text" \
+        "well" \
+        "dataprep-multimedia2text" \
+        "dataprep-multimedia2text" \
+        "{\"audio\": \"$(input_data_for_test "audio")\"}"
+
+    # Docsum Data service - text
+    validate_services_json \
+        "${host_ip}:7079/v1/multimedia2text" \
+        "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco" \
+        "dataprep-multimedia2text" \
+        "dataprep-multimedia2text" \
+        "{\"text\": \"$(input_data_for_test "text")\"}"
+
+}
+
+function validate_megaservice_text() {
+    echo ">>> Checking text data in json format"
+    validate_services_json \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
-    echo ">>> Checking audio data"
-    validate_services \
+    echo ">>> Checking text data in form format, set language=en"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=text" \
+        "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+        "max_tokens=32" \
+        "language=en" \
+        "stream=True"
+
+    echo ">>> Checking text data in form format, set language=zh"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=text" \
+        "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
+        "max_tokens=32" \
+        "language=zh" \
+        "stream=True"
+
+    echo ">>> Checking text data in form format, upload file"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=text" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/short.txt" \
+        "max_tokens=32" \
+        "language=en"
+}
+
+function validate_megaservice_multimedia() {
+    echo ">>> Checking audio data in json format"
+    validate_services_json \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "{\"type\": \"audio\",  \"messages\": \"$(input_data_for_test "audio")\"}"
 
-    echo ">>> Checking video data"
-    validate_services \
+    echo ">>> Checking audio data in form format"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=audio" \
+        "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
+        "max_tokens=32" \
+        "language=en" \
+        "stream=True"
+
+    echo ">>> Checking video data in json format"
+    validate_services_json \
         "${host_ip}:8888/v1/docsum" \
         "[DONE]" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\"}"
 
+    echo ">>> Checking video data in form format"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=video" \
+        "messages=\"$(input_data_for_test "video")\"" \
+        "max_tokens=32" \
+        "language=en" \
+        "stream=True"
+}
+
+function validate_megaservice_long_text() {
+    echo ">>> Checking long text data in form format, set summary_type=auto"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=text" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/long.txt" \
+        "max_tokens=128" \
+        "summary_type=auto"
+
+    echo ">>> Checking long text data in form format, set summary_type=stuff"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=text" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/long.txt" \
+        "max_tokens=128" \
+        "summary_type=stuff"
+
+    echo ">>> Checking long text data in form format, set summary_type=truncate"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=text" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/long.txt" \
+        "max_tokens=128" \
+        "summary_type=truncate"
+
+    echo ">>> Checking long text data in form format, set summary_type=map_reduce"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=text" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/long.txt" \
+        "max_tokens=128" \
+        "summary_type=map_reduce"
+
+    echo ">>> Checking long text data in form format, set summary_type=refine"
+    validate_services_form \
+        "${host_ip}:8888/v1/docsum" \
+        "[DONE]" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "type=text" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/long.txt" \
+        "max_tokens=128" \
+        "summary_type=refine"
 }
 
 function stop_docker() {
@@ -278,10 +404,16 @@ function main() {
     validate_microservices
 
     echo "==========================================="
-    echo ">>>> Validating megaservice..."
-    validate_megaservice
-    echo ">>>> Validating validate_megaservice_json..."
-    validate_megaservice_json
+    echo ">>>> Validating megaservice for text..."
+    validate_megaservice_text
+
+    echo "==========================================="
+    echo ">>>> Validating megaservice for multimedia..."
+    validate_megaservice_multimedia
+
+    echo "==========================================="
+    echo ">>>> Validating megaservice for long text..."
+    validate_megaservice_long_text
 
     echo "==========================================="
     echo ">>>> Stopping Docker containers..."

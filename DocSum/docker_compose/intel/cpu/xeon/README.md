@@ -67,15 +67,6 @@ docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-
 
 Several UI options are provided. If you need to work with multimedia documents, .doc, or .pdf files, suggested to use Gradio UI.
 
-#### Svelte UI
-
-Build the frontend Docker image via below command:
-
-```bash
-cd GenAIExamples/DocSum/ui
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-```
-
 #### Gradio UI
 
 Build the Gradio UI frontend Docker image using the following command:
@@ -83,6 +74,15 @@ Build the Gradio UI frontend Docker image using the following command:
 ```bash
 cd GenAIExamples/DocSum/ui
 docker build -t opea/docsum-gradio-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.gradio .
+```
+
+#### Svelte UI
+
+Build the frontend Docker image via below command:
+
+```bash
+cd GenAIExamples/DocSum/ui
+docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
 #### React UI
@@ -223,11 +223,12 @@ You will have the following Docker Images:
    Text:
 
    ```bash
+   ## json input
    curl -X POST http://${host_ip}:8888/v1/docsum \
         -H "Content-Type: application/json" \
         -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
-   # Use English mode (default).
+   # form input, use English mode (default).
    curl http://${host_ip}:8888/v1/docsum \
        -H "Content-Type: multipart/form-data" \
        -F "type=text" \
@@ -288,6 +289,93 @@ You will have the following Docker Images:
       -F "max_tokens=32" \
       -F "language=en" \
       -F "stream=true"
+   ```
+
+7. MegaService with long context
+
+   If you want to deal with long context, can set following parameters and select suitable summary type.
+
+   - "summary_type": can be "auto", "stuff", "truncate", "map_reduce", "refine", default is "auto"
+   - "chunk_size": max token length for each chunk. Set to be different default value according to "summary_type".
+   - "chunk_overlap": overlap token length between each chunk, default is 0.1\*chunk_size
+
+   **summary_type=auto**
+
+   "summary_type" is set to be "auto" by default, in this mode we will check input token length, if it exceed `MAX_INPUT_TOKENS`, `summary_type` will automatically be set to `refine` mode, otherwise will be set to `stuff` mode.
+
+   ```bash
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=text" \
+      -F "messages=" \
+      -F "max_tokens=32" \
+      -F "files=@/path to your file (.txt, .docx, .pdf)" \
+      -F "language=en" \
+      -F "summary_type=auto"
+   ```
+
+   **summary_type=stuff**
+
+   In this mode LLM generate summary based on complete input text. In this case please carefully set `MAX_INPUT_TOKENS` and `MAX_TOTAL_TOKENS` according to your model and device memory, otherwise it may exceed LLM context limit and raise error when meet long context.
+
+   ```bash
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=text" \
+      -F "messages=" \
+      -F "max_tokens=32" \
+      -F "files=@/path to your file (.txt, .docx, .pdf)" \
+      -F "language=en" \
+      -F "summary_type=stuff"
+   ```
+
+   **summary_type=truncate**
+
+   Truncate mode will truncate the input text and keep only the first chunk, whose length is equal to `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
+
+   ```bash
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=text" \
+      -F "messages=" \
+      -F "max_tokens=32" \
+      -F "files=@/path to your file (.txt, .docx, .pdf)" \
+      -F "language=en" \
+      -F "summary_type=truncate"
+   ```
+
+   **summary_type=map_reduce**
+
+   Map_reduce mode will split the inputs into multiple chunks, map each document to an individual summary, then consolidate those summaries into a single global summary. `streaming=True` is not allowed here.
+
+   In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
+
+   ```bash
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=text" \
+      -F "messages=" \
+      -F "max_tokens=32" \
+      -F "files=@/path to your file (.txt, .docx, .pdf)" \
+      -F "language=en" \
+      -F "summary_type=map_reduce"
+   ```
+
+   **summary_type=refine**
+
+   Refin mode will split the inputs into multiple chunks, generate summary for the first one, then combine with the second, loops over every remaining chunks to get the final summary.
+
+   In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - 2 * input.max_tokens - 128, MAX_INPUT_TOKENS)`.
+
+   ```bash
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=text" \
+      -F "messages=" \
+      -F "max_tokens=32" \
+      -F "files=@/path to your file (.txt, .docx, .pdf)" \
+      -F "language=en" \
+      -F "summary_type=refine"
    ```
 
 ## 🚀 Launch the UI
