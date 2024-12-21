@@ -20,7 +20,7 @@ services:
   embedding-tei:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/tei/langchain/Dockerfile
+      dockerfile: comps/embeddings/src/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
   web-retriever-chroma:
@@ -32,12 +32,12 @@ services:
   reranking-tei:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/tei/Dockerfile
+      dockerfile: comps/reranks/src/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
   llm-tgi:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
