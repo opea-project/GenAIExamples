@@ -28,7 +28,7 @@ function build_docker_images() {
     rm -rf GenAIComps/
     git clone https://github.com/opea-project/GenAIComps.git
     cd $OPEAPATH/GenAIComps
-    docker build --no-cache -t opea/texttosql:latest -f comps/texttosql/langchain/Dockerfile .
+    docker build --no-cache -t opea/texttosql:latest -f comps/texttosql/src/Dockerfile .
 
     echo "Building React UI service..."
     cd $OPEAPATH/GenAIExamples/DBQnA/ui
