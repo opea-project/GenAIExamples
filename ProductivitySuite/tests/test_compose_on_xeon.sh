@@ -78,6 +78,8 @@ function start_services() {
     export EMBEDDING_SERVER_PORT=6006
     export LLM_SERVER_PORT=9009
     export PROMPT_COLLECTION_NAME="prompt"
+    export MAX_INPUT_TOKENS=1024
+    export MAX_TOTAL_TOKENS=2048
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -109,7 +111,11 @@ function check_http_status() {
     local HTTP_RESPONSE
 
     case "$SERVICE_NAME" in
-        *"docsum-xeon-backend-server"* | *"faqgen-xeon-backend-server"*)
+        *"docsum-xeon-backend-server"*)
+            local INPUT_DATA='{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+            HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+            ;;
+        *"faqgen-xeon-backend-server"*)
             local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
             HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
             ;;
@@ -136,7 +142,11 @@ function check_response_body() {
     local HTTP_RESPONSE
 
     case "$SERVICE_NAME" in
-        *"docsum-xeon-backend-server"* | *"faqgen-xeon-backend-server"*)
+        *"docsum-xeon-backend-server"*)
+            local INPUT_DATA='{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+            HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+            ;;
+        *"faqgen-xeon-backend-server"*)
             local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
             HTTP_RESPONSE=$(curl --silent -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
             ;;
@@ -366,8 +376,6 @@ function validate_microservices() {
 
 
 function validate_megaservice() {
-
-
     # Curl the ChatQnAMega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
@@ -388,10 +396,10 @@ function validate_megaservice() {
     # Curl the DocSum Mega Service
     validate_service \
         "${ip_address}:8890/v1/docsum" \
-        "embedding" \
+        "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
-        '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'\
 
 
     # Curl the CodeGen Mega Service
