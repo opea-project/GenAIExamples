@@ -27,7 +27,7 @@ services:
     security_opt:
       - seccomp:unconfined
     ipc: host
-    command: --model-id ${DOCSUM_LLM_MODEL_ID}
+    command: --model-id ${DOCSUM_LLM_MODEL_ID} --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
 
   docsum-llm-server:
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
@@ -53,6 +53,9 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: "http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}"
       HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
+      LLM_MODEL_ID: ${DOCSUM_LLM_MODEL_ID}
     restart: unless-stopped
 
   whisper:
