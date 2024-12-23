@@ -554,7 +554,7 @@ spec:
           securityContext:
             {}
           image: "opea/chatqna-ui:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: ui
               containerPort: 5173
@@ -612,7 +612,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/dataprep-redis:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: data-prep
               containerPort: 6007
@@ -687,7 +687,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "redis/redis-stack:7.2.0-v9"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
               name: data-volume
@@ -762,7 +762,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/guardrails-tgi:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: guardrails-usvc
               containerPort: 9090
@@ -840,7 +840,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/retriever-redis:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: retriever-usvc
               containerPort: 7000
@@ -919,7 +919,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args:
             - "--auto-truncate"
           volumeMounts:
@@ -1010,7 +1010,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "ghcr.io/huggingface/text-embeddings-inference:cpu-1.5"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args:
             - "--auto-truncate"
           volumeMounts:
@@ -1100,8 +1100,8 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
-          imagePullPolicy: IfNotPresent
+          image: "ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu"
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -1180,8 +1180,8 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
-          imagePullPolicy: IfNotPresent
+          image: "ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu"
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
               name: model-volume
@@ -1252,18 +1252,12 @@ spec:
           env:
             - name: LLM_SERVER_HOST_IP
               value: chatqna-tgi
-            - name: LLM_SERVER_PORT
-              value: "2080"
             - name: RERANK_SERVER_HOST_IP
               value: chatqna-teirerank
-            - name: RERANK_SERVER_PORT
-              value: "2082"
             - name: RETRIEVER_SERVICE_HOST_IP
               value: chatqna-retriever-usvc
             - name: EMBEDDING_SERVER_HOST_IP
               value: chatqna-tei
-            - name: EMBEDDING_SERVER_PORT
-              value: "2081"
             - name: GUARDRAIL_SERVICE_HOST_IP
               value: chatqna-guardrails-usvc
             - name: GUARDRAIL_SERVICE_PORT
@@ -1279,7 +1273,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "opea/chatqna-guardrails:latest"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /tmp
               name: tmp
@@ -1320,7 +1314,7 @@ spec:
     spec:
       containers:
       - image: nginx:1.27.1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: nginx
         volumeMounts:
         - mountPath: /etc/nginx/conf.d

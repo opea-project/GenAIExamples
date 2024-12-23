@@ -41,7 +41,7 @@ services:
     environment:
       TTS_ENDPOINT: ${TTS_ENDPOINT}
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     container_name: tgi-service
     ports:
       - "3006:80"
@@ -89,6 +89,20 @@ services:
       - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
       - TTS_SERVICE_HOST_IP=${TTS_SERVICE_HOST_IP}
       - TTS_SERVICE_PORT=${TTS_SERVICE_PORT}
+    ipc: host
+    restart: always
+  audioqna-xeon-ui-server:
+    image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}
+    container_name: audioqna-xeon-ui-server
+    depends_on:
+      - audioqna-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 

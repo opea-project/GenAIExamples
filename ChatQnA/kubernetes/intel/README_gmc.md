@@ -18,14 +18,15 @@ The ChatQnA uses the below prebuilt images if you choose a Xeon deployment
 - tei_embedding_service: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 - retriever: opea/retriever-redis:latest
 - tei_xeon_service: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-- tgi-service: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+- tgi-service: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
 - chaqna-xeon-backend-server: opea/chatqna:latest
 
 Should you desire to use the Gaudi accelerator, two alternate images are used for the embedding and llm services.
 For Gaudi:
 
-- tei-embedding-service: ghcr.io/huggingface/tei-gaudi:latest
-- tgi-service: gghcr.io/huggingface/tgi-gaudi:2.0.5
+tei-embedding-service: ghcr.io/huggingface/tei-gaudi:1.5.0
+tgi-service: gghcr.io/huggingface/tgi-gaudi:2.0.6
+
 
 > [NOTE]  
 > Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/hpu/gaudi/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.

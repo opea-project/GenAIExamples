@@ -81,72 +81,122 @@ flowchart LR
 3. Hierarchical agent can further improve performance.
    Expert worker agents, such as retrieval agent, knowledge graph agent, SQL agent, etc., can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information together to provide a comprehensive answer.
 
-### Roadmap
+## Deployment with docker
 
-- v0.9: Worker agent uses open-source websearch tool (duckduckgo), agents use OpenAI GPT-4o-mini as llm backend.
-- v1.0: Worker agent uses OPEA retrieval megaservice as tool.
-- v1.0 or later: agents use open-source llm backend.
-- v1.1 or later: add safeguards
+1. Build agent docker image [Optional]
 
-## Getting started
+> [!NOTE]
+> the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
 
-1. Build agent docker image </br>
-   First, clone the opea GenAIComps repo
+First, clone the opea GenAIComps repo.
+
+```
+export WORKDIR=<your-work-directory>
+cd $WORKDIR
+git clone https://github.com/opea-project/GenAIComps.git
+```
+
+Then build the agent docker image. Both the supervisor agent and the worker agent will use the same docker image, but when we launch the two agents we will specify different strategies and register different tools.
+
+```
+cd GenAIComps
+docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
+```
+
+2. Set up environment for this example </br>
+
+   First, clone this repo.
 
    ```
    export WORKDIR=<your-work-directory>
    cd $WORKDIR
-   git clone https://github.com/opea-project/GenAIComps.git
+   git clone https://github.com/opea-project/GenAIExamples.git
    ```
 
-   Then build the agent docker image. Both the supervisor agent and the worker agent will use the same docker image, but when we launch the two agents we will specify different strategies and register different tools.
+   Second, set up env vars.
 
    ```
-   cd GenAIComps
-   docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
+   # Example: host_ip="192.168.1.1" or export host_ip="External_Public_IP"
+   export host_ip=$(hostname -I | awk '{print $1}')
+   # if you are in a proxy environment, also set the proxy-related environment variables
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+
+   export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+   # for using open-source llms
+   export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
+   export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #so that no need to redownload every time
+
+   # optional: OPANAI_API_KEY if you want to use OpenAI models
+   export OPENAI_API_KEY=<your-openai-key>
    ```
 
-2. Launch tool services </br>
+3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
+
+   First, launch the mega-service.
+
+   ```
+   cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool
+   bash launch_retrieval_tool.sh
+   ```
+
+   Then, ingest data into the vector database. Here we provide an example. You can ingest your own data.
+
+   ```
+   bash run_ingest_data.sh
+   ```
+
+4. Launch other tools. </br>
    In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
 
    ```
    docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
    ```
 
-3. Set up environment for this example </br>
-   First, clone this repo
+5. Launch agent services</br>
+   We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
+
+   Deploy it on Gaudi or Xeon respectively
+
+   ::::{tab-set}
+   :::{tab-item} Gaudi
+   :sync: Gaudi
+
+   To use open-source LLMs on Gaudi2, run commands below.
 
    ```
-   cd $WORKDIR
-   git clone https://github.com/opea-project/GenAIExamples.git
+   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
+   bash launch_tgi_gaudi.sh
+   bash launch_agent_service_tgi_gaudi.sh
    ```
 
-   Second, set up env vars
+   :::
+   :::{tab-item} Xeon
+   :sync: Xeon
+
+   To use OpenAI models, run commands below.
 
    ```
-   export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
-   # optional: OPANAI_API_KEY
-   export OPENAI_API_KEY=<your-openai-key>
-   ```
-
-4. Launch agent services</br>
-   The configurations of the supervisor agent and the worker agent are defined in the docker-compose yaml file. We currently use openAI GPT-4o-mini as LLM, and we plan to add support for llama3.1-70B-instruct (served by TGI-Gaudi) in a subsequent release.
-   To use openai llm, run command below.
-
-   ```
-   cd docker_compose/intel/cpu/xeon
+   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
    bash launch_agent_service_openai.sh
    ```
+
+   :::
+   ::::
 
 ## Validate services
 
 First look at logs of the agent docker containers:
 
 ```
-docker logs docgrader-agent-endpoint
+# worker agent
+docker logs rag-agent-endpoint
 ```
 
 ```
+# supervisor agent
 docker logs react-agent-endpoint
 ```
 
@@ -155,7 +205,7 @@ You should see something like "HTTP server setup successful" if the docker conta
 Second, validate worker agent:
 
 ```
-curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "Most recent album by Taylor Swift"
     }'
 ```
@@ -163,11 +213,11 @@ curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: app
 Third, validate supervisor agent:
 
 ```
-curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "Most recent album by Taylor Swift"
     }'
 ```
 
 ## How to register your own tools with agent
 
-You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/langchain/README.md#5-customize-agent-strategy).
+You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/langchain/README.md).

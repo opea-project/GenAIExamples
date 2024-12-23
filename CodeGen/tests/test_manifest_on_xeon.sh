@@ -51,6 +51,7 @@ function validate_codegen() {
 
     if [ $status == false ]; then
         echo "Response check failed, please check the logs in artifacts!"
+        exit 1
     else
         echo "Response check succeed!"
     fi

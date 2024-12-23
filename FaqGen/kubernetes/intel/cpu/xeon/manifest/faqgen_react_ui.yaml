@@ -126,7 +126,7 @@ spec:
             - name: no_proxy
               value:
           securityContext: {}
-          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
+          image: "ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
@@ -264,7 +264,7 @@ spec:
       containers:
         - name: faqgen-react-ui
           env:
-            - name: DOC_BASE_URL
+            - name: FAQ_BASE_URL
               value: "http://faqgen:8888/v1/faqgen"
             - name: http_proxy
               value:

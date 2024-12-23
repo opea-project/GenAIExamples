@@ -22,7 +22,7 @@ function build_docker_images() {
     service_list="codetrans codetrans-ui llm-tgi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
@@ -31,7 +31,7 @@ function start_services() {
 
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
-    export LLM_MODEL_ID="HuggingFaceH4/mistral-7b-grok"
+    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
@@ -138,7 +138,7 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 

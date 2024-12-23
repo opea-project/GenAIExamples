@@ -64,7 +64,7 @@ metadata:
     app.kubernetes.io/version: "2.1.0"
     app.kubernetes.io/managed-by: Helm
 data:
-  MODEL_ID: "meta-llama/CodeLlama-7b-hf"
+  MODEL_ID: "Qwen/Qwen2.5-Coder-7B-Instruct"
   PORT: "2080"
   HF_TOKEN: "insert-your-huggingface-token-here"
   http_proxy: ""
@@ -404,7 +404,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu"
+          image: "ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /data
