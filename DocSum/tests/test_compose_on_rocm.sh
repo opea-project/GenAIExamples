@@ -13,7 +13,8 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-
+export MAX_INPUT_TOKENS=1024
+export MAX_TOTAL_TOKENS=2048
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
