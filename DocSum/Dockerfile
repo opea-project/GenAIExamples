@@ -1,5 +1,3 @@
-
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -18,7 +16,7 @@ WORKDIR /home/user
 RUN git clone https://github.com/opea-project/GenAIComps.git
 
 WORKDIR /home/user/GenAIComps
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
 
 COPY ./docsum.py /home/user/docsum.py
@@ -30,3 +28,4 @@ USER user
 WORKDIR /home/user
 
 ENTRYPOINT ["python", "docsum.py"]
+

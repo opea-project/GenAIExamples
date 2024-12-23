@@ -197,7 +197,7 @@
 >
 	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[72%]">
 		<div class="flex justify-between p-2">
-			<p class="text-[1.7rem] font-bold tracking-tight">ChatQnA</p>
+			<p class="text-[1.7rem] font-bold tracking-tight">GraphRAG</p>
 			<UploadFile />
 		</div>
 		<div

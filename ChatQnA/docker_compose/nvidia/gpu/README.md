@@ -5,8 +5,9 @@ This document outlines the deployment process for a ChatQnA application utilizin
 Quick Start Deployment Steps:
 
 1. Set up the environment variables.
-2. Run Docker Compose.
-3. Consume the ChatQnA Service.
+2. Modify the TEI Docker Image for Reranking
+3. Run Docker Compose.
+4. Consume the ChatQnA Service.
 
 ## Quick Start: 1.Setup Environment Variable
 
@@ -17,8 +18,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
@@ -27,6 +26,8 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy",chatqna-ui-server,chatqna-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
    ```
 
 3. Set up other environment variables:
@@ -35,7 +36,30 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    source ./set_env.sh
    ```
 
-## Quick Start: 2.Run Docker Compose
+## Quick Start: 2.Modify the TEI Docker Image for Reranking
+
+> **Note:**
+> The default Docker image for the `tei-reranking-service` in `compose.yaml` is built for A100 and A30 backend with compute capacity 8.0. If you are using A100/A30, skip this step. For other GPU architectures, please modify the `image` with specific tag for `tei-reranking-service` based on the following table with target CUDA compute capacity.
+
+| GPU Arch     | GPU                                        | Compute Capacity | Image                                                    |
+| ------------ | ------------------------------------------ | ---------------- | -------------------------------------------------------- |
+| Volta        | V100                                       | 7.0              | NOT SUPPORTED                                            |
+| Turing       | T4, GeForce RTX 2000 Series                | 7.5              | ghcr.io/huggingface/text-embeddings-inference:turing-1.5 |
+| Ampere 80    | A100, A30                                  | 8.0              | ghcr.io/huggingface/text-embeddings-inference:1.5        |
+| Ampere 86    | A40, A10, A16, A2, GeForce RTX 3000 Series | 8.6              | ghcr.io/huggingface/text-embeddings-inference:86-1.5     |
+| Ada Lovelace | L40S, L40, L4, GeForce RTX 4000 Series     | 8.9              | ghcr.io/huggingface/text-embeddings-inference:89-1.5     |
+| Hopper       | H100                                       | 9.0              | ghcr.io/huggingface/text-embeddings-inference:hopper-1.5 |
+
+For instance, if Hopper arch GPU (such as H100/H100 NVL) is the target backend:
+
+```
+# vim compose.yaml
+tei-reranking-service:
+  #image: ghcr.io/huggingface/text-embeddings-inference:1.5
+  image: ghcr.io/huggingface/text-embeddings-inference:hopper-1.5
+```
+
+## Quick Start: 3.Run Docker Compose
 
 ```bash
 docker compose up -d
@@ -56,7 +80,7 @@ In following cases, you could build docker image from source by yourself.
 
 Please refer to 'Build Docker Images' in below.
 
-## QuickStart: 3.Consume the ChatQnA Service
+## QuickStart: 4.Consume the ChatQnA Service
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna \
@@ -156,8 +180,6 @@ Change the `xxx_MODEL_ID` below for your needs.
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
@@ -168,6 +190,8 @@ Change the `xxx_MODEL_ID` below for your needs.
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy",chatqna-ui-server,chatqna-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
    ```
 
 3. Set up other environment variables:
@@ -175,6 +199,29 @@ Change the `xxx_MODEL_ID` below for your needs.
    ```bash
    source ./set_env.sh
    ```
+
+### Modify the TEI Docker Image for Reranking
+
+> **Note:**
+> The default Docker image for the `tei-reranking-service` in `compose.yaml` is built for A100 and A30 backend with compute capacity 8.0. If you are using A100/A30, skip this step. For other GPU architectures, please modify the `image` with specific tag for `tei-reranking-service` based on the following table with target CUDA compute capacity.
+
+| GPU Arch     | GPU                                        | Compute Capacity | Image                                                    |
+| ------------ | ------------------------------------------ | ---------------- | -------------------------------------------------------- |
+| Volta        | V100                                       | 7.0              | NOT SUPPORTED                                            |
+| Turing       | T4, GeForce RTX 2000 Series                | 7.5              | ghcr.io/huggingface/text-embeddings-inference:turing-1.5 |
+| Ampere 80    | A100, A30                                  | 8.0              | ghcr.io/huggingface/text-embeddings-inference:1.5        |
+| Ampere 86    | A40, A10, A16, A2, GeForce RTX 3000 Series | 8.6              | ghcr.io/huggingface/text-embeddings-inference:86-1.5     |
+| Ada Lovelace | L40S, L40, L4, GeForce RTX 4000 Series     | 8.9              | ghcr.io/huggingface/text-embeddings-inference:89-1.5     |
+| Hopper       | H100                                       | 9.0              | ghcr.io/huggingface/text-embeddings-inference:hopper-1.5 |
+
+For instance, if Hopper arch GPU (such as H100/H100 NVL) is the target backend:
+
+```
+# vim compose.yaml
+tei-reranking-service:
+  #image: ghcr.io/huggingface/text-embeddings-inference:1.5
+  image: ghcr.io/huggingface/text-embeddings-inference:hopper-1.5
+```
 
 ### Start all the services Docker Containers
 
@@ -226,7 +273,7 @@ docker compose up -d
    Try the command below to check whether the TGI service is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs tgi-server | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
@@ -238,9 +285,9 @@ docker compose up -d
    Then try the `cURL` command below to validate TGI.
 
    ```bash
-   curl http://${host_ip}:8008/generate \
+   curl http://${host_ip}:8008/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
+     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 
