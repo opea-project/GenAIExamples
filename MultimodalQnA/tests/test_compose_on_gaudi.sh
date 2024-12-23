@@ -22,7 +22,7 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-multimodal-redis lvm-tgi dataprep-multimodal-redis whisper asr"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-redis lvm-tgi dataprep-multimodal-redis whisper asr"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -41,6 +41,7 @@ function setup_env() {
     export REDIS_URL="redis://${host_ip}:6379"
     export REDIS_HOST=${host_ip}
     export INDEX_NAME="mm-rag-redis"
+    export BRIDGE_TOWER_EMBEDDING=true
     export LLAVA_SERVER_PORT=8399
     export LVM_ENDPOINT="http://${host_ip}:8399"
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
@@ -192,13 +193,13 @@ function validate_microservices() {
     sleep 1m
 
     # multimodal retrieval microservice
-    echo "Validating retriever-multimodal-redis"
+    echo "Validating retriever-redis"
     your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
     validate_service \
-        "http://${host_ip}:7000/v1/multimodal_retrieval" \
+        "http://${host_ip}:7000/v1/retrieval" \
         "retrieved_docs" \
-        "retriever-multimodal-redis" \
-        "retriever-multimodal-redis" \
+        "retriever-redis" \
+        "retriever-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
     sleep 3m

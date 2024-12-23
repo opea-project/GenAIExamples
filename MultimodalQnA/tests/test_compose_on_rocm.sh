@@ -1,8 +1,8 @@
 #!/bin/bash
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -ex
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -21,44 +21,51 @@ export caption_fn="apple.txt"
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-redis lvm-llava lvm-llava-svc dataprep-multimodal-redis whisper asr"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-redis lvm-tgi lvm-llava-svc dataprep-multimodal-redis whisper asr"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
 }
 
 function setup_env() {
+    export HOST_IP=${ip_address}
     export host_ip=${ip_address}
+    export MULTIMODAL_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export MULTIMODAL_TGI_SERVICE_PORT="8399"
+    export no_proxy=${your_no_proxy}
+    export http_proxy=${your_http_proxy}
+    export https_proxy=${your_http_proxy}
+    export BRIDGE_TOWER_EMBEDDING=true
     export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
+    export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT/v1/encode"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
     export ASR_ENDPOINT=http://$host_ip:7066
     export ASR_SERVICE_PORT=3001
     export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
-    export REDIS_URL="redis://${host_ip}:6379"
-    export REDIS_HOST=${host_ip}
+    export REDIS_URL="redis://${HOST_IP}:6379"
+    export REDIS_HOST=${HOST_IP}
     export INDEX_NAME="mm-rag-redis"
-    export BRIDGE_TOWER_EMBEDDING=true
     export LLAVA_SERVER_PORT=8399
-    export LVM_ENDPOINT="http://${host_ip}:8399"
-    export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
+    export LVM_ENDPOINT="http://${HOST_IP}:8399"
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
+    export LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
     export WHISPER_MODEL="base"
-    export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
-    export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
-    export LVM_SERVICE_HOST_IP=${host_ip}
-    export MEGA_SERVICE_HOST_IP=${host_ip}
-    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/ingest_with_text"
-    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
-    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_files"
+    export MM_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
+    export MM_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
+    export LVM_SERVICE_HOST_IP=${HOST_IP}
+    export MEGA_SERVICE_HOST_IP=${HOST_IP}
+    export BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:8888/v1/multimodalqna"
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/ingest_with_text"
+    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/generate_transcripts"
+    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/generate_captions"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/get_files"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/delete_files"
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    cd $WORKPATH/docker_compose/amd/gpu/rocm
 
 
     # Start Docker Containers
@@ -75,6 +82,7 @@ function prepare_data() {
     echo "This is an apple."  > ${caption_fn}
     sleep 1m
 }
+
 
 function validate_service() {
     local URL="$1"
@@ -206,18 +214,18 @@ function validate_microservices() {
     echo "Evaluating lvm-llava"
     validate_service \
         "http://${host_ip}:${LLAVA_SERVER_PORT}/generate" \
-        '"text":' \
-        "lvm-llava" \
-        "lvm-llava" \
-        '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+        '"generated_text":' \
+        "tgi-llava-rocm-server" \
+        "tgi-llava-rocm-server" \
+        '{"inputs":"![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/rabbit.png)What is this a picture of?\n\n","parameters":{"max_new_tokens":16, "seed": 42}}'
 
     # lvm
     echo "Evaluating lvm-llava-svc"
     validate_service \
         "http://${host_ip}:9399/v1/lvm" \
         '"text":"' \
-        "lvm-llava-svc" \
-        "lvm-llava-svc" \
+        "lvm-tgi" \
+        "lvm-tgi" \
         '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 
     # data prep requiring lvm
@@ -284,7 +292,7 @@ function delete_data() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    cd $WORKPATH/docker_compose/amd/gpu/rocm
     docker compose -f compose.yaml stop && docker compose -f compose.yaml rm -f
 }
 
