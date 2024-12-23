@@ -11,7 +11,7 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/texttosql:comps -f comps/texttosql/langchain/Dockerfile .
+docker build --no-cache -t opea/texttosql:comps -f comps/texttosql/src/Dockerfile .
 
 ```
 
