@@ -171,7 +171,6 @@ class DocSumService:
 
         docsum_parameters = DocSumLLMParams(
             query="",
-
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
             top_p=chat_request.top_p if chat_request.top_p else 0.95,
@@ -182,7 +181,6 @@ class DocSumService:
             streaming=stream_opt,
             model=chat_request.model if chat_request.model else None,
             language=chat_request.language if chat_request.language else "auto",
-
             summary_type=summary_type,
             chunk_overlap=chunk_overlap,
             chunk_size=chunk_size,
@@ -190,7 +188,6 @@ class DocSumService:
 
         result_dict, runtime_graph = await self.megaservice.schedule(
             initial_inputs=initial_inputs_data, docsum_parameters=docsum_parameters
-
         )
 
         for node, response in result_dict.items():
