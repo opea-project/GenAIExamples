@@ -83,29 +83,32 @@ flowchart LR
 
 ## Deployment with docker
 
-1. Build agent docker image
+1. Build agent docker image [Optional]
 
-   Note: this is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
+> [!NOTE]
+> the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
 
-   First, clone the opea GenAIComps repo.
+First, clone the opea GenAIComps repo.
 
-   ```
-   export WORKDIR=<your-work-directory>
-   cd $WORKDIR
-   git clone https://github.com/opea-project/GenAIComps.git
-   ```
+```
+export WORKDIR=<your-work-directory>
+cd $WORKDIR
+git clone https://github.com/opea-project/GenAIComps.git
+```
 
-   Then build the agent docker image. Both the supervisor agent and the worker agent will use the same docker image, but when we launch the two agents we will specify different strategies and register different tools.
+Then build the agent docker image. Both the supervisor agent and the worker agent will use the same docker image, but when we launch the two agents we will specify different strategies and register different tools.
 
-   ```
-   cd GenAIComps
-   docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
-   ```
+```
+cd GenAIComps
+docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
+```
 
 2. Set up environment for this example </br>
+
    First, clone this repo.
 
    ```
+   export WORKDIR=<your-work-directory>
    cd $WORKDIR
    git clone https://github.com/opea-project/GenAIExamples.git
    ```
@@ -113,6 +116,14 @@ flowchart LR
    Second, set up env vars.
 
    ```
+   # Example: host_ip="192.168.1.1" or export host_ip="External_Public_IP"
+   export host_ip=$(hostname -I | awk '{print $1}')
+   # if you are in a proxy environment, also set the proxy-related environment variables
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+
    export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
    # for using open-source llms
    export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
@@ -147,6 +158,12 @@ flowchart LR
 5. Launch agent services</br>
    We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
 
+   Deploy it on Gaudi or Xeon respectively
+
+   ::::{tab-set}
+   :::{tab-item} Gaudi
+   :sync: Gaudi
+
    To use open-source LLMs on Gaudi2, run commands below.
 
    ```
@@ -155,12 +172,19 @@ flowchart LR
    bash launch_agent_service_tgi_gaudi.sh
    ```
 
+   :::
+   :::{tab-item} Xeon
+   :sync: Xeon
+
    To use OpenAI models, run commands below.
 
    ```
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
    bash launch_agent_service_openai.sh
    ```
+
+   :::
+   ::::
 
 ## Validate services
 
@@ -181,7 +205,7 @@ You should see something like "HTTP server setup successful" if the docker conta
 Second, validate worker agent:
 
 ```
-curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "Most recent album by Taylor Swift"
     }'
 ```
@@ -189,7 +213,7 @@ curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: app
 Third, validate supervisor agent:
 
 ```
-curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "Most recent album by Taylor Swift"
     }'
 ```

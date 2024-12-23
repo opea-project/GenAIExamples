@@ -78,22 +78,27 @@ export https_proxy=${your_http_proxy}
 export EMBEDDER_PORT=6006
 export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
 export MM_EMBEDDING_PORT_MICROSERVICE=6000
+export ASR_ENDPOINT=http://$host_ip:7066
+export ASR_SERVICE_PORT=3001
+export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
 export REDIS_URL="redis://${host_ip}:6379"
 export REDIS_HOST=${host_ip}
 export INDEX_NAME="mm-rag-redis"
 export LLAVA_SERVER_PORT=8399
 export LVM_ENDPOINT="http://${host_ip}:8399"
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
+export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
 export WHISPER_MODEL="base"
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
+export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/ingest_with_text"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
 export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
-export DATAPREP_GET_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
-export DATAPREP_DELETE_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_videos"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_files"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -119,7 +124,7 @@ docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_pr
 ### 2. Build retriever-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/retriever-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
 ```
 
 ### 3. Build LVM Images
@@ -142,7 +147,21 @@ docker build --no-cache -t opea/lvm-llava-svc:latest --build-arg https_proxy=$ht
 docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
 ```
 
-### 5. Build MegaService Docker Image
+### 5. Build asr images
+
+Build whisper server image
+
+```bash
+docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
+```
+
+Build asr image
+
+```bash
+docker build --no-cache -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile .
+```
+
+### 6. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalqna.py](../../../../multimodalqna.py) Python script. Build MegaService Docker image via below command:
 
@@ -153,7 +172,7 @@ docker build --no-cache -t opea/multimodalqna:latest --build-arg https_proxy=$ht
 cd ../..
 ```
 
-### 6. Build UI Docker Image
+### 7. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -163,16 +182,19 @@ docker build --no-cache -t opea/multimodalqna-ui:latest --build-arg https_proxy=
 cd ../../../
 ```
 
-Then run the command `docker images`, you will have the following 8 Docker Images:
+Then run the command `docker images`, you will have the following 11 Docker Images:
 
 1. `opea/dataprep-multimodal-redis:latest`
 2. `opea/lvm-llava-svc:latest`
 3. `opea/lvm-llava:latest`
 4. `opea/retriever-multimodal-redis:latest`
-5. `opea/embedding-multimodal:latest`
-6. `opea/embedding-multimodal-bridgetower:latest`
-7. `opea/multimodalqna:latest`
-8. `opea/multimodalqna-ui:latest`
+5. `opea/whisper:latest`
+6. `opea/asr:latest`
+7. `opea/redis-vector-db`
+8. `opea/embedding-multimodal:latest`
+9. `opea/embedding-multimodal-bridgetower:latest`
+10. `opea/multimodalqna:latest`
+11. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -238,7 +260,16 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
 
-4. lvm-llava
+4. asr
+
+```bash
+curl ${ASR_SERVICE_ENDPOINT} \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"byte_str" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
+```
+
+5. lvm-llava
 
 ```bash
 curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
@@ -247,7 +278,7 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
      -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-5. lvm-llava-svc
+6. lvm-llava-svc
 
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
@@ -272,65 +303,93 @@ curl http://${host_ip}:9399/v1/lvm \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
-6. dataprep-multimodal-redis
+7. dataprep-multimodal-redis
 
-Download a sample video
+Download a sample video, image, and audio file and create a caption
 
 ```bash
 export video_fn="WeAreGoingOnBullrun.mp4"
 wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
+
+export image_fn="apple.png"
+wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
+
+export caption_fn="apple.txt"
+echo "This is an apple."  > ${caption_fn}
+
+export audio_fn="AudioSample.wav"
+wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav -O ${audio_fn}
 ```
 
-Test dataprep microservice. This command updates a knowledge base by uploading a local video .mp4.
+Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
-    -X POST -F "files=@./${video_fn}"
+    -X POST \
+    -F "files=@./${video_fn}" \
+    -F "files=@./${audio_fn}"
 ```
 
-Also, test dataprep microservice with generating caption using lvm microservice
+Also, test dataprep microservice with generating an image caption using lvm microservice
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
-    -X POST -F "files=@./${video_fn}"
+    -X POST -F "files=@./${image_fn}"
 ```
 
-Also, you are able to get the list of all videos that you uploaded:
+Now, test the microservice with posting a custom caption along with an image
+
+```bash
+curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+    ${DATAPREP_INGEST_SERVICE_ENDPOINT} \
+    -H 'Content-Type: multipart/form-data' \
+    -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}"
+```
+
+Also, you are able to get the list of all files that you uploaded:
 
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
-    ${DATAPREP_GET_VIDEO_ENDPOINT}
+    ${DATAPREP_GET_FILE_ENDPOINT}
 ```
 
-Then you will get the response python-style LIST like this. Notice the name of each uploaded video e.g., `videoname.mp4` will become `videoname_uuid.mp4` where `uuid` is a unique ID for each uploaded video. The same video that are uploaded twice will have different `uuid`.
+Then you will get the response python-style LIST like this. Notice the name of each uploaded file e.g., `videoname.mp4` will become `videoname_uuid.mp4` where `uuid` is a unique ID for each uploaded file. The same files that are uploaded twice will have different `uuid`.
 
 ```bash
 [
     "WeAreGoingOnBullrun_7ac553a1-116c-40a2-9fc5-deccbb89b507.mp4",
-    "WeAreGoingOnBullrun_6d13cf26-8ba2-4026-a3a9-ab2e5eb73a29.mp4"
+    "WeAreGoingOnBullrun_6d13cf26-8ba2-4026-a3a9-ab2e5eb73a29.mp4",
+    "apple_fcade6e6-11a5-44a2-833a-3e534cbe4419.png",
+    "AudioSample_976a85a6-dc3e-43ab-966c-9d81beef780c.wav
 ]
 ```
 
-To delete all uploaded videos along with data indexed with `$INDEX_NAME` in REDIS.
+To delete all uploaded files along with data indexed with `$INDEX_NAME` in REDIS.
 
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
-    ${DATAPREP_DELETE_VIDEO_ENDPOINT}
+    ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
-7. MegaService
+8. MegaService
 
 ```bash
 curl http://${host_ip}:8888/v1/multimodalqna \
     -H "Content-Type: application/json" \
     -X POST \
     -d '{"messages": "What is the revenue of Nike in 2023?"}'
+```
+
+```bash
+curl http://${host_ip}:8888/v1/multimodalqna  \
+    -H "Content-Type: application/json"  \
+    -d '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
 ```
 
 ```bash

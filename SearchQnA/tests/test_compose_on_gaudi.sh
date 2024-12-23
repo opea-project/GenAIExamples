@@ -23,8 +23,8 @@ function build_docker_images() {
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
-    docker pull ghcr.io/huggingface/tei-gaudi:latest
+    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
@@ -76,17 +76,14 @@ function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
+    docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
+    docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
+    docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
+    docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
+
     if [[ $result == *"the"* ]]; then
-        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
-        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
-        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
-        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
         echo "Result correct."
     else
-        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
-        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
-        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
-        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
         echo "Result wrong."
         exit 1
     fi
@@ -107,7 +104,7 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
