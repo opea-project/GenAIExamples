@@ -72,7 +72,7 @@ function start_services() {
     export OUTFILE="/outputs/result.mp4"
     export GFPGAN_MODEL_VERSION=1.4 # latest version, can roll back to v1.3 if needed
     export UPSCALE_FACTOR=1
-    export FPS=10
+    export FPS=5
 
     # Start Docker Containers
     docker compose up -d
