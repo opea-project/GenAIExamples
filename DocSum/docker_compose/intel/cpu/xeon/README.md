@@ -161,7 +161,7 @@ You will have the following Docker Images:
      {"asr_result":"you"}
    ```
 
-6. MegaService
+4. MegaService
 
    Text:
 
@@ -234,7 +234,7 @@ You will have the following Docker Images:
       -F "stream=true"
    ```
 
-7. MegaService with long context
+5. MegaService with long context
 
    If you want to deal with long context, can set following parameters and select suitable summary type.
 

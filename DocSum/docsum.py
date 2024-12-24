@@ -2,12 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
-import os
-from typing import List
-import uuid
 import base64
+import os
 import subprocess
-
+import uuid
+from typing import List
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.mega.utils import handle_message
@@ -57,9 +56,11 @@ def read_pdf(file):
     docs = loader.load_and_split()
     return docs
 
-def video2audio(video_base64: str,) -> str:
-    """
-    Convert a base64 video string to a base64 audio string using ffmpeg.
+
+def video2audio(
+    video_base64: str,
+) -> str:
+    """Convert a base64 video string to a base64 audio string using ffmpeg.
 
     Args:
         video_base64 (str): Base64 encoded video string.
@@ -80,7 +81,7 @@ def video2audio(video_base64: str,) -> str:
             ["ffmpeg", "-i", temp_video_path, "-q:a", "0", "-map", "a", temp_audio_path],
             check=True,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT,
         )
         # Read the extracted audio file and encode it to base64
         with open(temp_audio_path, "rb") as audio_file:
@@ -155,8 +156,7 @@ class DocSumService:
         self.megaservice_text_only.add(llm)
 
     async def handle_request(self, request: Request, files: List[UploadFile] = File(default=None)):
-        """Accept pure text, or files .txt/.pdf.docx, audio/video base64 string.
-        """
+        """Accept pure text, or files .txt/.pdf.docx, audio/video base64 string."""
 
         if "application/json" in request.headers.get("content-type"):
             data = await request.json()
