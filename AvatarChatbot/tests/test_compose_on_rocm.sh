@@ -72,7 +72,7 @@ function start_services() {
     export OUTFILE="/outputs/result.mp4"
     export GFPGAN_MODEL_VERSION=1.4 # latest version, can roll back to v1.3 if needed
     export UPSCALE_FACTOR=1
-    export FPS=5
+    export FPS=10
 
     # Start Docker Containers
     docker compose up -d
@@ -140,8 +140,9 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+#    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
+    sleep 60
     # validate_microservices
     validate_megaservice
     # validate_frontend

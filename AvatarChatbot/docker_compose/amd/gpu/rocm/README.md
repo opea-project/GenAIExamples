@@ -105,7 +105,22 @@ export UPSCALE_FACTOR=1
 export FPS=10
 ```
 
-Warning!!! - The Wav2lip service works in this solution using only the CPU. To use AMD GPUs and achieve operational performance, the Wav2lip image needs to be modified to adapt to AMD hardware and the ROCm framework.
+- Xeon CPU
+
+```bash
+export DEVICE="cpu"
+export WAV2LIP_PORT=7860
+export INFERENCE_MODE='wav2lip_only'
+export CHECKPOINT_PATH='/usr/local/lib/python3.11/site-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
+export FACE="assets/img/avatar1.jpg"
+# export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
+export AUDIO='None'
+export FACESIZE=96
+export OUTFILE="/outputs/result.mp4"
+export GFPGAN_MODEL_VERSION=1.4 # latest version, can roll back to v1.3 if needed
+export UPSCALE_FACTOR=1
+export FPS=10
+```
 
 ## 🚀 Start the MegaService
 
