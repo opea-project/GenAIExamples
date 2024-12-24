@@ -213,7 +213,11 @@ class DocSumUI:
                     generated_text = gr.TextArea(
                         label="Text Summary", placeholder="Summarized text will be displayed here"
                     )
-            upload_btn.upload(lambda file: self.generate_summary(process_function(file), document_type=document_type), upload_btn, generated_text)
+            upload_btn.upload(
+                lambda file: self.generate_summary(process_function(file), document_type=document_type),
+                upload_btn,
+                generated_text,
+            )
         return upload_ui
 
     def render(self):
@@ -269,12 +273,15 @@ class DocSumUI:
             label="Please upload audio file (.wav, .mp3)",
             file_types=[".wav", ".mp3"],
             process_function=self.read_audio_file,
-            document_type="audio"
+            document_type="audio",
         )
 
         # Video Upload UI
         video_ui = self.create_upload_ui(
-            label="Please upload Video file (.mp4)", file_types=[".mp4"], process_function=self.read_video_file, document_type="video"
+            label="Please upload Video file (.mp4)",
+            file_types=[".mp4"],
+            process_function=self.read_video_file,
+            document_type="video",
         )
 
         # Render all the UI in separate tabs
