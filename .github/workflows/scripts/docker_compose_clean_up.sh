@@ -23,7 +23,7 @@ case "$1" in
     ports)
         # Remove all ports used by containers
         echo "Release all ports used by the services in $yaml_file ..."
-        pip install yq
+        pip install yq jq
         ports=$(yq '.services[].ports[] | split(":")[0]' $yaml_file | grep -o '[0-9]\+')
         echo "$ports"
         for port in $ports; do
