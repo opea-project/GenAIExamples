@@ -113,7 +113,6 @@ jobs:
 
       - name: Clean up container before test
         shell: bash
-        if: cancelled() || failure()
         run: |
           docker ps
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_compose
