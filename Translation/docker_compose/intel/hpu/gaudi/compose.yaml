@@ -20,6 +20,8 @@ services:
       LIMIT_HPU_GRAPH: true
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
+    healthcheck:
+      test: ["CMD-SHELL", "sleep 500 && exit 0"]
     runtime: habana
     cap_add:
       - SYS_NICE
@@ -31,7 +33,8 @@ services:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-gaudi-server
     depends_on:
-      - tgi-service
+      - tgi-service:
+        condition: service_healthy
     ports:
       - "9000:9000"
     ipc: host

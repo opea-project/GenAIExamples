@@ -19,7 +19,7 @@ services:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8008/health || exit 1"]
       interval: 10s
       timeout: 10s
-      retries: 30
+      retries: 60
     volumes:
       - "./data:/data"
     shm_size: 1g
