@@ -39,6 +39,7 @@ function start_services() {
     export ASR_SERVICE_HOST_IP=${ip_address}
     export TTS_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export host_ip=${ip_address}
 
     export ASR_SERVICE_PORT=3001
     export TTS_SERVICE_PORT=3002
