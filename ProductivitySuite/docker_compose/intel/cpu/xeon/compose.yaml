@@ -45,9 +45,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:6006/health || exit 1"]
-      interval: 10s
+      interval: 1s
       timeout: 10s
-      retries: 30
+      retries: 60
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
@@ -103,9 +103,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8808/health || exit 1"]
-      interval: 10s
+      interval: 1s
       timeout: 10s
-      retries: 30
+      retries: 60
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
@@ -146,9 +146,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]
-      interval: 10s
+      interval: 1s
       timeout: 10s
-      retries: 30
+      retries: 60
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
@@ -163,7 +163,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CHATQNA}
+      LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CHATQNA}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
@@ -218,9 +219,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8028/health || exit 1"]
-      interval: 10s
+      interval: 1s
       timeout: 10s
-      retries: 30
+      retries: 60
     command: --model-id ${LLM_MODEL_ID_CODEGEN}
   llm_codegen:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
@@ -235,7 +236,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CODEGEN}
+      LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_CODEGEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
@@ -270,6 +272,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_FAQGEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}

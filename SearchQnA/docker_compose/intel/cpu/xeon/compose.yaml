@@ -17,9 +17,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:3001/health || exit 1"]
-      interval: 10s
+      interval: 1s
       timeout: 10s
-      retries: 30
+      retries: 60
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
@@ -66,9 +66,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:3004/health || exit 1"]
-      interval: 10s
+      interval: 1s
       timeout: 10s
-      retries: 30
+      retries: 60
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
@@ -102,9 +102,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:3006/health || exit 1"]
-      interval: 10s
+      interval: 1s
       timeout: 10s
-      retries: 30
+      retries: 60
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
@@ -119,7 +119,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   searchqna-xeon-backend-server:
