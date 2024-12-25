@@ -33,7 +33,7 @@ services:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-gaudi-server
     depends_on:
-      - tgi-service:
+      tgi-service:
         condition: service_healthy
     ports:
       - "9000:9000"
