@@ -21,7 +21,7 @@ services:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8399/health || exit 1"]
       interval: 10s
       timeout: 10s
-      retries: 30
+      retries: 60
     command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192 --cuda-graphs 0
   lvm-tgi:
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
