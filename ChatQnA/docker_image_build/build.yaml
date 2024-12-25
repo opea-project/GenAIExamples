@@ -128,6 +128,6 @@ services:
   nginx:
     build:
       context: GenAIComps
-      dockerfile: comps/3rd_parties/nginx/src/Dockerfile
+      dockerfile: comps/3rd_parties/nginx/deployment/docker/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
