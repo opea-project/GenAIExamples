@@ -14,6 +14,12 @@ services:
       TGI_LLM_ENDPOINT: "http://${HOST_IP}:${VISUALQNA_TGI_SERVICE_PORT}"
       HUGGINGFACEHUB_API_TOKEN: ${VISUALQNA_HUGGINGFACEHUB_API_TOKEN}
       HUGGING_FACE_HUB_TOKEN: ${VISUALQNA_HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${HOST_IP}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8399/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
     volumes:
       - "/var/opea/visualqna-service/data:/data"
     shm_size: 64g
@@ -32,7 +38,8 @@ services:
     image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
     container_name: lvm-tgi-server
     depends_on:
-      - visualqna-llava-tgi-service
+      visualqna-llava-tgi-service:
+        condition: service_healthy
     ports:
       - "9399:9399"
     ipc: host
