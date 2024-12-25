@@ -54,12 +54,19 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:3006/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
     depends_on:
-      - tgi-service
+      tgi-service:
+        condition: service_healthy
     ports:
       - "3007:9000"
     ipc: host

@@ -77,12 +77,15 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
+    healthcheck:
+      test: ["CMD-SHELL", "sleep 120s"] # tgi-gaudi /health has bug, wait for new tgi version to fix
     command: --model-id ${LLM_MODEL_ID} --max-input-length 128 --max-total-tokens 256
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-gaudi-server
     depends_on:
-      - tgi-service
+      tgi-service:
+        condition: service_healthy
     ports:
       - "3007:9000"
     ipc: host
