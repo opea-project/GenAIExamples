@@ -33,7 +33,7 @@ services:
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
     depends_on:
-      - tei-embedding-service:
+      tei-embedding-service:
         condition: service_healthy
     ports:
       - "3002:6000"
@@ -81,7 +81,7 @@ services:
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-xeon-server
     depends_on:
-      - tei-reranking-service:
+      tei-reranking-service:
         condition: service_healthy
     ports:
       - "3005:8000"
@@ -124,7 +124,7 @@ services:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-gaudi-server
     depends_on:
-      - tgi-service:
+      tgi-service:
         condition: service_healthy
     ports:
       - "3007:9000"
