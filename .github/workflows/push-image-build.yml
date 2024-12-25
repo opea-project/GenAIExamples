@@ -10,7 +10,7 @@ on:
       - "**.py"
       - "**Dockerfile*"
       - "**docker_image_build/build.yaml"
-      - "ui"
+      - "**/ui/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-on-push
