@@ -25,7 +25,8 @@ case "$1" in
         echo "Release all ports used by the services in $yaml_file ..."
         export PATH=/home/huggingface/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
         echo $PATH
-        pip install jq yq
+        pip install --force-reinstall PyYAML
+        pip install --force-reinstall jq yq
         pip list | grep jq
         pip list | grep yq
         ports=$(yq '.services[].ports[] | split(":")[0]' $yaml_file | grep -o '[0-9]\+')
