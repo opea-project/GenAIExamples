@@ -14,12 +14,19 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:3001/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   embedding:
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
     depends_on:
-      - tei-embedding-service
+      - tei-embedding-service:
+        condition: service_healthy
     ports:
       - "3002:6000"
     ipc: host
@@ -56,12 +63,19 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:3004/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   reranking:
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
     container_name: reranking-tei-xeon-server
     depends_on:
-      - tei-reranking-service
+      - tei-reranking-service:
+        condition: service_healthy
     ports:
       - "3005:8000"
     ipc: host
@@ -85,12 +99,19 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:3006/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-server
     depends_on:
-      - tgi-service
+      - tgi-service:
+        condition: service_healthy
     ports:
       - "3007:9000"
     ipc: host

@@ -78,6 +78,7 @@ function start_services() {
     export EMBEDDING_SERVER_PORT=6006
     export LLM_SERVER_PORT=9009
     export PROMPT_COLLECTION_NAME="prompt"
+    export host_ip=${ip_address}
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
