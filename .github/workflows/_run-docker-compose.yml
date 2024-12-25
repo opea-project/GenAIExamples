@@ -115,6 +115,7 @@ jobs:
         shell: bash
         if: cancelled() || failure()
         run: |
+          docker ps
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_compose
           export test_case=${{ matrix.test_case }}
           export hardware=${{ inputs.hardware }}
