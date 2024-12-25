@@ -87,17 +87,28 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9009/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   chatqna-xeon-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
-      - redis-vector-db
-      - tei-embedding-service
-      - dataprep-redis-service
-      - retriever
-      - tei-reranking-service
-      - tgi-service
+      tgi-service:
+        condition: service_healthy
+      redis-vector-db:
+        condition: service_started
+      tei-embedding-service:
+        condition: service_started
+      dataprep-redis-service:
+        condition: service_started
+      retriever:
+        condition: service_started
+      tei-reranking-service:
+        condition: service_started
     ports:
       - "8888:8888"
     environment:
