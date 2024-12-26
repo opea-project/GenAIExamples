@@ -51,18 +51,6 @@ services:
     build:
       dockerfile: comps/dataprep/neo4j/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-neo4j-llamaindex:${TAG:-latest}
-  dataprep-multimedia2text:
-    build:
-      dockerfile: comps/dataprep/multimedia2text/Dockerfile
-    image: ${REGISTRY:-opea}/dataprep-multimedia2text:${TAG:-latest}
-  dataprep-video2audio:
-    build:
-      dockerfile: comps/dataprep/multimedia2text/video2audio/Dockerfile
-    image: ${REGISTRY:-opea}/dataprep-video2audio:${TAG:-latest}
-  dataprep-audio2text:
-    build:
-      dockerfile: comps/dataprep/multimedia2text/audio2text/Dockerfile
-    image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
   dataprep-elasticsearch:
     build:
       dockerfile: comps/dataprep/elasticsearch/langchain/Dockerfile
