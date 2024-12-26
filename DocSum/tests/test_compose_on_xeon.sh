@@ -210,6 +210,7 @@ function validate_microservices() {
         "${host_ip}:7079/v1/multimedia2text" \
         "well" \
         "dataprep-multimedia2text" \
+
         "dataprep-multimedia2text" \
         "{\"video\": \"$(input_data_for_test "video")\"}"
 
@@ -217,7 +218,9 @@ function validate_microservices() {
     validate_services_json \
         "${host_ip}:7079/v1/multimedia2text" \
         "well" \
+
         "dataprep-multimedia2text" \
+
         "dataprep-multimedia2text" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
 

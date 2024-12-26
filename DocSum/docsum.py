@@ -108,9 +108,11 @@ class DocSumService:
         if "application/json" in request.headers.get("content-type"):
             data = await request.json()
             stream_opt = data.get("stream", True)
+
             summary_type = data.get("summary_type", "auto")
             chunk_size = data.get("chunk_size", -1)
             chunk_overlap = data.get("chunk_overlap", -1)
+
             chat_request = ChatCompletionRequest.model_validate(data)
             prompt = handle_message(chat_request.messages)
 
@@ -119,9 +121,11 @@ class DocSumService:
         elif "multipart/form-data" in request.headers.get("content-type"):
             data = await request.form()
             stream_opt = data.get("stream", True)
+
             summary_type = data.get("summary_type", "auto")
             chunk_size = data.get("chunk_size", -1)
             chunk_overlap = data.get("chunk_overlap", -1)
+
             chat_request = ChatCompletionRequest.model_validate(data)
 
             data_type = data.get("type")
