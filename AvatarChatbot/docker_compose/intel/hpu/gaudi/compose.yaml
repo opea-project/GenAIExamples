@@ -78,7 +78,7 @@ services:
       - SYS_NICE
     ipc: host
     healthcheck:
-      test: ["CMD-SHELL", "sleep 200s && exit 0"] # tgi-gaudi /health has bug, wait for new tgi version to fix
+      test: ["CMD-SHELL", "sleep 500 && exit 0"]
     command: --model-id ${LLM_MODEL_ID} --max-input-length 128 --max-total-tokens 256
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
