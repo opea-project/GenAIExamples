@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tgi-service:
+  tgi-server:
     image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
-    container_name: tgi-service
+    container_name: tgi-server
     ports:
       - "8008:80"
     environment:
@@ -16,13 +16,13 @@ services:
     volumes:
       - "./data:/data"
     shm_size: 1g
-    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0  --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
 
   llm-docsum-tgi:
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
     container_name: llm-docsum-server
     depends_on:
-      - tgi-service
+      - tgi-server
     ports:
       - "9000:9000"
     ipc: host
@@ -32,11 +32,15 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LOGFLAG: True
     restart: unless-stopped
 
   whisper:
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-    container_name: whisper-service
+    container_name: whisper-server
     ports:
       - "7066:7066"
     ipc: host
@@ -48,7 +52,7 @@ services:
 
   dataprep-audio2text:
     image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
-    container_name: dataprep-audio2text-service
+    container_name: dataprep-audio2text-server
     ports:
       - "9099:9099"
     ipc: host
@@ -57,7 +61,7 @@ services:
 
   dataprep-video2audio:
     image: ${REGISTRY:-opea}/dataprep-video2audio:${TAG:-latest}
-    container_name: dataprep-video2audio-service
+    container_name: dataprep-video2audio-server
     ports:
       - "7078:7078"
     ipc: host
@@ -78,7 +82,7 @@ services:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-xeon-backend-server
     depends_on:
-      - tgi-service
+      - tgi-server
       - llm-docsum-tgi
       - dataprep-multimedia2text
       - dataprep-video2audio
@@ -95,8 +99,8 @@ services:
     ipc: host
     restart: always
 
-  docsum-ui:
-    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+  docsum-gradio-ui:
+    image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
     container_name: docsum-xeon-ui-server
     depends_on:
       - docsum-xeon-backend-server
