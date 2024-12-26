@@ -23,12 +23,7 @@ case "$1" in
     ports)
         # Remove all ports used by containers
         echo "Release all ports used by the services in $yaml_file ..."
-        export PATH=/home/huggingface/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-        echo $PATH
-        pip install --force-reinstall PyYAML
-        pip install --force-reinstall jq yq
-        pip list | grep jq
-        pip list | grep yq
+        pip install jq yq
         ports=$(yq '.services[].ports[] | split(":")[0]' $yaml_file | grep -o '[0-9]\+')
         echo "$ports"
         for port in $ports; do
