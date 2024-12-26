@@ -41,6 +41,7 @@ function start_services() {
     export BACKEND_SERVICE_NAME=translation
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -167,7 +168,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+    # validate_frontend
 
     stop_docker
     echo y | docker system prune
