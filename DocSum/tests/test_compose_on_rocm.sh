@@ -29,24 +29,17 @@ export DOCSUM_BACKEND_SERVER_PORT="8888"
 export DOCSUM_FRONTEND_PORT="5552"
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
+export ASR_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 export DOCSUM_CARD_ID="card1"
 export DOCSUM_RENDER_ID="renderD136"
-export V2A_SERVICE_HOST_IP=${host_ip}
-export V2A_ENDPOINT=http://${host_ip}:7078
-export A2T_ENDPOINT=http://${host_ip}:7066
-export A2T_SERVICE_HOST_IP=${host_ip}
-export A2T_SERVICE_PORT=9099
-export DATA_ENDPOINT=http://${host_ip}:7079
-export DATA_SERVICE_HOST_IP=${host_ip}
-export DATA_SERVICE_PORT=7079
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-gradio-ui whisper dataprep-multimedia2text dataprep-audio2text dataprep-video2audio llm-docsum-tgi"
+    service_list="docsum docsum-gradio-ui whisper llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:1.4
@@ -140,46 +133,6 @@ function validate_microservices() {
         "whisper-service" \
         "whisper-service" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
-
-    # Audio2Text service
-    validate_services \
-        "${host_ip}:9099/v1/audio/transcriptions" \
-        '"query":"well"' \
-        "dataprep-audio2text" \
-        "dataprep-audio2text-service" \
-        "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
-
-    # Video2Audio service
-    validate_services \
-        "${host_ip}:7078/v1/video2audio" \
-        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd95t4qPAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
-        "dataprep-video2audio" \
-        "dataprep-video2audio-service" \
-        "{\"byte_str\": \"$(input_data_for_test "video")\"}"
-
-    # Docsum Data service - video
-    validate_services \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "well" \
-        "dataprep-multimedia2text-service" \
-        "dataprep-multimedia2text" \
-        "{\"video\": \"$(input_data_for_test "video")\"}"
-
-    # Docsum Data service - audio
-    validate_services \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "well" \
-        "dataprep-multimedia2text-service" \
-        "dataprep-multimedia2text" \
-        "{\"audio\": \"$(input_data_for_test "audio")\"}"
-
-    # Docsum Data service - text
-    validate_services \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco" \
-        "dataprep-multimedia2text-service" \
-        "dataprep-multimedia2text" \
-        "{\"text\": \"$(input_data_for_test "text")\"}"
 
     # tgi for llm service
     validate_services \

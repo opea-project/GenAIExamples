@@ -13,28 +13,12 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-#### Audio to text Service
+#### Whisper Service
 
-The Audio to text Service is another service for converting audio to text. Follow these steps to build and run the service:
-
-```bash
-docker build -t opea/dataprep-audio2text:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/audio2text/Dockerfile .
-```
-
-#### Video to Audio Service
-
-The Video to Audio Service extracts audio from video files. Follow these steps to build and run the service:
+The Whisper Service converts audio files to text. Follow these steps to build and run the service:
 
 ```bash
-docker build -t opea/dataprep-video2audio:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/video2audio/Dockerfile .
-```
-
-#### Multimedia to Text Service
-
-The Multimedia to Text Service transforms multimedia data to text data. Follow these steps to build and run the service:
-
-```bash
-docker build -t opea/dataprep-multimedia2text:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimedia2text/Dockerfile .
+docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -133,9 +117,6 @@ You will have the following Docker Images:
 2. `opea/docsum:latest`
 3. `opea/llm-docsum-tgi:latest`
 4. `opea/whisper:latest`
-5. `opea/dataprep-audio2text:latest`
-6. `opea/dataprep-multimedia2text:latest`
-7. `opea/dataprep-video2audio:latest`
 
 ### Validate Microservices
 
@@ -172,37 +153,7 @@ You will have the following Docker Images:
      {"asr_result":"you"}
    ```
 
-4. Audio2Text Microservice
-
-   ```bash
-    curl http://${host_ip}:9199/v1/audio/transcriptions \
-        -X POST \
-        -d '{"byte_str":"UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
-        -H 'Content-Type: application/json'
-   ```
-
-   Expected output:
-
-   ```bash
-     {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
-   ```
-
-5. Multimedia to text Microservice
-
-   ```bash
-    curl http://${host_ip}:7079/v1/multimedia2text \
-        -X POST \
-        -d '{"audio":"UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
-        -H 'Content-Type: application/json'
-   ```
-
-   Expected output:
-
-   ```bash
-     {"downstream_black_list":[],"id":"--> this will be different id number for each run <--","query":"you"}
-   ```
-
-6. MegaService
+4. MegaService
 
    Text:
 
@@ -274,7 +225,7 @@ You will have the following Docker Images:
       -F "stream=True"
    ```
 
-7. MegaService with long context
+5. MegaService with long context
 
    If you want to deal with long context, can set following parameters and select suitable summary type.
 
