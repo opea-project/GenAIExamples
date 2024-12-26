@@ -1,0 +1,65 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3"
+services:
+  opensearch-vector-db:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch-vector-db
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-vector-db
+      - discovery.seed_hosts=opensearch-vector-db
+      - cluster.initial_master_nodes=opensearch-vector-db
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD}    # Sets the demo admin user password when using demo configuration, required for OpenSearch 2.12 and later
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    ports:
+      - 9200:9200
+      - 9600:9600 # required for Performance Analyzer
+    networks:
+      - opensearch-net
+    security_opt:
+      - no-new-privileges:true
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-embedding-server
+    ports:
+      - "6060:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+  dataprep-opensearch:
+    image: opea/dataprep-opensearch:latest
+    container_name: dataprep-opensearch-server
+    ports:
+      - 6007:6007
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      OPENSEARCH_URL: ${OPENSEARCH_URL}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: ${TEI_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  default:
+    driver: bridge
+  opensearch-net:

@@ -47,3 +47,7 @@ services:
     build:
       dockerfile: comps/retrievers/elasticsearch/langchain/Dockerfile
     image: ${REGISTRY:-opea}/retriever-elasticsearch:${TAG:-latest}
+  retriever-opensearch:
+    build:
+      dockerfile: comps/retrievers/opensearch/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/retriever-opensearch:${TAG:-latest}

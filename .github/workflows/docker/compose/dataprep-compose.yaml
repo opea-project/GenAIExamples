@@ -67,3 +67,7 @@ services:
     build:
       dockerfile: comps/dataprep/elasticsearch/langchain/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-elasticsearch:${TAG:-latest}
+  dataprep-opensearch:
+    build:
+      dockerfile: comps/dataprep/opensearch/langchain/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep-opensearch:${TAG:-latest}
