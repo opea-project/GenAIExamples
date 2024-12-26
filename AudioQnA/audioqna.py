@@ -17,6 +17,7 @@ LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 TTS_SERVICE_HOST_IP = os.getenv("TTS_SERVICE_HOST_IP", "0.0.0.0")
 TTS_SERVICE_PORT = int(os.getenv("TTS_SERVICE_PORT", 9088))
 
+
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.TTS:
         new_inputs = {}
@@ -24,6 +25,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         return new_inputs
     else:
         return inputs
+
 
 class AudioQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
