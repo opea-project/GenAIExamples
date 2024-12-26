@@ -77,7 +77,7 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 20s
     echo "All services are up and running"
-    
+
 }
 
 

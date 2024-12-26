@@ -20,6 +20,7 @@ TTS_SERVICE_PORT = int(os.getenv("TTS_SERVICE_PORT", 9088))
 ANIMATION_SERVICE_HOST_IP = os.getenv("ANIMATION_SERVICE_HOST_IP", "0.0.0.0")
 ANIMATION_SERVICE_PORT = int(os.getenv("ANIMATION_SERVICE_PORT", 9066))
 
+
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.TTS:
         new_inputs = {}
@@ -27,6 +28,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         return new_inputs
     else:
         return inputs
+
 
 def check_env_vars(env_var_list):
     for var in env_var_list:
