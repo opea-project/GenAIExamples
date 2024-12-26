@@ -115,7 +115,7 @@ jobs:
         shell: bash
         run: |
           docker ps
-          cd ${{ github.workspace }}/${{ inputs.example }}/docker_compose
+          cd ${{ github.workspace }}/${{ inputs.example }}
           export test_case=${{ matrix.test_case }}
           export hardware=${{ inputs.hardware }}
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
@@ -146,7 +146,7 @@ jobs:
         shell: bash
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}/docker_compose
+          cd ${{ github.workspace }}/${{ inputs.example }}
           export test_case=${{ matrix.test_case }}
           export hardware=${{ inputs.hardware }}
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"

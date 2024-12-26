@@ -6,6 +6,8 @@
 # the all the containers, ports and networks directly.
 # So we need to use the following script to minimize the impact of the clean up.
 
+test_case=${test_case:-"test_compose_on_gaudi.sh"}
+hardware=${hardware:-"gaudi"}
 flag=${test_case%_on_*}
 flag=${flag#test_}
 yaml_file=$(find . -type f -wholename "*${hardware}/${flag}.yaml")
@@ -24,9 +26,13 @@ case "$1" in
         # Remove all ports used by containers
         echo "Release all ports used by the services in $yaml_file ..."
         pip install jq yq
-        ports=$(yq '.services[].ports[] | split(":")[0]' $yaml_file | grep -o '[0-9]\+')
+        ports=$(yq '.services[].ports[] | split(":")[0]' $yaml_file | grep -o '[0-9a-zA-Z_-]\+')
         echo "$ports"
         for port in $ports; do
+          if [[ $port =~ [a-zA-Z_-] ]]; then
+            port=$(grep -E "export $port=" tests/$test_case | cut -d'=' -f2)
+          fi
+          echo $port
           cid=$(docker ps --filter "publish=${port}" --format "{{.ID}}")
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
         done

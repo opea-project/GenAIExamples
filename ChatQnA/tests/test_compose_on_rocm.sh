@@ -1,7 +1,6 @@
 #!/bin/bash
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
-# for test
 
 set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
