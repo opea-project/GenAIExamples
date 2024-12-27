@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-set -ex
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -40,6 +40,7 @@ function start_services() {
     export ASR_SERVICE_HOST_IP=${ip_address}
     export TTS_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export host_ip=${ip_address}
 
     export ASR_SERVICE_PORT=3001
     export TTS_SERVICE_PORT=3002
@@ -49,15 +50,7 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-    n=0
-    until [[ "$n" -ge 100 ]]; do
-       docker logs tgi-service > $LOG_PATH/tgi_service_start.log
-       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
-           break
-       fi
-       sleep 5s
-       n=$((n+1))
-    done
+    sleep 20s
 }
 function validate_megaservice() {
     result=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
