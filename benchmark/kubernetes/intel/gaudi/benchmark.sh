@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+deployment_type="k8s"
+node_number=1
+service_port=7778
+query_per_node=128
+
+benchmark_tool_path="$(pwd)/GenAIEval"
+
+usage() {
+    echo "Usage: $0 [-d deployment_type] [-n node_number] [-i service_ip] [-p service_port] [-w ai_workload]"
+    echo "  -d deployment_type    Deployment type, select between k8s and docker (default: ${deployment_type})"
+    echo "  -n node_number        Test node number, required only for k8s deployment_type, (default: ${node_number})"
+    echo "  -i service_ip         Service IP, required only for docker deployment_type"
+    echo "  -p service_port       Service port, required only for docker deployment_type, (default: ${service_port})"
+    echo "  -w ai_workload        AI workload name to be tested (e.g., chatqna, codegen, etc.) (required)"
+    exit 1
+}
+
+while getopts ":d:n:i:p:w:" opt; do
+    case ${opt} in
+        d )
+            deployment_type=$OPTARG
+            ;;
+        n )
+            node_number=$OPTARG
+            ;;
+        i )
+            service_ip=$OPTARG
+            ;;
+        p )
+            service_port=$OPTARG
+            ;;
+        w )
+            ai_workload=$OPTARG
+            ;;
+        \? )
+            echo "Invalid option: -$OPTARG" 1>&2
+            usage
+            ;;
+        : )
+            echo "Invalid option: -$OPTARG requires an argument" 1>&2
+            usage
+            ;;
+    esac
+done
+
+# Validate ai_workload is set
+if [ -z "$ai_workload" ]; then
+    echo "Error: AI workload name must be specified using -w"
+    usage
+fi
+
+case $ai_workload in
+    chatqna)
+        query_per_node=640
+        ;;
+    codegen)
+        query_per_node=128
+        ;;
+    codetrans)
+        query_per_node=128
+        ;;
+    faqgen)
+        query_per_node=128
+        ;;
+    *)
+        echo "Error: Unknown ai_workload '$ai_workload'"
+        exit 1
+        ;;
+esac
+
+echo "AI workload: $ai_workload"
+echo "Query per node: $query_per_node"
+
+if [[ "$deployment_type" == "docker" && -z "$service_ip" ]]; then
+    echo "Error: service_ip is required for docker deployment_type" 1>&2
+    usage
+fi
+
+if [[ "$deployment_type" == "k8s" && ( -n "$service_ip" || -n "$service_port" ) ]]; then
+    echo "Warning: service_ip and service_port are ignored for k8s deployment_type" 1>&2
+fi
+
+function main() {
+    if [[ ! -d ${benchmark_tool_path} ]]; then
+        echo "Benchmark tool not found, setting up..."
+        setup_env
+    fi
+    run_benchmark
+}
+
+function setup_env() {
+    git clone https://github.com/opea-project/GenAIEval.git
+    pushd ${benchmark_tool_path}
+    python3 -m venv stress_venv
+    source stress_venv/bin/activate
+    pip install -r requirements.txt
+    popd
+}
+
+function run_benchmark() {
+    source ${benchmark_tool_path}/stress_venv/bin/activate
+    export DEPLOYMENT_TYPE=${deployment_type}
+    export SERVICE_IP=${service_ip:-"None"}
+    export SERVICE_PORT=${service_port:-"None"}
+    if [[ -z $USER_QUERIES ]]; then
+        user_query=$((query_per_node*node_number))
+        export USER_QUERIES="[${user_query}, ${user_query}, ${user_query}, ${user_query}]"
+        echo "USER_QUERIES not configured, setting to: ${USER_QUERIES}."
+    fi
+    export WARMUP=$(echo $USER_QUERIES | sed -e 's/[][]//g' -e 's/,.*//')
+    if [[ -z $WARMUP ]]; then export WARMUP=0; fi
+    if [[ -z $TEST_OUTPUT_DIR ]]; then
+        if [[ $DEPLOYMENT_TYPE == "k8s" ]]; then
+            export TEST_OUTPUT_DIR="${benchmark_tool_path}/evals/benchmark/benchmark_output/node_${node_number}"
+        else
+            export TEST_OUTPUT_DIR="${benchmark_tool_path}/evals/benchmark/benchmark_output/docker"
+        fi
+        echo "TEST_OUTPUT_DIR not configured, setting to: ${TEST_OUTPUT_DIR}."
+    fi
+
+    envsubst < ./benchmark.yaml > ${benchmark_tool_path}/evals/benchmark/benchmark.yaml
+    sed -i "s/^\(\s*examples:\s*\).*/\1[$ai_workload]/" ${benchmark_tool_path}/evals/benchmark/benchmark.yaml
+
+    cd ${benchmark_tool_path}/evals/benchmark
+    python benchmark.py
+}
+
+main
