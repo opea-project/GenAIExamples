@@ -27,6 +27,7 @@ function build_docker_images() {
 function start_service() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
     export model="meta-llama/Meta-Llama-3-8B-Instruct"
+    export LLM_MODEL_ID=${model}
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export POSTGRES_USER=postgres
     export POSTGRES_PASSWORD=testpwd
