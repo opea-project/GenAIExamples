@@ -32,7 +32,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         next_data = {"text": inputs["input"], "embedding": data["data"][0]["embedding"], "k": 1}
         return next_data
-    
+
     else:
         return data
 
