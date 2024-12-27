@@ -15,8 +15,8 @@ RUN useradd -m -s /bin/bash user && \
     chown -R user /home/user/
 
 WORKDIR /home/user/
-RUN git clone https://github.com/opea-project/GenAIComps.git
-
+#### TODO REVERT THIS!!!!!!
+RUN git clone --branch source/refactor_multimedia --single-branch https://github.com/opea-project/GenAIComps.git
 WORKDIR /home/user/GenAIComps
 RUN pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
