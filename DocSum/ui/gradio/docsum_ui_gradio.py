@@ -6,12 +6,13 @@ import base64
 import json
 import logging
 import os
+from urllib.parse import urlparse
 
 import gradio as gr
 import requests
 import uvicorn
 from fastapi import FastAPI
-from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader
+from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader, UnstructuredURLLoader
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -76,7 +77,7 @@ class DocSumUI:
         """
         logger.info(">>> Reading audio file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
-        return self.generate_summary(base64_str, document_type="audio")
+        return base64_str
 
     def read_video_file(self, file):
         """Read and process the content of a video file.
@@ -89,7 +90,43 @@ class DocSumUI:
         """
         logger.info(">>> Reading video file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
-        return self.generate_summary(base64_str, document_type="video")
+        return base64_str
+
+    def is_valid_url(self, url):
+        try:
+            result = urlparse(url)
+            return all([result.scheme, result.netloc])
+        except ValueError:
+            return False
+
+    def read_url(self, url):
+        """Read and process the content of a url.
+
+        Args:
+            url: The url to be read as a document.
+
+        Returns:
+            str: The content of the website or an error message if the url is unsupported.
+        """
+
+        self.page_content = ""
+
+        logger.info(">>> Reading url: %s", url)
+        if self.is_valid_url(url=url):
+            os.environ["no_proxy"] = f"{os.environ.get('no_proxy', '')},{url}".strip(",")
+            try:
+                loader = UnstructuredURLLoader([url])
+                page = loader.load()
+                self.page_content = [content.page_content for content in page][0]
+            except Exception as e:
+                msg = f"There was an error trying to read '{url}' --> '{e}'\nTry adding the domain name to your `no_proxy` variable and try again. Example: example.com*"
+                logger.error(msg)
+        else:
+            msg = f"Invalid URL '{url}'. Make sure the link provided is a valid URL"
+            logger.error(msg)
+            return msg
+
+        return self.page_content
 
     def generate_summary(self, doc_content, document_type="text"):
         """Generate a summary for the given document content.
@@ -156,7 +193,7 @@ class DocSumUI:
 
         return str(response.status_code)
 
-    def create_upload_ui(self, label, file_types, process_function):
+    def create_upload_ui(self, label, file_types, process_function, document_type="text"):
         """Create a Gradio UI for file uploads.
 
         Args:
@@ -176,7 +213,11 @@ class DocSumUI:
                     generated_text = gr.TextArea(
                         label="Text Summary", placeholder="Summarized text will be displayed here"
                     )
-            upload_btn.upload(lambda file: self.generate_summary(process_function(file)), upload_btn, generated_text)
+            upload_btn.upload(
+                lambda file: self.generate_summary(process_function(file), document_type=document_type),
+                upload_btn,
+                generated_text,
+            )
         return upload_ui
 
     def render(self):
@@ -201,6 +242,25 @@ class DocSumUI:
                     )
             submit_btn.click(fn=self.generate_summary, inputs=[input_text], outputs=[generated_text])
 
+        with gr.Blocks() as url_ui:
+            # URL text UI
+            with gr.Row():
+                with gr.Column():
+                    input_text = gr.TextArea(
+                        label="Please paste a URL for summarization",
+                        placeholder="Paste a URL for the information you need to summarize",
+                    )
+                    submit_btn = gr.Button("Generate Summary")
+                with gr.Column():
+                    generated_text = gr.TextArea(
+                        label="Text Summary", placeholder="Summarized text will be displayed here"
+                    )
+            submit_btn.click(
+                lambda input_text: self.generate_summary(self.read_url(input_text)),
+                inputs=input_text,
+                outputs=generated_text,
+            )
+
         # File Upload UI
         file_ui = self.create_upload_ui(
             label="Please upload a document (.pdf, .doc, .docx)",
@@ -213,11 +273,15 @@ class DocSumUI:
             label="Please upload audio file (.wav, .mp3)",
             file_types=[".wav", ".mp3"],
             process_function=self.read_audio_file,
+            document_type="audio",
         )
 
         # Video Upload UI
         video_ui = self.create_upload_ui(
-            label="Please upload Video file (.mp4)", file_types=[".mp4"], process_function=self.read_video_file
+            label="Please upload Video file (.mp4)",
+            file_types=[".mp4"],
+            process_function=self.read_video_file,
+            document_type="video",
         )
 
         # Render all the UI in separate tabs
@@ -232,6 +296,8 @@ class DocSumUI:
                     audio_ui.render()
                 with gr.TabItem("Upload Video"):
                     video_ui.render()
+                with gr.TabItem("Enter URL"):
+                    url_ui.render()
 
         return self.demo
 

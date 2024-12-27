@@ -60,15 +60,18 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 3. Set up other environment variables:
 
-   > Notice that you can only choose **one** command below to set up envs according to your hardware. Other that the port numbers may be set incorrectly.
+   > Notice that you can only choose **one** hardware option below to set up envs according to your hardware. Make sure port numbers are set correctly as well.
 
    ```bash
    # on Gaudi
    source ./docker_compose/intel/hpu/gaudi/set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
    # on Xeon
    source ./docker_compose/intel/cpu/xeon/set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
    # on Nvidia GPU
    source ./docker_compose/nvidia/gpu/set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-ui-server,chatqna-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
    ```
 
 ### Quick Start: 2.Run Docker Compose
@@ -196,7 +199,7 @@ In the below, we provide a table that describes for each microservice component 
 Gaudi default compose.yaml
 | MicroService | Open Source Project | HW | Port | Endpoint |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding | Langchain | Xeon | 6000 | /v1/embaddings |
+| Embedding | Langchain | Xeon | 6000 | /v1/embeddings |
 | Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
 | Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
 | LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
