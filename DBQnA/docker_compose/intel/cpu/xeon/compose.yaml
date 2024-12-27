@@ -33,7 +33,7 @@ services:
       - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
 
   text2sql-service:
-    image: opea/text2sql:latest
+    image: ${REGISTRY:-opea}/text2sql:${TAG:-latest}
     container_name: text2sql-service
     ports:
       - "9090:8090"
@@ -41,7 +41,7 @@ services:
       - TGI_LLM_ENDPOINT=${TGI_LLM_ENDPOINT}
 
   dbqna-xeon-react-ui-server:
-    image: opea/dbqna-react-ui:latest
+    image: ${REGISTRY:-opea}/dbqna-react-ui:${TAG:-latest}
     container_name: dbqna-xeon-react-ui-server
     depends_on:
       - text2sql-service
