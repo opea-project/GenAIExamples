@@ -64,7 +64,7 @@ function start_services() {
     export WAV2LIP_PORT=7860
     export INFERENCE_MODE='wav2lip+gfpgan'
     export CHECKPOINT_PATH='/usr/local/lib/python3.10/dist-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
-    export FACE="assets/img/avatar1.jpg"
+    export FACE="/home/user/comps/animation/src/assets/img/avatar1.jpg"
     # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
     export AUDIO='None'
     export FACESIZE=96
