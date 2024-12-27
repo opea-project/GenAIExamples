@@ -16,16 +16,15 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    # git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    # service_list="searchqna searchqna-ui embedding-tei web-retriever-chroma reranking-tei llm-tgi"
-    service_list="searchqna"
+    service_list="searchqna searchqna-ui embedding-tei web-retriever-chroma reranking-tei llm-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    # docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    # docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
-    # docker images && sleep 1s
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -79,12 +78,12 @@ function validate_megaservice() {
     echo $result
 
     if [[ $result == *"capital"* ]]; then
-        docker logs web-retriever-chroma-server
-        docker logs searchqna-xeon-backend-server
+        docker logs web-retriever-chroma-server > $LOG_PATH/web_retriever.log
+        docker logs searchqna-xeon-backend-server > $LOG_PATH/searchqna_backend.log
         echo "Result correct."
     else
-        docker logs web-retriever-chroma-server
-        docker logs searchqna-xeon-backend-server
+        docker logs web-retriever-chroma-server > $LOG_PATH/web_retriever.log
+        docker logs searchqna-xeon-backend-server > $LOG_PATH/searchqna_backend.log
         echo "Result wrong."
         exit 1
     fi
