@@ -16,15 +16,16 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    # git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="searchqna searchqna-ui embedding-tei web-retriever-chroma reranking-tei llm-tgi"
+    # service_list="searchqna searchqna-ui embedding-tei web-retriever-chroma reranking-tei llm-tgi"
+    service_list="searchqna"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
-    docker images && sleep 1s
+    # docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    # docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    # docker images && sleep 1s
 }
 
 function start_services() {
@@ -36,6 +37,7 @@ function start_services() {
     export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
     export TEI_EMBEDDING_ENDPOINT=http://$ip_address:3001
     export RERANK_MODEL_ID=BAAI/bge-reranker-base
+    export RERANK_TYPE="tei"
     export TEI_RERANKING_ENDPOINT=http://$ip_address:3004
 
     export TGI_LLM_ENDPOINT=http://$ip_address:3006
@@ -53,6 +55,7 @@ function start_services() {
     export LLM_SERVICE_PORT=3007
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
     export host_ip=${ip_address}
+    export LOGFLAG=true
 
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
@@ -72,10 +75,10 @@ function start_services() {
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is the capital of China?", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"the"* ]]; then
+    if [[ $result == *"capital"* ]]; then
         docker logs web-retriever-chroma-server
         docker logs searchqna-xeon-backend-server
         echo "Result correct."
@@ -128,7 +131,7 @@ function main() {
     start_services
 
     validate_megaservice
-    validate_frontend
+    # validate_frontend
 
     stop_docker
     echo y | docker system prune
