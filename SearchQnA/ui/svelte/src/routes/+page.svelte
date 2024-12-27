@@ -93,7 +93,7 @@
 
 		eventSource.addEventListener("message", (e: any) => {
 			let res = e.data;
-			
+
 			if (res === "[DONE]") {
 				let startTime = chatMessages[chatMessages.length - 1].time;
 
