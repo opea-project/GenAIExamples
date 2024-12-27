@@ -17,7 +17,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8008/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://$host_ip:${CODEGEN_TGI_SERVICE_PORT:-8028}/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100

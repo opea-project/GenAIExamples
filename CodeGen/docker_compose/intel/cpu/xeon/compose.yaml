@@ -17,7 +17,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8008/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8028/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
