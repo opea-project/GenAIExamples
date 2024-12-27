@@ -40,7 +40,7 @@ function start_service() {
     # check whether tgi is fully ready.
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
-        docker logs test-text2sql-tgi-endpoint > ${LOG_PATH}/tgi.log
+        docker logs tgi-service > ${LOG_PATH}/tgi.log
         n=$((n+1))
         if grep -q Connected ${LOG_PATH}/tgi.log; then
             break
