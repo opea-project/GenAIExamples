@@ -30,6 +30,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+    export RERANK_TYPE="tei"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export LLM_MODEL_ID_CODEGEN="Intel/neural-chat-7b-v3-3"
@@ -163,10 +164,10 @@ function validate_microservices() {
     # embedding microservice
     validate_service \
         "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":[' \
+        '""embedding":[' \
         "embedding-microservice" \
         "embedding-tei-server" \
-        '{"text":"What is Deep Learning?"}'
+        '{"input":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
