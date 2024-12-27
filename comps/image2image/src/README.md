@@ -28,7 +28,7 @@ export HF_TOKEN=<your huggingface token>
 Start the OPEA Microservice:
 
 ```bash
-python image2image.py --bf16 --model_name_or_path $MODEL --token $HF_TOKEN
+python opea_image2image_microservice.py --bf16 --model_name_or_path $MODEL --token $HF_TOKEN
 ```
 
 # 🚀2. Start Microservice with Docker (Option 2)
@@ -48,7 +48,7 @@ Build image-to-image service image on Xeon with below command:
 
 ```bash
 cd ../..
-docker build -t opea/image2image:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/image2image/Dockerfile .
+docker build -t opea/image2image:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/image2image/src/Dockerfile .
 ```
 
 ### 2.1.2 Image-to-Image Service Image on Gaudi
@@ -57,7 +57,7 @@ Build image-to-image service image on Gaudi with below command:
 
 ```bash
 cd ../..
-docker build -t opea/image2image-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/image2image/Dockerfile.intel_hpu .
+docker build -t opea/image2image-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/image2image/src/Dockerfile.intel_hpu .
 ```
 
 ## 2.2 Start Image-to-Image Service

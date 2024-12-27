@@ -12,12 +12,12 @@ COPY comps /home/comps
 
 RUN pip install --no-cache-dir --upgrade pip && \
     if [ ${ARCH} = "cpu" ]; then pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
-    pip install --no-cache-dir -r /home/comps/image2image/requirements.txt
+    pip install --no-cache-dir -r /home/comps/image2image/src/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home
 
-WORKDIR /home/comps/image2image
+WORKDIR /home/comps/image2image/src
 
-RUN echo python image2image.py --bf16 >> run.sh
+RUN echo python opea_image2image_microservice.py --bf16 >> run.sh
 
 CMD bash run.sh

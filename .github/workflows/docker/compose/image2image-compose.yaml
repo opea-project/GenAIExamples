@@ -5,9 +5,9 @@
 services:
   image2image:
     build:
-      dockerfile: comps/image2image/Dockerfile
+      dockerfile: comps/image2image/src/Dockerfile
     image: ${REGISTRY:-opea}/image2image:${TAG:-latest}
   image2image-gaudi:
     build:
-      dockerfile: comps/image2image/Dockerfile.intel_hpu
+      dockerfile: comps/image2image/src/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/image2image-gaudi:${TAG:-latest}
