@@ -43,9 +43,9 @@ docker build --no-cache -t opea/audioqna:latest --build-arg https_proxy=$https_p
 Then run the command `docker images`, you will have following images ready:
 
 1. `opea/whisper-gaudi:latest`
-3. `opea/llm-tgi:latest`
-4. `opea/speecht5-gaudi:latest`
-6. `opea/audioqna:latest`
+2. `opea/llm-tgi:latest`
+3. `opea/speecht5-gaudi:latest`
+4. `opea/audioqna:latest`
 
 ## 🚀 Set the environment variables
 
