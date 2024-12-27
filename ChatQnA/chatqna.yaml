@@ -1,0 +1,61 @@
+deploy:
+  device: gaudi
+  version: 1.1.0
+  modelUseHostPath: /mnt/models
+  HUGGINGFACEHUB_API_TOKEN: ""
+  node: [1, 2, 4, 8]
+  namespace: ""
+
+  services:
+    backend:
+      instance_num: [2, 2, 4, 8]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    teirerank:
+      enabled: True
+      model_id: ""
+      replicaCount: [1, 1, 1, 1]
+      cards_per_instance: 1
+
+    tei:
+      model_id: ""
+      replicaCount: [1, 2, 4, 8]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    llm:
+      engine: tgi
+      model_id: ""
+      replicaCount: [7, 15, 31, 63]
+      max_batch_size: [1, 2, 4, 8]
+      max_input_length: ""
+      max_total_tokens: ""
+      max_batch_total_tokens: ""
+      max_batch_prefill_tokens: ""
+      cards_per_instance: 1
+
+    data-prep:
+      replicaCount: [1, 1, 1, 1]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    retriever-usvc:
+      replicaCount: [2, 2, 4, 8]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    redis-vector-db:
+      replicaCount: [1, 1, 1, 1]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    chatqna-ui:
+      replicaCount: [1, 1, 1, 1]
+
+    nginx:
+      replicaCount: [1, 1, 1, 1]
+
+benchmark:
+  llm:
+    max_token_size: 1024  # specify the output token size
