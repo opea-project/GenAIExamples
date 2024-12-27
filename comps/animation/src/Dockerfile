@@ -15,10 +15,10 @@ ARG ARCH=cpu
 COPY comps /home/user/comps
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/user/comps/animation/wav2lip/requirements.txt ;
+    pip install --no-cache-dir -r /home/user/comps/animation/src/requirements.txt ;
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/animation/wav2lip
+WORKDIR /home/user/comps/animation/src
 
-ENTRYPOINT ["python3", "animation.py"]
+ENTRYPOINT ["python3", "opea_animation_microservice.py"]

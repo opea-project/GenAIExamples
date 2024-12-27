@@ -5,13 +5,13 @@
 services:
   animation:
     build:
-      dockerfile: comps/animation/wav2lip/Dockerfile
+      dockerfile: comps/animation/src/Dockerfile
     image: ${REGISTRY:-opea}/animation:${TAG:-latest}
   wav2lip:
     build:
-      dockerfile: comps/animation/wav2lip/dependency/Dockerfile
+      dockerfile: comps/animation/src/integration/dependency/Dockerfile
     image: ${REGISTRY:-opea}/wav2lip:${TAG:-latest}
   wav2lip-gaudi:
     build:
-      dockerfile: comps/animation/wav2lip/dependency/Dockerfile.intel_hpu
+      dockerfile: comps/animation/src/integration/dependency/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/wav2lip-gaudi:${TAG:-latest}

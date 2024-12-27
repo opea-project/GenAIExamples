@@ -8,12 +8,11 @@ import json
 import os
 import time
 
-import requests
-
 # GenAIComps
-from comps import CustomLogger
+from comps import CustomLogger, OpeaComponentController
+from comps.animation.src.integration.opea import OpeaAnimation
 
-logger = CustomLogger("animation")
+logger = CustomLogger("opea_animation")
 logflag = os.getenv("LOGFLAG", False)
 from comps import (
     Base64ByteStrDoc,
@@ -24,6 +23,23 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+
+# Initialize OpeaComponentController
+controller = OpeaComponentController()
+
+# Register components
+try:
+    # Instantiate Animation component and register it to controller
+    opea_animation = OpeaAnimation(
+        name="OpeaAnimation",
+        description="OPEA Animation Service",
+    )
+    controller.register(opea_animation)
+
+    # Discover and activate a healthy component
+    controller.discover_and_activate()
+except Exception as e:
+    logger.error(f"Failed to initialize components: {e}")
 
 
 # Register the microservice
@@ -37,19 +53,11 @@ from comps import (
     output_datatype=VideoPath,
 )
 @register_statistics(names=["opea_service@animation"])
-async def animate(audio: Base64ByteStrDoc):
+def animate(audio: Base64ByteStrDoc):
     start = time.time()
 
-    byte_str = audio.byte_str
-    inputs = {"audio": byte_str}
+    outfile = opea_animation.invoke(audio.byte_str)
     if logflag:
-        logger.info(inputs)
-
-    response = requests.post(url=f"{wav2lip_endpoint}/v1/wav2lip", data=json.dumps(inputs), proxies={"http": None})
-
-    outfile = response.json()["wav2lip_result"]
-    if logflag:
-        logger.info(response)
         logger.info(f"Video generated successfully, check {outfile} for the result.")
 
     statistics_dict["opea_service@animation"].append_latency(time.time() - start, None)
@@ -57,6 +65,5 @@ async def animate(audio: Base64ByteStrDoc):
 
 
 if __name__ == "__main__":
-    wav2lip_endpoint = os.getenv("WAV2LIP_ENDPOINT", "http://localhost:7860")
     logger.info("[animation - router] Animation initialized.")
     opea_microservices["opea_service@animation"].start()

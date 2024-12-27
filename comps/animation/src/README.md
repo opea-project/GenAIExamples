@@ -16,19 +16,19 @@ cd GenAIComps
 - Xeon CPU
 
 ```bash
-docker build -t opea/wav2lip:latest -f comps/animation/wav2lip/dependency/Dockerfile .
+docker build -t opea/wav2lip:latest -f comps/animation/src/integration/dependency/Dockerfile .
 ```
 
 - Gaudi2 HPU
 
 ```bash
-docker build -t opea/wav2lip-gaudi:latest -f comps/animation/wav2lip/dependency/Dockerfile.intel_hpu .
+docker build -t opea/wav2lip-gaudi:latest -f comps/animation/src/integration/dependency/Dockerfile.intel_hpu .
 ```
 
 ### 1.1.2 Animation server image
 
 ```bash
-docker build -t opea/animation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/wav2lip/Dockerfile .
+docker build -t opea/animation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/src/Dockerfile .
 ```
 
 ## 1.2. Set environment variables
@@ -78,13 +78,13 @@ export FPS=10
 - Xeon CPU
 
 ```bash
-docker run --privileged -d --name "wav2lip-service" -p 7860:7860 --ipc=host -w /home/user/comps/animation/wav2lip -e PYTHON=/usr/bin/python3.11 -v $(pwd)/comps/animation/wav2lip/assets:/home/user/comps/animation/wav2lip/assets -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip:latest
+docker run --privileged -d --name "wav2lip-service" -p 7860:7860 --ipc=host -w /home/user/comps/animation/src -e PYTHON=/usr/bin/python3.11 -v $(pwd)/comps/animation/src/assets:/home/user/comps/animation/src/assets -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip:latest
 ```
 
 - Gaudi2 HPU
 
 ```bash
-docker run --privileged -d --name "wav2lip-gaudi-service" -p 7860:7860 --runtime=habana --cap-add=sys_nice --ipc=host -w /home/user/comps/animation/wav2lip -v $(pwd)/comps/animation/wav2lip/assets:/home/user/comps/animation/wav2lip/assets -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PYTHON=/usr/bin/python3.10 -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip-gaudi:latest
+docker run --privileged -d --name "wav2lip-gaudi-service" -p 7860:7860 --runtime=habana --cap-add=sys_nice --ipc=host -w /home/user/comps/animation/src -v $(pwd)/comps/animation/src/assets:/home/user/comps/animation/src/assets -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PYTHON=/usr/bin/python3.10 -e DEVICE=$DEVICE -e INFERENCE_MODE=$INFERENCE_MODE -e CHECKPOINT_PATH=$CHECKPOINT_PATH -e FACE=$FACE -e AUDIO=$AUDIO -e FACESIZE=$FACESIZE -e OUTFILE=$OUTFILE -e GFPGAN_MODEL_VERSION=$GFPGAN_MODEL_VERSION -e UPSCALE_FACTOR=$UPSCALE_FACTOR -e FPS=$FPS -e WAV2LIP_PORT=$WAV2LIP_PORT opea/wav2lip-gaudi:latest
 ```
 
 ## 2.2 Run Animation Microservice
@@ -101,7 +101,7 @@ Once microservice starts, user can use below script to validate the running micr
 
 ```bash
 cd GenAIComps
-python3 comps/animation/wav2lip/dependency/check_wav2lip_server.py
+python3 comps/animation/src/integration/dependency/check_wav2lip_server.py
 ```
 
 ## 3.2 Validate Animation service
@@ -109,20 +109,20 @@ python3 comps/animation/wav2lip/dependency/check_wav2lip_server.py
 ```bash
 cd GenAIComps
 export ip_address=$(hostname -I | awk '{print $1}')
-curl http://${ip_address}:9066/v1/animation -X POST -H "Content-Type: application/json" -d @comps/animation/wav2lip/assets/audio/sample_question.json
+curl http://${ip_address}:9066/v1/animation -X POST -H "Content-Type: application/json" -d @comps/animation/src/assets/audio/sample_question.json
 ```
 
 or
 
 ```bash
 cd GenAIComps
-python3 comps/animation/wav2lip/dependency/check_animation_server.py
+python3 comps/animation/src/integration/dependency/check_animation_server.py
 ```
 
 The expected output will be a message similar to the following:
 
 ```bash
-{'wav2lip_result': '....../GenAIComps/comps/animation/wav2lip/assets/outputs/result.mp4'}
+{'wav2lip_result': '....../GenAIComps/comps/animation/src/assets/outputs/result.mp4'}
 ```
 
-Please find "comps/animation/wav2lip/assets/outputs/result.mp4" as a reference generated video.
+Please find "comps/animation/src/assets/outputs/result.mp4" as a reference generated video.

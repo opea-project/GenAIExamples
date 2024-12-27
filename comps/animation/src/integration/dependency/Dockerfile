@@ -25,11 +25,11 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
 # Install GenAIComps
 RUN mkdir -p /home/user/comps
 COPY comps /home/user/comps
-COPY comps/animation/wav2lip/dependency/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY comps/animation/src/integration/dependency/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Install ffmpeg with x264 software codec
-RUN git clone https://github.com/FFmpeg/FFmpeg.git /home/user/comps/animation/wav2lip/FFmpeg
-WORKDIR /home/user/comps/animation/wav2lip/FFmpeg
+RUN git clone https://github.com/FFmpeg/FFmpeg.git /home/user/comps/animation/src/FFmpeg
+WORKDIR /home/user/comps/animation/src/FFmpeg
 RUN ./configure --enable-gpl --enable-libx264 --enable-cross-compile && \
     make -j$(nproc-1) && \
     make install && \
@@ -53,7 +53,7 @@ ENV PYTHONPATH="$PYTHONPATH:/usr/local/lib/python3.11/site-packages/gfpgan"
 WORKDIR /usr/local/lib/python3.11/site-packages
 
 # Install pip dependencies
-RUN pip install -r /home/user/comps/animation/wav2lip/requirements.txt
+RUN pip install -r /home/user/comps/animation/src/requirements.txt
 
 # Custom patches
 # Modify the degradations.py file to import rgb_to_grayscale from torchvision.transforms.functional
@@ -66,7 +66,7 @@ RUN sed -i "s/if 'cpu' not in device and 'cuda' not in device:/if 'cpu' not in d
 RUN sed -i 's/hp.sample_rate, hp.n_fft/sr=hp.sample_rate, n_fft=hp.n_fft/' /usr/local/lib/python3.11/site-packages/Wav2Lip/audio.py
 
 # Set the working directory
-WORKDIR /home/user/comps/animation/wav2lip/
+WORKDIR /home/user/comps/animation/src/
 
 # Define the command to run when the container starts
 RUN chmod +x /usr/local/bin/entrypoint.sh

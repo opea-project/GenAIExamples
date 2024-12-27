@@ -23,7 +23,7 @@ export PT_HPU_LAZY_MODE=0
 export PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES=1
 
 # Wav2Lip, GFPGAN
-cd /home/user/comps/animation/wav2lip/ || exit
+cd /home/user/comps/animation/src/integration/ || exit
 python3 dependency/wav2lip_server.py \
 --device $DEVICE \
 --port $((WAV2LIP_PORT)) \
