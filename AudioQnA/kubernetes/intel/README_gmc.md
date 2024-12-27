@@ -15,10 +15,7 @@ The AudioQnA application is defined as a Custom Resource (CR) file that the abov
 The AudioQnA uses the below prebuilt images if you choose a Xeon deployment
 
 - tgi-service: ghcr.io/huggingface/text-generation-inference:1.4
-- llm: opea/llm-tgi:latest
-- asr: opea/asr:latest
 - whisper: opea/whisper:latest
-- tts: opea/tts:latest
 - speecht5: opea/speecht5:latest
 
 
@@ -52,7 +49,7 @@ This involves deploying the AudioQnA custom resource. You can use audioQnA_xeon.
    ```sh
    kubectl get gmconnectors.gmc.opea.io -n audioqa
    NAME      URL                                                    READY   AGE
-   audioqa   http://router-service.audioqa.svc.cluster.local:8080   6/0/6   5m
+   audioqa   http://router-service.audioqa.svc.cluster.local:8080   3/0/3   5m
    ```
 
 4. Deploy a client pod to test the application

@@ -25,13 +25,7 @@ For compose for ROCm example AMD optimized image hosted in huggingface repo will
 ### 4. Build TTS Image
 
 ```bash
-<<<<<<< Updated upstream
-docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
-
-docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/Dockerfile .
-=======
 docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/dependency/Dockerfile .
->>>>>>> Stashed changes
 ```
 
 ### 5. Build MegaService Docker Image
@@ -58,11 +52,7 @@ Before starting the services with `docker compose`, you have to recheck the foll
 export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=<your HF token>
 
-export TGI_LLM_ENDPOINT=http://$host_ip:3006
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-
-export ASR_ENDPOINT=http://$host_ip:7066
-export TTS_ENDPOINT=http://$host_ip:7055
 
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export WHISPER_SERVER_HOST_IP=${host_ip}
