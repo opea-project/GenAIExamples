@@ -47,7 +47,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: "http://codegen-tgi-service"
-      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LLM_MODEL_ID: ${CODEGEN_LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codegen-backend-server:
