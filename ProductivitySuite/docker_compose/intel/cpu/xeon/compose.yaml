@@ -32,6 +32,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output"
     container_name: tei-embedding-server
     ports:
       - "6006:80"
@@ -45,7 +46,7 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:6006/health || exit 1"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 60
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
@@ -87,6 +88,7 @@ services:
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output"
     container_name: tei-reranking-server
     ports:
       - "8808:80"
@@ -103,7 +105,7 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8808/health || exit 1"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 60
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
@@ -146,9 +148,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
-      retries: 60
+      retries: 100
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
@@ -219,9 +221,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8028/health || exit 1"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
-      retries: 60
+      retries: 100
     command: --model-id ${LLM_MODEL_ID_CODEGEN}
   llm_codegen:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
@@ -263,7 +265,8 @@ services:
     image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
     container_name: llm-faqgen-server
     depends_on:
-      - tgi_service
+      tgi_service:
+        condition: service_healthy
     ports:
       - "9002:9000"
     ipc: host
@@ -299,7 +302,8 @@ services:
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
     container_name: llm-docsum-server
     depends_on:
-      - tgi_service
+      tgi_service:
+        condition: service_healthy
     ports:
       - "9003:9000"
     ipc: host

@@ -4,6 +4,7 @@
 services:
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output"
     container_name: tei-embedding-server
     ports:
       - "3001:80"
@@ -17,7 +18,7 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:3001/health || exit 1"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 60
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
@@ -53,6 +54,7 @@ services:
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output"
     container_name: tei-reranking-server
     ports:
       - "3004:80"
@@ -66,7 +68,7 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:3004/health || exit 1"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 60
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
@@ -102,9 +104,9 @@ services:
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:3006/health || exit 1"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
-      retries: 60
+      retries: 100
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
