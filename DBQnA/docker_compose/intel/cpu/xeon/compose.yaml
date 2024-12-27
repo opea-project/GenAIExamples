@@ -41,7 +41,7 @@ services:
       - TGI_LLM_ENDPOINT=${TGI_LLM_ENDPOINT}
 
   dbqna-xeon-react-ui-server:
-    image: ${REGISTRY:-opea}/dbqna-react-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/text2sql-react-ui:${TAG:-latest}
     container_name: dbqna-xeon-react-ui-server
     depends_on:
       - text2sql-service
