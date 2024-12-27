@@ -17,6 +17,7 @@ SPEECHT5_SERVER_PORT = int(os.getenv("SPEECHT5_SERVER_PORT", 7055))
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 3006))
 
+
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
@@ -37,6 +38,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs["voice"] = kwargs["voice"]
         inputs = next_inputs
     return inputs
+
 
 class AudioQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
@@ -92,7 +94,9 @@ class AudioQnAService:
             streaming=False,  # TODO add streaming LLM output as input to TTS
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs={"audio": chat_request.audio}, llm_parameters=parameters, voice=chat_request.voice,
+            initial_inputs={"audio": chat_request.audio},
+            llm_parameters=parameters,
+            voice=chat_request.voice,
         )
 
         last_node = runtime_graph.all_leaves()[-1]
