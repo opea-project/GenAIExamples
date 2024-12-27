@@ -21,6 +21,15 @@ ANIMATION_SERVICE_HOST_IP = os.getenv("ANIMATION_SERVICE_HOST_IP", "0.0.0.0")
 ANIMATION_SERVICE_PORT = int(os.getenv("ANIMATION_SERVICE_PORT", 9066))
 
 
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.TTS:
+        new_inputs = {}
+        new_inputs["text"] = inputs["choices"][0]["text"]
+        return new_inputs
+    else:
+        return inputs
+
+
 def check_env_vars(env_var_list):
     for var in env_var_list:
         if os.getenv(var) is None:
@@ -33,6 +42,7 @@ class AvatarChatbotService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_inputs = align_inputs
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.AVATAR_CHATBOT)
 
