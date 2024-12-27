@@ -38,7 +38,7 @@ function validate_audioqna() {
     -X POST \
     -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64, "voice":"default"}' \
     -H 'Content-Type: application/json' | sed 's/^"//;s/"$//' | base64 -d > output.wav
-    
+
     if [[ $(file speech.mp3) == *"RIFF"* ]]; then
         echo "Result correct."
     else
