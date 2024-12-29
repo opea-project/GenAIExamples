@@ -39,6 +39,7 @@ function start_services() {
     export CODEGEN_BACKEND_SERVICE_PORT=7778
     export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
     export CODEGEN_UI_SERVICE_PORT=5173
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
