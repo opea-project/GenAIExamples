@@ -22,6 +22,7 @@ class AIExample(Enum):
                 return example
         raise ValueError(f"Invalid example type: {value}")
 
+
 def get_example_services(example_type):
     """Get service configuration for different AI examples."""
     COMMON_SERVICES = {
@@ -39,7 +40,7 @@ def get_example_services(example_type):
                 "retriever-usvc": {"scalable": True},
                 "chatqna-ui": {"scalable": False},
             },
-            "supports_rerank": True
+            "supports_rerank": True,
         },
         AIExample.DOCSUM: {
             "services": {
@@ -47,32 +48,33 @@ def get_example_services(example_type):
                 "whisper": {"scalable": True},
                 "docsum-ui": {"scalable": False},
             },
-            "supports_rerank": False
+            "supports_rerank": False,
         },
         AIExample.FAQGEN: {
             "services": {
                 **COMMON_SERVICES,
                 "faqgen-ui": {"scalable": False},
             },
-            "supports_rerank": False
+            "supports_rerank": False,
         },
         AIExample.CODEGEN: {
             "services": {
                 **COMMON_SERVICES,
                 "codegen-ui": {"scalable": False},
             },
-            "supports_rerank": False
+            "supports_rerank": False,
         },
         AIExample.CODETRANS: {
             "services": {
                 **COMMON_SERVICES,
                 "codetrans-ui": {"scalable": False},
             },
-            "supports_rerank": False
-        }
+            "supports_rerank": False,
+        },
     }
 
     return EXAMPLE_CONFIGS[example_type]
+
 
 def configure_node_selectors(values, node_selector, example_config):
     """Configure node selectors for all services."""
@@ -80,6 +82,7 @@ def configure_node_selectors(values, node_selector, example_config):
         values[service] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
     values["nodeSelector"] = {key: value for key, value in node_selector.items()}
     return values
+
 
 def configure_rerank(values, with_rerank, example_type_enum):
     """Configure rerank-specific settings."""
@@ -89,6 +92,7 @@ def configure_rerank(values, with_rerank, example_type_enum):
         values["image"] = {"repository": "opea/chatqna-without-rerank"}
     return values
 
+
 def get_replica_config(with_rerank, num_nodes, example_config, example_type_enum):
     """Get replica configuration based on example type and node count."""
     replicas = []
@@ -96,54 +100,38 @@ def get_replica_config(with_rerank, num_nodes, example_config, example_type_enum
     # Check for the special case when num_nodes == 1 and example_type_enum is CHATQNA
     if num_nodes == 1 and example_type_enum == AIExample.CHATQNA:
         # Special handling for retriever-usvc and mega_backend when num_nodes is 1 and example_type_enum is CHATQNA
-        replicas.append({
-            "name": "retriever-usvc",
-            "replicaCount": 2
-        })
-        replicas.append({
-            "name": "mega_backend",
-            "replicaCount": 2
-        })
+        replicas.append({"name": "retriever-usvc", "replicaCount": 2})
+        replicas.append({"name": "mega_backend", "replicaCount": 2})
         # Add rerank service if supported and enabled
         if example_config["supports_rerank"] and with_rerank:
-            replicas.append({
-                "name": "teirerank",
-                "replicaCount": 1
-            })
-            replicas.append({
-                "name": "tgi",
-                "replicaCount": 7
-            })
+            replicas.append({"name": "teirerank", "replicaCount": 1})
+            replicas.append({"name": "tgi", "replicaCount": 7})
     else:
         # Proceed with normal logic for num_nodes > 1 or any other condition
         for service_name, config in example_config["services"].items():
             if service_name == "tgi":
                 # Special handling for TGI service
                 if example_config["supports_rerank"] and with_rerank:
-                    replica_count = (8 * num_nodes - 1)
+                    replica_count = 8 * num_nodes - 1
                 else:
                     replica_count = 8 * num_nodes
             else:
                 # For other services, scale based on num_nodes if they're scalable
                 replica_count = num_nodes if config.get("scalable", True) else 1
 
-            replicas.append({
-                "name": service_name,
-                "replicaCount": replica_count
-            })
+            replicas.append({"name": service_name, "replicaCount": replica_count})
 
-        replicas.append({
-            "name": "mega_backend",
-            "replicaCount": num_nodes
-        })
+        replicas.append({"name": "mega_backend", "replicaCount": num_nodes})
 
     return replicas
+
 
 def get_output_filename(tune, num_nodes, with_rerank, example_type):
     """Generate output filename based on configuration."""
     mode = "tuned" if tune else "oob"
     rerank_suffix = "with-rerank-" if with_rerank else ""
     return f"{example_type}-{mode}-{num_nodes}-gaudi-{rerank_suffix}values.yaml"
+
 
 def configure_resources(values, tune, with_rerank, example_type_enum):
     """Configure resources when tuning is enabled."""
@@ -183,13 +171,18 @@ def configure_resources(values, tune, with_rerank, example_type_enum):
 
     if "tgi" in values:
         values["tgi"]["extraCmdArgs"] = [
-            "--max-input-length", "1280",
-            "--max-total-tokens", "2048",
-            "--max-batch-total-tokens", "65536",
-            "--max-batch-prefill-tokens", "4096",
+            "--max-input-length",
+            "1280",
+            "--max-total-tokens",
+            "2048",
+            "--max-batch-total-tokens",
+            "65536",
+            "--max-batch-prefill-tokens",
+            "4096",
         ]
 
     return values
+
 
 def generate_helm_values(example_type, with_rerank, num_nodes, hf_token, model_dir, node_selector=None, tune=False):
     """Create a values.yaml file based on the provided configuration."""
@@ -248,6 +241,7 @@ def generate_helm_values(example_type, with_rerank, num_nodes, hf_token, model_d
 
     print(f"YAML file {filepath} has been generated.")
     return {"status": "success", "filepath": filepath}
+
 
 # Main execution for standalone use of create_values_yaml
 if __name__ == "__main__":
