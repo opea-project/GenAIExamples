@@ -41,9 +41,8 @@ function setup_env() {
     export EMBEDDER_PORT=6006
     export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT/v1/encode"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
-    export ASR_ENDPOINT=http://$host_ip:7066
-    export ASR_SERVICE_PORT=3001
-    export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
+    export WHISPER_SERVER_PORT=7066
+    export WHISPER_SERVER_ENDPOINT="http://${HOST_IP}:${WHISPER_SERVER_PORT}/v1/asr"
     export REDIS_URL="redis://${HOST_IP}:6379"
     export REDIS_HOST=${HOST_IP}
     export INDEX_NAME="mm-rag-redis"
