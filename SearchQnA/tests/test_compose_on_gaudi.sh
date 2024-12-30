@@ -75,7 +75,7 @@ function validate_megaservice() {
     docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
     docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
     docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
-    docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
+    docker logs embedding-tei-gaudi-server > ${LOG_PATH}/embedding-tei-gaudi-server.log
 
     if [[ $result == *"capital"* ]]; then
         echo "Result correct."
