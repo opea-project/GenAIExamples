@@ -31,7 +31,7 @@ services:
       retries: 60
   embedding:
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-    container_name: embedding-tei-server
+    container_name: embedding-tei-gaudi-server
     depends_on:
       tei-embedding-service:
         condition: service_healthy
@@ -81,7 +81,7 @@ services:
       retries: 60
   reranking:
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
-    container_name: reranking-tei-xeon-server
+    container_name: reranking-tei-gaudi-server
     depends_on:
       tei-reranking-service:
         condition: service_healthy
