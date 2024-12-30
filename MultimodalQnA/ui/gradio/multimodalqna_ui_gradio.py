@@ -533,19 +533,22 @@ enable_queue = True
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="0.0.0.0")
-    parser.add_argument("--port", type=int, default=5173)
+    parser.add_argument("--port", type=int, default=os.getenv("UI_PORT", 5173))
     parser.add_argument("--concurrency-count", type=int, default=20)
     parser.add_argument("--share", action="store_true")
 
-    backend_service_endpoint = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/multimodalqna")
+    MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8888)
+    DATAPREP_MMR_PORT = os.getenv("DATAPREP_MMR_PORT", 6007)
+
+    backend_service_endpoint = os.getenv("BACKEND_SERVICE_ENDPOINT", f"http://localhost:{MEGA_SERVICE_PORT}/v1/multimodalqna")
     dataprep_ingest_endpoint = os.getenv(
-        "DATAPREP_INGEST_SERVICE_ENDPOINT", "http://localhost:6007/v1/ingest_with_text"
+        "DATAPREP_INGEST_SERVICE_ENDPOINT", f"http://localhost:{DATAPREP_MMR_PORT}/v1/ingest_with_text"
     )
     dataprep_gen_transcript_endpoint = os.getenv(
-        "DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_transcripts"
+        "DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT", f"http://localhost:{DATAPREP_MMR_PORT}/v1/generate_transcripts"
     )
     dataprep_gen_caption_endpoint = os.getenv(
-        "DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT", "http://localhost:6007/v1/generate_captions"
+        "DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT", f"http://localhost:{DATAPREP_MMR_PORT}/v1/generate_captions"
     )
     args = parser.parse_args()
     logger.info(f"args: {args}")

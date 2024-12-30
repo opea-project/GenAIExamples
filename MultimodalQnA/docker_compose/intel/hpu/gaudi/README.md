@@ -24,31 +24,41 @@ export your_no_proxy=${your_no_proxy},"External_Public_IP"
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export EMBEDDER_PORT=6006
-export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
-export MM_EMBEDDING_PORT_MICROSERVICE=6000
-export REDIS_URL="redis://${host_ip}:6379"
-export REDIS_HOST=${host_ip}
-export INDEX_NAME="mm-rag-redis"
-export LLAVA_SERVER_PORT=8399
-export LVM_ENDPOINT="http://${host_ip}:8399"
-export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
-export MAX_IMAGES=1
-export WHISPER_MODEL="base"
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export ASR_ENDPOINT=http://$host_ip:7066
-export ASR_SERVICE_PORT=3001
-export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
-export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/ingest_with_text"
-export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
-export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_files"
+export REDIS_DB_PORT=6379
+export REDIS_INSIGHTS_PORT=8001
+export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
+export REDIS_HOST=${host_ip}
+export INDEX_NAME="mm-rag-redis"
+export WHISPER_PORT=7066
+export MAX_IMAGES=1
+export WHISPER_MODEL="base"
+export ASR_ENDPOINT=http://$host_ip:$WHISPER_PORT
+export ASR_PORT=9099
+export ASR_SERVICE_PORT=3001
+export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
+export DATAPREP_MMR_PORT=6007
+export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/ingest_with_text"
+export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_transcripts"
+export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_captions"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get_files"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete_files"
+export EMM_BRIDGETOWER_PORT=6006
+export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
+export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT/v1/encode"
+export MM_EMBEDDING_PORT_MICROSERVICE=6000
+export REDIS_RETRIEVER_PORT=7000
+export LVM_PORT=9399
+export LLAVA_SERVER_PORT=8399
+export TGI_GAUDI_PORT="${LLAVA_SERVER_PORT}:80"
+export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
+export LVM_ENDPOINT="http://${host_ip}:${LLAVA_SERVER_PORT}"
+export MEGA_SERVICE_PORT=8888
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna"
+export UI_PORT=5173
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -69,7 +79,7 @@ Build embedding-multimodal-bridgetower docker image
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMM_BRIDGETOWER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
 ```
 
 Build embedding-multimodal microservice image
@@ -176,14 +186,14 @@ docker compose -f compose.yaml up -d
 1. embedding-multimodal-bridgetower
 
 ```bash
-curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
      -X POST \
      -H "Content-Type:application/json" \
      -d '{"text":"This is example"}'
 ```
 
 ```bash
-curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
      -X POST \
      -H "Content-Type:application/json" \
      -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
@@ -236,14 +246,14 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
 6. lvm-tgi
 
 ```bash
-curl http://${host_ip}:9399/v1/lvm \
+curl http://${host_ip}:${LVM_PORT}/v1/lvm \
     -X POST \
     -H 'Content-Type: application/json' \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
 ```bash
-curl http://${host_ip}:9399/v1/lvm  \
+curl http://${host_ip}:${LVM_PORT}/v1/lvm  \
     -X POST \
     -H 'Content-Type: application/json' \
     -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
@@ -252,7 +262,7 @@ curl http://${host_ip}:9399/v1/lvm  \
 Also, validate LVM TGI Gaudi Server with empty retrieval results
 
 ```bash
-curl http://${host_ip}:9399/v1/lvm \
+curl http://${host_ip}:${LVM_PORT}/v1/lvm \
     -X POST \
     -H 'Content-Type: application/json' \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
@@ -336,7 +346,7 @@ curl -X POST \
 
 Test the MegaService with a text query:
 ```bash
-curl http://${host_ip}:8888/v1/multimodalqna \
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -H "Content-Type: application/json" \
     -X POST \
     -d '{"messages": "What is the revenue of Nike in 2023?"}'
@@ -358,7 +368,7 @@ curl http://${host_ip}:8888/v1/multimodalqna \
 
 Test the MegaService with a back and forth conversation between the user and assistant:
 ```bash
-curl http://${host_ip}:8888/v1/multimodalqna \
-    -H "Content-Type: application/json" \
-    -d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
+	-H "Content-Type: application/json" \
+	-d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
 ```

@@ -53,41 +53,53 @@ function build_docker_images() {
 
 function setup_env() {
     export host_ip=${ip_address}
-    export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
-    export MM_EMBEDDING_PORT_MICROSERVICE=6000
-    export ASR_ENDPOINT=http://$host_ip:7066
-    export ASR_SERVICE_PORT=3001
-    export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
-    export REDIS_URL="redis://${host_ip}:6379"
-    export REDIS_HOST=${host_ip}
-    export INDEX_NAME="mm-rag-redis"
-    export BRIDGE_TOWER_EMBEDDING=true
-    export LLAVA_SERVER_PORT=8399
-    export LVM_ENDPOINT="http://${host_ip}:8399"
-    export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
-    export MAX_IMAGES=1
-    export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-    export WHISPER_MODEL="base"
     export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
     export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
     export LVM_SERVICE_HOST_IP=${host_ip}
     export MEGA_SERVICE_HOST_IP=${host_ip}
-    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/ingest_with_text"
-    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
-    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_files"
+    export WHISPER_PORT=7066
+    export MAX_IMAGES=1
+    export WHISPER_MODEL="base"
+    export ASR_ENDPOINT=http://$host_ip:$WHISPER_PORT
+    export ASR_PORT=9099
+    export ASR_SERVICE_PORT=3001
+    export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
+    export REDIS_DB_PORT=6379
+    export REDIS_INSIGHTS_PORT=8001
+    export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
+    export REDIS_HOST=${host_ip}
+    export INDEX_NAME="mm-rag-redis"
+    export DATAPREP_MMR_PORT=6007
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/ingest_with_text"
+    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_transcripts"
+    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_captions"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get_files"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete_files"
+    export EMM_BRIDGETOWER_PORT=6006
+    export BRIDGE_TOWER_EMBEDDING=true
+    export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
+    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT/v1/encode"
+    export MM_EMBEDDING_PORT_MICROSERVICE=6000
+    export REDIS_RETRIEVER_PORT=7000
+    export LVM_PORT=9399
+    export LLAVA_SERVER_PORT=8399
+    export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
+    export LVM_ENDPOINT="http://${host_ip}:$LLAVA_SERVER_PORT"
+    export MEGA_SERVICE_PORT=8888
+    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:$MEGA_SERVICE_PORT/v1/multimodalqna"
+    export UI_PORT=5173
 }
 
+
 function start_services() {
+    echo "Starting services..."
     cd $WORKPATH/docker_compose/intel/cpu/xeon
 
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 2m
+    echo "Services started."
 }
 
 function prepare_data() {
@@ -99,6 +111,7 @@ function prepare_data() {
     echo "This is an apple."  > ${caption_fn}
     sleep 1m
 }
+
 
 function validate_service() {
     local URL="$1"
@@ -152,14 +165,14 @@ function validate_microservices() {
     # Bridgetower Embedding Server
     echo "Validating embedding-multimodal-bridgetower"
     validate_service \
-        "http://${host_ip}:${EMBEDDER_PORT}/v1/encode" \
+        "http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode" \
         '"embedding":[' \
         "embedding-multimodal-bridgetower" \
         "embedding-multimodal-bridgetower" \
         '{"text":"This is example"}'
 
     validate_service \
-        "http://${host_ip}:${EMBEDDER_PORT}/v1/encode" \
+        "http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode" \
         '"embedding":[' \
         "embedding-multimodal-bridgetower" \
         "embedding-multimodal-bridgetower" \
@@ -218,7 +231,7 @@ function validate_microservices() {
     echo "Validating retriever-redis"
     your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
     validate_service \
-        "http://${host_ip}:7000/v1/retrieval" \
+        "http://${host_ip}:${REDIS_RETRIEVER_PORT}/v1/retrieval" \
         "retrieved_docs" \
         "retriever-redis" \
         "retriever-redis" \
@@ -247,7 +260,7 @@ function validate_microservices() {
     # lvm
     echo "Evaluating lvm-llava-svc"
     validate_service \
-        "http://${host_ip}:9399/v1/lvm" \
+        "http://${host_ip}:${LVM_PORT}/v1/lvm" \
         '"text":"' \
         "lvm-llava-svc" \
         "lvm-llava-svc" \
@@ -268,7 +281,7 @@ function validate_megaservice() {
     # Curl the Mega Service with retrieval
     echo "Validate megaservice with first query"
     validate_service \
-        "http://${host_ip}:8888/v1/multimodalqna" \
+        "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
         '"time_of_frame_ms":' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
@@ -276,7 +289,7 @@ function validate_megaservice() {
 
     echo "Validate megaservice with first audio query"
     validate_service \
-        "http://${host_ip}:8888/v1/multimodalqna" \
+        "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
         '"time_of_frame_ms":' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
@@ -284,7 +297,7 @@ function validate_megaservice() {
 
     echo "Validate megaservice with first query with an image"
     validate_service \
-        "http://${host_ip}:8888/v1/multimodalqna" \
+        "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
         '"time_of_frame_ms":' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
@@ -292,7 +305,7 @@ function validate_megaservice() {
 
     echo "Validate megaservice with follow-up query"
     validate_service \
-        "http://${host_ip}:8888/v1/multimodalqna" \
+        "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
         '"content":"' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
@@ -300,7 +313,7 @@ function validate_megaservice() {
 
     echo "Validate megaservice with multiple text queries"
     validate_service \
-        "http://${host_ip}:8888/v1/multimodalqna" \
+        "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
         '"content":"' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
@@ -325,8 +338,10 @@ function delete_data() {
 }
 
 function stop_docker() {
+    echo "Stopping docker..."
     cd $WORKPATH/docker_compose/intel/cpu/xeon
     docker compose -f compose.yaml stop && docker compose -f compose.yaml rm -f
+    echo "Docker stopped."
 }
 
 function main() {
