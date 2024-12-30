@@ -96,7 +96,7 @@ class AudioQnAService:
         result_dict, runtime_graph = await self.megaservice.schedule(
             initial_inputs={"audio": chat_request.audio},
             llm_parameters=parameters,
-            voice=chat_request.voice,
+            voice=chat_request.voice if hasattr(chat_request, 'voice') else 'default',
         )
 
         last_node = runtime_graph.all_leaves()[-1]

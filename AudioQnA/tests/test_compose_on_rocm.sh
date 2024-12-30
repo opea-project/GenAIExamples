@@ -59,7 +59,6 @@ function start_services() {
 }
 function validate_megaservice() {
     response=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
-    #  | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
     # always print the log
     docker logs whisper-service > $LOG_PATH/whisper-service.log
     docker logs speecht5-service > $LOG_PATH/tts-service.log
@@ -70,11 +69,6 @@ function validate_megaservice() {
     if [[ $(file speech.mp3) == *"RIFF"* ]]; then
         echo "Result correct."
     else
-        docker logs whisper-service > $LOG_PATH/whisper-service.log
-        docker logs speecht5-service > $LOG_PATH/tts-service.log
-        docker logs tgi-service > $LOG_PATH/tgi-service.log
-        docker logs audioqna-xeon-backend-server > $LOG_PATH/audioqna-xeon-backend-server.log
-
         echo "Result wrong."
         exit 1
     fi
