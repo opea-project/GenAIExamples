@@ -39,7 +39,7 @@ function setup_env() {
     export https_proxy=${your_http_proxy}
     export BRIDGE_TOWER_EMBEDDING=true
     export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT/v1/encode"
+    export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
     export ASR_ENDPOINT=http://$host_ip:7066
     export ASR_SERVICE_PORT=3001

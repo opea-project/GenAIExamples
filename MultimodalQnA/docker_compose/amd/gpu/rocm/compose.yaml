@@ -80,6 +80,7 @@ services:
       https_proxy: ${https_proxy}
       MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MULTIMODAL_EMBEDDING: true
     restart: unless-stopped
   retriever-redis:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
@@ -96,6 +97,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
+      RETRIEVER_TYPE: "redis"
     restart: unless-stopped
   tgi-rocm:
     image: ghcr.io/huggingface/text-generation-inference:3.0.1-rocm
