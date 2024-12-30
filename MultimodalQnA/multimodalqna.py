@@ -29,6 +29,7 @@ LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9399))
 WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", "http://0.0.0.0:7066/v1/asr")
 
+
 class MultimodalQnAService:
 
     def __init__(self, host="0.0.0.0", port=8000):

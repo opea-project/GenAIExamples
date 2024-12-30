@@ -20,6 +20,7 @@ SPEECHT5_SERVER_PORT = int(os.getenv("SPEECHT5_SERVER_PORT", 7055))
 ANIMATION_SERVICE_HOST_IP = os.getenv("ANIMATION_SERVICE_HOST_IP", "0.0.0.0")
 ANIMATION_SERVICE_PORT = int(os.getenv("ANIMATION_SERVICE_PORT", 9066))
 
+
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
@@ -118,7 +119,7 @@ class AvatarChatbotService:
         result_dict, runtime_graph = await self.megaservice.schedule(
             initial_inputs={"audio": chat_request.audio},
             llm_parameters=parameters,
-            voice=chat_request.voice if hasattr(chat_request, 'voice') else 'default',
+            voice=chat_request.voice if hasattr(chat_request, "voice") else "default",
         )
 
         last_node = runtime_graph.all_leaves()[-1]
