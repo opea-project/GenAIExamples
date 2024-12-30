@@ -1,0 +1,31 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Clean up container on manual event
+on:
+  workflow_dispatch:
+    inputs:
+      node:
+        default: "rocm"
+        description: "Hardware to clean"
+        required: true
+        type: string
+      clean_list:
+        default: ""
+        description: "docker command to clean"
+        required: false
+        type: string
+
+jobs:
+  clean:
+    runs-on: "${{ inputs.node }}"
+    steps:
+      - name: Clean up container
+        run: |
+          docker ps
+          if [ "${{ inputs.clean_list }}" ]; then
+            echo "----------stop and remove containers----------"
+            docker stop ${{ inputs.clean_list }} && docker rm ${{ inputs.clean_list }}
+            echo "----------container removed----------"
+            docker ps
+          fi
