@@ -63,7 +63,7 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-    
+
     sleep 10s
 }
 
