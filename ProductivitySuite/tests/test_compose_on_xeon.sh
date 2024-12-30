@@ -34,6 +34,8 @@ function start_services() {
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export LLM_MODEL_ID_CODEGEN="Intel/neural-chat-7b-v3-3"
+    export DATAPREP_TYPE="redis"
+    export RETRIEVER_TYPE="redis"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:9009"
@@ -59,8 +61,8 @@ function start_services() {
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6009/v1/dataprep/delete_file"
     export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
     export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${ip_address}:8890/v1/docsum"
-    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6008/v1/dataprep/get_file"
+    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/ingest"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6008/v1/dataprep/get"
     export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
     export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
     export CHAT_HISTORY_DELETE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/delete"
@@ -164,7 +166,7 @@ function validate_microservices() {
     # embedding microservice
     validate_service \
         "${ip_address}:6000/v1/embeddings" \
-        '""embedding":[' \
+        '"embedding":[' \
         "embedding-microservice" \
         "embedding-tei-server" \
         '{"input":"What is Deep Learning?"}'
@@ -174,28 +176,28 @@ function validate_microservices() {
     # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-redis-server"
 
     # test /v1/dataprep upload link
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
         "dataprep-redis-server"
 
     # test /v1/dataprep/get_file
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/get_file" \
+        "http://${ip_address}:6007/v1/dataprep/get" \
         '{"name":' \
         "dataprep_get" \
         "dataprep-redis-server"
 
     # test /v1/dataprep/delete_file
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/delete_file" \
+        "http://${ip_address}:6007/v1/dataprep/delete" \
         '{"status":true}' \
         "dataprep_del" \
         "dataprep-redis-server"
