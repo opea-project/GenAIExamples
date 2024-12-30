@@ -105,6 +105,8 @@ function start_services() {
         sleep 5s
         n=$((n+1))
     done
+
+    sleep 10s
 }
 
 function validate_service() {
