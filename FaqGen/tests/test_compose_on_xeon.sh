@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="faqgen faqgen-ui llm-faqgen-tgi"
+    service_list="faqgen faqgen-ui llm-faqgen"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:1.4
@@ -29,8 +29,11 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
+    export host_ip=${ip_address}
+    export LLM_ENDPOINT_PORT=8008
+    export LLM_BACKEND="tgi"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}

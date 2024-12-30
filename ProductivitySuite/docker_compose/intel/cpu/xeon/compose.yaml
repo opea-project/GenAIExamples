@@ -230,7 +230,7 @@ services:
     ipc: host
     restart: always
   llm_faqgen:
-    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
     container_name: llm-faqgen-server
     depends_on:
       - tgi_service
