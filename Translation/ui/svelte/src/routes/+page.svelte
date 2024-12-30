@@ -22,8 +22,8 @@
   import LoadingAnimation from "$lib/assets/loadingAnimation.svelte";
 
   // Set default language
-  let langFrom: string = "en";
-  let langTo: string = "zh";
+  let langFrom: string = "zh";
+  let langTo: string = "en";
   let languages: Language[] = languagesList;
   // Initialize disabled state of input
   let inputDisabled: boolean = false;

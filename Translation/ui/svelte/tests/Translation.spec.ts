@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 // Constants definition
-const TRANSLATE_ITEMS = ["hello"];
+const TRANSLATE_ITEMS = ["我爱机器翻译。"];
 
 // Helper function: Enter message to chat
 async function enterMessageToChat(page: Page, message: string) {
