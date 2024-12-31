@@ -7,12 +7,11 @@ quality and performance.
 
 ## What's New in this release?
 
-- Support Intel(R) Arc(TM) A-Series Graphics
-- Support vLLM-OpenVINO inference serving
-- Support pipeline customization with various node-parser, indexer, retriever, postprocessor and generator choices
-- Support REST API and a Gradio UI as reference
-- Support Intel(R) OpenVINO(TM) optimized LLMs
-- Support LLM registration and deletion through REST API
+- Support image/url data retrieval and display in EC-RAG
+- Support display of LLM-used context sources in UI
+- Support pipeline remove operation in RESTful API and UI
+- Support RAG pipeline performance benchmark and display in UI
+- Fixed known issues in EC-RAG UI and server
 
 ## Quick Start Guide
 
