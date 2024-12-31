@@ -37,10 +37,12 @@ services:
     image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
   reranking-videoqna:
     build:
+      args:
+        SERVICE: all
       context: GenAIComps
-      dockerfile: comps/reranks/videoqna/Dockerfile
+      dockerfile: comps/rerankings/src/Dockerfile
     extends: videoqna
-    image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
   video-llama-lvm-server:
     build:
       context: GenAIComps
