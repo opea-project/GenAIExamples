@@ -96,7 +96,7 @@ Build frontend Docker image that enables via below command:
 
 ```bash
 cd GenAIExamples/ProductivitySuite/ui
-docker build --no-cache -t ProductivitySuite/docker_compose/intel/cpu/xeon/compose.yaml docker/Dockerfile.react .
+docker build --no-cache -t opea/productivity-suite-react-ui-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.react .
 ```
 
 ---
