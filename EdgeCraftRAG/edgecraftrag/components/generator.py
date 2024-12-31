@@ -8,9 +8,23 @@ import os
 from comps import GeneratedDoc
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType
 from fastapi.responses import StreamingResponse
+import json
 from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
+from unstructured.staging.base import elements_from_base64_gzipped_json
+
+
+async def stream_generator(llm, prompt_str, retrieved_nodes = [], text_gen_context = ""):
+    response = llm.stream_complete(prompt_str)
+    for r in response:
+        yield json.dumps({"llm_res": r.delta})
+        await asyncio.sleep(0)
+    for node in retrieved_nodes:
+        node.node.metadata["score"] = float(node.score)
+        yield json.dumps(node.node.metadata)
+        await asyncio.sleep(0)
+    yield json.dumps({"retrieved_text": text_gen_context})
 
 
 class QnAGenerator(BaseComponent):
@@ -45,18 +59,27 @@ class QnAGenerator(BaseComponent):
             ret = ret.replace(*p)
         return ret
 
+    def query_transform(self, chat_request, retrieved_nodes):
+        """
+        Generate text_gen_context and prompt_str
+        :param chat_request: Request object
+        :param retrieved_nodes: List of retrieved nodes
+        :return: Generated text_gen_context and prompt_str
+        """
+        text_gen_context = ""
+        for n in retrieved_nodes:
+            origin_text = n.node.get_text()
+            text_gen_context += self.clean_string(origin_text.strip())
+        query = chat_request.messages
+        prompt_str = self.prompt.format(input=query, context=text_gen_context)
+        return text_gen_context, prompt_str
+    
     def run(self, chat_request, retrieved_nodes, **kwargs):
         if self.llm() is None:
             # This could happen when User delete all LLMs through RESTful API
             return "No LLM available, please load LLM"
         # query transformation
-        text_gen_context = ""
-        for n in retrieved_nodes:
-            origin_text = n.node.get_text()
-            text_gen_context += self.clean_string(origin_text.strip())
-
-        query = chat_request.messages
-        prompt_str = self.prompt.format(input=query, context=text_gen_context)
+        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
         generate_kwargs = dict(
             temperature=chat_request.temperature,
             do_sample=chat_request.temperature > 0.0,
@@ -68,15 +91,7 @@ class QnAGenerator(BaseComponent):
         self.llm().generate_kwargs = generate_kwargs
         self.llm().max_new_tokens = chat_request.max_tokens
         if chat_request.stream:
-
-            async def stream_generator():
-                response = self.llm().stream_complete(prompt_str)
-                for r in response:
-                    yield r.delta
-                    # Simulate asynchronous operation
-                    await asyncio.sleep(0.01)
-
-            return StreamingResponse(stream_generator(), media_type="text/event-stream")
+            return StreamingResponse(stream_generator(self.llm(), prompt_str, retrieved_nodes, text_gen_context), media_type="text/event-stream")
         else:
             return self.llm().complete(prompt_str)
 
@@ -84,14 +99,7 @@ class QnAGenerator(BaseComponent):
         if self.llm is None:
             return "No LLM provided, please provide model_id_or_path"
         # query transformation
-        text_gen_context = ""
-        for n in retrieved_nodes:
-            origin_text = n.node.get_text()
-            text_gen_context += self.clean_string(origin_text.strip())
-
-        query = chat_request.messages
-        prompt_str = self.prompt.format(input=query, context=text_gen_context)
-
+        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
         llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8008")
         model_name = self.llm().model_id
         llm = OpenAILike(
@@ -107,14 +115,7 @@ class QnAGenerator(BaseComponent):
         )
 
         if chat_request.stream:
-
-            async def stream_generator():
-                response = llm.stream_complete(prompt_str)
-                for text in response:
-                    yield text.delta
-                    await asyncio.sleep(0.01)
-
-            return StreamingResponse(stream_generator(), media_type="text/event-stream")
+            return StreamingResponse(stream_generator(llm, prompt_str, retrieved_nodes, text_gen_context), media_type="text/event-stream")
         else:
             response = llm.complete(prompt_str)
             response = response.text

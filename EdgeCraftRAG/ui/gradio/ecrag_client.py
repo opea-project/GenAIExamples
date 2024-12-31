@@ -83,7 +83,6 @@ def create_update_pipeline(
             inference_type=llm_infertype,
         ),
     )
-    # hard code only for test
     print(req_dict)
     res = requests.post(f"{server_addr}/v1/settings/pipelines", json=req_dict.dict(), proxies={"http": None})
     return res.text
@@ -94,11 +93,17 @@ def activate_pipeline(name):
     res = requests.patch(f"{server_addr}/v1/settings/pipelines/{name}", json=active_dict, proxies={"http": None})
     status = False
     restext = f"Activate pipeline {name} failed."
-    if res.ok:
+    if res.ok and res.text:
         status = True
-        restext = f"Activate pipeline {name} successfully."
-    return restext, status
+        restext = res.text
+    return {'response':restext}, status
 
+def remove_pipeline(name):
+    res = requests.delete(f"{server_addr}/v1/settings/pipelines/{name}", proxies={"http": None})
+    restext = f"Remove pipeline {name} failed."
+    if res.ok and res.text:
+        restext = res.text
+    return {'response':restext}
 
 def create_vectordb(docs, spliter):
     req_dict = api_schema.FilesIn(local_paths=docs)
@@ -119,3 +124,34 @@ def get_files():
 def delete_file(file_name_or_id):
     res = requests.delete(f"{server_addr}/v1/data/files/{file_name_or_id}", proxies={"http": None})
     return res.text
+
+def get_actived_pipeline():
+    try:
+        res = requests.get( f"{server_addr}/v1/settings/pipelines", proxies={"http": None,})
+        for pl in res.json():
+            if pl["status"]["active"]:
+                return pl["name"]
+        return None
+    except requests.RequestException:
+        return None
+
+def get_benchmark(name):
+    try:
+        res = requests.get( f"{server_addr}/v1/settings/pipelines/{name}/benchmark", proxies={"http": None,})
+        data = res.json()
+
+        if data.get('Benchmark enabled', False): 
+            benchmark_data = data.get('last_benchmark_data', {})
+            if benchmark_data.get('generator',"N/A"):
+                benchmark = (
+                    f"Retrieval: {benchmark_data.get('retriever', 0.0):.4f}s      "
+                    f"Post-process: {benchmark_data.get('postprocessor', 0.0):.4f}s      "
+                    f"Generation: {benchmark_data.get('generator', 0.0):.4f}s"
+                ).rstrip()
+                return benchmark
+            else:
+                return None
+        else:
+            return None
+    except requests.RequestException:
+        return None

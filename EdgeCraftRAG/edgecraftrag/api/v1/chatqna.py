@@ -3,7 +3,10 @@
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.context import ctx
+from edgecraftrag.api_schema import RagOut
 from fastapi import FastAPI
+from comps import GeneratedDoc
+from fastapi.responses import StreamingResponse
 
 chatqna_app = FastAPI()
 
@@ -25,8 +28,35 @@ async def retrieval(request: ChatCompletionRequest):
 # ChatQnA
 @chatqna_app.post(path="/v1/chatqna")
 async def chatqna(request: ChatCompletionRequest):
+    generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
+    if generator:
+        request.model = generator.model_id
     if request.stream:
-        return ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+        ret, retri_res = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+        return ret
     else:
-        ret = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+        ret, retri_res = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
         return str(ret)
+
+
+# RAGQnA
+@chatqna_app.post(path="/v1/ragqna")
+async def ragqna(request: ChatCompletionRequest):
+    res, retri_res = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+    if isinstance(res, GeneratedDoc):
+        res = res.text
+    elif isinstance(res, StreamingResponse):
+        collected_data = []
+        async for chunk in res.body_iterator:
+            collected_data.append(chunk)
+        res = "".join(collected_data)
+
+    ragout = RagOut(
+        query = request.messages,
+        contexts = [],
+        response = str(res)
+    )
+    for n in retri_res:
+        origin_text = n.node.get_text()
+        ragout.contexts.append(origin_text.strip())
+    return ragout

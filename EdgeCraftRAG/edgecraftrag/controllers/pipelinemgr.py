@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
+import gc
 from typing import Any, List
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
@@ -29,6 +30,29 @@ class PipelineMgr(BaseMgr):
                 return pl
         return None
 
+    def remove_pipeline_by_name_or_id(self, name: str):
+        pl = self.get_pipeline_by_name_or_id(name)
+        if pl is None:
+            return "Pipeline not found..."
+        if pl.status.active:
+            return "Unable to remove an active pipeline..."
+        pl.node_parser = None
+        pl.indexer = None
+        pl.retriever = None
+        pl.postprocessor = None
+        pl.generator = None
+        pl.benchmark = None
+        pl.status = None
+        pl.run_pipeline_cb = None
+        pl.run_retriever_cb = None
+        pl.run_data_prepare_cb = None
+        pl.run_data_update_cb = None
+        pl._node_changed = None
+        self.remove(pl.idx)
+        del pl
+        gc.collect()
+        return "Pipeline removed successfully"
+    
     def get_pipelines(self):
         return [pl for _, pl in self.components.items()]
 
@@ -76,4 +100,10 @@ class PipelineMgr(BaseMgr):
         ap = self.get_active_pipeline()
         if ap is not None:
             return ap.run(cbtype=CallbackType.DATAPREP, docs=docs)
+        return -1
+
+    def run_data_update(self, docs: List[Document]) -> Any:
+        ap = self.get_active_pipeline()
+        if ap is not None:
+            return ap.run(cbtype=CallbackType.DATAUPDATE, docs=docs)
         return -1

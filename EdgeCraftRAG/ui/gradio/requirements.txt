@@ -6,3 +6,4 @@ openvino>=2024.4.0
 psutil>=6.1.0
 py-cpuinfo>=9.0.0
 uvicorn>=0.30.6
+unstructured==0.16.11

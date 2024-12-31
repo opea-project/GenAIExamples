@@ -9,3 +9,8 @@ llama-index-postprocessor-openvino-rerank>=0.3.0
 llama-index-retrievers-bm25>=0.3.0
 llama-index-vector-stores-faiss>=0.2.1
 opea-comps>=0.9
+unstructured==0.16.11
+llama-index-readers-file>=0.4.0
+python-docx==1.1.2
+pillow>=10.4.0
+unstructured[pdf]

@@ -5,6 +5,15 @@ Retrieval-Augmented Generation system for edge solutions. It is designed to
 curate the RAG pipeline to meet hardware requirements at edge with guaranteed
 quality and performance.
 
+## What's New in this release?
+
+- Support Intel(R) Arc(TM) A-Series Graphics
+- Support vLLM-OpenVINO inference serving
+- Support pipeline customization with various node-parser, indexer, retriever, postprocessor and generator choices
+- Support REST API and a Gradio UI as reference
+- Support Intel(R) OpenVINO(TM) optimized LLMs
+- Support LLM registration and deletion through REST API
+
 ## Quick Start Guide
 
 ### (Optional) Build Docker Images for Mega Service, Server and UI by your own
@@ -43,6 +52,8 @@ export GRADIO_PATH="your gradio cache path for transferring files"
 
 # Make sure all 3 folders have 1000:1000 permission, otherwise
 # chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${GRADIO_PATH}
+# In addition, also make sure the .cache folder has 1000:1000 permission, otherwise
+# chown 1000:1000 $HOME/.cache
 
 # Use `ip a` to check your active ip
 export HOST_IP="your host ip"
@@ -192,7 +203,7 @@ curl -X POST http://${HOST_IP}:16010/v1/settings/pipelines -H "Content-Type: app
 #### Update a pipeline
 
 ```bash
-curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines -H "Content-Type: application/json" -d @tests/test_pipeline_local_llm.json | jq '.'
+curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm  -H "Content-Type: application/json" -d @tests/test_pipeline_local_llm.json | jq '.'
 ```
 
 #### Check all pipelines
@@ -204,15 +215,35 @@ curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines -H "Content-Type: appl
 #### Activate a pipeline
 
 ```bash
-curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/test1 -H "Content-Type: application/json" -d '{"active": "true"}' | jq '.'
+curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm -H "Content-Type: application/json" -d '{"active": "true"}' | jq '.'
 ```
+
+#### Remove a pipeline
+
+```bash
+# Firstly, deactivate the pipeline if the pipeline status is active
+curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm -H "Content-Type: application/json" -d '{"active": "false"}' | jq '.'
+# Then delete the pipeline
+curl -X DELETE http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm -H "Content-Type: application/json" | jq '.'
+```
+
+#### Enable and check benchmark for pipelines
+
+```bash
+# Set ENABLE_BENCHMARK as true before launch services
+export ENABLE_BENCHMARK="true"
+
+# check the benchmark data for pipeline {pipeline_name}
+curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines/{pipeline_name}/benchmark -H "Content-Type: application/json" | jq '.'
+```
+
 
 ### Model Management
 
 #### Load a model
 
 ```bash
-curl -X POST http://${HOST_IP}:16010/v1/settings/models -H "Content-Type: application/json" -d '{"model_type": "reranker", "model_id": "BAAI/bge-reranker-large", "model_path": "./models/bge_ov_reranker", "device": "cpu"}' | jq '.'
+curl -X POST http://${HOST_IP}:16010/v1/settings/models -H "Content-Type: application/json" -d '{"model_type": "reranker", "model_id": "BAAI/bge-reranker-large", "model_path": "./models/bge_ov_reranker", "device": "cpu", "weight": "INT4"}' | jq '.'
 ```
 
 It will take some time to load the model.
@@ -226,7 +257,7 @@ curl -X GET http://${HOST_IP}:16010/v1/settings/models -H "Content-Type: applica
 #### Update a model
 
 ```bash
-curl -X PATCH http://${HOST_IP}:16010/v1/settings/models/BAAI/bge-reranker-large -H "Content-Type: application/json" -d '{"model_type": "reranker", "model_id": "BAAI/bge-reranker-large", "model_path": "./models/bge_ov_reranker", "device": "gpu"}' | jq '.'
+curl -X PATCH http://${HOST_IP}:16010/v1/settings/models/BAAI/bge-reranker-large -H "Content-Type: application/json" -d '{"model_type": "reranker", "model_id": "BAAI/bge-reranker-large", "model_path": "./models/bge_ov_reranker", "device": "gpu", "weight": "INT4"}' | jq '.'
 ```
 
 #### Check a certain model

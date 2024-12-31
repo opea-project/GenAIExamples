@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from pathlib import Path
 from typing import Any, Optional
 
 from edgecraftrag.base import BaseComponent, CompType, ModelType
@@ -9,6 +10,13 @@ from llama_index.llms.openvino import OpenVINOLLM
 from llama_index.postprocessor.openvino_rerank import OpenVINORerank
 from pydantic import Field, model_serializer
 
+def model_exist(model_path):
+    model_dir = Path(model_path)
+    return (
+        model_dir.is_dir() 
+        and (model_dir / "openvino_model.xml").exists() 
+        and (model_dir / "openvino_model.bin").exists()
+    )
 
 class BaseModelComponent(BaseComponent):
 
@@ -36,7 +44,8 @@ class BaseModelComponent(BaseComponent):
 class OpenVINOEmbeddingModel(BaseModelComponent, OpenVINOEmbedding):
 
     def __init__(self, model_id, model_path, device, weight):
-        OpenVINOEmbedding.create_and_save_openvino_model(model_id, model_path)
+        if not model_exist(model_path):
+            OpenVINOEmbedding.create_and_save_openvino_model(model_id, model_path)
         OpenVINOEmbedding.__init__(self, model_id_or_path=model_path, device=device)
         self.comp_type = CompType.MODEL
         self.comp_subtype = ModelType.EMBEDDING
@@ -49,7 +58,8 @@ class OpenVINOEmbeddingModel(BaseModelComponent, OpenVINOEmbedding):
 class OpenVINORerankModel(BaseModelComponent, OpenVINORerank):
 
     def __init__(self, model_id, model_path, device, weight):
-        OpenVINORerank.create_and_save_openvino_model(model_id, model_path)
+        if not model_exist(model_path):
+            OpenVINORerank.create_and_save_openvino_model(model_id, model_path)
         OpenVINORerank.__init__(
             self,
             model_id_or_path=model_path,
