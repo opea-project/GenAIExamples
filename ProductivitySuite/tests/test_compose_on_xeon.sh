@@ -86,7 +86,7 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 30s
-    
+
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs tgi_service_codegen > ${LOG_PATH}/tgi_service_codegen_start.log
