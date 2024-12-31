@@ -15,7 +15,7 @@ from comps.cores.proto.api_protocol import (
     ChatMessage,
     UsageInfo,
 )
-from comps.cores.proto.docarray import LLMParams, TextDoc, ImageDoc, TextImageDoc
+from comps.cores.proto.docarray import ImageDoc, LLMParams, TextDoc, TextImageDoc
 from fastapi import Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from PIL import Image
@@ -27,6 +27,7 @@ MM_RETRIEVER_SERVICE_HOST_IP = os.getenv("MM_RETRIEVER_SERVICE_HOST_IP", "0.0.0.
 MM_RETRIEVER_SERVICE_PORT = int(os.getenv("MM_RETRIEVER_SERVICE_PORT", 7000))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9399))
+
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
