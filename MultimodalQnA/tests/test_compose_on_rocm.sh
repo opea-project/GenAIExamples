@@ -23,7 +23,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-redis lvm-tgi lvm-llava-svc dataprep-multimodal-redis whisper asr"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-redis lvm-tgi lvm-llava-svc dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -41,9 +41,8 @@ function setup_env() {
     export EMBEDDER_PORT=6006
     export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT/v1/encode"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
-    export ASR_ENDPOINT=http://$host_ip:7066
-    export ASR_SERVICE_PORT=3001
-    export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
+    export WHISPER_SERVER_PORT=7066
+    export WHISPER_SERVER_ENDPOINT="http://${HOST_IP}:${WHISPER_SERVER_PORT}/v1/asr"
     export REDIS_URL="redis://${HOST_IP}:6379"
     export REDIS_HOST=${HOST_IP}
     export INDEX_NAME="mm-rag-redis"

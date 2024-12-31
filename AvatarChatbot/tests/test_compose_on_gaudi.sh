@@ -26,7 +26,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="avatarchatbot whisper-gaudi asr llm-tgi speecht5-gaudi tts wav2lip-gaudi animation"
+    service_list="avatarchatbot whisper-gaudi speecht5-gaudi wav2lip-gaudi animation"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -41,24 +41,21 @@ function start_services() {
     export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
     export host_ip=$(hostname -I | awk '{print $1}')
 
-    export TGI_LLM_ENDPOINT=http://$host_ip:3006
     export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
 
-    export ASR_ENDPOINT=http://$host_ip:7066
-    export TTS_ENDPOINT=http://$host_ip:7055
     export WAV2LIP_ENDPOINT=http://$host_ip:7860
 
     export MEGA_SERVICE_HOST_IP=${host_ip}
-    export ASR_SERVICE_HOST_IP=${host_ip}
-    export TTS_SERVICE_HOST_IP=${host_ip}
-    export LLM_SERVICE_HOST_IP=${host_ip}
+    export WHISPER_SERVER_HOST_IP=${host_ip}
+    export WHISPER_SERVER_PORT=7066
+    export SPEECHT5_SERVER_HOST_IP=${host_ip}
+    export SPEECHT5_SERVER_PORT=7055
+    export LLM_SERVER_HOST_IP=${host_ip}
+    export LLM_SERVER_PORT=3006
     export ANIMATION_SERVICE_HOST_IP=${host_ip}
+    export ANIMATION_SERVICE_PORT=3008
 
     export MEGA_SERVICE_PORT=8888
-    export ASR_SERVICE_PORT=3001
-    export TTS_SERVICE_PORT=3002
-    export LLM_SERVICE_PORT=3007
-    export ANIMATION_SERVICE_PORT=3008
 
     export DEVICE="hpu"
     export WAV2LIP_PORT=7860
@@ -77,7 +74,7 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
+    until [[ "$n" -ge 200 ]]; do
        docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
        if grep -q Connected $LOG_PATH/tgi_service_start.log; then
            break
@@ -100,14 +97,12 @@ function validate_megaservice() {
     else
         echo "Result wrong, print docker logs."
         docker logs whisper-service > $LOG_PATH/whisper-service.log
-        docker logs asr-service > $LOG_PATH/asr-service.log
         docker logs speecht5-service > $LOG_PATH/speecht5-service.log
-        docker logs tts-service > $LOG_PATH/tts-service.log
         docker logs tgi-gaudi-server > $LOG_PATH/tgi-gaudi-server.log
-        docker logs llm-tgi-gaudi-server > $LOG_PATH/llm-tgi-gaudi-server.log
         docker logs wav2lip-service > $LOG_PATH/wav2lip-service.log
         docker logs animation-gaudi-server > $LOG_PATH/animation-gaudi-server.log
-        echo "Exit test."
+
+        echo "Result wrong."
         exit 1
     fi
 

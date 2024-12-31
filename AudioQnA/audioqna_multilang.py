@@ -1,7 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import asyncio
 import base64
 import os
 
@@ -21,12 +20,8 @@ LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 8888))
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
-    print(inputs)
-    if self.services[cur_node].service_type == ServiceType.ASR:
-        # {'byte_str': 'UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'}
-        inputs["audio"] = inputs["byte_str"]
-        del inputs["byte_str"]
-    elif self.services[cur_node].service_type == ServiceType.LLM:
+
+    if self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
         next_inputs["model"] = "tgi"  # specifically clarify the fake model to make the format unified
@@ -111,7 +106,7 @@ class AudioQnAService:
             streaming=False,  # TODO add streaming LLM output as input to TTS
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs={"byte_str": chat_request.audio}, llm_parameters=parameters
+            initial_inputs={"audio": chat_request.audio}, llm_parameters=parameters
         )
 
         last_node = runtime_graph.all_leaves()[-1]

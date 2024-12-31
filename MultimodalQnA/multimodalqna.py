@@ -27,11 +27,10 @@ MM_RETRIEVER_SERVICE_HOST_IP = os.getenv("MM_RETRIEVER_SERVICE_HOST_IP", "0.0.0.
 MM_RETRIEVER_SERVICE_PORT = int(os.getenv("MM_RETRIEVER_SERVICE_PORT", 7000))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9399))
+WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", "http://0.0.0.0:7066/v1/asr")
 
 
 class MultimodalQnAService:
-    asr_port = int(os.getenv("ASR_SERVICE_PORT", 3001))
-    asr_endpoint = os.getenv("ASR_SERVICE_ENDPOINT", "http://0.0.0.0:{}/v1/audio/transcriptions".format(asr_port))
 
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
@@ -189,11 +188,11 @@ class MultimodalQnAService:
     def convert_audio_to_text(self, audio):
         # translate audio to text by passing in base64 encoded audio to ASR
         if isinstance(audio, dict):
-            input_dict = {"byte_str": audio["audio"][0]}
+            input_dict = {"audio": audio["audio"][0]}
         else:
-            input_dict = {"byte_str": audio[0]}
+            input_dict = {"audio": audio[0]}
 
-        response = requests.post(self.asr_endpoint, data=json.dumps(input_dict))
+        response = requests.post(WHISPER_SERVER_ENDPOINT, data=json.dumps(input_dict))
 
         if response.status_code != 200:
             return JSONResponse(
@@ -201,7 +200,7 @@ class MultimodalQnAService:
             )
 
         response = response.json()
-        return response["query"]
+        return response["asr_result"]
 
     async def handle_request(self, request: Request):
         data = await request.json()
