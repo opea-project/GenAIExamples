@@ -20,11 +20,13 @@ RETRIEVER_SERVICE_PORT = os.getenv("RETRIEVER_SERVICE_PORT", 7000)
 RERANK_SERVICE_HOST_IP = os.getenv("RERANK_SERVICE_HOST_IP", "0.0.0.0")
 RERANK_SERVICE_PORT = os.getenv("RERANK_SERVICE_PORT", 8000)
 
+
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         inputs["input"] = inputs["text"]
         del inputs["text"]
     return inputs
+
 
 def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
     next_data = {}
@@ -34,6 +36,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         next_data = data
 
     return next_data
+
 
 class RetrievalToolService:
     def __init__(self, host="0.0.0.0", port=8000):
