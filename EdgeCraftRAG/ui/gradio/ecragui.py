@@ -2,18 +2,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+import base64
+import json
 import os
 import platform
+import time
+import urllib.request
 from datetime import datetime
+from threading import Timer
+from urllib.parse import urlparse
 
 import cpuinfo
 import distro  # if running Python 3.8 or above
 import ecrag_client as cli
 import gradio as gr
 import httpx
-import json, base64
-import time
-from threading import Timer
 
 # Creation of the ModelLoader instance and loading models remain the same
 import platform_config as pconf
@@ -27,8 +30,6 @@ from platform_config import (
     get_local_available_models,
 )
 from unstructured.staging.base import elements_from_base64_gzipped_json
-from urllib.parse import urlparse
-import urllib.request
 
 pipeline_df = []
 
@@ -40,16 +41,17 @@ UI_SERVICE_PORT = int(os.getenv("UI_SERVICE_PORT", 8082))
 
 
 def get_image_base64(image_path):
-    """
-    Get the Base64 encoding of a PNG image from a local file path.
+    """Get the Base64 encoding of a PNG image from a local file path.
+
     :param image_path: The file path of the image.
     :return: The Base64 encoded string of the image.
     """
     with open(image_path, "rb") as image_file:
         image_data = image_file.read()
         # Encode the image data to Base64
-        image_base64 = base64.b64encode(image_data).decode('utf-8')
+        image_base64 = base64.b64encode(image_data).decode("utf-8")
     return image_base64
+
 
 def extract_urls(text):
     urls = []
@@ -65,6 +67,7 @@ def extract_urls(text):
             except (urllib.error.URLError, urllib.error.HTTPError, Exception):
                 pass
     return urls
+
 
 def get_system_status():
     cpu_usage = psutil.cpu_percent(interval=1)
@@ -98,18 +101,24 @@ def get_system_status():
     )
     return status
 
+
 def get_benchmark():
-    time.sleep(0.5)  
-    active_pipeline_nam =  get_actived_pipeline()
+    time.sleep(0.5)
+    active_pipeline_nam = get_actived_pipeline()
     if active_pipeline_nam:
         data = cli.get_benchmark(active_pipeline_nam)
         if data:
-            return gr.update(visible=True, value=data,)
+            return gr.update(
+                visible=True,
+                value=data,
+            )
         else:
             return gr.update(visible=False)
 
+
 def get_actived_pipeline():
     return cli.get_actived_pipeline()
+
 
 def build_app(cfg, args):
 
@@ -124,7 +133,7 @@ def build_app(cfg, args):
         """
         # Append the user's message to the conversation history
         return "", history + [[message, ""]]
-    
+
     async def bot(
         history,
         temperature,
@@ -152,10 +161,18 @@ def build_app(cfg, args):
         if history[-1][0] == "" or len(history[-1][0]) == 0:
             yield history[:-1]
             return
-        
+
         stream_opt = True
-        new_req = {"messages": history[-1][0], "stream": stream_opt, "max_tokens": max_tokens, "top_n": vector_rerank_top_n, "temperature": temperature,
-                    "top_p": top_p, "top_k": top_k, "repetition_penalty": repetition_penalty}
+        new_req = {
+            "messages": history[-1][0],
+            "stream": stream_opt,
+            "max_tokens": max_tokens,
+            "top_n": vector_rerank_top_n,
+            "temperature": temperature,
+            "top_p": top_p,
+            "top_k": top_k,
+            "repetition_penalty": repetition_penalty,
+        }
         server_addr = f"http://{MEGA_SERVICE_HOST_IP}:{MEGA_SERVICE_PORT}"
 
         # Async for streaming response
@@ -171,47 +188,51 @@ def build_app(cfg, args):
                     if chunk.strip():
                         try:
                             data = json.loads(chunk)
-                            if 'llm_res' in data:
-                                partial_text = partial_text + data['llm_res']
-                            elif 'score' in data:
+                            if "llm_res" in data:
+                                partial_text = partial_text + data["llm_res"]
+                            elif "score" in data:
                                 # show referenced docs
-                                if 'filename' in data:
-                                    reference_doc = data['filename'] if not 'page_number' in data else  data['filename'] + " --page" + str(data['page_number'])
+                                if "filename" in data:
+                                    reference_doc = (
+                                        data["filename"]
+                                        if "page_number" not in data
+                                        else data["filename"] + " --page" + str(data["page_number"])
+                                    )
                                     reference_docs.add(reference_doc)
                                 # show hyperlinks in chunk
-                                if data['score'] > 0.5 and 'link_urls' in data:
-                                    if isinstance(data['link_urls'], str):
+                                if data["score"] > 0.5 and "link_urls" in data:
+                                    if isinstance(data["link_urls"], str):
                                         try:
-                                            url_list = json.loads(data['link_urls'])
+                                            url_list = json.loads(data["link_urls"])
                                             link_urls.extend(url_list)
                                         except json.JSONDecodeError:
                                             print("link_urls is not a valid JSON string.")
                                 # show images in chunk
-                                if image_count < IMAGE_NUMBER and 'orig_elements' in data:
-                                    elements = elements_from_base64_gzipped_json(data['orig_elements'])
+                                if image_count < IMAGE_NUMBER and "orig_elements" in data:
+                                    elements = elements_from_base64_gzipped_json(data["orig_elements"])
                                     for element in elements:
                                         if element.metadata.image_path:
                                             image_paths.append(element.metadata.image_path)
                                             image_count += 1
-                            elif 'retrieved_text' in data:
-                                link_urls.extend(extract_urls(data['retrieved_text']))
+                            elif "retrieved_text" in data:
+                                link_urls.extend(extract_urls(data["retrieved_text"]))
                         except json.JSONDecodeError:
                             print(f"Received non-JSON chunk: {chunk}")
                     history[-1][1] = partial_text
                     yield history
         if image_paths:
-            history[-1][1] += f'\n参考图片:\n'
+            history[-1][1] += "\n参考图片:\n"
             for image_path in image_paths:
                 image_base64 = get_image_base64(image_path)
                 history[-1][1] += f'<img src="data:image/png;base64,{image_base64}">'
         if link_urls:
-            history[-1][1] += f'\n相关链接:\n'
+            history[-1][1] += "\n相关链接:\n"
             for link in link_urls:
-                history[-1][1] += f'{link}\n'
+                history[-1][1] += f"{link}\n"
         if reference_docs:
-            history[-1][1] += f'\n内容来源:\n'
+            history[-1][1] += "\n内容来源:\n"
             for reference_doc in reference_docs:
-                history[-1][1] += f'{reference_doc}\n'
+                history[-1][1] += f"{reference_doc}\n"
         yield history
 
     avail_llms = get_local_available_models("llm")
@@ -242,7 +263,7 @@ def build_app(cfg, args):
     # .benchmark-wrap {position: absolute;top: -40px;height: 36px;z-index: 20;.container {padding: 8px 16px;}h2 {font-size: 14px;padding: 0;font-weight: 500;color: #666666;justify-content: end;}}
     .container{padding-top:0;}h2{font-size:14px;padding:0;color:var(--neutral-500);}}
     .benchmark-wrap {position: absolute;top: -40px;height: 36px;z-index: 20;.container {padding: 8px 16px;}h2 {font-size: 14px;padding: 0;font-weight: 500;color: #666666;justify-content: end;}}
-    
+
     """
 
     with gr.Blocks(theme=gr.themes.Soft(), css=css, title="Edge Craft RAG based Q&A Chatbot") as app:
@@ -475,14 +496,14 @@ def build_app(cfg, args):
                 return gr.Accordion(visible=False)
             else:
                 return gr.Accordion(visible=True)
-            
+
         def update_rerank_model(selected_list):  # Accept the event argument, even if not used
             print(selected_list)
-            if 'reranker' in selected_list:
+            if "reranker" in selected_list:
                 return gr.Accordion(visible=True)
             else:
                 return gr.Accordion(visible=False)
-            
+
         def show_pipeline_detail(evt: gr.SelectData):
             # get selected pipeline id
             # Dataframe: {'headers': '', 'data': [[x00, x01], [x10, x11]}
@@ -915,7 +936,11 @@ def build_app(cfg, args):
             queue=True,
         )
         clear.click(lambda: None, None, chatbot, queue=False)
-        chatbot.change(get_benchmark, inputs=None, outputs=benchmark,)
+        chatbot.change(
+            get_benchmark,
+            inputs=None,
+            outputs=benchmark,
+        )
     return app
 
 

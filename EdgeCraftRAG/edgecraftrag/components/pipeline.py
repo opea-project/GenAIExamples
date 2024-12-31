@@ -1,16 +1,16 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+import time
 from typing import Any, Callable, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType
 from edgecraftrag.components.postprocessor import RerankProcessor
+from fastapi.responses import StreamingResponse
 from llama_index.core.schema import Document, QueryBundle
 from pydantic import BaseModel, Field, model_serializer
-import time
-import os
-from fastapi.responses import StreamingResponse
 
 
 class PipelineStatus(BaseModel):
@@ -172,6 +172,7 @@ def benchmark_response(ret, benchmark, benchmark_index, start):
                 yield chunk
             benchmark.update_benchmark_data(benchmark_index, CompType.GENERATOR, start, time.perf_counter())
             benchmark.insert_llm_data(benchmark_index)
+
         ret.body_iterator = timing_wrapper()
         return ret
     else:

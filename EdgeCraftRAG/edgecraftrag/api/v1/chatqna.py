@@ -1,11 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from comps.cores.proto.api_protocol import ChatCompletionRequest
-from edgecraftrag.context import ctx
-from edgecraftrag.api_schema import RagOut
-from fastapi import FastAPI
 from comps import GeneratedDoc
+from comps.cores.proto.api_protocol import ChatCompletionRequest
+from edgecraftrag.api_schema import RagOut
+from edgecraftrag.context import ctx
+from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 
 chatqna_app = FastAPI()
@@ -51,11 +51,7 @@ async def ragqna(request: ChatCompletionRequest):
             collected_data.append(chunk)
         res = "".join(collected_data)
 
-    ragout = RagOut(
-        query = request.messages,
-        contexts = [],
-        response = str(res)
-    )
+    ragout = RagOut(query=request.messages, contexts=[], response=str(res))
     for n in retri_res:
         origin_text = n.node.get_text()
         ragout.contexts.append(origin_text.strip())

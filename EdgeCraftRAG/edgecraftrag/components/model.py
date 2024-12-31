@@ -10,13 +10,15 @@ from llama_index.llms.openvino import OpenVINOLLM
 from llama_index.postprocessor.openvino_rerank import OpenVINORerank
 from pydantic import Field, model_serializer
 
+
 def model_exist(model_path):
     model_dir = Path(model_path)
     return (
-        model_dir.is_dir() 
-        and (model_dir / "openvino_model.xml").exists() 
+        model_dir.is_dir()
+        and (model_dir / "openvino_model.xml").exists()
         and (model_dir / "openvino_model.bin").exists()
     )
+
 
 class BaseModelComponent(BaseComponent):
 

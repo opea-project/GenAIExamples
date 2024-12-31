@@ -52,7 +52,7 @@ class PipelineMgr(BaseMgr):
         del pl
         gc.collect()
         return "Pipeline removed successfully"
-    
+
     def get_pipelines(self):
         return [pl for _, pl in self.components.items()]
 

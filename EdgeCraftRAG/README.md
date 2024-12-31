@@ -236,7 +236,6 @@ export ENABLE_BENCHMARK="true"
 curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines/{pipeline_name}/benchmark -H "Content-Type: application/json" | jq '.'
 ```
 
-
 ### Model Management
 
 #### Load a model

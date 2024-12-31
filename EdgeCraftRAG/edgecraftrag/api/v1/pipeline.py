@@ -8,7 +8,12 @@ from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserT
 from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import QnAGenerator
 from edgecraftrag.components.indexer import VectorIndexer
-from edgecraftrag.components.node_parser import HierarchyNodeParser, SimpleNodeParser, SWindowNodeParser, UnstructedNodeParser
+from edgecraftrag.components.node_parser import (
+    HierarchyNodeParser,
+    SimpleNodeParser,
+    SWindowNodeParser,
+    UnstructedNodeParser,
+)
 from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, RerankProcessor
 from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from edgecraftrag.context import ctx
@@ -68,6 +73,7 @@ async def update_pipeline(name, request: PipelineCreateIn):
     async with ctx.get_pipeline_mgr()._lock:
         update_pipeline_handler(pl, request)
     return pl
+
 
 # REMOVE Pipeline
 @pipeline_app.delete(path="/v1/settings/pipelines/{name}")

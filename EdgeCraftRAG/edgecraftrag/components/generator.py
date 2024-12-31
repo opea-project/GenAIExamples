@@ -3,19 +3,19 @@
 
 import asyncio
 import dataclasses
+import json
 import os
 
 from comps import GeneratedDoc
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType
 from fastapi.responses import StreamingResponse
-import json
 from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
 
 
-async def stream_generator(llm, prompt_str, retrieved_nodes = [], text_gen_context = ""):
+async def stream_generator(llm, prompt_str, retrieved_nodes=[], text_gen_context=""):
     response = llm.stream_complete(prompt_str)
     for r in response:
         yield json.dumps({"llm_res": r.delta})
@@ -60,12 +60,10 @@ class QnAGenerator(BaseComponent):
         return ret
 
     def query_transform(self, chat_request, retrieved_nodes):
-        """
-        Generate text_gen_context and prompt_str
+        """Generate text_gen_context and prompt_str
         :param chat_request: Request object
         :param retrieved_nodes: List of retrieved nodes
-        :return: Generated text_gen_context and prompt_str
-        """
+        :return: Generated text_gen_context and prompt_str."""
         text_gen_context = ""
         for n in retrieved_nodes:
             origin_text = n.node.get_text()
@@ -73,7 +71,7 @@ class QnAGenerator(BaseComponent):
         query = chat_request.messages
         prompt_str = self.prompt.format(input=query, context=text_gen_context)
         return text_gen_context, prompt_str
-    
+
     def run(self, chat_request, retrieved_nodes, **kwargs):
         if self.llm() is None:
             # This could happen when User delete all LLMs through RESTful API
@@ -91,7 +89,10 @@ class QnAGenerator(BaseComponent):
         self.llm().generate_kwargs = generate_kwargs
         self.llm().max_new_tokens = chat_request.max_tokens
         if chat_request.stream:
-            return StreamingResponse(stream_generator(self.llm(), prompt_str, retrieved_nodes, text_gen_context), media_type="text/event-stream")
+            return StreamingResponse(
+                stream_generator(self.llm(), prompt_str, retrieved_nodes, text_gen_context),
+                media_type="text/event-stream",
+            )
         else:
             return self.llm().complete(prompt_str)
 
@@ -115,7 +116,9 @@ class QnAGenerator(BaseComponent):
         )
 
         if chat_request.stream:
-            return StreamingResponse(stream_generator(llm, prompt_str, retrieved_nodes, text_gen_context), media_type="text/event-stream")
+            return StreamingResponse(
+                stream_generator(llm, prompt_str, retrieved_nodes, text_gen_context), media_type="text/event-stream"
+            )
         else:
             response = llm.complete(prompt_str)
             response = response.text

@@ -4,11 +4,12 @@
 from typing import Any
 
 from edgecraftrag.base import BaseComponent, CompType, NodeParserType
+from edgecraftrag.utils import IMG_OUTPUT_DIR, DocxParagraphPicturePartitioner
 from llama_index.core.node_parser import HierarchicalNodeParser, SentenceSplitter, SentenceWindowNodeParser
 from llama_index.readers.file import UnstructuredReader
 from pydantic import model_serializer
 from unstructured.partition.docx import register_picture_partitioner
-from edgecraftrag.utils import  DocxParagraphPicturePartitioner, IMG_OUTPUT_DIR
+
 
 class SimpleNodeParser(BaseComponent, SentenceSplitter):
 
@@ -88,9 +89,7 @@ class SWindowNodeParser(BaseComponent, SentenceWindowNodeParser):
 
 
 class UnstructedNodeParser(BaseComponent, UnstructuredReader):
-
-    """
-    UnstructedNodeParser is a component that processes unstructured data.
+    """UnstructedNodeParser is a component that processes unstructured data.
 
     Args:
         chunk_size (int): Size of each chunk for processing. Default is 250.
@@ -113,7 +112,13 @@ class UnstructedNodeParser(BaseComponent, UnstructuredReader):
         self.comp_type = CompType.NODEPARSER
         self.comp_subtype = NodeParserType.UNSTRUCTURED
         # excluded metadata
-        self._excluded_embed_metadata_keys = ["file_size", "creation_date", "last_modified_date", "last_accessed_date", "orig_elements"]
+        self._excluded_embed_metadata_keys = [
+            "file_size",
+            "creation_date",
+            "last_modified_date",
+            "last_accessed_date",
+            "orig_elements",
+        ]
         self._excluded_llm_metadata_keys = ["orig_elements"]
         # PDF image extraction parameters
         self._extract_images_in_pdf = True
@@ -127,26 +132,26 @@ class UnstructedNodeParser(BaseComponent, UnstructuredReader):
                 nodelist = []
                 processed_paths = set()
                 for document in v:
-                    if 'file_path' in document.metadata and document.metadata['file_path'] not in processed_paths:
-                        file_path = document.metadata['file_path']
+                    if "file_path" in document.metadata and document.metadata["file_path"] not in processed_paths:
+                        file_path = document.metadata["file_path"]
                         nodes = self.load_data(
                             file=file_path,
                             unstructured_kwargs={
                                 "strategy": "hi_res",
                                 "extract_images_in_pdf": self._extract_images_in_pdf,
-                                "extract_image_block_types": ["Image"],   
+                                "extract_image_block_types": ["Image"],
                                 "extract_image_block_output_dir": self._image_output_dir,
                                 "languages": self._image_language,
                                 "chunking_strategy": "basic",
                                 "overlap_all": True,
-                                "max_characters":self.chunk_size,
-                                "overlap": self.chunk_overlap
+                                "max_characters": self.chunk_size,
+                                "overlap": self.chunk_overlap,
                             },
                             split_documents=True,
                             document_kwargs={
                                 "excluded_embed_metadata_keys": self._excluded_embed_metadata_keys,
-                                "excluded_llm_metadata_keys": self._excluded_llm_metadata_keys
-                            }
+                                "excluded_llm_metadata_keys": self._excluded_llm_metadata_keys,
+                            },
                         )
                         nodelist += nodes
                         processed_paths.add(file_path)
