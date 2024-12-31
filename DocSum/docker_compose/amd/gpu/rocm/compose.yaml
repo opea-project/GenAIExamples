@@ -70,34 +70,6 @@ services:
       https_proxy: ${https_proxy}
     restart: unless-stopped
 
-  dataprep-audio2text:
-    image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
-    container_name: dataprep-audio2text-service
-    ports:
-      - "9099:9099"
-    ipc: host
-    environment:
-      A2T_ENDPOINT: ${A2T_ENDPOINT}
-
-  dataprep-video2audio:
-    image: ${REGISTRY:-opea}/dataprep-video2audio:${TAG:-latest}
-    container_name: dataprep-video2audio-service
-    ports:
-      - "7078:7078"
-    ipc: host
-    environment:
-      V2A_ENDPOINT: ${V2A_ENDPOINT}
-
-  dataprep-multimedia2text:
-    image: ${REGISTRY:-opea}/dataprep-multimedia2text:${TAG:-latest}
-    container_name: dataprep-multimedia2text
-    ports:
-      - "7079:7079"
-    ipc: host
-    environment:
-      V2A_ENDPOINT: ${V2A_ENDPOINT}
-      A2T_ENDPOINT: ${A2T_ENDPOINT}
-
   docsum-backend-server:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-backend-server
@@ -111,8 +83,9 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${HOST_IP}
-      - DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${HOST_IP}
+      - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
+
     ipc: host
     restart: always
 
