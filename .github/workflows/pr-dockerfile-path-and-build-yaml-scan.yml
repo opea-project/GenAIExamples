@@ -22,7 +22,6 @@ jobs:
         run: |
           cd ..
           git clone https://github.com/opea-project/GenAIComps.git
-          cd GenAIComps && git checkout source/refactor_multimedia
 
       - name: Check for Missing Dockerfile Paths in GenAIComps
         run: |
