@@ -29,7 +29,7 @@ export LLM_SERVICE_HOST_IP=${ip_address}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/faqgen"
 export PATH="~/miniconda3/bin:$PATH"
 export LLM_BACKEND="tgi"
-
+export LOGFLAG=True
 
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build

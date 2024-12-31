@@ -54,6 +54,7 @@ services:
       HUGGING_FACE_HUB_TOKEN: ${FAQGEN_HUGGINGFACEHUB_API_TOKEN}
       LLM_MODEL_ID: ${FAQGEN_LLM_MODEL_ID}
       LLM_BACKEND: ${LLM_BACKEND}
+      LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
   faqgen-backend-server:
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
