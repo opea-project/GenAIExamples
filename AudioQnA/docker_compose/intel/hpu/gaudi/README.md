@@ -15,9 +15,6 @@ cd GenAIComps
 
 ```bash
 docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile.intel_hpu .
-
-
-docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/Dockerfile .
 ```
 
 ### 3. Build LLM Image
@@ -27,7 +24,7 @@ Intel Xeon optimized image hosted in huggingface repo will be used for TGI servi
 ### 4. Build TTS Image
 
 ```bash
-docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/dependency/Dockerfile.intel_hpu .
+docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile.intel_hpu .
 ```
 
 ### 5. Build MegaService Docker Image
