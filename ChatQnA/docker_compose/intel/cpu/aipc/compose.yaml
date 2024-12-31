@@ -10,6 +10,12 @@ services:
       - "8001:8001"
   dataprep-redis-service:
     image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    build:
+      context: ../../../../../../GenAIComps
+      dockerfile: comps/dataprep/redis/langchain/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
@@ -40,6 +46,12 @@ services:
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   retriever:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    build:
+      context: ../../../../../../GenAIComps
+      dockerfile: comps/retrievers/redis/langchain/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -88,6 +100,12 @@ services:
 
   chatqna-aipc-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    build:
+      context: ../../../../
+      dockerfile: Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
     container_name: chatqna-aipc-backend-server
     depends_on:
       - redis-vector-db
@@ -115,6 +133,12 @@ services:
     restart: always
   chatqna-aipc-ui-server:
     image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    build:
+      context: ../../../../ui
+      dockerfile: docker/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
     container_name: chatqna-aipc-ui-server
     depends_on:
       - chatqna-aipc-backend-server
@@ -128,6 +152,12 @@ services:
     restart: always
   chatqna-aipc-nginx-server:
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    build:
+      context: ../../../../../../GenAIComps
+      dockerfile: comps/nginx/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
     container_name: chatqna-aipc-nginx-server
     depends_on:
       - chatqna-aipc-backend-server
