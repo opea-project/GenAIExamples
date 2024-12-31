@@ -1,0 +1,40 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  speecht5-service:
+    image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
+    container_name: speecht5-service
+    ports:
+      - "7055:7055"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7055/health"]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+  tts:
+    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
+    container_name: tts-service
+    ports:
+      - "3002:9088"
+    ipc: host
+    environment:
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
+    dependes_on:
+      speecht5-service:
+      condition: service_healthy
+
+networks:
+  default:
+    driver: bridge

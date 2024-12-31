@@ -1,0 +1,35 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  gpt-sovits-service:
+    image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}
+    container_name: gpt-sovits-service
+    ports:
+      - "9880:9880"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9880/health"]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+  tts:
+    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
+    container_name: tts-service
+    ports:
+      - "3002:9088"
+    ipc: host
+    environment:
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
+    dependes_on:
+      speecht5-service:
+      condition: service_healthy
+
+networks:
+  default:
+    driver: bridge

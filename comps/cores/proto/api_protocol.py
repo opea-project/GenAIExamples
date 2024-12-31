@@ -279,6 +279,7 @@ class DocSumChatCompletionRequest(BaseModel):
 
 class AudioChatCompletionRequest(BaseModel):
     audio: str
+    voice: str = "default"
     messages: Optional[
         Union[
             str,

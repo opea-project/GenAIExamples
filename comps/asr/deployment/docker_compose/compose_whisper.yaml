@@ -1,0 +1,35 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7066/health"]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+  asr:
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+    container_name: asr-service
+    ports:
+      - "9099:9099"
+    ipc: host
+    environment:
+      ASR_ENDPOINT: ${ASR_ENDPOINT}
+    dependes_on:
+      speecht5-service:
+      condition: service_healthy
+
+networks:
+  default:
+    driver: bridge
