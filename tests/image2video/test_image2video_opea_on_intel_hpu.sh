@@ -10,26 +10,18 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build --no-cache -t opea/svd:latest -f comps/image2video/dependency/Dockerfile .
+    docker build --no-cache -t opea/image2video-gaudi:latest -f comps/image2video/src/Dockerfile.intel_hpu .
     if [ $? -ne 0 ]; then
-        echo "opea/svd built fail"
+        echo "opea/image2video-gaudi built fail"
         exit 1
     else
-        echo "opea/svd built successful"
-    fi
-    docker build --no-cache -t opea/image2video:latest -f comps/image2video/Dockerfile .
-    if [ $? -ne 0 ]; then
-        echo "opea/image2video built fail"
-        exit 1
-    else
-        echo "opea/image2video built successful"
+        echo "opea/image2video-gaudi built successful"
     fi
 }
 
 function start_service() {
     unset http_proxy
-    docker run -d --name="test-comps-image2video-svd" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 9368:9368 --ipc=host opea/svd:latest
-    docker run -d --name="test-comps-image2video" -e SVD_ENDPOINT=http://$ip_address:9368 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 9369:9369 --ipc=host opea/image2video:latest
+    docker run -d --name="test-comps-image2video-gaudi" -p 9369:9369 --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/image2video-gaudi:latest
     sleep 3m
 }
 
@@ -39,8 +31,7 @@ function validate_microservice() {
         echo "Result correct."
     else
         echo "Result wrong."
-        docker logs test-comps-image2video-svd
-        docker logs test-comps-image2video
+        docker logs test-comps-image2video-gaudi
         exit 1
     fi
 

@@ -19,11 +19,11 @@ ENV PYTHONPATH=/home/user:/usr/lib/habanalabs/:/optimum-habana
 
 # Install requirements and optimum habana
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /home/user/comps/image2video/dependency/requirements.txt && \
+    pip install --no-cache-dir -r /home/user/comps/image2video/src/requirements.txt && \
     pip install --no-cache-dir optimum[habana]
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/image2video/dependency
+WORKDIR /home/user/comps/image2video/src
 
-ENTRYPOINT ["python", "svd_server.py", "--device", "hpu"]
+ENTRYPOINT ["python", "opea_image2video_microservice.py", "--device", "hpu"]

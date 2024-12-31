@@ -5,13 +5,9 @@
 services:
   image2video:
     build:
-      dockerfile: comps/image2video/Dockerfile
+      dockerfile: comps/image2video/src/Dockerfile
     image: ${REGISTRY:-opea}/image2video:${TAG:-latest}
-  svd:
+  image2video-gaudi:
     build:
-      dockerfile: comps/image2video/dependency/Dockerfile
-    image: ${REGISTRY:-opea}/svd:${TAG:-latest}
-  svd-gaudi:
-    build:
-      dockerfile: comps/image2video/dependency/Dockerfile.intel_hpu
-    image: ${REGISTRY:-opea}/svd-gaudi:${TAG:-latest}
+      dockerfile: comps/image2video/src/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/image2video-gaudi:${TAG:-latest}

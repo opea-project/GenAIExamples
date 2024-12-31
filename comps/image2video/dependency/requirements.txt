@@ -1,7 +1,0 @@
-accelerate
-diffusers
-fastapi
-opencv-python
-torch
-transformers
-uvicorn
