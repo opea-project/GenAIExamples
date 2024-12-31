@@ -9,5 +9,5 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: GenAIComps
-      dockerfile: comps/finetuning/Dockerfile
+      dockerfile: comps/finetuning/src/Dockerfile
     image: ${REGISTRY:-opea}/finetuning:${TAG:-latest}

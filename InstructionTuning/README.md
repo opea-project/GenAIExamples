@@ -38,7 +38,7 @@ curl http://${your_ip}:8015/v1/fine_tuning/jobs \
   }'
 ```
 
-The outputs of the finetune job (adapter_model.safetensors, adapter_config,json... ) are stored in `/home/user/comps/finetuning/output` and other execution logs are stored in `/home/user/ray_results`
+The outputs of the finetune job (adapter_model.safetensors, adapter_config,json... ) are stored in `/home/user/comps/finetuning/src/output` and other execution logs are stored in `/home/user/ray_results`
 
 ### 3. Manage fine-tuning job
 
