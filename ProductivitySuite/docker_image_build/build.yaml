@@ -38,7 +38,7 @@ services:
   dataprep-redis:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/src/Dockerfile
+      dockerfile: comps/dataprep/redis/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
   promptregistry-mongo-server:
