@@ -20,13 +20,13 @@ services:
   embedding-multimodal-bridgetower:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/native/multimodal/bridgetower/dependency/Dockerfile
+      dockerfile: comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
   embedding-multimodal:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/native/multimodal/bridgetower/wrapper/Dockerfile
+      dockerfile: comps/embeddings/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
   retriever-redis:
