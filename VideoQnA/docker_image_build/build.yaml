@@ -38,7 +38,7 @@ services:
   reranking-videoqna:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/videoqna/Dockerfile
+      dockerfile: comps/reranks/src/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
   video-llama-lvm-server:
