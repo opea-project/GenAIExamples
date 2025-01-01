@@ -68,6 +68,6 @@ services:
   gpt-sovits:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/gpt-sovits/Dockerfile
+      dockerfile: comps/tts/src/integrations/dependency/gpt-sovits/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}
