@@ -113,7 +113,7 @@ curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
 ```bash
 curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions\
   -X POST \
-  -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+  -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
   -H 'Content-Type: application/json'
 ```
 
