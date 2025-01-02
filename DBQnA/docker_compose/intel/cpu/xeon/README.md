@@ -11,7 +11,7 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/texttosql:comps -f comps/texttosql/langchain/Dockerfile .
+docker build --no-cache -t opea/text2sql:comps -f comps/text2sql/src/Dockerfile .
 
 ```
 
@@ -21,13 +21,13 @@ Build the frontend Docker image based on react framework via below command:
 
 ```bash
 cd GenAIExamples/DBQnA/ui
-docker build --no-cache -t opea/texttosql-react-ui:latest -f docker/Dockerfile.react .
+docker build --no-cache -t opea/text2sql-react-ui:latest -f docker/Dockerfile.react .
 
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `opea/texttosql:latest`
+1. `opea/text2sql:latest`
 2. `opea/dbqna-react-ui:latest`
 
 ## 🚀 Start Microservices
@@ -62,7 +62,7 @@ export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=testpwd
 export POSTGRES_DB=chinook
-export texttosql_port=9090
+export text2sql_port=9090
 ```
 
 Note: Please replace with `your_ip` with your external IP address, do not use localhost.
@@ -90,14 +90,14 @@ We will use [Chinook](https://github.com/lerocha/chinook-database) sample databa
 
 ```bash
 
-docker run --name test-texttosql-postgres --ipc=host -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=${POSTGRES_DB} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -p 5442:5432 -d -v $WORKPATH/comps/texttosql/langchain/chinook.sql:/docker-entrypoint-initdb.d/chinook.sql postgres:latest
+docker run --name test-text2sql-postgres --ipc=host -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=${POSTGRES_DB} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -p 5442:5432 -d -v $WORKPATH/comps/text2sql/langchain/chinook.sql:/docker-entrypoint-initdb.d/chinook.sql postgres:latest
 ```
 
 - Start TGI Service
 
 ```bash
 
-docker run -d --name="test-texttosql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model
+docker run -d --name="test-text2sql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model
 ```
 
 - Start Text-to-SQL Service
@@ -105,7 +105,7 @@ docker run -d --name="test-texttosql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v
 ```bash
 unset http_proxy
 
-docker run -d --name="test-texttosql-server" --ipc=host -p ${texttosql_port}:8090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT opea/texttosql:latest
+docker run -d --name="test-text2sql-server" --ipc=host -p ${text2sql_port}:8090 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT opea/text2sql:latest
 ```
 
 - Start React UI service
@@ -141,7 +141,7 @@ curl --location http://${your_ip}:9090/v1/postgres/health \
 #### 3.2.2 Invoke the microservice.
 
 ```bash
-curl http://${your_ip}:9090/v1/texttosql\
+curl http://${your_ip}:9090/v1/text2sql\
     -X POST \
     -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${your_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}}' \
     -H 'Content-Type: application/json'
