@@ -40,15 +40,6 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
     return inputs
 
 
-def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
-    if self.services[cur_node].service_type == ServiceType.TTS:
-        new_inputs = {}
-        new_inputs["text"] = inputs["choices"][0]["text"]
-        return new_inputs
-    else:
-        return inputs
-
-
 class AudioQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host

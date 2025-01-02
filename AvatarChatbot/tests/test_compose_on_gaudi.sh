@@ -72,9 +72,17 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 60s
+    n=0
+    until [[ "$n" -ge 200 ]]; do
+       docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+           break
+       fi
+       sleep 5s
+       n=$((n+1))
+    done
     echo "All services are up and running"
-
+    sleep 5s
 }
 
 
