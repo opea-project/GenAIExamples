@@ -20,7 +20,7 @@ services:
     depends_on:
       - redis-vector-db
     ports:
-      - "6007:5000"
+      - "6007:6007"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -288,39 +288,6 @@ services:
       MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
       LLM_SERVICE_PORT: ${LLM_SERVICE_HOST_PORT_FAQGEN}
       LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP_FAQGEN}
-      LOGFLAG: ${LOGFLAG}
-    ipc: host
-    restart: always
-  llm_docsum_server:
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
-    container_name: llm-docsum-server
-    depends_on:
-      - tgi_service
-    ports:
-      - "9003:9000"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_DOCSUM}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    restart: unless-stopped
-  docsum-xeon-backend-server:
-    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
-    container_name: docsum-xeon-backend-server
-    depends_on:
-      - tgi_service
-      - llm_docsum_server
-    ports:
-      - "8890:8888"
-    environment:
-      no_proxy: ${no_proxy}
-      https_proxy: ${https_proxy}
-      http_proxy: ${http_proxy}
-      LLM_SERVICE_PORT: ${LLM_SERVICE_HOST_PORT_DOCSUM}
-      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
-      LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP_DOCSUM}
       LOGFLAG: ${LOGFLAG}
     ipc: host
     restart: always
