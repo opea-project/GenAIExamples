@@ -15,7 +15,7 @@
 /comps/prompt_registry/ hoong.tee.yeoh@intel.com
 /comps/feedback_management/ hoong.tee.yeoh@intel.com
 /comps/chathistory/ yogesh.pandey@intel.com
-/comps/texttosql/ yogesh.pandey@intel.com
+/comps/text2sql/ yogesh.pandey@intel.com
 /comps/text2image/ xinyu.ye@intel.com
 /comps/reranks/ kaokao.lv@intel.com
 /comps/retrievers/ kaokao.lv@intel.com

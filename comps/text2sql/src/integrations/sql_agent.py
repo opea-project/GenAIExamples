@@ -1,4 +1,4 @@
-﻿# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Optional, Sequence, Type, Union
 
 from langchain.agents import create_react_agent
 from langchain.agents.agent import AgentExecutor, RunnableAgent
-from langchain.agents.agent_types import AgentType
 from langchain.agents.mrkl import prompt as react_prompt
 from langchain.chains.llm import LLMChain
 from langchain_community.agent_toolkits.sql.prompt import SQL_PREFIX, SQL_SUFFIX
@@ -21,37 +20,21 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate, PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, Field, root_validator
 from langchain_core.tools import BaseTool
-from langchain_huggingface import HuggingFaceEndpoint
 from sqlalchemy.engine import Result
 
 from comps import CustomLogger
 
-generation_params = {
-    "max_new_tokens": 1024,
-    "top_k": 10,
-    "top_p": 0.95,
-    "temperature": 0.01,
-    "repetition_penalty": 1.03,
-    "streaming": True,
-}
-
-
-TGI_LLM_ENDPOINT = os.environ.get("TGI_LLM_ENDPOINT")
-
-llm = HuggingFaceEndpoint(
-    endpoint_url=TGI_LLM_ENDPOINT,
-    task="text-generation",
-    **generation_params,
-)
-
-sql_params = {
-    "max_string_length": 3600,
-}
-
-logger = CustomLogger("comps-texttosql")
+logger = CustomLogger("comps-text2sql")
 logflag = os.getenv("LOGFLAG", False)
 
-# https://github.com/langchain-ai/langchain/issues/23585
+
+def remove_quotes(s):
+    if s.startswith('"') and s.endswith('"'):
+        return s[1:-1]
+    elif s.startswith("'") and s.endswith("'"):
+        return s[1:-1]
+    else:
+        return s
 
 
 class BaseSQLDatabaseTool(BaseModel):
@@ -86,8 +69,13 @@ class CustomQuerySQLDataBaseTool(BaseSQLDatabaseTool, BaseTool):
         """Execute the query, return the results or an error message."""
         logger.info("query: {}".format(query))
         query = query.replace("\nObservation", "")
+        query = remove_quotes(query)
         result = self.db.run_no_throw(query)
         return result
+
+
+class _ListSQLDataBaseToolInput(BaseModel):
+    tool_input: str = Field("", description="An empty string")
 
 
 class _InfoSQLDatabaseToolInput(BaseModel):
@@ -115,10 +103,6 @@ class CustomInfoSQLDatabaseTool(BaseSQLDatabaseTool, BaseTool):
         """Get the schema for tables in a comma-separated list."""
         table_names = table_names.replace("\nObservation", "")  # this changed
         return self.db.get_table_info_no_throw([t.strip() for t in table_names.split(",")])
-
-
-class _ListSQLDataBaseToolInput(BaseModel):
-    tool_input: str = Field("", description="An empty string")
 
 
 class CustomListSQLDatabaseTool(BaseSQLDatabaseTool, BaseTool):
@@ -306,33 +290,3 @@ def custom_create_sql_agent(
         handle_parsing_errors=True,
         **(agent_executor_kwargs or {}),
     )
-
-
-def execute(input, url):
-    """Execute a SQL query using the custom SQL agent.
-
-    Args:
-        input (str): The user's input.
-        url (str): The URL of the database to connect to.
-
-    Returns:
-        dict: The result of the SQL execution.
-    """
-    db = SQLDatabase.from_uri(url, **sql_params)
-    logger.info("Starting Agent")
-    agent_executor = custom_create_sql_agent(
-        llm=llm,
-        verbose=True,
-        toolkit=CustomSQLDatabaseToolkit(llm=llm, db=db),
-        agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-        agent_executor_kwargs={"return_intermediate_steps": True},
-    )
-
-    result = agent_executor.invoke(input)
-
-    query = []
-    for log, _ in result["intermediate_steps"]:
-        if log.tool == "sql_db_query":
-            query.append(log.tool_input)
-    result["sql"] = query[0].replace("Observation", "")
-    return result

@@ -32,9 +32,9 @@ services:
     volumes:
       - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
 
-  texttosql_service:
-    image: opea/texttosql:latest
-    container_name: texttosql_service
+  text2sql_service:
+    image: opea/text2sql:latest
+    container_name: text2sql_service
     ports:
       - "9090:8090"
     environment:

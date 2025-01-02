@@ -3,7 +3,7 @@
 
 # this file should be run in the root of the repo
 services:
-  texttosql:
+  text2sql:
     build:
-      dockerfile: comps/texttosql/langchain/Dockerfile
-    image: ${REGISTRY:-opea}/texttosql:${TAG:-latest}
+      dockerfile: comps/text2sql/src/Dockerfile
+    image: ${REGISTRY:-opea}/text2sql:${TAG:-latest}
