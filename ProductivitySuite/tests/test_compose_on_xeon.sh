@@ -60,7 +60,6 @@ function start_services() {
     export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${ip_address}:8889/v1/faqgen"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6009/v1/dataprep/delete_file"
     export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
-    export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${ip_address}:8890/v1/docsum"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/ingest"
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6008/v1/dataprep/get"
     export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
@@ -76,7 +75,6 @@ function start_services() {
     export COLLECTION_NAME="Conversations"
     export LLM_SERVICE_HOST_PORT_FAQGEN=9002
     export LLM_SERVICE_HOST_PORT_CODEGEN=9001
-    export LLM_SERVICE_HOST_PORT_DOCSUM=9003
     export RERANK_SERVER_PORT=8808
     export EMBEDDING_SERVER_PORT=6006
     export LLM_SERVER_PORT=9009
@@ -126,9 +124,6 @@ function validate_service() {
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "all"}' -H 'Content-Type: application/json' "$URL")
-    elif [[ $SERVICE_NAME == *"docsum-xeon-backend-server"* ]]; then
-	local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"faqgen-xeon-backend-server"* ]]; then
         local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
@@ -257,14 +252,6 @@ function validate_microservices() {
         "llm-faqgen-server" \
         '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
-    # Docsum llm microservice
-    validate_service \
-        "${ip_address}:9003/v1/chat/docsum" \
-        "data: " \
-        "llm_docsum" \
-        "llm-docsum-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
-
     # CodeGen llm microservice
     validate_service \
         "${ip_address}:9001/v1/chat/completions" \
@@ -319,7 +306,6 @@ function validate_megaservice() {
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'\
 
-
     # Curl the FAQGen Service
     validate_service \
         "${ip_address}:8889/v1/faqgen" \
@@ -327,15 +313,6 @@ function validate_megaservice() {
         "faqgen-xeon-backend-server" \
         "faqgen-xeon-backend-server" \
         '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'\
-
-    # Curl the DocSum Mega Service
-    # validate_service \
-    #     "${ip_address}:8890/v1/docsum" \
-    #     "embedding" \
-    #     "docsum-xeon-backend-server" \
-    #     "docsum-xeon-backend-server" \
-    #     '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
-
 
     # Curl the CodeGen Mega Service
     validate_service \
