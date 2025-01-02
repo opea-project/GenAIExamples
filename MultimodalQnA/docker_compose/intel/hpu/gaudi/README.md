@@ -89,7 +89,7 @@ docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
 Build lvm-tgi microservice image
 
 ```bash
-docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
+docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
 ```
 
 ### 4. Build dataprep-multimodal-redis Image

@@ -71,10 +71,10 @@ docker build -t opea/reranking-videoqna:latest --build-arg https_proxy=$https_pr
 ### 4. Build LVM Image (Xeon)
 
 ```bash
-docker build -t opea/video-llama-lvm-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/dependency/Dockerfile .
+docker build -t opea/video-llama-lvm-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/video-llama/Dockerfile .
 
 # LVM Service Image
-docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/Dockerfile .
+docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image

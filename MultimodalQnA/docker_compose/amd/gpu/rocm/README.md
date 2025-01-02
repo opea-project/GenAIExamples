@@ -39,7 +39,7 @@ docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_pr
 Build lvm-llava image
 
 ```bash
-docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/dependency/Dockerfile .
+docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/llava/Dockerfile .
 ```
 
 ### 3. Build retriever-multimodal-redis Image
