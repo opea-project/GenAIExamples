@@ -15,7 +15,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
 
@@ -32,19 +33,19 @@ services:
     volumes:
       - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
 
-  texttosql-service:
-    image: opea/texttosql:latest
-    container_name: texttosql-service
+  text2sql-service:
+    image: ${REGISTRY:-opea}/text2sql:${TAG:-latest}
+    container_name: text2sql-service
     ports:
-      - "9090:8090"
+      - "9090:8080"
     environment:
       - TGI_LLM_ENDPOINT=${TGI_LLM_ENDPOINT}
 
   dbqna-xeon-react-ui-server:
-    image: opea/dbqna-react-ui:latest
+    image: ${REGISTRY:-opea}/text2sql-react-ui:${TAG:-latest}
     container_name: dbqna-xeon-react-ui-server
     depends_on:
-      - texttosql-service
+      - text2sql-service
     ports:
       - "5174:80"
     environment:
