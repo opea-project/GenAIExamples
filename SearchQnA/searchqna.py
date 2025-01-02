@@ -27,10 +27,21 @@ LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
 
+def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
+    next_data = {}
+    if self.services[cur_node].service_type == ServiceType.EMBEDDING:
+        next_data = {"text": inputs["input"], "embedding": data["data"][0]["embedding"], "k": 1}
+        return next_data
+
+    else:
+        return data
+
+
 class SearchQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_outputs = align_outputs
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.SEARCH_QNA)
 
@@ -88,7 +99,7 @@ class SearchQnAService:
             streaming=stream_opt,
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs={"text": prompt}, llm_parameters=parameters
+            initial_inputs={"input": prompt}, llm_parameters=parameters
         )
         for node, response in result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
@@ -99,7 +110,8 @@ class SearchQnAService:
             ):
                 return response
         last_node = runtime_graph.all_leaves()[-1]
-        response = result_dict[last_node]["text"]
+        print(f"================= result: {result_dict[last_node]}")
+        response = result_dict[last_node]["choices"][0]["text"]
         choices = []
         usage = UsageInfo()
         choices.append(

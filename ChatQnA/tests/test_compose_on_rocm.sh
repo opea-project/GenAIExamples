@@ -76,6 +76,8 @@ function start_services() {
         sleep 1s
         n=$((n+1))
     done
+
+    echo "all containers start!"
 }
 
 function validate_service() {
