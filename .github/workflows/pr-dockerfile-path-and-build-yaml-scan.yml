@@ -5,7 +5,7 @@ name: Compose file and dockerfile path checking
 
 on:
   pull_request:
-    branches: [main, genaicomps_refactor]
+    branches: [main]
     types: [opened, reopened, ready_for_review, synchronize]
 
 jobs:
@@ -22,7 +22,6 @@ jobs:
         run: |
           cd ..
           git clone https://github.com/opea-project/GenAIComps.git
-          cd GenAIComps && git checkout refactor_comps
 
       - name: Check for Missing Dockerfile Paths in GenAIComps
         run: |
