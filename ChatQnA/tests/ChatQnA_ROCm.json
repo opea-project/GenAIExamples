@@ -1,0 +1,95 @@
+{
+  "ChatQnA_ROCm": [
+    {
+      "service": "env",
+      "port": "",
+      "endpoint": "",
+      "CHATQNA_HUGGINGFACEHUB_API_TOKEN": true,
+      "CHATQNA_TGI_SERVICE_IMAGE": true,
+      "CHATQNA_EMBEDDING_MODEL_ID": true,
+      "CHATQNA_RERANK_MODEL_ID": true,
+      "CHATQNA_LLM_MODEL_ID": true,
+      "CHATQNA_TGI_SERVICE_PORT": true,
+      "CHATQNA_TEI_EMBEDDING_PORT": true,
+      "CHATQNA_TEI_EMBEDDING_ENDPOINT": true,
+      "CHATQNA_TEI_RERANKING_PORT": true,
+      "CHATQNA_REDIS_VECTOR_PORT": true,
+      "CHATQNA_REDIS_VECTOR_INSIGHT_PORT": true,
+      "CHATQNA_REDIS_DATAPREP_PORT": true,
+      "CHATQNA_REDIS_RETRIEVER_PORT": true,
+      "CHATQNA_INDEX_NAME": true,
+      "CHATQNA_MEGA_SERVICE_HOST_IP": true,
+      "CHATQNA_RETRIEVER_SERVICE_HOST_IP": true,
+      "CHATQNA_BACKEND_SERVICE_ENDPOINT": true,
+      "CHATQNA_DATAPREP_SERVICE_ENDPOINT": true,
+      "CHATQNA_DATAPREP_GET_FILE_ENDPOINT": true,
+      "CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT": true,
+      "CHATQNA_FRONTEND_SERVICE_IP": true,
+      "CHATQNA_FRONTEND_SERVICE_PORT": true,
+      "CHATQNA_BACKEND_SERVICE_NAME": true,
+      "CHATQNA_BACKEND_SERVICE_IP": true,
+      "CHATQNA_BACKEND_SERVICE_PORT": true,
+      "CHATQNA_REDIS_URL": true,
+      "CHATQNA_EMBEDDING_SERVICE_HOST_IP": true,
+      "CHATQNA_RERANK_SERVICE_HOST_IP": true,
+      "CHATQNA_LLM_SERVICE_HOST_IP": true,
+      "CHATQNA_NGINX_PORT": true,
+      "http_proxy": false,
+      "https_proxy": false,
+      "no_proxy": false,
+      "output": false
+    },
+    {
+      "service": "embed",
+      "port": "8090",
+      "endpoint": "embed",
+      "inputs": "What is Deep Learning?",
+      "output": "[["
+    },
+    {
+      "service": "dataprep",
+      "port": "6007",
+      "endpoint": "/v1/dataprep",
+      "file_path": "",
+      "output": "Data preparation succeeded"
+    },
+    {
+      "service": "retrieval",
+      "port": "7000",
+      "endpoint": "/v1/retrieval",
+      "text": "test",
+      "embedding": "",
+      "output": "retrieved_docs"
+    },
+    {
+      "service": "rerank",
+      "port": "8808",
+      "endpoint": "rerank",
+      "query": "What is Deep Learning?",
+      "texts": ["Deep Learning is not...", "Deep learning is..."],
+      "output": "index"
+    },
+    {
+      "service": "llm",
+      "port": "8008",
+      "endpoint": "generate",
+      "inputs": "What is Deep Learning?",
+      "parameters": { "max_new_tokens": 64, "do_sample": true },
+      "output": "generated_text"
+    },
+    {
+      "service": "nginx",
+      "port": "80",
+      "endpoint": "v1/chatqna",
+      "messages": "What is the revenue of Nike in 2023?",
+      "output": "data: "
+    },
+    {
+      "service": "mega",
+      "port": "8888",
+      "endpoint": "v1/chatqna",
+      "messages": "What is the revenue of Nike in 2023?",
+      "output": "data: "
+    }
+  ]
+}
