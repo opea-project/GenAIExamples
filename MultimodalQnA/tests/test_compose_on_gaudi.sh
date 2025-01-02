@@ -33,7 +33,7 @@ function build_docker_images() {
 function setup_env() {
     export host_ip=${ip_address}
     export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
+    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
     export WHISPER_SERVER_PORT=7066
     export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_SERVER_PORT}/v1/asr"

@@ -42,6 +42,7 @@ function start_services() {
     export TRANSLATION_BACKEND_SERVICE_PORT=8888
     export TRANSLATION_BACKEND_SERVICE_ENDPOINT="http://${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation"
     export TRANSLATION_NGINX_PORT=8084
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

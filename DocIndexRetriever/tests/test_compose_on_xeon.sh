@@ -47,6 +47,9 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export host_ip=${ip_address}
+    export RERANK_TYPE="tei"
+    export LOGFLAG=true
 
     # Start Docker Containers
     docker compose up -d

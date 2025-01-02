@@ -42,6 +42,7 @@ function start_services() {
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=7777
     export NGINX_PORT=80
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

@@ -53,7 +53,7 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/Dockerfile .
+docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/integrations/dependency/clip/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
@@ -65,7 +65,7 @@ docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy 
 ### 3. Build Rerank Image
 
 ```bash
-docker build -t opea/reranking-videoqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/videoqna/Dockerfile .
+docker build -t opea/reranking-videoqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/src/Dockerfile .
 ```
 
 ### 4. Build LVM Image (Xeon)

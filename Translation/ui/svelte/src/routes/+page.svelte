@@ -22,8 +22,8 @@
   import LoadingAnimation from "$lib/assets/loadingAnimation.svelte";
 
   // Set default language
-  let langFrom: string = "en";
-  let langTo: string = "zh";
+  let langFrom: string = "zh";
+  let langTo: string = "en";
   let languages: Language[] = languagesList;
   // Initialize disabled state of input
   let inputDisabled: boolean = false;
@@ -52,23 +52,20 @@
     const eventSource = await fetchLanguageResponse(input, langFrom, langTo);
 
     eventSource.addEventListener("message", (e: any) => {
-      let Msg = e.data;
-      console.log("Msg", Msg);
-
-      if (Msg.startsWith("b")) {
-        let trimmedData = Msg.slice(2, -1);
-
-        if (/\\x[\dA-Fa-f]{2}/.test(trimmedData)) {
-          trimmedData = decodeEscapedBytes(trimmedData);
-        } else if (/\\u[\dA-Fa-f]{4}/.test(trimmedData)) {
-          trimmedData = decodeUnicode(trimmedData);
-        }
-
-        if (trimmedData !== "</s>") {
-          output += trimmedData.replace(/\\n/g, "\n");
-        }
-      } else if (Msg === "[DONE]") {
+      let res = e.data;
+      if (res === "[DONE]") {
         loading = false;
+      } else {
+        let Msg = JSON.parse(res).choices[0].text;
+        if (/\\x[\dA-Fa-f]{2}/.test(Msg)) {
+          Msg = decodeEscapedBytes(Msg);
+        } else if (/\\u[\dA-Fa-f]{4}/.test(Msg)) {
+          Msg = decodeUnicode(Msg);
+        }
+
+        if (Msg !== "</s>") {
+          output += Msg.replace(/\\n/g, "\n");
+        }
       }
     });
     eventSource.stream();
@@ -129,7 +126,6 @@
           placeholder="Input"
           bind:value={input}
           data-testid="translate-input"
-
         />
         <textarea
           readonly

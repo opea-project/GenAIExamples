@@ -26,22 +26,29 @@ services:
       REDIS_URL: redis://redis-vector-db:6379
       REDIS_HOST: redis-vector-db
       INDEX_NAME: ${INDEX_NAME:-rag-redis}
-      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      TEI_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LOGFLAG: ${LOGFLAG}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     container_name: tei-embedding-server
     ports:
       - "6006:80"
     volumes:
-      - "/home/ligang/models:/data"
+      - "/mnt/models:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:6006/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
   embedding:
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
     container_name: embedding-tei-server
@@ -49,13 +56,15 @@ services:
       - "6000:6000"
     ipc: host
     depends_on:
-      - tei-embedding-service
+      tei-embedding-service:
+        condition: service_healthy
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   retriever:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
@@ -73,6 +82,7 @@ services:
       INDEX_NAME: ${INDEX_NAME:-rag-redis}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   doc-index-retriever-server:
     image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}

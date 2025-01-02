@@ -17,6 +17,12 @@ services:
       TGI_LLM_ENDPOINT: ${CODETRANS_TGI_LLM_ENDPOINT}
       HUGGING_FACE_HUB_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8008/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri/:/dev/dri/
@@ -31,6 +37,9 @@ services:
   codetrans-llm-server:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: codetrans-llm-server
+    depends_on:
+      codetrans-tgi-service:
+        condition: service_healthy
     ports:
       - "${CODETRANS_LLM_SERVICE_PORT:-9000}:9000"
     ipc: host
@@ -38,7 +47,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: "http://codetrans-tgi-service"
+      LLM_ENDPOINT: "http://codetrans-tgi-service"
+      LLM_MODEL_ID: ${CODETRANS_LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${CODETRANS_HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codetrans-backend-server:

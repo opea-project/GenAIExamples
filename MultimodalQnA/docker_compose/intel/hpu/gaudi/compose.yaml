@@ -47,13 +47,20 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       PORT: ${EMBEDDER_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMBEDDER_PORT}/v1/health_check"]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+      start_period: 30s
     entrypoint: ["python", "bridgetower_server.py", "--device", "hpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
     restart: unless-stopped
   embedding-multimodal:
     image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
     container_name: embedding-multimodal
     depends_on:
-      - embedding-multimodal-bridgetower
+      embedding-multimodal-bridgetower:
+        condition: service_healthy
     ports:
       - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
     ipc: host
@@ -63,6 +70,7 @@ services:
       https_proxy: ${https_proxy}
       MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MULTIMODAL_EMBEDDING: true
     restart: unless-stopped
   retriever-redis:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
@@ -79,6 +87,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
+      RETRIEVER_TYPE: "redis"
     restart: unless-stopped
   tgi-gaudi:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.6

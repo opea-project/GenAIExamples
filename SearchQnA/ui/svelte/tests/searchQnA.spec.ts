@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 // Constants definition
-const CHAT_ITEMS = ["What is black myth wukong?"];
+const CHAT_ITEMS = ["What is the capital of China?"];
 
 // Helper function: Enter message to chat
 async function enterMessageToChat(page: Page, message: string) {

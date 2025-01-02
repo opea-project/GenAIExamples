@@ -39,7 +39,7 @@ function setup_env() {
     export https_proxy=${your_http_proxy}
     export BRIDGE_TOWER_EMBEDDING=true
     export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT/v1/encode"
+    export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
     export WHISPER_SERVER_PORT=7066
     export WHISPER_SERVER_ENDPOINT="http://${HOST_IP}:${WHISPER_SERVER_PORT}/v1/asr"

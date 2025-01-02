@@ -92,37 +92,9 @@
 		);
 
 		eventSource.addEventListener("message", (e: any) => {
-			let Msg = e.data;
-			if (Msg.startsWith("b")) {
-				let trimmedData = Msg.slice(2, -1);
+			let res = e.data;
 
-				if (/\\x[\dA-Fa-f]{2}/.test(trimmedData)) {
-					trimmedData = decodeEscapedBytes(trimmedData);
-				} else if (/\\u[\dA-Fa-f]{4}/.test(trimmedData)) {
-					trimmedData = decodeUnicode(trimmedData);
-				}
-
-				if (trimmedData !== "</s>") {
-				        trimmedData = trimmedData.replace(/\\n/g, "\n");
-				}
-				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-
-					chatMessages = [
-						...chatMessages,
-						{
-							role: MessageRole.Assistant,
-							type: MessageType.Text,
-							content: trimmedData,
-							time: getCurrentTimeStamp(),
-						},
-					];
-					console.log("? chatMessages", chatMessages);
-				} else {
-					let content = chatMessages[chatMessages.length - 1].content as string;
-					chatMessages[chatMessages.length - 1].content = content + trimmedData;
-				}
-				scrollToBottom(scrollToDiv);
-			} else if (Msg === "[DONE]") {
+			if (res === "[DONE]") {
 				let startTime = chatMessages[chatMessages.length - 1].time;
 
 				loading = false;
@@ -133,6 +105,27 @@
 					chatMessages[chatMessages.length - 1].time = totalTime;
 				}
 				storeMessages();
+			} else {
+				let Msg = JSON.parse(res).choices[0].text;
+				if (Msg !== "</s>") {
+					if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
+						chatMessages = [
+							...chatMessages,
+							{
+								role: MessageRole.Assistant,
+								type: MessageType.Text,
+								content: Msg,
+								time: getCurrentTimeStamp(),
+							},
+						];
+						console.log("? chatMessages", chatMessages);
+					} else {
+						let content = chatMessages[chatMessages.length - 1]
+							.content as string;
+						chatMessages[chatMessages.length - 1].content = content + Msg;
+					}
+					scrollToBottom(scrollToDiv);
+				}
 			}
 		});
 		eventSource.stream();

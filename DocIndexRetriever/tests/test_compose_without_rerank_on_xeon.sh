@@ -42,6 +42,8 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export EMBEDDING_SERVICE_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
+    export host_ip=${ip_address}
+    export LOGFLAG=true
 
     # Start Docker Containers
     docker compose -f compose_without_rerank.yaml up -d

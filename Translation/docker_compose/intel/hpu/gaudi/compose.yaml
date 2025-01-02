@@ -20,6 +20,11 @@ services:
       LIMIT_HPU_GRAPH: true
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
+    healthcheck:
+      test: ["CMD-SHELL", "sleep 500 && exit 0"]
+      interval: 1s
+      timeout: 505s
+      retries: 1
     runtime: habana
     cap_add:
       - SYS_NICE
@@ -31,7 +36,8 @@ services:
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
     container_name: llm-tgi-gaudi-server
     depends_on:
-      - tgi-service
+      tgi-service:
+        condition: service_healthy
     ports:
       - "9000:9000"
     ipc: host
@@ -39,7 +45,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0

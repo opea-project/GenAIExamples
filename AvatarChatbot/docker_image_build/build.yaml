@@ -32,7 +32,7 @@ services:
   llm-tgi:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: avatarchatbot
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
   speecht5-gaudi:

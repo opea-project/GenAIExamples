@@ -47,16 +47,16 @@
 
   const languagesTag = {
     // 'TypeScript': typescript,
-    'Python': python,
-    'C': c,
-    'C++': cpp,
+    Python: python,
+    C: c,
+    "C++": cpp,
     // 'C#': csharp,
-    'Go': go,
-    'Java': java,
-    'JavaScript': javascript,
+    Go: go,
+    Java: java,
+    JavaScript: javascript,
     // 'Swift': swift,
     // 'Ruby': ruby,
-    'Rust': rust,
+    Rust: rust,
     // 'PHP': php,
     // 'Kotlin': kotlin,
     // 'Objective-C': objectivec,
@@ -103,21 +103,20 @@
     const eventSource = await fetchTextStream(input, langFrom, langTo);
 
     eventSource.addEventListener("message", (e: any) => {
-      let Msg = e.data;
-      console.log('Msg', Msg);
+      let res = e.data;
 
-      if (Msg.startsWith("b")) {
-        const trimmedData = Msg.slice(2, -1);
-        if (trimmedData.includes("'''")) {
-          deleteFlag = true;
-        } else if (deleteFlag && trimmedData.includes("\\n")) {
-          deleteFlag = false;
-        } else if (trimmedData !== "</s>" && !deleteFlag) {
-          output += trimmedData.replace(/\\n/g, "\n");
-        }
-      } else if (Msg === "[DONE]") {
+      if (res === "[DONE]") {
         deleteFlag = false;
         loading = false;
+      } else {
+        let Msg = JSON.parse(res).choices[0].text;
+        if (Msg.includes("'''")) {
+          deleteFlag = true;
+        } else if (deleteFlag && Msg.includes("\\n")) {
+          deleteFlag = false;
+        } else if (Msg !== "</s>" && !deleteFlag) {
+          output += Msg.replace(/\\n/g, "\n");
+        }
       }
     });
     eventSource.stream();
@@ -202,7 +201,9 @@
           data-testid="code-output"
         >
           {#if output !== ""}
-            <div class="bg-[#282c34] p-2 px-6 text-white flex justify-end border-2 border-none border-b-gray-800">
+            <div
+              class="bg-[#282c34] p-2 px-6 text-white flex justify-end border-2 border-none border-b-gray-800"
+            >
               <button
                 class="border px-3 py-1 rounded border-none"
                 on:click={() => {
