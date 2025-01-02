@@ -62,12 +62,12 @@ services:
   whisper:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/dependency/Dockerfile
+      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
   asr:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/Dockerfile
+      dockerfile: comps/asr/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/asr:${TAG:-latest}
