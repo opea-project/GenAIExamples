@@ -71,7 +71,7 @@ export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:6060"
 ### 2.2 Build Docker Image
 
 ```bash
-cd comps/retrievers/pgvector/langchain
+cd ../../../../
 docker build -t opea/retriever-pgvector:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/pgvector/langchain/Dockerfile .
 ```
 

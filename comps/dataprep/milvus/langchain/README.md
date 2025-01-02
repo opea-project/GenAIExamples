@@ -24,29 +24,23 @@ export https_proxy=${your_http_proxy}
 export MILVUS_HOST=${your_milvus_host_ip}
 export MILVUS_PORT=19530
 export COLLECTION_NAME=${your_collection_name}
-export MOSEC_EMBEDDING_ENDPOINT=${your_embedding_endpoint}
+export TEI_EMBEDDING_ENDPOINT=${your_embedding_endpoint}
 ```
 
-### 1.4 Start Mosec Embedding Service
+### 1.4 Start TEI Embedding Service
 
-First, you need to build a mosec embedding serving docker image.
-
-```bash
-cd ../../..
-docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -t opea/embedding-mosec-endpoint:latest -f comps/embeddings/mosec/langchain/dependency/Dockerfile .
-```
-
-Then start the mosec embedding server.
+First, start the TEI embedding server.
 
 ```bash
 your_port=6010
-docker run -d --name="embedding-mosec-endpoint" -p $your_port:8000  opea/embedding-mosec-endpoint:latest
+model="BAAI/bge-base-en-v1.5"
+docker run -p $your_port:80 -v ./data:/data --name tei_server -e http_proxy=$http_proxy -e https_proxy=$https_proxy --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $model
 ```
 
 Setup environment variables:
 
 ```bash
-export MOSEC_EMBEDDING_ENDPOINT="http://localhost:$your_port"
+export TEI_EMBEDDING_ENDPOINT="http://localhost:$your_port"
 export MILVUS_HOST=${your_host_ip}
 ```
 
@@ -68,8 +62,6 @@ Please refer to this [readme](../../../vectorstores/milvus/README.md).
 
 ```bash
 cd ../../..
-# build mosec embedding docker image
-docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -t opea/embedding-langchain-mosec-endpoint:latest -f comps/embeddings/mosec/langchain/dependency/Dockerfile .
 # build dataprep milvus docker image
 docker build -t opea/dataprep-milvus:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg no_proxy=$no_proxy -f comps/dataprep/milvus/langchain/Dockerfile .
 ```
@@ -77,14 +69,14 @@ docker build -t opea/dataprep-milvus:latest --build-arg https_proxy=$https_proxy
 ### 2.3 Setup Environment Variables
 
 ```bash
-export MOSEC_EMBEDDING_ENDPOINT="http://localhost:$your_port"
+export TEI_EMBEDDING_ENDPOINT="http://localhost:$your_port"
 export MILVUS_HOST=${your_host_ip}
 ```
 
 ### 2.3 Run Docker with CLI (Option A)
 
 ```bash
-docker run -d --name="dataprep-milvus-server" -p 6010:6010 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MOSEC_EMBEDDING_ENDPOINT=${MOSEC_EMBEDDING_ENDPOINT} -e MILVUS_HOST=${MILVUS_HOST} opea/dataprep-milvus:latest
+docker run -d --name="dataprep-milvus-server" -p 6010:6010 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e TEI_EMBEDDING_ENDPOINT=${TEI_EMBEDDING_ENDPOINT} -e MILVUS_HOST=${MILVUS_HOST} opea/dataprep-milvus:latest
 ```
 
 ### 2.4 Run with Docker Compose (Option B)
@@ -241,7 +233,7 @@ curl -X POST \
 
 ## 🚀4. Troubleshooting
 
-1. If you get errors from Mosec Embedding Endpoint like `cannot find this task, maybe it has expired` while uploading files, try to reduce the `chunk_size` in the curl command like below (the default chunk_size=1500).
+1. If you get errors from TEI Embedding Endpoint like `cannot find this task, maybe it has expired` while uploading files, try to reduce the `chunk_size` in the curl command like below (the default chunk_size=1500).
 
    ```bash
    curl -X POST \

@@ -23,9 +23,8 @@ function build_docker_images() {
 function start_service() {
     docker run -d --name="test-comps-dataprep-redis-llama-index" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 6381:6379 -p 8003:8001 --ipc=host redis/redis-stack:7.2.0-v9
     dataprep_service_port=5012
-    dataprep_file_service_port=5017
     REDIS_URL="redis://${ip_address}:6381"
-    docker run -d --name="test-comps-dataprep-redis-llama-index-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -p ${dataprep_service_port}:6007 -p ${dataprep_file_service_port}:6008 --ipc=host opea/dataprep-redis-llama-index:comps
+    docker run -d --name="test-comps-dataprep-redis-llama-index-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -p ${dataprep_service_port}:6007 -e LOGFLAG=true --ipc=host opea/dataprep-redis-llama-index:comps
     sleep 2m
 }
 
@@ -56,8 +55,7 @@ function validate_microservice() {
     rm -rf $LOG_PATH/dataprep_file.txt
 
     # test /v1/dataprep/get_file
-    dataprep_file_service_port=5017
-    URL="http://${ip_address}:$dataprep_file_service_port/v1/dataprep/get_file"
+    URL="http://${ip_address}:$dataprep_service_port/v1/dataprep/get_file"
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ dataprep - file ] HTTP status is 200. Checking content..."

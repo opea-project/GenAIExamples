@@ -1,0 +1,40 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  tei_reranking_service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.2
+    container_name: tei-reranking-server
+    ports:
+      - "8808:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8808/health"]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+    command: --model-id ${RERANK_MODEL_ID} --hf-api-token ${HF_TOKEN}
+  reranking:
+    image: opea/reranking:latest
+    container_name: reranking-tei-server
+    ports:
+      - "8000:8000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
+      HF_TOKEN: ${HF_TOKEN}
+    depends_on:
+      tei_reranking_service:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

@@ -10,7 +10,7 @@ We currently have two types of SQL agents:
 The architecture of `sql_agent_llama` is shown in the figure below.
 The agent node takes user question, hints (optional) and history (when available), and thinks step by step to solve the problem.
 
-![SQL Agent Llama Architecture](../../../assets/sql_agent_llama.png)
+![SQL Agent Llama Architecture](../../../sql_agent_llama.png)
 
 ### Database schema:
 
@@ -33,7 +33,7 @@ Due to the current limitations of open source LLMs and serving frameworks (tgi a
 The architecture of `sql_agent` is shown in the figure below.
 The agent node takes user question, hints (optional) and history (when available), and thinks step by step to solve the problem. The basic idea is the same as `sql_agent_llama`. However, since OpenAI APIs produce well-structured tool call objects, we don't need a special output parser. Instead, we only keep the query fixer.
 
-![SQL Agent Architecture](../../../assets/sql_agent.png)
+![SQL Agent Architecture](../../../sql_agent.png)
 
 ## Limitations
 

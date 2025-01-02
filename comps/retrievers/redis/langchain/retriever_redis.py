@@ -30,7 +30,7 @@ from comps.cores.proto.api_protocol import (
     RetrievalResponse,
     RetrievalResponseData,
 )
-from comps.embeddings.multimodal.bridgetower import BridgeTowerEmbedding
+from comps.embeddings.src.integrations.dependency.bridgetower import BridgeTowerEmbedding
 
 logger = CustomLogger("retriever_redis")
 logflag = os.getenv("LOGFLAG", False)

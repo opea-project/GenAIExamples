@@ -21,13 +21,13 @@ export https_proxy=${your_http_proxy}
 export MILVUS_HOST=${your_milvus_host_ip}
 export MILVUS_PORT=19530
 export COLLECTION_NAME=${your_collection_name}
-export MOSEC_EMBEDDING_ENDPOINT=${your_emdding_endpoint}
+export TEI_EMBEDDING_ENDPOINT=${your_emdding_endpoint}
 ```
 
 ### Start Retriever Service
 
 ```bash
-export MOSEC_EMBEDDING_ENDPOINT="http://${your_ip}:6060"
+export TEI_EMBEDDING_ENDPOINT="http://${your_ip}:6060"
 python retriever_redis.py
 ```
 
@@ -43,7 +43,7 @@ docker build -t opea/retriever-milvus:latest --build-arg https_proxy=$https_prox
 ### Run Docker with CLI
 
 ```bash
-docker run -d --name="retriever-milvus-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e MOSEC_EMBEDDING_ENDPOINT=${your_emdding_endpoint} -e MILVUS_HOST=${your_milvus_host_ip}  opea/retriever-milvus:latest
+docker run -d --name="retriever-milvus-server" -p 7000:7000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_EMBEDDING_ENDPOINT=${your_emdding_endpoint} -e MILVUS_HOST=${your_milvus_host_ip}  opea/retriever-milvus:latest
 ```
 
 ## 🚀3. Consume Retriever Service

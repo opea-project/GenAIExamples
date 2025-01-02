@@ -1,8 +1,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import asyncio
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 from comps import OpeaComponent, OpeaComponentController
 
@@ -12,7 +13,7 @@ class TestOpeaComponent(unittest.TestCase):
         def check_health(self) -> bool:
             return True
 
-        def invoke(self, *args, **kwargs):
+        async def invoke(self, *args, **kwargs):
             return "Service accessed"
 
     def test_initialization(self):
@@ -79,7 +80,7 @@ class TestOpeaComponentController(unittest.TestCase):
     def test_invoke_no_active_component(self):
         controller = OpeaComponentController()
         with self.assertRaises(RuntimeError):
-            controller.invoke("arg1", key="value")
+            asyncio.run(controller.invoke("arg1", key="value"))
 
     def test_invoke_with_active_component(self):
         controller = OpeaComponentController()
@@ -88,14 +89,14 @@ class TestOpeaComponentController(unittest.TestCase):
         component = MagicMock()
         component.name = "TestComponent"
         component.check_health.return_value = True
-        component.invoke = MagicMock(return_value="Service accessed")
+        component.invoke = AsyncMock(return_value="Service accessed")
 
         # Register and activate the component
         controller.register(component)
         controller.discover_and_activate()
 
         # Invoke using the active component
-        result = controller.invoke("arg1", key="value")
+        result = asyncio.run(controller.invoke("arg1", key="value"))
 
         # Assert the result and method call
         self.assertEqual(result, "Service accessed")
@@ -109,7 +110,7 @@ class TestOpeaComponentController(unittest.TestCase):
         component1 = MagicMock()
         component1.name = "Component1"
         component1.check_health.return_value = True
-        component1.invoke = MagicMock(return_value="Result from Component1")
+        component1.invoke = AsyncMock(return_value="Result from Component1")
 
         # Register the component
         controller.register(component1)
@@ -121,7 +122,7 @@ class TestOpeaComponentController(unittest.TestCase):
         self.assertEqual(controller.active_component, component1)
 
         # Call invoke separately
-        result = controller.invoke("test_input")
+        result = asyncio.run(controller.invoke("test_input"))
         self.assertEqual(result, "Result from Component1")
         component1.invoke.assert_called_once_with("test_input")
 

@@ -43,7 +43,7 @@ from openai import Client
 from transformers import AutoTokenizer
 
 from comps import CustomLogger, DocPath, opea_microservices, register_microservice
-from comps.dataprep.utils import (
+from comps.dataprep.src.utils import (
     document_loader,
     encode_filename,
     get_separators,

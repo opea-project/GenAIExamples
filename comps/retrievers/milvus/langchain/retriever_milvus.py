@@ -10,9 +10,8 @@ from config import (
     LOCAL_EMBEDDING_MODEL,
     MILVUS_HOST,
     MILVUS_PORT,
-    MOSEC_EMBEDDING_ENDPOINT,
-    MOSEC_EMBEDDING_MODEL,
     TEI_EMBEDDING_ENDPOINT,
+    TEI_EMBEDDING_MODEL,
 )
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings, OpenAIEmbeddings
 from langchain_milvus.vectorstores import Milvus
@@ -31,31 +30,6 @@ from comps import (
 
 logger = CustomLogger("retriever_milvus")
 logflag = os.getenv("LOGFLAG", False)
-
-
-class MosecEmbeddings(OpenAIEmbeddings):
-    def _get_len_safe_embeddings(
-        self, texts: List[str], *, engine: str, chunk_size: Optional[int] = None
-    ) -> List[List[float]]:
-        _chunk_size = chunk_size or self.chunk_size
-        batched_embeddings: List[List[float]] = []
-        response = self.client.create(input=texts, **self._invocation_params)
-        if not isinstance(response, dict):
-            response = response.model_dump()
-        batched_embeddings.extend(r["embedding"] for r in response["data"])
-
-        _cached_empty_embedding: Optional[List[float]] = None
-
-        def empty_embedding() -> List[float]:
-            nonlocal _cached_empty_embedding
-            if _cached_empty_embedding is None:
-                average_embedded = self.client.create(input="", **self._invocation_params)
-                if not isinstance(average_embedded, dict):
-                    average_embedded = average_embedded.model_dump()
-                _cached_empty_embedding = average_embedded["data"][0]["embedding"]
-            return _cached_empty_embedding
-
-        return [e if e is not None else empty_embedding() for e in batched_embeddings]
 
 
 @register_microservice(
@@ -104,12 +78,7 @@ async def retrieve(input: EmbedDoc) -> SearchedDoc:
 
 if __name__ == "__main__":
     # Create vectorstore
-    if MOSEC_EMBEDDING_ENDPOINT:
-        # create embeddings using Mosec endpoint service
-        if logflag:
-            logger.info(f"[ retriever_milvus ] MOSEC_EMBEDDING_ENDPOINT:{MOSEC_EMBEDDING_ENDPOINT}")
-        embeddings = MosecEmbeddings(model=MOSEC_EMBEDDING_MODEL)
-    elif TEI_EMBEDDING_ENDPOINT:
+    if TEI_EMBEDDING_ENDPOINT:
         # create embeddings using TEI endpoint service
         if logflag:
             logger.info(f"[ retriever_milvus ] TEI_EMBEDDING_ENDPOINT:{TEI_EMBEDDING_ENDPOINT}")

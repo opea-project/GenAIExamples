@@ -24,7 +24,7 @@ function start_service() {
     export PINECONE_INDEX_NAME="test-index"
     export HUGGINGFACEHUB_API_TOKEN=$HF_TOKEN
 
-    docker run -d --name="test-comps-dataprep-pinecone" -p 5039:6007 -p 5040:6008 -p 5041:6009 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e PINECONE_API_KEY=$PINECONE_API_KEY -e PINECONE_INDEX_NAME=$PINECONE_INDEX_NAME opea/dataprep-pinecone:comps
+    docker run -d --name="test-comps-dataprep-pinecone" -p 5039:6007 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e PINECONE_API_KEY=$PINECONE_API_KEY -e PINECONE_INDEX_NAME=$PINECONE_INDEX_NAME -e LOGFLAG=true opea/dataprep-pinecone:comps
 
     sleep 1m
 }
@@ -41,7 +41,7 @@ function validate_microservice() {
         docker logs test-comps-dataprep-pinecone
         exit 1
     fi
-    DELETE_URL="http://$ip_address:5041/v1/dataprep/delete_file"
+    DELETE_URL="http://$ip_address:5039/v1/dataprep/delete_file"
     result=$(curl --noproxy $ip_address --location --request POST \
       -d '{"file_path": "all"}' -H 'Content-Type: application/json' $DELETE_URL)
     if [[ $result == *"true"* ]]; then

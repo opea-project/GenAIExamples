@@ -206,4 +206,4 @@ data: [DONE]
 ## 5. Customize agent strategy
 
 For advanced developers who want to implement their own agent strategies, you can add a separate folder in `src\strategy`, implement your agent by inherit the `BaseAgent` class, and add your strategy into the `src\agent.py`. The architecture of this agent microservice is shown in the diagram below as a reference.
-![Architecture Overview](assets/agent_arch.jpg)
+![Architecture Overview](agent_arch.jpg)

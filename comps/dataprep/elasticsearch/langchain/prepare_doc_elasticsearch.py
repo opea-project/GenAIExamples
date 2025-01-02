@@ -25,7 +25,7 @@ from langchain_elasticsearch import ElasticsearchStore
 from langchain_huggingface.embeddings import HuggingFaceEndpointEmbeddings
 
 from comps import CustomLogger, DocPath, opea_microservices, register_microservice
-from comps.dataprep.utils import (
+from comps.dataprep.src.utils import (
     create_upload_folder,
     document_loader,
     encode_filename,

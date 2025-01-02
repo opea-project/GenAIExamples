@@ -3,5 +3,5 @@
 services:
   ragas:
     build:
-      dockerfile: comps/ragas/tgi/langchain/Dockerfile
+      dockerfile: comps/ragas/src/tgi/langchain/Dockerfile
     image: ${REGISTRY:-opea}/ragas:${TAG:-latest}

@@ -3,6 +3,10 @@
 
 # this file should be run in the root of the repo
 services:
+  retriever:
+    build:
+      dockerfile: comps/retrievers/src/Dockerfile
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
   retriever-redis:
     build:
       dockerfile: comps/retrievers/redis/langchain/Dockerfile

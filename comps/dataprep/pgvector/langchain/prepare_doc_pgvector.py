@@ -15,7 +15,7 @@ from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFace
 from langchain_community.vectorstores import PGVector
 
 from comps import CustomLogger, DocPath, opea_microservices, register_microservice
-from comps.dataprep.utils import (
+from comps.dataprep.src.utils import (
     create_upload_folder,
     document_loader,
     encode_filename,

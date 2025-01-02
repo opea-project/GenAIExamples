@@ -127,8 +127,6 @@ In order to start the microservices with docker, you need to build the docker im
 
 ### 2.1 Build Docker Image
 
-#### 2.1.1 TGI
-
 ```bash
 # Build the microservice docker
 cd ${OPEA_GENAICOMPS_ROOT}
@@ -136,24 +134,8 @@ cd ${OPEA_GENAICOMPS_ROOT}
 docker build \
   --build-arg https_proxy=$https_proxy \
   --build-arg http_proxy=$http_proxy \
-  -t opea/llm-tgi:latest \
-  -f comps/llms/text-generation/tgi/Dockerfile .
-```
-
-#### 2.1.2 vLLM
-
-```bash
-# Build vllm docker
-bash ${OPEA_GENAICOMPS_ROOT}/comps/llms/text-generation/vllm/langchain/dependency/build_docker_vllm.sh hpu
-
-# Build the microservice docker
-cd ${OPEA_GENAICOMPS_ROOT}
-
-docker build \
-  --build-arg https_proxy=$https_proxy \
-  --build-arg http_proxy=$http_proxy \
-  -t opea/llm-vllm:latest \
-  -f comps/llms/text-generation/vllm/langchain/Dockerfile .
+  -t opea/llm:latest \
+  -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 2.2 Start LLM Service with the built image

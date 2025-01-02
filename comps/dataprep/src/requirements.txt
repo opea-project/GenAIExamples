@@ -1,0 +1,33 @@
+beautifulsoup4
+cairosvg
+docarray[full]
+docx2txt
+easyocr
+fastapi
+html2text
+huggingface_hub
+langchain --extra-index-url https://download.pytorch.org/whl/cpu
+langchain-community --extra-index-url https://download.pytorch.org/whl/cpu
+langchain-text-splitters --extra-index-url https://download.pytorch.org/whl/cpu
+langchain_huggingface --extra-index-url https://download.pytorch.org/whl/cpu
+langchain_milvus --extra-index-url https://download.pytorch.org/whl/cpu
+markdown
+numpy
+openai
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+pandas
+Pillow
+prometheus-fastapi-instrumentator
+pymupdf
+pyspark
+pytesseract
+python-bidi
+python-docx
+python-pptx
+redis
+sentence_transformers
+shortuuid
+unstructured[all-docs]
+uvicorn

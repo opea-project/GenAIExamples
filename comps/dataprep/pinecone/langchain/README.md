@@ -41,7 +41,7 @@ docker build -t opea/dataprep-pinecone:latest --build-arg https_proxy=$https_pro
 ### Run Docker with CLI
 
 ```bash
-docker run -d --name="dataprep-pinecone-server" -p 6000:6000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/dataprep-pinecone:latest
+docker run -d --name="dataprep-pinecone-server" -p 6007:6007 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/dataprep-pinecone:latest
 ```
 
 ### Setup Environment Variables
@@ -65,5 +65,5 @@ docker compose -f docker-compose-dataprep-pinecone.yaml up -d
 Once document preparation microservice for Pinecone is started, user can use below command to invoke the microservice to convert the document to embedding and save to the database.
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"path":"/path/to/document"}' http://localhost:6000/v1/dataprep
+curl -X POST -H "Content-Type: application/json" -d '{"path":"/path/to/document"}' http://localhost:6007/v1/dataprep
 ```

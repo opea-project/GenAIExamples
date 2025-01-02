@@ -1,0 +1,48 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  tgi_service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-service
+    ports:
+      - "8008:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+  llm:
+    image: opea/llm:latest
+    container_name: llm-server
+    ports:
+      - "9000:9000"
+    ipc: host
+    depends_on:
+      tgi_service:
+        condition: service_healthy
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      HF_TOKEN: ${HF_TOKEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

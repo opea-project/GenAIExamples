@@ -41,7 +41,7 @@ from ray.data.datasource import FileBasedDatasource
 from tqdm import tqdm
 
 from comps import CustomLogger, DocPath, opea_microservices, register_microservice
-from comps.dataprep.utils import (
+from comps.dataprep.src.utils import (
     Timer,
     create_upload_folder,
     document_loader,
@@ -340,7 +340,7 @@ async def ingest_documents(files: List[UploadFile] = File(None), link_list: str 
 
 
 @register_microservice(
-    name="opea_service@prepare_doc_redis_file", endpoint="/v1/dataprep/get_file", host="0.0.0.0", port=6008
+    name="opea_service@prepare_doc_redis", endpoint="/v1/dataprep/get_file", host="0.0.0.0", port=6007
 )
 async def rag_get_file_structure():
     if logflag:
@@ -358,7 +358,7 @@ async def rag_get_file_structure():
 
 
 @register_microservice(
-    name="opea_service@prepare_doc_redis_del", endpoint="/v1/dataprep/delete_file", host="0.0.0.0", port=6009
+    name="opea_service@prepare_doc_redis", endpoint="/v1/dataprep/delete_file", host="0.0.0.0", port=6007
 )
 async def delete_single_file(file_path: str = Body(..., embed=True)):
     """Delete file according to `file_path`.
@@ -416,4 +416,3 @@ async def delete_single_file(file_path: str = Body(..., embed=True)):
 if __name__ == "__main__":
 
     opea_microservices["opea_service@prepare_doc_redis"].start()
-    opea_microservices["opea_service@prepare_doc_redis_file"].start()

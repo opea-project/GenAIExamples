@@ -3,6 +3,10 @@
 
 from abc import ABC, abstractmethod
 
+from ..mega.logger import CustomLogger
+
+logger = CustomLogger("OpeaComponent")
+
 
 class OpeaComponent(ABC):
     """The OpeaComponent class serves as the base class for all components in the GenAIComps.
@@ -58,10 +62,10 @@ class OpeaComponent(ABC):
         Returns:
             bool: True if the component is healthy, False otherwise.
         """
-        pass
+        raise NotImplementedError("The 'check_health' method must be implemented by subclasses.")
 
     @abstractmethod
-    def invoke(self, *args, **kwargs):
+    async def invoke(self, *args, **kwargs):
         """Invoke service accessing using the component.
 
         Args:
@@ -71,7 +75,7 @@ class OpeaComponent(ABC):
         Returns:
             Any: The result of the service accessing.
         """
-        pass
+        raise NotImplementedError("The 'invoke' method must be implemented by subclasses.")
 
     def __repr__(self):
         """Provides a string representation of the component for debugging and logging purposes.
@@ -107,6 +111,7 @@ class OpeaComponentController(ABC):
         """
         if component.name in self.components:
             raise ValueError(f"Component '{component.name}' is already registered.")
+        logger.info(f"Registered component: {component.name}")
         self.components[component.name] = component
 
     def discover_and_activate(self):
@@ -117,11 +122,11 @@ class OpeaComponentController(ABC):
         for component in self.components.values():
             if component.check_health():
                 self.active_component = component
-                print(f"Activated component: {component.name}")
+                logger.info(f"Activated component: {component.name}")
                 return
         raise RuntimeError("No healthy components available.")
 
-    def invoke(self, *args, **kwargs):
+    async def invoke(self, *args, **kwargs):
         """Invokes service accessing using the active component.
 
         Args:
@@ -136,7 +141,7 @@ class OpeaComponentController(ABC):
         """
         if not self.active_component:
             raise RuntimeError("No active component. Call 'discover_and_activate' first.")
-        return self.active_component.invoke(*args, **kwargs)
+        return await self.active_component.invoke(*args, **kwargs)
 
     def list_components(self):
         """Lists all registered components.

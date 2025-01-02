@@ -3,6 +3,10 @@
 
 # this file should be run in the root of the repo
 services:
+  dataprep:
+    build:
+      dockerfile: comps/dataprep/src/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
   dataprep-redis:
     build:
       dockerfile: comps/dataprep/redis/langchain/Dockerfile

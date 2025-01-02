@@ -5,7 +5,7 @@
 services:
   llm-tgi:
     build:
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
   llm-ollama:
     build:
@@ -21,7 +21,7 @@ services:
     image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
   llm-vllm:
     build:
-      dockerfile: comps/llms/text-generation/vllm/langchain/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
   llm-native:
     build:
@@ -50,10 +50,6 @@ services:
     build:
       dockerfile: comps/llms/utils/lm-eval/Dockerfile
     image: ${REGISTRY:-opea}/llm-eval:${TAG:-latest}
-  llm-vllm-llamaindex:
-    build:
-      dockerfile: comps/llms/text-generation/vllm/llama_index/Dockerfile
-    image: ${REGISTRY:-opea}/llm-vllm-llamaindex:${TAG:-latest}
   llm-textgen-predictionguard:
     build:
       dockerfile: comps/llms/text-generation/predictionguard/Dockerfile

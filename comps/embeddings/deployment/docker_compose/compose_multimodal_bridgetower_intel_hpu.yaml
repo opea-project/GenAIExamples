@@ -1,0 +1,47 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  embedding-multimodal-bridgetower:
+    image: opea/embedding-multimodal-bridgetower-hpu:latest
+    container_name: embedding-multimodal-bridgetower
+    ports:
+      - ${EMBEDDER_PORT}:${EMBEDDER_PORT}
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PORT: ${EMBEDDER_PORT}
+      HABANA_VISIBLE_DEVICES: all
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMBEDDER_PORT}/v1/health_check"]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+      start_period: 30s
+  embedding-multimodal:
+    image: opea/embedding:latest
+    container_name: embedding-multimodal-bridgetower-server
+    ports:
+      - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MULTIMODAL_EMBEDDING: true
+      MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+    restart: unless-stopped
+    depends_on:
+      embedding-multimodal-bridgetower:
+        condition: service_healthy
+
+networks:
+  default:
+    driver: bridge

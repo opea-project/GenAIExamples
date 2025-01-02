@@ -1,0 +1,14 @@
+aiohttp
+docarray[full]
+fastapi
+httpx==0.27.2
+huggingface_hub
+langchain_core
+openai==1.57.4
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-sdk
+prometheus-fastapi-instrumentator
+shortuuid
+transformers
+uvicorn

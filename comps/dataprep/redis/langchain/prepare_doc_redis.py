@@ -19,7 +19,7 @@ from redis.commands.search.field import TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 
 from comps import CustomLogger, DocPath, opea_microservices, register_microservice
-from comps.dataprep.utils import (
+from comps.dataprep.src.utils import (
     create_upload_folder,
     document_loader,
     encode_filename,

@@ -24,6 +24,6 @@ RUN python -m pip install --no-cache-dir --upgrade pip && \
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/finetuning
+WORKDIR /home/user/comps/finetuning/
 
 ENTRYPOINT ["/bin/bash", "launch.sh"]

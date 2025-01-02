@@ -57,7 +57,7 @@ For more information, see the relevant Pathway docs:
 Build the Docker and run the Pathway Vector Store:
 
 ```bash
-docker build --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t opea/vectorstore-pathway:latest -f comps/vectorstores/pathway/Dockerfile .
+docker build --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t opea/vectorstore-pathway:latest -f comps/vectorstores/src/pathway/Dockerfile .
 
 # with locally loaded model, you may add `EMBED_MODEL` env variable to configure the model.
 docker run -e PATHWAY_HOST=${PATHWAY_HOST} -e PATHWAY_PORT=${PATHWAY_PORT} -e http_proxy=$http_proxy -e https_proxy=$https_proxy -v ./data:/app/data -p ${PATHWAY_PORT}:${PATHWAY_PORT} opea/vectorstore-pathway:latest

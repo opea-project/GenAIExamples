@@ -29,7 +29,7 @@ function start_service() {
     export REDIS_URL="redis://${ip_address}:5038"
     export INDEX_NAME="rag-redis"
     echo "Starting dataprep-redis-server"
-    docker run -d --name="test-comps-dataprep-redis-ray-server" --runtime=runc -p 5037:6007 -p 6010:6008 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT -e TIMEOUT_SECONDS=600 opea/dataprep-on-ray-redis:comps
+    docker run -d --name="test-comps-dataprep-redis-ray-server" --runtime=runc -p 5037:6007 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e INDEX_NAME=$INDEX_NAME -e TEI_ENDPOINT=$TEI_ENDPOINT -e TIMEOUT_SECONDS=600 -e LOGFLAG=true opea/dataprep-on-ray-redis:comps
 
     sleep 10
     echo "Service started successfully"
@@ -40,6 +40,7 @@ function validate_microservice() {
 
     dataprep_service_port=5037
     export URL="http://${ip_address}:$dataprep_service_port/v1/dataprep"
+    export GET_URL="http://${ip_address}:$dataprep_service_port/v1/dataprep/get_file"
 
     echo "Starting validating the microservice"
     export PATH="${HOME}/miniforge3/bin:$PATH"
@@ -52,6 +53,7 @@ import json
 import os
 proxies = {'http':""}
 url = os.environ['URL']
+get_url = os.environ['GET_URL']
 
 print("test single file ingestion")
 file_list = ["dataprep_file.txt"]
@@ -70,8 +72,7 @@ resp.raise_for_status()  # Raise an exception for unsuccessful HTTP status codes
 print("Request successful!")
 
 print("test get file structure")
-url = 'http://localhost:6010/v1/dataprep/get_file'
-resp = requests.request('POST', url=url, headers={}, proxies=proxies)
+resp = requests.request('POST', url=get_url, headers={}, proxies=proxies)
 print(resp.text)
 assert "name" in resp.text, "Response does not meet expectation."
 print("Request successful!")
