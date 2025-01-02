@@ -19,11 +19,7 @@ docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy -
 
 ### 3. Build LLM Image
 
-```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
-```
-
-Intel Xeon optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/tgi-gaudi:2.0.6 (https://github.com/huggingface/tgi-gaudi)
+Intel Gaudi optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/tgi-gaudi:2.0.6 (https://github.com/huggingface/tgi-gaudi)
 
 ### 4. Build TTS Image
 
