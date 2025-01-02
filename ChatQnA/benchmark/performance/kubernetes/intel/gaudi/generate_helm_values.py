@@ -75,6 +75,19 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
         elif service_name in values:
             values[service_name]["replicaCount"] = replica["replicaCount"]
 
+    # Add extraCmdArgs for tgi service with default values
+    if "tgi" in values:
+        values["tgi"]["extraCmdArgs"] = [
+            "--max-input-length",
+            "1280",
+            "--max-total-tokens",
+            "2048",
+            "--max-batch-total-tokens",
+            "65536",
+            "--max-batch-prefill-tokens",
+            "4096",
+        ]
+
     # Prepare resource configurations based on tuning
     resources = []
     if tune:
@@ -108,19 +121,6 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
                 values["resources"] = resource["resources"]
             elif service_name in values:
                 values[service_name]["resources"] = resource["resources"]
-
-        # Add extraCmdArgs for tgi service with default values
-        if "tgi" in values:
-            values["tgi"]["extraCmdArgs"] = [
-                "--max-input-length",
-                "1280",
-                "--max-total-tokens",
-                "2048",
-                "--max-batch-total-tokens",
-                "65536",
-                "--max-batch-prefill-tokens",
-                "4096",
-            ]
 
     yaml_string = yaml.dump(values, default_flow_style=False)
 
