@@ -123,7 +123,7 @@ You will have the following Docker Images:
 
 1. `opea/docsum-ui:latest`
 2. `opea/docsum:latest`
-3. `opea/llm-docsum-tgi:latest`
+3. `opea/llm-docsum:latest`
 4. `opea/whisper:latest`
 
 ### Validate Microservices
