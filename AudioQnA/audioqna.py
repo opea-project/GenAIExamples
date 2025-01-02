@@ -1,7 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import asyncio
 import os
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
@@ -10,43 +9,68 @@ from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
-ASR_SERVICE_HOST_IP = os.getenv("ASR_SERVICE_HOST_IP", "0.0.0.0")
-ASR_SERVICE_PORT = int(os.getenv("ASR_SERVICE_PORT", 9099))
-LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
-LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
-TTS_SERVICE_HOST_IP = os.getenv("TTS_SERVICE_HOST_IP", "0.0.0.0")
-TTS_SERVICE_PORT = int(os.getenv("TTS_SERVICE_PORT", 9088))
+
+WHISPER_SERVER_HOST_IP = os.getenv("WHISPER_SERVER_HOST_IP", "0.0.0.0")
+WHISPER_SERVER_PORT = int(os.getenv("WHISPER_SERVER_PORT", 7066))
+SPEECHT5_SERVER_HOST_IP = os.getenv("SPEECHT5_SERVER_HOST_IP", "0.0.0.0")
+SPEECHT5_SERVER_PORT = int(os.getenv("SPEECHT5_SERVER_PORT", 7055))
+LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
+LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 3006))
+
+
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.LLM:
+        # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
+        next_inputs = {}
+        next_inputs["model"] = "tgi"  # specifically clarify the fake model to make the format unified
+        next_inputs["messages"] = [{"role": "user", "content": inputs["asr_result"]}]
+        next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
+        next_inputs["top_p"] = llm_parameters_dict["top_p"]
+        next_inputs["stream"] = inputs["streaming"]  # False as default
+        next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
+        # next_inputs["presence_penalty"] = inputs["presence_penalty"]
+        # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
+        next_inputs["temperature"] = inputs["temperature"]
+        inputs = next_inputs
+    elif self.services[cur_node].service_type == ServiceType.TTS:
+        next_inputs = {}
+        next_inputs["text"] = inputs["choices"][0]["message"]["content"]
+        next_inputs["voice"] = kwargs["voice"]
+        inputs = next_inputs
+    return inputs
 
 
 class AudioQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_inputs = align_inputs
         self.megaservice = ServiceOrchestrator()
+
         self.endpoint = str(MegaServiceEndpoint.AUDIO_QNA)
 
     def add_remote_service(self):
         asr = MicroService(
             name="asr",
-            host=ASR_SERVICE_HOST_IP,
-            port=ASR_SERVICE_PORT,
-            endpoint="/v1/audio/transcriptions",
+            host=WHISPER_SERVER_HOST_IP,
+            port=WHISPER_SERVER_PORT,
+            endpoint="/v1/asr",
             use_remote_service=True,
             service_type=ServiceType.ASR,
         )
         llm = MicroService(
             name="llm",
-            host=LLM_SERVICE_HOST_IP,
-            port=LLM_SERVICE_PORT,
+            host=LLM_SERVER_HOST_IP,
+            port=LLM_SERVER_PORT,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )
         tts = MicroService(
             name="tts",
-            host=TTS_SERVICE_HOST_IP,
-            port=TTS_SERVICE_PORT,
-            endpoint="/v1/audio/speech",
+            host=SPEECHT5_SERVER_HOST_IP,
+            port=SPEECHT5_SERVER_PORT,
+            endpoint="/v1/tts",
             use_remote_service=True,
             service_type=ServiceType.TTS,
         )
@@ -70,11 +94,13 @@ class AudioQnAService:
             streaming=False,  # TODO add streaming LLM output as input to TTS
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs={"byte_str": chat_request.audio}, llm_parameters=parameters
+            initial_inputs={"audio": chat_request.audio},
+            llm_parameters=parameters,
+            voice=chat_request.voice if hasattr(chat_request, "voice") else "default",
         )
 
         last_node = runtime_graph.all_leaves()[-1]
-        response = result_dict[last_node]["byte_str"]
+        response = result_dict[last_node]["tts_result"]
 
         return response
 
