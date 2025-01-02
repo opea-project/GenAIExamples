@@ -5,7 +5,7 @@ name: Compose file and dockerfile path checking
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, genaicomps_refactor]
     types: [opened, reopened, ready_for_review, synchronize]
 
 jobs:
