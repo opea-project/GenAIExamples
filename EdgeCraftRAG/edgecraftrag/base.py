@@ -44,6 +44,7 @@ class NodeParserType(str, Enum):
     SIMPLE = "simple"
     HIERARCHY = "hierarchical"
     SENTENCEWINDOW = "sentencewindow"
+    UNSTRUCTURED = "unstructured"
 
 
 class IndexerType(str, Enum):
@@ -81,6 +82,7 @@ class InferenceType(str, Enum):
 class CallbackType(str, Enum):
 
     DATAPREP = "dataprep"
+    DATAUPDATE = "dataupdate"
     RETRIEVE = "retrieve"
     PIPELINE = "pipeline"
 
