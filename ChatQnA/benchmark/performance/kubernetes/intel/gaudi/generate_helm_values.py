@@ -40,13 +40,13 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
         values["image"] = {"repository": "opea/chatqna-without-rerank"}
 
     default_replicas = [
-        {"name": "chatqna", "replicaCount": 1},
+        {"name": "chatqna", "replicaCount": 2},
         {"name": "tei", "replicaCount": 1},
         {"name": "teirerank", "replicaCount": 1} if with_rerank else None,
         {"name": "tgi", "replicaCount": 7 if with_rerank else 8},
         {"name": "data-prep", "replicaCount": 1},
         {"name": "redis-vector-db", "replicaCount": 1},
-        {"name": "retriever-usvc", "replicaCount": 1},
+        {"name": "retriever-usvc", "replicaCount": 2},
     ]
 
     if num_nodes > 1:
