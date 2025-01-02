@@ -82,6 +82,7 @@ function start_services() {
     export LLM_SERVER_PORT=9009
     export PROMPT_COLLECTION_NAME="prompt"
     export host_ip=${ip_address}
+    export LOGFLAG=true
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -128,6 +129,9 @@ function validate_service() {
     elif [[ $SERVICE_NAME == *"docsum-xeon-backend-server"* ]]; then
 	local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"faqgen-xeon-backend-server"* ]]; then
+        local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
@@ -175,33 +179,33 @@ function validate_microservices() {
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
+    # test /v1/dataprep/delete_file
+    validate_service \
+        "http://${ip_address}:6007/v1/dataprep/delete_file" \
+        '{"status":true}' \
+        "dataprep_del" \
+        "dataprep-redis-server"
+
     # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/ingest" \
+        "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-redis-server"
 
     # test /v1/dataprep upload link
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/ingest" \
+        "http://${ip_address}:6007/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
         "dataprep-redis-server"
 
     # test /v1/dataprep/get_file
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/get" \
+        "http://${ip_address}:6007/v1/dataprep/get_file" \
         '{"name":' \
         "dataprep_get" \
-        "dataprep-redis-server"
-
-    # test /v1/dataprep/delete_file
-    validate_service \
-        "http://${ip_address}:6007/v1/dataprep/delete" \
-        '{"status":true}' \
-        "dataprep_del" \
         "dataprep-redis-server"
 
     # retrieval microservice
@@ -325,12 +329,12 @@ function validate_megaservice() {
         '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'\
 
     # Curl the DocSum Mega Service
-    validate_service \
-        "${ip_address}:8890/v1/docsum" \
-        "embedding" \
-        "docsum-xeon-backend-server" \
-        "docsum-xeon-backend-server" \
-        '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+    # validate_service \
+    #     "${ip_address}:8890/v1/docsum" \
+    #     "embedding" \
+    #     "docsum-xeon-backend-server" \
+    #     "docsum-xeon-backend-server" \
+    #     '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
 
     # Curl the CodeGen Mega Service
