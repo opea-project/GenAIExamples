@@ -23,12 +23,12 @@ function validate_services() {
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
             echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}_${DOCKER_NAME}.log
             exit 1
         fi
     else
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}_${DOCKER_NAME}.log
         exit 1
     fi
     sleep 1s

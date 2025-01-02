@@ -61,3 +61,9 @@ class DataIn(BaseModel):
 
 class FilesIn(BaseModel):
     local_paths: Optional[list[str]] = None
+
+
+class RagOut(BaseModel):
+    query: str
+    contexts: Optional[list[str]] = None
+    response: str

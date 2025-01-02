@@ -65,7 +65,7 @@ async def delete_file(name):
         # TODO: delete the nodes related to the file
         all_docs = ctx.get_file_mgr().get_all_docs()
 
-        nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=all_docs)
+        nodelist = ctx.get_pipeline_mgr().run_data_update(docs=all_docs)
         if nodelist is None:
             return "Error"
         pl = ctx.get_pipeline_mgr().get_active_pipeline()
@@ -91,7 +91,7 @@ async def update_file(name, request: DataIn):
         # 3. Re-run the pipeline
         # TODO: update the nodes related to the file
         all_docs = ctx.get_file_mgr().get_all_docs()
-        nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=all_docs)
+        nodelist = ctx.get_pipeline_mgr().run_data_update(docs=all_docs)
         if nodelist is None:
             return "Error"
         pl = ctx.get_pipeline_mgr().get_active_pipeline()

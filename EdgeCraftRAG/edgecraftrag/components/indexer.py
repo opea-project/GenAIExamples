@@ -24,6 +24,9 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
             from llama_index.core import Settings
 
             Settings.embed_model = None
+        self._initialize_indexer(embed_model, vector_type)
+
+    def _initialize_indexer(self, embed_model, vector_type):
         match vector_type:
             case IndexerType.DEFAULT_VECTOR:
                 VectorStoreIndex.__init__(self, embed_model=embed_model, nodes=[])
@@ -35,6 +38,10 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
                 faiss_index = faiss.IndexFlatL2(d)
                 faiss_store = StorageContext.from_defaults(vector_store=FaissVectorStore(faiss_index=faiss_index))
                 VectorStoreIndex.__init__(self, embed_model=embed_model, nodes=[], storage_context=faiss_store)
+
+    def reinitialize_indexer(self):
+        if self.comp_subtype == IndexerType.FAISS_VECTOR:
+            self._initialize_indexer(self.model, IndexerType.FAISS_VECTOR)
 
     def run(self, **kwargs) -> Any:
         pass
