@@ -60,9 +60,11 @@ jobs:
             base_commit=$(git rev-parse HEAD~1) # push event
           fi
           merged_commit=$(git log -1 --format='%H')
+          echo "print all changed files..."
+          git diff --name-only ${base_commit} ${merged_commit}
           changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
           grep -vE '${{ inputs.diff_excluded_files }}')" || true
-          echo "changed_files=$changed_files"
+          echo "filtered changed_files=$changed_files"
           export changed_files=$changed_files
           export test_mode=${{ inputs.test_mode }}
           export WORKSPACE=${{ github.workspace }}
