@@ -9,7 +9,6 @@ import shutil
 import subprocess
 import sys
 
-import yaml
 from generate_helm_values import generate_helm_values
 
 
