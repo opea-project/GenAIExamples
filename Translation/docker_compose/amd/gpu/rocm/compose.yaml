@@ -35,8 +35,8 @@ services:
     ipc: host
     command: --model-id ${TRANSLATION_LLM_MODEL_ID}
   translation-llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: translation-llm-tgi-server
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: translation-llm-textgen-server
     depends_on:
       translation-tgi-service:
         condition: service_healthy

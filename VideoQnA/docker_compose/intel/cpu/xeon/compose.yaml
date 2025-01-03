@@ -61,8 +61,8 @@ services:
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   reranking:
-    image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
-    container_name: reranking-videoqna-server
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+    container_name: reranking-tei-server
     ports:
       - "8000:8000"
     ipc: host

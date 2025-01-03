@@ -19,7 +19,7 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -46,7 +46,7 @@ docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-a
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-- `opea/llm-tgi:latest`
+- `opea/llm-textgen:latest`
 - `opea/codetrans:latest`
 - `opea/codetrans-ui:latest`
 - `opea/nginx:latest`

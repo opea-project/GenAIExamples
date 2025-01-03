@@ -35,7 +35,7 @@ services:
     ipc: host
     command: --model-id ${CODETRANS_LLM_MODEL_ID}
   codetrans-llm-server:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
     container_name: codetrans-llm-server
     depends_on:
       codetrans-tgi-service:

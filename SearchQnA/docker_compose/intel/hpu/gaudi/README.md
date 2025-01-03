@@ -29,7 +29,7 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 ### 4. Build LLM Image
 
 ```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 5. Build MegaService Docker Image
@@ -54,7 +54,7 @@ Then run the command `docker images`, you will have
 1. `opea/embedding-tei:latest`
 2. `opea/web-retriever-chroma:latest`
 3. `opea/reranking-tei:latest`
-4. `opea/llm-tgi:latest`
+4. `opea/llm-textgen:latest`
 5. `opea/searchqna:latest`
 
 ## 🚀 Set the environment variables

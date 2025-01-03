@@ -35,9 +35,9 @@ services:
       dockerfile: comps/reranks/src/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
-  llm-tgi:
+  llm-textgen:
     build:
       context: GenAIComps
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: searchqna
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}

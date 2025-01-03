@@ -29,12 +29,12 @@ services:
       dockerfile: comps/asr/src/Dockerfile
     extends: avatarchatbot
     image: ${REGISTRY:-opea}/asr:${TAG:-latest}
-  llm-tgi:
+  llm-textgen:
     build:
       context: GenAIComps
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: avatarchatbot
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
   speecht5-gaudi:
     build:
       context: GenAIComps

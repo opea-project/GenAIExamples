@@ -285,7 +285,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/llm-tgi:latest"
+          image: "opea/llm-textgen:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - name: llm-uservice
