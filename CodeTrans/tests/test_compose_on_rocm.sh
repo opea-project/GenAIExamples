@@ -45,6 +45,7 @@ function start_services() {
     export CODETRANS_BACKEND_SERVICE_PORT=7777
     export CODETRANS_NGINX_PORT=8088
     export CODETRANS_BACKEND_SERVICE_URL="http://${ip_address}:${CODETRANS_BACKEND_SERVICE_PORT}/v1/codetrans"
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

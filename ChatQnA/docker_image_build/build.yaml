@@ -44,7 +44,7 @@ services:
   embedding-tei:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/tei/langchain/Dockerfile
+      dockerfile: comps/embeddings/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
   retriever-redis:
@@ -68,7 +68,7 @@ services:
   reranking-tei:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/tei/Dockerfile
+      dockerfile: comps/reranks/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
   llm-textgen:
@@ -80,7 +80,7 @@ services:
   llm-ollama:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/ollama/langchain/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
   dataprep-redis:
@@ -122,6 +122,6 @@ services:
   nginx:
     build:
       context: GenAIComps
-      dockerfile: comps/nginx/Dockerfile
+      dockerfile: comps/3rd_parties/nginx/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

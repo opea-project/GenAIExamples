@@ -9,7 +9,7 @@ This document outlines the deployment process for a SearchQnA application utiliz
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
+docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
@@ -21,7 +21,7 @@ docker build --no-cache -t opea/web-retriever-chroma:latest --build-arg https_pr
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/src/Dockerfile .
 ```
 
 ### 4. Build LLM Image
