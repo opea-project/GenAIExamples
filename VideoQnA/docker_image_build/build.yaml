@@ -26,7 +26,7 @@ services:
   embedding-multimodal-clip:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/multimodal_clip/Dockerfile
+      dockerfile: comps/embeddings/src/integrations/dependency/clip/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
   retriever-vdms:
@@ -38,7 +38,7 @@ services:
   reranking-videoqna:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/videoqna/Dockerfile
+      dockerfile: comps/reranks/src/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
   video-llama-lvm-server:
