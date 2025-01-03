@@ -124,7 +124,7 @@ docker compose up -d
    ```
 
    ```bash
-   ##enable streaming
+   ##enable stream
    curl http://${host_ip}:8888/v1/faqgen \
      -H "Content-Type: multipart/form-data" \
      -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
