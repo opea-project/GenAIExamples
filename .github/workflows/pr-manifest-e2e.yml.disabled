@@ -25,7 +25,7 @@ jobs:
   job1:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '.github|docker_compose|gmc|assets|*.md|*.txt|benchmark'
+      diff_excluded_files: '\.github|docker_compose|gmc|assets|\.md|\.txt|benchmark'
       test_mode: "manifest"
 
   run-example:
