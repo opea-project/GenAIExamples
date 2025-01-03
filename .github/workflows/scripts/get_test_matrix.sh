@@ -16,14 +16,14 @@ function find_test_1() {
     local n=$2
     local all_service=$3
 
-    common_file_change=$(printf '%s\n' "${changed_files[@]}"| grep ${pre_service_path} | cut -d'/' -f$n | grep -E '*.py' | grep -vE '__init__.py|version.py' | sort -u) || true
+    common_file_change=$(printf '%s\n' "${changed_files[@]}"| grep ${pre_service_path} | cut -d'/' -f$n | grep -E '\.py' | grep -vE '__init__.py|version.py' | sort -u) || true
     if [ "$common_file_change" ] || [ "$all_service" = "true" ]; then
         # if common files changed, run all services
-        services=$(ls ${pre_service_path} | cut -d'/' -f$n | grep -vE '*.md|*.py|*.sh|*.yaml|*.yml|*.pdf' | sort -u) || true
+        services=$(ls ${pre_service_path} | cut -d'/' -f$n | grep -vE '\.md|\.py|\.sh|\.yaml|\.yml|\.pdf' | sort -u) || true
         all_service="true"
     else
         # if specific service files changed, only run the specific service
-        services=$(printf '%s\n' "${changed_files[@]}"| grep ${pre_service_path} | cut -d'/' -f$n | grep -vE '*.py|*.sh|*.yaml|*.yml|*.pdf' | sort -u) || true
+        services=$(printf '%s\n' "${changed_files[@]}"| grep ${pre_service_path} | cut -d'/' -f$n | grep -vE '\.py|\.sh|\.yaml|\.yml|\.pdf' | sort -u) || true
     fi
 
     for service in ${services}; do
@@ -99,7 +99,7 @@ function _fill_in_matrix() {
 
 # add test case when test scripts code change
 function find_test_2() {
-    test_files=$(printf '%s\n' "${changed_files[@]}" | grep -E "*.sh") || true
+    test_files=$(printf '%s\n' "${changed_files[@]}" | grep -E "\.sh") || true
     for test_file in ${test_files}; do
         if [ -f $test_file ]; then
             _service=$(echo $test_file | cut -d'/' -f3 | cut -d'.' -f1 | cut -c6-)
@@ -110,7 +110,7 @@ function find_test_2() {
 
 function main() {
 
-    changed_files=$(printf '%s\n' "${changed_files_full[@]}" | grep 'comps/' | grep -vE '*.md|comps/cores|comps/3rd_parties|deployment|*.yaml') || true
+    changed_files=$(printf '%s\n' "${changed_files_full[@]}" | grep 'comps/' | grep -vE '\.md|comps/cores|comps/3rd_parties|deployment|\.yaml') || true
     echo "===========start find_test_1============"
     echo "changed_files=${changed_files}"
     find_test_1 "comps" 2 false
@@ -118,7 +118,7 @@ function main() {
     echo "run_matrix=${run_matrix}"
     echo "===========finish find_test_1============"
 
-    changed_files=$(printf '%s\n' "${changed_files_full[@]}" | grep 'tests/' | grep -vE '*.md|*.txt|tests/cores') || true
+    changed_files=$(printf '%s\n' "${changed_files_full[@]}" | grep 'tests/' | grep -vE '\.md|\.txt|tests/cores') || true
     echo "===========start find_test_2============"
     echo "changed_files=${changed_files}"
     find_test_2

@@ -33,8 +33,8 @@ jobs:
         run: |
           base_commit=$(git rev-parse HEAD~1)
           merged_commit=$(git log -1 --format='%H')
-          changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | grep 'comps/' | grep -vE '*.md|*.txt|comps/cores')" || true
-          services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '*.py' | sort -u | jq -R '.' | jq -sc '.') || true
+          changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | grep 'comps/' | grep -vE '\.md|\.txt|comps/cores')" || true
+          services=$(printf '%s\n' "${changed_files[@]}" | cut -d'/' -f2 | grep -vE '\.py' | sort -u | jq -R '.' | jq -sc '.') || true
           echo "services=$services"
           echo "services=$services" >> $GITHUB_OUTPUT
 
