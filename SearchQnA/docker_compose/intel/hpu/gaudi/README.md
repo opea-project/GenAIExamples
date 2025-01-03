@@ -17,7 +17,7 @@ docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$ht
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/web-retriever-chroma:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/web_retrievers/chroma/langchain/Dockerfile .
+docker build --no-cache -t opea/web-retriever-chroma:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/web_retrievers/src/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
