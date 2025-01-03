@@ -12,6 +12,7 @@ images = {}
 dockerfiles = {}
 errors = []
 
+
 def check_docker_compose_build_definition(file_path):
     with open(file_path, "r") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
@@ -33,17 +34,21 @@ def check_docker_compose_build_definition(file_path):
                     dockerfile = os.path.normpath(os.path.join(context, build.get("dockerfile", "")))
                 item = {"file_path": file_path, "service": service, "dockerfile": dockerfile, "image": image}
                 if image in images and dockerfile != images[image]["dockerfile"]:
-                    errors.append(f"ERROR: !!! Found Conflicts !!!\n"
-                                  f"Image: {image}, Dockerfile: {dockerfile}, defined in Service: {service}, File: {file_path}\n"
-                                  f"Image: {image}, Dockerfile: {images[image]['dockerfile']}, defined in Service: {images[image]['service']}, File: {images[image]['file_path']}")
+                    errors.append(
+                        f"ERROR: !!! Found Conflicts !!!\n"
+                        f"Image: {image}, Dockerfile: {dockerfile}, defined in Service: {service}, File: {file_path}\n"
+                        f"Image: {image}, Dockerfile: {images[image]['dockerfile']}, defined in Service: {images[image]['service']}, File: {images[image]['file_path']}"
+                    )
                 else:
                     # print(f"Add Image: {image} Dockerfile: {dockerfile}")
                     images[image] = item
 
                 if dockerfile in dockerfiles and image != dockerfiles[dockerfile]["image"]:
-                    errors.append(f"WARNING: Different images using the same Dockerfile\n"
-                                  f"Dockerfile: {dockerfile}, Image: {image}, defined in Service: {service}, File: {file_path}\n"
-                                  f"Dockerfile: {dockerfile}, Image: {dockerfiles[dockerfile]['image']}, defined in Service: {dockerfiles[dockerfile]['service']}, File: {dockerfiles[dockerfile]['file_path']}")
+                    errors.append(
+                        f"WARNING: Different images using the same Dockerfile\n"
+                        f"Dockerfile: {dockerfile}, Image: {image}, defined in Service: {service}, File: {file_path}\n"
+                        f"Dockerfile: {dockerfile}, Image: {dockerfiles[dockerfile]['image']}, defined in Service: {dockerfiles[dockerfile]['service']}, File: {dockerfiles[dockerfile]['file_path']}"
+                    )
                 else:
                     dockerfiles[dockerfile] = item
 
