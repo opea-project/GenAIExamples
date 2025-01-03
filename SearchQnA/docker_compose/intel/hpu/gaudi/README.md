@@ -17,7 +17,7 @@ docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$ht
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/web-retriever-chroma:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/web_retrievers/src/Dockerfile .
+docker build --no-cache -t opea/web-retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/web_retrievers/src/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
@@ -52,7 +52,7 @@ docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_
 Then run the command `docker images`, you will have
 
 1. `opea/embedding-tei:latest`
-2. `opea/web-retriever-chroma:latest`
+2. `opea/web-retriever:latest`
 3. `opea/reranking-tei:latest`
 4. `opea/llm-tgi:latest`
 5. `opea/searchqna:latest`
