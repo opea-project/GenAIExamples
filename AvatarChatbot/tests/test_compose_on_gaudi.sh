@@ -71,6 +71,7 @@ function start_services() {
     export FPS=10
 
     # Start Docker Containers
+    sed -i "s|container_name: avatarchatbot-gaudi-backend-server|container_name: avatarchatbot-gaudi-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do

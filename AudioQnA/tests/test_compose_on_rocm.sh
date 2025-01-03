@@ -46,6 +46,7 @@ function start_services() {
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
+    sed -i "s|container_name: audioqna-rocm-backend-server|container_name: audioqna-rocm-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
@@ -63,7 +64,7 @@ function validate_megaservice() {
     docker logs whisper-service > $LOG_PATH/whisper-service.log
     docker logs speecht5-service > $LOG_PATH/tts-service.log
     docker logs tgi-service > $LOG_PATH/tgi-service.log
-    docker logs audioqna-xeon-backend-server > $LOG_PATH/audioqna-xeon-backend-server.log
+    docker logs audioqna-rocm-backend-server > $LOG_PATH/audioqna-rocm-backend-server.log
     echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
 
     if [[ $(file speech.mp3) == *"RIFF"* ]]; then
