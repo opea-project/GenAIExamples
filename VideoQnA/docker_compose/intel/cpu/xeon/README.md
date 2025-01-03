@@ -62,10 +62,10 @@ docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$h
 docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/vdms/langchain/Dockerfile .
 ```
 
-### 3. Build Rerank Image
+### 3. Build Reranking Image
 
 ```bash
-docker build -t opea/reranking-videoqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/src/Dockerfile .
+docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/rerankings/src/Dockerfile .
 ```
 
 ### 4. Build LVM Image (Xeon)
