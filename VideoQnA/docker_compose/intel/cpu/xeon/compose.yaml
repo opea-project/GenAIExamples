@@ -75,8 +75,8 @@ services:
       DATAPREP_GET_VIDEO_LIST_ENDPOINT: ${DATAPREP_GET_VIDEO_LIST_ENDPOINT}
     restart: unless-stopped
   lvm-video-llama:
-    image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
-    container_name: video-llama-lvm-server
+    image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
+    container_name: lvm-video-llama
     ports:
       - "9009:9009"
     ipc: host
