@@ -15,7 +15,7 @@ The AudioQnA application is defined as a Custom Resource (CR) file that the abov
 The AudioQnA uses the below prebuilt images if you choose a Xeon deployment
 
 - tgi-service: ghcr.io/huggingface/text-generation-inference:1.4
-- llm: opea/llm-tgi:latest
+- llm: opea/llm-textgen:latest
 - asr: opea/asr:latest
 - whisper: opea/whisper:latest
 - tts: opea/tts:latest

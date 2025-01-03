@@ -71,24 +71,18 @@ services:
       dockerfile: comps/reranks/tei/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
-  llm-tgi:
+  llm-textgen:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
   llm-ollama:
     build:
       context: GenAIComps
       dockerfile: comps/llms/text-generation/ollama/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
-  llm-vllm:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/text-generation/vllm/langchain/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
   dataprep-redis:
     build:
       context: GenAIComps
