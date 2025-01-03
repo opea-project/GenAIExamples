@@ -85,7 +85,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 
 1. `opea/dataprep-multimodal-redis:latest`
 2. `ghcr.io/huggingface/text-generation-inference:2.4.1-rocm`
-3. `opea/lvm-tgi:latest`
+3. `opea/lvm:latest`
 4. `opea/retriever-multimodal-redis:latest`
 5. `opea/embedding-multimodal:latest`
 6. `opea/embedding-multimodal-bridgetower:latest`
