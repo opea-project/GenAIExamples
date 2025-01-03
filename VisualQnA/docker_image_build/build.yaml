@@ -26,6 +26,6 @@ services:
   nginx:
     build:
       context: GenAIComps
-      dockerfile: comps/nginx/Dockerfile
+      dockerfile: comps/3rd_parties/nginx/src/Dockerfile
     extends: visualqna
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

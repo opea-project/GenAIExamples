@@ -15,7 +15,7 @@ from comps.cores.proto.api_protocol import (
     ChatMessage,
     UsageInfo,
 )
-from comps.cores.proto.docarray import LLMParams
+from comps.cores.proto.docarray import ImageDoc, LLMParams, TextDoc, TextImageDoc
 from fastapi import Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from PIL import Image
@@ -30,11 +30,25 @@ LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9399))
 WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", "http://0.0.0.0:7066/v1/asr")
 
 
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.EMBEDDING:
+        if "text" in inputs and "image" in inputs:
+            text_doc = TextDoc(text=inputs["text"])
+            image_doc = ImageDoc(base64_image=inputs["image"])
+            inputs = TextImageDoc(text=text_doc, image=image_doc).dict()
+        elif "image" in inputs:
+            inputs = ImageDoc(base64_image=inputs["image"]).dict()
+        elif "text" in inputs:
+            inputs = TextDoc(text=inputs["text"]).dict()
+    return inputs
+
+
 class MultimodalQnAService:
 
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_inputs = align_inputs
         self.lvm_megaservice = ServiceOrchestrator()
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.MULTIMODAL_QNA)
