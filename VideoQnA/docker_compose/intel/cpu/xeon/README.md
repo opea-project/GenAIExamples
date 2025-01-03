@@ -65,7 +65,7 @@ docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy 
 ### 3. Build Rerank Image
 
 ```bash
-docker build -t opea/reranking-videoqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/videoqna/Dockerfile .
+docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/rerankings/src/Dockerfile .
 ```
 
 ### 4. Build LVM Image (Xeon)
