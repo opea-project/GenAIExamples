@@ -77,12 +77,6 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
-  llm-ollama:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/src/text-generation/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
   dataprep-redis:
     build:
       context: GenAIComps
