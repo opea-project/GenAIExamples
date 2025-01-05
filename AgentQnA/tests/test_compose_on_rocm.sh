@@ -72,4 +72,4 @@ echo "=================== #5 Agent and API server stopped===================="
 
 echo y | docker system prune
 
-echo "ALL DONE!"
+echo "ALL DONE!!"
