@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="translation translation-ui llm-tgi nginx"
+    service_list="translation translation-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
@@ -105,7 +105,7 @@ function validate_microservices() {
         "${TRANSLATION_HOST_IP}:9000/v1/chat/completions" \
         "data: " \
         "translation-llm" \
-        "translation-llm-tgi-server" \
+        "translation-llm-textgen-server" \
         '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
 }
 

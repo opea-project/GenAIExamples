@@ -33,7 +33,7 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 #### Use TGI as backend
 
 ```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
