@@ -23,11 +23,11 @@ function start_service() {
     tei_endpoint=5001
     model="BAAI/bge-base-en-v1.5"
     unset http_proxy
-    docker run -d --name="test-comps-embedding-tei-endpoint" -p $tei_endpoint:80 -v ./data:/data --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $model
+    docker run -d --name="test-comps-embedding-endpoint" -p $tei_endpoint:80 -v ./data:/data --pull always ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 --model-id $model
     sleep 3m
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:${tei_endpoint}"
     tei_service_port=5002
-    docker run -d --name="test-comps-embedding-tei-server" -e LOGFLAG=True -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p ${tei_service_port}:6000 --ipc=host -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT  opea/embedding:comps
+    docker run -d --name="test-comps-embedding-server" -e LOGFLAG=True -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p ${tei_service_port}:6000 --ipc=host -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT  opea/embedding:comps
     sleep 15
 }
 
@@ -42,8 +42,8 @@ function validate_service() {
         echo "Result correct."
     else
         echo "Result wrong. Received was $result"
-        docker logs test-comps-embedding-tei-endpoint
-        docker logs test-comps-embedding-tei-server
+        docker logs test-comps-embedding-endpoint
+        docker logs test-comps-embedding-server
         exit 1
     fi
 }
@@ -62,8 +62,8 @@ function validate_microservice_with_openai() {
     tei_service_port=5002
     python3 ${WORKPATH}/tests/utils/validate_svc_with_openai.py $ip_address $tei_service_port "embedding"
     if [ $? -ne 0 ]; then
-        docker logs test-comps-embedding-tei-endpoint
-        docker logs test-comps-embedding-tei-server
+        docker logs test-comps-embedding-endpoint
+        docker logs test-comps-embedding-server
         exit 1
     fi
 }

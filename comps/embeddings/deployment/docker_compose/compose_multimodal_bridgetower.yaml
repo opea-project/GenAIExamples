@@ -20,7 +20,7 @@ services:
       timeout: 6s
       retries: 18
       start_period: 30s
-  embedding-multimodal:
+  embedding:
     image: opea/embedding:latest
     container_name: embedding-multimodal-bridgetower-server
     ports:

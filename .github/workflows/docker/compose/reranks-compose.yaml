@@ -3,15 +3,7 @@
 
 # this file should be run in the root of the repo
 services:
-  reranking-tei:
+  reranking:
     build:
       dockerfile: comps/reranks/src/Dockerfile
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
-  reranking-videoqna:
-    build:
-      dockerfile: comps/reranks/src/Dockerfile # TODO. need to update
-    image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
-  reranking-fastrag:
-    build:
-      dockerfile: comps/reranks/src/Dockerfile # TODO. need to update
-    image: ${REGISTRY:-opea}/reranking-fastrag:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}

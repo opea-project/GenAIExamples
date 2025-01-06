@@ -3,10 +3,10 @@
 
 # this file should be run in the root of the repo
 services:
-  llm-tgi:
+  llm-textgen:
     build:
       dockerfile: comps/llms/src/text-generation/Dockerfile
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
   llm-ollama:
     build:
       dockerfile: comps/llms/text-generation/ollama/langchain/Dockerfile
@@ -19,10 +19,6 @@ services:
     build:
       dockerfile: comps/llms/faq-generation/tgi/langchain/Dockerfile
     image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
-  llm-vllm:
-    build:
-      dockerfile: comps/llms/src/text-generation/Dockerfile
-    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
   llm-native:
     build:
       dockerfile: comps/llms/text-generation/native/langchain/Dockerfile

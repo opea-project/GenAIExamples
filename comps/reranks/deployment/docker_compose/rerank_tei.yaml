@@ -20,7 +20,7 @@ services:
     command: --model-id ${RERANK_MODEL_ID} --hf-api-token ${HF_TOKEN}
   reranking:
     image: opea/reranking:latest
-    container_name: reranking-tei-server
+    container_name: reranking-server
     ports:
       - "8000:8000"
     ipc: host

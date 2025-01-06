@@ -11,4 +11,4 @@ docker run -d --rm \
     -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN \
     -e LLM_MODEL=$LLM_MODEL \
     -e LOGFLAG=$LOGFLAG \
-    opea/llm-vllm:latest
+    opea/llm-textgen:latest

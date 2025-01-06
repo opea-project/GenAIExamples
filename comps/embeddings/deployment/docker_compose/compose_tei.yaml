@@ -24,7 +24,7 @@ services:
       retries: 18
   embedding:
     image: opea/embedding:latest
-    container_name: embedding-tei-server
+    container_name: embedding-server
     ports:
       - "6000:6000"
     ipc: host

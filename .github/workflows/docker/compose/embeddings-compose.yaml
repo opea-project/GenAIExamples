@@ -3,10 +3,10 @@
 
 # this file should be run in the root of the repo
 services:
-  embedding-tei:
+  embedding:
     build:
       dockerfile: comps/embeddings/src/Dockerfile
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
   embedding-multimodal-clip:
     build:
       dockerfile: comps/embeddings/src/integrations/dependency/clip/Dockerfile
@@ -15,15 +15,7 @@ services:
     build:
       dockerfile: comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
-  embedding-multimodal:
-    build:
-      dockerfile: comps/embeddings/src/Dockerfile
-    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
   embedding-multimodal-bridgetower-gaudi:
     build:
       dockerfile: comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
-  embedding-predictionguard:
-    build:
-      dockerfile: comps/embeddings/src/Dockerfile
-    image: ${REGISTRY:-opea}/embedding-predictionguard:${TAG:-latest}

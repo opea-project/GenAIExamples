@@ -41,7 +41,7 @@ export LLM_MODEL_ID=${your_hf_llm_model}
 
 ```bash
 cd ../../../../
-docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 To start a docker container, you have two options:
@@ -54,7 +54,7 @@ You can choose one as needed.
 ### 2.3 Run Docker with CLI (Option A)
 
 ```bash
-docker run -d --name="llm-tgi-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e HF_TOKEN=$HF_TOKEN opea/llm-tgi:latest
+docker run -d --name="llm-tgi-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT -e HF_TOKEN=$HF_TOKEN opea/llm-textgen:latest
 ```
 
 ### 2.4 Run Docker with Docker Compose (Option B)

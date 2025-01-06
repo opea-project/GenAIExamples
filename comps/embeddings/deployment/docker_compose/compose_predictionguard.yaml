@@ -4,7 +4,7 @@
 services:
   embedding:
     image: opea/embedding:latest
-    container_name: embedding-predictionguard
+    container_name: embedding
     ports:
       - "6000:6000"
     ipc: host

@@ -194,7 +194,7 @@ docker run -d \
   -e https_proxy=$https_proxy \
   -e TGI_LLM_ENDPOINT=$TGI_LLM_ENDPOINT \
   -e HF_TOKEN=$HF_TOKEN \
-  opea/llm-tgi:latest
+  opea/llm-textgen:latest
 ```
 
 #### 2.3.2 vLLM
@@ -218,7 +218,7 @@ docker run \
   -e vLLM_LLM_ENDPOINT=$vLLM_LLM_ENDPOINT \
   -e HF_TOKEN=$HF_TOKEN \
   -e LLM_MODEL=$LLM_MODEL \
-  opea/llm-vllm:latest
+  opea/llm-textgen:latest
 ```
 
 ### 2.4 Run Docker with Docker Compose (Option B)
