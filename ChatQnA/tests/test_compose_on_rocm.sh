@@ -65,6 +65,7 @@ function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
+    sed -i "s|container_name: chatqna-backend-server|container_name: chatqna-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
