@@ -15,7 +15,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 1. Set the required environment variables:
 
    ```bash
-   # Example: host_ip="192.168.1.1" 
+   # Example: host_ip="192.168.1.1"
    export host_ip=$(hostname -I | awk '{print $1}')
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
@@ -52,7 +52,8 @@ It will automatically download the docker image on `docker hub`, please check th
   docker ps -a
   docker logs tgi-gaudi-server -t
 ```
-it may take some time to download the model. 
+
+it may take some time to download the model.
 In following cases, you could build docker image from source by yourself.
 
 - Failed to download the docker image.
@@ -69,14 +70,17 @@ curl localhost:8008/generate \
      -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
      -H 'Content-Type: application/json'
 ```
+
 here we just test the service on the host machine for a quick start.
-If all networks work fine, please try 
+If all networks work fine, please try
+
 ```bash
    curl http://${host_ip}:8008/generate \
      -X POST \
      -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
      -H 'Content-Type: application/json'
 ```
+
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
