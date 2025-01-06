@@ -25,11 +25,12 @@ export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDER_PORT=6006
-export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
+export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT"
 export MM_EMBEDDING_PORT_MICROSERVICE=6000
 export REDIS_URL="redis://${host_ip}:6379"
 export REDIS_HOST=${host_ip}
 export INDEX_NAME="mm-rag-redis"
+export BRIDGE_TOWER_EMBEDDING=true
 export LLAVA_SERVER_PORT=8399
 export LVM_ENDPOINT="http://${host_ip}:8399"
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
@@ -37,9 +38,8 @@ export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
 export WHISPER_MODEL="base"
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export ASR_ENDPOINT=http://$host_ip:7066
-export ASR_SERVICE_PORT=3001
-export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
+export WHISPER_SERVER_PORT=7066
+export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_SERVER_PORT}/v1/asr"v1/audio/transcriptions"
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
@@ -63,13 +63,13 @@ Build embedding-multimodal-bridgetower docker image
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile .
 ```
 
 Build embedding-multimodal microservice image
 
 ```bash
-docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/multimodal_langchain/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
 ```
 
 ### 2. Build retriever-multimodal-redis Image
@@ -103,13 +103,7 @@ docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg htt
 Build whisper server image
 
 ```bash
-docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
-```
-
-Build asr image
-
-```bash
-docker build --no-cache -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile .
+docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
 ```
 
 ### 6. Build MegaService Docker Image
@@ -138,12 +132,11 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 4. `opea/retriever-multimodal-redis:latest`
 5. `opea/whisper:latest`
-6. `opea/asr:latest`
-7. `opea/redis-vector-db`
-8. `opea/embedding-multimodal:latest`
-9. `opea/embedding-multimodal-bridgetower:latest`
-10. `opea/multimodalqna:latest`
-11. `opea/multimodalqna-ui:latest`
+6. `opea/redis-vector-db`
+7. `opea/embedding-multimodal:latest`
+8. `opea/embedding-multimodal-bridgetower:latest`
+9. `opea/multimodalqna:latest`
+10. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -212,10 +205,10 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
 4. asr
 
 ```bash
-curl ${ASR_SERVICE_ENDPOINT} \
+curl ${WHISPER_SERVER_ENDPOINT} \
     -X POST \
     -H "Content-Type: application/json" \
-    -d '{"byte_str" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
+    -d '{"audio" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
 ```
 
 5. TGI LLaVA Gaudi Server

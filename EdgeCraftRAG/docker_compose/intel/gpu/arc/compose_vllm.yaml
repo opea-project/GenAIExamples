@@ -11,6 +11,7 @@ services:
       https_proxy: ${https_proxy}
       HF_ENDPOINT: ${HF_ENDPOINT}
       vLLM_ENDPOINT: ${vLLM_ENDPOINT}
+      ENABLE_BENCHMARK: ${ENABLE_BENCHMARK:-false}
     volumes:
       - ${MODEL_PATH:-${PWD}}:/home/user/models
       - ${DOC_PATH:-${PWD}}:/home/user/docs

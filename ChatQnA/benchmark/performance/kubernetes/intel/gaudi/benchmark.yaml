@@ -58,7 +58,7 @@ test_cases:
         top_k: 10
         top_p: 0.95
         repetition_penalty: 1.03
-        streaming: true
+        stream: true
     llmserve:
       run_test: false
       service_name: "chatqna-tgi"  # Replace with your service name
