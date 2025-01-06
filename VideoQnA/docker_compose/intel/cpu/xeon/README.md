@@ -109,7 +109,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 1. `opea/dataprep-multimodal-vdms:latest`
 2. `opea/embedding-multimodal-clip:latest`
 3. `opea/retriever-vdms:latest`
-4. `opea/reranking-videoqna:latest`
+4. `opea/reranking:latest`
 5. `opea/video-llama-lvm-server:latest`
 6. `opea/lvm-video-llama:latest`
 7. `opea/videoqna:latest`

@@ -53,7 +53,7 @@ Then run the command `docker images`, you will have
 
 1. `opea/embedding-tei:latest`
 2. `opea/web-retriever-chroma:latest`
-3. `opea/reranking-tei:latest`
+3. `opea/reranking:latest`
 4. `opea/llm-tgi:latest`
 5. `opea/searchqna:latest`
 

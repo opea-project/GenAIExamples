@@ -26,9 +26,9 @@ services:
   reranking-tei:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/src/Dockerfile
+      dockerfile: comps/rerankings/src/Dockerfile
     extends: doc-index-retriever
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
   dataprep-redis:
     build:
       context: GenAIComps
