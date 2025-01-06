@@ -144,10 +144,10 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
 
-| Service       | Model                                       |
-| ------------- | ------------------------------------------- |
+| Service   | Model                                       |
+| --------- | ------------------------------------------- |
 | embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
-| LVM           | llava-hf/llava-v1.6-vicuna-13b-hf           |
+| LVM       | llava-hf/llava-v1.6-vicuna-13b-hf           |
 
 ### Start all the services Docker Containers
 
