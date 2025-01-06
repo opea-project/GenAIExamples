@@ -20,7 +20,7 @@ services:
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
-      streaming: false
+      stream: false
       tools: /home/user/tools/tools.yaml
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}

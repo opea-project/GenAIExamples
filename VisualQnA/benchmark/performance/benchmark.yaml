@@ -38,7 +38,7 @@ test_cases:
         top_k: 10
         top_p: 0.95
         repetition_penalty: 1.03
-        streaming: true
+        stream: true
     lvmserve:
       run_test: true
       service_name: "lvm-serving-svc"  # Replace with your service name

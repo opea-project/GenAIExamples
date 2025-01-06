@@ -71,6 +71,7 @@ function start_services() {
     export FPS=10
 
     # Start Docker Containers
+    sed -i "s|container_name: avatarchatbot-xeon-backend-server|container_name: avatarchatbot-xeon-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose up -d
     n=0
     until [[ "$n" -ge 100 ]]; do
