@@ -1,26 +1,30 @@
 # Code owners will review PRs within their respective folders. 
 # Typically, ownership is organized at the second-level subdirectory under the homepage
-/comps/agent/ kaokao.lv@intel.com
-/comps/finetuning/ xinyu.ye@intel.com
-/comps/guardrails/ liang1.lv@intel.com
-/comps/asr/ sihan.chen@intel.com
-/comps/intent_detection/ liang1.lv@intel.com
-/comps/cores/ liang1.lv@intel.com
-/comps/dataprep/ xinyu.ye@intel.com
+
+* liang1.lv@intel.com feng.tian@intel.com suyue.chen@intel.com
+/.github/ suyue.chen@intel.com ze.pan@intel.com
+/comps/3rd_parties/ liang1.lv@intel.com letong.han@intel.com xinyao.wang@intel.com
+/comps/agent/ kaokao.lv@intel.com minmin.hou@intel.com
+/comps/animation/ qing.yao@intel.com chun.tao@intel.com
+/comps/asr/ sihan.chen@intel.com liang1.lv@intel.com
+/comps/chathistory/ yogesh.pandey@intel.com xinyao.wang@intel.com
+/comps/cores/ liang1.lv@intel.com feng.tian@intel.com letong.han@intel.com xinyao.wang@intel.com sihan.chen@intel.com
+/comps/dataprep/ xinyu.ye@intel.com letong.han@intel.com
 /comps/embeddings/ kaokao.lv@intel.com
-/comps/guardrails/ letong.han@intel.com
-/comps/llms/ liang1.lv@intel.com
-/comps/lvms/ sihan.chen@intel.com
-/comps/nginx/ letong.han@intel.com
-/comps/prompt_registry/ hoong.tee.yeoh@intel.com
-/comps/feedback_management/ hoong.tee.yeoh@intel.com
-/comps/chathistory/ yogesh.pandey@intel.com
-/comps/text2sql/ yogesh.pandey@intel.com
-/comps/text2image/ xinyu.ye@intel.com
-/comps/reranks/ kaokao.lv@intel.com
-/comps/retrievers/ kaokao.lv@intel.com
-/comps/tts/ sihan.chen@intel.com
-/comps/ragas/ kaokao.lv@intel.com
-/comps/vectorstores/ xinyu.ye@intel.com
-/comps/web_retrievers/ sihan.chen@intel.com
-/*/ liang1.lv@intel.com
+/comps/feedback_management/ hoong.tee.yeoh@intel.com liang1.lv@intel.com
+/comps/finetuning/ xinyu.ye@intel.com kaokao.lv@intel.com
+/comps/guardrails/ liang1.lv@intel.com letong.han@intel.com
+/comps/image2image/ qing.yao@intel.com xinyu.ye@intel.com
+/comps/image2video/ xinyu.ye@intel.com qing.yao@intel.com
+/comps/intent_detection/ liang1.lv@intel.com xinyao.wang@intel.com
+/comps/llms/ liang1.lv@intel.com letong.han@intel.com
+/comps/lvms/ sihan.chen@intel.com liang1.lv@intel.com
+/comps/prompt_registry/ hoong.tee.yeoh@intel.com xinyao.wang@intel.com
+/comps/ragas/ kaokao.lv@intel.com liang1.lv@intel.com
+/comps/reranks/ kaokao.lv@intel.com liang1.lv@intel.com
+/comps/retrievers/ kaokao.lv@intel.com liang1.lv@intel.com
+/comps/text2image/ xinyu.ye@intel.com liang1.lv@intel.com
+/comps/text2sql/ yogesh.pandey@intel.com qing.yao@intel.com
+/comps/tts/ sihan.chen@intel.com letong.han@intel.com
+/comps/vectorstores/ xinyu.ye@intel.com letong.han@intel.com
+/comps/web_retrievers/ sihan.chen@intel.com liang1.lv@intel.com
