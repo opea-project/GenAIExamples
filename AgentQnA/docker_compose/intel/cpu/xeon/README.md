@@ -60,7 +60,7 @@ This example showcases a hierarchical multi-agent system for question-answering 
    ```
    git clone https://github.com/opea-project/GenAIComps.git
    cd GenAIComps
-   docker build -t opea/agent-langchain:latest -f comps/agent/langchain/Dockerfile .
+   docker build -t opea/agent:latest -f comps/agent/src/Dockerfile .
    ```
 
 ## Validate services
@@ -97,4 +97,4 @@ curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: applic
 
 ## How to register your own tools with agent
 
-You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/langchain/README.md).
+You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md).

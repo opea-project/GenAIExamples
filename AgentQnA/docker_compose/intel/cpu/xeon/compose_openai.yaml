@@ -3,7 +3,7 @@
 
 services:
   worker-rag-agent:
-    image: opea/agent-langchain:latest
+    image: opea/agent:latest
     container_name: rag-agent-endpoint
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
@@ -33,7 +33,7 @@ services:
 
 
   supervisor-react-agent:
-    image: opea/agent-langchain:latest
+    image: opea/agent:latest
     container_name: react-agent-endpoint
     depends_on:
       - worker-rag-agent

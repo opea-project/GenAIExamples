@@ -100,7 +100,7 @@ Then build the agent docker image. Both the supervisor agent and the worker agen
 
 ```
 cd GenAIComps
-docker build -t opea/agent-langchain:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/langchain/Dockerfile .
+docker build -t opea/agent:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/src/Dockerfile .
 ```
 
 2. Set up environment for this example </br>
@@ -220,4 +220,4 @@ curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: applic
 
 ## How to register your own tools with agent
 
-You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/langchain/README.md).
+You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md).
