@@ -25,8 +25,8 @@ services:
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-server
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: llm-textgen-server
     depends_on:
       tgi-service:
         condition: service_healthy
