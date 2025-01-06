@@ -15,7 +15,7 @@ LOG_PATH="$WORKPATH/tests"
 export WORKDIR=$(dirname "$WORKPATH")
 echo $WORKDIR
 
-export agent_image="opea/agent-langchain:comps"
+export agent_image="opea/agent:comps"
 export agent_container_name="test-comps-agent-endpoint"
 
 export ip_address=$(hostname -I | awk '{print $1}')
@@ -29,7 +29,7 @@ export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-70B-Instruct"
 export LLM_ENDPOINT_URL="http://${ip_address}:${vllm_port}"
 export temperature=0.01
 export max_new_tokens=4096
-export TOOLSET_PATH=$WORKPATH/comps/agent/langchain/tools/ # $WORKPATH/tests/agent/sql_agent_test/
+export TOOLSET_PATH=$WORKPATH/comps/agent/src/tools/ # $WORKPATH/tests/agent/sql_agent_test/
 echo "TOOLSET_PATH=${TOOLSET_PATH}"
 export recursion_limit=15
 export db_name=california_schools
@@ -75,12 +75,12 @@ function build_docker_images() {
     echo "Building the docker images"
     cd $WORKPATH
     echo $WORKPATH
-    docker build --no-cache -t $agent_image --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -f comps/agent/langchain/Dockerfile .
+    docker build --no-cache -t $agent_image --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -f comps/agent/src/Dockerfile .
     if [ $? -ne 0 ]; then
-        echo "opea/agent-langchain built fail"
+        echo "opea/agent built fail"
         exit 1
     else
-        echo "opea/agent-langchain built successful"
+        echo "opea/agent built successful"
     fi
 }
 

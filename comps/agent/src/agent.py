@@ -14,10 +14,10 @@ comps_path = os.path.join(cur_path, "../../../")
 sys.path.append(comps_path)
 
 from comps import CustomLogger, GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
-from comps.agent.langchain.src.agent import instantiate_agent
-from comps.agent.langchain.src.global_var import assistants_global_kv, threads_global_kv
-from comps.agent.langchain.src.thread import instantiate_thread_memory, thread_completion_callback
-from comps.agent.langchain.src.utils import get_args
+from comps.agent.src.integrations.agent import instantiate_agent
+from comps.agent.src.integrations.global_var import assistants_global_kv, threads_global_kv
+from comps.agent.src.integrations.thread import instantiate_thread_memory, thread_completion_callback
+from comps.agent.src.integrations.utils import get_args
 from comps.cores.proto.api_protocol import (
     AssistantsObject,
     ChatCompletionRequest,

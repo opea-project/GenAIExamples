@@ -20,7 +20,7 @@ ls $vllm_volume
 
 export WORKPATH=$WORKPATH
 
-export agent_image="opea/agent-langchain:comps"
+export agent_image="opea/agent:comps"
 export agent_container_name="test-comps-agent-endpoint"
 
 export model=meta-llama/Meta-Llama-3.1-70B-Instruct
@@ -31,7 +31,7 @@ export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-70B-Instruct"
 export LLM_ENDPOINT_URL="http://${ip_address}:${vllm_port}"
 export temperature=0.01
 export max_new_tokens=4096
-export TOOLSET_PATH=$WORKPATH/comps/agent/langchain/tools/
+export TOOLSET_PATH=$WORKPATH/comps/agent/src/tools/
 echo "TOOLSET_PATH=${TOOLSET_PATH}"
 export recursion_limit=15
 
@@ -39,12 +39,12 @@ function build_docker_images() {
     echo "Building the docker images"
     cd $WORKPATH
     echo $WORKPATH
-    docker build --no-cache -t $agent_image --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -f comps/agent/langchain/Dockerfile .
+    docker build --no-cache -t $agent_image --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -f comps/agent/src/Dockerfile .
     if [ $? -ne 0 ]; then
-        echo "opea/agent-langchain built fail"
+        echo "opea/agent built fail"
         exit 1
     else
-        echo "opea/agent-langchain built successful"
+        echo "opea/agent built successful"
     fi
 }
 
@@ -164,8 +164,8 @@ function start_vllm_service_70B() {
     echo "Service started successfully"
 }
 
-function start_react_langchain_agent_service() {
-    echo "Starting react_langchain agent microservice"
+function start_react_agent_service() {
+    echo "Starting react agent microservice"
     docker compose -f $WORKPATH/tests/agent/react_langchain.yaml up -d
     sleep 120s
     docker logs test-comps-agent-endpoint
@@ -174,7 +174,7 @@ function start_react_langchain_agent_service() {
 
 
 function start_react_langgraph_agent_service_openai() {
-    echo "Starting react_langchain agent microservice"
+    echo "Starting react agent microservice"
     docker compose -f $WORKPATH/tests/agent/react_langgraph_openai.yaml up -d
     sleep 120s
     docker logs test-comps-agent-endpoint
@@ -253,7 +253,7 @@ function validate_microservice() {
     #  "query": "What is OPEA?"
     # }')
     CONTENT=$(python3 $WORKPATH/tests/agent/test.py)
-    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-agent-langchain")
+    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-agent")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
@@ -270,7 +270,7 @@ function validate_microservice() {
 function validate_microservice_streaming() {
     echo "Testing agent service - chat completion API"
     CONTENT=$(python3 $WORKPATH/tests/agent/test.py --stream)
-    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-agent-langchain")
+    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-agent")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
@@ -286,8 +286,8 @@ function validate_microservice_streaming() {
 function validate_assistant_api() {
     cd $WORKPATH
     echo "Testing agent service - assistant api"
-    local CONTENT=$(python3 comps/agent/langchain/test_assistant_api.py --ip_addr ${ip_address} --ext_port 9095 --assistants_api_test --query 'What is Intel OPEA project?' 2>&1 | tee ${LOG_PATH}/test-agent-langchain-assistantsapi.log)
-    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-agent-langchain-assistantsapi")
+    local CONTENT=$(python3 comps/agent/src/test_assistant_api.py --ip_addr ${ip_address} --ext_port 9095 --assistants_api_test --query 'What is Intel OPEA project?' 2>&1 | tee ${LOG_PATH}/test-agent-assistantsapi.log)
+    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-agent-assistantsapi")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
@@ -295,7 +295,7 @@ function validate_assistant_api() {
         echo "==================TGI logs ======================"
         docker logs comps-tgi-gaudi-service
         echo "==================Agent logs ======================"
-        docker logs comps-langchain-agent-endpoint
+        docker logs comps-agent-endpoint
         exit 1
     fi
 }
@@ -357,7 +357,7 @@ function main() {
     build_vllm_docker_images
 
     # ==================== Tests with 70B model ====================
-    # RAG agent, react_llama, react_langchain, assistant apis
+    # RAG agent, react_llama, react, assistant apis
 
     start_vllm_service_70B
 
@@ -376,8 +376,8 @@ function main() {
     echo "============================================="
 
 
-    # # # test react_langchain
-    start_react_langchain_agent_service
+    # # # test react
+    start_react_agent_service
     echo "=============Testing ReAct Langchain============="
     validate_microservice_streaming
     validate_assistant_api
