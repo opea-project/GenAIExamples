@@ -133,7 +133,7 @@ class OPEALLM(OpeaComponent):
                 messages=prompt,
                 max_tokens=input.max_tokens,
                 top_p=input.top_p,
-                stream=input.streaming,
+                stream=input.stream,
                 frequency_penalty=input.frequency_penalty,
                 temperature=input.temperature,
             )

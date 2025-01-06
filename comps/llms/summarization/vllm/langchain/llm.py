@@ -172,9 +172,9 @@ async def llm_generate(input: DocSumLLMParams):
         headers = {"Authorization": f"Bearer {access_token}"}
 
     ## LLM
-    if input.streaming and input.summary_type == "map_reduce":
-        logger.info("Map Reduce mode don't support streaming=True, set to streaming=False")
-        input.streaming = False
+    if input.stream and input.summary_type == "map_reduce":
+        logger.info("Map Reduce mode don't support stream=True, set to stream=False")
+        input.stream = False
     llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8080")
     model = input.model if input.model else os.getenv("LLM_MODEL_ID")
     llm = VLLMOpenAI(
@@ -184,7 +184,7 @@ async def llm_generate(input: DocSumLLMParams):
         default_headers=headers,
         max_tokens=input.max_tokens,
         top_p=input.top_p,
-        streaming=input.streaming,
+        streaming=input.stream,
         temperature=input.temperature,
         presence_penalty=input.repetition_penalty,
     )
@@ -211,7 +211,7 @@ async def llm_generate(input: DocSumLLMParams):
     else:
         raise NotImplementedError('Please specify the summary_type in "stuff", "truncate", "map_reduce", "refine"')
 
-    if input.streaming:
+    if input.stream:
 
         async def stream_generator():
             from langserve.serialization import WellKnownLCSerializer

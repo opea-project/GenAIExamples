@@ -21,7 +21,7 @@ services:
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
       top_k: 10
-      streaming: true
+      stream: true
       tools: /home/user/tools/custom_tools.yaml
       require_human_feedback: false
       no_proxy: ${no_proxy}

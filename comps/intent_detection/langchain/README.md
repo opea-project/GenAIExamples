@@ -83,6 +83,6 @@ Once intent detection microservice is started, user can use below command to inv
 ```bash
 curl http://${your_ip}:9000/v1/chat/intent\
   -X POST \
-  -d '{"query":"What is Deep Learning?","max_new_tokens":10,"top_k":1,"temperature":0.001,"streaming":false}' \
+  -d '{"query":"What is Deep Learning?","max_new_tokens":10,"top_k":1,"temperature":0.001,"stream":false}' \
   -H 'Content-Type: application/json'
 ```

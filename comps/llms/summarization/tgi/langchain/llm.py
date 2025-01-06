@@ -171,9 +171,9 @@ async def llm_generate(input: DocSumLLMParams):
         server_kwargs["headers"] = {"Authorization": f"Bearer {access_token}"}
 
     ## LLM
-    if input.streaming and input.summary_type == "map_reduce":
-        logger.info("Map Reduce mode don't support streaming=True, set to streaming=False")
-        input.streaming = False
+    if input.stream and input.summary_type == "map_reduce":
+        logger.info("Map Reduce mode don't support stream=True, set to stream=False")
+        input.stream = False
     llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
     llm = HuggingFaceEndpoint(
         endpoint_url=llm_endpoint,
@@ -183,7 +183,7 @@ async def llm_generate(input: DocSumLLMParams):
         typical_p=input.typical_p,
         temperature=input.temperature,
         repetition_penalty=input.repetition_penalty,
-        streaming=input.streaming,
+        streaming=input.stream,
         server_kwargs=server_kwargs,
     )
 
@@ -209,7 +209,7 @@ async def llm_generate(input: DocSumLLMParams):
     else:
         raise NotImplementedError('Please specify the summary_type in "stuff", "truncate", "map_reduce", "refine"')
 
-    if input.streaming:
+    if input.stream:
 
         async def stream_generator():
             from langserve.serialization import WellKnownLCSerializer

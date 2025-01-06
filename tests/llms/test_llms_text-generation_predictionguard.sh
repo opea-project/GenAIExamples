@@ -36,7 +36,7 @@ function validate_microservice() {
     llm_service_port=9000
     result=$(http_proxy="" curl http://${ip_address}:${llm_service_port}/v1/chat/completions \
         -X POST \
-        -d '{"model": "Hermes-2-Pro-Llama-3-8B", "query": "What is AI?", "streaming": false, "max_tokens": 100, "temperature": 0.7, "top_p": 1.0, "top_k": 50}' \
+        -d '{"model": "Hermes-2-Pro-Llama-3-8B", "query": "What is AI?", "stream": false, "max_tokens": 100, "temperature": 0.7, "top_p": 1.0, "top_k": 50}' \
         -H 'Content-Type: application/json')
 
     if [[ $result == *"text"* ]]; then

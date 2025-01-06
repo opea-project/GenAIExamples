@@ -1,6 +1,6 @@
 # LLM Native Microservice
 
-LLM Native microservice uses [optimum-habana](https://github.com/huggingface/optimum-habana) for model initialization and warm-up, focusing solely on large language models (LLMs). It operates without frameworks like TGI/VLLM, using PyTorch directly for inference, and supports only non-streaming formats. This streamlined approach optimizes performance on Habana hardware.
+LLM Native microservice uses [optimum-habana](https://github.com/huggingface/optimum-habana) for model initialization and warm-up, focusing solely on large language models (LLMs). It operates without frameworks like TGI/VLLM, using PyTorch directly for inference, and supports only non-stream formats. This streamlined approach optimizes performance on Habana hardware.
 
 ## 🚀1. Start Microservice
 

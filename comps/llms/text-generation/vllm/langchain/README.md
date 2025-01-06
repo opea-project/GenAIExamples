@@ -94,7 +94,7 @@ bash ./launch_vllm_service.sh 8008 meta-llama/Meta-Llama-3-70b hpu 8
 
 ### 2.3 vLLM with OpenVINO (on Intel GPU and CPU)
 
-vLLM powered by OpenVINO supports all LLM models from [vLLM supported models list](https://github.com/vllm-project/vllm/blob/main/docs/source/models/supported_models.rst) and can perform optimal model serving on Intel GPU and all x86-64 CPUs with, at least, AVX2 support, as well as on both integrated and discrete Intel® GPUs (starting from Intel® UHD Graphics generation). OpenVINO vLLM backend supports the following advanced vLLM features:
+vLLM powered by OpenVINO supports all LLM models from [vLLM supported models list](https://github.com/vllm-project/vllm/blob/main/docs/source/models/supported_models.md) and can perform optimal model serving on Intel GPU and all x86-64 CPUs with, at least, AVX2 support, as well as on both integrated and discrete Intel® GPUs (starting from Intel® UHD Graphics generation). OpenVINO vLLM backend supports the following advanced vLLM features:
 
 - Prefix caching (`--enable-prefix-caching`)
 - Chunked prefill (`--enable-chunked-prefill`)
@@ -220,7 +220,7 @@ curl http://${your_ip}:9000/v1/health_check\
 User can set the following model parameters according to needs:
 
 - max_tokens: Total output token
-- streaming(true/false): return text response in streaming mode or non-streaming mode
+- stream(true/false): return text response in stream mode or non-stream mode
 
 ```bash
 # stream mode

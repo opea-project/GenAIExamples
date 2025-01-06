@@ -25,7 +25,7 @@ services:
       model: "gpt-4o-mini-2024-07-18"
       temperature: 0
       max_new_tokens: ${max_new_tokens}
-      streaming: false
+      stream: false
       tools: /home/user/tools/sql_agent_tools.yaml # /home/user/tools/custom_tools.yaml #
       require_human_feedback: false
       no_proxy: ${no_proxy}

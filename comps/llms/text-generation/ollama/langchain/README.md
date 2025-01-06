@@ -70,5 +70,5 @@ docker run --network host -e http_proxy=$http_proxy -e https_proxy=$https_proxy 
 ## Consume the Ollama Microservice
 
 ```bash
-curl http://127.0.0.1:9000/v1/chat/completions  -X POST   -d '{"model": "llama3", "query":"What is Deep Learning?","max_tokens":32,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}'   -H 'Content-Type: application/json'
+curl http://127.0.0.1:9000/v1/chat/completions  -X POST   -d '{"model": "llama3", "query":"What is Deep Learning?","max_tokens":32,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}'   -H 'Content-Type: application/json'
 ```

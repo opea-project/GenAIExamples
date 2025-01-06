@@ -41,7 +41,7 @@ def llm_generate(input: LLMParamsDoc):
         {"role": "user", "content": input.query},
     ]
 
-    if input.streaming:
+    if input.stream:
 
         async def stream_generator():
             chat_response = ""

@@ -60,16 +60,16 @@ curl http://${your_ip}:9000/v1/health_check\
 
 ```bash
 # Streaming Response
-# Set streaming to True. Default will be True.
+# Set stream to True. Default will be True.
 curl http://${your_ip}:9000/v1/faqgen \
   -X POST \
   -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
   -H 'Content-Type: application/json'
 
 # Non-Streaming Response
-# Set streaming to False.
+# Set stream to False.
 curl http://${your_ip}:9000/v1/faqgen \
   -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "streaming":false}' \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "stream":false}' \
   -H 'Content-Type: application/json'
 ```

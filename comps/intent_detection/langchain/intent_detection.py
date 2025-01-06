@@ -26,7 +26,7 @@ async def llm_generate(input: LLMParamsDoc):
         typical_p=input.typical_p,
         temperature=input.temperature,
         repetition_penalty=input.repetition_penalty,
-        streaming=input.streaming,
+        streaming=input.stream,
         timeout=600,
     )
 

@@ -57,7 +57,7 @@ async def llm_generate(input: LLMParamsDoc):
         typical_p=input.typical_p,
         temperature=input.temperature,
         repetition_penalty=input.repetition_penalty,
-        streaming=input.streaming,
+        streaming=input.stream,
         server_kwargs=server_kwargs,
     )
     templ = """Create a concise FAQs (frequently asked questions and answers) for following text:
@@ -71,7 +71,7 @@ async def llm_generate(input: LLMParamsDoc):
     # Create multiple documents
     docs = [Document(page_content=t) for t in texts]
 
-    if input.streaming:
+    if input.stream:
 
         async def stream_generator():
             from langserve.serialization import WellKnownLCSerializer

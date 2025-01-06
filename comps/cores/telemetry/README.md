@@ -52,7 +52,7 @@ Applications' megaservice `ServiceOrchectrator` provides following metrics:
 
 Latency ones are histogram metrics i.e. include count, total value and set of value buckets for each item.
 
-They are available only for _streaming_ requests using LLM. Pending count accounts for all requests.
+They are available only for _stream_ requests using LLM. Pending count accounts for all requests.
 
 ### Inferencing Metrics
 

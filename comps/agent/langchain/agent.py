@@ -56,7 +56,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, AgentCo
     if logflag:
         logger.info(input)
 
-    input.streaming = args.streaming
+    input.stream = args.stream
     config = {"recursion_limit": args.recursion_limit}
 
     if args.with_memory:
@@ -79,7 +79,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, AgentCo
             input_query = input.messages[-1]["content"]
 
     # 2. prepare the input for the agent
-    if input.streaming:
+    if input.stream:
         logger.info("-----------STREAMING-------------")
         return StreamingResponse(agent_inst.stream_generator(input_query, config), media_type="text/event-stream")
 

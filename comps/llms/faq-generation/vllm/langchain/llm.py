@@ -58,7 +58,7 @@ async def llm_generate(input: LLMParamsDoc):
         default_headers=headers,
         max_tokens=input.max_tokens,
         top_p=input.top_p,
-        streaming=input.streaming,
+        streaming=input.stream,
         temperature=input.temperature,
     )
 
@@ -73,7 +73,7 @@ async def llm_generate(input: LLMParamsDoc):
     # Create multiple documents
     docs = [Document(page_content=t) for t in texts]
 
-    if input.streaming:
+    if input.stream:
 
         async def stream_generator():
             from langserve.serialization import WellKnownLCSerializer

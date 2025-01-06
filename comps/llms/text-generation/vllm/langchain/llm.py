@@ -120,7 +120,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
         if logflag:
             logger.info(f"[ SearchedDoc ] final input: {new_input}")
 
-        if new_input.streaming:
+        if new_input.stream:
 
             async def stream_generator():
                 chat_response = ""
@@ -172,7 +172,7 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
                 # use rag default template
                 prompt = ChatTemplate.generate_rag_prompt(input.query, input.documents, model_name)
 
-        if input.streaming:
+        if input.stream:
 
             async def stream_generator():
                 chat_response = ""

@@ -35,7 +35,7 @@ def setup_hf_tgi_client(args):
         "temperature": args.temperature,
         "repetition_penalty": args.repetition_penalty,
         "return_full_text": args.return_full_text,
-        "streaming": args.streaming,
+        "stream": args.stream,
     }
 
     llm = HuggingFaceEndpoint(
@@ -53,7 +53,7 @@ def setup_chat_model(args):
         "temperature": args.temperature,
         "max_tokens": args.max_new_tokens,
         "top_p": args.top_p,
-        "streaming": args.streaming,
+        "stream": args.stream,
     }
     if args.llm_engine == "vllm" or args.llm_engine == "tgi":
         openai_endpoint = f"{args.llm_endpoint_url}/v1"
@@ -115,7 +115,7 @@ def adapt_custom_prompt(local_vars, custom_prompt):
 def get_args():
     parser = argparse.ArgumentParser()
     # llm args
-    parser.add_argument("--streaming", type=str, default="true")
+    parser.add_argument("--stream", type=str, default="true")
     parser.add_argument("--port", type=int, default=9090)
     parser.add_argument("--agent_name", type=str, default="OPEA_Default_Agent")
     parser.add_argument("--strategy", type=str, default="react_langchain")
@@ -153,10 +153,10 @@ def get_args():
         for key, value in vars(env_args).items():
             setattr(sys_args, key, value)
 
-    if sys_args.streaming == "true":
-        sys_args.streaming = True
+    if sys_args.stream == "true":
+        sys_args.stream = True
     else:
-        sys_args.streaming = False
+        sys_args.stream = False
 
     if sys_args.use_hints == "true":
         print("SQL agent will use hints")

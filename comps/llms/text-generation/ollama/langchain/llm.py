@@ -32,7 +32,7 @@ async def llm_generate(input: LLMParamsDoc):
         repeat_penalty=input.repetition_penalty,
     )
     # assuming you have Ollama installed and have llama3 model pulled with `ollama pull llama3`
-    if input.streaming:
+    if input.stream:
 
         async def stream_generator():
             chat_response = ""

@@ -150,7 +150,7 @@ class LVMSearchedMultimodalDoc(SearchedMultimodalDoc):
     top_p: float = 0.95
     typical_p: float = 0.95
     temperature: float = 0.01
-    streaming: bool = False
+    stream: bool = False
     repetition_penalty: float = 1.03
     chat_template: Optional[str] = Field(
         default=None,
@@ -184,7 +184,7 @@ class LLMParamsDoc(BaseDoc):
     frequency_penalty: float = 0.0
     presence_penalty: float = 0.0
     repetition_penalty: float = 1.03
-    streaming: bool = True
+    stream: bool = True
     language: str = "auto"  # can be "en", "zh"
 
     chat_template: Optional[str] = Field(
@@ -229,7 +229,7 @@ class LLMParams(BaseDoc):
     frequency_penalty: float = 0.0
     presence_penalty: float = 0.0
     repetition_penalty: float = 1.03
-    streaming: bool = True
+    stream: bool = True
     language: str = "auto"  # can be "en", "zh"
 
     chat_template: Optional[str] = Field(
@@ -292,7 +292,7 @@ class LVMDoc(BaseDoc):
     typical_p: float = 0.95
     temperature: float = 0.01
     repetition_penalty: float = 1.03
-    streaming: bool = False
+    stream: bool = False
 
 
 class LVMVideoDoc(BaseDoc):

@@ -269,12 +269,12 @@ curl http://${host_ip}:8008/v1/chat/completions \
 
 ### 3.3 Consume LLM Service
 
-You can set the following model parameters according to your actual needs, such as `max_tokens`, `streaming`.
+You can set the following model parameters according to your actual needs, such as `max_tokens`, `stream`.
 
-The `streaming` parameter determines the format of the data returned by the API. It will return text string with `streaming=false`, return text streaming flow with `streaming=true`.
+The `stream` parameter determines the format of the data returned by the API. It will return text string with `stream=false`, return text stream flow with `stream=true`.
 
 ```bash
-# non-streaming mode
+# non-stream mode
 curl http://${your_ip}:9000/v1/chat/completions \
   -X POST \
   -H 'Content-Type: application/json' \
@@ -286,11 +286,11 @@ curl http://${your_ip}:9000/v1/chat/completions \
   "typical_p":0.95,
   "temperature":0.01,
   "repetition_penalty":1.03,
-  "streaming":false
+  "stream":false
   }'
 
 
-# streaming mode
+# stream mode
 curl http://${your_ip}:9000/v1/chat/completions \
   -X POST \
   -H 'Content-Type: application/json' \
@@ -302,7 +302,7 @@ curl http://${your_ip}:9000/v1/chat/completions \
   "typical_p":0.95,
   "temperature":0.01,
   "repetition_penalty":1.03,
-  "streaming":true
+  "stream":true
   }'
 
 ```

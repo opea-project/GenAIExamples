@@ -21,7 +21,7 @@ docker run -d -p 9000:9000 -e PREDICTIONGUARD_API_KEY=$PREDICTIONGUARD_API_KEY  
 
 See the [Prediction Guard docs](https://docs.predictionguard.com/) for available model options.
 
-### Without streaming
+### Without stream
 
 ```bash
 curl -X POST http://localhost:9000/v1/chat/completions \
@@ -37,7 +37,7 @@ curl -X POST http://localhost:9000/v1/chat/completions \
     }'
 ```
 
-### With streaming
+### With stream
 
 ```bash
 curl -N -X POST http://localhost:9000/v1/chat/completions \

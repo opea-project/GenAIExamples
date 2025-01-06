@@ -70,7 +70,7 @@ async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> Union[TextDoc
                     f"[ LVMSearchedMultimodalDoc ] {prompt_template} not used, we only support 2 input variables ['question', 'context']"
                 )
         max_new_tokens = request.max_new_tokens
-        streaming = request.streaming
+        stream = request.stream
         repetition_penalty = request.repetition_penalty
         temperature = request.temperature
         top_k = request.top_k
@@ -82,7 +82,7 @@ async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> Union[TextDoc
         img_b64_str = request.image
         prompt = request.prompt
         max_new_tokens = request.max_new_tokens
-        streaming = request.streaming
+        stream = request.stream
         repetition_penalty = request.repetition_penalty
         temperature = request.temperature
         top_k = request.top_k
@@ -98,13 +98,13 @@ async def lvm(request: Union[LVMDoc, LVMSearchedMultimodalDoc]) -> Union[TextDoc
     image = f"data:image/png;base64,{img_b64_str}"
     image_prompt = f"![]({image})\n{prompt}\nASSISTANT:"
 
-    if streaming:
+    if stream:
 
         async def stream_generator():
             chat_response = ""
             text_generation = await lvm_client.text_generation(
                 prompt=image_prompt,
-                stream=streaming,
+                stream=stream,
                 max_new_tokens=max_new_tokens,
                 repetition_penalty=repetition_penalty,
                 temperature=temperature,

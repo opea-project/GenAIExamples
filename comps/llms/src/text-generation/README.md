@@ -76,9 +76,9 @@ curl http://${your_ip}:9000/v1/health_check\
 
 ### 3.2 Consume LLM Service
 
-You can set the following model parameters according to your actual needs, such as `max_tokens`, `streaming`.
+You can set the following model parameters according to your actual needs, such as `max_tokens`, `stream`.
 
-The `streaming` parameter determines the format of the data returned by the API. It will return text string with `streaming=false`, return text streaming flow with `streaming=true`.
+The `stream` parameter determines the format of the data returned by the API. It will return text string with `stream=false`, return text stream flow with `stream=true`.
 
 ```bash
 # stream mode

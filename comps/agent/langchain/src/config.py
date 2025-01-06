@@ -40,8 +40,8 @@ if os.environ.get("role_description") is not None:
 if os.environ.get("tools") is not None:
     env_config += ["--tools", os.environ["tools"]]
 
-if os.environ.get("streaming") is not None:
-    env_config += ["--streaming", os.environ["streaming"]]
+if os.environ.get("stream") is not None:
+    env_config += ["--stream", os.environ["stream"]]
 
 if os.environ.get("max_new_tokens") is not None:
     env_config += ["--max_new_tokens", os.environ["max_new_tokens"]]
