@@ -175,7 +175,7 @@ def build_app(cfg, args):
         }
         server_addr = f"http://{MEGA_SERVICE_HOST_IP}:{MEGA_SERVICE_PORT}"
 
-        # Async for streaming response
+        # Async for stream response
         partial_text = ""
         link_urls = []
         image_paths = []

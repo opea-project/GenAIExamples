@@ -220,7 +220,7 @@ class MultimodalQnAService:
         data = await request.json()
         stream_opt = bool(data.get("stream", False))
         if stream_opt:
-            print("[ MultimodalQnAService ] stream=True not used, this has not support streaming yet!")
+            print("[ MultimodalQnAService ] stream=True not used, this has not support stream yet!")
             stream_opt = False
         chat_request = ChatCompletionRequest.model_validate(data)
         # Multimodal RAG QnA With Videos has not yet accepts image as input during QnA.
@@ -263,7 +263,7 @@ class MultimodalQnAService:
             frequency_penalty=chat_request.frequency_penalty if chat_request.frequency_penalty else 0.0,
             presence_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 0.0,
             repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
-            streaming=stream_opt,
+            stream=stream_opt,
             chat_template=chat_request.chat_template if chat_request.chat_template else None,
         )
         result_dict, runtime_graph = await cur_megaservice.schedule(
@@ -272,8 +272,8 @@ class MultimodalQnAService:
         for node, response in result_dict.items():
             # the last microservice in this megaservice is LVM.
             # checking if LVM returns StreamingResponse
-            # Currently, LVM with LLAVA has not yet supported streaming.
-            # @TODO: Will need to test this once LVM with LLAVA supports streaming
+            # Currently, LVM with LLAVA has not yet supported stream.
+            # @TODO: Will need to test this once LVM with LLAVA supports stream
             if (
                 isinstance(response, StreamingResponse)
                 and node == runtime_graph.all_leaves()[-1]
