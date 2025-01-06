@@ -11,7 +11,7 @@ First of all, you need to build the Docker images locally. This step can be igno
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 2. Build the MegaService Docker Image
@@ -46,7 +46,7 @@ docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=
 
 Then run the command `docker images`, you will have the following 3 Docker images:
 
-- `opea/llm-tgi:latest`
+- `opea/llm-textgen:latest`
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
 - `opea/codegen-react-ui:latest`

@@ -100,12 +100,12 @@ In the below, we provide a table that describes for each microservice component 
 
 By default, the embedding and LVM models are set to a default value as listed below:
 
-| Service              | HW    | Model                                     |
-| -------------------- | ----- | ----------------------------------------- |
-| embedding-multimodal | Xeon  | BridgeTower/bridgetower-large-itm-mlm-itc |
-| LVM                  | Xeon  | llava-hf/llava-1.5-7b-hf                  |
-| embedding-multimodal | Gaudi | BridgeTower/bridgetower-large-itm-mlm-itc |
-| LVM                  | Gaudi | llava-hf/llava-v1.6-vicuna-13b-hf         |
+| Service       | HW    | Model                                     |
+| ------------- | ----- | ----------------------------------------- |
+| embedding-tei | Xeon  | BridgeTower/bridgetower-large-itm-mlm-itc |
+| LVM           | Xeon  | llava-hf/llava-1.5-7b-hf                  |
+| embedding-tei | Gaudi | BridgeTower/bridgetower-large-itm-mlm-itc |
+| LVM           | Gaudi | llava-hf/llava-v1.6-vicuna-13b-hf         |
 
 You can choose other LVM models, such as `llava-hf/llava-1.5-7b-hf ` and `llava-hf/llava-1.5-13b-hf`, as needed.
 

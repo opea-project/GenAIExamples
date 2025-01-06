@@ -241,7 +241,7 @@ function validate_microservices() {
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm-microservice" \
-        "llm-tgi-server" \
+        "llm-textgen-server" \
         '{"query":"What is Deep Learning?"}'
 
     # FAQGen llm microservice
@@ -257,7 +257,7 @@ function validate_microservices() {
         "${ip_address}:9001/v1/chat/completions" \
         "data: " \
         "llm_codegen" \
-        "llm-tgi-server-codegen" \
+        "llm-textgen-server-codegen" \
         '{"query":"def print_hello_world():"}'
 
     result=$(curl -X 'POST' \
