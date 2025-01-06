@@ -55,9 +55,9 @@ services:
       start_period: 30s
     entrypoint: ["python", "bridgetower_server.py", "--device", "cpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
     restart: unless-stopped
-  embedding-tei:
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-    container_name: embedding-tei
+  embedding:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding
     depends_on:
       embedding-multimodal-bridgetower:
         condition: service_healthy
@@ -120,7 +120,7 @@ services:
     depends_on:
       - redis-vector-db
       - dataprep-multimodal-redis
-      - embedding-tei
+      - embedding
       - retriever-redis
       - lvm-llava-svc
     ports:
