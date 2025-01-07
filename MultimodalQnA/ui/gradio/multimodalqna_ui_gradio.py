@@ -361,14 +361,14 @@ with gr.Blocks() as upload_video:
 
     def select_upload_type(choice, request: gr.Request):
         if choice == "transcript":
-            return gr.Video(sources="upload", visible=True), gr.Video(sources="upload", visible=False)
+            return gr.Video(sources="upload", visible=True, format="mp4"), gr.Video(sources="upload", visible=False, format="mp4")
         else:
-            return gr.Video(sources="upload", visible=False), gr.Video(sources="upload", visible=True)
+            return gr.Video(sources="upload", visible=False, format="mp4"), gr.Video(sources="upload", visible=True, format="mp4")
 
     with gr.Row():
         with gr.Column(scale=6):
-            video_upload_trans = gr.Video(sources="upload", elem_id="video_upload_trans", visible=True)
-            video_upload_cap = gr.Video(sources="upload", elem_id="video_upload_cap", visible=False)
+            video_upload_trans = gr.Video(sources="upload", elem_id="video_upload_trans", visible=True, format="mp4")
+            video_upload_cap = gr.Video(sources="upload", elem_id="video_upload_cap", visible=False, format="mp4")
         with gr.Column(scale=3):
             text_options_radio = gr.Radio(
                 [
