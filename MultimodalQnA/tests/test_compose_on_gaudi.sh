@@ -22,7 +22,7 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-redis lvm-tgi dataprep-multimodal-redis whisper asr"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever-redis lvm-tgi dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -33,11 +33,10 @@ function build_docker_images() {
 function setup_env() {
     export host_ip=${ip_address}
     export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
+    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
-    export ASR_ENDPOINT=http://$host_ip:7066
-    export ASR_SERVICE_PORT=3001
-    export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
+    export WHISPER_SERVER_PORT=7066
+    export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_SERVER_PORT}/v1/asr"
     export REDIS_URL="redis://${host_ip}:6379"
     export REDIS_HOST=${host_ip}
     export INDEX_NAME="mm-rag-redis"
@@ -63,6 +62,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     # Start Docker Containers
+    sed -i "s|container_name: multimodalqna-backend-server|container_name: multimodalqna-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 2m
 }
@@ -144,19 +144,19 @@ function validate_microservices() {
         '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 
     # embedding microservice
-    echo "Validating embedding-multimodal"
+    echo "Validating embedding"
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text" : "This is some sample text."}'
 
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
