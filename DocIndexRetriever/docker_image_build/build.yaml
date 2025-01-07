@@ -11,12 +11,12 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
-  embedding-tei:
+  embedding:
     build:
       context: GenAIComps
       dockerfile: comps/embeddings/src/Dockerfile
     extends: doc-index-retriever
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
   retriever-redis:
     build:
       context: GenAIComps
