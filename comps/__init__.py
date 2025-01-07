@@ -53,7 +53,7 @@ from comps.cores.mega.micro_service import MicroService, register_microservice, 
 from comps.cores.telemetry.opea_telemetry import opea_telemetry
 
 # Common
-from comps.cores.common.component import OpeaComponent, OpeaComponentController
+from comps.cores.common.component import OpeaComponent, OpeaComponentRegistry, OpeaComponentLoader
 
 # Statistics
 from comps.cores.mega.base_statistics import statistics_dict, register_statistics

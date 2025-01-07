@@ -12,7 +12,7 @@ from comps import (
     Base64ByteStrDoc,
     CustomLogger,
     LLMParamsDoc,
-    OpeaComponentController,
+    OpeaComponentLoader,
     ServiceType,
     opea_microservices,
     register_microservice,
@@ -24,24 +24,9 @@ from comps.cores.proto.api_protocol import AudioTranscriptionResponse
 logger = CustomLogger("opea_asr_microservice")
 logflag = os.getenv("LOGFLAG", False)
 
-# Initialize OpeaComponentController
-controller = OpeaComponentController()
-
-# Register components
-try:
-    # Instantiate ASR components
-    opea_whisper = OpeaWhisperAsr(
-        name="OpeaWhisperAsr",
-        description="OPEA Whisper ASR Service",
-    )
-
-    # Register components with the controller
-    controller.register(opea_whisper)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
-except Exception as e:
-    logger.error(f"Failed to initialize components: {e}")
+asr_component_name = os.getenv("ASR_COMPONENT_NAME", "OPEA_WHISPER_ASR")
+# Initialize OpeaComponentLoader
+loader = OpeaComponentLoader(asr_component_name, description=f"OPEA ASR Component: {asr_component_name}")
 
 
 @register_microservice(
@@ -69,8 +54,8 @@ async def audio_to_text(
         logger.info("ASR file uploaded.")
 
     try:
-        # Use the controller to invoke the active component
-        asr_response = await controller.invoke(
+        # Use the loader to invoke the component
+        asr_response = await loader.invoke(
             file=file,
             model=model,
             language=language,

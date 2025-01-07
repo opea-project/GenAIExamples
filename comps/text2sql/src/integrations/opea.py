@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
-from comps import CustomLogger, OpeaComponent, ServiceType
+from comps import CustomLogger, OpeaComponent, OpeaComponentRegistry, ServiceType
 from comps.text2sql.src.integrations.sql_agent import CustomSQLDatabaseToolkit, custom_create_sql_agent
 
 logger = CustomLogger("comps-text2sql")
@@ -69,6 +69,7 @@ class Input(BaseModel):
     conn_str: Optional[PostgresConnection] = None
 
 
+@OpeaComponentRegistry.register("OPEA_TEXT2SQL")
 class OpeaText2SQL(OpeaComponent):
     """A specialized text to sql component derived from OpeaComponent for interacting with TGI services and Database.
 
@@ -78,6 +79,9 @@ class OpeaText2SQL(OpeaComponent):
 
     def __init__(self, name: str, description: str, config: dict = None):
         super().__init__(name, ServiceType.TEXT2SQL.name.lower(), description, config)
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OpeaText2SQL health check failed.")
 
     async def check_health(self) -> bool:
         """Checks the health of the TGI service.

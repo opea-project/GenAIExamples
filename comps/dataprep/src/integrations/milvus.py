@@ -15,7 +15,7 @@ from langchain_core.documents import Document
 from langchain_milvus.vectorstores import Milvus
 from langchain_text_splitters import HTMLHeaderTextSplitter
 
-from comps import CustomLogger, DocPath, OpeaComponent, ServiceType
+from comps import CustomLogger, DocPath, OpeaComponent, OpeaComponentRegistry, ServiceType
 from comps.dataprep.src.utils import (
     create_upload_folder,
     document_loader,
@@ -157,6 +157,7 @@ def delete_by_partition_field(my_milvus, partition_field):
         logger.info(f"[ delete partition ] delete success: {res}")
 
 
+@OpeaComponentRegistry.register("OPEA_DATAPREP_MILVUS")
 class OpeaMilvusDataprep(OpeaComponent):
     """A specialized dataprep component derived from OpeaComponent for milvus dataprep services.
 
@@ -167,6 +168,9 @@ class OpeaMilvusDataprep(OpeaComponent):
     def __init__(self, name: str, description: str, config: dict = None):
         super().__init__(name, ServiceType.DATAPREP.name.lower(), description, config)
         self.embedder = self._initialize_embedder()
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OpeaMilvusDataprep health check failed.")
 
     def _initialize_embedder(self):
         if logflag:

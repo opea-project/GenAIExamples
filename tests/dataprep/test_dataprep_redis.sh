@@ -33,7 +33,7 @@ function start_service() {
     REDIS_URL="redis://${ip_address}:${REDIS_PORT}"
     export INDEX_NAME="rag_redis"
     export HF_TOKEN=${HF_TOKEN}
-    docker run -d --name="test-comps-dataprep-redis-langchain-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e REDIS_HOST=$ip_address -e REDIS_PORT=$REDIS_PORT -e TEI_EMBEDDING_ENDPOINT=${TEI_EMBEDDING_ENDPOINT} -e INDEX_NAME=$INDEX_NAME -e HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN} -e LOGFLAG=true -e DATAPREP_TYPE="redis" -p ${dataprep_service_port}:5000 --ipc=host opea/dataprep-redis:comps
+    docker run -d --name="test-comps-dataprep-redis-langchain-server" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e REDIS_URL=$REDIS_URL -e REDIS_HOST=$ip_address -e REDIS_PORT=$REDIS_PORT -e TEI_EMBEDDING_ENDPOINT=${TEI_EMBEDDING_ENDPOINT} -e INDEX_NAME=$INDEX_NAME -e HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN} -e LOGFLAG=true -e DATAPREP_COMPONENT_NAME="OPEA_DATAPREP_REDIS" -p ${dataprep_service_port}:5000 --ipc=host opea/dataprep-redis:comps
     sleep 1m
 }
 

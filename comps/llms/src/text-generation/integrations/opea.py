@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 from openai import AsyncOpenAI
 
-from comps import CustomLogger, LLMParamsDoc, OpeaComponent, SearchedDoc, ServiceType
+from comps import CustomLogger, LLMParamsDoc, OpeaComponent, OpeaComponentRegistry, SearchedDoc, ServiceType
 from comps.cores.mega.utils import ConfigError, get_access_token, load_model_configs
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 
@@ -47,6 +47,7 @@ def get_llm_endpoint():
         raise ConfigError(f"Input model {MODEL_NAME} not present in model_configs")
 
 
+@OpeaComponentRegistry.register("OPEA_LLM")
 class OPEALLM(OpeaComponent):
     """A specialized OPEA LLM component derived from OpeaComponent for interacting with TGI/vLLM services based on OpenAI API.
 
@@ -57,6 +58,9 @@ class OPEALLM(OpeaComponent):
     def __init__(self, name: str, description: str, config: dict = None):
         super().__init__(name, ServiceType.LLM.name.lower(), description, config)
         self.client = self._initialize_client()
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OPEALLM health check failed.")
 
     def _initialize_client(self) -> AsyncOpenAI:
         """Initializes the AsyncOpenAI."""

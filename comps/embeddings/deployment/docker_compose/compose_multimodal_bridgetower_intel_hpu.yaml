@@ -35,6 +35,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       MULTIMODAL_EMBEDDING: true
+      EMBEDDING_COMPONENT_NAME: "OPEA_MULTIMODAL_EMBEDDING_BRIDGETOWER"
       MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
     restart: unless-stopped

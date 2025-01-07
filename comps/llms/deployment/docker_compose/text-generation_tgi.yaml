@@ -41,6 +41,7 @@ services:
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       HF_TOKEN: ${HF_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LLM_COMPONENT_NAME: "OPEA_LLM"
     restart: unless-stopped
 
 networks:

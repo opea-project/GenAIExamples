@@ -9,7 +9,7 @@ from integrations.opea_tei import OPEATEIReranking
 
 from comps import (
     CustomLogger,
-    OpeaComponentController,
+    OpeaComponentLoader,
     ServiceType,
     opea_microservices,
     register_microservice,
@@ -21,24 +21,10 @@ from comps.cores.proto.docarray import LLMParamsDoc, LVMVideoDoc, RerankedDoc, S
 
 logger = CustomLogger("opea_reranking_microservice")
 logflag = os.getenv("LOGFLAG", False)
-rerank_type = os.getenv("RERANK_TYPE", False)
-controller = OpeaComponentController()
 
-# Register components
-try:
-    # Instantiate reranking components
-    if rerank_type == "tei":
-        opea_tei_reranking = OPEATEIReranking(
-            name="OPEATEIReranking",
-            description="OPEA TEI Reranking Service",
-        )
-        # Register components with the controller
-        controller.register(opea_tei_reranking)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
-except Exception as e:
-    logger.error(f"Failed to initialize components: {e}")
+rerank_component_name = os.getenv("RERANK_COMPONENT_NAME", "OPEA_RERANK_TEI")
+# Initialize OpeaComponentLoader
+loader = OpeaComponentLoader(rerank_component_name, description=f"OPEA RERANK Component: {rerank_component_name}")
 
 
 @register_microservice(
@@ -59,8 +45,8 @@ async def reranking(
         logger.info(f"Input received: {input}")
 
     try:
-        # Use the controller to invoke the active component
-        reranking_response = await controller.invoke(input)
+        # Use the loader to invoke the component
+        reranking_response = await loader.invoke(input)
 
         # Log the result if logging is enabled
         if logflag:

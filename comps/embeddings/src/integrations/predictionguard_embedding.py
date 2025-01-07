@@ -6,13 +6,14 @@ import os
 
 from predictionguard import PredictionGuard
 
-from comps import CustomLogger, OpeaComponent, ServiceType
+from comps import CustomLogger, OpeaComponent, OpeaComponentRegistry, ServiceType
 from comps.cores.proto.api_protocol import EmbeddingRequest, EmbeddingResponse, EmbeddingResponseData
 
 logger = CustomLogger("predictionguard_embedding")
 logflag = os.getenv("LOGFLAG", False)
 
 
+@OpeaComponentRegistry.register("OPEA_PREDICTIONGUARD_EMBEDDING")
 class PredictionguardEmbedding(OpeaComponent):
     """A specialized embedding component derived from OpeaComponent for interacting with Prediction Guard services.
 
@@ -30,6 +31,9 @@ class PredictionguardEmbedding(OpeaComponent):
         else:
             logger.info("No PredictionGuard API KEY provided, client not instantiated")
         self.model_name = os.getenv("PG_EMBEDDING_MODEL_NAME", "bridgetower-large-itm-mlm-itc")
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("PredictionguardEmbedding health check failed.")
 
     def check_health(self) -> bool:
         """Checks the health of the Prediction Guard embedding service.

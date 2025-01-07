@@ -39,7 +39,7 @@ function start_service() {
     MILVUS_HOST=${ip_address}
     dataprep_service_port=5022
     HF_TOKEN=${HF_TOKEN}
-    docker run -d --name="test-comps-dataprep-milvus-server" -p ${dataprep_service_port}:5000 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e TEI_EMBEDDING_ENDPOINT=${TEI_EMBEDDING_ENDPOINT} -e MILVUS_HOST=${MILVUS_HOST} -e HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN} -e LOGFLAG=true -e DATAPREP_TYPE="milvus" --ipc=host opea/dataprep-milvus:comps
+    docker run -d --name="test-comps-dataprep-milvus-server" -p ${dataprep_service_port}:5000 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e TEI_EMBEDDING_ENDPOINT=${TEI_EMBEDDING_ENDPOINT} -e MILVUS_HOST=${MILVUS_HOST} -e HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN} -e LOGFLAG=true -e DATAPREP_COMPONENT_NAME="OPEA_DATAPREP_MILVUS" --ipc=host opea/dataprep-milvus:comps
     sleep 1m
 }
 

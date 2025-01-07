@@ -7,7 +7,15 @@ from typing import Union
 
 from langchain_community.vectorstores import Redis
 
-from comps import CustomLogger, EmbedDoc, EmbedMultimodalDoc, OpeaComponent, SearchedDoc, ServiceType
+from comps import (
+    CustomLogger,
+    EmbedDoc,
+    EmbedMultimodalDoc,
+    OpeaComponent,
+    OpeaComponentRegistry,
+    SearchedDoc,
+    ServiceType,
+)
 from comps.cores.proto.api_protocol import ChatCompletionRequest, EmbeddingResponse, RetrievalRequest, RetrievalResponse
 
 from .config import BRIDGE_TOWER_EMBEDDING, EMBED_MODEL, INDEX_NAME, REDIS_URL, TEI_EMBEDDING_ENDPOINT
@@ -16,6 +24,7 @@ logger = CustomLogger("redis_retrievers")
 logflag = os.getenv("LOGFLAG", False)
 
 
+@OpeaComponentRegistry.register("OPEA_RETRIEVER_REDIS")
 class OpeaRedisRetriever(OpeaComponent):
     """A specialized retriever component derived from OpeaComponent for redis retriever services.
 
@@ -43,6 +52,9 @@ class OpeaRedisRetriever(OpeaComponent):
 
             self.embeddings = HuggingFaceBgeEmbeddings(model_name=EMBED_MODEL)
         self.client = self._initialize_client()
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OpeaRedisRetriever health check failed.")
 
     def _initialize_client(self) -> Redis:
         """Initializes the redis client."""

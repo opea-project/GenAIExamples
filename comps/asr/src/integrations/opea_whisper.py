@@ -8,13 +8,14 @@ from typing import List
 import requests
 from fastapi import File, Form, UploadFile
 
-from comps import CustomLogger, OpeaComponent, ServiceType
+from comps import CustomLogger, OpeaComponent, OpeaComponentRegistry, ServiceType
 from comps.cores.proto.api_protocol import AudioTranscriptionResponse
 
 logger = CustomLogger("opea_whisper")
 logflag = os.getenv("LOGFLAG", False)
 
 
+@OpeaComponentRegistry.register("OPEA_WHISPER_ASR")
 class OpeaWhisperAsr(OpeaComponent):
     """A specialized ASR (Automatic Speech Recognition) component derived from OpeaComponent for Whisper ASR services.
 
@@ -25,6 +26,9 @@ class OpeaWhisperAsr(OpeaComponent):
     def __init__(self, name: str, description: str, config: dict = None):
         super().__init__(name, ServiceType.ASR.name.lower(), description, config)
         self.base_url = os.getenv("ASR_ENDPOINT", "http://localhost:7066")
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OpeaWhisperAsr health check failed.")
 
     async def invoke(
         self,

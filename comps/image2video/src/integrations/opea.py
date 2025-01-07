@@ -7,11 +7,12 @@ import torch
 from diffusers import StableVideoDiffusionPipeline
 from diffusers.utils import export_to_video, load_image
 
-from comps import CustomLogger, ImagesPath, OpeaComponent, ServiceType, VideoPath
+from comps import CustomLogger, ImagesPath, OpeaComponent, OpeaComponentRegistry, ServiceType, VideoPath
 
 logger = CustomLogger("opea")
 
 
+@OpeaComponentRegistry.register("OPEA_IMAGE2VIDEO")
 class OpeaImage2video(OpeaComponent):
     """A specialized image2video component derived from OpeaComponent for image2video services."""
 
@@ -42,6 +43,9 @@ class OpeaImage2video(OpeaComponent):
         else:
             raise NotImplementedError(f"Only support cpu and hpu device now, device {self.device} not supported.")
         logger.info("Stable Video Diffusion model initialized.")
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OpeaImage2video health check failed.")
 
     async def invoke(self, input: ImagesPath) -> VideoPath:
         """Invokes the image2video service to generate video(s) for the provided input.

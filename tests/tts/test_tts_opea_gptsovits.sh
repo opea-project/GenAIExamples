@@ -32,7 +32,7 @@ function start_service() {
     unset http_proxy
     docker run -d --name="test-comps-tts-gpt-sovits" -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 9880:9880 --ipc=host opea/gpt-sovits:comps
     sleep 2m
-    docker run -d --name="test-comps-tts" -e TTS_ENDPOINT=http://$ip_address:9880 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p 5016:9088 --ipc=host opea/tts:comps
+    docker run -d --name="test-comps-tts" -e TTS_ENDPOINT=http://$ip_address:9880 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TTS_COMPONENT_NAME="OPEA_GPTSOVITS_TTS" -p 5016:9088 --ipc=host opea/tts:comps
     sleep 15
 }
 

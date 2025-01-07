@@ -7,12 +7,22 @@ import os
 
 import requests
 
-from comps import CustomLogger, EmbedMultimodalDoc, MultimodalDoc, OpeaComponent, ServiceType, TextDoc, TextImageDoc
+from comps import (
+    CustomLogger,
+    EmbedMultimodalDoc,
+    MultimodalDoc,
+    OpeaComponent,
+    OpeaComponentRegistry,
+    ServiceType,
+    TextDoc,
+    TextImageDoc,
+)
 
 logger = CustomLogger("opea_multimodal_embedding_bridgetower")
 logflag = os.getenv("LOGFLAG", False)
 
 
+@OpeaComponentRegistry.register("OPEA_MULTIMODAL_EMBEDDING_BRIDGETOWER")
 class OpeaMultimodalEmbeddingBrigeTower(OpeaComponent):
     """A specialized embedding component derived from OpeaComponent for local deployed BrigeTower multimodal embedding services.
 
@@ -23,6 +33,9 @@ class OpeaMultimodalEmbeddingBrigeTower(OpeaComponent):
     def __init__(self, name: str, description: str, config: dict = None):
         super().__init__(name, ServiceType.EMBEDDING.name.lower(), description, config)
         self.base_url = os.getenv("MMEI_EMBEDDING_ENDPOINT", "http://localhost:8080")
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OpeaMultimodalEmbeddingBrigeTower health check failed.")
 
     async def invoke(self, input: MultimodalDoc) -> EmbedMultimodalDoc:
         """Invokes the embedding service to generate embeddings for the provided input.

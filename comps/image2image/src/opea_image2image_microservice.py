@@ -8,7 +8,7 @@ import time
 
 from comps import (
     CustomLogger,
-    OpeaComponentController,
+    OpeaComponentLoader,
     SDImg2ImgInputs,
     SDOutputs,
     ServiceType,
@@ -23,15 +23,7 @@ args = None
 
 logger = CustomLogger("image2image")
 
-
-# Initialize OpeaComponentController
-controller = OpeaComponentController()
-
-# Register components
-# try:
-
-# except Exception as e:
-#     logger.error(f"Failed to initialize components: {e}")
+component_loader = None
 
 
 @register_microservice(
@@ -46,7 +38,7 @@ controller = OpeaComponentController()
 @register_statistics(names=["opea_service@image2image"])
 def image2image(input: SDImg2ImgInputs):
     start = time.time()
-    results = controller.invoke(input)
+    results = component_loader.invoke(input)
     statistics_dict["opea_service@image2image"].append_latency(time.time() - start, None)
     return SDOutputs(images=results)
 
@@ -61,21 +53,18 @@ if __name__ == "__main__":
     parser.add_argument("--bf16", action="store_true")
 
     args = parser.parse_args()
-    # Instantiate Animation component and register it to controller
-    opea_imagetoimage = OpeaImageToImage(
-        name="OpeaImageToImage",
-        description="OPEA Image To Image Service",
-        seed=args.seed,
-        model_name_or_path=args.model_name_or_path,
-        device=args.device,
-        token=args.token,
-        bf16=args.bf16,
-        use_hpu_graphs=args.use_hpu_graphs,
-    )
+    image2image_component_name = os.getenv("IMAGE2IMAGE_COMPONENT_NAME", "OPEA_IMAGE2IMAGE")
+    # Register components
+    try:
+        # Initialize OpeaComponentLoader
+        component_loader = OpeaComponentLoader(
+            image2image_component_name,
+            description=f"OPEA IMAGE2IMAGE Component: {image2image_component_name}",
+            config=args.__dict__,
+        )
+    except Exception as e:
+        logger.error(f"Failed to initialize components: {e}")
+        exit(1)
 
-    controller.register(opea_imagetoimage)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
     logger.info("Image2image server started.")
     opea_microservices["opea_service@image2image"].start()

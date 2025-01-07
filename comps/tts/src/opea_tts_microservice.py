@@ -10,7 +10,7 @@ from integrations.opea_speecht5 import OpeaSpeecht5Tts
 
 from comps import (
     CustomLogger,
-    OpeaComponentController,
+    OpeaComponentLoader,
     ServiceType,
     opea_microservices,
     register_microservice,
@@ -22,30 +22,9 @@ from comps.cores.proto.api_protocol import AudioSpeechRequest
 logger = CustomLogger("opea_tts_microservice")
 logflag = os.getenv("LOGFLAG", False)
 
-# Initialize OpeaComponentController
-controller = OpeaComponentController()
-
-# Register components
-try:
-    # Instantiate TTS components
-    opea_speecht5 = OpeaSpeecht5Tts(
-        name="OpeaSpeecht5Tts",
-        description="OPEA SpeechT5 TTS Service",
-    )
-
-    opea_gptsovits = OpeaGptsovitsTts(
-        name="OpeaGptsovitsTts",
-        description="OPEA GPTSoVITS TTS Service",
-    )
-
-    # Register components with the controller
-    controller.register(opea_speecht5)
-    controller.register(opea_gptsovits)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
-except Exception as e:
-    logger.error(f"Failed to initialize components: {e}")
+tts_component_name = os.getenv("TTS_COMPONENT_NAME", "OPEA_SPEECHT5_TTS")
+# Initialize OpeaComponentLoader
+loader = OpeaComponentLoader(tts_component_name, description=f"OPEA TTS Component: {tts_component_name}")
 
 
 async def stream_forwarder(response):
@@ -71,8 +50,8 @@ async def text_to_speech(request: AudioSpeechRequest) -> StreamingResponse:
         logger.info(f"Input received: {request}")
 
     try:
-        # Use the controller to invoke the active component
-        tts_response = controller.invoke(request)
+        # Use the loader to invoke the component
+        tts_response = await loader.invoke(request)
         if logflag:
             logger.info(tts_response)
         statistics_dict["opea_service@tts"].append_latency(time.time() - start, None)

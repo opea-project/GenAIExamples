@@ -9,7 +9,7 @@ from integrations.predictionguard_embedding import PredictionguardEmbedding
 
 from comps import (
     CustomLogger,
-    OpeaComponentController,
+    OpeaComponentLoader,
     ServiceType,
     opea_microservices,
     register_microservice,
@@ -21,29 +21,12 @@ from comps.cores.proto.api_protocol import EmbeddingRequest, EmbeddingResponse
 logger = CustomLogger("opea_embedding_microservice")
 logflag = os.getenv("LOGFLAG", False)
 
-# Initialize OpeaComponentController
-controller = OpeaComponentController()
-
-# Register components
-try:
-    # Instantiate Embedding components and register it to controller
-    if os.getenv("TEI_EMBEDDING_ENDPOINT"):
-        opea_tei_embedding = OpeaTEIEmbedding(
-            name="OpeaTEIEmbedding",
-            description="OPEA TEI Embedding Service",
-        )
-        controller.register(opea_tei_embedding)
-    if os.getenv("PREDICTIONGUARD_API_KEY"):
-        predictionguard_embedding = PredictionguardEmbedding(
-            name="PredictionGuardEmbedding",
-            description="Prediction Guard Embedding Service",
-        )
-        controller.register(predictionguard_embedding)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
-except Exception as e:
-    logger.error(f"Failed to initialize components: {e}")
+embedding_component_name = os.getenv("EMBEDDING_COMPONENT_NAME", "OPEA_TEI_EMBEDDING")
+# Initialize OpeaComponentLoader
+loader = OpeaComponentLoader(
+    embedding_component_name,
+    description=f"OPEA Embedding Component: {embedding_component_name}",
+)
 
 
 @register_microservice(
@@ -62,8 +45,8 @@ async def embedding(input: EmbeddingRequest) -> EmbeddingResponse:
         logger.info(f"Input received: {input}")
 
     try:
-        # Use the controller to invoke the active component
-        embedding_response = await controller.invoke(input)
+        # Use the loader to invoke the component
+        embedding_response = await loader.invoke(input)
 
         # Log the result if logging is enabled
         if logflag:

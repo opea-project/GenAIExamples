@@ -4,7 +4,7 @@ import base64
 import os
 import threading
 
-from comps import CustomLogger, OpeaComponent, SDImg2ImgInputs, ServiceType
+from comps import CustomLogger, OpeaComponent, OpeaComponentRegistry, SDImg2ImgInputs, ServiceType
 
 logger = CustomLogger("opea_imagetoimage")
 logflag = os.getenv("LOGFLAG", False)
@@ -65,6 +65,7 @@ def initialize(
             initialized = True
 
 
+@OpeaComponentRegistry.register("OPEA_IMAGE2IMAGE")
 class OpeaImageToImage(OpeaComponent):
     """A specialized ImageToImage component derived from OpeaComponent for Stable Diffusion model .
 
@@ -94,6 +95,9 @@ class OpeaImageToImage(OpeaComponent):
         )
         self.pipe = pipe
         self.seed = seed
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OpeaImageToImage health check failed.")
 
     def invoke(self, input: SDImg2ImgInputs):
         """Invokes the ImageToImage service to generate Images for the provided input.

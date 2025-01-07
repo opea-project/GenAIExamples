@@ -14,6 +14,7 @@ services:
       https_proxy: ${https_proxy}
       PG_EMBEDDING_MODEL_NAME: ${PG_EMBEDDING_MODEL_NAME}
       PREDICTIONGUARD_API_KEY: ${PREDICTIONGUARD_API_KEY}
+      EMBEDDING_COMPONENT_NAME: "OPEA_PREDICTIONGUARD_EMBEDDING"
     restart: unless-stopped
 
 networks:

@@ -5,18 +5,22 @@ import os
 
 import requests
 
-from comps import CustomLogger, OpeaComponent, ServiceType
+from comps import CustomLogger, OpeaComponent, OpeaComponentRegistry, ServiceType
 
 logger = CustomLogger("opea_animation")
 logflag = os.getenv("LOGFLAG", False)
 
 
+@OpeaComponentRegistry.register("OPEA_ANIMATION")
 class OpeaAnimation(OpeaComponent):
     """A specialized animation component derived from OpeaComponent."""
 
     def __init__(self, name: str, description: str, config: dict = None):
         super().__init__(name, ServiceType.ANIMATION.name.lower(), description, config)
         self.base_url = os.getenv("WAV2LIP_ENDPOINT", "http://localhost:7860")
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OpeaAnimation health check failed.")
 
     def invoke(self, input: str):
         """Invokes the animation service to generate embeddings for the animation input.

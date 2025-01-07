@@ -33,6 +33,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      EMBEDDING_COMPONENT_NAME: "OPEA_TEI_EMBEDDING"
     depends_on:
       tei-embedding-service:
         condition: service_healthy

@@ -27,7 +27,7 @@ function start_service() {
     sleep 3m
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:${tei_endpoint}"
     tei_service_port=5002
-    docker run -d --name="test-comps-embedding-server" -e LOGFLAG=True -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p ${tei_service_port}:6000 --ipc=host -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT  opea/embedding:comps
+    docker run -d --name="test-comps-embedding-server" -e LOGFLAG=True -e http_proxy=$http_proxy -e https_proxy=$https_proxy -p ${tei_service_port}:6000 --ipc=host -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e EMBEDDING_COMPONENT_NAME="OPEA_TEI_EMBEDDING" opea/embedding:comps
     sleep 15
 }
 

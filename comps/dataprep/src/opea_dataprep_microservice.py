@@ -9,7 +9,7 @@ from typing import List, Optional, Union
 from fastapi import Body, File, Form, UploadFile
 from integrations.milvus import OpeaMilvusDataprep
 from integrations.redis import OpeaRedisDataprep
-from opea_dataprep_controller import OpeaDataprepController
+from opea_dataprep_loader import OpeaDataprepLoader
 
 from comps import (
     CustomLogger,
@@ -23,32 +23,14 @@ from comps.dataprep.src.utils import create_upload_folder
 
 logger = CustomLogger("opea_dataprep_microservice")
 logflag = os.getenv("LOGFLAG", False)
-dataprep_type = os.getenv("DATAPREP_TYPE", False)
 upload_folder = "./uploaded_files/"
-# Initialize Controller
-controller = OpeaDataprepController()
 
-
-# Register components
-try:
-    # Instantiate Dataprep components and register it to controller
-    if dataprep_type == "redis":
-        redis_dataprep = OpeaRedisDataprep(
-            name="OpeaRedisDataprep",
-            description="OPEA Redis Dataprep Service",
-        )
-        controller.register(redis_dataprep)
-    elif dataprep_type == "milvus":
-        milvus_dataprep = OpeaMilvusDataprep(
-            name="OpeaMilvusDataprep",
-            description="OPEA Milvus Dataprep Service",
-        )
-        controller.register(milvus_dataprep)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
-except Exception as e:
-    logger.error(f"Failed to initialize components: {e}")
+dataprep_component_name = os.getenv("DATAPREP_COMPONENT_NAME", "OPEA_DATAPREP_REDIS")
+# Initialize OpeaComponentLoader
+loader = OpeaDataprepLoader(
+    dataprep_component_name,
+    description=f"OPEA DATAPREP Component: {dataprep_component_name}",
+)
 
 
 @register_microservice(
@@ -74,10 +56,8 @@ async def ingest_files(
         logger.info(f"[ ingest ] link_list:{link_list}")
 
     try:
-        # Use the controller to invoke the active component
-        response = await controller.ingest_files(
-            files, link_list, chunk_size, chunk_overlap, process_table, table_strategy
-        )
+        # Use the loader to invoke the component
+        response = await loader.ingest_files(files, link_list, chunk_size, chunk_overlap, process_table, table_strategy)
         # Log the result if logging is enabled
         if logflag:
             logger.info(f"[ ingest ] Output generated: {response}")
@@ -104,8 +84,8 @@ async def get_files():
         logger.info("[ get ] start to get ingested files")
 
     try:
-        # Use the controller to invoke the active component
-        response = await controller.get_files()
+        # Use the loader to invoke the component
+        response = await loader.get_files()
         # Log the result if logging is enabled
         if logflag:
             logger.info(f"[ get ] ingested files: {response}")
@@ -132,8 +112,8 @@ async def delete_files(file_path: str = Body(..., embed=True)):
         logger.info("[ delete ] start to delete ingested files")
 
     try:
-        # Use the controller to invoke the active component
-        response = await controller.delete_files(file_path)
+        # Use the loader to invoke the component
+        response = await loader.delete_files(file_path)
         # Log the result if logging is enabled
         if logflag:
             logger.info(f"[ delete ] deleted result: {response}")

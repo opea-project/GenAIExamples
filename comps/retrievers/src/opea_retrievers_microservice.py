@@ -13,7 +13,7 @@ from comps import (
     CustomLogger,
     EmbedDoc,
     EmbedMultimodalDoc,
-    OpeaComponentController,
+    OpeaComponentLoader,
     SearchedDoc,
     SearchedMultimodalDoc,
     ServiceType,
@@ -32,31 +32,13 @@ from comps.cores.proto.api_protocol import (
 
 logger = CustomLogger("opea_retrievers_microservice")
 logflag = os.getenv("LOGFLAG", False)
-retriever_type = os.getenv("RETRIEVER_TYPE", False)
-# Initialize Controller
-controller = OpeaComponentController()
 
-
-# Register components
-try:
-    # Instantiate Retrievers components and register it to controller
-    if retriever_type == "redis":
-        redis_retriever = OpeaRedisRetriever(
-            name="OpeaRedisRetriever",
-            description="OPEA Redis Retriever Service",
-        )
-        controller.register(redis_retriever)
-    elif retriever_type == "milvus":
-        milvus_retriever = OpeaMilvusRetriever(
-            name="OpeaMilvusRetriever",
-            description="OPEA Milvus Retriever Service",
-        )
-        controller.register(milvus_retriever)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
-except Exception as e:
-    logger.error(f"Failed to initialize components: {e}")
+retriever_component_name = os.getenv("RETRIEVER_COMPONENT_NAME", "OPEA_RETRIEVER_REDIS")
+# Initialize OpeaComponentLoader
+loader = OpeaComponentLoader(
+    retriever_component_name,
+    description=f"OPEA RETRIEVER Component: {retriever_component_name}",
+)
 
 
 @register_microservice(
@@ -76,8 +58,8 @@ async def ingest_files(
         logger.info(f"[ retrieval ] input:{input}")
 
     try:
-        # Use the controller to invoke the active component
-        response = await controller.invoke(input)
+        # Use the loader to invoke the component
+        response = await loader.invoke(input)
 
         # return different response format
         retrieved_docs = []

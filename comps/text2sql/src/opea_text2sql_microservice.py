@@ -7,7 +7,7 @@ import sys
 
 from fastapi.exceptions import HTTPException
 
-from comps import CustomLogger, OpeaComponentController, opea_microservices, register_microservice
+from comps import CustomLogger, OpeaComponentLoader, opea_microservices, register_microservice
 from comps.text2sql.src.integrations.opea import Input, OpeaText2SQL
 
 cur_path = pathlib.Path(__file__).parent.resolve()
@@ -17,23 +17,12 @@ sys.path.append(comps_path)
 logger = CustomLogger("text2sql")
 logflag = os.getenv("LOGFLAG", False)
 
-try:
-    # Initialize OpeaComponentController
-    controller = OpeaComponentController()
-
-    # Register components
-    text2sql_agent = OpeaText2SQL(
-        name="Text2SQL",
-        description="Text2SQL Service",
-    )
-
-    # Register components with the controller
-    controller.register(text2sql_agent)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
-except Exception as e:
-    logger.error(f"Failed to initialize components: {e}")
+text2sql_component_name = os.getenv("TEXT2SQL_COMPONENT_NAME", "OPEA_TEXT2SQL")
+# Initialize OpeaComponentLoader
+loader = OpeaComponentLoader(
+    text2sql_component_name,
+    description=f"OPEA RERANK Component: {text2sql_component_name}",
+)
 
 
 @register_microservice(
@@ -55,7 +44,7 @@ async def execute_agent(input: Input):
         dict: A dictionary with a 'result' key containing the output of the executed SQL query.
     """
     if input.conn_str.test_connection():
-        response = await controller.invoke(input)
+        response = await loader.invoke(input)
         # response = "a"
         return {"result": response}
     else:

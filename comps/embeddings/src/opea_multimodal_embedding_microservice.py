@@ -10,7 +10,7 @@ from comps import (
     CustomLogger,
     EmbedMultimodalDoc,
     MultimodalDoc,
-    OpeaComponentController,
+    OpeaComponentLoader,
     ServiceType,
     opea_microservices,
     register_microservice,
@@ -21,23 +21,12 @@ from comps import (
 logger = CustomLogger("opea_multimodal_embedding_microservice")
 logflag = os.getenv("LOGFLAG", False)
 
-# Initialize OpeaComponentController
-controller = OpeaComponentController()
-
-# Register components
-try:
-    # Instantiate Embedding components and register it to controller
-    if os.getenv("MMEI_EMBEDDING_ENDPOINT"):
-        opea_mm_embedding_bt = OpeaMultimodalEmbeddingBrigeTower(
-            name="OpeaMultimodalEmbeddingBrigeTower",
-            description="OPEA Multimodal Embedding Service using BridgeTower",
-        )
-        controller.register(opea_mm_embedding_bt)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
-except Exception as e:
-    logger.error(f"Failed to initialize components: {e}")
+embedding_component_name = os.getenv("EMBEDDING_COMPONENT_NAME", "OPEA_MULTIMODAL_EMBEDDING_BRIDGETOWER")
+# Initialize OpeaComponentLoader
+loader = OpeaComponentLoader(
+    embedding_component_name,
+    description=f"OPEA Embedding Component: {embedding_component_name}",
+)
 
 port = int(os.getenv("MM_EMBEDDING_PORT_MICROSERVICE", 6000))
 
@@ -60,8 +49,8 @@ async def embedding(input: MultimodalDoc) -> EmbedMultimodalDoc:
         logger.info(f"Input received: {input}")
 
     try:
-        # Use the controller to invoke the active component
-        embedding_response = await controller.invoke(input)
+        # Use the loader to invoke the component
+        embedding_response = await loader.invoke(input)
 
         # Log the result if logging is enabled
         if logflag:

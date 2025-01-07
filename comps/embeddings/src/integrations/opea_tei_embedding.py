@@ -8,7 +8,7 @@ from typing import List, Union
 import requests
 from huggingface_hub import AsyncInferenceClient
 
-from comps import CustomLogger, OpeaComponent, ServiceType
+from comps import CustomLogger, OpeaComponent, OpeaComponentRegistry, ServiceType
 from comps.cores.mega.utils import get_access_token
 from comps.cores.proto.api_protocol import EmbeddingRequest, EmbeddingResponse
 
@@ -19,6 +19,7 @@ CLIENTID = os.getenv("CLIENTID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 
+@OpeaComponentRegistry.register("OPEA_TEI_EMBEDDING")
 class OpeaTEIEmbedding(OpeaComponent):
     """A specialized embedding component derived from OpeaComponent for TEI embedding services.
 
@@ -31,6 +32,10 @@ class OpeaTEIEmbedding(OpeaComponent):
         super().__init__(name, ServiceType.EMBEDDING.name.lower(), description, config)
         self.base_url = os.getenv("TEI_EMBEDDING_ENDPOINT", "http://localhost:8080")
         self.client = self._initialize_client()
+
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OpeaTEIEmbedding health check failed.")
 
     def _initialize_client(self) -> AsyncInferenceClient:
         """Initializes the AsyncInferenceClient."""

@@ -38,7 +38,7 @@ function start_service() {
     export HUGGINGFACEHUB_API_TOKEN=$HF_TOKEN
     retriever_port=5015
     # unset http_proxy
-    docker run -d --name="test-comps-retriever-milvus-server" -p ${retriever_port}:7000 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MILVUS_HOST=$ip_address -e LOGFLAG=true -e RETRIEVER_TYPE="milvus" opea/retriever-milvus:comps
+    docker run -d --name="test-comps-retriever-milvus-server" -p ${retriever_port}:7000 --ipc=host -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e TEI_EMBEDDING_ENDPOINT=$TEI_EMBEDDING_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MILVUS_HOST=$ip_address -e LOGFLAG=true -e RETRIEVER_COMPONENT_NAME="OPEA_RETRIEVER_MILVUS" opea/retriever-milvus:comps
 
     sleep 1m
 }

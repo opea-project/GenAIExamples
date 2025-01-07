@@ -8,7 +8,7 @@ from typing import Union
 import requests
 from huggingface_hub import AsyncInferenceClient
 
-from comps import CustomLogger, LLMParamsDoc, SearchedDoc, ServiceType
+from comps import CustomLogger, LLMParamsDoc, OpeaComponentRegistry, SearchedDoc, ServiceType
 from comps.cores.common.component import OpeaComponent
 from comps.cores.mega.utils import get_access_token
 from comps.cores.proto.api_protocol import (
@@ -27,6 +27,7 @@ CLIENTID = os.getenv("CLIENTID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 
+@OpeaComponentRegistry.register("OPEA_RERANK_TEI")
 class OPEATEIReranking(OpeaComponent):
     """A specialized reranking component derived from OpeaComponent for TEI reranking services.
 
@@ -38,6 +39,9 @@ class OPEATEIReranking(OpeaComponent):
         super().__init__(name, ServiceType.RERANK.name.lower(), description, config)
         self.base_url = os.getenv("TEI_RERANKING_ENDPOINT", "http://localhost:8808")
         self.client = self._initialize_client()
+        health_status = self.check_health()
+        if not health_status:
+            logger.error("OPEATEIReranking health check failed.")
 
     def _initialize_client(self) -> AsyncInferenceClient:
         """Initializes the AsyncInferenceClient."""

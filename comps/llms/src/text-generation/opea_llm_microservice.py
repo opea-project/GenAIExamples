@@ -10,7 +10,7 @@ from integrations.opea import OPEALLM
 from comps import (
     CustomLogger,
     LLMParamsDoc,
-    OpeaComponentController,
+    OpeaComponentLoader,
     SearchedDoc,
     ServiceType,
     opea_microservices,
@@ -23,23 +23,10 @@ from comps.cores.proto.api_protocol import ChatCompletionRequest
 logger = CustomLogger("llm")
 logflag = os.getenv("LOGFLAG", False)
 
-# Initialize OpeaComponentController
-controller = OpeaComponentController()
 
-# Register components
-try:
-    opea_llm = OPEALLM(
-        name="OPEALLM",
-        description="OPEA LLM Service, compatible with OpenAI API",
-    )
-
-    # Register components with the controller
-    controller.register(opea_llm)
-
-    # Discover and activate a healthy component
-    controller.discover_and_activate()
-except Exception as e:
-    logger.error(f"Failed to initialize components: {e}")
+llm_component_name = os.getenv("LLM_COMPONENT_NAME", "OPEA_LLM")
+# Initialize OpeaComponentLoader
+loader = OpeaComponentLoader(llm_component_name, description=f"OPEA LLM Component: {llm_component_name}")
 
 
 @register_microservice(
@@ -58,8 +45,8 @@ async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, Searche
         logger.info(input)
 
     try:
-        # Use the controller to invoke the active component
-        response = await controller.invoke(input)
+        # Use the loader to invoke the component
+        response = await loader.invoke(input)
         # Record statistics
         statistics_dict["opea_service@llm"].append_latency(time.time() - start, None)
         return response
