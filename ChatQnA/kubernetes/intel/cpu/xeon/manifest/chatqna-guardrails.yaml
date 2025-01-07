@@ -541,11 +541,8 @@ spec:
   template:
     metadata:
       labels:
-        helm.sh/chart: chatqna-ui-1.0.0
         app.kubernetes.io/name: chatqna-ui
         app.kubernetes.io/instance: chatqna
-        app.kubernetes.io/version: "v1.0"
-        app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
         {}
