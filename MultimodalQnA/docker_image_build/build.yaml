@@ -41,18 +41,12 @@ services:
       dockerfile: comps/lvms/src/integrations/dependency/llava/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
-  lvm-llava-svc:
+  lvm:
     build:
       context: GenAIComps
       dockerfile: comps/lvms/src/Dockerfile
     extends: multimodalqna
-    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
-  lvm-tgi:
-    build:
-      context: GenAIComps
-      dockerfile: comps/lvms/src/Dockerfile
-    extends: multimodalqna
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
   dataprep-multimodal-redis:
     build:
       context: GenAIComps
