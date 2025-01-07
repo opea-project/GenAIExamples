@@ -19,7 +19,7 @@ Should the Docker image you seek not yet be available on Docker Hub, you can bui
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 2. Build the MegaService Docker Image
@@ -43,7 +43,7 @@ docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --bu
 
 Then run the command `docker images`, you will have the following 3 Docker Images:
 
-- `opea/llm-tgi:latest`
+- `opea/llm-textgen:latest`
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
 
@@ -60,7 +60,7 @@ docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=
 
 Then run the command `docker images`, you will have the following 3 Docker Images:
 
-- `opea/llm-tgi:latest`
+- `opea/llm-textgen:latest`
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
 - `opea/codegen-react-ui:latest` (optional)

@@ -35,12 +35,12 @@ services:
       dockerfile: comps/retrievers/vdms/langchain/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
-  reranking-videoqna:
+  reranking-tei:
     build:
       context: GenAIComps
       dockerfile: comps/reranks/src/Dockerfile
     extends: videoqna
-    image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
   video-llama-lvm-server:
     build:
       context: GenAIComps
