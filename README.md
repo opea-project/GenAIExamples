@@ -35,11 +35,11 @@ Deployment are based on released docker images by default, check [docker image l
 
   Based on different deployment model size and performance requirement, you may choose different hardware platforms or cloud instances. Here are some reference platforms
 
-    | Use Case | Deployment model | Reference Configuration                                      | Hardware access/instances                                                    |
-    | -------- | ---------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-    | Xeon     | Intel/neural-chat-7b-v3-3     | 64 vCPUs, 365 GB disk 100 GB RAM, and Ubuntu 24.04            | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
-    | Gaudi    | Intel/neural-chat-7b-v3-3     | 1 or 2 Gaudi Card, 16vCPUs, 365 GB disk 100 GB RAM, and Ubuntu 24.04 | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
-    | Xeon     | Intel/neural-chat-7b-v3-3     | 64 vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04            | AWS Cloud/c7i.16xlarge                                                   |
+  | Use Case | Deployment model          | Reference Configuration                                              | Hardware access/instances                                                    |
+  | -------- | ------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+  | Xeon     | Intel/neural-chat-7b-v3-3 | 64 vCPUs, 365 GB disk 100 GB RAM, and Ubuntu 24.04                   | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
+  | Gaudi    | Intel/neural-chat-7b-v3-3 | 1 or 2 Gaudi Card, 16vCPUs, 365 GB disk 100 GB RAM, and Ubuntu 24.04 | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
+  | Xeon     | Intel/neural-chat-7b-v3-3 | 64 vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04                    | AWS Cloud/c7i.16xlarge                                                       |
 
 #### Deploy Examples
 
