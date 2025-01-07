@@ -29,7 +29,7 @@ services:
       dockerfile: comps/web_retrievers/chroma/langchain/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/web-retriever-chroma:${TAG:-latest}
-  reranking-tei:
+  reranking:
     build:
       context: GenAIComps
       dockerfile: comps/rerankings/src/Dockerfile

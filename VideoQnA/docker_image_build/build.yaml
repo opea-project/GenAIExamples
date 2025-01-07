@@ -35,7 +35,7 @@ services:
       dockerfile: comps/retrievers/vdms/langchain/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
-  reranking-tei:
+  reranking:
     build:
       context: GenAIComps
       dockerfile: comps/rerankings/src/Dockerfile
