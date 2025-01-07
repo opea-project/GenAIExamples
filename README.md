@@ -30,16 +30,16 @@ Deployment are based on released docker images by default, check [docker image l
   - You should have a kubernetes cluster ready for use. If not, you can refer to [k8s install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install/README.md) to deploy one.
   - (Optional) You should have GMC installed to your kubernetes cluster if you want to try with GMC. Refer to [GMC install](https://github.com/opea-project/docs/blob/main/guide/installation/gmc_install/gmc_install.md) for more information.
   - (Optional) You should have Helm (version >= 3.15) installed if you want to deploy with Helm Charts. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
-  - Based on different deployment model, you may choose different hardware platforms or cloud instances. Here are some reference platforms
+
+- Recommended Hardware Reference
+
+  Based on different deployment model size and performance requirement, you may choose different hardware platforms or cloud instances. Here are some reference platforms
 
     | Use Case | Deployment model | Reference Configuration                                      | Hardware access/instances                                                    |
     | -------- | ---------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-    | Xeon     | Single node      | 16 vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04            | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
-    | Gaudi    | Single node      | Gaudi Card, 16vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04 | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
-    | Xeon     | Single node      | 16 vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04            | AWS Cloud/m7i-flex.4xlarge                                                   |
-    |          |
-    | Xeon     | Single node      | 16 vCPUs, 512 GB disk 80 GB RAM, and Ubuntu 24.04            | IBM Cloud/xlarge                                                             |
-    |          |
+    | Xeon     | Intel/neural-chat-7b-v3-3     | 64 vCPUs, 365 GB disk 100 GB RAM, and Ubuntu 24.04            | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
+    | Gaudi    | Intel/neural-chat-7b-v3-3     | 1 or 2 Gaudi Card, 16vCPUs, 365 GB disk 100 GB RAM, and Ubuntu 24.04 | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
+    | Xeon     | Intel/neural-chat-7b-v3-3     | 64 vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04            | AWS Cloud/c7i.16xlarge                                                   |
 
 #### Deploy Examples
 
