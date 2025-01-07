@@ -1,7 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import asyncio
 import base64
 import os
 
@@ -21,19 +20,15 @@ LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 8888))
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
-    print(inputs)
-    if self.services[cur_node].service_type == ServiceType.ASR:
-        # {'byte_str': 'UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'}
-        inputs["audio"] = inputs["byte_str"]
-        del inputs["byte_str"]
-    elif self.services[cur_node].service_type == ServiceType.LLM:
+
+    if self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
         next_inputs["model"] = "tgi"  # specifically clarify the fake model to make the format unified
         next_inputs["messages"] = [{"role": "user", "content": inputs["asr_result"]}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
-        next_inputs["stream"] = inputs["streaming"]  # False as default
+        next_inputs["stream"] = inputs["stream"]  # False as default
         next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
         # next_inputs["presence_penalty"] = inputs["presence_penalty"]
         # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
@@ -108,10 +103,10 @@ class AudioQnAService:
             frequency_penalty=chat_request.frequency_penalty if chat_request.frequency_penalty else 0.0,
             presence_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 0.0,
             repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
-            streaming=False,  # TODO add streaming LLM output as input to TTS
+            stream=False,  # TODO add stream LLM output as input to TTS
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs={"byte_str": chat_request.audio}, llm_parameters=parameters
+            initial_inputs={"audio": chat_request.audio}, llm_parameters=parameters
         )
 
         last_node = runtime_graph.all_leaves()[-1]
