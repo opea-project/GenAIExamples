@@ -53,7 +53,7 @@ services:
     ipc: host
   audioqna-backend-server:
     image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
-    container_name: audioqna-xeon-backend-server
+    container_name: audioqna-rocm-backend-server
     depends_on:
       - whisper-service
       - tgi-service

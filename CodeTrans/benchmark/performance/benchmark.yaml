@@ -38,7 +38,7 @@ test_cases:
         top_k: 10
         top_p: 0.95
         repetition_penalty: 1.03
-        streaming: true
+        stream: true
     llmserve:
       run_test: true
       service_name: "codetrans-llm-svc"  # Replace with your service name
