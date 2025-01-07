@@ -26,9 +26,20 @@ Deployment are based on released docker images by default, check [docker image l
 
 - For Docker Compose based deployment, you should have docker compose installed. Refer to [docker compose install](https://docs.docker.com/compose/install/).
 - For Kubernetes based deployment, we provide 3 ways from the easiest manifests to powerful [GMC](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector/README.md) based deployment.
+
   - You should have a kubernetes cluster ready for use. If not, you can refer to [k8s install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install/README.md) to deploy one.
   - (Optional) You should have GMC installed to your kubernetes cluster if you want to try with GMC. Refer to [GMC install](https://github.com/opea-project/docs/blob/main/guide/installation/gmc_install/gmc_install.md) for more information.
   - (Optional) You should have Helm (version >= 3.15) installed if you want to deploy with Helm Charts. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
+
+- Recommended Hardware Reference
+
+  Based on different deployment model size and performance requirement, you may choose different hardware platforms or cloud instances. Here are some reference platforms
+
+  | Use Case | Deployment model          | Reference Configuration                                              | Hardware access/instances                                                    |
+  | -------- | ------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+  | Xeon     | Intel/neural-chat-7b-v3-3 | 64 vCPUs, 365 GB disk 100 GB RAM, and Ubuntu 24.04                   | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
+  | Gaudi    | Intel/neural-chat-7b-v3-3 | 1 or 2 Gaudi Card, 16vCPUs, 365 GB disk 100 GB RAM, and Ubuntu 24.04 | visit the [[Intel Tiber Developer Cloud]](https://console.cloud.intel.com/). |
+  | Xeon     | Intel/neural-chat-7b-v3-3 | 64 vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04                    | AWS Cloud/c7i.16xlarge                                                       |
 
 #### Deploy Examples
 

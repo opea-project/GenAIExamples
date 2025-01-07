@@ -169,7 +169,7 @@ function validate_microservices() {
         "${ip_address}:6000/v1/embeddings" \
         '"embedding":[' \
         "embedding-microservice" \
-        "embedding-tei-server" \
+        "embedding-server" \
         '{"input":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -241,7 +241,7 @@ function validate_microservices() {
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm-microservice" \
-        "llm-tgi-server" \
+        "llm-textgen-server" \
         '{"query":"What is Deep Learning?"}'
 
     # FAQGen llm microservice
@@ -257,7 +257,7 @@ function validate_microservices() {
         "${ip_address}:9001/v1/chat/completions" \
         "data: " \
         "llm_codegen" \
-        "llm-tgi-server-codegen" \
+        "llm-textgen-server-codegen" \
         '{"query":"def print_hello_world():"}'
 
     result=$(curl -X 'POST' \
