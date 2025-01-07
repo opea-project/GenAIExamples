@@ -24,7 +24,7 @@ embedding-multimodal-bridgetower
 =====================
 Port 6006 - Open to 0.0.0.0/0
 
-embedding-tei
+embedding
 =========
 Port 6000 - Open to 0.0.0.0/0
 
@@ -115,10 +115,10 @@ cd GenAIComps
 docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile .
 ```
 
-Build embedding-tei microservice image
+Build embedding microservice image
 
 ```bash
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
+docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
 ```
 
 ### 2. Build retriever-multimodal-redis Image
@@ -184,7 +184,7 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 4. `opea/retriever-multimodal-redis:latest`
 5. `opea/whisper:latest`
 6. `opea/redis-vector-db`
-7. `opea/embedding-tei:latest`
+7. `opea/embedding:latest`
 8. `opea/embedding-multimodal-bridgetower:latest`
 9. `opea/multimodalqna:latest`
 10. `opea/multimodalqna-ui:latest`
@@ -195,10 +195,10 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
 
-| Service       | Model                                       |
-| ------------- | ------------------------------------------- |
-| embedding-tei | BridgeTower/bridgetower-large-itm-mlm-gaudi |
-| LVM           | llava-hf/llava-1.5-7b-hf                    |
+| Service   | Model                                       |
+| --------- | ------------------------------------------- |
+| embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
+| LVM       | llava-hf/llava-1.5-7b-hf                    |
 
 ### Start all the services Docker Containers
 
@@ -227,7 +227,7 @@ curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
      -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-2. embedding-tei
+2. embedding
 
 ```bash
 curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \

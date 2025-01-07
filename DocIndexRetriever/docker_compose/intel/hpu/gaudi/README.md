@@ -9,7 +9,7 @@ DocRetriever are the most widely adopted use case for leveraging the different m
   ```bash
   git clone https://github.com/opea-project/GenAIComps.git
   cd GenAIComps
-  docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
+  docker build -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
   ```
 
 - Retriever Vector store Image
@@ -115,7 +115,7 @@ curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: applicati
      -X POST \
      -d '{"text":"Explain the OPEA project"}' \
      -H 'Content-Type: application/json' > query
-   docker container logs embedding-tei-server
+   docker container logs embedding-server
 
    # if you used tei-gaudi
    docker container logs tei-embedding-gaudi-server

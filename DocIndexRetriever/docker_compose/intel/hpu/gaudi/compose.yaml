@@ -55,8 +55,8 @@ services:
       timeout: 10s
       retries: 60
   embedding:
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-    container_name: embedding-tei-server
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding-server
     ports:
       - "6000:6000"
     ipc: host

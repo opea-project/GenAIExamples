@@ -52,8 +52,8 @@ services:
       timeout: 10s
       retries: 60
   embedding:
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-    container_name: embedding-tei-server
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding-server
     depends_on:
       tei-embedding-service:
         condition: service_healthy

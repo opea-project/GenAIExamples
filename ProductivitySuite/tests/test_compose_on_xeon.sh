@@ -169,7 +169,7 @@ function validate_microservices() {
         "${ip_address}:6000/v1/embeddings" \
         '"embedding":[' \
         "embedding-microservice" \
-        "embedding-tei-server" \
+        "embedding-server" \
         '{"input":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
