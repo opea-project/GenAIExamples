@@ -42,7 +42,7 @@ First of all, you need to build Docker Images locally and install the python pac
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
-docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/3rd_parties/nginx/src/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -67,12 +67,12 @@ docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$htt
 ### 4. Pull TGI Xeon Image
 
 ```bash
-docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
 ```
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu`
+1. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu`
 2. `opea/lvm-tgi:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`

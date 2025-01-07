@@ -40,6 +40,11 @@ on:
         default: "main"
         required: false
         type: string
+      inject_commit:
+        default: false
+        required: false
+        type: string
+
 jobs:
 ####################################################################################################
 # Image Build
@@ -72,6 +77,10 @@ jobs:
               git clone https://github.com/vllm-project/vllm.git
               cd vllm && git rev-parse HEAD && cd ../
           fi
+          if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
+               git clone https://github.com/HabanaAI/vllm-fork.git
+               cd vllm-fork && git checkout 3c39626 && cd ../
+          fi
           git clone https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git checkout ${{ inputs.opea_branch }} && git rev-parse HEAD && cd ../
 
@@ -83,6 +92,7 @@ jobs:
           docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           service_list: ${{ inputs.services }}
           registry: ${OPEA_IMAGE_REPO}opea
+          inject_commit: ${{ inputs.inject_commit }}
           tag: ${{ inputs.tag }}
 
 ####################################################################################################

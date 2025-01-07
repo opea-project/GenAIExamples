@@ -1,0 +1,73 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  avatarchatbot:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/avatarchatbot:${TAG:-latest}
+  whisper-gaudi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile.intel_hpu
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/whisper-gaudi:${TAG:-latest}
+  whisper:
+    build:
+      context: GenAIComps
+      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+  asr:
+    build:
+      context: GenAIComps
+      dockerfile: comps/asr/src/Dockerfile
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+  llm-textgen:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/src/text-generation/Dockerfile
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  speecht5-gaudi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/src/integrations/dependency/speecht5/Dockerfile.intel_hpu
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
+  speecht5:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/src/integrations/dependency/speecht5/Dockerfile
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+  tts:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/src/Dockerfile
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
+  wav2lip-gaudi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/animation/src/integration/dependency/Dockerfile.intel_hpu
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/wav2lip-gaudi:${TAG:-latest}
+  wav2lip:
+    build:
+      context: GenAIComps
+      dockerfile: comps/animation/src/integration/dependency/Dockerfile
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/wav2lip:${TAG:-latest}
+  animation:
+    build:
+      context: GenAIComps
+      dockerfile: comps/animation/src/Dockerfile
+    extends: avatarchatbot
+    image: ${REGISTRY:-opea}/animation:${TAG:-latest}

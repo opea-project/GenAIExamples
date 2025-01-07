@@ -21,7 +21,7 @@ function build_docker_images() {
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker images && sleep 1s
 }
 
@@ -41,6 +41,7 @@ function start_services() {
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
     export NGINX_PORT=80
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -48,7 +49,7 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
+    until [[ "$n" -ge 200 ]]; do
         docker logs lvm-tgi-xeon-server > ${LOG_PATH}/lvm_tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
             break
@@ -167,7 +168,7 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 

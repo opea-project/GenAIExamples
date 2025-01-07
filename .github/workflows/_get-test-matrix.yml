@@ -14,7 +14,7 @@ on:
       test_mode:
         required: false
         type: string
-        default: 'docker_compose'
+        default: 'compose'
     outputs:
       run_matrix:
         description: "The matrix string"
@@ -42,6 +42,12 @@ jobs:
           ref: ${{ env.CHECKOUT_REF }}
           fetch-depth: 0
 
+      - name: Check Dangerous Command Injection
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+        uses: opea-project/validation/actions/check-cmd@main
+        with:
+          work_dir: ${{ github.workspace }}
+
       - name: Get test matrix
         id: get-test-matrix
         run: |
@@ -54,9 +60,11 @@ jobs:
             base_commit=$(git rev-parse HEAD~1) # push event
           fi
           merged_commit=$(git log -1 --format='%H')
+          echo "print all changed files..."
+          git diff --name-only ${base_commit} ${merged_commit}
           changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | \
           grep -vE '${{ inputs.diff_excluded_files }}')" || true
-          echo "changed_files=$changed_files"
+          echo "filtered changed_files=$changed_files"
           export changed_files=$changed_files
           export test_mode=${{ inputs.test_mode }}
           export WORKSPACE=${{ github.workspace }}

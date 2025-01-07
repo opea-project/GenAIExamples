@@ -14,14 +14,15 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
+export image_fn="apple.png"
 export video_fn="WeAreGoingOnBullrun.mp4"
+export caption_fn="apple.txt"
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-multimodal-redis lvm-llava lvm-llava-svc dataprep-multimodal-redis"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever-redis lvm-llava lvm-llava-svc dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -30,13 +31,17 @@ function build_docker_images() {
 function setup_env() {
     export host_ip=${ip_address}
     export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
+    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
+    export WHISPER_SERVER_PORT=7066
+    export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_SERVER_PORT}/v1/asr"
     export REDIS_URL="redis://${host_ip}:6379"
     export REDIS_HOST=${host_ip}
     export INDEX_NAME="mm-rag-redis"
+    export BRIDGE_TOWER_EMBEDDING=true
     export LLAVA_SERVER_PORT=8399
     export LVM_ENDPOINT="http://${host_ip}:8399"
+    export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
     export WHISPER_MODEL="base"
     export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
@@ -44,10 +49,11 @@ function setup_env() {
     export LVM_SERVICE_HOST_IP=${host_ip}
     export MEGA_SERVICE_HOST_IP=${host_ip}
     export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/ingest_with_text"
     export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
     export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
-    export DATAPREP_GET_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
-    export DATAPREP_DELETE_VIDEO_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_videos"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_files"
 }
 
 function start_services() {
@@ -55,18 +61,21 @@ function start_services() {
 
 
     # Start Docker Containers
+    sed -i "s|container_name: multimodalqna-backend-server|container_name: multimodalqna-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 2m
 }
 
 function prepare_data() {
     cd $LOG_PATH
-    echo "Downloading video"
+    echo "Downloading image and video"
+    wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
-
+    echo "Writing caption file"
+    echo "This is an apple."  > ${caption_fn}
     sleep 1m
-
 }
+
 function validate_service() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
@@ -74,9 +83,15 @@ function validate_service() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    if [[ $SERVICE_NAME == *"dataprep-multimodal-redis"* ]]; then
+    if [[ $SERVICE_NAME == *"dataprep-multimodal-redis-transcript"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${video_fn}" -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-caption"* ]]; then
+        cd $LOG_PATH
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-ingest"* ]]; then
+        cd $LOG_PATH
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -F "files=@./apple.txt" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
@@ -127,58 +142,65 @@ function validate_microservices() {
         '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 
     # embedding microservice
-    echo "Validating embedding-multimodal"
+    echo "Validating embedding"
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text" : "This is some sample text."}'
 
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # test data prep
-    echo "Data Prep with Generating Transcript"
+    echo "Data Prep with Generating Transcript for Video"
     validate_service \
         "${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}" \
         "Data preparation succeeded" \
-        "dataprep-multimodal-redis" \
+        "dataprep-multimodal-redis-transcript" \
         "dataprep-multimodal-redis"
 
-    # echo "Data Prep with Generating Caption"
-    # validate_service \
-    #     "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
-    #     "Data preparation succeeded" \
-    #     "dataprep-multimodal-redis" \
-    #     "dataprep-multimodal-redis"
-
-    echo "Validating get file"
+    echo "Data Prep with Image & Caption Ingestion"
     validate_service \
-        "${DATAPREP_GET_VIDEO_ENDPOINT}" \
+        "${DATAPREP_INGEST_SERVICE_ENDPOINT}" \
+        "Data preparation succeeded" \
+        "dataprep-multimodal-redis-ingest" \
+        "dataprep-multimodal-redis"
+
+    echo "Validating get file returns mp4"
+    validate_service \
+        "${DATAPREP_GET_FILE_ENDPOINT}" \
         '.mp4' \
+        "dataprep_get" \
+        "dataprep-multimodal-redis"
+
+    echo "Validating get file returns png"
+    validate_service \
+        "${DATAPREP_GET_FILE_ENDPOINT}" \
+        '.png' \
         "dataprep_get" \
         "dataprep-multimodal-redis"
 
     sleep 1m
 
     # multimodal retrieval microservice
-    echo "Validating retriever-multimodal-redis"
+    echo "Validating retriever-redis"
     your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
     validate_service \
-        "http://${host_ip}:7000/v1/multimodal_retrieval" \
+        "http://${host_ip}:7000/v1/retrieval" \
         "retrieved_docs" \
-        "retriever-multimodal-redis" \
-        "retriever-multimodal-redis" \
+        "retriever-redis" \
+        "retriever-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
-    sleep 10s
+    sleep 3m
 
     # llava server
     echo "Evaluating lvm-llava"
@@ -198,6 +220,14 @@ function validate_microservices() {
         "lvm-llava-svc" \
         '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 
+    # data prep requiring lvm
+    echo "Data Prep with Generating Caption for Image"
+    validate_service \
+        "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
+        "Data preparation succeeded" \
+        "dataprep-multimodal-redis-caption" \
+        "dataprep-multimodal-redis"
+
     sleep 3m
 }
 
@@ -211,23 +241,46 @@ function validate_megaservice() {
         "multimodalqna-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
+    echo "Validate megaservice with first audio query"
+    validate_service \
+        "http://${host_ip}:8888/v1/multimodalqna" \
+        '"time_of_frame_ms":' \
+        "multimodalqna" \
+        "multimodalqna-backend-server" \
+        '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
+
     echo "Validate megaservice with follow-up query"
     validate_service \
         "http://${host_ip}:8888/v1/multimodalqna" \
         '"content":"' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
-        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+        '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": [{"type": "text", "text": "goodbye"}]}]}'
 
+    echo "Validate megaservice with multiple text queries"
+    validate_service \
+        "http://${host_ip}:8888/v1/multimodalqna" \
+        '"content":"' \
+        "multimodalqna" \
+        "multimodalqna-backend-server" \
+        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": [{"type": "text", "text": "goodbye"}]}]}'
 }
 
 function validate_delete {
-    echo "Validate data prep delete videos"
+    echo "Validate data prep delete files"
     validate_service \
-        "${DATAPREP_DELETE_VIDEO_ENDPOINT}" \
+        "${DATAPREP_DELETE_FILE_ENDPOINT}" \
         '{"status":true}' \
         "dataprep_del" \
         "dataprep-multimodal-redis"
+}
+
+function delete_data() {
+    cd $LOG_PATH
+    echo "Deleting image, video, and caption"
+    rm -rf ${image_fn}
+    rm -rf ${video_fn}
+    rm -rf ${caption_fn}
 }
 
 function stop_docker() {
@@ -254,6 +307,7 @@ function main() {
     validate_delete
     echo "==== delete validated ===="
 
+    delete_data
     stop_docker
     echo y | docker system prune
 

@@ -12,7 +12,7 @@ on:
       - "**/tests/test_gmc**"
       - "!**.md"
       - "!**.txt"
-      - "!**/kubernetes/**/manifests/**"
+      - "!**/kubernetes/**/manifest/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -22,7 +22,7 @@ jobs:
   job1:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '.github|docker_compose|manifest|assets|*.md|*.txt'
+      diff_excluded_files: '\.github|docker_compose|manifest|assets|\.md|\.txt'
       test_mode: "gmc"
 
   gmc-test:

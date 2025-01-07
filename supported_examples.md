@@ -63,17 +63,17 @@ This document introduces the supported examples of GenAIExamples. The supported 
 
 [CodeGen](./CodeGen/README.md) is an example of copilot designed for code generation in Visual Studio Code.
 
-| Framework                                                                      | LLM                                                                             | Serving                                                         | HW          | Description |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ----------- |
-| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [meta-llama/CodeLlama-7b-hf](https://huggingface.co/meta-llama/CodeLlama-7b-hf) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Copilot     |
+| Framework                                                                      | LLM                                                                                     | Serving                                                         | HW          | Description |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ----------- |
+| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Copilot     |
 
 ### CodeTrans
 
 [CodeTrans](./CodeTrans/README.md) is an example of chatbot for converting code written in one programming language to another programming language while maintaining the same functionality.
 
-| Framework                                                                      | LLM                                                                                   | Serving                                                         | HW          | Description      |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ---------------- |
-| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [HuggingFaceH4/mistral-7b-grok](https://huggingface.co/HuggingFaceH4/mistral-7b-grok) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Code Translation |
+| Framework                                                                      | LLM                                                                                             | Serving                                                         | HW          | Description      |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ---------------- |
+| [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [mistralai/Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Code Translation |
 
 ### DocSum
 
@@ -186,7 +186,15 @@ FAQ Generation Application leverages the power of large language models (LLMs) t
 
 ### MultimodalQnA
 
-[MultimodalQnA](./MultimodalQnA/README.md) addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos.
+[MultimodalQnA](./MultimodalQnA/README.md) addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos, images, or audio files. MultimodalQnA utilizes BridgeTower model, a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MultimodalQnA will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVM) as input context to generate a response for the user.
+
+| Service   | Model                                                                                                             | HW         | Description                   |
+| --------- | ----------------------------------------------------------------------------------------------------------------- | ---------- | ----------------------------- |
+| Embedding | [BridgeTower/bridgetower-large-itm-mlm-itc](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-itc)     | Xeon/Gaudi | Multimodal embeddings service |
+| Embedding | [BridgeTower/bridgetower-large-itm-mlm-gaudi](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) | Gaudi      | Multimodal embeddings service |
+| LVM       | [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf)                                       | Xeon       | LVM service                   |
+| LVM       | [llava-hf/llava-1.5-13b-hf](https://huggingface.co/llava-hf/llava-1.5-13b-hf)                                     | Xeon       | LVM service                   |
+| LVM       | [llava-hf/llava-v1.6-vicuna-13b-hf](https://huggingface.co/llava-hf/llava-v1.6-vicuna-13b-hf)                     | Gaudi      | LVM service                   |
 
 ### ProductivitySuite
 

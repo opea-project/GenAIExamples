@@ -34,22 +34,21 @@
 		const eventSource = await fetchTextStream(query);
 
 		eventSource.addEventListener("message", (e: any) => {
-			let Msg = e.data;
-			console.log("Msg", Msg);
+			let res = e.data;
 
-			if (Msg.startsWith("b")) {
-				const trimmedData = Msg.slice(2, -1);
-				if (trimmedData.includes("'''")) {
-					deleteFlag = true;
-				} else if (deleteFlag && trimmedData.includes("\\n")) {
-					deleteFlag = false;
-				} else if (trimmedData !== "</s>" && !deleteFlag) {
-					code_output += trimmedData.replace(/\\n/g, "\n");
-				}
-			} else if (Msg === "[DONE]") {
+			if (res === "[DONE]") {
 				deleteFlag = false;
 				loading = false;
 				query = '';
+			} else {
+				let Msg = JSON.parse(res).choices[0].text;
+				if (Msg.includes("'''")) {
+					deleteFlag = true;
+				} else if (deleteFlag && Msg.includes("\\n")) {
+					deleteFlag = false;
+				} else if (Msg !== "</s>" && !deleteFlag) {
+					code_output += Msg.replace(/\\n/g, "\n");
+				}
 			}
 		});
 		eventSource.stream();

@@ -1,0 +1,46 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Model language for LLM
+model_language: "Chinese"
+splitter_name: "RecursiveCharacter"
+k_rerank: 5
+search_method: "similarity"
+score_threshold: 0.5
+bm25_weight: 0
+
+# Pipeline
+name: "default"
+
+# Node parser
+node_parser: "simple"
+chunk_size: 400
+chunk_overlap: 48
+
+# Indexer
+indexer: "faiss_vector"
+
+# Retriever
+retriever: "vectorsimilarity"
+k_retrieval: 30
+
+# Post Processor
+postprocessor: "reranker"
+
+# Generator
+generator: "chatqna"
+prompt_path: "./default_prompt.txt"
+
+# Models
+embedding_model_id: "BAAI/bge-small-en-v1.5"
+# Device for embedding model inference
+embedding_device: "AUTO"
+
+rerank_model_id: "BAAI/bge-reranker-large"
+# Device for reranking model inference
+rerank_device: "AUTO"
+
+llm_model_id: "Qwen/Qwen2-7B-Instruct"
+llm_weights: "INT4"
+# Device for LLM model inference
+llm_device: "AUTO"

@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 // Constants definition
-const TRANSLATE_ITEMS = ["hello"];
+const TRANSLATE_ITEMS = ["我爱机器翻译。"];
 
 // Helper function: Enter message to chat
 async function enterMessageToChat(page: Page, message: string) {
@@ -17,6 +17,7 @@ async function enterMessageToChat(page: Page, message: string) {
   await page.getByTestId("translate-input").fill(message);
   await page.waitForTimeout(10000);
   const outputText = await page.getByTestId("translate-output").inputValue();
+  await page.waitForTimeout(10000);
   console.log("Actual text:", outputText);
   await expect(page.getByTestId("translate-output")).not.toHaveValue("");
 }

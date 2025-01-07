@@ -3,7 +3,7 @@
 
 services:
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     container_name: tgi-service
     ports:
       - "8028:80"
@@ -15,12 +15,19 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8028/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-server
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: llm-textgen-server
     depends_on:
-      - tgi-service
+      tgi-service:
+        condition: service_healthy
     ports:
       - "9000:9000"
     ipc: host
@@ -28,7 +35,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codegen-xeon-backend-server:

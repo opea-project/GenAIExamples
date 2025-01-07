@@ -1,0 +1,104 @@
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  speecht5-service:
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+    container_name: speecht5-service
+    ports:
+      - "7055:7055"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-service
+    ports:
+      - "3006:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+  wav2lip-service:
+    image: ${REGISTRY:-opea}/wav2lip:${TAG:-latest}
+    container_name: wav2lip-service
+    ports:
+      - "7860:7860"
+    ipc: host
+    volumes:
+      - ${PWD}:/outputs
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      DEVICE: ${DEVICE}
+      INFERENCE_MODE: ${INFERENCE_MODE}
+      CHECKPOINT_PATH: ${CHECKPOINT_PATH}
+      FACE: ${FACE}
+      AUDIO: ${AUDIO}
+      FACESIZE: ${FACESIZE}
+      OUTFILE: ${OUTFILE}
+      GFPGAN_MODEL_VERSION: ${GFPGAN_MODEL_VERSION}
+      UPSCALE_FACTOR: ${UPSCALE_FACTOR}
+      FPS: ${FPS}
+      WAV2LIP_PORT: ${WAV2LIP_PORT}
+    restart: unless-stopped
+  animation:
+    image: ${REGISTRY:-opea}/animation:${TAG:-latest}
+    container_name: animation-server
+    ports:
+      - "3008:9066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      WAV2LIP_ENDPOINT: ${WAV2LIP_ENDPOINT}
+    restart: unless-stopped
+  avatarchatbot-xeon-backend-server:
+    image: ${REGISTRY:-opea}/avatarchatbot:${TAG:-latest}
+    container_name: avatarchatbot-xeon-backend-server
+    depends_on:
+      - animation
+    ports:
+      - "3009:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - MEGA_SERVICE_PORT=${MEGA_SERVICE_PORT}
+      - WHISPER_SERVER_HOST_IP=${WHISPER_SERVER_HOST_IP}
+      - WHISPER_SERVER_PORT=${WHISPER_SERVER_PORT}
+      - LLM_SERVER_HOST_IP=${LLM_SERVER_HOST_IP}
+      - LLM_SERVER_PORT=${LLM_SERVER_PORT}
+      - SPEECHT5_SERVER_HOST_IP=${SPEECHT5_SERVER_HOST_IP}
+      - SPEECHT5_SERVER_PORT=${SPEECHT5_SERVER_PORT}
+      - ANIMATION_SERVICE_HOST_IP=${ANIMATION_SERVICE_HOST_IP}
+      - ANIMATION_SERVICE_PORT=${ANIMATION_SERVICE_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
