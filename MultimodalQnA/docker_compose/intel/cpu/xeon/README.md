@@ -132,13 +132,13 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 Build lvm-llava image
 
 ```bash
-docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/dependency/Dockerfile .
+docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/llava/Dockerfile .
 ```
 
 Build lvm-llava-svc microservice image
 
 ```bash
-docker build --no-cache -t opea/lvm-llava-svc:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/Dockerfile .
+docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
 ```
 
 ### 4. Build dataprep-multimodal-redis Image
@@ -179,7 +179,7 @@ cd ../../../
 Then run the command `docker images`, you will have the following 11 Docker Images:
 
 1. `opea/dataprep-multimodal-redis:latest`
-2. `opea/lvm-llava-svc:latest`
+2. `opea/lvm:latest`
 3. `opea/lvm-llava:latest`
 4. `opea/retriever-multimodal-redis:latest`
 5. `opea/whisper:latest`

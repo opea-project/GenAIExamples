@@ -39,7 +39,7 @@ docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_
 Build lvm-llava image
 
 ```bash
-docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/dependency/Dockerfile .
+docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/llava/Dockerfile .
 ```
 
 ### 3. Build retriever-multimodal-redis Image
@@ -85,7 +85,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 
 1. `opea/dataprep-multimodal-redis:latest`
 2. `ghcr.io/huggingface/text-generation-inference:2.4.1-rocm`
-3. `opea/lvm-tgi:latest`
+3. `opea/lvm:latest`
 4. `opea/retriever-multimodal-redis:latest`
 5. `opea/embedding:latest`
 6. `opea/embedding-multimodal-bridgetower:latest`
