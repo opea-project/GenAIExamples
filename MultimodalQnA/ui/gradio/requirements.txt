@@ -1,4 +1,5 @@
 gradio==5.5.0
+gradio_pdf==0.0.19
 moviepy==1.0.3
 numpy==1.26.4
 opencv-python==4.10.0.82
