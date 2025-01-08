@@ -112,12 +112,12 @@ fi
 
 case "$1" in
     install_CodeGen)
-        pushd CodeGen/kubernetes/intel/hpu/gaudi/gmc
+        pushd CodeGen/kubernetes/gmc
         install_codegen
         popd
         ;;
     validate_CodeGen)
-        pushd CodeGen/kubernetes/intel/hpu/gaudi/gmc
+        pushd CodeGen/kubernetes/gmc
         validate_codegen
         popd
         ;;
