@@ -13,7 +13,7 @@ fi
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build --no-cache -t opea/pii-pg:comps -f comps/guardrails/pii_detection/predictionguard/Dockerfile .
+    docker build --no-cache -t opea/pii-pg:comps -f comps/guardrails/src/pii_detection/Dockerfile .
     if [ $? -ne 0 ]; then
         echo "opea/pii-pg build failed"
         exit 1

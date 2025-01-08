@@ -13,7 +13,7 @@ fi
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build --no-cache -t opea/injection-pg:comps -f comps/guardrails/prompt_injection/predictionguard/Dockerfile .
+    docker build --no-cache -t opea/injection-pg:comps -f comps/guardrails/src/prompt_injection/Dockerfile .
     if [ $? -ne 0 ]; then
         echo "opea/injection-pg build failed"
         exit 1

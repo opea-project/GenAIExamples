@@ -28,7 +28,7 @@ pip install -e .
 
 ## MicroService
 
-`Microservices` are akin to building blocks, offering the fundamental services for constructing `RAG (Retrieval-Augmented Generation)` applications.
+`Microservices` are akin to building blocks, offering the fundamental services for constructing `RAG (Retrieval-Augmented Generation)` and other Enterprise AI applications.
 
 Each `Microservice` is designed to perform a specific function or task within the application architecture. By breaking down the system into smaller, self-contained services, `Microservices` promote modularity, flexibility, and scalability.
 
