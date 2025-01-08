@@ -20,7 +20,7 @@ services:
   embedding-multimodal-bridgetower:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile
+      dockerfile: comps/3rd_parties/bridgetower/deployment/docker_compose/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
   embedding:
