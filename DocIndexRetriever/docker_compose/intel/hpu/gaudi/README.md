@@ -21,7 +21,7 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 - Rerank TEI Image
 
   ```bash
-  docker build -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/src/Dockerfile .
+  docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/src/Dockerfile .
   ```
 
 - Dataprep Image

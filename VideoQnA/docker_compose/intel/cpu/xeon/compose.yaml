@@ -61,7 +61,7 @@ services:
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   reranking:
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-server
     ports:
       - "8000:8000"

@@ -110,7 +110,7 @@ services:
       timeout: 10s
       retries: 60
   reranking:
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-gaudi-server
     depends_on:
       tei-reranking-service:
