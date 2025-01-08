@@ -113,7 +113,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LVM_COMPONENT_NAME: "OPEA_LLAVA_LVM"
-      LLAVA_LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
     restart: unless-stopped
   multimodalqna:
     image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
