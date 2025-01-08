@@ -109,17 +109,16 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 1. `opea/dataprep-multimodal-vdms:latest`
 2. `opea/embedding-multimodal-clip:latest`
 3. `opea/retriever-vdms:latest`
-<<<<<<< HEAD
+   <<<<<<< HEAD
 4. `opea/reranking:latest`
 5. `opea/video-llama-lvm-server:latest`
-6. `opea/lvm-video-llama:latest`
-=======
-4. `opea/reranking-tei:latest`
-5. `opea/lvm-video-llama:latest`
-6. `opea/lvm:latest`
->>>>>>> d93597cbfd9da92b956adb3673c9e5d743c181af
-7. `opea/videoqna:latest`
-8. `opea/videoqna-ui:latest`
+6. # `opea/lvm-video-llama:latest`
+7. `opea/reranking-tei:latest`
+8. `opea/lvm-video-llama:latest`
+9. `opea/lvm:latest`
+   > > > > > > > d93597cbfd9da92b956adb3673c9e5d743c181af
+10. `opea/videoqna:latest`
+11. `opea/videoqna-ui:latest`
 
 ## 🚀 Start Microservices
 
