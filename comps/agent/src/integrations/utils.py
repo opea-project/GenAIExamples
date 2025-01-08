@@ -35,7 +35,7 @@ def setup_hf_tgi_client(args):
         "temperature": args.temperature,
         "repetition_penalty": args.repetition_penalty,
         "return_full_text": args.return_full_text,
-        "stream": args.stream,
+        "streaming": args.stream,
     }
 
     llm = HuggingFaceEndpoint(
@@ -53,7 +53,7 @@ def setup_chat_model(args):
         "temperature": args.temperature,
         "max_tokens": args.max_new_tokens,
         "top_p": args.top_p,
-        "stream": args.stream,
+        "streaming": args.stream,
     }
     if args.llm_engine == "vllm" or args.llm_engine == "tgi":
         openai_endpoint = f"{args.llm_endpoint_url}/v1"
