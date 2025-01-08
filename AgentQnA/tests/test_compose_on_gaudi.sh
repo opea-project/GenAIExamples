@@ -82,6 +82,7 @@ echo "=================== #5 Stop agent and API server===================="
 stop_crag
 stop_agent_docker
 stop_retrieval_tool
+stop_llm
 echo "=================== #5 Agent and API server stopped===================="
 
 echo y | docker system prune

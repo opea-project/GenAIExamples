@@ -19,7 +19,7 @@ if [ ! -d "$HF_CACHE_DIR" ]; then
 fi
 ls $HF_CACHE_DIR
 
-vllm_port=8085
+vllm_port=8086
 vllm_volume=${HF_CACHE_DIR}
 
 function start_tgi(){
@@ -136,9 +136,9 @@ function validate_agent_service() {
         exit 1
     fi
 
-    prompt="How many schools have average math score greater than 560?"
+    prompt="How many schools have both average math score and reading score greater than 650?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    local EXIT_CODE=$(validate "$CONTENT" "173" "react-agent-endpoint")
+    local EXIT_CODE=$(validate "$CONTENT" "1" "react-agent-endpoint")
     echo $CONTENT
     echo $EXIT_CODE
     if [ "$EXIT_CODE" == "1" ]; then

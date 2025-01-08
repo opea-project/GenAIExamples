@@ -22,7 +22,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ip_address = os.getenv("ip_address", "localhost")
-    agent_port = os.getenv("agent_port", "9095")
+    agent_port = os.getenv("agent_port", "9090")
     url = f"http://{ip_address}:{agent_port}/v1/chat/completions"
     prompt = args.prompt
     answer = generate_answer_agent_api(url, prompt)

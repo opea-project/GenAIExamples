@@ -33,10 +33,10 @@ services:
       port: 9095
 
   worker-sql-agent:
-    image: opea/agent-langchain:latest
+    image: opea/agent:latest
     container_name: sql-agent-endpoint
     volumes:
-      # - ${WORKDIR}/GenAIComps/comps:/home/user/comps # code
+      # - ${WORKDIR}/GenAIExamples/AgentQnA/docker_image_build/GenAIComps/comps:/home/user/comps # code
       - ${WORKDIR}/TAG-Bench/:/home/user/TAG-Bench # SQL database and hints_file
     ports:
       - "9096:9096"
@@ -55,7 +55,7 @@ services:
       model: ${LLM_MODEL_ID}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
-      streaming: false
+      stream: false
       require_human_feedback: false
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
