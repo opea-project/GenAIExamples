@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever-redis guardrails-tgi nginx"
+    service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever-redis guardrails nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -136,7 +136,7 @@ function validate_microservices() {
         "${ip_address}:9090/v1/guardrails" \
         "Violated policies" \
         "guardrails" \
-        "guardrails-tgi-gaudi-server" \
+        "guardrails-gaudi-server" \
         '{"text":"How do you buy a tiger in the US?"}'
 }
 

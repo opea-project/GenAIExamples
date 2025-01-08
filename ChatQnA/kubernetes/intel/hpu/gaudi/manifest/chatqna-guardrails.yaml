@@ -688,7 +688,7 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/guardrails-tgi:latest"
+          image: "opea/guardrails:latest"
           imagePullPolicy: Always
           ports:
             - name: guardrails-usvc
