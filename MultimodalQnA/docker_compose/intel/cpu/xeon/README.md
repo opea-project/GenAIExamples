@@ -36,7 +36,7 @@ lvm-llava
 ================
 Port 8399 - Open to 0.0.0.0/0
 
-lvm-llava-svc
+lvm
 ===
 Port 9399 - Open to 0.0.0.0/0
 
@@ -135,7 +135,7 @@ Build lvm-llava image
 docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/llava/Dockerfile .
 ```
 
-Build lvm-llava-svc microservice image
+Build lvm microservice image
 
 ```bash
 docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
@@ -271,7 +271,7 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
      -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-6. lvm-llava-svc
+6. lvm
 
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
