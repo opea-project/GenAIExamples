@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="searchqna searchqna-ui embedding web-retriever-chroma reranking llm-textgen"
+    service_list="searchqna searchqna-ui embedding web-retriever reranking llm-textgen"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -72,7 +72,7 @@ function validate_megaservice() {
     result=$(curl http://${ip_address}:3008/v1/searchqna -X POST -d '{"messages": "What is the capital of China?", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
+    docker logs web-retriever-server > ${LOG_PATH}/web-retriever-server.log
     docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
     docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
     docker logs embedding-gaudi-server > ${LOG_PATH}/embedding-gaudi-server.log
