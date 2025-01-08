@@ -42,6 +42,7 @@ export EMM_BRIDGETOWER_PORT=6006
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
 export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT/v1/encode"
 export MM_EMBEDDING_PORT_MICROSERVICE=6000
+export BRIDGE_TOWER_EMBEDDING=true
 
 export REDIS_RETRIEVER_PORT=7000
 

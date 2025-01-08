@@ -7,6 +7,7 @@ source .set_env.sh
 popd > /dev/null
 
 export host_ip=$(hostname -I | awk '{print $1}')
+
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
@@ -41,6 +42,7 @@ export EMM_BRIDGETOWER_PORT=6006
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
 export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT/v1/encode"
 export MM_EMBEDDING_PORT_MICROSERVICE=6000
+export BRIDGE_TOWER_EMBEDDING=true
 
 export REDIS_RETRIEVER_PORT=7000
 

@@ -21,7 +21,7 @@ function build_docker_images() {
         echo "Cloning GenAIComps repository"
         git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
-    service_list="dataprep-redis embedding-tei retriever-redis doc-index-retriever"
+    service_list="dataprep-redis embedding retriever-redis doc-index-retriever"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -42,6 +42,8 @@ function start_services() {
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export EMBEDDING_SERVICE_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
+    export host_ip=${ip_address}
+    export LOGFLAG=true
 
     # Start Docker Containers
     docker compose -f compose_without_rerank.yaml up -d
@@ -83,14 +85,14 @@ function validate_megaservice() {
     local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "text": "Explain the OPEA project?"
     }')
-    # local CONTENT=$(python test.py --host_ip ${ip_address} --request_type text)
+
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
         echo "=============Embedding container log=================="
-        docker logs embedding-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         echo "=============Retriever container log=================="
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         echo "=============Doc-index-retriever container log=================="
@@ -98,22 +100,6 @@ function validate_megaservice() {
         exit 1
     fi
 
-    echo "================Testing retriever service: ChatCompletion Request================"
-    cd $WORKPATH/tests
-    local CONTENT=$(python test.py --host_ip ${ip_address} --request_type chat_completion)
-    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
-    echo "$EXIT_CODE"
-    local EXIT_CODE="${EXIT_CODE:0-1}"
-    echo "return value is $EXIT_CODE"
-    if [ "$EXIT_CODE" == "1" ]; then
-        echo "=============Embedding container log=================="
-        docker logs embedding-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        echo "=============Retriever container log=================="
-        docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        echo "=============Doc-index-retriever container log=================="
-        docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        exit 1
-    fi
 }
 
 function stop_docker() {

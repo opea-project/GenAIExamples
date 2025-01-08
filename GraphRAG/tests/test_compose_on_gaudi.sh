@@ -40,6 +40,7 @@ function start_services() {
     export host_ip=${ip_address}
 
     # Start Docker Containers
+    sed -i "s|container_name: graphrag-gaudi-backend-server|container_name: graphrag-gaudi-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0

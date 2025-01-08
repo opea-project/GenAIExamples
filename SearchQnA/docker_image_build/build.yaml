@@ -17,27 +17,27 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
-  embedding-tei:
+  embedding:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/tei/langchain/Dockerfile
+      dockerfile: comps/embeddings/src/Dockerfile
     extends: searchqna
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-  web-retriever-chroma:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+  web-retriever:
     build:
       context: GenAIComps
-      dockerfile: comps/web_retrievers/chroma/langchain/Dockerfile
+      dockerfile: comps/web_retrievers/src/Dockerfile
     extends: searchqna
-    image: ${REGISTRY:-opea}/web-retriever-chroma:${TAG:-latest}
-  reranking-tei:
+    image: ${REGISTRY:-opea}/web-retriever:${TAG:-latest}
+  reranking:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/tei/Dockerfile
+      dockerfile: comps/rerankings/src/Dockerfile
     extends: searchqna
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
-  llm-tgi:
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
+  llm-textgen:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: searchqna
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}

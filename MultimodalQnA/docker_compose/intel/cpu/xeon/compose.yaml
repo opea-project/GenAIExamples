@@ -63,13 +63,20 @@ services:
       https_proxy: ${https_proxy}
       EMM_BRIDGETOWER_PORT: ${EMM_BRIDGETOWER_PORT}
       PORT: ${EMM_BRIDGETOWER_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMM_BRIDGETOWER_PORT}/v1/health_check"]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+      start_period: 30s
     entrypoint: ["python", "bridgetower_server.py", "--device", "cpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
     restart: unless-stopped
-  embedding-multimodal:
-    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
-    container_name: embedding-multimodal
+  embedding:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding
     depends_on:
-      - embedding-multimodal-bridgetower
+      embedding-multimodal-bridgetower:
+        condition: service_healthy
     ports:
       - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
     ipc: host
@@ -79,6 +86,7 @@ services:
       https_proxy: ${https_proxy}
       MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MULTIMODAL_EMBEDDING: true
     restart: unless-stopped
   retriever-redis:
     image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
@@ -98,6 +106,7 @@ services:
       REDIS_RETRIEVER_PORT: ${REDIS_RETRIEVER_PORT}
       INDEX_NAME: ${INDEX_NAME}
       BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
+      RETRIEVER_TYPE: "redis"
     restart: unless-stopped
   lvm-llava:
     image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
@@ -135,10 +144,9 @@ services:
     depends_on:
       - redis-vector-db
       - dataprep-multimodal-redis
-      - embedding-multimodal
+      - embedding
       - retriever-redis
       - lvm-llava-svc
-      - asr
     ports:
       - "${MEGA_SERVICE_PORT}:${MEGA_SERVICE_PORT}"
     environment:
@@ -154,6 +162,8 @@ services:
       LVM_MODEL_ID: ${LVM_MODEL_ID}
       ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
       ASR_SERVICE_ENDPOINT: ${ASR_SERVICE_ENDPOINT}
+      WHISPER_SERVER_PORT: ${WHISPER_SERVER_PORT}
+      WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     ipc: host
     restart: always
   multimodalqna-ui:
