@@ -60,12 +60,12 @@ class Conversation:
                 for i, (role, message) in enumerate(messages):
                     if message:
                         dic = {"role": role}
+                        # The main message will be either audio or text
                         if self.audio_query_file:
                             content = [{"type": "audio", "audio": self.get_b64_audio_query()}]
-                        elif self.image:
-                            content = [{"type": "image_url", "image_url": {"url": self.image_query_file}}]
                         else:
                             content = [{"type": "text", "text": message}]
+                        # There might be a returned image/video from the first query
                         if i == 0 and self.time_of_frame_ms and self.video_file:
                             base64_frame = (
                                 self.base64_frame
@@ -74,7 +74,13 @@ class Conversation:
                             )
                             if base64_frame is None:
                                 base64_frame = ""
+                            # Include the original caption for the returned image/video
+                            if self.caption and content[0]["type"] == "text":
+                                content[0]["text"] = content[0]["text"] + " " + self._template_caption()
                             content.append({"type": "image_url", "image_url": {"url": base64_frame}})
+                        # There might be a query image
+                        if self.image_query_file:
+                            content.append({"type": "image_url", "image_url": {"url": self.image_query_file}})
                         dic["content"] = content
                         conv_dict.append(dic)
             else:
