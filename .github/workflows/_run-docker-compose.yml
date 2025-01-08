@@ -134,6 +134,7 @@ jobs:
           SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: "lvl/refator_guardrails"
           example: ${{ inputs.example }}
           hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}
