@@ -9,7 +9,12 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH
-    docker build --no-cache -t opea/reranking:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/src/Dockerfile .
+    docker build --no-cache \
+          -t opea/reranking:comps \
+          --build-arg https_proxy=$https_proxy \
+          --build-arg http_proxy=$http_proxy \
+          --build-arg SERVICE=tei \
+          -f comps/rerankings/src/Dockerfile .
     if [ $? -ne 0 ]; then
         echo "opea/reranking built fail"
         exit 1
@@ -30,7 +35,7 @@ function start_service() {
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:${tei_endpoint}"
     tei_service_port=5007
     unset http_proxy
-    docker run -d --name="test-comps-reranking-server" -e LOGFLAG=True  -p ${tei_service_port}:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HF_TOKEN=$HF_TOKEN -e RERANK_TYPE="tei" opea/reranking:comps
+    docker run -d --name="test-comps-reranking-server" -e LOGFLAG=True  -p ${tei_service_port}:8000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e TEI_RERANKING_ENDPOINT=$TEI_RERANKING_ENDPOINT -e HF_TOKEN=$HF_TOKEN  -e RERANK_COMPONENT_NAME="OPEA_TEI_RERANKING"  opea/reranking:comps
     sleep 15
 }
 
@@ -52,7 +57,7 @@ function validate_microservice() {
 }
 
 function stop_docker() {
-    cid=$(docker ps -aq --filter "name=test-comps-rerank*")
+    cid=$(docker ps -aq --filter "name=test-comps-reranking*")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 }
 

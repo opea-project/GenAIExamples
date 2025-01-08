@@ -29,6 +29,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
+      RERANK_COMPONENT_NAME: "OPEA_TEI_RERANKING"
       HF_TOKEN: ${HF_TOKEN}
     depends_on:
       tei_reranking_service:

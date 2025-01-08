@@ -4238,7 +4238,7 @@ def _ranking_fast(
     alpha: float,
     beam_width: int,
 ) -> torch.FloatTensor:
-    """Reranks the top_k candidates based on a degeneration penalty (cosine similarity with previous tokens), as described
+    """Rerankings the top_k candidates based on a degeneration penalty (cosine similarity with previous tokens), as described
     in the paper "A Contrastive Framework for Neural Text Generation".
 
     Returns the index of the best candidate for each

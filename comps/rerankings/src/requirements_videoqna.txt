@@ -1,0 +1,7 @@
+datasets
+haystack-ai
+langchain  --extra-index-url https://download.pytorch.org/whl/cpu
+langchain_community  --extra-index-url https://download.pytorch.org/whl/cpu
+openai
+Pillow
+pydub

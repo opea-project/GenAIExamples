@@ -21,7 +21,7 @@
 /comps/lvms/ sihan.chen@intel.com liang1.lv@intel.com
 /comps/prompt_registry/ hoong.tee.yeoh@intel.com xinyao.wang@intel.com
 /comps/ragas/ kaokao.lv@intel.com liang1.lv@intel.com
-/comps/reranks/ kaokao.lv@intel.com liang1.lv@intel.com
+/comps/rerankings/ kaokao.lv@intel.com liang1.lv@intel.com
 /comps/retrievers/ kaokao.lv@intel.com liang1.lv@intel.com
 /comps/text2image/ xinyu.ye@intel.com liang1.lv@intel.com
 /comps/text2sql/ yogesh.pandey@intel.com qing.yao@intel.com

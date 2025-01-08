@@ -18,7 +18,7 @@ from comps.cores.proto.api_protocol import (
     RerankingResponseData,
 )
 
-logger = CustomLogger("reranking_tei")
+logger = CustomLogger("tei_reranking")
 logflag = os.getenv("LOGFLAG", False)
 
 # Environment variables
@@ -27,8 +27,8 @@ CLIENTID = os.getenv("CLIENTID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 
-@OpeaComponentRegistry.register("OPEA_RERANK_TEI")
-class OPEATEIReranking(OpeaComponent):
+@OpeaComponentRegistry.register("OPEA_TEI_RERANKING")
+class OpeaTEIReranking(OpeaComponent):
     """A specialized reranking component derived from OpeaComponent for TEI reranking services.
 
     Attributes:

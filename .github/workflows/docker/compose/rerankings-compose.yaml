@@ -5,5 +5,5 @@
 services:
   reranking:
     build:
-      dockerfile: comps/reranks/src/Dockerfile
+      dockerfile: comps/rerankings/src/Dockerfile
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}

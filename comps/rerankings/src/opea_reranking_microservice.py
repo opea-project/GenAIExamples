@@ -5,7 +5,8 @@ import os
 import time
 from typing import Union
 
-from integrations.opea_tei import OPEATEIReranking
+from integrations.tei import OpeaTEIReranking
+from integrations.videoqna import OpeaVideoReranking
 
 from comps import (
     CustomLogger,
@@ -22,7 +23,7 @@ from comps.cores.proto.docarray import LLMParamsDoc, LVMVideoDoc, RerankedDoc, S
 logger = CustomLogger("opea_reranking_microservice")
 logflag = os.getenv("LOGFLAG", False)
 
-rerank_component_name = os.getenv("RERANK_COMPONENT_NAME", "OPEA_RERANK_TEI")
+rerank_component_name = os.getenv("RERANK_COMPONENT_NAME", "OPEA_TEI_RERANKING")
 # Initialize OpeaComponentLoader
 loader = OpeaComponentLoader(rerank_component_name, description=f"OPEA RERANK Component: {rerank_component_name}")
 
