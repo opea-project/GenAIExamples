@@ -270,7 +270,7 @@ curl http://${host_ip}:${LVM_PORT}/v1/lvm \
 
 7. Multimodal Dataprep Microservice
 
-Download a sample video, image, and audio file and create a caption
+Download a sample video, image, PDF, and audio file and create a caption
 
 ```bash
 export video_fn="WeAreGoingOnBullrun.mp4"
@@ -278,6 +278,9 @@ wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoing
 
 export image_fn="apple.png"
 wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
+
+export pdf_fn="nke-10k-2023.pdf"
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf -O ${pdf_fn}
 
 export caption_fn="apple.txt"
 echo "This is an apple."  > ${caption_fn}
@@ -297,7 +300,7 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     -F "files=@./${audio_fn}"
 ```
 
-Also, test dataprep microservice with generating an image caption using lvm-tgi
+Also, test dataprep microservice with generating an image caption using lvm-tgi.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
@@ -306,13 +309,14 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     -X POST -F "files=@./${image_fn}"
 ```
 
-Now, test the microservice with posting a custom caption along with an image
+Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_INGEST_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
-    -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}"
+    -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}" \
+    -F "files=@./${pdf_fn}"
 ```
 
 Also, you are able to get the list of all files that you uploaded:
@@ -330,7 +334,8 @@ Then you will get the response python-style LIST like this. Notice the name of e
     "WeAreGoingOnBullrun_7ac553a1-116c-40a2-9fc5-deccbb89b507.mp4",
     "WeAreGoingOnBullrun_6d13cf26-8ba2-4026-a3a9-ab2e5eb73a29.mp4",
     "apple_fcade6e6-11a5-44a2-833a-3e534cbe4419.png",
-    "AudioSample_976a85a6-dc3e-43ab-966c-9d81beef780c.wav
+    "nke-10k-2023_28000757-5533-4b1b-89fe-7c0a1b7e2cd0.pdf",
+    "AudioSample_976a85a6-dc3e-43ab-966c-9d81beef780c.wav"
 ]
 ```
 
