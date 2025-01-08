@@ -21,9 +21,8 @@ export caption_fn="apple.txt"
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-multimodal-redis lvm-llava lvm-llava-svc dataprep-multimodal-redis"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever-redis lvm-llava lvm-llava-svc dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -32,11 +31,14 @@ function build_docker_images() {
 function setup_env() {
     export host_ip=${ip_address}
     export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
+    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
+    export WHISPER_SERVER_PORT=7066
+    export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_SERVER_PORT}/v1/asr"
     export REDIS_URL="redis://${host_ip}:6379"
     export REDIS_HOST=${host_ip}
     export INDEX_NAME="mm-rag-redis"
+    export BRIDGE_TOWER_EMBEDDING=true
     export LLAVA_SERVER_PORT=8399
     export LVM_ENDPOINT="http://${host_ip}:8399"
     export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
@@ -59,6 +61,7 @@ function start_services() {
 
 
     # Start Docker Containers
+    sed -i "s|container_name: multimodalqna-backend-server|container_name: multimodalqna-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 2m
 }
@@ -139,19 +142,19 @@ function validate_microservices() {
         '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 
     # embedding microservice
-    echo "Validating embedding-multimodal"
+    echo "Validating embedding"
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text" : "This is some sample text."}'
 
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -188,13 +191,13 @@ function validate_microservices() {
     sleep 1m
 
     # multimodal retrieval microservice
-    echo "Validating retriever-multimodal-redis"
+    echo "Validating retriever-redis"
     your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
     validate_service \
-        "http://${host_ip}:7000/v1/multimodal_retrieval" \
+        "http://${host_ip}:7000/v1/retrieval" \
         "retrieved_docs" \
-        "retriever-multimodal-redis" \
-        "retriever-multimodal-redis" \
+        "retriever-redis" \
+        "retriever-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
     sleep 3m
@@ -238,14 +241,29 @@ function validate_megaservice() {
         "multimodalqna-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
+    echo "Validate megaservice with first audio query"
+    validate_service \
+        "http://${host_ip}:8888/v1/multimodalqna" \
+        '"time_of_frame_ms":' \
+        "multimodalqna" \
+        "multimodalqna-backend-server" \
+        '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
+
     echo "Validate megaservice with follow-up query"
     validate_service \
         "http://${host_ip}:8888/v1/multimodalqna" \
         '"content":"' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
-        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+        '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": [{"type": "text", "text": "goodbye"}]}]}'
 
+    echo "Validate megaservice with multiple text queries"
+    validate_service \
+        "http://${host_ip}:8888/v1/multimodalqna" \
+        '"content":"' \
+        "multimodalqna" \
+        "multimodalqna-backend-server" \
+        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": [{"type": "text", "text": "goodbye"}]}]}'
 }
 
 function validate_delete {

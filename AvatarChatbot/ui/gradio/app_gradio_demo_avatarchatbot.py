@@ -294,7 +294,7 @@ if __name__ == "__main__":
                 <p style='font-size: 24px;'>OPEA microservices deployed:
                 <ul style='font-size: 24px;'>
                     <li><strong>ASR</strong> (service: opea/whisper-gaudi, model: openai/whisper-small)</li>
-                    <li><strong>LLM 'text-generation'</strong> (service: opea/llm-tgi, model: Intel/neural-chat-7b-v3-3)</li>
+                    <li><strong>LLM 'text-generation'</strong> (service: opea/llm-textgen, model: Intel/neural-chat-7b-v3-3)</li>
                     <li><strong>TTS</strong> (service: opea/speecht5-gaudi, model: microsoft/speecht5_tts)</li>
                     <li><strong>Animation</strong> (service: opea/animation, model: wav2lip+gfpgan)</li>
                 </ul></p>

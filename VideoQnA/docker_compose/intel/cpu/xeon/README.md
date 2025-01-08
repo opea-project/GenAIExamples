@@ -53,7 +53,7 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/Dockerfile .
+docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/integrations/dependency/clip/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
@@ -62,10 +62,10 @@ docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$h
 docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/vdms/langchain/Dockerfile .
 ```
 
-### 3. Build Rerank Image
+### 3. Build Reranking Image
 
 ```bash
-docker build -t opea/reranking-videoqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/videoqna/Dockerfile .
+docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/rerankings/src/Dockerfile .
 ```
 
 ### 4. Build LVM Image (Xeon)
@@ -109,7 +109,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 1. `opea/dataprep-multimodal-vdms:latest`
 2. `opea/embedding-multimodal-clip:latest`
 3. `opea/retriever-vdms:latest`
-4. `opea/reranking-videoqna:latest`
+4. `opea/reranking:latest`
 5. `opea/video-llama-lvm-server:latest`
 6. `opea/lvm-video-llama:latest`
 7. `opea/videoqna:latest`

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -20,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-ui llm-tgi"
+    service_list="codegen codegen-ui llm-textgen"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
@@ -40,6 +39,7 @@ function start_services() {
     export CODEGEN_BACKEND_SERVICE_PORT=7778
     export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
     export CODEGEN_UI_SERVICE_PORT=5173
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
