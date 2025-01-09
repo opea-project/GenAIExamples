@@ -15,7 +15,7 @@ The AudioQnA application is defined as a Custom Resource (CR) file that the abov
 The AudioQnA uses the below prebuilt images if you choose a Xeon deployment
 
 - tgi-service: ghcr.io/huggingface/text-generation-inference:1.4
-- llm: opea/llm-tgi:latest
+- llm: opea/llm-textgen:latest
 - asr: opea/asr:latest
 - whisper: opea/whisper:latest
 - tts: opea/tts:latest
@@ -66,7 +66,7 @@ This involves deploying the AudioQnA custom resource. You can use audioQnA_xeon.
    ```sh
    export CLIENT_POD=$(kubectl get pod -n audioqa -l app=client-test -o jsonpath={.items..metadata.name})
    export accessUrl=$(kubectl get gmc -n audioqa -o jsonpath="{.items[?(@.metadata.name=='audioqa')].status.accessUrl}")
-   kubectl exec "$CLIENT_POD" -n audioqa -- curl -s --no-buffer $accessUrl  -X POST  -d '{"byte_str": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "parameters":{"max_new_tokens":64, "do_sample": true, "streaming":false}}' -H 'Content-Type: application/json'
+   kubectl exec "$CLIENT_POD" -n audioqa -- curl -s --no-buffer $accessUrl  -X POST  -d '{"byte_str": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "parameters":{"max_new_tokens":64, "do_sample": true, "stream":false}}' -H 'Content-Type: application/json'
    ```
 
 > [NOTE]
