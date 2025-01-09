@@ -10,7 +10,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build --no-cache -t opea/text2image:latest -f comps/text2image/Dockerfile .
+    docker build --no-cache -t opea/text2image:latest -f comps/text2image/src/Dockerfile .
     if [ $? -ne 0 ]; then
         echo "opea/text2image built fail"
         exit 1

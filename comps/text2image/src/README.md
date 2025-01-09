@@ -34,7 +34,7 @@ export HF_TOKEN=<your huggingface token>
 Start the OPEA Microservice:
 
 ```bash
-python text2image.py --bf16 --model_name_or_path $MODEL --token $HF_TOKEN
+python opea_text2image_microservice.py --bf16 --model_name_or_path $MODEL --token $HF_TOKEN
 ```
 
 # 🚀2. Start Microservice with Docker (Option 2)
@@ -60,7 +60,7 @@ Build text-to-image service image on Xeon with below command:
 
 ```bash
 cd ../..
-docker build -t opea/text2image:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/text2image/Dockerfile .
+docker build -t opea/text2image:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/text2image/src/Dockerfile .
 ```
 
 ### 2.1.2 Text-to-Image Service Image on Gaudi
@@ -69,7 +69,7 @@ Build text-to-image service image on Gaudi with below command:
 
 ```bash
 cd ../..
-docker build -t opea/text2image-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/text2image/Dockerfile.intel_hpu .
+docker build -t opea/text2image-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/text2image/src/Dockerfile.intel_hpu .
 ```
 
 ## 2.2 Start Text-to-Image Service
