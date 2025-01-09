@@ -9,6 +9,8 @@ tgi:
   resources:
     limits:
       habana.ai/gaudi: 1
+  MAX_INPUT_LENGTH: "1024"
+  MAX_TOTAL_TOKENS: "2048"
   CUDA_GRAPHS: ""
   ENABLE_HPU_GRAPH: true
   LIMIT_HPU_GRAPH: true
