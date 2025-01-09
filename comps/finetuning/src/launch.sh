@@ -9,4 +9,4 @@ else
 fi
 
 export RAY_ADDRESS=http://localhost:$RAY_PORT
-python finetuning_service.py
+python opea_finetuning_microservice.py

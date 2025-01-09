@@ -19,11 +19,11 @@ USER user
 ENV PATH=$PATH:/home/user/.local/bin
 
 RUN python -m pip install --no-cache-dir --upgrade pip && \
-    python -m pip install --no-cache-dir -r /home/user/comps/finetuning/requirements.txt && \
+    python -m pip install --no-cache-dir -r /home/user/comps/finetuning/src/requirements.txt && \
     python -m pip install --no-cache-dir optimum-habana
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/finetuning/
+WORKDIR /home/user/comps/finetuning/src
 
 ENTRYPOINT ["/bin/bash", "launch.sh"]

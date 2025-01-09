@@ -23,9 +23,9 @@ from ray.train.torch import TorchTrainer
 from transformers import Trainer, TrainingArguments
 
 from comps import CustomLogger
-from comps.finetuning.finetune_config import FinetuneConfig
-from comps.finetuning.llm_on_ray import common
-from comps.finetuning.llm_on_ray.finetune.data_process import (
+from comps.finetuning.src.integrations.finetune_config import FinetuneConfig
+from comps.finetuning.src.integrations.llm_on_ray import common
+from comps.finetuning.src.integrations.llm_on_ray.finetune.data_process import (
     DPOCollator,
     DPODataProcessor,
     EmbedCollator,
@@ -35,7 +35,7 @@ from comps.finetuning.llm_on_ray.finetune.data_process import (
     TrainDatasetForCE,
     TrainDatasetForEmbedding,
 )
-from comps.finetuning.llm_on_ray.finetune.modeling import BiEncoderModel, CrossEncoder
+from comps.finetuning.src.integrations.llm_on_ray.finetune.modeling import BiEncoderModel, CrossEncoder
 
 logger = CustomLogger("llm_on_ray/finetune")
 
@@ -394,7 +394,7 @@ def get_trainer(config: Dict, model, ref_model, tokenizer, tokenized_dataset, da
         if task == "dpo":
             lora_config = config["General"].get("lora_config", None)
             peft_config = LoraConfig(**lora_config)
-            from comps.finetuning.llm_on_ray.finetune.dpo_trainer import DPOTrainer
+            from comps.finetuning.src.integrations.llm_on_ray.finetune.dpo_trainer import DPOTrainer
 
             trainer = DPOTrainer(
                 model,
@@ -431,7 +431,7 @@ def get_trainer(config: Dict, model, ref_model, tokenizer, tokenized_dataset, da
         if task == "dpo":
             lora_config = config["General"].get("lora_config", None)
             peft_config = LoraConfig(**lora_config)
-            from comps.finetuning.llm_on_ray.finetune.dpo_trainer import GaudiDPOTrainer
+            from comps.finetuning.src.integrations.llm_on_ray.finetune.dpo_trainer import GaudiDPOTrainer
 
             trainer = GaudiDPOTrainer(
                 model,

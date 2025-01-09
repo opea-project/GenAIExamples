@@ -5,9 +5,9 @@
 services:
   finetuning:
     build:
-      dockerfile: comps/finetuning/Dockerfile
+      dockerfile: comps/finetuning/src/Dockerfile
     image: ${REGISTRY:-opea}/finetuning:${TAG:-latest}
   finetuning-gaudi:
     build:
-      dockerfile: comps/finetuning/Dockerfile.intel_hpu
+      dockerfile: comps/finetuning/src/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/finetuning-gaudi:${TAG:-latest}

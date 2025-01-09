@@ -13,7 +13,7 @@ ray_port=8265
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build -t opea/finetuning-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/finetuning/Dockerfile.intel_hpu .
+    docker build -t opea/finetuning-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/finetuning/src/Dockerfile.intel_hpu .
     if [ $? -ne 0 ]; then
         echo "opea/finetuning-gaudi built fail"
         exit 1
