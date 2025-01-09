@@ -31,6 +31,7 @@ jobs:
       - name: Get test matrix
         id: get-test-matrix
         run: |
+          set -x
           base_commit=${{ github.event.pull_request.base.sha }}
           merged_commit=$(git log -1 --format='%H')
           e2e_charts=$(git diff --name-only ${base_commit} ${merged_commit} | \
