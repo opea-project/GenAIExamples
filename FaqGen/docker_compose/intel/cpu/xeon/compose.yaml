@@ -39,7 +39,7 @@ services:
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      LLM_BACKEND: ${LLM_BACKEND}
+      FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME}
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
   faqgen-xeon-backend-server:
