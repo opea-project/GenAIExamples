@@ -26,7 +26,7 @@ services:
   embedding-multimodal-clip:
     build:
       context: GenAIComps
-      dockerfile: comps/3rd_parties/clip/deployment/docker_compose/Dockerfile
+      dockerfile: comps/3rd_parties/clip/src/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
   retriever-vdms:
