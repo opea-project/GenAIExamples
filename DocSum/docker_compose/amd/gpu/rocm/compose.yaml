@@ -64,7 +64,7 @@ services:
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
       LLM_MODEL_ID: ${DOCSUM_LLM_MODEL_ID}
-      LLM_BACKEND: ${LLM_BACKEND}
+      DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME}
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
 

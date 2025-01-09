@@ -81,7 +81,7 @@ export DOCSUM_HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export DOCSUM_LLM_SERVER_PORT="8008"
 export DOCSUM_BACKEND_SERVER_PORT="8888"
 export DOCSUM_FRONTEND_PORT="5173"
-export LLM_BACKEND="tgi"
+export DocSum_COMPONENT_NAME="OPEADocSum_TGI"
 ```
 
 Note: Please replace with `host_ip` with your external IP address, do not use localhost.
