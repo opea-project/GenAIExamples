@@ -44,7 +44,7 @@ services:
   promptregistry-mongo-server:
     build:
       context: GenAIComps
-      dockerfile: comps/prompt_registry/mongo/Dockerfile
+      dockerfile: comps/prompt_registry/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}
   chathistory-mongo-server:
