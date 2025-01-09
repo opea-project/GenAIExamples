@@ -12,7 +12,6 @@ vllm:
   accelDevice: "gaudi"
   image:
     repository: opea/vllm-gaudi
-    tag: "latest"
   resources:
     limits:
       habana.ai/gaudi: 1
