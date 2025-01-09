@@ -35,16 +35,16 @@ jobs:
           base_commit=${{ github.event.pull_request.base.sha }}
           merged_commit=$(git log -1 --format='%H')
           e2e_charts=$(git diff --name-only ${base_commit} ${merged_commit} | \
-          grep "helm" \
+          grep "kubernetes/helm" | \
           grep -vE 'README.md' | \
-          cut -d'/' -f2-4 | sort -u ) #CodeGen/kubernetes/helm
+          cut -d'/' -f1-3 | sort -u ) #CodeGen/kubernetes/helm
 
           run_matrix="{\"include\":["
           for chart in ${e2e_charts}; do
             for file in "$chart"/*values.yaml; do
               if [ -f "$file" ]; then
                 filename=$(basename "$file" .yaml)
-                example=$($echo "$chart" | cut -d'/' -f1)
+                example=$(echo "$chart" | cut -d'/' -f1)
                 if [[ "$filename" == *"gaudi"* ]]; then
                   run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"gaudi\", \"valuefile\":\"${filename}\"},"
                 else
