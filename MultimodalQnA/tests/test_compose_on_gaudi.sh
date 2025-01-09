@@ -22,7 +22,7 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-redis lvm-tgi dataprep-multimodal-redis whisper"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever-redis lvm-tgi dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -62,6 +62,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     # Start Docker Containers
+    sed -i "s|container_name: multimodalqna-backend-server|container_name: multimodalqna-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 2m
 }
@@ -143,19 +144,19 @@ function validate_microservices() {
         '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 
     # embedding microservice
-    echo "Validating embedding-multimodal"
+    echo "Validating embedding"
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text" : "This is some sample text."}'
 
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
