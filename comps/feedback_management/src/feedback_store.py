@@ -3,8 +3,8 @@
 
 import bson.errors as BsonError
 from bson.objectid import ObjectId
-from config import COLLECTION_NAME
-from mongo_conn import MongoClient
+from integrations.mongo.config import COLLECTION_NAME
+from integrations.mongo.mongo_conn import MongoClient
 
 
 class FeedbackStore:
@@ -15,8 +15,9 @@ class FeedbackStore:
     ):
         self.user = user
 
-    def initialize_storage(self) -> None:
-        self.db_client = MongoClient.get_db_client()
+    def initialize_storage(self, db_type="mongo") -> None:
+        if db_type == "mongo":
+            self.db_client = MongoClient.get_db_client()
         self.collection = self.db_client[COLLECTION_NAME]
 
     async def save_feedback(self, feedback_data) -> str:

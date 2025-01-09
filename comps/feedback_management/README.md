@@ -19,4 +19,4 @@ The Feedback Management microservice able to support various database backends f
 
 ### Feedback Management with MongoDB
 
-For more detail, please refer to this [README](./mongo/README.md)
+For more detail, please refer to this [README](./src/README.md)

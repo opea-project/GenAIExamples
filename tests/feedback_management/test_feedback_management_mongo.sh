@@ -17,7 +17,7 @@ function build_docker_images() {
     echo $(pwd)
     docker run -d -p 27017:27017 --name=test-comps-mongo mongo:latest
 
-    docker build --no-cache -t opea/feedbackmanagement-mongo-server:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/feedback_management/mongo/Dockerfile .
+    docker build --no-cache -t opea/feedbackmanagement-mongo-server:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/feedback_management/src/Dockerfile .
     if [ $? -ne 0 ]; then
         echo "opea/feedbackmanagement-mongo-server built fail"
         exit 1

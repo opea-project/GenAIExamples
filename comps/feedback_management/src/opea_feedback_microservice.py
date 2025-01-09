@@ -4,7 +4,7 @@ import os
 from typing import Annotated, Optional
 
 from fastapi import HTTPException
-from mongo_store import FeedbackStore
+from feedback_store import FeedbackStore
 from pydantic import BaseModel, Field
 
 from comps import CustomLogger
