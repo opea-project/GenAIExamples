@@ -14,7 +14,7 @@ Build docker image with below command:
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 export HF_TOKEN=${your_huggingface_token}
-docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg HF_TOKEN=$HF_TOKEN -f comps/finetuning/Dockerfile .
+docker build -t opea/finetuning:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg HF_TOKEN=$HF_TOKEN -f comps/finetuning/src/Dockerfile .
 ```
 
 ### 2. Run Docker with CLI
