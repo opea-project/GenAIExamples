@@ -47,8 +47,8 @@ services:
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   web-retriever:
-    image: ${REGISTRY:-opea}/web-retriever-chroma:${TAG:-latest}
-    container_name: web-retriever-chroma-server
+    image: ${REGISTRY:-opea}/web-retriever:${TAG:-latest}
+    container_name: web-retriever-server
     ports:
       - "3003:7077"
     ipc: host
@@ -80,7 +80,7 @@ services:
       timeout: 10s
       retries: 60
   reranking:
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-gaudi-server
     depends_on:
       tei-reranking-service:
