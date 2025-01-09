@@ -344,3 +344,22 @@ OPEA microservice deployment can easily be monitored through Grafana dashboards 
 
 ![chatqna dashboards](./assets/img/chatqna_dashboards.png)
 ![tgi dashboard](./assets/img/tgi_dashboard.png)
+
+## Tracing Services with OpenTelemetry Tracing and Jaeger
+
+> NOTE: limited support. Only LLM inference serving with TGI on Gaudi is enabled for this feature.
+
+OPEA microservice and TGI/TEI serving can easily be traced through Jaeger dashboards in conjunction with OpenTelemetry Tracing feature. Follow the [README](https://github.com/opea-project/GenAIComps/tree/main/comps/cores/telemetry#tracing) to trace additional functions if needed.
+
+Tracing data is exported to http://{EXTERNAL_IP}:4318/v1/traces via Jaeger.
+Users could also get the external IP via below command.
+
+```bash
+ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+'
+```
+
+For TGI serving on Gaudi, users could see different services like opea, TEI and TGI.
+![Screenshot from 2024-12-27 11-58-18](https://github.com/user-attachments/assets/6126fa70-e830-4780-bd3f-83cb6eff064e)
+
+Here is a screenshot for one tracing of TGI serving request.
+![Screenshot from 2024-12-27 11-26-25](https://github.com/user-attachments/assets/3a7c51c6-f422-41eb-8e82-c3df52cd48b8)
