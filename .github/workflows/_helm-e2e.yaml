@@ -73,7 +73,7 @@ jobs:
           echo "should_cleanup=false" >> $GITHUB_ENV
           echo "skip_validate=false" >> $GITHUB_ENV
           echo "CHART_FOLDER=${workload_path}/kubernetes/helm" >> $GITHUB_ENV
-  
+
       - name: Initialize chart testing
         run: |
           # Replace values for CI test environment
