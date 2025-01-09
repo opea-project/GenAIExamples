@@ -69,18 +69,6 @@ services:
       https_proxy: ${https_proxy}
     restart: unless-stopped
 
-  whisper:
-    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-    container_name: whisper-service
-    ports:
-      - "7066:7066"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-    restart: unless-stopped
-
   dataprep-audio2text:
     image: ${REGISTRY:-opea}/dataprep-audio2text:${TAG:-latest}
     container_name: dataprep-audio2text-service
@@ -122,8 +110,9 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${HOST_IP}
-      - DATA_SERVICE_HOST_IP=${DATA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${HOST_IP}
+      - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
+
     ipc: host
     restart: always
 

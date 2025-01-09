@@ -9,25 +9,25 @@ This document outlines the deployment process for a SearchQnA application utiliz
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
+docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/web-retriever-chroma:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/web_retrievers/chroma/langchain/Dockerfile .
+docker build --no-cache -t opea/web-retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/web_retrievers/src/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
+docker build --no-cache -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/src/Dockerfile .
 ```
 
 ### 4. Build LLM Image
 
 ```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 5. Build MegaService Docker Image
@@ -51,10 +51,10 @@ docker build --no-cache -t opea/opea/searchqna-ui:latest --build-arg https_proxy
 
 Then run the command `docker images`, you will have following images ready:
 
-1. `opea/embedding-tei:latest`
-2. `opea/web-retriever-chroma:latest`
-3. `opea/reranking-tei:latest`
-4. `opea/llm-tgi:latest`
+1. `opea/embedding:latest`
+2. `opea/web-retriever:latest`
+3. `opea/reranking:latest`
+4. `opea/llm-textgen:latest`
 5. `opea/searchqna:latest`
 6. `opea/searchqna-ui:latest`
 
@@ -140,7 +140,7 @@ curl http://${host_ip}:3006/generate \
 # llm microservice
 curl http://${host_ip}:3007/v1/chat/completions\
   -X POST \
-  -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+  -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
   -H 'Content-Type: application/json'
 
 ```

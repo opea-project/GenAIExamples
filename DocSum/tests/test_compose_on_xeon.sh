@@ -21,19 +21,9 @@ export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
+export ASR_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 export no_proxy="${no_proxy},${host_ip}"
-
-export V2A_SERVICE_HOST_IP=${host_ip}
-export V2A_ENDPOINT=http://$host_ip:7078
-
-export A2T_ENDPOINT=http://$host_ip:7066
-export A2T_SERVICE_HOST_IP=${host_ip}
-export A2T_SERVICE_PORT=9099
-
-export DATA_ENDPOINT=http://$host_ip:7079
-export DATA_SERVICE_HOST_IP=${host_ip}
-export DATA_SERVICE_PORT=7079
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -46,7 +36,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-gradio-ui whisper dataprep-multimedia2text dataprep-audio2text dataprep-video2audio llm-docsum-tgi"
+    service_list="docsum docsum-gradio-ui whisper llm-docsum-tgi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:1.4
