@@ -23,9 +23,9 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.name "NeuralChatBot"
-          git config --global user.email "grp_neural_chat_bot@intel.com"
-          git remote set-url origin https://NeuralChatBot:"${{ secrets.ACTION_TOKEN }}"@github.com/opea-project/GenAIComps.git
+          git config --global user.name "CICD-at-OPEA"
+          git config --global user.email "CICD@opea.dev"
+          git remote set-url origin https://CICD-at-OPEA:"${{ secrets.ACTION_TOKEN }}"@github.com/opea-project/GenAIComps.git
 
       - name: Run script
         run: |
