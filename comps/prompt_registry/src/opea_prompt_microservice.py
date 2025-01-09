@@ -3,13 +3,13 @@
 import os
 from typing import Optional
 
-from mongo_store import PromptStore
+from prompt_store import PromptStore
 from pydantic import BaseModel
 
 from comps import CustomLogger
 from comps.cores.mega.micro_service import opea_microservices, register_microservice
 
-logger = CustomLogger("prompt_mongo")
+logger = CustomLogger("prompt_registry")
 logflag = os.getenv("LOGFLAG", False)
 
 
@@ -39,7 +39,7 @@ class PromptId(BaseModel):
 
 
 @register_microservice(
-    name="opea_service@prompt_mongo",
+    name="opea_service@prompt",
     endpoint="/v1/prompt/create",
     host="0.0.0.0",
     input_datatype=PromptCreate,
@@ -70,7 +70,7 @@ async def create_prompt(prompt: PromptCreate):
 
 
 @register_microservice(
-    name="opea_service@prompt_mongo",
+    name="opea_service@prompt",
     endpoint="/v1/prompt/get",
     host="0.0.0.0",
     input_datatype=PromptId,
@@ -106,7 +106,7 @@ async def get_prompt(prompt: PromptId):
 
 
 @register_microservice(
-    name="opea_service@prompt_mongo",
+    name="opea_service@prompt",
     endpoint="/v1/prompt/delete",
     host="0.0.0.0",
     input_datatype=PromptId,
@@ -140,4 +140,4 @@ async def delete_prompt(prompt: PromptId):
 
 
 if __name__ == "__main__":
-    opea_microservices["opea_service@prompt_mongo"].start()
+    opea_microservices["opea_service@prompt"].start()

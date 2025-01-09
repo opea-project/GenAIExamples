@@ -17,18 +17,18 @@ function build_docker_images() {
     echo $(pwd)
     docker run -d -p 27017:27017 --name=test-comps-mongo mongo:latest
 
-    docker build --no-cache -t opea/promptregistry-mongo-server:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/mongo/Dockerfile .
+    docker build --no-cache -t opea/promptregistry-server:comps --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/src/Dockerfile .
     if [ $? -ne 0 ]; then
-        echo "opea/promptregistry-mongo-server built fail"
+        echo "opea/promptregistry-server built fail"
         exit 1
     else
-        echo "opea/promptregistry-mongo-server built successful"
+        echo "opea/promptregistry-server built successful"
     fi
 }
 
 function start_service() {
 
-    docker run -d --name="test-comps-promptregistry-mongo-server" -p 6018:6018 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MONGO_HOST=${MONGO_HOST} -e MONGO_PORT=${MONGO_PORT} -e DB_NAME=${DB_NAME} -e COLLECTION_NAME=${COLLECTION_NAME} opea/promptregistry-mongo-server:comps
+    docker run -d --name="test-comps-promptregistry-server" -p 6018:6018 -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e MONGO_HOST=${MONGO_HOST} -e MONGO_PORT=${MONGO_PORT} -e DB_NAME=${DB_NAME} -e COLLECTION_NAME=${COLLECTION_NAME} opea/promptregistry-server:comps
 
     sleep 10s
 }
@@ -46,7 +46,7 @@ function validate_microservice() {
         echo "Correct result."
     else
         echo "Incorrect result."
-        docker logs test-comps-promptregistry-mongo-server
+        docker logs test-comps-promptregistry-server
         exit 1
     fi
 

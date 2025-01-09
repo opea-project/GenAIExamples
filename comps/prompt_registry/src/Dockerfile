@@ -20,11 +20,11 @@ COPY comps /home/user/comps
 COPY requirements.txt /home/user/
 
 RUN pip install --no-cache-dir --upgrade pip setuptools && \
-    pip install --no-cache-dir -r /home/user/comps/prompt_registry/mongo/requirements.txt && \
+    pip install --no-cache-dir -r /home/user/comps/prompt_registry/src/requirements.txt && \
     pip install --no-cache-dir -r /home/user/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/prompt_registry/mongo
+WORKDIR /home/user/comps/prompt_registry/src/
 
-ENTRYPOINT ["python", "prompt.py"]
+ENTRYPOINT ["python", "opea_prompt_microservice.py"]

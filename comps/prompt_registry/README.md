@@ -18,4 +18,4 @@ The Prompt Registry microservice able to support various database backends for s
 
 ### Prompt Registry with MongoDB
 
-For more detail, please refer to this [README](./mongo/README.md)
+For more detail, please refer to this [README](./src/README.md)
