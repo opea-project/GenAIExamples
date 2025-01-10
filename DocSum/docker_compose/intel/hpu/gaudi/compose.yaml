@@ -42,7 +42,7 @@ services:
       tgi-gaudi-server:
         condition: service_healthy
     ports:
-      - ${LLM_SERVICE_PORT:-9000}:9000
+      - ${DOCSUM_PORT:-9000}:9000
     ipc: host
     environment:
       no_proxy: ${no_proxy}
