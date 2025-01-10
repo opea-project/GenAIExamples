@@ -262,7 +262,7 @@ services:
     image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
     container_name: llm-faqgen-server
     depends_on:
-      tgi-service:
+      tgi_service:
         condition: service_healthy
     ports:
       - "9002:9000"
