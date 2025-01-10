@@ -36,7 +36,7 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: GenAIComps
-      dockerfile: comps/3rd_parties/nginx/src/Dockerfile
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
   graphrag-ui:
     build:
