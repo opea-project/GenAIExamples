@@ -186,6 +186,10 @@ docker build -t opea/agent:latest --build-arg https_proxy=$https_proxy --build-a
    :::
    ::::
 
+## Deploy using Helm Chart
+
+Refer to the [AgentQnA helm chart](./kubernetes/helm/README.md) for instructions on deploying AgentQnA on Kubernetes.
+
 ## Validate services
 
 First look at logs of the agent docker containers:
