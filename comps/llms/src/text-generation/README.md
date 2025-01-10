@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 ### 1.2 Start 3rd-party TGI Service
 
-Please refer to [3rd-party TGI](../../../3rd_parties/tgi/deployment/docker_compose/) to start a LLM endpoint and verify.
+Please refer to [3rd-party TGI](../../../third_parties/tgi/deployment/docker_compose/) to start a LLM endpoint and verify.
 
 ### 1.3 Start LLM Service with Python Script
 

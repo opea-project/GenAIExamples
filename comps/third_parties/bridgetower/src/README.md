@@ -22,8 +22,8 @@ Currently, we employ [**BridgeTower**](https://huggingface.co/BridgeTower/bridge
 
 ```bash
 cd ../../../../../../../
-docker build -t opea/embedding-multimodal-bridgetower-hpu:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/integrations/dependency/multimodal/bridgetower/Dockerfile.intel_hpu .
-cd comps/embeddings/src/integrations/dependency/multimodal/bridgetower/
+docker build -t opea/embedding-multimodal-bridgetower-hpu:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/bridgetower/src/Dockerfile.intel_hpu .
+cd comps/third_parties/bridgetower/deployment/docker_compose/
 docker compose -f compose_intel_hpu.yaml up -d
 ```
 
@@ -33,8 +33,8 @@ docker compose -f compose_intel_hpu.yaml up -d
 
 ```bash
 cd ../../../../../../../
-docker build -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/integrations/dependency/multimodal/bridgetower/Dockerfile .
-cd comps/embeddings/src/integrations/dependency/multimodal/bridgetower/
+docker build -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/bridgetower/src/Dockerfile .
+cd comps/third_parties/bridgetower/deployment/docker_compose/
 docker compose -f compose_intel_cpu.yaml up -d
 ```
 

@@ -32,7 +32,7 @@ from multimodal_utils import (
 from PIL import Image
 
 from comps import opea_microservices, register_microservice
-from comps.embeddings.src.integrations.dependency.bridgetower.bridgetower_embedding import BridgeTowerEmbedding
+from comps.third_parties.bridgetower.src.bridgetower_embedding import BridgeTowerEmbedding
 
 device = "cpu"
 upload_folder = "./uploaded_files/"

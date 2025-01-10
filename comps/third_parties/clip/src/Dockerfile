@@ -19,11 +19,11 @@ COPY comps /home/user/comps
 
 RUN pip install --no-cache-dir --upgrade pip setuptools && \
     if [ ${ARCH} = "cpu" ]; then pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu; fi && \
-    pip install --no-cache-dir -r /home/user/comps/embeddings/src/integrations/dependency/clip/requirements.txt
+    pip install --no-cache-dir -r /home/user/comps/third_parties/clip/src/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/embeddings/src/integrations/dependency/clip/
+WORKDIR /home/user/comps/third_parties/clip/src/
 
 ENTRYPOINT ["python", "clip_server.py"]
 

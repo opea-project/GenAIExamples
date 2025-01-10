@@ -28,7 +28,7 @@ function build_mm_docker_images() {
 function build_embedding_service_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile .
+    docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/bridgetower/src/Dockerfile .
 
     if [ $? -ne 0 ]; then
         echo "opea/embedding-multimodal-bridgetower built fail"

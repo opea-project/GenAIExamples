@@ -7,15 +7,3 @@ services:
     build:
       dockerfile: comps/embeddings/src/Dockerfile
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
-  embedding-multimodal-clip:
-    build:
-      dockerfile: comps/embeddings/src/integrations/dependency/clip/Dockerfile
-    image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
-  embedding-multimodal-bridgetower:
-    build:
-      dockerfile: comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile
-    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
-  embedding-multimodal-bridgetower-gaudi:
-    build:
-      dockerfile: comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile.intel_hpu
-    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}

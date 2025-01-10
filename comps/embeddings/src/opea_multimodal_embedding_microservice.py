@@ -4,7 +4,7 @@
 import os
 import time
 
-from integrations.opea_multimodal_embedding_bridgetower import OpeaMultimodalEmbeddingBrigeTower
+from integrations.multimodal_bridgetower import OpeaMultimodalEmbeddingBrigeTower
 
 from comps import (
     CustomLogger,

@@ -43,7 +43,7 @@ class OpeaRedisRetriever(OpeaComponent):
             self.embeddings = HuggingFaceEndpointEmbeddings(model=TEI_EMBEDDING_ENDPOINT)
         elif BRIDGE_TOWER_EMBEDDING:
             logger.info("use bridge tower embedding")
-            from comps.embeddings.src.integrations.dependency.bridgetower import BridgeTowerEmbedding
+            from comps.third_parties.bridgetower.src.bridgetower_embedding import BridgeTowerEmbedding
 
             self.embeddings = BridgeTowerEmbedding()
         else:

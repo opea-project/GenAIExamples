@@ -1,0 +1,28 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  nginx:
+    build:
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+  embedding-multimodal-clip:
+    build:
+      dockerfile: comps/third_parties/clip/src/Dockerfile
+    image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
+  embedding-multimodal-bridgetower:
+    build:
+      dockerfile: comps/third_parties/bridgetower/src/Dockerfile
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
+  embedding-multimodal-bridgetower-gaudi:
+    build:
+      dockerfile: comps/third_parties/bridgetower/src/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
+  wav2lip:
+    build:
+      dockerfile: comps/third_parties/wav2lip/src/Dockerfile
+    image: ${REGISTRY:-opea}/wav2lip:${TAG:-latest}
+  wav2lip-gaudi:
+    build:
+      dockerfile: comps/third_parties/wav2lip/src/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/wav2lip-gaudi:${TAG:-latest}

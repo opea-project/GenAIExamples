@@ -9,7 +9,7 @@ from langchain_core.pydantic_v1 import BaseModel, Extra
 from PIL import Image
 from transformers import BridgeTowerProcessor
 
-from .bridgetower_custom import BridgeTowerForITC, BridgeTowerTextFeatureExtractor
+from comps.third_parties.bridgetower.src.bridgetower_custom import BridgeTowerForITC, BridgeTowerTextFeatureExtractor
 
 
 class BridgeTowerEmbedding(BaseModel, Embeddings):
