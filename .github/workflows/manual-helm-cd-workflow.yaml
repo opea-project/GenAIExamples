@@ -57,7 +57,7 @@ jobs:
               if [[ -f $chart ]]; then
                 continue
               fi
-              for file in "chart"/kubernetes/helm/*values.yaml; do
+              for file in "$chart"/kubernetes/helm/*values.yaml; do
                 if [ -f "$file" ]; then
                   filename=$(basename "$file" .yaml)
                   if [[ "$filename" == *"gaudi"* ]]; then
