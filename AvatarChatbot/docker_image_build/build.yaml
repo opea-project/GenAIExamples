@@ -57,7 +57,6 @@ services:
     build:
       context: GenAIComps
       dockerfile: comps/3rd_parties/wav2lip/src/Dockerfile.intel_hpu
-
     extends: avatarchatbot
     image: ${REGISTRY:-opea}/wav2lip-gaudi:${TAG:-latest}
   wav2lip:
