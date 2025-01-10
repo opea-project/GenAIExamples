@@ -29,7 +29,7 @@ services:
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
     container_name: llm-docsum-server
     depends_on:
-      tgi-service:
+      tgi-server:
         condition: service_healthy
     ports:
       - ${LLM_SERVICE_PORT:-9000}:9000

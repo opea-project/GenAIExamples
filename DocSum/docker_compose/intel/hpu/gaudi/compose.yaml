@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tgi-server:
+  tgi-gaudi-server:
     image: ghcr.io/huggingface/tgi-gaudi:2.3.1
     container_name: tgi-gaudi-server
     ports:
@@ -39,7 +39,7 @@ services:
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
     container_name: llm-docsum-gaudi-server
     depends_on:
-      tgi-service:
+      tgi-gaudi-server:
         condition: service_healthy
     ports:
       - ${LLM_SERVICE_PORT:-9000}:9000
@@ -78,7 +78,7 @@ services:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-gaudi-backend-server
     depends_on:
-      - tgi-server
+      - tgi-gaudi-server
       - llm-docsum-tgi
     ports:
       - "8888:8888"

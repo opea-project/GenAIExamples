@@ -151,7 +151,7 @@ function validate_microservices() {
     validate_services_json \
         "${host_ip}:8008/generate" \
         "generated_text" \
-        "tgi-gaudi" \
+        "tgi-gaudi-server" \
         "tgi-gaudi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
