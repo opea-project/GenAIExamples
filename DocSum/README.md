@@ -72,19 +72,9 @@ docker compose -f compose.yaml up -d
 
 Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
-### Deploy using Kubernetes with GMC
+### Deploy DocSum on Kubernetes using Helm Chart
 
-Refer to [Kubernetes deployment](./kubernetes/intel/README_gmc.md)
-
-### Deploy using Kubernetes without GMC
-
-Refer to [Kubernetes deployment](./kubernetes/intel/README.md)
-
-### Deploy DocSum into Kubernetes using Helm Chart
-
-Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
-
-Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum/README.md) for instructions on deploying DocSum into Kubernetes on Xeon & Gaudi.
+Refer to the [DocSum helm chart](./kubernetes/helm/README.md) for instructions on deploying DocSum on Kubernetes.
 
 ### Workflow of the deployed Document Summarization Service
 
