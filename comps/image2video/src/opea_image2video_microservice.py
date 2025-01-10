@@ -5,8 +5,6 @@ import argparse
 import os
 import time
 
-from integrations.opea import OpeaImage2video
-
 from comps import (
     CustomLogger,
     ImagesPath,
@@ -18,6 +16,7 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+from comps.image2video.src.integrations.native import OpeaImage2video
 
 logger = CustomLogger("opea_image2video_microservice")
 

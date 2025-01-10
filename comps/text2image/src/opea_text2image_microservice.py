@@ -5,8 +5,6 @@ import argparse
 import os
 import time
 
-from integrations.opea import OpeaText2image
-
 from comps import (
     CustomLogger,
     OpeaComponentLoader,
@@ -18,6 +16,7 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+from comps.text2image.src.integrations.native import OpeaText2image
 
 logger = CustomLogger("opea_text2image_microservice")
 
