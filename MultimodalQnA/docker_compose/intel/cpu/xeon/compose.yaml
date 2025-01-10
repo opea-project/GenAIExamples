@@ -117,8 +117,6 @@ services:
   multimodalqna:
     image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
     container_name: multimodalqna-backend-server
-    volumes:
-      - "/home/sdp/lvl/GenAIExamples/MultimodalQnA/docker_image_build/GenAIComps:/home/user/GenAIComps"
     depends_on:
       - redis-vector-db
       - dataprep-multimodal-redis
