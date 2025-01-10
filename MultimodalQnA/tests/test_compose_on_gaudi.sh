@@ -310,9 +310,9 @@ function main() {
     validate_delete
     echo "==== delete validated ===="
 
-#    delete_data
-#    stop_docker
-#    echo y | docker system prune
+    delete_data
+    stop_docker
+    echo y | docker system prune
 
 }
 
