@@ -19,6 +19,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       WHISPER_PORT: ${WHISPER_PORT}
+      WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     restart: unless-stopped
   asr:
     image: ${REGISTRY:-opea}/asr:${TAG:-latest}
@@ -180,7 +181,7 @@ services:
       LVM_MODEL_ID: ${LVM_MODEL_ID}
       ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
       ASR_SERVICE_ENDPOINT: ${ASR_SERVICE_ENDPOINT}
-      WHISPER_SERVER_PORT: ${WHISPER_SERVER_PORT}
+      WHISPER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     ipc: host
     restart: always
