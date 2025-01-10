@@ -137,7 +137,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${host_ip}:9000/v1/chat/docsum" \
+        "${host_ip}:9000/v1/docsum" \
         "data: " \
         "docsum-llm-server" \
         "docsum-llm-server" \

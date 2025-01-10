@@ -132,7 +132,7 @@ You will have the following Docker Images:
 2. LLM Microservice
 
    ```bash
-   curl http://${host_ip}:9000/v1/chat/docsum \
+   curl http://${host_ip}:9000/v1/docsum \
      -X POST \
      -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
      -H 'Content-Type: application/json'
