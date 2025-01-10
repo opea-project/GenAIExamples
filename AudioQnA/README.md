@@ -71,6 +71,10 @@ Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instr
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for instructions on deploying AudioQnA on Xeon.
 
+## Deploy using Helm Chart
+
+Refer to the [AudioQnA helm chart](./kubernetes/helm/README.md) for instructions on deploying AudioQnA on Kubernetes.
+
 ## Supported Models
 
 ### ASR

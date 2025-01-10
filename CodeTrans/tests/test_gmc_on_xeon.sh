@@ -111,12 +111,12 @@ fi
 
 case "$1" in
     install_CodeTrans)
-        pushd CodeTrans/kubernetes/intel/cpu/xeon/gmc
+        pushd CodeTrans/kubernetes/gmc
         install_codetrans
         popd
         ;;
     validate_CodeTrans)
-        pushd CodeTrans/kubernetes/intel/cpu/xeon/gmc
+        pushd CodeTrans/kubernetes/gmc
         validate_codetrans
         popd
         ;;

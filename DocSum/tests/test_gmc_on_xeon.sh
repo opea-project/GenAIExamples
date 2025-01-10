@@ -112,12 +112,12 @@ fi
 
 case "$1" in
     install_DocSum)
-        pushd DocSum/kubernetes/intel/cpu/xeon/gmc
+        pushd DocSum/kubernetes/gmc
         install_docsum
         popd
         ;;
     validate_DocSum)
-        pushd DocSum/kubernetes/intel/cpu/xeon/gmc
+        pushd DocSum/kubernetes/gmc
         validate_docsum
         popd
         ;;
