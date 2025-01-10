@@ -96,12 +96,12 @@ fi
 
 case "$1" in
     install_AudioQnA)
-        pushd AudioQnA/kubernetes/intel/hpu/gaudi/gmc
+        pushd AudioQnA/kubernetes/gmc
         install_audioqa
         popd
         ;;
     validate_AudioQnA)
-        pushd AudioQnA/kubernetes/intel/hpu/gaudi/gmc
+        pushd AudioQnA/kubernetes/gmc
         validate_audioqa
         popd
         ;;
