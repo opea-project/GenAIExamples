@@ -14,10 +14,10 @@ services:
       TGI_LLM_ENDPOINT: "http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}"
       HUGGINGFACEHUB_API_TOKEN: ${FAQGEN_HUGGINGFACEHUB_API_TOKEN}
       HUGGING_FACE_HUB_TOKEN: ${FAQGEN_HUGGINGFACEHUB_API_TOKEN}
-      host_ip: ${host_ip}
-      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+      HOST_IP: ${HOST_IP}
+      FAQGEN_TGI_SERVICE_PORT: ${FAQGEN_TGI_SERVICE_PORT}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100

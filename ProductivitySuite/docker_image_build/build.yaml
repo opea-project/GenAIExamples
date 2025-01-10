@@ -83,9 +83,3 @@ services:
       dockerfile: comps/llms/src/faq-generation/Dockerfile
     extends: faqgen
     image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
-  llm-docsum-tgi:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/summarization/tgi/langchain/Dockerfile
-    extends: docsum
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
