@@ -1,0 +1,12 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+image:
+  repository: opea/chatqna-wrapper
+
+llm-uservice:
+  enabled: true
+embedding-usvc:
+  enabled: true
+reranking-usvc:
+  enabled: true
