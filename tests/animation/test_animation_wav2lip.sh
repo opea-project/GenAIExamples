@@ -10,7 +10,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH
     echo $(pwd)
-    docker build -t opea/wav2lip:comps -f comps/animation/src/integration/dependency/Dockerfile .
+    docker build -t opea/wav2lip:comps -f comps/3rd_parties/wav2lip/src/Dockerfile .
     if [ $? -ne 0 ]; then
         echo "opea/wav2lip built fail"
         exit 1

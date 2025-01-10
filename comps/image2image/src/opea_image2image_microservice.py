@@ -17,7 +17,7 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
-from comps.image2image.src.integration.opea_image2image_native import OpeaImageToImage
+from comps.image2image.src.integrations.native import OpeaImageToImage
 
 args = None
 
@@ -36,9 +36,9 @@ component_loader = None
     output_datatype=SDOutputs,
 )
 @register_statistics(names=["opea_service@image2image"])
-def image2image(input: SDImg2ImgInputs):
+async def image2image(input: SDImg2ImgInputs):
     start = time.time()
-    results = component_loader.invoke(input)
+    results = await component_loader.invoke(input)
     statistics_dict["opea_service@image2image"].append_latency(time.time() - start, None)
     return SDOutputs(images=results)
 

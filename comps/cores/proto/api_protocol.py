@@ -636,10 +636,10 @@ class FineTuningJobWandbIntegration(BaseModel):
 
 class FineTuningJobWandbIntegrationObject(BaseModel):
     type: Literal["wandb"]
-    """The type of the integration being enabled for the fine-tuning job."""
+    """The type of the integrations being enabled for the fine-tuning job."""
 
     wandb: FineTuningJobWandbIntegration
-    """The settings for your integration with Weights and Biases.
+    """The settings for your integrations with Weights and Biases.
 
     This payload specifies the project that metrics will be sent to. Optionally, you
     can set an explicit display name for your run, add tags to your run, and set a

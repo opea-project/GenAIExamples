@@ -22,7 +22,7 @@ class OpeaAnimation(OpeaComponent):
         if not health_status:
             logger.error("OpeaAnimation health check failed.")
 
-    def invoke(self, input: str):
+    async def invoke(self, input: str):
         """Invokes the animation service to generate embeddings for the animation input.
 
         Args:

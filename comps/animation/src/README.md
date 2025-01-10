@@ -16,13 +16,13 @@ cd GenAIComps
 - Xeon CPU
 
 ```bash
-docker build -t opea/wav2lip:latest -f comps/animation/src/integration/dependency/Dockerfile .
+docker build -t opea/wav2lip:latest -f comps/3rd_parties/wav2lip/src/Dockerfile .
 ```
 
 - Gaudi2 HPU
 
 ```bash
-docker build -t opea/wav2lip-gaudi:latest -f comps/animation/src/integration/dependency/Dockerfile.intel_hpu .
+docker build -t opea/wav2lip-gaudi:latest -f comps/3rd_parties/wav2lip/src/Dockerfile.intel_hpu .
 ```
 
 ### 1.1.2 Animation server image
@@ -101,7 +101,7 @@ Once microservice starts, user can use below script to validate the running micr
 
 ```bash
 cd GenAIComps
-python3 comps/animation/src/integration/dependency/check_wav2lip_server.py
+python3 comps/3rd_parties/wav2lip/src/check_wav2lip_server.py
 ```
 
 ## 3.2 Validate Animation service
@@ -116,7 +116,7 @@ or
 
 ```bash
 cd GenAIComps
-python3 comps/animation/src/integration/dependency/check_animation_server.py
+python3 comps/3rd_parties/wav2lip/src/check_animation_server.py
 ```
 
 The expected output will be a message similar to the following:

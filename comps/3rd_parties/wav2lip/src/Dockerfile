@@ -25,7 +25,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
 # Install GenAIComps
 RUN mkdir -p /home/user/comps
 COPY comps /home/user/comps
-COPY comps/animation/src/integration/dependency/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY comps/3rd_parties/wav2lip/src/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Install ffmpeg with x264 software codec
 RUN git clone https://github.com/FFmpeg/FFmpeg.git /home/user/comps/animation/src/FFmpeg
