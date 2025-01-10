@@ -44,6 +44,6 @@ services:
   llm-docsum:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/doc-summarization/src/Dockerfile
+      dockerfile: comps/llms/src/doc-summarization/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
