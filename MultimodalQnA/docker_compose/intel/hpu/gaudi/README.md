@@ -345,6 +345,7 @@ curl -X POST \
 8. MegaService
 
 Test the MegaService with a text query:
+
 ```bash
 curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -H "Content-Type: application/json" \
@@ -353,6 +354,7 @@ curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
 ```
 
 Test the MegaService with an audio query:
+
 ```bash
 curl http://${host_ip}:8888/v1/multimodalqna  \
     -H "Content-Type: application/json"  \
@@ -360,6 +362,7 @@ curl http://${host_ip}:8888/v1/multimodalqna  \
 ```
 
 Test the MegaService with a text and image query:
+
 ```bash
 curl http://${host_ip}:8888/v1/multimodalqna \
     -H "Content-Type: application/json" \
@@ -367,6 +370,7 @@ curl http://${host_ip}:8888/v1/multimodalqna \
 ```
 
 Test the MegaService with a back and forth conversation between the user and assistant:
+
 ```bash
 curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
 	-H "Content-Type: application/json" \

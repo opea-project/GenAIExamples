@@ -299,7 +299,7 @@ function validate_megaservice() {
         "multimodalqna" \
         "multimodalqna-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
-    
+
     echo "Validating megaservice with first audio query"
     validate_service \
         "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \

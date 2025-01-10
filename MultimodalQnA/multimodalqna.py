@@ -91,19 +91,17 @@ class MultimodalQnAService:
         self.lvm_megaservice.add(lvm)
 
     def _get_role_labels(self):
-        """
-        Returns a dictionary of role labels that are used in the chat prompt based on the LVM_MODEL_ID
-        environment variable. The function defines the role labels used by the llava-1.5, llava-v1.6-vicuna,
+        """Returns a dictionary of role labels that are used in the chat prompt based on the LVM_MODEL_ID
+        environment variable.
+
+        The function defines the role labels used by the llava-1.5, llava-v1.6-vicuna,
         llava-v1.6-mistral, and llava-interleave models, and then defaults to use "USER:" and "ASSISTANT:" if the
         LVM_MODEL_ID is not one of those.
         """
         lvm_model = os.getenv("LVM_MODEL_ID", "")
 
         # Default to labels used by llava-1.5 and llava-v1.6-vicuna models
-        role_labels = {
-            "user": "USER:",
-            "assistant": "ASSISTANT:"
-        }
+        role_labels = {"user": "USER:", "assistant": "ASSISTANT:"}
 
         if "llava-interleave" in lvm_model:
             role_labels["user"] = "<|im_start|>user"
@@ -251,8 +249,9 @@ class MultimodalQnAService:
         return response["asr_result"]
 
     async def handle_request(self, request: Request):
-        """
-        MultimodalQnA accepts input queries as text, images, and/or audio. The messages in the request can be a single
+        """MultimodalQnA accepts input queries as text, images, and/or audio.
+
+        The messages in the request can be a single
         message (which would be assumed to be a first query from the user) or back and forth conversation between the
         user and the assistant.
         Audio queries are converted to text before being sent to the megaservice and the translated text is returned

@@ -61,7 +61,7 @@ def clear_history(state, request: gr.Request):
 
 
 def add_text(state, textbox, audio, request: gr.Request):
-    text = textbox['text']
+    text = textbox["text"]
     logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
     if audio:
         state.audio_query_file = audio
@@ -70,8 +70,8 @@ def add_text(state, textbox, audio, request: gr.Request):
         state.skip_next = False
         return (state, state.to_gradio_chatbot(), None, None) + (disable_btn,) * 1
     # If it is a image query
-    elif textbox['files']:
-        image_file = textbox['files'][0]
+    elif textbox["files"]:
+        image_file = textbox["files"][0]
         state.image_query_files[len(state.messages)] = image_file
         state.append_message(state.roles[0], text)
         state.append_message(state.roles[1], None)
@@ -374,12 +374,10 @@ def ingest_with_text(filepath, text, request: gr.Request):
 
 
 def ingest_pdf(filepath, request: gr.Request):
-    yield (
-        gr.Textbox(visible=True, value="Please wait while your uploaded PDF is ingested into the database...")
-    )
+    yield (gr.Textbox(visible=True, value="Please wait while your uploaded PDF is ingested into the database..."))
     verified_filepath = os.path.normpath(filepath)
     if not verified_filepath.startswith(tmp_upload_folder):
-        print(f"Found malicious PDF file name!")
+        print("Found malicious PDF file name!")
         yield (
             gr.Textbox(
                 visible=True,
@@ -440,9 +438,13 @@ with gr.Blocks() as upload_video:
 
     def select_upload_type(choice, request: gr.Request):
         if choice == "transcript":
-            return gr.Video(sources="upload", visible=True, format="mp4"), gr.Video(sources="upload", visible=False, format="mp4")
+            return gr.Video(sources="upload", visible=True, format="mp4"), gr.Video(
+                sources="upload", visible=False, format="mp4"
+            )
         else:
-            return gr.Video(sources="upload", visible=False, format="mp4"), gr.Video(sources="upload", visible=True, format="mp4")
+            return gr.Video(sources="upload", visible=False, format="mp4"), gr.Video(
+                sources="upload", visible=True, format="mp4"
+            )
 
     with gr.Row():
         with gr.Column(scale=6):
@@ -526,9 +528,7 @@ with gr.Blocks() as upload_pdf:
             pdf_upload = PDF(label="PDF File")
         with gr.Column(scale=3):
             pdf_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
-        pdf_upload.upload(
-            ingest_pdf, [pdf_upload], [pdf_upload_result]
-        )
+        pdf_upload.upload(ingest_pdf, [pdf_upload], [pdf_upload_result])
 
 with gr.Blocks() as qna:
     state = gr.State(multimodalqna_conv.copy())
@@ -544,10 +544,7 @@ with gr.Blocks() as qna:
                     with gr.Tabs():
                         with gr.TabItem("Text Query"):
                             textbox = gr.MultimodalTextbox(
-                                show_label=False,
-                                container=True,
-                                submit_btn=False,
-                                file_types=['image']
+                                show_label=False, container=True, submit_btn=False, file_types=["image"]
                             )
                         with gr.TabItem("Audio Query"):
                             audio = gr.Audio(
@@ -610,7 +607,9 @@ if __name__ == "__main__":
     MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8888)
     DATAPREP_MMR_PORT = os.getenv("DATAPREP_MMR_PORT", 6007)
 
-    backend_service_endpoint = os.getenv("BACKEND_SERVICE_ENDPOINT", f"http://localhost:{MEGA_SERVICE_PORT}/v1/multimodalqna")
+    backend_service_endpoint = os.getenv(
+        "BACKEND_SERVICE_ENDPOINT", f"http://localhost:{MEGA_SERVICE_PORT}/v1/multimodalqna"
+    )
     dataprep_ingest_endpoint = os.getenv(
         "DATAPREP_INGEST_SERVICE_ENDPOINT", f"http://localhost:{DATAPREP_MMR_PORT}/v1/ingest_with_text"
     )
@@ -632,4 +631,3 @@ if __name__ == "__main__":
     dataprep_gen_caption_addr = dataprep_gen_caption_endpoint
 
     uvicorn.run(app, host=args.host, port=args.port)
-    
