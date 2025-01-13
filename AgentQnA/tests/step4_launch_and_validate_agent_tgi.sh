@@ -35,10 +35,12 @@ function start_vllm_service_70B() {
 
     echo "start vllm gaudi service"
     echo "**************model is $model**************"
-    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:comps --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+    vllm_image=opea/vllm-gaudi:comps
+    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $vllm_image --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
     sleep 5s
     echo "Waiting vllm gaudi ready"
     n=0
+    LOG_PATH=$PWD
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
         docker logs vllm-gaudi-server &> ${LOG_PATH}/vllm-gaudi-service.log
         n=$((n+1))
@@ -136,9 +138,9 @@ function validate_agent_service() {
         exit 1
     fi
 
-    prompt="How many schools have both average math score and reading score greater than 650?"
+    prompt="How many schools have both average math score and reading score greater than 620?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    local EXIT_CODE=$(validate "$CONTENT" "1" "react-agent-endpoint")
+    local EXIT_CODE=$(validate "$CONTENT" "13" "react-agent-endpoint")
     echo $CONTENT
     echo $EXIT_CODE
     if [ "$EXIT_CODE" == "1" ]; then

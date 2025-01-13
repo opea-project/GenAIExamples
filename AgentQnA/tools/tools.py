@@ -13,7 +13,7 @@ def search_knowledge_base(query: str) -> str:
     print(url)
     proxies = {"http": ""}
     payload = {
-        "query": query,
+        "messages": query,
     }
     response = requests.post(url, json=payload, proxies=proxies)
     return response.json()["text"]
@@ -24,7 +24,7 @@ def search_sql_database(query: str) -> str:
     print(url)
     proxies = {"http": ""}
     payload = {
-        "query": query,
+        "messages": query,
     }
     response = requests.post(url, json=payload, proxies=proxies)
     return response.json()["text"]

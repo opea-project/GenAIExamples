@@ -43,7 +43,6 @@ function build_vllm_docker_image() {
         git clone https://github.com/vllm-project/vllm.git
     fi
     cd ./vllm
-    git checkout main
     docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:comps --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
         echo "opea/vllm-gaudi:comps failed"
