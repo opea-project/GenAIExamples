@@ -16,7 +16,7 @@ python get_context.py
 
 ### Launch FaQGen microservice
 
-Please refer to [FaQGen microservice](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/faq-generation/tgi/langchain/README.md), set up an microservice endpoint.
+Please refer to [FaQGen microservice](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/faq-generation/README.md), set up an microservice endpoint.
 
 ```
 export FAQ_ENDPOINT = "http://${your_ip}:9000/v1/faqgen"

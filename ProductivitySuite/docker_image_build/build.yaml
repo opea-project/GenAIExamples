@@ -77,9 +77,9 @@ services:
       context: ../../FaqGen/
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
-  llm-faqgen-tgi:
+  llm-faqgen:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/faq-generation/tgi/langchain/Dockerfile
+      dockerfile: comps/llms/src/faq-generation/Dockerfile
     extends: faqgen
-    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
