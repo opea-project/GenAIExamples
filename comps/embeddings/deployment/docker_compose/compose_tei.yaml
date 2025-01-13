@@ -7,6 +7,7 @@ services:
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     ports:
       - "6006:80"
     volumes:
@@ -16,9 +17,9 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+      host_ip: ${host_ip}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6006/health"]
+      test: ["CMD", "curl", "-f", "http://${host_ip}:6006/health"]
       interval: 10s
       timeout: 6s
       retries: 18
