@@ -40,7 +40,7 @@ function build_vllm_docker_image() {
     cd $WORKPATH
     echo $WORKPATH
     if [ ! -d "./vllm" ]; then
-        "echo clone vllm repo...."
+        echo "clone vllm repo...."
         git clone https://github.com/vllm-project/vllm.git
     fi
     cd ./vllm
@@ -68,6 +68,8 @@ function main() {
     echo "==================== Build vllm docker image ===================="
     build_vllm_docker_image
     echo "==================== Build vllm docker image completed ===================="
+
+    docker image ls | grep vllm
 }
 
 main
