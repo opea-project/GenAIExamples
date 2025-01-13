@@ -57,13 +57,14 @@ jobs:
               if [[ -f $chart ]]; then
                 continue
               fi
+              service=$(echo "$chart"| awk -F'/' '{print $NF}')
               for file in "$chart"/kubernetes/helm/*values.yaml; do
                 if [ -f "$file" ]; then
                   filename=$(basename "$file" .yaml)
                   if [[ "$filename" == *"gaudi"* ]]; then
-                    run_matrix="${run_matrix}{\"example\":\"${chart}\",\"hardware\":\"gaudi\", \"valuefile\":\"${filename}\"},"
+                    run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"gaudi\", \"valuefile\":\"${filename}\"},"
                   else
-                    run_matrix="${run_matrix}{\"example\":\"${chart}\",\"hardware\":\"xeon\", \"valuefile\":\"${filename}\"},"
+                    run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"xeon\", \"valuefile\":\"${filename}\"},"
                   fi
                 fi
               done
