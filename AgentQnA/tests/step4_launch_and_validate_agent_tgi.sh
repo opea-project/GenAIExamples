@@ -75,6 +75,13 @@ function prepare_data() {
     echo "Data preparation done!"
 }
 
+function download_chinook_data(){
+    echo "Downloading chinook data..."
+    cd $WORKDIR
+    git clone https://github.com/lerocha/chinook-database.git
+    cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
+}
+
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
     docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
@@ -105,9 +112,10 @@ function validate_agent_service() {
     export agent_port="9095"
     prompt="Tell me about Michael Jackson song Thriller"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    echo $CONTENT
+    # echo $CONTENT
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
     echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs rag-agent-endpoint
         exit 1
@@ -116,11 +124,13 @@ function validate_agent_service() {
     # test worker sql agent
     echo "======================Testing worker sql agent======================"
     export agent_port="9096"
-    prompt="How many schools have average math score greater than 560?"
+    # prompt="How many schools have average math score greater than 560?"
+    prompt="How many employees are there in the company?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    local EXIT_CODE=$(validate "$CONTENT" "173" "sql-agent-endpoint")
+    local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
     echo $CONTENT
-    echo $EXIT_CODE
+    # echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs sql-agent-endpoint
         exit 1
@@ -132,18 +142,21 @@ function validate_agent_service() {
     prompt="Tell me about Michael Jackson song Thriller"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
-    echo $CONTENT
+    # echo $CONTENT
     echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs react-agent-endpoint
         exit 1
     fi
 
-    prompt="How many schools have both average math score and reading score greater than 620?"
+    # prompt="How many schools have both average math score and reading score greater than 620?"
+    prompt="How many employees are there in the database?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    local EXIT_CODE=$(validate "$CONTENT" "13" "react-agent-endpoint")
-    echo $CONTENT
+    local EXIT_CODE=$(validate "$CONTENT" "8" "react-agent-endpoint")
+    # echo $CONTENT
     echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs react-agent-endpoint
         exit 1
@@ -154,13 +167,24 @@ function validate_agent_service() {
 function remove_data() {
     echo "Removing data..."
     cd $WORKDIR
-    rm -rf TAG-Bench
+    if [ -d "TAG-Bench" ]; then
+        rm -rf TAG-Bench
+    fi
     echo "Data removed!"
+}
+
+function remove_chinook_data(){
+    echo "Removing chinook data..."
+    cd $WORKDIR
+    if [ -d "chinook-database" ]; then
+        rm -rf chinook-database
+    fi
+    echo "Chinook data removed!"
 }
 
 function main() {
     echo "==================== Prepare data ===================="
-    prepare_data
+    download_chinook_data
     echo "==================== Data prepare done ===================="
 
     echo "==================== Start VLLM service ===================="
@@ -177,5 +201,7 @@ function main() {
 }
 
 remove_data
+remove_chinook_data
 main
 remove_data
+remove_chinook_data

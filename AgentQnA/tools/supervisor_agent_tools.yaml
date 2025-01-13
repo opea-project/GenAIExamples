@@ -10,8 +10,8 @@ search_music_knowledge_base:
       description: query
   return_output: retrieved_data
 
-search_school_database:
-  description: Search a SQL database about schools with a natural language query. Returns text related to the query.
+search_database:
+  description: Search a SQL database with a natural language query. Returns text related to the query.
   callable_api: tools.py:search_sql_database
   args_schema:
     query:
