@@ -38,7 +38,7 @@ export PYTHONPATH=${path_to_comps}
 
 This is required only if you are going to consume the _generate_captions_ API of this microservice as in [Section 4.3](#43-consume-generate_captions-api).
 
-Please refer to this [readme](../../../../lvms/llava/README.md) to start the LVM microservice.
+Please refer to this [readme](../../../../lvms/src/README.md) to start the LVM microservice.
 After LVM is up, set up environment variables.
 
 ```bash
@@ -64,7 +64,7 @@ Please refer to this [readme](../../../../vectorstores/redis/README.md).
 
 This is required only if you are going to consume the _generate_captions_ API of this microservice as described [here](#43-consume-generate_captions-api).
 
-Please refer to this [readme](../../../../lvms/llava/README.md) to start the LVM microservice.
+Please refer to this [readme](../../../../lvms/src/README.md) to start the LVM microservice.
 After LVM is up, set up environment variables.
 
 ```bash

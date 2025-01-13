@@ -2,44 +2,40 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # this file should be run in the root of the repo
+# Deprecated original wrappers opea/lvm-tgi, opea/lvm-llava-svc, opea/lvm-video-llama
+# and merged functionalities in opea/lvm
+# Original video-llama-lvm-server renamed as lvm-video-llama
+
 services:
-  lvm-tgi:
+  lvm:
     build:
-      dockerfile: comps/lvms/tgi-llava/Dockerfile
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+      dockerfile: comps/lvms/src/Dockerfile
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
   lvm-video-llama:
     build:
-      dockerfile: comps/lvms/video-llama/Dockerfile
+      dockerfile: comps/lvms/src/integrations/dependency/video-llama/Dockerfile
     image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
-  video-llama-lvm-server:
-    build:
-      dockerfile: comps/lvms/video-llama/dependency/Dockerfile
-    image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
   lvm-llava:
     build:
-      dockerfile: comps/lvms/llava/dependency/Dockerfile
+      dockerfile: comps/lvms/src/integrations/dependency/llava/Dockerfile
     image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
-  lvm-llava-svc:
-    build:
-      dockerfile: comps/lvms/llava/Dockerfile
-    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
   llava-gaudi:
     build:
-      dockerfile: comps/lvms/llava/dependency/Dockerfile.intel_hpu
+      dockerfile: comps/lvms/src/integrations/dependency/llava/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/llava-gaudi:${TAG:-latest}
   lvm-predictionguard:
     build:
-      dockerfile: comps/lvms/predictionguard/Dockerfile
+      dockerfile: comps/lvms/src/integrations/dependency/predictionguard/Dockerfile
     image: ${REGISTRY:-opea}/lvm-predictionguard:${TAG:-latest}
   lvm-llama-vision:
     build:
-      dockerfile: comps/lvms/llama-vision/Dockerfile
+      dockerfile: comps/lvms/src/integrations/dependency/llama-vision/Dockerfile
     image: ${REGISTRY:-opea}/lvm-llama-vision:${TAG:-latest}
   lvm-llama-vision-tp:
     build:
-      dockerfile: comps/lvms/llama-vision/Dockerfile_tp
+      dockerfile: comps/lvms/src/integrations/dependency/llama-vision/Dockerfile_tp
     image: ${REGISTRY:-opea}/lvm-llama-vision-tp:${TAG:-latest}
   lvm-llama-vision-guard:
     build:
-      dockerfile: comps/lvms/llama-vision/Dockerfile_guard
+      dockerfile: comps/lvms/src/integrations/dependency/llama-vision/Dockerfile_guard
     image: ${REGISTRY:-opea}/lvm-llama-vision-guard:${TAG:-latest}

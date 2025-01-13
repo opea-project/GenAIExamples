@@ -8,6 +8,7 @@ import re
 from typing import Optional
 
 from fastapi import FastAPI
+from fastapi.responses import Response
 from prometheus_fastapi_instrumentator import Instrumentator
 from uvicorn import Config, Server
 
@@ -72,6 +73,11 @@ class HTTPService(BaseService):
         async def _health_check():
             """Get the health status of this GenAI microservice."""
             return {"Service Title": self.title, "Service Description": self.description}
+
+        @app.get("/health")
+        async def _health() -> Response:
+            """Health check."""
+            return Response(status_code=200)
 
         @app.get(
             path="/v1/statistics",
