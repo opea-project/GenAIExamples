@@ -1,0 +1,50 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-server
+    ports:
+      - ${LLM_ENDPOINT_PORT:-8008}:80
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+  llm:
+    image: opea/llm-faqgen:latest
+    container_name: llm-faqgen-server
+    depends_on:
+      tgi-service:
+        condition: service_healthy
+    ports:
+      - ${FAQ_PORT:-9000}:9000
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

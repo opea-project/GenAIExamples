@@ -1,0 +1,61 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  tgi-service:
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
+    container_name: tgi-gaudi-server
+    ports:
+      - ${LLM_ENDPOINT_PORT:-8008}:80
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      ENABLE_HPU_GRAPH: true
+      LIMIT_HPU_GRAPH: true
+      USE_FLASH_ATTENTION: true
+      FLASH_ATTENTION_RECOMPUTE: true
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
+  llm:
+    image: opea/llm-faqgen:latest
+    container_name: llm-faqgen-server
+    depends_on:
+      tgi-service:
+        condition: service_healthy
+    ports:
+      - ${FAQ_PORT:-9000}:9000
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
