@@ -40,9 +40,12 @@ function build_vllm_docker_image() {
     cd $WORKPATH
     echo $WORKPATH
     if [ ! -d "./vllm" ]; then
+        "echo clone vllm repo...."
         git clone https://github.com/vllm-project/vllm.git
     fi
     cd ./vllm
+    echo "Checking out latest stable release of vllm"
+    git checkout v0.6.6
     docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:comps --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
         echo "opea/vllm-gaudi:comps failed"
