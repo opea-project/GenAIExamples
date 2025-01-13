@@ -175,5 +175,6 @@ function main() {
     echo "==================== Agent service validated ===================="
 }
 
+remove_data
 main
 remove_data
