@@ -51,25 +51,25 @@ jobs:
         run: |
           set -x
           run_matrix="{\"include\":["
-          if [[ -z "${{ inputs.workloads }}" ]]; then
-            ls ${{ github.workspace }}
-            for chart in ${{ github.workspace }}/*; do
-              if [[ -f $chart ]]; then
-                continue
-              fi
-              service=$(echo "$chart"| awk -F'/' '{print $NF}')
-              for file in "$chart"/kubernetes/helm/*values.yaml; do
-                if [ -f "$file" ]; then
-                  filename=$(basename "$file" .yaml)
-                  if [[ "$filename" == *"gaudi"* ]]; then
-                    run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"gaudi\", \"valuefile\":\"${filename}\"},"
-                  else
-                    run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"xeon\", \"valuefile\":\"${filename}\"},"
-                  fi
-                fi
-              done
-            done
-          else
+          # if [[ -z "${{ inputs.workloads }}" ]]; then
+          #   ls ${{ github.workspace }}
+          #   for chart in ${{ github.workspace }}/*; do
+          #     if [[ -f $chart ]]; then
+          #       continue
+          #     fi
+          #     service=$(echo "$chart"| awk -F'/' '{print $NF}')
+          #     for file in "$chart"/kubernetes/helm/*values.yaml; do
+          #       if [ -f "$file" ]; then
+          #         filename=$(basename "$file" .yaml)
+          #         if [[ "$filename" == *"gaudi"* ]]; then
+          #           run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"gaudi\", \"valuefile\":\"${filename}\"},"
+          #         else
+          #           run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"xeon\", \"valuefile\":\"${filename}\"},"
+          #         fi
+          #       fi
+          #     done
+          #   done
+          # else
             service_list=($(echo "CodeGen"| tr ',' ' '))
             # ${{ github.event.inputs.workloads }} | tr ',' ' '))
             for service in $service_list; do
@@ -84,7 +84,7 @@ jobs:
                 fi
               done
             done
-          fi
+          # fi
           run_matrix=$run_matrix"]}"
           echo "run_matrix=${run_matrix}"
           echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
