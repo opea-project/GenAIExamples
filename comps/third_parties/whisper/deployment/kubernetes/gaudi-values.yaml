@@ -1,0 +1,9 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+image:
+  repository: opea/whisper-gaudi
+
+resources:
+  limits:
+    habana.ai/gaudi: 1

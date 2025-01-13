@@ -1,0 +1,33 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Default values for retriever-usvc.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+milvus:
+  enabled: true
+  cluster:
+    enabled: false
+  etcd:
+    replicaCount: 1
+  pulsar:
+    enabled: false
+  minio:
+    mode: standalone
+redis-vector-db:
+    enabled: false
+tei:
+  enabled: true
+
+image:
+  repository: opea/retriever-milvus
+port: 7000
+# text embedding inference service URL, e.g. http://<service-name>:<port>
+#TEI_EMBEDDING_ENDPOINT: "http://dataprep-tei:80"
+# milvus DB configurations
+#MILVUS_HOST: "dataprep-milvus"
+MILVUS_PORT: "19530"
+COLLECTION_NAME: "rag_milvus"
+MOSEC_EMBEDDING_ENDPOINT: ""
+MOSEC_EMBEDDING_MODEL: ""

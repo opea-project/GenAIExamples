@@ -1,0 +1,30 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+milvus:
+  enabled: true
+  cluster:
+    enabled: false
+  etcd:
+    replicaCount: 1
+  pulsar:
+    enabled: false
+  minio:
+    mode: standalone
+redis-vector-db:
+  enabled: false
+tei:
+  enabled: true
+
+image:
+  repository: opea/dataprep-milvus
+
+port: 6010
+# text embedding inference service URL, e.g. http://<service-name>:<port>
+#TEI_EMBEDDING_ENDPOINT: "http://embedding-tei:80"
+# milvus DB configurations
+#MILVUS_HOST: "milvustest"
+MILVUS_PORT: "19530"
+COLLECTION_NAME: "rag_milvus"
+MOSEC_EMBEDDING_ENDPOINT: ""
+MOSEC_EMBEDDING_MODEL: ""

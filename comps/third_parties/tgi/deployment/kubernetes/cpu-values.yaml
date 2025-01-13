@@ -1,0 +1,26 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Resource requirements for Intel/neural-chat-7b-v3-3 @ 32-bit:
+resources:
+  limits:
+    cpu: 8
+    memory: 70Gi
+  requests:
+    cpu: 6
+    memory: 65Gi
+
+livenessProbe:
+  initialDelaySeconds: 8
+  periodSeconds: 8
+  failureThreshold: 24
+  timeoutSeconds: 4
+readinessProbe:
+  initialDelaySeconds: 16
+  periodSeconds: 8
+  timeoutSeconds: 4
+startupProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 180
+  timeoutSeconds: 2
