@@ -1,0 +1,31 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Accelerate inferencing in heaviest components to improve performance
+# by overriding their subchart values
+
+# TGI: largest bottleneck for VisualQnA
+tgi:
+  accelDevice: "gaudi"
+  image:
+    repository: ghcr.io/huggingface/tgi-gaudi
+    tag: "2.0.6"
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  MAX_INPUT_LENGTH: "4096"
+  MAX_TOTAL_TOKENS: "8192"
+  CUDA_GRAPHS: ""
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120

@@ -64,3 +64,7 @@ Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instr
 ### Deploy FAQ Generation on Xeon
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for instructions on deploying FAQ Generation on Xeon.
+
+### Deploy FaqGen on Kubernetes using Helm Chart
+
+Refer to the [FaqGen helm chart](./kubernetes/helm/README.md) for instructions on deploying FaqGen on Kubernetes.
