@@ -42,6 +42,7 @@ function start_vllm_service_70B() {
     n=0
     LOG_PATH=$PWD
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+        docker logs vllm-gaudi-server
         docker logs vllm-gaudi-server &> ${LOG_PATH}/vllm-gaudi-service.log
         n=$((n+1))
         if grep -q "Uvicorn running on" ${LOG_PATH}/vllm-gaudi-service.log; then
