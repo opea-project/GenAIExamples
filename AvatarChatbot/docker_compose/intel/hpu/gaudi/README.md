@@ -30,7 +30,7 @@ docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy 
 ### 5. Build Animation Image
 
 ```bash
-docker build -t opea/wav2lip-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/src/integration/dependency/Dockerfile.intel_hpu .
+docker build -t opea/wav2lip-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/wav2lip/src/Dockerfile.intel_hpu .
 
 docker build -t opea/animation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/src/Dockerfile .
 ```
