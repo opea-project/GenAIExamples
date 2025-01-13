@@ -1,0 +1,61 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  vllm-service:
+    image: opea/vllm-gaudi:latest
+    container_name: vllm-gaudi-server
+    ports:
+      - ${LLM_ENDPOINT_PORT:-8008}:80
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+      VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-false}
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model $LLM_MODEL_ID --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq-len-to-capture ${MAX_INPUT_TOKENS}
+  llm:
+    image: opea/llm-docsum:latest
+    container_name: llm-docsum-server
+    depends_on:
+      vllm-service:
+        condition: service_healthy
+    ports:
+      - ${DOCSUM_PORT:-9000}:9000
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

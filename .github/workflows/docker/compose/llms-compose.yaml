@@ -11,9 +11,9 @@ services:
     build:
       dockerfile: comps/llms/text-generation/ollama/langchain/Dockerfile
     image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
-  llm-docsum-tgi:
+  llm-docsum:
     build:
-      dockerfile: comps/llms/summarization/tgi/langchain/Dockerfile
+      dockerfile: comps/llms/src/doc-summarization/Dockerfile
     image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
   llm-faqgen:
     build:
@@ -50,7 +50,3 @@ services:
     build:
       dockerfile: comps/llms/text-generation/predictionguard/Dockerfile
     image: ${REGISTRY:-opea}/llm-textgen-predictionguard:${TAG:-latest}
-  llm-docsum-vllm:
-    build:
-      dockerfile: comps/llms/summarization/vllm/langchain/Dockerfile
-    image: ${REGISTRY:-opea}/llm-docsum-vllm:${TAG:-latest}

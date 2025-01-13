@@ -1,64 +1,43 @@
-# Document Summary vLLM Microservice
+# Document Summary LLM Microservice
 
-This microservice leverages LangChain to implement summarization strategies and facilitate LLM inference using vLLM.
-[vLLM](https://github.com/vllm-project/vllm) is a fast and easy-to-use library for LLM inference and serving, it delivers state-of-the-art serving throughput with a set of advanced features such as PagedAttention, Continuous batching and etc.. Besides GPUs, vLLM already supported [Intel CPUs](https://www.intel.com/content/www/us/en/products/overview.html) and [Gaudi accelerators](https://habana.ai/products).
+This microservice leverages LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors. You can set backend service either [TGI](../../../third_parties/tgi) or [vLLM](../../../third_parties/vllm).
 
-## 🚀1. Start Microservice with Python 🐍 (Option 1)
+## 🚀1. Start Microservice with Docker 🐳
 
-To start the LLM microservice, you need to install python packages first.
+### 1.1 Setup Environment Variables
 
-### 1.1 Install Requirements
-
-```bash
-pip install -r requirements.txt
-```
-
-### 1.2 Start LLM Service
+In order to start DocSum services, you need to setup the following environment variables first.
 
 ```bash
-export HF_TOKEN=${your_hf_api_token}
+export host_ip=${your_host_ip}
+export LLM_ENDPOINT_PORT=8008
+export DOCSUM_PORT=9000
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 export LLM_MODEL_ID=${your_hf_llm_model}
-docker run -p 8008:80 -v ./data:/data --name llm-docsum-vllm --shm-size 1g opea/vllm-gaudi:latest --model-id ${LLM_MODEL_ID}
+export MAX_INPUT_TOKENS=2048
+export MAX_TOTAL_TOKENS=4096
+export DocSum_COMPONENT_NAME="OPEADocSum_TGI" # or "OPEADocSum_vLLM"
 ```
 
-### 1.3 Verify the vLLM Service
+Please make sure MAX_TOTAL_TOKENS should be larger than (MAX_INPUT_TOKENS + max_new_tokens + 50), 50 is reserved prompt length.
+
+### 1.2 Build Docker Image
+
+Step 1: Prepare backend LLM docker image.
+
+If you want to use vLLM backend, refer to [vLLM](../../../third_parties/vllm/src) to build vLLM docker images first.
+
+No need for TGI.
+
+Step 2: Build FaqGen docker image.
 
 ```bash
-curl http://${your_ip}:8008/v1/chat/completions \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning? "}]}'
+cd ../../../../
+docker build -t opea/llm-docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/summarization/Dockerfile .
 ```
 
-### 1.4 Start LLM Service with Python Script
-
-```bash
-export vLLM_ENDPOINT="http://${your_ip}:8008"
-python llm.py
-```
-
-## 🚀2. Start Microservice with Docker 🐳 (Option 2)
-
-If you start an LLM microservice with docker, the `docker_compose_llm.yaml` file will automatically start a vLLM/vLLM service with docker.
-
-To setup or build the vLLM image follow the instructions provided in [vLLM Gaudi](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/text-generation/vllm/langchain#22-vllm-on-gaudi)
-
-### 2.1 Setup Environment Variables
-
-In order to start vLLM and LLM services, you need to setup the following environment variables first.
-
-```bash
-export HF_TOKEN=${your_hf_api_token}
-export vLLM_ENDPOINT="http://${your_ip}:8008"
-export LLM_MODEL_ID=${your_hf_llm_model}
-```
-
-### 2.2 Build Docker Image
-
-```bash
-cd ../../../../../
-docker build -t opea/llm-docsum-vllm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/vllm/langchain/Dockerfile .
-```
+### 1.3 Run Docker
 
 To start a docker container, you have two options:
 
@@ -67,16 +46,45 @@ To start a docker container, you have two options:
 
 You can choose one as needed.
 
-### 2.3 Run Docker with CLI (Option A)
+### 1.3.1 Run Docker with CLI (Option A)
+
+Step 1: Start the backend LLM service
+Please refer to [TGI](../../../third_parties/tgi/deployment/docker_compose/) or [vLLM](../../../third_parties/vllm/deployment/docker_compose/) guideline to start a backend LLM service.
+
+Step 2: Start the DocSum microservices
 
 ```bash
-docker run -d --name="llm-docsum-vllm-server" -p 9000:9000 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e vLLM_ENDPOINT=$vLLM_ENDPOINT -e HF_TOKEN=$HF_TOKEN opea/llm-docsum-vllm:latest
+docker run -d \
+    --name="llm-docsum-server" \
+    -p 9000:9000 \
+    --ipc=host \
+    -e http_proxy=$http_proxy \
+    -e https_proxy=$https_proxy \
+    -e LLM_MODEL_ID=$LLM_MODEL_ID \
+    -e LLM_ENDPOINT=$LLM_ENDPOINT \
+    -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN \
+    -e DocSum_COMPONENT_NAME=$DocSum_COMPONENT_NAME \
+    -e MAX_INPUT_TOKENS=${MAX_INPUT_TOKENS} \
+    -e MAX_TOTAL_TOKENS=${MAX_TOTAL_TOKENS} \
+    opea/llm-docsum:latest
 ```
 
-### 2.4 Run Docker with Docker Compose (Option B)
+### 1.3.2 Run Docker with Docker Compose (Option B)
 
 ```bash
-docker compose -f docker_compose_llm.yaml up -d
+cd ../../deployment/docker_compose/
+
+# Backend is TGI on xeon
+docker compose -f doc-summarization_tgi.yaml up -d
+
+# Backend is TGI on gaudi
+# docker compose -f doc-summarization_tgi_on_intel_hpu.yaml up -d
+
+# Backend is vLLM on xeon
+# docker compose -f doc-summarization_vllm.yaml up -d
+
+# Backend is vLLM on gaudi
+# docker compose -f doc-summarization_vllm_on_intel_hpu.yaml up -d
 ```
 
 ## 🚀3. Consume LLM Service
@@ -105,19 +113,19 @@ If you want to deal with long context, can select suitable summary type, details
 
 ```bash
 # Enable stream to receive a stream response. By default, this is set to True.
-curl http://${your_ip}:9000/v1/chat/docsum \
+curl http://${your_ip}:9000/v1/docsum \
   -X POST \
   -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "max_tokens":32, "language":"en"}' \
   -H 'Content-Type: application/json'
 
 # Disable stream to receive a non-stream response.
-curl http://${your_ip}:9000/v1/chat/docsum \
+curl http://${your_ip}:9000/v1/docsum \
   -X POST \
   -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "max_tokens":32, "language":"en", "stream":false}' \
   -H 'Content-Type: application/json'
 
 # Use Chinese mode
-curl http://${your_ip}:9000/v1/chat/docsum \
+curl http://${your_ip}:9000/v1/docsum \
   -X POST \
   -d '{"query":"2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。", "max_tokens":32, "language":"zh", "stream":false}' \
   -H 'Content-Type: application/json'
@@ -138,7 +146,7 @@ In this mode LLM generate summary based on complete input text. In this case ple
 Truncate mode will truncate the input text and keep only the first chunk, whose length is equal to `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
 
 ```bash
-curl http://${your_ip}:9000/v1/chat/docsum \
+curl http://${your_ip}:9000/v1/docsum \
   -X POST \
   -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "max_tokens":32, "language":"en", "summary_type": "truncate", "chunk_size": 2000}' \
   -H 'Content-Type: application/json'
@@ -151,7 +159,7 @@ Map_reduce mode will split the inputs into multiple chunks, map each document to
 In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
 
 ```bash
-curl http://${your_ip}:9000/v1/chat/docsum \
+curl http://${your_ip}:9000/v1/docsum \
   -X POST \
   -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "max_tokens":32, "language":"en", "summary_type": "map_reduce", "chunk_size": 2000, "stream":false}' \
   -H 'Content-Type: application/json'
@@ -164,7 +172,7 @@ Refin mode will split the inputs into multiple chunks, generate summary for the 
 In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - 2 * input.max_tokens - 128, MAX_INPUT_TOKENS)`.
 
 ```bash
-curl http://${your_ip}:9000/v1/chat/docsum \
+curl http://${your_ip}:9000/v1/docsum \
   -X POST \
   -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.", "max_tokens":32, "language":"en", "summary_type": "refine", "chunk_size": 2000}' \
   -H 'Content-Type: application/json'

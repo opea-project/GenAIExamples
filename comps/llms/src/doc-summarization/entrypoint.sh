@@ -5,4 +5,4 @@
 
 pip --no-cache-dir install -r requirements-runtime.txt
 
-python llm.py
+python opea_docsum_microservice.py
