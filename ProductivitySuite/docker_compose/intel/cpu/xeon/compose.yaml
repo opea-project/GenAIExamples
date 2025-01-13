@@ -147,7 +147,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
       host_ip: ${host_ip}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:9009/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
@@ -259,10 +259,11 @@ services:
     ipc: host
     restart: always
   llm_faqgen:
-    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
     container_name: llm-faqgen-server
     depends_on:
-      - tgi_service
+      tgi_service:
+        condition: service_healthy
     ports:
       - "9002:9000"
     ipc: host
@@ -270,8 +271,14 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_FAQGEN}
+      LLM_ENDPOINT: ${TGI_LLM_ENDPOINT_FAQGEN}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+      LANGCHAIN_PROJECT: "opea-llm-service"
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
   faqgen-xeon-backend-server:
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
