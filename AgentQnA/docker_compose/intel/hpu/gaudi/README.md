@@ -67,19 +67,24 @@ For more details, please refer to the deployment guide [here](../../../../README
    On Gaudi2 we will serve `meta-llama/Meta-Llama-3.1-70B-Instruct` using vllm.
 
    First build vllm-gaudi docker image.
+
    ```bash
    cd $WORKDIR
    git clone https://github.com/vllm-project/vllm.git
    cd ./vllm
    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
    ```
+
    Then launch vllm on Gaudi2 with the command below.
+
    ```bash
    vllm_port=8086
    model="meta-llama/Meta-Llama-3.1-70B-Instruct"
    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
    ```
+
    Then launch Agent microservices.
+
    ```bash
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
    bash launch_agent_service_gaudi.sh
@@ -123,6 +128,7 @@ curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: applic
 ```
 
 Third, validate worker SQL agent:
+
 ```
 curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "How many schools have average math score higher than 560?"
@@ -136,6 +142,7 @@ curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: applic
      "query": "Michael Jackson song Thriller"
     }'
 ```
+
 ```
 curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
      "query": "How many schools have average math score higher than 560?"
