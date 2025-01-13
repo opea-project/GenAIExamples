@@ -71,10 +71,10 @@ docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --bui
 ### 4. Build LVM Image (Xeon)
 
 ```bash
-docker build -t opea/video-llama-lvm-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/dependency/Dockerfile .
+docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/video-llama/Dockerfile .
 
 # LVM Service Image
-docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/Dockerfile .
+docker build -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
@@ -109,11 +109,16 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 1. `opea/dataprep-multimodal-vdms:latest`
 2. `opea/embedding-multimodal-clip:latest`
 3. `opea/retriever-vdms:latest`
+   <<<<<<< HEAD
 4. `opea/reranking:latest`
 5. `opea/video-llama-lvm-server:latest`
-6. `opea/lvm-video-llama:latest`
-7. `opea/videoqna:latest`
-8. `opea/videoqna-ui:latest`
+6. # `opea/lvm-video-llama:latest`
+7. `opea/reranking-tei:latest`
+8. `opea/lvm-video-llama:latest`
+9. `opea/lvm:latest`
+   > > > > > > > d93597cbfd9da92b956adb3673c9e5d743c181af
+10. `opea/videoqna:latest`
+11. `opea/videoqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -275,7 +280,7 @@ docker compose up -d
 
    In first startup, this service will take times to download the LLM file. After it's finished, the service will be ready.
 
-   Use `docker logs video-llama-lvm-server` to check if the download is finished.
+   Use `docker logs lvm-video-llama` to check if the download is finished.
 
    ```bash
    curl -X POST \
