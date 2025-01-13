@@ -40,6 +40,7 @@ function start_services() {
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
     export TGI_LLM_ENDPOINT="http://${ip_address}:6005"
     export host_ip=${ip_address}
+    export MAX_OUTPUT_TOKENS="1024"
 
     # Start Docker Containers
     sed -i "s|container_name: graphrag-gaudi-backend-server|container_name: graphrag-gaudi-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
