@@ -75,8 +75,8 @@ services:
       DATAPREP_GET_VIDEO_LIST_ENDPOINT: ${DATAPREP_GET_VIDEO_LIST_ENDPOINT}
     restart: unless-stopped
   lvm-video-llama:
-    image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
-    container_name: video-llama-lvm-server
+    image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
+    container_name: lvm-video-llama
     ports:
       - "9009:9009"
     ipc: host
@@ -90,8 +90,8 @@ services:
       - video-llama-model:/home/user/model
     restart: unless-stopped
   lvm:
-    image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
-    container_name: lvm-video-llama
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm
     ports:
       - "9000:9000"
     ipc: host
@@ -99,6 +99,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       no_proxy: ${no_proxy}
+      LVM_COMPONENT_NAME: "OPEA_VIDEO_LLAMA_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
     restart: unless-stopped
     depends_on:

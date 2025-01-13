@@ -23,7 +23,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever-redis lvm-tgi lvm-llava-svc dataprep-multimodal-redis whisper"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever-redis lvm dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -220,12 +220,12 @@ function validate_microservices() {
         '{"inputs":"![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/rabbit.png)What is this a picture of?\n\n","parameters":{"max_new_tokens":16, "seed": 42}}'
 
     # lvm
-    echo "Evaluating lvm-llava-svc"
+    echo "Evaluating lvm"
     validate_service \
         "http://${host_ip}:9399/v1/lvm" \
         '"text":"' \
-        "lvm-tgi" \
-        "lvm-tgi" \
+        "lvm" \
+        "lvm" \
         '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 
     # data prep requiring lvm

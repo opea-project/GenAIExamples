@@ -24,7 +24,7 @@ services:
     container_name: dataprep-multimodal-redis
     depends_on:
       - redis-vector-db
-      - lvm-tgi
+      - lvm
     ports:
       - "6007:6007"
     environment:
@@ -116,9 +116,9 @@ services:
     ipc: host
     command: --model-id ${LVM_MODEL_ID} --max-input-tokens 3048 --max-total-tokens 4096
     restart: unless-stopped
-  lvm-tgi:
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-    container_name: lvm-tgi
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm
     depends_on:
       - tgi-rocm
     ports:
@@ -128,6 +128,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
@@ -140,7 +141,7 @@ services:
       - dataprep-multimodal-redis
       - embedding
       - retriever-redis
-      - lvm-tgi
+      - lvm
     ports:
       - "8888:8888"
     environment:

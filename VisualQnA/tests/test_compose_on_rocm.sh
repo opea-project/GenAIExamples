@@ -99,7 +99,7 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:9399/v1/lvm" \
         "The image" \
-        "lvm-tgi" \
+        "lvm" \
         "visualqna-tgi-service" \
         '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }

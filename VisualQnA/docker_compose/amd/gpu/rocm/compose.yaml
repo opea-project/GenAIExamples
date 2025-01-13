@@ -28,9 +28,9 @@ services:
       - seccomp:unconfined
     ipc: host
     command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
-  lvm-tgi:
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-    container_name: lvm-tgi-server
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm-server
     depends_on:
       - visualqna-llava-tgi-service
     ports:
@@ -41,6 +41,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
@@ -49,7 +50,7 @@ services:
     container_name: visualqna-rocm-backend-server
     depends_on:
       - visualqna-llava-tgi-service
-      - lvm-tgi
+      - lvm
     ports:
       - "${BACKEND_SERVICE_PORT:-8888}:8888"
     environment:
