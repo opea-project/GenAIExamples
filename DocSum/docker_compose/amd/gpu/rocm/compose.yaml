@@ -13,6 +13,8 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: "http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}"
       HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+      DOCSUM_TGI_SERVICE_PORT: ${DOCSUM_TGI_SERVICE_PORT}
     volumes:
       - "/var/opea/docsum-service/data:/data"
     shm_size: 1g
@@ -27,13 +29,19 @@ services:
     security_opt:
       - seccomp:unconfined
     ipc: host
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${DOCSUM_TGI_SERVICE_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     command: --model-id ${DOCSUM_LLM_MODEL_ID} --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
 
   docsum-llm-server:
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
     container_name: docsum-llm-server
     depends_on:
-      - docsum-tgi-service
+      docsum-tgi-service:
+        condition: service_healthy
     ports:
       - "${DOCSUM_LLM_SERVER_PORT}:9000"
     ipc: host
@@ -51,11 +59,13 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: "http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}"
+      LLM_ENDPOINT: "http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}"
       HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
       LLM_MODEL_ID: ${DOCSUM_LLM_MODEL_ID}
+      DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
 
   whisper:

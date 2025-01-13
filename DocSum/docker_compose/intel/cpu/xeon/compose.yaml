@@ -6,36 +6,45 @@ services:
     image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     container_name: tgi-server
     ports:
-      - "8008:80"
+      - ${LLM_ENDPOINT_PORT:-8008}:80
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     volumes:
       - "./data:/data"
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0  --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
 
   llm-docsum-tgi:
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
     container_name: llm-docsum-server
     depends_on:
-      - tgi-server
+      tgi-server:
+        condition: service_healthy
     ports:
-      - "9000:9000"
+      - ${DOCSUM_PORT:-9000}:9000
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      LOGFLAG: True
+      DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
 
   whisper:

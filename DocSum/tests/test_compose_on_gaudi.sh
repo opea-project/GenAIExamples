@@ -17,13 +17,17 @@ export TAG=${IMAGE_TAG}
 export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export ASR_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 export no_proxy="${no_proxy},${host_ip}"
+export LLM_ENDPOINT_PORT=8008
+export DOCSUM_PORT=9000
+export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+export DocSum_COMPONENT_NAME="OPEADocSum_TGI"
+export LOGFLAG=True
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -37,10 +41,10 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-gradio-ui whisper llm-docsum-tgi"
+    service_list="docsum docsum-gradio-ui whisper llm-docsum"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
     docker images && sleep 1s
 }
 
@@ -49,15 +53,6 @@ function start_services() {
 
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 3m
-
-    until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
 }
 
 get_base64_str() {
@@ -156,13 +151,13 @@ function validate_microservices() {
     validate_services_json \
         "${host_ip}:8008/generate" \
         "generated_text" \
-        "tgi-gaudi" \
+        "tgi-gaudi-server" \
         "tgi-gaudi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
     validate_services_json \
-        "${host_ip}:9000/v1/chat/docsum" \
+        "${host_ip}:9000/v1/docsum" \
         "data: " \
         "llm-docsum-tgi" \
         "llm-docsum-gaudi-server" \

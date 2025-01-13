@@ -23,7 +23,7 @@ spec:
         internalService:
           serviceName: docsum-llm-uservice
           config:
-            endpoint: /v1/chat/docsum
+            endpoint: /v1/docsum
             PORT: "9009"
             TGI_LLM_ENDPOINT: tgi-svc
       - name: Tgi
