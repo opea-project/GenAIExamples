@@ -4,6 +4,9 @@
 
 set -xe
 
+echo "All running containers"
+docker ps
+
 WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
@@ -37,6 +40,10 @@ function stop_llm(){
     done
 
     cid=$(docker ps -aq --filter "name=vllm-gaudi-server")
+    echo "Stopping container $cid"
+    if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
+
+    cid=$(docker ps -aq --filter "name=test-comps-vllm-gaudi-service")
     echo "Stopping container $cid"
     if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
 
