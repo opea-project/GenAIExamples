@@ -23,9 +23,9 @@ services:
       dockerfile: ./docker/Dockerfile.react
     extends: faqgen
     image: ${REGISTRY:-opea}/faqgen-react-ui:${TAG:-latest}
-  llm-faqgen-tgi:
+  llm-faqgen:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/faq-generation/tgi/langchain/Dockerfile
+      dockerfile: comps/llms/src/faq-generation/Dockerfile
     extends: faqgen
-    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
