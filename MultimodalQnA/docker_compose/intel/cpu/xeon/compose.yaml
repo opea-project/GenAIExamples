@@ -121,9 +121,9 @@ services:
       LVM_PORT: ${LVM_PORT}
     entrypoint: ["python", "llava_server.py", "--device", "cpu", "--model_name_or_path", $LVM_MODEL_ID]
     restart: unless-stopped
-  lvm-llava-svc:
-    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
-    container_name: lvm-llava-svc
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm
     depends_on:
       - lvm-llava
     ports:
@@ -133,6 +133,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      LVM_COMPONENT_NAME: "OPEA_LLAVA_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
       LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
       LVM_PORT: ${LVM_PORT}
@@ -146,7 +147,7 @@ services:
       - dataprep-multimodal-redis
       - embedding
       - retriever-redis
-      - lvm-llava-svc
+      - lvm
     ports:
       - "${MEGA_SERVICE_PORT}:${MEGA_SERVICE_PORT}"
     environment:

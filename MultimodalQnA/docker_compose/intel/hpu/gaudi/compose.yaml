@@ -39,7 +39,7 @@ services:
     container_name: dataprep-multimodal-redis
     depends_on:
       - redis-vector-db
-      - lvm-tgi
+      - lvm
     ports:
       - "${DATAPREP_MMR_PORT}:${DATAPREP_MMR_PORT}"
     environment:
@@ -138,9 +138,9 @@ services:
     ipc: host
     command: --model-id ${LVM_MODEL_ID} --max-input-tokens 3048 --max-total-tokens 4096
     restart: unless-stopped
-  lvm-tgi:
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-    container_name: lvm-tgi
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm
     depends_on:
       - tgi-gaudi
     ports:
@@ -150,6 +150,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
       LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
       LVM_PORT: ${LVM_PORT}
@@ -165,7 +166,7 @@ services:
       - dataprep-multimodal-redis
       - embedding
       - retriever-redis
-      - lvm-tgi
+      - lvm
     ports:
       - "${MEGA_SERVICE_PORT}:${MEGA_SERVICE_PORT}"
     environment:
