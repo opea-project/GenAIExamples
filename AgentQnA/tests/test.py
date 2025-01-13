@@ -16,6 +16,7 @@ def generate_answer_agent_api(url, prompt):
     answer = response.json()["text"]
     return answer
 
+
 def process_request(url, query, is_stream=False):
     proxies = {"http": ""}
 
