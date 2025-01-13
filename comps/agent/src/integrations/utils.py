@@ -86,6 +86,14 @@ def tool_renderer(tools):
     return "\n".join(tool_strings)
 
 
+def filter_tools(tools, tools_choices):
+    tool_used = []
+    for tool in tools:
+        if tool.name in tools_choices:
+            tool_used.append(tool)
+    return tool_used
+
+
 def has_multi_tool_inputs(tools):
     ret = False
     for tool in tools:

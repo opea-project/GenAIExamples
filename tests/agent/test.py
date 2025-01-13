@@ -10,7 +10,7 @@ import requests
 def generate_answer_agent_api(url, prompt):
     proxies = {"http": ""}
     payload = {
-        "query": prompt,
+        "messages": prompt,
     }
     response = requests.post(url, json=payload, proxies=proxies)
     answer = response.json()["text"]
@@ -21,7 +21,7 @@ def process_request(url, query, is_stream=False):
     proxies = {"http": ""}
 
     payload = {
-        "query": query,
+        "messages": query,
     }
 
     try:

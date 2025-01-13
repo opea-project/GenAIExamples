@@ -5,7 +5,7 @@ import os
 import pathlib
 import sys
 from datetime import datetime
-from typing import Union
+from typing import List, Optional, Union
 
 from fastapi.responses import StreamingResponse
 
@@ -40,7 +40,10 @@ logger.info(f"args: {args}")
 agent_inst = instantiate_agent(args, args.strategy, with_memory=args.with_memory)
 
 
-class AgentCompletionRequest(LLMParamsDoc):
+class AgentCompletionRequest(ChatCompletionRequest):
+    # rewrite, specify tools in this turn of conversation
+    tool_choice: Optional[List[str]] = None
+    # for short/long term in-memory
     thread_id: str = "0"
     user_id: str = "0"
 
@@ -52,42 +55,40 @@ class AgentCompletionRequest(LLMParamsDoc):
     host="0.0.0.0",
     port=args.port,
 )
-async def llm_generate(input: Union[LLMParamsDoc, ChatCompletionRequest, AgentCompletionRequest]):
+async def llm_generate(input: AgentCompletionRequest):
     if logflag:
         logger.info(input)
 
-    input.stream = args.stream
-    config = {"recursion_limit": args.recursion_limit}
+    # don't use global stream setting
+    # input.stream = args.stream
+    config = {"recursion_limit": args.recursion_limit, "tool_choice": input.tool_choice}
 
     if args.with_memory:
-        if isinstance(input, AgentCompletionRequest):
-            config["configurable"] = {"thread_id": input.thread_id}
-        else:
-            config["configurable"] = {"thread_id": "0"}
+        config["configurable"] = {"thread_id": input.thread_id}
 
     if logflag:
         logger.info(type(agent_inst))
 
-    if isinstance(input, LLMParamsDoc):
-        # use query as input
-        input_query = input.query
+    # openai compatible input
+    if isinstance(input.messages, str):
+        messages = input.messages
     else:
-        # openai compatible input
-        if isinstance(input.messages, str):
-            input_query = input.messages
-        else:
-            input_query = input.messages[-1]["content"]
+        # TODO: need handle multi-turn messages
+        messages = input.messages[-1]["content"]
 
     # 2. prepare the input for the agent
     if input.stream:
         logger.info("-----------STREAMING-------------")
-        return StreamingResponse(agent_inst.stream_generator(input_query, config), media_type="text/event-stream")
+        return StreamingResponse(
+            agent_inst.stream_generator(messages, config),
+            media_type="text/event-stream",
+        )
 
     else:
         logger.info("-----------NOT STREAMING-------------")
-        response = await agent_inst.non_streaming_run(input_query, config)
+        response = await agent_inst.non_streaming_run(messages, config)
         logger.info("-----------Response-------------")
-        return GeneratedDoc(text=response, prompt=input_query)
+        return GeneratedDoc(text=response, prompt=messages)
 
 
 @register_microservice(

@@ -11,7 +11,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
 from ...global_var import threads_global_kv
-from ...utils import has_multi_tool_inputs, tool_renderer
+from ...utils import filter_tools, has_multi_tool_inputs, tool_renderer
 from ..base_agent import BaseAgent
 from .prompt import REACT_SYS_MESSAGE, hwchase17_react_prompt
 
@@ -136,7 +136,8 @@ class ReActAgentwithLanggraph(BaseAgent):
 # does not rely on langchain bind_tools API
 # since tgi and vllm still do not have very good support for tool calling like OpenAI
 
-from typing import Annotated, Sequence, TypedDict
+import json
+from typing import Annotated, List, Optional, Sequence, TypedDict
 
 from langchain_core.messages import AIMessage, BaseMessage
 from langchain_core.prompts import PromptTemplate
@@ -154,6 +155,7 @@ class AgentState(TypedDict):
     """The state of the agent."""
 
     messages: Annotated[Sequence[BaseMessage], add_messages]
+    tool_choice: Optional[List[str]] = None
     is_last_step: IsLastStep
 
 
@@ -191,7 +193,11 @@ class ReActAgentNodeLlama:
             history = assemble_history(messages)
         print("@@@ History: ", history)
 
-        tools_descriptions = tool_renderer(self.tools)
+        tools_used = self.tools
+        if state["tool_choice"] is not None:
+            tools_used = filter_tools(self.tools, state["tool_choice"])
+
+        tools_descriptions = tool_renderer(tools_used)
         print("@@@ Tools description: ", tools_descriptions)
 
         # invoke chain
@@ -279,21 +285,45 @@ class ReActAgentLlama(BaseAgent):
 
     async def stream_generator(self, query, config):
         initial_state = self.prepare_initial_state(query)
-        try:
-            async for event in self.app.astream(initial_state, config=config):
-                for node_name, node_state in event.items():
-                    yield f"--- CALL {node_name} ---\n"
-                    for k, v in node_state.items():
-                        if v is not None:
-                            yield f"{k}: {v}\n"
+        if "tool_choice" in config:
+            initial_state["tool_choice"] = config.pop("tool_choice")
 
-                yield f"data: {repr(event)}\n\n"
+        try:
+            async for event in self.app.astream(initial_state, config=config, stream_mode=["updates"]):
+                event_type = event[0]
+                data = event[1]
+                if event_type == "updates":
+                    for node_name, node_state in data.items():
+                        print(f"--- CALL {node_name} node ---\n")
+                        for k, v in node_state.items():
+                            if v is not None:
+                                print(f"------- {k}, {v} -------\n\n")
+                                if node_name == "agent":
+                                    if v[0].content == "":
+                                        tool_names = []
+                                        for tool_call in v[0].tool_calls:
+                                            tool_names.append(tool_call["name"])
+                                        result = {"tool": tool_names}
+                                    else:
+                                        result = {"content": [v[0].content.replace("\n\n", "\n")]}
+                                    # ui needs this format
+                                    yield f"data: {json.dumps(result)}\n\n"
+                                elif node_name == "tools":
+                                    full_content = v[0].content
+                                    tool_name = v[0].name
+                                    result = {"tool": tool_name, "content": [full_content]}
+                                    yield f"data: {json.dumps(result)}\n\n"
+                                    if not full_content:
+                                        continue
+
             yield "data: [DONE]\n\n"
         except Exception as e:
             yield str(e)
 
     async def non_streaming_run(self, query, config):
         initial_state = self.prepare_initial_state(query)
+        if "tool_choice" in config:
+            initial_state["tool_choice"] = config.pop("tool_choice")
         try:
             async for s in self.app.astream(initial_state, config=config, stream_mode="values"):
                 message = s["messages"][-1]
