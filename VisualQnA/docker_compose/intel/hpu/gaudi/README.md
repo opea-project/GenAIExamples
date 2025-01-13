@@ -11,8 +11,8 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
-docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/3rd_parties/nginx/src/Dockerfile .
+docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
+docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
 ### 2. Pull TGI Gaudi Image
@@ -44,7 +44,7 @@ docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$htt
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
-2. `opea/lvm-tgi:latest`
+2. `opea/lvm:latest`
 3. `opea/visualqna:latest`
 4. `opea/visualqna-ui:latest`
 5. `opea/nginx`
