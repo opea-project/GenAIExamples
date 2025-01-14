@@ -46,15 +46,13 @@ For more details, please refer to the deployment guide [here](../../../../README
    ```
 
 4. Prepare SQL database
-   In this example, we will use the SQLite database provided in the [TAG-Bench](https://github.com/TAG-Research/TAG-Bench/tree/main). Run the commands below.
+   In this example, we will use the Chinook SQLite database. Run the commands below.
 
    ```
    # Download data
    cd $WORKDIR
-   git clone https://github.com/TAG-Research/TAG-Bench.git
-   cd TAG-Bench/setup
-   chmod +x get_dbs.sh
-   ./get_dbs.sh
+   git clone https://github.com/lerocha/chinook-database.git
+   cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
    ```
 
 5. Launch Tool service
@@ -72,6 +70,7 @@ For more details, please refer to the deployment guide [here](../../../../README
    cd $WORKDIR
    git clone https://github.com/vllm-project/vllm.git
    cd ./vllm
+   git checkout v0.6.6
    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
    ```
 
@@ -123,7 +122,7 @@ Second, validate worker RAG agent:
 
 ```
 curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Michael Jackson song Thriller"
+     "messages": "Michael Jackson song Thriller"
     }'
 ```
 
@@ -131,21 +130,14 @@ Third, validate worker SQL agent:
 
 ```
 curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "How many schools have average math score higher than 560?"
+     "messages": "How many employees are in the company?"
     }'
 ```
 
 Finally, validate supervisor agent:
-
 ```
 curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Michael Jackson song Thriller"
-    }'
-```
-
-```
-curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "How many schools have average math score higher than 560?"
+     "messages": "Which artist in the database has the most albumns?"
     }'
 ```
 

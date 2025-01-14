@@ -1,8 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-search_music_knowledge_base:
-  description: Search a knowledge base about music and singers for a given query. Returns text related to the query.
+search_knowledge_base:
+  description: Search a knowledge base for a given query. Returns text related to the query.
   callable_api: tools.py:search_knowledge_base
   args_schema:
     query:
@@ -10,8 +10,8 @@ search_music_knowledge_base:
       description: query
   return_output: retrieved_data
 
-search_database:
-  description: Search a SQL database with a natural language query. Returns text related to the query.
+search_artist_database:
+  description: Search a SQL database on artists and their music with a natural language query. Returns text related to the query.
   callable_api: tools.py:search_sql_database
   args_schema:
     query:

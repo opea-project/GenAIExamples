@@ -98,7 +98,7 @@ Second, validate worker RAG agent:
 
 ```
 curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Michael Jackson song Thriller"
+     "messages": "Michael Jackson song Thriller"
     }'
 ```
 
@@ -106,7 +106,7 @@ Third, validate worker SQL agent:
 
 ```
 curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "How many schools have average math score higher than 560?"
+     "messages": "How many employees are in the company?"
     }'
 ```
 
@@ -114,13 +114,7 @@ Finally, validate supervisor agent:
 
 ```
 curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Michael Jackson song Thriller"
-    }'
-```
-
-```
-curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "How many schools have average math score higher than 560?"
+     "messages": "Which artist in the database has the most albumns?"
     }'
 ```
 

@@ -23,7 +23,7 @@ def search_knowledge_base(query: str) -> str:
 
 
 def search_sql_database(query: str) -> str:
-    """Search a SQL database with a natural language query.
+    """Search a SQL database on artists and their music with a natural language query.
 
     Returns text related to the query.
     """

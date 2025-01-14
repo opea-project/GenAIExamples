@@ -17,7 +17,7 @@ export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-70B-Instruct"
 export NUM_SHARDS=4
 export LLM_ENDPOINT_URL="http://${ip_address}:8086"
-export temperature=0.01
+export temperature=0
 export max_new_tokens=4096
 
 # agent related environment variables
@@ -29,8 +29,7 @@ export WORKER_AGENT_URL="http://${ip_address}:9095/v1/chat/completions"
 export SQL_AGENT_URL="http://${ip_address}:9096/v1/chat/completions"
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
 export CRAG_SERVER=http://${ip_address}:8080
-# export db_name=california_schools
-# export db_path="sqlite:////home/user/TAG-Bench/dev_folder/dev_databases/${db_name}/${db_name}.sqlite"
+
 export db_name=Chinook
 export db_path="sqlite:////home/user/chinook-db/Chinook_Sqlite.sqlite"
 

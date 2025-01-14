@@ -107,7 +107,7 @@ function validate() {
 }
 
 function validate_agent_service() {
-    # test worker rag agent
+    # # test worker rag agent
     echo "======================Testing worker rag agent======================"
     export agent_port="9095"
     prompt="Tell me about Michael Jackson song Thriller"
@@ -121,10 +121,9 @@ function validate_agent_service() {
         exit 1
     fi
 
-    # test worker sql agent
+    # # test worker sql agent
     echo "======================Testing worker sql agent======================"
     export agent_port="9096"
-    # prompt="How many schools have average math score greater than 560?"
     prompt="How many employees are there in the company?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
     local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
@@ -139,21 +138,9 @@ function validate_agent_service() {
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
     export agent_port="9090"
-    prompt="Michael Jackson song Thriller"
+    prompt="Which artist in the database has the most albums?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
-    # echo $CONTENT
-    echo $EXIT_CODE
-    local EXIT_CODE="${EXIT_CODE:0-1}"
-    if [ "$EXIT_CODE" == "1" ]; then
-        docker logs react-agent-endpoint
-        exit 1
-    fi
-
-    # prompt="How many schools have both average math score and reading score greater than 620?"
-    prompt="How many employees are there in the database?"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    local EXIT_CODE=$(validate "$CONTENT" "8" "react-agent-endpoint")
+    local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
     # echo $CONTENT
     echo $EXIT_CODE
     local EXIT_CODE="${EXIT_CODE:0-1}"
