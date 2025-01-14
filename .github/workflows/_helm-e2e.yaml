@@ -74,16 +74,6 @@ jobs:
           echo "skip_validate=false" >> $GITHUB_ENV
           echo "CHART_FOLDER=${workload_path}/kubernetes/helm" >> $GITHUB_ENV
 
-      - name: Initialize chart testing
-        run: |
-          # Replace values for CI test environment
-          pushd ${{ inputs.workload }}/kubernetes/helm
-          # insert a prefix before opea/.*, the prefix is OPEA_IMAGE_REPO
-          find . -name '*values.yaml' -type f -exec sed -i "s#repository: opea/*#repository: ${OPEA_IMAGE_REPO}opea/#g" {} \;
-          # set OPEA image tag to ${{ inputs.tag }}
-          find . -name '*values.yaml' -type f -exec sed -i 's#tag: "latest"#tag: ${{ inputs.tag }}#g' {} \;
-          popd
-
       - name: Helm install
         id: install
         env:
@@ -101,13 +91,7 @@ jobs:
             echo "should_cleanup=false" >> $GITHUB_ENV
             exit 0
           fi
-          # helm dependency update ${{ github.workspace }}/${{ env.CHART_FOLDER }}
-          # if ! helm install --create-namespace --namespace $NAMESPACE --wait \
-          #     --timeout "$ROLLOUT_TIMEOUT_SECONDS" \
-          #     --set GOOGLE_API_KEY=${{ env.GOOGLE_API_KEY}} \
-          #     --set GOOGLE_CSE_ID=${{ env.GOOGLE_CSE_ID}} \
-          #     --values ${{ env.CHART_FOLDER }}/${value_file} \
-          #      ${{ env.CHART_FOLDER }} ; then
+          
           if ! helm install --create-namespace --namespace $NAMESPACE $RELEASE_NAME oci://ghcr.io/opea-project/charts/${{ inputs.workload }} --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f ${{ inputs.workload }}/kubernetes/helm/${value_file} --version 0-latest ; then
             echo "Failed to install chart ${{ inputs.workload }}"
             echo "skip_validate=true" >> $GITHUB_ENV
