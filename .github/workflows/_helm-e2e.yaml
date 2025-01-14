@@ -136,7 +136,7 @@ jobs:
             if [[ -f $LOG_PATH/charts-${chart}.log ]] && \
             [[ $(grep -c "^Phase:.*Failed" $LOG_PATH/charts-${chart}.log) != 0 ]]; then
                 teststatus=false
-                ${{ github.workspace }}/.github/workflows/scripts/e2e/chart_test.sh dump_all_pod_logs $NAMESPACE
+                ${{ github.workspace }}/.github/workflows/scripts/k8s-utils.sh dump_all_pod_logs $NAMESPACE
             else
                 teststatus=true
             fi
