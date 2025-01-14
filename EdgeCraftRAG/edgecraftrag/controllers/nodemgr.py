@@ -25,7 +25,8 @@ class NodeMgr:
         pass
 
     def del_nodes_by_np_idx(self, np_idx):
-        del self.nodes[np_idx]
+        if np_idx in self.nodes:
+            del self.nodes[np_idx]
 
     def get_nodes(self, np_idx) -> List[BaseNode]:
         if np_idx in self.nodes:
