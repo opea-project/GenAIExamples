@@ -67,14 +67,14 @@ services:
     ports:
       - ${VLLM_SERVICE_PORT:-8008}:80
     environment:
-      HTTPS_PROXY: ${https_proxy}
-      HTTP_PROXY: ${https_proxy}
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
       VLLM_OPENVINO_DEVICE: GPU
       HF_ENDPOINT: ${HF_ENDPOINT}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
-      - /dev/dri/by-path:/dev/dri/by-path
-      - $HOME/.cache/huggingface:/root/.cache/huggingface
+      - ${HF_CACHE:-${HOME}/.cache}:/root/.cache
     devices:
       - /dev/dri
     group_add:

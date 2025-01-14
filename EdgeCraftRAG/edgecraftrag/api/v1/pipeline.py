@@ -54,7 +54,11 @@ async def add_pipeline(request: PipelineCreateIn):
             pass
         else:
             return "Unable to patch an active pipeline..."
-    update_pipeline_handler(pl, request)
+    try:
+        update_pipeline_handler(pl, request)
+    except ValueError as e:
+        ctx.get_pipeline_mgr().remove_pipeline_by_name_or_id(request.name)
+        return str(e)
     return pl
 
 
@@ -71,7 +75,10 @@ async def update_pipeline(name, request: PipelineCreateIn):
         else:
             return "Unable to patch an active pipeline..."
     async with ctx.get_pipeline_mgr()._lock:
-        update_pipeline_handler(pl, request)
+        try:
+            update_pipeline_handler(pl, request)
+        except ValueError as e:
+            return str(e)
     return pl
 
 

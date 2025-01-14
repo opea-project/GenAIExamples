@@ -19,7 +19,7 @@ class NodeParserIn(BaseModel):
     chunk_overlap: Optional[int] = None
     chunk_sizes: Optional[list] = None
     parser_type: str
-    window_size: Optional[int] = None
+    window_size: Optional[int] = 3
 
 
 class IndexerIn(BaseModel):

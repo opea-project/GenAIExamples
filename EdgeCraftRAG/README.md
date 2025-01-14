@@ -8,7 +8,7 @@ quality and performance.
 ## What's New in this release?
 
 - Support image/url data retrieval and display in EC-RAG
-- Support display of LLM-used context sources in UI
+- Support display of document source used by LLM in UI
 - Support pipeline remove operation in RESTful API and UI
 - Support RAG pipeline performance benchmark and display in UI
 - Fixed known issues in EC-RAG UI and server
@@ -77,7 +77,7 @@ export RENDERGROUPID=$(getent group render | cut -d: -f3)
 pip install --upgrade --upgrade-strategy eager "optimum[openvino]"
 
 optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-small-en-v1.5 --task sentence-similarity
-optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task sentence-similarity
+optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task text-classification
 optimum-cli export openvino -m Qwen/Qwen2-7B-Instruct ${MODEL_PATH}/Qwen/Qwen2-7B-Instruct/INT4_compressed_weights --weight-format int4
 
 ```
