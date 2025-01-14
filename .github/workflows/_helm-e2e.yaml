@@ -91,7 +91,7 @@ jobs:
             echo "should_cleanup=false" >> $GITHUB_ENV
             exit 0
           fi
-          
+
           if ! helm install --create-namespace --namespace $NAMESPACE $RELEASE_NAME oci://ghcr.io/opea-project/charts/${{ inputs.workload }} --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f ${{ inputs.workload }}/kubernetes/helm/${value_file} --version 0-latest ; then
             echo "Failed to install chart ${{ inputs.workload }}"
             echo "skip_validate=true" >> $GITHUB_ENV
