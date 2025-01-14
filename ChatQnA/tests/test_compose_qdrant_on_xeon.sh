@@ -17,9 +17,10 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone https://github.com/vllm-project/vllm.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-qdrant retriever-qdrant nginx"
+    service_list="chatqna chatqna-ui dataprep-qdrant retriever-qdrant vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
@@ -40,8 +41,8 @@ function start_services() {
     docker compose -f compose_qdrant.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-service > tgi_service_start.log
-        if grep -q Connected tgi_service_start.log; then
+        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
+        if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
             break
         fi
         sleep 5s
@@ -133,10 +134,10 @@ function validate_microservices() {
     # tgi for llm service
     validate_services \
         "${ip_address}:6042/generate" \
-        "generated_text" \
-        "tgi-llm" \
-        "tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+        "text" \
+        "vllm-llm" \
+        "vllm-service" \
+        '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
 }
 
 function validate_megaservice() {
