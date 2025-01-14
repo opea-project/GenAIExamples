@@ -259,7 +259,7 @@ curl http://${host_ip}:9096/v1/chat/completions -X POST -H "Content-Type: applic
 Finally, validate supervisor agent:
 ```
 curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "messages": "Which artist in the database has the most albumns?"
+     "messages": "How many albums does Iron Maiden have?"
     }'
 ```
 

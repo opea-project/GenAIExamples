@@ -138,9 +138,9 @@ function validate_agent_service() {
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
     export agent_port="9090"
-    prompt="Which artist in the database has the most albums?"
+    prompt="How many albums does Iron Maiden have?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
+    local EXIT_CODE=$(validate "$CONTENT" "21" "react-agent-endpoint")
     # echo $CONTENT
     echo $EXIT_CODE
     local EXIT_CODE="${EXIT_CODE:0-1}"
