@@ -197,7 +197,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
-   docker run -p 8008:80 -v ./data:/data --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
+   docker run -p 8008:80 -v ./data:/data --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
    ```
 
 2. Offline
@@ -211,7 +211,7 @@ For users in China who are unable to download models directly from Huggingface, 
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name vllm-service --shm-size 1g opea/vllm:latest --model /data --host 0.0.0.0 --port 80
+     docker run -p 8008:80 -v $model_path:/data --name vllm-service --shm-size 128g opea/vllm:latest --model /data --host 0.0.0.0 --port 80
      ```
 
 ### Setup Environment Variables
