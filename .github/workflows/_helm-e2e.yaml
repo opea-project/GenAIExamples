@@ -101,7 +101,7 @@ jobs:
             echo "should_cleanup=false" >> $GITHUB_ENV
             exit 0
           fi
-          helm dependency update ${{ github.workspace }}/${{ env.CHART_FOLDER }}
+          # helm dependency update ${{ github.workspace }}/${{ env.CHART_FOLDER }}
           # if ! helm install --create-namespace --namespace $NAMESPACE --wait \
           #     --timeout "$ROLLOUT_TIMEOUT_SECONDS" \
           #     --set GOOGLE_API_KEY=${{ env.GOOGLE_API_KEY}} \
