@@ -3,36 +3,28 @@
 
 name: GenAIExamples Helm CD workflow on manual event
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
-    paths:
-      - "**/helm/**"
-  # workflow_dispatch:
-  #   inputs:
-  #     workloads:
-  #       default: ""
-  #       required: false
-  #       type: string
-  #       description: "workloads to test, empty for testing all helm charts"
-  #     dockerhub:
-  #       default: "false"
-  #       required: false
-  #       type: string
-  #       description: "Set to true if you want to use released docker images at dockerhub. By default using internal docker registry."
-  #     tag:
-  #       default: "latest"
-  #       description: "Image tag to be tested"
-  #       required: true
-  #       type: string
-  #     opea_branch:
-  #       default: "main"
-  #       description: 'OPEA branch for image build'
-  #       required: false
-  #       type: string
-
-env:
-  CHARTS_DIR: "helm-charts"
+  workflow_dispatch:
+    inputs:
+      workloads:
+        default: ""
+        required: false
+        type: string
+        description: "workloads to test, empty for testing all helm charts"
+      dockerhub:
+        default: "false"
+        required: false
+        type: string
+        description: "Set to true if you want to use released docker images at dockerhub. By default using internal docker registry."
+      tag:
+        default: "latest"
+        description: "Image tag to be tested"
+        required: true
+        type: string
+      opea_branch:
+        default: "main"
+        description: 'OPEA branch for image build'
+        required: false
+        type: string
 
 jobs:
   get-build-matrix:
@@ -51,27 +43,26 @@ jobs:
         run: |
           set -x
           run_matrix="{\"include\":["
-          # if [[ -z "${{ inputs.workloads }}" ]]; then
-          #   ls ${{ github.workspace }}
-          #   for chart in ${{ github.workspace }}/*; do
-          #     if [[ -f $chart ]]; then
-          #       continue
-          #     fi
-          #     service=$(echo "$chart"| awk -F'/' '{print $NF}')
-          #     for file in "$chart"/kubernetes/helm/*values.yaml; do
-          #       if [ -f "$file" ]; then
-          #         filename=$(basename "$file" .yaml)
-          #         if [[ "$filename" == *"gaudi"* ]]; then
-          #           run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"gaudi\", \"valuefile\":\"${filename}\"},"
-          #         else
-          #           run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"xeon\", \"valuefile\":\"${filename}\"},"
-          #         fi
-          #       fi
-          #     done
-          #   done
-          # else
-            service_list=($(echo "CodeGen"| tr ',' ' '))
-            # ${{ github.event.inputs.workloads }} | tr ',' ' '))
+          if [[ -z "${{ inputs.workloads }}" ]]; then
+            ls ${{ github.workspace }}
+            for chart in ${{ github.workspace }}/*; do
+              if [[ -f $chart ]]; then
+                continue
+              fi
+              service=$(echo "$chart"| awk -F'/' '{print $NF}')
+              for file in "$chart"/kubernetes/helm/*values.yaml; do
+                if [ -f "$file" ]; then
+                  filename=$(basename "$file" .yaml)
+                  if [[ "$filename" == *"gaudi"* ]]; then
+                    run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"gaudi\", \"valuefile\":\"${filename}\"},"
+                  else
+                    run_matrix="${run_matrix}{\"example\":\"$service\",\"hardware\":\"xeon\", \"valuefile\":\"${filename}\"},"
+                  fi
+                fi
+              done
+            done
+          else
+            service_list=($(echo "${{ github.event.inputs.workloads }}" | tr ',' ' '))
             for service in $service_list; do
               for file in "$service"/kubernetes/helm/*values.yaml; do
                 if [ -f "$file" ]; then
@@ -84,7 +75,7 @@ jobs:
                 fi
               done
             done
-          # fi
+          fi
           run_matrix=$run_matrix"]}"
           echo "run_matrix=${run_matrix}"
           echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
