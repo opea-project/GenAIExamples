@@ -146,7 +146,7 @@ from langgraph.graph.message import add_messages
 from langgraph.managed import IsLastStep
 from langgraph.prebuilt import ToolNode
 
-from ...persistence import AgentPersistence, PersistenceConfig
+from ...store.persistence_memory import AgentPersistence, PersistenceConfig
 from ...utils import setup_chat_model
 from .utils import assemble_history, assemble_memory, convert_json_to_tool_call
 
