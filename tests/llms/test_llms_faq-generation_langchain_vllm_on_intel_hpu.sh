@@ -12,7 +12,6 @@ function build_docker_images() {
     cd $WORKPATH
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd vllm-fork/
-    git checkout 3c39626
     docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g .
     if [ $? -ne 0 ]; then
         echo "opea/vllm-gaudi built fail"

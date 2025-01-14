@@ -65,7 +65,6 @@ jobs:
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_yml}) != 0 ]]; then
                git clone https://github.com/HabanaAI/vllm-fork.git vllm-fork
-               cd vllm-fork && git checkout 3c39626 && cd ../
           fi
       - name: Get build list
         id: get-build-list
