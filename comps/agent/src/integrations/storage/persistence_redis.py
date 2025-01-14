@@ -1,8 +1,11 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import json
 from typing import Any, Dict, List, Optional, Tuple
 
-from redis.asyncio import Redis as AsyncRedis
 from redis import Redis
+from redis.asyncio import Redis as AsyncRedis
 
 DEFAULT_COLLECTION = "data"
 DEFAULT_BATCH_SIZE = 1
@@ -22,32 +25,24 @@ class RedisPersistence:
             raise ValueError(f"Redis failed to connect: {e}")
 
     def put(self, key: str, val: dict, collection: str = DEFAULT_COLLECTION) -> None:
-        """
-        Put a key-value pair into the store.
+        """Put a key-value pair into the store.
 
         Args:
             key (str): key
             val (dict): value
             collection (str): collection name
-
         """
         self._redis_client.hset(name=collection, key=key, value=json.dumps(val))
 
-    async def aput(
-        self, key: str, val: dict, collection: str = DEFAULT_COLLECTION
-    ) -> None:
-        """
-        Put a key-value pair into the store.
+    async def aput(self, key: str, val: dict, collection: str = DEFAULT_COLLECTION) -> None:
+        """Put a key-value pair into the store.
 
         Args:
             key (str): key
             val (dict): value
             collection (str): collection name
-
         """
-        await self._async_redis_client.hset(
-            name=collection, key=key, value=json.dumps(val)
-        )
+        await self._async_redis_client.hset(name=collection, key=key, value=json.dumps(val))
 
     def put_all(
         self,
@@ -55,13 +50,11 @@ class RedisPersistence:
         collection: str = DEFAULT_COLLECTION,
         batch_size: int = DEFAULT_BATCH_SIZE,
     ) -> None:
-        """
-        Put a dictionary of key-value pairs into the store.
+        """Put a dictionary of key-value pairs into the store.
 
         Args:
             kv_pairs (List[Tuple[str, dict]]): key-value pairs
             collection (str): collection name
-
         """
         with self._redis_client.pipeline() as pipe:
             cur_batch = 0
@@ -77,29 +70,23 @@ class RedisPersistence:
                 pipe.execute()
 
     def get(self, key: str, collection: str = DEFAULT_COLLECTION) -> Optional[dict]:
-        """
-        Get a value from the store.
+        """Get a value from the store.
 
         Args:
             key (str): key
             collection (str): collection name
-
         """
         val_str = self._redis_client.hget(name=collection, key=key)
         if val_str is None:
             return None
         return json.loads(val_str)
 
-    async def aget(
-        self, key: str, collection: str = DEFAULT_COLLECTION
-    ) -> Optional[dict]:
-        """
-        Get a value from the store.
+    async def aget(self, key: str, collection: str = DEFAULT_COLLECTION) -> Optional[dict]:
+        """Get a value from the store.
 
         Args:
             key (str): key
             collection (str): collection name
-
         """
         val_str = await self._async_redis_client.hget(name=collection, key=key)
         if val_str is None:
@@ -123,25 +110,21 @@ class RedisPersistence:
         return collection_kv_dict
 
     def delete(self, key: str, collection: str = DEFAULT_COLLECTION) -> bool:
-        """
-        Delete a value from the store.
+        """Delete a value from the store.
 
         Args:
             key (str): key
             collection (str): collection name
-
         """
         deleted_num = self._redis_client.hdel(collection, key)
         return bool(deleted_num > 0)
 
     async def adelete(self, key: str, collection: str = DEFAULT_COLLECTION) -> bool:
-        """
-        Delete a value from the store.
+        """Delete a value from the store.
 
         Args:
             key (str): key
             collection (str): collection name
-
         """
         deleted_num = await self._async_redis_client.hdel(collection, key)
         return bool(deleted_num > 0)
@@ -152,8 +135,7 @@ class RedisPersistence:
         host: str,
         port: int,
     ) -> "RedisPersistence":
-        """
-        Load a RedisPersistence from a Redis host and port.
+        """Load a RedisPersistence from a Redis host and port.
 
         Args:
             host (str): Redis host
@@ -161,4 +143,3 @@ class RedisPersistence:
         """
         url = f"redis://{host}:{port}".format(host=host, port=port)
         return cls(redis_uri=url)
-

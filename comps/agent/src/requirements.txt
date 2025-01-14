@@ -22,14 +22,6 @@ pandas
 prometheus_fastapi_instrumentator
 pyarrow
 pydantic #==1.10.13
-shortuuid
-tavily-python
-
-# used by agents
-transformers
-transformers[sentencepiece]
-
-uvicorn
 
 # used by document loader
 # beautifulsoup4
@@ -46,3 +38,11 @@ uvicorn
 # virtualenv
 
 redis
+shortuuid
+tavily-python
+
+# used by agents
+transformers
+transformers[sentencepiece]
+
+uvicorn
