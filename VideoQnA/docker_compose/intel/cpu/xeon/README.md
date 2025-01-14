@@ -59,7 +59,7 @@ docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$h
 ### 2. Build Retriever Image
 
 ```bash
-docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/vdms/langchain/Dockerfile .
+docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 3. Build Reranking Image

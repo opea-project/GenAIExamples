@@ -45,7 +45,7 @@ docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_
 ### 3. Build retriever-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 4. Build dataprep-multimodal-redis Image
