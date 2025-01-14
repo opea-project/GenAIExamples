@@ -86,10 +86,10 @@ Build TGI Gaudi image
 docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
 ```
 
-Build lvm-tgi microservice image
+Build lvm microservice image
 
 ```bash
-docker build --no-cache -t opea/lvm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/tgi-llava/Dockerfile .
+docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
 ```
 
 ### 4. Build dataprep-multimodal-redis Image
@@ -128,7 +128,7 @@ docker build --no-cache -t opea/multimodalqna-ui:latest --build-arg https_proxy=
 Then run the command `docker images`, you will have the following 11 Docker Images:
 
 1. `opea/dataprep-multimodal-redis:latest`
-2. `opea/lvm-tgi:latest`
+2. `opea/lvm:latest`
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 4. `opea/retriever-multimodal-redis:latest`
 5. `opea/whisper:latest`
@@ -220,7 +220,7 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
     -H 'Content-Type: application/json'
 ```
 
-6. lvm-tgi
+6. lvm
 
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
@@ -274,7 +274,7 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     -F "files=@./${audio_fn}"
 ```
 
-Also, test dataprep microservice with generating an image caption using lvm-tgi
+Also, test dataprep microservice with generating an image caption using lvm
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \

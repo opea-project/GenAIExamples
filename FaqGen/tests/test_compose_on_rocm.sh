@@ -23,19 +23,20 @@ export FAQGEN_CARD_ID="card1"
 export FAQGEN_RENDER_ID="renderD136"
 export FAQGEN_BACKEND_SERVER_PORT=8888
 export FAGGEN_UI_PORT=5173
-export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+export LLM_ENDPOINT="http://${ip_address}:8008"
 export MEGA_SERVICE_HOST_IP=${ip_address}
 export LLM_SERVICE_HOST_IP=${ip_address}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/faqgen"
 export PATH="~/miniconda3/bin:$PATH"
-
+export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI"
+export LOGFLAG=True
 
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="faqgen faqgen-ui llm-faqgen-tgi"
+    service_list="faqgen faqgen-ui llm-faqgen"
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     docker images && sleep 1s
@@ -49,15 +50,7 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
 
-    n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs faggen-tgi-service > "${LOG_PATH}"/tgi_service_start.log
-        if grep -q Connected "${LOG_PATH}"/tgi_service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
+    sleep 30s
 }
 
 function validate_services() {
