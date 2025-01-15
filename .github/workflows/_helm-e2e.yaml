@@ -6,11 +6,15 @@ permissions: read-all
 on:
   workflow_call:
     inputs:
-      workload:
+      example:
         default: "chatqna"
         required: true
         type: string
-        description: "workload to test, chatqna or common/asr"
+        description: "example to test, chatqna or common/asr"
+      hardware:
+        default: "xeon"
+        required: true
+        type: string
       dockerhub:
         default: "false"
         required: false
@@ -20,20 +24,62 @@ on:
         default: "latest"
         required: false
         type: string
-      hardware:
-        default: "xeon"
-        required: true
-        type: string
-      valuefile:
-        default: "values"
-        required: true
-        type: string
 
 jobs:
-####################################################################################################
-# Helm Test
-####################################################################################################
+  get-build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      value_files: ${{ steps.test-case-matrix.outputs.value_files }}
+      CHECKOUT_REF: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
+    steps:
+      - name: Get checkout ref
+        id: get-checkout-ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge
+          else
+            CHECKOUT_REF=${{ github.ref }}
+          fi
+          echo "CHECKOUT_REF=${CHECKOUT_REF}" >> $GITHUB_OUTPUT
+          echo "checkout ref ${CHECKOUT_REF}"
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
+          fetch-depth: 0
+
+      - name: Get test Services
+        id: get-services
+        run: |
+          set -x
+          # service_list=($(echo "${{ inputs.example }}" | tr ',' ' '))
+          value_files=""
+          for file in "${{ inputs.example }}"/kubernetes/helm/*values.yaml; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file" .yaml)
+              if [[ "$filename" == *"gaudi"* ]]; then
+                if [[ "${{ inputs.hardware }}" == "gaudi" ]]; then
+                  value_files="${value_files}${filename},"
+                fi
+              elif [[ "$filename" == *"nv"* ]]; then
+                continue
+              else
+                if [[ "${{ inputs.hardware }}" == "xeon" ]]; then
+                  value_files="${value_files}${filename},"
+                fi
+              fi
+            fi
+          done
+
+          echo "value_files=${value_files}"
+          echo "value_files=${value_files}" >> $GITHUB_OUTPUT
+
   helm-test:
+    needs: [get-test-case]
+    strategy:
+      matrix: 
+        value_file: ${{ fromJSON(needs.get-build-matrix.outputs.value_files) }}
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
     outputs:
@@ -61,9 +107,9 @@ jobs:
 
       - name: Set variables
         env:
-          workload_path: ${{ inputs.workload }}
+          example: ${{ inputs.example }}
         run: |
-          CHART_NAME="${workload_path}"  # CodeGen
+          CHART_NAME="${example}"  # CodeGen
           echo "CHART_NAME=$CHART_NAME" >> $GITHUB_ENV
           echo "RELEASE_NAME=${CHART_NAME}$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
           echo "NAMESPACE=${CHART_NAME}-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
@@ -72,7 +118,7 @@ jobs:
           echo "KUBECTL_TIMEOUT_SECONDS=60s" >> $GITHUB_ENV
           echo "should_cleanup=false" >> $GITHUB_ENV
           echo "skip_validate=false" >> $GITHUB_ENV
-          echo "CHART_FOLDER=${workload_path}/kubernetes/helm" >> $GITHUB_ENV
+          echo "CHART_FOLDER=${example}/kubernetes/helm" >> $GITHUB_ENV
 
       - name: Helm install
         id: install
@@ -81,10 +127,10 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
           HFTOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+          value_file: ${{ matrix.value_file }}
         run: |
           set -xe
           echo "should_cleanup=true" >> $GITHUB_ENV
-          value_file="${{ inputs.valuefile }}.yaml"
           if [[ ! -f ${{ github.workspace }}/${{ env.CHART_FOLDER }}/${value_file} ]]; then
             echo "No value file found, exist test!"
             echo "skip_validate=true" >> $GITHUB_ENV
@@ -92,8 +138,8 @@ jobs:
             exit 0
           fi
 
-          if ! helm install --create-namespace --namespace $NAMESPACE $RELEASE_NAME oci://ghcr.io/opea-project/charts/${{ inputs.workload }} --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f ${{ inputs.workload }}/kubernetes/helm/${value_file} --version 0-latest ; then
-            echo "Failed to install chart ${{ inputs.workload }}"
+          if ! helm install --create-namespace --namespace $NAMESPACE $RELEASE_NAME oci://ghcr.io/opea-project/charts/${{ inputs.example }} --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f ${{ inputs.example }}/kubernetes/helm/${value_file} --version 0-latest ; then
+            echo "Failed to install chart ${{ inputs.example }}"
             echo "skip_validate=true" >> $GITHUB_ENV
             .github/workflows/scripts/k8s-utils.sh dump_pods_status $NAMESPACE
             exit 1

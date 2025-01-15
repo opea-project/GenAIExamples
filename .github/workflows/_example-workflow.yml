@@ -28,7 +28,7 @@ on:
         default: false
         required: false
         type: boolean
-      test_k8s:
+      test_helmchart:
         default: false
         required: false
         type: boolean
@@ -109,12 +109,11 @@ jobs:
 
 
 ####################################################################################################
-# K8S Test
+# helmchart Test
 ####################################################################################################
-  test-k8s-manifest:
-    needs: [build-images]
-    if: ${{ fromJSON(inputs.test_k8s) }}
-    uses: ./.github/workflows/_manifest-e2e.yml
+  test-helmchart:
+    if: ${{ fromJSON(inputs.test_helmchart) }}
+    uses: ./.github/workflows/_helm-e2e.yml
     with:
       example: ${{ inputs.example }}
       hardware: ${{ inputs.node }}
