@@ -252,7 +252,7 @@ function validate_microservices() {
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
     echo "Wait for tgi-llava-gaudi-server service to be ready"
-    check_service_ready "tgi-llava-gaudi-server" 10 "Connected"
+    check_service_ready "tgi-llava-gaudi-server" 20 "Connected"
 
     # llava server
     echo "Evaluating LLAVA tgi-gaudi"
