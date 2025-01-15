@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export OPENAI_API_KEY=''
 export host_ip=$(hostname -I | awk '{print $1}')
 
 export TGI_SERVICE_PORT=3006
