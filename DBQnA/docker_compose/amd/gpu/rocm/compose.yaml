@@ -51,7 +51,7 @@ services:
     image: opea/text2sql:latest
     container_name: text2sql
     ports:
-      - "${DBQNA_TEXT_TO_SQL_PORT:-9090}:8090"
+      - "${DBQNA_TEXT_TO_SQL_PORT:-9090}:8080"
     environment:
       TGI_LLM_ENDPOINT: ${DBQNA_TGI_LLM_ENDPOINT}
 
