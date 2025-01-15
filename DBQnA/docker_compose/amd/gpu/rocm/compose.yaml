@@ -47,9 +47,9 @@ services:
     volumes:
       - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
 
-  texttosql:
-    image: opea/texttosql:latest
-    container_name: texttosql-service
+  text2sql:
+    image: opea/text2sql:latest
+    container_name: text2sql
     ports:
       - "${DBQNA_TEXT_TO_SQL_PORT:-9090}:8090"
     environment:
@@ -57,7 +57,7 @@ services:
 
   text2sql-react-ui:
     image: opea/text2sql-react-ui:latest
-    container_name: dbqna-react-ui-server
+    container_name: text2sql-react-ui
     depends_on:
       - texttosql
     ports:
