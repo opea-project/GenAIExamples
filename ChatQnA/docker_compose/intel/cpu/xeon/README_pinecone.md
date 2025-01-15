@@ -352,7 +352,7 @@ click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comp
 Or run this command to get the file on a terminal.
 
 ```bash
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/1,1/comps/retrievers/redis/data/nke-10k-2023.pdf
 
 ```
 
