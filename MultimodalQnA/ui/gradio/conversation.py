@@ -71,7 +71,7 @@ class Conversation:
                         content = [{"type": "text", "text": message}]
                         # There might be audio
                         if self.audio_query_file:
-                            content.append({"type": "audio", "audio": self.get_b64_audio_query()})   
+                            content.append({"type": "audio", "audio": self.get_b64_audio_query()})
                         # There might be a returned item from the first query
                         if i == 0 and self.time_of_frame_ms and self.video_file:
                             base64_frame = (
