@@ -12,7 +12,6 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 docker build --no-cache -t opea/texttosql:latest -f comps/text2sql/src/Dockerfile .
-
 ```
 
 ### 1.2 Build react UI Docker Image
