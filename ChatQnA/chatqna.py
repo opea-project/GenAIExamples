@@ -76,7 +76,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
-        next_inputs["stream"] = inputs["streaming"]
+        next_inputs["stream"] = inputs["stream"]
         next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
         # next_inputs["presence_penalty"] = inputs["presence_penalty"]
         # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
@@ -158,7 +158,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
         next_data["inputs"] = prompt
 
-    elif self.services[cur_node].service_type == ServiceType.LLM and not llm_parameters_dict["streaming"]:
+    elif self.services[cur_node].service_type == ServiceType.LLM and not llm_parameters_dict["stream"]:
         next_data["text"] = data["choices"][0]["message"]["content"]
     else:
         next_data = data
@@ -342,7 +342,7 @@ class ChatQnAService:
             frequency_penalty=chat_request.frequency_penalty if chat_request.frequency_penalty else 0.0,
             presence_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 0.0,
             repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
-            streaming=stream_opt,
+            stream=stream_opt,
             chat_template=chat_request.chat_template if chat_request.chat_template else None,
         )
         retriever_parameters = RetrieverParms(

@@ -24,7 +24,7 @@ embedding-multimodal-bridgetower
 =====================
 Port 6006 - Open to 0.0.0.0/0
 
-embedding-multimodal
+embedding
 =========
 Port 6000 - Open to 0.0.0.0/0
 
@@ -76,14 +76,14 @@ export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDER_PORT=6006
-export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
+export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT"
 export MM_EMBEDDING_PORT_MICROSERVICE=6000
-export ASR_ENDPOINT=http://$host_ip:7066
-export ASR_SERVICE_PORT=3001
-export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
+export WHISPER_SERVER_PORT=7066
+export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_SERVER_PORT}/v1/asr"
 export REDIS_URL="redis://${host_ip}:6379"
 export REDIS_HOST=${host_ip}
 export INDEX_NAME="mm-rag-redis"
+export BRIDGE_TOWER_EMBEDDING=true
 export LLAVA_SERVER_PORT=8399
 export LVM_ENDPOINT="http://${host_ip}:8399"
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
@@ -112,13 +112,13 @@ Build embedding-multimodal-bridgetower docker image
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile .
 ```
 
-Build embedding-multimodal microservice image
+Build embedding microservice image
 
 ```bash
-docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/multimodal_langchain/Dockerfile .
+docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
 ```
 
 ### 2. Build retriever-multimodal-redis Image
@@ -152,13 +152,7 @@ docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg htt
 Build whisper server image
 
 ```bash
-docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
-```
-
-Build asr image
-
-```bash
-docker build --no-cache -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile .
+docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
 ```
 
 ### 6. Build MegaService Docker Image
@@ -189,12 +183,11 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 3. `opea/lvm-llava:latest`
 4. `opea/retriever-multimodal-redis:latest`
 5. `opea/whisper:latest`
-6. `opea/asr:latest`
-7. `opea/redis-vector-db`
-8. `opea/embedding-multimodal:latest`
-9. `opea/embedding-multimodal-bridgetower:latest`
-10. `opea/multimodalqna:latest`
-11. `opea/multimodalqna-ui:latest`
+6. `opea/redis-vector-db`
+7. `opea/embedding:latest`
+8. `opea/embedding-multimodal-bridgetower:latest`
+9. `opea/multimodalqna:latest`
+10. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -202,10 +195,10 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
 
-| Service              | Model                                       |
-| -------------------- | ------------------------------------------- |
-| embedding-multimodal | BridgeTower/bridgetower-large-itm-mlm-gaudi |
-| LVM                  | llava-hf/llava-1.5-7b-hf                    |
+| Service   | Model                                       |
+| --------- | ------------------------------------------- |
+| embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
+| LVM       | llava-hf/llava-1.5-7b-hf                    |
 
 ### Start all the services Docker Containers
 
@@ -234,7 +227,7 @@ curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
      -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-2. embedding-multimodal
+2. embedding
 
 ```bash
 curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
@@ -263,10 +256,10 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
 4. asr
 
 ```bash
-curl ${ASR_SERVICE_ENDPOINT} \
+curl ${WHISPER_SERVER_ENDPOINT} \
     -X POST \
     -H "Content-Type: application/json" \
-    -d '{"byte_str" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
+    -d '{"audio" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
 ```
 
 5. lvm-llava
