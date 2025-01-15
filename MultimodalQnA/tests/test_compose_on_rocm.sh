@@ -23,7 +23,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding-multimodal retriever-redis lvm-tgi lvm-llava-svc dataprep-multimodal-redis whisper asr"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever-redis lvm dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -39,11 +39,10 @@ function setup_env() {
     export https_proxy=${your_http_proxy}
     export BRIDGE_TOWER_EMBEDDING=true
     export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT/v1/encode"
+    export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
-    export ASR_ENDPOINT=http://$host_ip:7066
-    export ASR_SERVICE_PORT=3001
-    export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
+    export WHISPER_SERVER_PORT=7066
+    export WHISPER_SERVER_ENDPOINT="http://${HOST_IP}:${WHISPER_SERVER_PORT}/v1/asr"
     export REDIS_URL="redis://${HOST_IP}:6379"
     export REDIS_HOST=${HOST_IP}
     export INDEX_NAME="mm-rag-redis"
@@ -69,6 +68,7 @@ function start_services() {
 
 
     # Start Docker Containers
+    sed -i "s|container_name: multimodalqna-backend-server|container_name: multimodalqna-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 2m
 }
@@ -150,19 +150,19 @@ function validate_microservices() {
         '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 
     # embedding microservice
-    echo "Validating embedding-multimodal"
+    echo "Validating embedding"
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text" : "This is some sample text."}'
 
     validate_service \
         "http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings" \
         '"embedding":[' \
-        "embedding-multimodal" \
-        "embedding-multimodal" \
+        "embedding" \
+        "embedding" \
         '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -220,12 +220,12 @@ function validate_microservices() {
         '{"inputs":"![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/rabbit.png)What is this a picture of?\n\n","parameters":{"max_new_tokens":16, "seed": 42}}'
 
     # lvm
-    echo "Evaluating lvm-llava-svc"
+    echo "Evaluating lvm"
     validate_service \
         "http://${host_ip}:9399/v1/lvm" \
         '"text":"' \
-        "lvm-tgi" \
-        "lvm-tgi" \
+        "lvm" \
+        "lvm" \
         '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 
     # data prep requiring lvm

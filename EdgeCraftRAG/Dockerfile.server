@@ -4,7 +4,11 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     libgl1-mesa-glx \
-    libjemalloc-dev
+    libjemalloc-dev \
+    libmagic1 \
+    libglib2.0-0 \
+    poppler-utils \
+    tesseract-ocr
 
 RUN apt-get update && apt-get install -y gnupg wget 
 RUN wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | \

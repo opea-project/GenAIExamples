@@ -3,7 +3,7 @@
 
 services:
   worker-rag-agent:
-    image: opea/agent-langchain:latest
+    image: opea/agent:latest
     container_name: rag-agent-endpoint
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
@@ -19,7 +19,7 @@ services:
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
-      streaming: false
+      stream: false
       tools: /home/user/tools/worker_agent_tools.yaml
       require_human_feedback: false
       RETRIEVAL_TOOL_URL: ${RETRIEVAL_TOOL_URL}
@@ -33,7 +33,7 @@ services:
 
 
   supervisor-react-agent:
-    image: opea/agent-langchain:latest
+    image: opea/agent:latest
     container_name: react-agent-endpoint
     depends_on:
       - worker-rag-agent
@@ -51,7 +51,7 @@ services:
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
-      streaming: false
+      stream: false
       tools: /home/user/tools/supervisor_agent_tools.yaml
       require_human_feedback: false
       no_proxy: ${no_proxy}

@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 
 WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
@@ -82,4 +82,4 @@ echo "=================== #5 Agent and API server stopped===================="
 
 echo y | docker system prune
 
-echo "ALL DONE!"
+echo "ALL DONE!!"

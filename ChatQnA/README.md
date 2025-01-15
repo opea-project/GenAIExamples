@@ -60,15 +60,18 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 3. Set up other environment variables:
 
-   > Notice that you can only choose **one** command below to set up envs according to your hardware. Other that the port numbers may be set incorrectly.
+   > Notice that you can only choose **one** hardware option below to set up envs according to your hardware. Make sure port numbers are set correctly as well.
 
    ```bash
    # on Gaudi
    source ./docker_compose/intel/hpu/gaudi/set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
    # on Xeon
    source ./docker_compose/intel/cpu/xeon/set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
    # on Nvidia GPU
    source ./docker_compose/nvidia/gpu/set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-ui-server,chatqna-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
    ```
 
 ### Quick Start: 2.Run Docker Compose
@@ -247,19 +250,9 @@ docker compose up -d
 
 Refer to the [NVIDIA GPU Guide](./docker_compose/nvidia/gpu/README.md) for more instructions on building docker images from source.
 
-### Deploy ChatQnA into Kubernetes on Xeon & Gaudi with GMC
+### Deploy ChatQnA on Kubernetes using Helm Chart
 
-Refer to the [Kubernetes Guide](./kubernetes/intel/README_gmc.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi with GMC.
-
-### Deploy ChatQnA into Kubernetes on Xeon & Gaudi without GMC
-
-Refer to the [Kubernetes Guide](./kubernetes/intel/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi without GMC.
-
-### Deploy ChatQnA into Kubernetes using Helm Chart
-
-Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
-
-Refer to the [ChatQnA helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/chatqna/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
+Refer to the [ChatQnA helm chart](./kubernetes/helm/README.md) for instructions on deploying ChatQnA on Kubernetes.
 
 ### Deploy ChatQnA on AI PC
 
@@ -294,7 +287,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:6007/v1/dataprep" \
     -H "Content-Type: multipart/form-data" \
@@ -341,3 +334,22 @@ OPEA microservice deployment can easily be monitored through Grafana dashboards 
 
 ![chatqna dashboards](./assets/img/chatqna_dashboards.png)
 ![tgi dashboard](./assets/img/tgi_dashboard.png)
+
+## Tracing Services with OpenTelemetry Tracing and Jaeger
+
+> NOTE: limited support. Only LLM inference serving with TGI on Gaudi is enabled for this feature.
+
+OPEA microservice and TGI/TEI serving can easily be traced through Jaeger dashboards in conjunction with OpenTelemetry Tracing feature. Follow the [README](https://github.com/opea-project/GenAIComps/tree/main/comps/cores/telemetry#tracing) to trace additional functions if needed.
+
+Tracing data is exported to http://{EXTERNAL_IP}:4318/v1/traces via Jaeger.
+Users could also get the external IP via below command.
+
+```bash
+ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+'
+```
+
+For TGI serving on Gaudi, users could see different services like opea, TEI and TGI.
+![Screenshot from 2024-12-27 11-58-18](https://github.com/user-attachments/assets/6126fa70-e830-4780-bd3f-83cb6eff064e)
+
+Here is a screenshot for one tracing of TGI serving request.
+![Screenshot from 2024-12-27 11-26-25](https://github.com/user-attachments/assets/3a7c51c6-f422-41eb-8e82-c3df52cd48b8)

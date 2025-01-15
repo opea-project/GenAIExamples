@@ -25,13 +25,13 @@ Build embedding-multimodal-bridgetower docker image
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/bridgetower/src/Dockerfile .
 ```
 
-Build embedding-multimodal microservice image
+Build embedding microservice image
 
 ```bash
-docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/multimodal_langchain/Dockerfile .
+docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
 ```
 
 ### 2. Build LVM Images
@@ -39,7 +39,7 @@ docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_pr
 Build lvm-llava image
 
 ```bash
-docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/dependency/Dockerfile .
+docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/llava/Dockerfile .
 ```
 
 ### 3. Build retriever-multimodal-redis Image
@@ -85,9 +85,9 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 
 1. `opea/dataprep-multimodal-redis:latest`
 2. `ghcr.io/huggingface/text-generation-inference:2.4.1-rocm`
-3. `opea/lvm-tgi:latest`
+3. `opea/lvm:latest`
 4. `opea/retriever-multimodal-redis:latest`
-5. `opea/embedding-multimodal:latest`
+5. `opea/embedding:latest`
 6. `opea/embedding-multimodal-bridgetower:latest`
 7. `opea/multimodalqna:latest`
 8. `opea/multimodalqna-ui:latest`
@@ -98,11 +98,11 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
 
-| Service              | Model                                       |
-| -------------------- | ------------------------------------------- |
-| embedding-multimodal | BridgeTower/bridgetower-large-itm-mlm-gaudi |
-| LVM                  | llava-hf/llava-1.5-7b-hf                    |
-| LVM                  | Xkev/Llama-3.2V-11B-cot                     |
+| Service   | Model                                       |
+| --------- | ------------------------------------------- |
+| embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
+| LVM       | llava-hf/llava-1.5-7b-hf                    |
+| LVM       | Xkev/Llama-3.2V-11B-cot                     |
 
 Note:
 
@@ -158,7 +158,7 @@ curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
      -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-2. embedding-multimodal
+2. embedding
 
 ```bash
 curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
@@ -193,7 +193,7 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
      -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-5. lvm-llava-svc
+5. lvm
 
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
