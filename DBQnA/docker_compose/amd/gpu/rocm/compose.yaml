@@ -59,7 +59,7 @@ services:
     image: opea/text2sql-react-ui:latest
     container_name: text2sql-react-ui
     depends_on:
-      - texttosql
+      - text2sql
     ports:
       - "${DBQNA_UI_PORT:-5174}:80"
     environment:
