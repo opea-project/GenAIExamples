@@ -125,6 +125,8 @@ function validate_microservices() {
         "extract_graph_neo4j" \
         "dataprep-neo4j-server"
 
+    sleep 2m
+
     # retrieval microservice
     validate_service \
         "${ip_address}:7000/v1/retrieval" \
