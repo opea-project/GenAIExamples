@@ -68,12 +68,11 @@ class Conversation:
                 for i, (role, message) in enumerate(messages):
                     if message:
                         dic = {"role": role}
-                        # The main message will be either audio or text
+                        content = [{"type": "text", "text": message}]
+                        # There might be audio
                         if self.audio_query_file:
-                            content = [{"type": "audio", "audio": self.get_b64_audio_query()}]
-                        else:
-                            content = [{"type": "text", "text": message}]
-                        # There might be a returned image/video from the first query
+                            content.append({"type": "audio", "audio": self.get_b64_audio_query()})   
+                        # There might be a returned item from the first query
                         if i == 0 and self.time_of_frame_ms and self.video_file:
                             base64_frame = (
                                 self.base64_frame
