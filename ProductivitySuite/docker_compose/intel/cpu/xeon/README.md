@@ -13,7 +13,7 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
+docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
@@ -25,7 +25,7 @@ docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
+docker build --no-cache -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/src/Dockerfile .
 ```
 
 ### 4. Build LLM Image
@@ -33,7 +33,7 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 #### Use TGI as backend
 
 ```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
@@ -45,7 +45,7 @@ docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$h
 ### 6. Build Prompt Registry Image
 
 ```bash
-docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/mongo/Dockerfile .
+docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/src/Dockerfile .
 ```
 
 ### 7. Build Chat History Image
@@ -96,7 +96,7 @@ Build frontend Docker image that enables via below command:
 
 ```bash
 cd GenAIExamples/ProductivitySuite/ui
-docker build --no-cache -t ProductivitySuite/docker_compose/intel/cpu/xeon/compose.yaml docker/Dockerfile.react .
+docker build --no-cache -t opea/productivity-suite-react-ui-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.react .
 ```
 
 ---
@@ -277,7 +277,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
    ```bash
    curl http://${host_ip}:9000/v1/chat/completions\
      -X POST \
-     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
      -H 'Content-Type: application/json'
    ```
 
@@ -293,7 +293,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 10. DocSum LLM Microservice
 
     ```bash
-    curl http://${host_ip}:9003/v1/chat/docsum\
+    curl http://${host_ip}:9003/v1/docsum\
       -X POST \
       -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
       -H 'Content-Type: application/json'

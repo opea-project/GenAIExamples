@@ -41,6 +41,7 @@ function start_services() {
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
     export NGINX_PORT=80
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -48,8 +49,8 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs lvm-tgi-xeon-server > ${LOG_PATH}/lvm_tgi_service_start.log
+    until [[ "$n" -ge 200 ]]; do
+        docker logs lvm-xeon-server > ${LOG_PATH}/lvm_tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
             break
         fi
@@ -93,8 +94,8 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:9399/v1/lvm" \
         "The image" \
-        "lvm-tgi" \
-        "lvm-tgi-xeon-server" \
+        "lvm" \
+        "lvm-xeon-server" \
         '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }
 

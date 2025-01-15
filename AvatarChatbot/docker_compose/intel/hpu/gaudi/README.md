@@ -14,32 +14,25 @@ cd GenAIComps
 ### 2. Build ASR Image
 
 ```bash
-docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile.intel_hpu .
-
-
-docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/Dockerfile .
+docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile.intel_hpu .
 ```
 
 ### 3. Build LLM Image
 
-```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
-```
+Intel Gaudi optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/tgi-gaudi:2.0.6 (https://github.com/huggingface/tgi-gaudi)
 
 ### 4. Build TTS Image
 
 ```bash
-docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/dependency/Dockerfile.intel_hpu .
-
-docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/speecht5/Dockerfile .
+docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile.intel_hpu .
 ```
 
 ### 5. Build Animation Image
 
 ```bash
-docker build -t opea/wav2lip-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/wav2lip/dependency/Dockerfile.intel_hpu .
+docker build -t opea/wav2lip-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/wav2lip/src/Dockerfile.intel_hpu .
 
-docker build -t opea/animation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/wav2lip/Dockerfile .
+docker build -t opea/animation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/animation/src/Dockerfile .
 ```
 
 ### 6. Build MegaService Docker Image
@@ -55,13 +48,10 @@ docker build --no-cache -t opea/avatarchatbot:latest --build-arg https_proxy=$ht
 Then run the command `docker images`, you will have following images ready:
 
 1. `opea/whisper-gaudi:latest`
-2. `opea/asr:latest`
-3. `opea/llm-tgi:latest`
-4. `opea/speecht5-gaudi:latest`
-5. `opea/tts:latest`
-6. `opea/wav2lip-gaudi:latest`
-7. `opea/animation:latest`
-8. `opea/avatarchatbot:latest`
+2. `opea/speecht5-gaudi:latest`
+3. `opea/wav2lip-gaudi:latest`
+4. `opea/animation:latest`
+5. `opea/avatarchatbot:latest`
 
 ## 🚀 Set the environment variables
 
@@ -71,24 +61,21 @@ Before starting the services with `docker compose`, you have to recheck the foll
 export HUGGINGFACEHUB_API_TOKEN=<your_hf_token>
 export host_ip=$(hostname -I | awk '{print $1}')
 
-export TGI_LLM_ENDPOINT=http://$host_ip:3006
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
 
-export ASR_ENDPOINT=http://$host_ip:7066
-export TTS_ENDPOINT=http://$host_ip:7055
 export WAV2LIP_ENDPOINT=http://$host_ip:7860
 
 export MEGA_SERVICE_HOST_IP=${host_ip}
-export ASR_SERVICE_HOST_IP=${host_ip}
-export TTS_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
+export WHISPER_SERVER_HOST_IP=${host_ip}
+export WHISPER_SERVER_PORT=7066
+export SPEECHT5_SERVER_HOST_IP=${host_ip}
+export SPEECHT5_SERVER_PORT=7055
+export LLM_SERVER_HOST_IP=${host_ip}
+export LLM_SERVER_PORT=3006
 export ANIMATION_SERVICE_HOST_IP=${host_ip}
+export ANIMATION_SERVICE_PORT=3008
 
 export MEGA_SERVICE_PORT=8888
-export ASR_SERVICE_PORT=3001
-export TTS_SERVICE_PORT=3002
-export LLM_SERVICE_PORT=3007
-export ANIMATION_SERVICE_PORT=3008
 ```
 
 - Gaudi2 HPU
@@ -124,32 +111,14 @@ curl http://${host_ip}:7066/v1/asr \
   -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
   -H 'Content-Type: application/json'
 
-# asr microservice
-curl http://${host_ip}:3001/v1/audio/transcriptions \
-  -X POST \
-  -d '{"byte_str": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
-  -H 'Content-Type: application/json'
-
 # tgi service
 curl http://${host_ip}:3006/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 
-# llm microservice
-curl http://${host_ip}:3007/v1/chat/completions\
-  -X POST \
-  -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":false}' \
-  -H 'Content-Type: application/json'
-
 # speecht5 service
 curl http://${host_ip}:7055/v1/tts \
-  -X POST \
-  -d '{"text": "Who are you?"}' \
-  -H 'Content-Type: application/json'
-
-# tts microservice
-curl http://${host_ip}:3002/v1/audio/speech \
   -X POST \
   -d '{"text": "Who are you?"}' \
   -H 'Content-Type: application/json'

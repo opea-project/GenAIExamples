@@ -92,7 +92,7 @@ docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$h
 To fortify AI initiatives in production, Guardrails microservice can secure model inputs and outputs, building Trustworthy, Safe, and Secure LLM-based Applications.
 
 ```bash
-docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/langchain/Dockerfile .
+docker build -t opea/guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/src/guardrails/Dockerfile .
 ```
 
 ### 4. Build MegaService Docker Image
@@ -151,7 +151,7 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 
 ```bash
 cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
@@ -168,7 +168,7 @@ If Conversation React UI is built, you will find one more image:
 
 If Guardrails docker image is built, you will find one more image:
 
-- `opea/guardrails-tgi:latest`
+- `opea/guardrails:latest`
 
 ## 🚀 Start MicroServices and MegaService
 

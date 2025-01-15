@@ -145,15 +145,9 @@ docker compose up -d
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
 
-### Deploy CodeGen using Kubernetes
+### Deploy CodeGen on Kubernetes using Helm Chart
 
-Refer to the [Kubernetes Guide](./kubernetes/intel/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
-
-### Deploy CodeGen into Kubernetes using Helm Chart
-
-Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
-
-Refer to the [CodeGen helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/codegen/README.md) for instructions on deploying CodeGen into Kubernetes on Xeon & Gaudi.
+Refer to the [CodeGen helm chart](./kubernetes/helm/README.md) for instructions on deploying CodeGen on Kubernetes.
 
 ## Consume CodeGen Service
 
