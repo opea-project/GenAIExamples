@@ -106,7 +106,7 @@ function main() {
 
     stop_docker
 
-#    build_docker_images
+    build_docker_images
     start_service
     sleep 10s
     validate_microservice
