@@ -95,7 +95,7 @@ services:
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   retriever-neo4j-llamaindex:
-    image: ${REGISTRY:-opea}/retriever-neo4j-llamaindex:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-neo4j-server
     depends_on:
       - neo4j-apoc
@@ -122,6 +122,7 @@ services:
       EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_NEO4J"
     restart: unless-stopped
   graphrag-gaudi-backend-server:
     image: ${REGISTRY:-opea}/graphrag:${TAG:-latest}
