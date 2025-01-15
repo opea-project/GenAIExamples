@@ -146,7 +146,7 @@ class DocSumService:
             name="llm",
             host=LLM_SERVICE_HOST_IP,
             port=LLM_SERVICE_PORT,
-            endpoint="/v1/chat/docsum",
+            endpoint="/v1/docsum",
             use_remote_service=True,
             service_type=ServiceType.LLM,
         )

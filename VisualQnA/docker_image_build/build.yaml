@@ -17,15 +17,15 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: visualqna
     image: ${REGISTRY:-opea}/visualqna-ui:${TAG:-latest}
-  lvm-tgi:
+  lvm:
     build:
       context: GenAIComps
-      dockerfile: comps/lvms/tgi-llava/Dockerfile
+      dockerfile: comps/lvms/src/Dockerfile
     extends: visualqna
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
   nginx:
     build:
       context: GenAIComps
-      dockerfile: comps/3rd_parties/nginx/src/Dockerfile
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: visualqna
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

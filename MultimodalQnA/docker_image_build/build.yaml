@@ -20,7 +20,7 @@ services:
   embedding-multimodal-bridgetower:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/src/integrations/dependency/bridgetower/Dockerfile
+      dockerfile: comps/third_parties/bridgetower/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
   embedding:
@@ -38,21 +38,15 @@ services:
   lvm-llava:
     build:
       context: GenAIComps
-      dockerfile: comps/lvms/llava/dependency/Dockerfile
+      dockerfile: comps/lvms/src/integrations/dependency/llava/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
-  lvm-llava-svc:
+  lvm:
     build:
       context: GenAIComps
-      dockerfile: comps/lvms/llava/Dockerfile
+      dockerfile: comps/lvms/src/Dockerfile
     extends: multimodalqna
-    image: ${REGISTRY:-opea}/lvm-llava-svc:${TAG:-latest}
-  lvm-tgi:
-    build:
-      context: GenAIComps
-      dockerfile: comps/lvms/tgi-llava/Dockerfile
-    extends: multimodalqna
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
   dataprep-multimodal-redis:
     build:
       context: GenAIComps

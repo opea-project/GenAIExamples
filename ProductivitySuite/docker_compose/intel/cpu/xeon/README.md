@@ -45,7 +45,7 @@ docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$h
 ### 6. Build Prompt Registry Image
 
 ```bash
-docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/mongo/Dockerfile .
+docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/src/Dockerfile .
 ```
 
 ### 7. Build Chat History Image
@@ -293,7 +293,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 10. DocSum LLM Microservice
 
     ```bash
-    curl http://${host_ip}:9003/v1/chat/docsum\
+    curl http://${host_ip}:9003/v1/docsum\
       -X POST \
       -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
       -H 'Content-Type: application/json'
