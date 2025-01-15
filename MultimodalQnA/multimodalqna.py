@@ -33,14 +33,18 @@ WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", "http://0.0.0.0:$
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
+        if "text" in inputs:
+            input_text = inputs["text"]["text"] if isinstance(inputs["text"], dict) else inputs["text"]
+        if "image" in inputs:
+            input_image = inputs["image"]["base64_image"] if isinstance(inputs["image"], dict) else inputs["image"]
         if "text" in inputs and "image" in inputs:
-            text_doc = TextDoc(text=inputs["text"])
-            image_doc = ImageDoc(base64_image=inputs["image"])
+            text_doc = TextDoc(text=input_text)
+            image_doc = ImageDoc(base64_image=input_image)
             inputs = TextImageDoc(text=text_doc, image=image_doc).dict()
         elif "image" in inputs:
-            inputs = ImageDoc(base64_image=inputs["image"]).dict()
+            inputs = ImageDoc(base64_image=input_image).dict()
         elif "text" in inputs:
-            inputs = TextDoc(text=inputs["text"]).dict()
+            inputs = TextDoc(text=input_text).dict()
     return inputs
 
 

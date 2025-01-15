@@ -62,6 +62,7 @@ function setup_env() {
     export WHISPER_PORT=7066
     export MAX_IMAGES=1
     export WHISPER_MODEL="base"
+    export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
     export ASR_ENDPOINT=http://$host_ip:$WHISPER_PORT
     export ASR_PORT=9099
     export ASR_SERVICE_PORT=3001
@@ -80,7 +81,7 @@ function setup_env() {
     export EMM_BRIDGETOWER_PORT=6006
     export BRIDGE_TOWER_EMBEDDING=true
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT/v1/encode"
+    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT"
     export MM_EMBEDDING_PORT_MICROSERVICE=6000
     export REDIS_RETRIEVER_PORT=7000
     export LVM_PORT=9399
