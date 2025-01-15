@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: E2E test with helm charts
+name: E2E Test with Helm Charts
 
 on:
   pull_request:
@@ -18,21 +18,22 @@ concurrency:
 
 jobs:
   job1:
-    name: Get-test-matrix
+    name: Get-Test-Matrix
     runs-on: ubuntu-latest
     outputs:
       run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
     steps:
-      - name: Checkout out Repo
+      - name: Checkout Repo
         uses: actions/checkout@v4
         with:
           ref: "refs/pull/${{ github.event.number }}/merge"
           fetch-depth: 0
 
-      - name: Get test matrix
+      - name: Get Test Matrix
         id: get-test-matrix
         run: |
           set -x
+          echo "base_commit=${{ github.event.pull_request.base.sha }}"
           base_commit=${{ github.event.pull_request.base.sha }}
           merged_commit=$(git log -1 --format='%H')
           e2e_charts=$(git diff --name-only ${base_commit} ${merged_commit} | \
@@ -58,9 +59,9 @@ jobs:
           echo "run_matrix=${run_matrix}"
           echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
 
-  helmchart-test:
+  helm-chart-test:
     needs: [job1]
-    if: always() && ${{ needs.job1.outputs.run_matrix.example.length }} > 0
+    if: ${{ needs.job1.outputs.run_matrix.example.length > 0 }}
     uses: ./.github/workflows/_helm-e2e.yaml
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
