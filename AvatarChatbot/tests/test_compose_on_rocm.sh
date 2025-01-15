@@ -82,6 +82,9 @@ function start_services() {
 
     # Start Docker Containers
     docker compose up -d --force-recreate
+
+    echo "Check tgi-service status"
+
     n=0
     until [[ "$n" -ge 100 ]]; do
        docker logs tgi-service > $LOG_PATH/tgi_service_start.log
@@ -93,6 +96,8 @@ function start_services() {
     done
     echo "tgi-service are up and running"
     sleep 5s
+
+    echo "Check wav2lip-service status"
 
     n=0
     until [[ "$n" -ge 100 ]]; do
