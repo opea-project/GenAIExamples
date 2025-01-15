@@ -56,7 +56,7 @@ services:
       TGI_LLM_ENDPOINT: ${DBQNA_TGI_LLM_ENDPOINT}
 
   dbqna-react-ui-server:
-    image: opea/dbqna-react-ui:latest
+    image: opea/text2sql-react-ui:latest
     container_name: dbqna-react-ui-server
     depends_on:
       - texttosql-service

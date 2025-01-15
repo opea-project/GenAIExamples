@@ -20,4 +20,4 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
         texttosql_url: ${build_texttosql_url}
-    image: ${REGISTRY:-opea}/texttosql-react-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/text2sql-react-ui:${TAG:-latest}
