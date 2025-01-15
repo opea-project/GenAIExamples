@@ -67,7 +67,7 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
   llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
     container_name: llm-tgi-server
     depends_on:
       - tgi-service
