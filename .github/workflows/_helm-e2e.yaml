@@ -26,7 +26,7 @@ on:
         type: string
 
 jobs:
-  get-build-matrix:
+  get-test-case:
     runs-on: ubuntu-latest
     outputs:
       value_files: ${{ steps.test-case-matrix.outputs.value_files }}
@@ -78,7 +78,7 @@ jobs:
   helm-test:
     needs: [get-test-case]
     strategy:
-      matrix: 
+      matrix:
         value_file: ${{ fromJSON(needs.get-build-matrix.outputs.value_files) }}
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
