@@ -208,7 +208,7 @@ function validate_microservices() {
         "retriever-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
-    sleep 3m
+    sleep 5m
 
     # llava server
     echo "Evaluating lvm-llava"
