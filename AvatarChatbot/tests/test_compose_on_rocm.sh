@@ -58,6 +58,9 @@ function start_services() {
     export WHISPER_SERVER_HOST_IP=${host_ip}
     export WHISPER_SERVER_PORT=7066
 
+    export SPEECHT5_SERVER_HOST_IP=${host_ip}
+    export SPEECHT5_SERVER_PORT=7055
+
     export MEGA_SERVICE_PORT=8888
     export ASR_SERVICE_PORT=3001
     export TTS_SERVICE_PORT=3002
@@ -88,7 +91,7 @@ function start_services() {
        sleep 5s
        n=$((n+1))
     done
-    echo "All services are up and running"
+    echo "tgi-service are up and running"
     sleep 5s
 
     n=0
@@ -100,7 +103,7 @@ function start_services() {
        sleep 5s
        n=$((n+1))
     done
-    echo "All services are up and running"
+    echo "wav2lip-service are up and running"
     sleep 5s
 }
 

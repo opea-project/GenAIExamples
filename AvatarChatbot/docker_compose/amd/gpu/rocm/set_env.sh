@@ -18,6 +18,9 @@ export WAV2LIP_ENDPOINT=http://${host_ip}:7860
 export WHISPER_SERVER_HOST_IP=${host_ip}
 export WHISPER_SERVER_PORT=7066
 
+export SPEECHT5_SERVER_HOST_IP=${host_ip}
+export SPEECHT5_SERVER_PORT=7055
+
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export ASR_SERVICE_HOST_IP=${host_ip}
 export TTS_SERVICE_HOST_IP=${host_ip}
