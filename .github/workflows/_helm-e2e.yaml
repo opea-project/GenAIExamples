@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: To Test a Helm Job for call
+name: Helm Chart E2e Test For Call
 permissions: read-all
 on:
   workflow_call:
