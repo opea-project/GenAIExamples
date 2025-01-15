@@ -46,7 +46,3 @@ services:
     build:
       dockerfile: comps/llms/utils/lm-eval/Dockerfile
     image: ${REGISTRY:-opea}/llm-eval:${TAG:-latest}
-  llm-textgen-predictionguard:
-    build:
-      dockerfile: comps/llms/text-generation/predictionguard/Dockerfile
-    image: ${REGISTRY:-opea}/llm-textgen-predictionguard:${TAG:-latest}
