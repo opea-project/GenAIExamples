@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to the worker agent and other tools to gather information and come up with answers. The worker agent uses the retrieval tool to generate answers to the queries posted by the supervisor agent. Other tools used by the supervisor agent may include APIs to interface knowledge graphs, SQL databases, external knowledge bases, etc.
+This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from the knowledge base (a vector database). The worker SQL agent retrieve relevant data from the SQL database. Although not included in this example, but other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
 ![Architecture Overview](assets/agent_qna_arch.png)
 
 The AgentQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
@@ -38,6 +38,7 @@ flowchart LR
     end
     AG_REACT([Agent MicroService - react]):::blue
     AG_RAG([Agent MicroService - rag]):::blue
+    AG_SQL([Agent MicroService - sql]):::blue
     LLM_gen{{LLM Service <br>}}
     DP([Data Preparation MicroService]):::blue
     TEI_RER{{Reranking service<br>}}
@@ -51,6 +52,7 @@ flowchart LR
     direction LR
     a[User Input Query] --> AG_REACT
     AG_REACT --> AG_RAG
+    AG_REACT --> AG_SQL
     AG_RAG --> DocIndexRetriever-MegaService
     EM ==> RET
     RET ==> RER
@@ -59,6 +61,7 @@ flowchart LR
     %% Embedding service flow
     direction LR
     AG_RAG <-.-> LLM_gen
+    AG_SQL <-.-> LLM_gen
     AG_REACT <-.-> LLM_gen
     EM <-.-> TEI_EM
     RET <-.-> R_RET
@@ -75,11 +78,11 @@ flowchart LR
 ### Why Agent for question answering?
 
 1. Improve relevancy of retrieved context.
-   Agent can rephrase user queries, decompose user queries, and iterate to get the most relevant context for answering user's questions. Compared to conventional RAG, RAG agent can significantly improve the correctness and relevancy of the answer.
-2. Use tools to get additional knowledge.
-   For example, knowledge graphs and SQL databases can be exposed as APIs for Agents to gather knowledge that may be missing in the retrieval vector database.
-3. Hierarchical agent can further improve performance.
-   Expert worker agents, such as retrieval agent, knowledge graph agent, SQL agent, etc., can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information together to provide a comprehensive answer.
+   RAG agent can rephrase user queries, decompose user queries, and iterate to get the most relevant context for answering user's questions. Compared to conventional RAG, RAG agent can significantly improve the correctness and relevancy of the answer.
+2. Expand scope of the agent.
+   The supervisor agent can interact with multiple worker agents that specialize in different domains with different skills (e.g., retrieve documents, write SQL queries, etc.), and thus can answer questions in multiple domains.
+3. Hierarchical multi-agents can improve performance.
+   Expert worker agents, such as RAG agent and SQL agent, can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information together to provide a comprehensive answer. If we only use one agent and provide all the tools to this single agent, it may get overwhelmed and not able to provide accurate answers.
 
 ## Deployment with docker
 
@@ -148,28 +151,55 @@ docker build -t opea/agent:latest --build-arg https_proxy=$https_proxy --build-a
    bash run_ingest_data.sh
    ```
 
-4. Launch other tools. </br>
+4. Prepare SQL database
+   In this example, we will use the Chinook SQLite database. Run the commands below.
+
+   ```
+   # Download data
+   cd $WORKDIR
+   git clone https://github.com/lerocha/chinook-database.git
+   cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
+   ```
+
+5. Launch other tools. </br>
    In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
 
    ```
    docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
    ```
 
-5. Launch agent services</br>
-   We provide two options for `llm_engine` of the agents: 1. open-source LLMs, 2. OpenAI models via API calls.
-
-   Deploy it on Gaudi or Xeon respectively
+6. Launch multi-agent system. </br>
+   We provide two options for `llm_engine` of the agents: 1. open-source LLMs on Intel Gaudi2, 2. OpenAI models via API calls.
 
    ::::{tab-set}
    :::{tab-item} Gaudi
    :sync: Gaudi
 
-   To use open-source LLMs on Gaudi2, run commands below.
+   On Gaudi2 we will serve `meta-llama/Meta-Llama-3.1-70B-Instruct` using vllm.
 
+   First build vllm-gaudi docker image.
+
+   ```bash
+   cd $WORKDIR
+   git clone https://github.com/vllm-project/vllm.git
+   cd ./vllm
+   git checkout v0.6.6
+   docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
    ```
-   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
-   bash launch_tgi_gaudi.sh
-   bash launch_agent_service_tgi_gaudi.sh
+
+   Then launch vllm on Gaudi2 with the command below.
+
+   ```bash
+   vllm_port=8086
+   model="meta-llama/Meta-Llama-3.1-70B-Instruct"
+   docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+   ```
+
+   Then launch Agent microservices.
+
+   ```bash
+   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+   bash launch_agent_service_gaudi.sh
    ```
 
    :::
@@ -179,6 +209,7 @@ docker build -t opea/agent:latest --build-arg https_proxy=$https_proxy --build-a
    To use OpenAI models, run commands below.
 
    ```
+   export OPENAI_API_KEY=<your-openai-key>
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
    bash launch_agent_service_openai.sh
    ```
@@ -195,8 +226,11 @@ Refer to the [AgentQnA helm chart](./kubernetes/helm/README.md) for instructions
 First look at logs of the agent docker containers:
 
 ```
-# worker agent
+# worker RAG agent
 docker logs rag-agent-endpoint
+
+# worker SQL agent
+docker logs sql-agent-endpoint
 ```
 
 ```
@@ -206,19 +240,27 @@ docker logs react-agent-endpoint
 
 You should see something like "HTTP server setup successful" if the docker containers are started successfully.</p>
 
-Second, validate worker agent:
+Second, validate worker RAG agent:
 
 ```
 curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Most recent album by Taylor Swift"
+     "messages": "Michael Jackson song Thriller"
     }'
 ```
 
-Third, validate supervisor agent:
+Third, validate worker SQL agent:
+
+```
+curl http://${host_ip}:9096/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+     "messages": "How many employees are in the company"
+    }'
+```
+
+Finally, validate supervisor agent:
 
 ```
 curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Most recent album by Taylor Swift"
+     "messages": "How many albums does Iron Maiden have?"
     }'
 ```
 
