@@ -111,6 +111,17 @@ jobs:
           ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
           fetch-depth: 0
 
+      - name: Clean up container before test
+        shell: bash
+        run: |
+          docker ps
+          cd ${{ github.workspace }}/${{ inputs.example }}
+          export test_case=${{ matrix.test_case }}
+          export hardware=${{ inputs.hardware }}
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
+          docker ps
+
       - name: Run test
         shell: bash
         env:
@@ -131,21 +142,14 @@ jobs:
           if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
           if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
 
-      - name: Clean up container
+      - name: Clean up container after test
         shell: bash
         if: cancelled() || failure()
         run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}/docker_compose
-          test_case=${{ matrix.test_case }}
-          flag=${test_case%_on_*}
-          flag=${flag#test_}
-          yaml_file=$(find . -type f -wholename "*${{ inputs.hardware }}/${flag}.yaml")
-          echo $yaml_file
-          container_list=$(cat $yaml_file | grep container_name | cut -d':' -f2)
-          for container_name in $container_list; do
-              cid=$(docker ps -aq --filter "name=$container_name")
-              if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-          done
+          cd ${{ github.workspace }}/${{ inputs.example }}
+          export test_case=${{ matrix.test_case }}
+          export hardware=${{ inputs.hardware }}
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
           docker system prune -f
           docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
 

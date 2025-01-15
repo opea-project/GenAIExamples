@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="faqgen faqgen-ui llm-faqgen-tgi"
+    service_list="faqgen faqgen-ui llm-faqgen"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -29,28 +29,24 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
+    export host_ip=${ip_address}
+    export LLM_ENDPOINT_PORT=8008
+    export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_PORT=9000
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/faqgen"
+    export LOGFLAG=True
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
-    n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
+    sleep 30s
 }
 
 function validate_services() {
@@ -107,11 +103,11 @@ function validate_megaservice() {
     local EXPECTED_RESULT="Embeddings"
     local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
     local URL="${ip_address}:8888/v1/faqgen"
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
-        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA"  -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
 
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
