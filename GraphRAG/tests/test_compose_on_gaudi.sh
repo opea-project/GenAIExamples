@@ -127,8 +127,8 @@ function validate_microservices() {
 
     # retrieval microservice
     validate_service \
-        "${ip_address}:6009/v1/retrieval" \
-        "Retrieval of answers from community summaries successful" \
+        "${ip_address}:7000/v1/retrieval" \
+        "retrieved_docs" \
         "retriever_community_answers_neo4j" \
         "retriever-neo4j-server" \
         "{\"model\": \"gpt-4o-mini\",\"messages\": [{\"role\": \"user\",\"content\": \"Who is John Brady and has he had any confrontations?\"}]}"

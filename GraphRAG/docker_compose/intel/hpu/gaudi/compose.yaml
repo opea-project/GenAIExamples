@@ -102,7 +102,7 @@ services:
       - tgi-gaudi-service
       - tei-embedding-service
     ports:
-      - "6009:6009"
+      - "7000:7000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
