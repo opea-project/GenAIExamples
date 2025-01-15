@@ -38,6 +38,7 @@ function start_services() {
     export PINECONE_INDEX_NAME="langchain-test"
     export INDEX_NAME="langchain-test"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export LOGFLAG=true
 
     # Start Docker Containers
     docker compose -f compose_pinecone.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -111,7 +112,7 @@ function validate_microservices() {
 
     # test /v1/dataprep/delete_file
     validate_service \
-       "http://${ip_address}:6009/v1/dataprep/delete_file" \
+       "http://${ip_address}:6007/v1/dataprep/delete_file" \
        '{"status":true}' \
         "dataprep_del" \
         "dataprep-pinecone-server"
