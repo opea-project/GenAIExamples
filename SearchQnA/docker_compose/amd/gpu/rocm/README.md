@@ -19,7 +19,7 @@ docker build --no-cache -t opea/web-retriever-chroma:latest --build-arg https_pr
 ### Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/Dockerfile .
+docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/src/Dockerfile .
 ```
 
 ### Build the LLM Docker Image
