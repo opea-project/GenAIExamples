@@ -13,6 +13,7 @@ export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
+export RERANK_TYPE="tei"
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
