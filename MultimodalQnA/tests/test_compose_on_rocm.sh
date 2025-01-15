@@ -196,7 +196,7 @@ function validate_microservices() {
         "dataprep_get" \
         "dataprep-multimodal-redis"
 
-    sleep 1m
+    sleep 2m
 
     # multimodal retrieval microservice
     echo "Validating retriever-redis"
