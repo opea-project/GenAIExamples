@@ -78,7 +78,7 @@ function start_services() {
     export FPS=5
 
     # Start Docker Containers
-    docker compose up -d
+    docker compose up -d --force-recreate
     n=0
     until [[ "$n" -ge 100 ]]; do
        docker logs tgi-service > $LOG_PATH/tgi_service_start.log
