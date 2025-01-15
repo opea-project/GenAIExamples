@@ -24,7 +24,7 @@ RUN wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | gpg --yes
 
 WORKDIR /workspace
 
-RUN git clone -b v0.6.3.post1 https://github.com/vllm-project/vllm.git
+RUN git clone -b v0.6.6.post1 https://github.com/vllm-project/vllm.git
 
 #ARG GIT_REPO_CHECK=0
 #RUN --mount=type=bind,source=.git,target=.git \
