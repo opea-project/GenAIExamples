@@ -14,6 +14,9 @@ export ASR_ENDPOINT=http://${host_ip}:7066
 export TTS_ENDPOINT=http://${host_ip}:7055
 export WAV2LIP_ENDPOINT=http://${host_ip}:7860
 
+export WHISPER_SERVER_HOST_IP=${host_ip}
+export WHISPER_SERVER_PORT=7066
+
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export ASR_SERVICE_HOST_IP=${host_ip}
 export TTS_SERVICE_HOST_IP=${host_ip}

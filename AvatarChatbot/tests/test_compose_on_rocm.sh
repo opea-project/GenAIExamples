@@ -55,6 +55,7 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${host_ip}
     export ANIMATION_SERVICE_HOST_IP=${host_ip}
     export WHISPER_SERVER_HOST_IP=${host_ip}
+    export WHISPER_SERVER_PORT=7066
 
     export MEGA_SERVICE_PORT=8888
     export ASR_SERVICE_PORT=3001
