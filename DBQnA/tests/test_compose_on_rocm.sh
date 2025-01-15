@@ -10,7 +10,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 tgi_port=8008
 tgi_volume=$WORKPATH/data
 
-export host_ip="192.165.1.21"
+export host_ip=${ip_address}
 export DBQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export DBQNA_TGI_SERVICE_PORT=8008
 export DBQNA_TGI_LLM_ENDPOINT="http://${host_ip}:${DBQNA_TGI_SERVICE_PORT}"
@@ -51,7 +51,7 @@ function start_service() {
 }
 
 function validate_microservice() {
-    result=$(http_proxy="" curl --connect-timeout 5 --max-time 120000 http://${ip_address}:${DBQNA_TEXT_TO_SQL_PORT}/v1/texttosql \
+    result=$(http_proxy="" curl --connect-timeout 5 --max-time 120000 http://${ip_address}:${DBQNA_TEXT_TO_SQL_PORT}/v1/text2sql \
         -X POST \
         -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${ip_address}'", "port": "5442", "database": "'${POSTGRES_DB}'" }}' \
         -H 'Content-Type: application/json')
@@ -61,7 +61,7 @@ function validate_microservice() {
         echo "Result correct."
     else
         echo "Result wrong. Received was $result"
-        docker logs texttosql-service > ${LOG_PATH}/texttosql.log
+        docker logs text2sql > ${LOG_PATH}/text2sql.log
         docker logs dbqna-tgi-service > ${LOG_PATH}/tgi.log
         exit 1
     fi
@@ -106,7 +106,7 @@ function main() {
 
     stop_docker
 
-    build_docker_images
+#    build_docker_images
     start_service
     sleep 10s
     validate_microservice
