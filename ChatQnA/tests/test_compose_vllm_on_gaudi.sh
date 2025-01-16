@@ -17,10 +17,10 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-    git clone https://github.com/HabanaAI/vllm-fork.git
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork && git checkout v0.6.4.post2+Gaudi-1.19.0 && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-redis retriever-redis vllm-gaudi nginx"
+    service_list="chatqna chatqna-ui dataprep-redis retriever vllm-gaudi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
