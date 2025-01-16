@@ -21,7 +21,7 @@ function build_docker_images() {
         echo "Cloning GenAIComps repository"
         git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     fi
-    service_list="dataprep-redis embedding retriever-redis reranking doc-index-retriever"
+    service_list="dataprep-redis embedding retriever reranking doc-index-retriever"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
