@@ -66,7 +66,7 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
     with:
-      workload: ${{ matrix.example }}
+      example: ${{ matrix.example }}
       hardware: ${{ matrix.hardware }}
       tag: "ci"
     secrets: inherit
