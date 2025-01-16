@@ -150,6 +150,9 @@ function stop_docker() {
 
 function main() {
 
+    echo $OPENAI_API_KEY
+    echo $OPENAI_KEY
+
     stop_docker
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
