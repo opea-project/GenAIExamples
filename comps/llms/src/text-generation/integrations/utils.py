@@ -134,7 +134,7 @@ def setup_env(args):
     # TODO: SW-167588 - WA for memory issue in hqt prep_model
     os.environ.setdefault("EXPERIMENTAL_WEIGHT_SHARING", "FALSE")
 
-    if args.global_rank == 0 and not args.torch_compile:
+    if args.global_rank == 0 and not args.torch_compile and args.show_graphs_count:
         os.environ.setdefault("GRAPH_VISUALIZATION", "true")
         shutil.rmtree(".graph_dumps", ignore_errors=True)
 
@@ -174,9 +174,51 @@ def patch_scoped_linear_all_reduce(model):
         patch_scoped_linear_all_reduce(module)
 
 
-def get_torch_compiled_model(model):
-    model.model = torch.compile(model.model, backend="hpu_backend", options={"keep_input_mutations": True})
+def get_torch_compiled_model(model, logger):
+    # for gpt_bigcode, mpt, bloom, gpt2 model_type
+    if hasattr(model, "transformer"):
+        model.transformer = torch.compile(
+            model.transformer, backend="hpu_backend", options={"keep_input_mutations": True}
+        )
+    # for gpt_neox
+    elif hasattr(model, "gpt_neox"):
+        model.gpt_neox = torch.compile(model.gpt_neox, backend="hpu_backend", options={"keep_input_mutations": True})
+    # for llama, mistral, mixtral, qwen2
+    elif hasattr(model, "model"):
+        model.model = torch.compile(model.model, backend="hpu_backend", options={"keep_input_mutations": True})
+    else:
+        logger.warning(
+            "In low performance case, please explicitly specify a module you want to wrap with `torch.compile`"
+        )
+        model = torch.compile(model, backend="hpu_backend", options={"keep_input_mutations": True})
     return model
+
+
+def setup_quantization(model, args):
+    try:
+        from neural_compressor.torch.quantization import FP8Config, convert, prepare
+    except ImportError:
+        raise ImportError(
+            "Module neural_compressor is missing. Please use a newer Synapse version to use quantization."
+        )
+
+    config = FP8Config.from_json_file(args.quant_config)
+    if config.measure:
+        model = prepare(model, config)
+    if config.quantize:
+        model = convert(model, config)
+
+    return model
+
+
+def finalize_quantization(model):
+    try:
+        from neural_compressor.torch.quantization import finalize_calibration
+    except ImportError:
+        raise ImportError(
+            "Module neural_compressor is missing. Please use a newer Synapse version to use quantization."
+        )
+    finalize_calibration(model)
 
 
 def setup_model(args, model_dtype, model_kwargs, logger):
@@ -201,6 +243,32 @@ def setup_model(args, model_dtype, model_kwargs, logger):
             torch_dtype=model_dtype,
             **model_kwargs,
         )
+    elif args.load_quantized_model_with_autogptq:
+        from transformers import GPTQConfig
+
+        quantization_config = GPTQConfig(bits=4, use_exllama=False)
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_name_or_path, torch_dtype=model_dtype, quantization_config=quantization_config, **model_kwargs
+        )
+    elif args.load_quantized_model_with_inc:
+        from neural_compressor.torch.quantization import load
+
+        model = load(model_name_or_path=args.model_name_or_path, format="huggingface", device="hpu", **model_kwargs)
+    elif args.local_quantized_inc_model_path:
+        org_model = AutoModelForCausalLM.from_pretrained(
+            args.model_name_or_path,
+            **model_kwargs,
+        )
+
+        from neural_compressor.torch.quantization import load
+
+        model = load(
+            model_name_or_path=args.local_quantized_inc_model_path,
+            format="default",
+            device="hpu",
+            original_model=org_model,
+            **model_kwargs,
+        )
     else:
         if args.assistant_model is not None:
             assistant_model = AutoModelForCausalLM.from_pretrained(
@@ -213,11 +281,7 @@ def setup_model(args, model_dtype, model_kwargs, logger):
                 args.model_name_or_path, torch_dtype=model_dtype, **model_kwargs
             )
     if args.quant_config:
-        import habana_quantization_toolkit
-
-        habana_quantization_toolkit.prep_model(model)
-        if args.assistant_model is not None:
-            habana_quantization_toolkit.quantize_model(assistant_model)
+        model = setup_quantization(model, args)
 
     model = model.eval().to(args.device)
     if args.assistant_model is not None:
@@ -235,12 +299,118 @@ def setup_model(args, model_dtype, model_kwargs, logger):
             assistant_model = wrap_in_hpu_graph(assistant_model)
         if _is_peft_model(model):
             model.base_model = wrap_in_hpu_graph(model.base_model)
+            if model.peft_type == "ADAPTION_PROMPT":
+                model.base_model.model = wrap_in_hpu_graph(model.base_model.model)
 
-    if args.torch_compile and model.config.model_type == "llama":
-        model = get_torch_compiled_model(model)
+    if args.torch_compile:
+        model = get_torch_compiled_model(model, logger)
         # if args.assistant_model is not None:
-        #     assistant_model = get_torch_compiled_model(assistant_model)
+        #     assistant_model = get_torch_compiled_model(assistant_model, logger)
     return model, assistant_model
+
+
+def setup_distributed_model_tp(args, model_dtype, model_kwargs, logger, cache_dir):
+    from typing import Any, MutableMapping
+
+    from optimum.habana.distributed import serialization
+    from optimum.habana.distributed.strategy import TensorParallelStrategy
+
+    logger.info("Multi-device run.")
+
+    assert args.quant_config == "", "Fp8 is not enabled, unset QUANT_CONFIG"
+    assert args.assistant_model is None, "Assistant model must be None"
+
+    from torch import distributed as dist
+
+    if args.device == "hpu":
+        dist.init_process_group(backend="hccl")
+    else:
+        assert False, "Supports TP only on HPU"
+
+    torch._C._distributed_c10d._register_process_group("default", dist.group.WORLD)
+    logger.info("Creating Model")
+    config = AutoConfig.from_pretrained(args.model_name_or_path, torch_dtype=model_dtype, **model_kwargs)
+    model_kwargs = {}
+    model_kwargs["parallel_strategy"] = TensorParallelStrategy()
+    model = AutoModelForCausalLM.from_config(config, torch_dtype=model_dtype, **model_kwargs)
+
+    initial_device = torch.device("cpu")
+    source = "hf"
+    checkpoint_sharding = None
+    lazy_sd: MutableMapping[str, Any] = {}
+    logger.info("Loading Checkpoints")
+    lazy_sd = serialization.load_state_dict(
+        cache_dir,
+        source=source,
+        distributed_strategy=args.parallel_strategy,
+        checkpoint_sharding=None,
+        initial_device=initial_device,
+        rank=args.global_rank,
+        world_size=args.world_size,
+    )
+    architecture = "llama"
+    if len(lazy_sd):
+        serialization.load_state_dict_into_model(
+            model,
+            lazy_sd,
+            architecture,
+            source,
+            args.parallel_strategy,
+            checkpoint_sharding,
+            initial_device,
+            args.local_rank,
+            args.world_size,
+        )
+
+    model = model.eval().to(args.device)
+
+    if args.use_hpu_graphs:
+        from habana_frameworks.torch.hpu import wrap_in_hpu_graph
+
+        model = wrap_in_hpu_graph(model)
+
+    if args.torch_compile:
+        model = get_torch_compiled_model(model, logger)
+
+    return model, args.assistant_model
+
+
+def setup_distributed_model_ep(args, model_dtype, model_kwargs, logger):
+    logger.info("Multi-device ep run.")
+
+    assert args.quant_config == "", "Fp8 is not enabled, unset QUANT_CONFIG"
+    assert args.assistant_model is None, "Assistant model must be None"
+
+    from torch import distributed as dist
+
+    if args.device == "hpu":
+        dist.init_process_group(backend="hccl")
+    else:
+        assert False, "Supports EP only on HPU"
+
+    torch._C._distributed_c10d._register_process_group("default", dist.group.WORLD)
+    logger.info("Creating Model")
+    config = AutoConfig.from_pretrained(args.model_name_or_path, torch_dtype=model_dtype, **model_kwargs)
+    config.update({"ep_size": args.world_size})
+
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model_name_or_path,
+        config=config,
+        torch_dtype=model_dtype,
+        **model_kwargs,
+    )
+
+    model = model.eval().to(args.device)
+
+    if args.use_hpu_graphs:
+        from habana_frameworks.torch.hpu import wrap_in_hpu_graph
+
+        model = wrap_in_hpu_graph(model)
+
+    if args.torch_compile:
+        model = get_torch_compiled_model(model)
+
+    return model, args.assistant_model
 
 
 def setup_distributed_model(args, model_dtype, model_kwargs, logger):
@@ -259,6 +429,13 @@ def setup_distributed_model(args, model_dtype, model_kwargs, logger):
     if load_to_meta:
         # Construct model with fake meta tensors, later will be replaced on devices during ds-inference ckpt load
         with deepspeed.OnDevice(dtype=model_dtype, device="meta"):
+            if (
+                hasattr(config, "rope_scaling")
+                and config.rope_scaling
+                and config.rope_scaling["rope_type"] == "llama3"
+                and config.max_position_embeddings > 8192
+            ):
+                config.max_position_embeddings = 8192
             model = AutoModelForCausalLM.from_config(config, torch_dtype=model_dtype)
 
         # Model loaded to meta is managed differently
@@ -305,20 +482,16 @@ def setup_distributed_model(args, model_dtype, model_kwargs, logger):
 
     model = deepspeed.init_inference(model, **ds_inference_kwargs)
     model = model.module
-    if model.config.model_type in ["llama", "falcon", "qwen2"]:
+    if model.config.model_type in ["llama", "falcon", "qwen2", "starcoder2", "gemma"]:
         patch_scoped_linear_all_reduce(model)
 
     if args.quant_config:
-        import habana_quantization_toolkit
+        model = setup_quantization(model, args)
 
-        habana_quantization_toolkit.prep_model(model)
-        if args.assistant_model is not None:
-            habana_quantization_toolkit.prep_model(assistant_model)
-
-    if args.torch_compile and model.config.model_type == "llama":
-        model = get_torch_compiled_model(model)
+    if args.torch_compile:
+        model = get_torch_compiled_model(model, logger)
         # if args.assistant_model is not None:
-        #     assistant_model = get_torch_compiled_model(assistant_model)
+        #     assistant_model = get_torch_compiled_model(assistant_model, logger)
     return model, assistant_model
 
 
@@ -369,10 +542,17 @@ def peft_model(args, model_dtype, logger, **model_kwargs):
 
         model.__class__.generate = gaudi_generate
         model.__class__.prepare_inputs_for_generation = gaudi_prepare_inputs_for_generation
+        if model.peft_type == "ADAPTION_PROMPT":
+            from optimum.habana.peft.layer import GaudiAdaptedAttention_getattr, GaudiAdaptedAttentionPreAttnForward
+            from peft import tuners
+
+            tuners.adaption_prompt.layer.AdaptedAttention.pre_attn_forward = GaudiAdaptedAttentionPreAttnForward
+            tuners.adaption_prompt.layer.AdaptedAttention.__getattr__ = GaudiAdaptedAttention_getattr
+
         return model
 
 
-def setup_tokenizer(args, model, assistant_model):
+def setup_tokenizer(args, model, assistant_model, logger):
     tokenizer_kwargs = {
         "revision": args.model_revision,
         "token": args.token,
@@ -385,16 +565,22 @@ def setup_tokenizer(args, model, assistant_model):
         tokenizer.padding_side = "left"
 
     if model.config.model_type == "llama":
-        # unwind broken decapoda-research config
-        model.generation_config.pad_token_id = 0
-        model.generation_config.bos_token_id = 1
-        model.generation_config.eos_token_id = 2
+        if model.generation_config.pad_token_id is None:
+            if isinstance(model.generation_config.eos_token_id, int):
+                model.generation_config.pad_token_id = model.generation_config.eos_token_id
+            elif isinstance(model.generation_config.eos_token_id, list):
+                model.generation_config.pad_token_id = model.generation_config.eos_token_id[0]
         if assistant_model is not None:
-            assistant_model.generation_config.pad_token_id = 0
-            assistant_model.generation_config.bos_token_id = 1
-            assistant_model.generation_config.eos_token_id = 2
+            if assistant_model.generation_config.pad_token_id is None:
+                if isinstance(assistant_model.generation_config.eos_token_id, int):
+                    assistant_model.generation_config.pad_token_id = assistant_model.generation_config.eos_token_id
+                elif isinstance(assistant_model.generation_config.eos_token_id, list):
+                    assistant_model.generation_config.pad_token_id = assistant_model.generation_config.eos_token_id[0]
         tokenizer.bos_token_id = model.generation_config.bos_token_id
-        tokenizer.eos_token_id = model.generation_config.eos_token_id
+        if isinstance(model.generation_config.eos_token_id, int):
+            tokenizer.eos_token_id = model.generation_config.eos_token_id
+        elif isinstance(model.generation_config.eos_token_id, list):
+            tokenizer.eos_token_id = model.generation_config.eos_token_id[0]
         tokenizer.pad_token_id = model.generation_config.pad_token_id
         tokenizer.pad_token = tokenizer.decode(tokenizer.pad_token_id)
         tokenizer.eos_token = tokenizer.decode(tokenizer.eos_token_id)
@@ -409,6 +595,13 @@ def setup_tokenizer(args, model, assistant_model):
         tokenizer.pad_token = tokenizer.decode(tokenizer.pad_token_id)
         tokenizer.eos_token = tokenizer.decode(tokenizer.eos_token_id)
         tokenizer.bos_token = tokenizer.decode(tokenizer.bos_token_id)
+
+    # HACK: MiniCPM3 does not support list EOS token ID generation config.
+    if model.config.model_type == "minicpm3" and isinstance(model.generation_config.eos_token_id, list):
+        logger.warning(
+            f"Model type {model.config.model_type} does not support list style EOS token ID in generation config. Only last eos token id will be used."
+        )
+        model.generation_config.eos_token_id = model.generation_config.eos_token_id[-1]
 
     # Some models like GPT2 do not have a PAD token so we have to set it if necessary
     if tokenizer.pad_token is None:
@@ -439,6 +632,8 @@ def setup_generation_config(args, model, assistant_model, tokenizer):
     generation_config.bucket_internal = args.bucket_internal
     generation_config.do_sample = args.do_sample
     generation_config.num_beams = args.num_beams
+    generation_config.top_k = args.top_k
+    generation_config.penalty_alpha = args.penalty_alpha
     generation_config.bad_words_ids = bad_words_ids
     generation_config.force_words_ids = force_words_ids
     generation_config.num_return_sequences = args.num_return_sequences
@@ -454,6 +649,7 @@ def setup_generation_config(args, model, assistant_model, tokenizer):
     generation_config.flash_attention_causal_mask = args.flash_attention_causal_mask
     generation_config.flash_attention_fast_softmax = args.flash_attention_fast_softmax
     generation_config.trust_remote_code = args.trust_remote_code
+    generation_config.valid_sequence_lengths = None
 
     return generation_config
 
@@ -484,7 +680,7 @@ def initialize_model(args, logger):
     setup_env(args)
     setup_device(args)
     set_seed(args.seed)
-    get_repo_root(args.model_name_or_path, local_rank=args.local_rank, token=args.token)
+    cache_dir = get_repo_root(args.model_name_or_path, local_rank=args.local_rank, token=args.token)
     if args.assistant_model is not None:
         get_repo_root(args.assistant_model, local_rank=args.local_rank, token=args.token)
     use_deepspeed = args.world_size > 0
@@ -499,15 +695,27 @@ def initialize_model(args, logger):
         "token": args.token,
         "trust_remote_code": args.trust_remote_code,
     }
+    if args.load_quantized_model_with_inc or args.local_quantized_inc_model_path:
+        model_kwargs["torch_dtype"] = torch.bfloat16
+
     if args.trust_remote_code:
         logger.warning("`trust_remote_code` is set, there is no guarantee this model works properly and it may fail")
 
     model, assistant_model = (
         setup_model(args, model_dtype, model_kwargs, logger)
         if not use_deepspeed
-        else setup_distributed_model(args, model_dtype, model_kwargs, logger)
+        else (
+            setup_distributed_model(args, model_dtype, model_kwargs, logger)
+            if args.parallel_strategy == "none"
+            else (
+                setup_distributed_model_tp(args, model_dtype, model_kwargs, logger, cache_dir)
+                if args.parallel_strategy == "tp"
+                else setup_distributed_model_ep(args, model_dtype, model_kwargs, logger)
+            )
+        )
     )
-    tokenizer, model, assistant_model = setup_tokenizer(args, model, assistant_model)
+
+    tokenizer, model, assistant_model = setup_tokenizer(args, model, assistant_model, logger)
     generation_config = setup_generation_config(args, model, assistant_model, tokenizer)
 
     if args.const_serialization_path:

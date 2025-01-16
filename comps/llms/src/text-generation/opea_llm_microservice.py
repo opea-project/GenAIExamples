@@ -5,9 +5,6 @@ import os
 import time
 from typing import Union
 
-from integrations.opea import OPEALLM
-from integrations.predictionguard import OPEATextGen_Predictionguard
-
 from comps import (
     CustomLogger,
     LLMParamsDoc,
@@ -24,10 +21,16 @@ from comps.cores.proto.api_protocol import ChatCompletionRequest
 logger = CustomLogger("llm")
 logflag = os.getenv("LOGFLAG", False)
 
-
 llm_component_name = os.getenv("LLM_COMPONENT_NAME", "OPEA_LLM")
 if logflag:
     logger.info(f"Get llm_component_name {llm_component_name}")
+
+if llm_component_name == "OPEATextGen_Native":
+    from integrations.native import OPEATextGen_Native
+else:
+    from integrations.opea import OPEALLM
+    from integrations.predictionguard import OPEATextGen_Predictionguard
+
 # Initialize OpeaComponentLoader
 loader = OpeaComponentLoader(llm_component_name, description=f"OPEA LLM Component: {llm_component_name}")
 

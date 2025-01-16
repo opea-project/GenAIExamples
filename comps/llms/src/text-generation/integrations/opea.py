@@ -21,7 +21,7 @@ logflag = os.getenv("LOGFLAG", False)
 # Environment variables
 MODEL_NAME = os.getenv("LLM_MODEL_ID")
 MODEL_CONFIGS = os.getenv("MODEL_CONFIGS")
-DEFAULT_ENDPOINT = os.getenv("LLM_ENDPOINT")
+DEFAULT_ENDPOINT = os.getenv("LLM_ENDPOINT", "http://localhost:8080")
 TOKEN_URL = os.getenv("TOKEN_URL")
 CLIENTID = os.getenv("CLIENTID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
