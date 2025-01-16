@@ -42,6 +42,7 @@ function start_services() {
     docker compose -f compose_guardrails.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 160 ]]; do
+        echo "n=$n"
         docker logs vllm-gaudi-server > vllm_service_start.log
         if grep -q "Warmup finished" vllm_service_start.log; then
             break
@@ -51,14 +52,15 @@ function start_services() {
     done
 
     # Make sure vllm guardrails service is ready
-    n=0
-    until [[ "$n" -ge 160 ]]; do
+    m=0
+    until [[ "$m" -ge 160 ]]; do
+        echo "m=$m"
         docker logs vllm-guardrails-server > vllm_guardrails_service_start.log
         if grep -q "Warmup finished" vllm_guardrails_service_start.log; then
             break
         fi
         sleep 5s
-        n=$((n+1))
+        m=$((m+1))
     done
 }
 

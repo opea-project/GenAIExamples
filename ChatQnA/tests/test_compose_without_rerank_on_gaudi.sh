@@ -145,7 +145,7 @@ function validate_microservices() {
 
     # vllm for llm service
     validate_service \
-        "${ip_address}:8005/v1/chat/completions" \
+        "${ip_address}:8007/v1/chat/completions" \
         "content" \
         "vllm-llm" \
         "vllm-gaudi-server" \
