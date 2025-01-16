@@ -21,7 +21,7 @@ function build_docker_images_for_retrieval_tool(){
     # git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     get_genai_comps
     echo "Build all the images with --no-cache..."
-    service_list="doc-index-retriever dataprep-redis embedding retriever-redis reranking"
+    service_list="doc-index-retriever dataprep-redis embedding retriever reranking"
     docker compose -f build.yaml build ${service_list} --no-cache
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
