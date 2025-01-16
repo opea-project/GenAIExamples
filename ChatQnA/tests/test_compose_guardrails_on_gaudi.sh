@@ -126,7 +126,7 @@ function validate_microservices() {
     # vllm for llm service
     validate_service \
         "${ip_address}:8008/v1/chat/completions" \
-        "text" \
+        "content" \
         "vllm-llm" \
         "vllm-gaudi-server" \
         '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'

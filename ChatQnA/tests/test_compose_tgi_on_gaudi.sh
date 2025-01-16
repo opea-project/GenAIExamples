@@ -159,7 +159,7 @@ function validate_microservices() {
     # tgi for llm service
     validate_service \
         "${ip_address}:8005/generate" \
-        "text" \
+        "content" \
         "tgi-llm" \
         "tgi-gaudi-server" \
         '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
