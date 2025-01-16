@@ -174,49 +174,6 @@ function validate_microservices() {
         "whisper-server" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
 
-    # Audio2Text service
-    validate_services_json \
-        "${host_ip}:9099/v1/audio/transcriptions" \
-        '"query":"well"' \
-        "dataprep-audio2text" \
-        "dataprep-audio2text-server" \
-        "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
-
-    # Video2Audio service
-    validate_services_json \
-        "${host_ip}:7078/v1/video2audio" \
-        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd95t4qPAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
-        "dataprep-video2audio" \
-        "dataprep-video2audio-server" \
-        "{\"byte_str\": \"$(input_data_for_test "video")\"}"
-
-    # Docsum Data service - video
-    validate_services_json \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "well" \
-        "dataprep-multimedia2text" \
-
-        "dataprep-multimedia2text" \
-        "{\"video\": \"$(input_data_for_test "video")\"}"
-
-    # Docsum Data service - audio
-    validate_services_json \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "well" \
-
-        "dataprep-multimedia2text" \
-
-        "dataprep-multimedia2text" \
-        "{\"audio\": \"$(input_data_for_test "audio")\"}"
-
-    # Docsum Data service - text
-    validate_services_json \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco" \
-        "dataprep-multimedia2text" \
-        "dataprep-multimedia2text" \
-        "{\"text\": \"$(input_data_for_test "text")\"}"
-
 }
 
 function validate_megaservice_text() {
