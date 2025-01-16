@@ -20,7 +20,7 @@ function build_docker_images() {
     git clone https://github.com/vllm-project/vllm.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-qdrant retriever-qdrant vllm nginx"
+    service_list="chatqna chatqna-ui dataprep-qdrant retriever vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
