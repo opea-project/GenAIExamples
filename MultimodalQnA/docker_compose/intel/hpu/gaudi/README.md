@@ -75,7 +75,7 @@ docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_
 ### 2. Build retriever-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 3. Build LVM Images
@@ -130,7 +130,7 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 1. `opea/dataprep-multimodal-redis:latest`
 2. `opea/lvm:latest`
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
-4. `opea/retriever-multimodal-redis:latest`
+4. `opea/retriever:latest`
 5. `opea/whisper:latest`
 6. `opea/redis-vector-db`
 7. `opea/embedding:latest`
