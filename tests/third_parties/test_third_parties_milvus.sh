@@ -10,7 +10,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 
 function start_service() {
-    cd $WORKPATH/comps/vectorstores/milvus
+    cd $WORKPATH/comps/third_parties/milvus/deployment/docker_compose
     rm -rf volumes/
 
     docker compose up -d

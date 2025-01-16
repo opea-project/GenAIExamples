@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 ### 1.2 Start OpenSearch Stack Server
 
-Please refer to this [readme](../../vectorstores/opensearch/README.md).
+Please refer to this [readme](../../third_parties/opensearch/src/README.md).
 
 ### 1.3 Setup Environment Variables
 
@@ -69,7 +69,7 @@ python prepare_doc_opensearch.py
 
 ### 2.1 Start OpenSearch Stack Server
 
-Please refer to this [readme](../../vectorstores/opensearch/README.md).
+Please refer to this [readme](../../third_parties/opensearch/src/README.md).
 
 ### 2.2 Setup Environment Variables
 

@@ -17,7 +17,7 @@ export INDEX_NAME=${your_index_name}
 
 ### 1.3 Start PGVector
 
-Please refer to this [readme](../../../vectorstores/pgvector/README.md).
+Please refer to this [readme](../../../third_parties/pgvector/src/README.md).
 
 ### 1.4 Start Document Preparation Microservice for PGVector with Python Script
 
@@ -31,7 +31,7 @@ python prepare_doc_pgvector.py
 
 ### 2.1 Start PGVector
 
-Please refer to this [readme](../../../vectorstores/pgvector/README.md).
+Please refer to this [readme](../../../third_parties/pgvector/src/README.md).
 
 ### 2.2 Setup Environment Variables
 

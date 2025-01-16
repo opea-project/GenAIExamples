@@ -10,7 +10,24 @@ pip install -r requirements.txt
 
 ### Start Pinecone Server
 
-Please refer to this [readme](../../../vectorstores/pinecone/README.md).
+1. Create Pinecone account from the below link
+
+https://app.pinecone.io/
+
+More details from Pinecone quick start guide https://docs.pinecone.io/guides/get-started/quickstart
+
+2. Get API key
+
+API Key is needed to make the API calls. API key can get it from the Project -> Manage -> API keys
+
+3. Create the index in https://app.pinecone.io/
+
+Following details are to be provided
+
+    - Index name
+    - Based on the embedding model selected, following has to be provided
+        a. Dimensions
+        b. Metric
 
 ### Setup Environment Variables
 

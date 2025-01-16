@@ -27,7 +27,7 @@ cd langchain_ray; pip install -r requirements_ray.txt
 
 ### 1.2 Start VDMS Server
 
-Refer to this [readme](../../vectorstores/vdms/README.md).
+Refer to this [readme](../../third_parties/vdms/src/README.md).
 
 ### 1.3 Setup Environment Variables
 
@@ -60,7 +60,7 @@ python prepare_doc_redis_on_ray.py
 
 ### 2.1 Start VDMS Server
 
-Refer to this [readme](../../vectorstores/vdms/README.md).
+Refer to this [readme](../../third_parties/vdms/src/README.md).
 
 ### 2.2 Setup Environment Variables
 

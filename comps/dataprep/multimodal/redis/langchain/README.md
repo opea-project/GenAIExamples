@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 ### 1.2 Start Redis Stack Server
 
-Please refer to this [readme](../../../../vectorstores/redis/README.md).
+Please refer to this [readme](../../../../third_parties/redis/src/README.md).
 
 ### 1.3 Setup Environment Variables
 
@@ -58,7 +58,7 @@ python prepare_videodoc_redis.py
 
 ### 2.1 Start Redis Stack Server
 
-Please refer to this [readme](../../../../vectorstores/redis/README.md).
+Please refer to this [readme](../../../../third_parties/redis/src/README.md).
 
 ### 2.2 Start LVM Microservice (Optional)
 

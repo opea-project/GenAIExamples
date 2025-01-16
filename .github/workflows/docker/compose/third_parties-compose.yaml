@@ -18,6 +18,10 @@ services:
     build:
       dockerfile: comps/third_parties/bridgetower/src/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
+  pathway:
+    build:
+      dockerfile: comps/third_parties/pathway/src/Dockerfile
+    image: ${REGISTRY:-opea}/pathway:${TAG:-latest}
   wav2lip:
     build:
       dockerfile: comps/third_parties/wav2lip/src/Dockerfile
