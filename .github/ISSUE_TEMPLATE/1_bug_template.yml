@@ -78,7 +78,8 @@ body:
         - label: Docker
         - label: Docker Compose
         - label: Kubernetes Helm Charts
-        - label: NA
+        - label: Kubernetes GMC
+        - label: Other
     validations:
       required: true
 
@@ -89,7 +90,7 @@ body:
       options:
         - Single Node
         - Multiple Nodes
-        - NA
+        - Other
       default: 0
     validations:
       required: true
