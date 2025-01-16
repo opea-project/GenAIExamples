@@ -18,7 +18,7 @@ function build_vllm_docker_image() {
     echo $WORKPATH
     if [ ! -d "./vllm" ]; then
         git clone https://github.com/vllm-project/vllm.git
-        cd ./vllm; git checkout tags/v0.6.0
+        cd ./vllm; git checkout tags/v0.6.6
     else
         cd ./vllm
     fi

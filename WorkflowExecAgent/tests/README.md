@@ -24,7 +24,7 @@ Launch validation by running the following command.
 
 ```sh
 cd GenAIExamples/WorkflowExecAgent/tests
-. /test_compose_on_xeon.sh
+. /test_compose_vllm_on_xeon.sh
 ```
 
 `test_compose_on_xeon.sh` will run the other `.sh` files under `tests/`. The validation script launches 1 docker container for the agent microservice, and another for the vllm model serving on CPU. When validation is completed, all containers will be stopped.
