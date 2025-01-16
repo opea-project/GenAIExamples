@@ -320,7 +320,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
    In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
 
    Try the command below to check whether the LLM serving is ready.
-   
+
    ```bash
    # vLLM service
    docker logs vllm-gaudi-server 2>&1 | grep complete
@@ -336,15 +336,15 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
    ```
 
    Then try the `cURL` command below to validate services.
-   
+
    ```bash
    # vLLM Service
    curl http://${host_ip}:8007/v1/chat/completions \
-     -X POST \    
+     -X POST \
      -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
-   
+
    ```bash
    # TGI service
    curl http://${host_ip}:8005/v1/chat/completions \
