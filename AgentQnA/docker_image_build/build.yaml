@@ -11,3 +11,9 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
     image: ${REGISTRY:-opea}/agent:${TAG:-latest}
+  agent-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: agent
+    image: ${REGISTRY:-opea}/agent-ui:${TAG:-latest}
