@@ -47,21 +47,26 @@ jobs:
                 filename=$(basename "$file" .yaml)
                 example=$(echo "$chart" | cut -d'/' -f1)
                 if [[ "$filename" == *"gaudi"* ]]; then
-                  run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"gaudi\","
+                  run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"gaudi\"},"
                 elif [[ "$filename" == *"cpu"* ]]; then
-                  run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"xeon\","
+                  run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"xeon\"},"
                 fi
               fi
             done
           done
-
+          run_matrix="${run_matrix%,}"
           run_matrix=$run_matrix"]}"
-          echo "run_matrix=${run_matrix}"
-          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+          # Use jq to process the run_matrix JSON
+          run_matrix=$(echo $run_matrix | jq --raw-output '
+            .include
+            | unique_by(.example, .hardware)
+          ' | jq -c .)
+          echo "run_matrix="{\"include\":"${run_matrix}"}""
+          echo "run_matrix="{\"include\":"${run_matrix}"}"" >> $GITHUB_OUTPUT
 
   helm-chart-test:
     needs: [job1]
-    if: ${{ needs.job1.outputs.run_matrix.example.length > 0 }}
+    if: always() && ${{ needs.job1.outputs.run_matrix.example.length > 0 }}
     uses: ./.github/workflows/_helm-e2e.yaml
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}

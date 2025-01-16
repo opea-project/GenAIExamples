@@ -29,7 +29,7 @@ jobs:
   get-test-case:
     runs-on: ubuntu-latest
     outputs:
-      value_files: ${{ steps.test-case-matrix.outputs.value_files }}
+      value_files: ${{ steps.get-test-files.outputs.value_files }}
       CHECKOUT_REF: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
     steps:
       - name: Get checkout ref
@@ -43,35 +43,38 @@ jobs:
           echo "CHECKOUT_REF=${CHECKOUT_REF}" >> $GITHUB_OUTPUT
           echo "checkout ref ${CHECKOUT_REF}"
 
-      - name: Checkout out Repo
+      - name: Checkout Repo
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
           fetch-depth: 0
 
       - name: Get test Services
-        id: get-services
+        id: get-test-files
         run: |
           set -x
           # service_list=($(echo "${{ inputs.example }}" | tr ',' ' '))
-          value_files=""
+          value_files="{\"include\":["
+          # value_files="["
           for file in "${{ inputs.example }}"/kubernetes/helm/*values.yaml; do
             if [ -f "$file" ]; then
-              filename=$(basename "$file" .yaml)
+              filename=$(basename "$file")
               if [[ "$filename" == *"gaudi"* ]]; then
                 if [[ "${{ inputs.hardware }}" == "gaudi" ]]; then
-                  value_files="${value_files}${filename},"
+                  value_files="${value_files}{\"valuefile\":\"${filename}\"},"
                 fi
               elif [[ "$filename" == *"nv"* ]]; then
                 continue
               else
                 if [[ "${{ inputs.hardware }}" == "xeon" ]]; then
-                  value_files="${value_files}${filename},"
+                  value_files="${value_files}{\"valuefile\":\"${filename}\"},"
                 fi
               fi
             fi
           done
-
+          # value_files="${value_files%,}"
+          # value_files=$value_files"]}"
+          value_files="${value_files%,}]}"
           echo "value_files=${value_files}"
           echo "value_files=${value_files}" >> $GITHUB_OUTPUT
 
@@ -79,14 +82,16 @@ jobs:
     needs: [get-test-case]
     strategy:
       matrix:
-        value_file: ${{ fromJSON(needs.get-build-matrix.outputs.value_files) }}
+        value_file: ${{ fromJSON(needs.get-test-case.outputs.value_files).include }}
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
     outputs:
       should_cleanup: ${{ steps.set_boolean.outputs.should_cleanup }}
     steps:
       - name: Clean Up Working Directory
-        run: sudo rm -rf ${{github.workspace}}/*
+        run: |
+          echo "value_file=${{ matrix.value_file }}"
+          sudo rm -rf ${{github.workspace}}/*
 
       - name: Get checkout ref
         id: get-checkout-ref
@@ -99,7 +104,7 @@ jobs:
           echo "CHECKOUT_REF=${CHECKOUT_REF}" >> $GITHUB_OUTPUT
           echo "checkout ref ${CHECKOUT_REF}"
 
-      - name: Checkout out Repo
+      - name: Checkout Repo
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
@@ -132,7 +137,7 @@ jobs:
           set -xe
           echo "should_cleanup=true" >> $GITHUB_ENV
           if [[ ! -f ${{ github.workspace }}/${{ env.CHART_FOLDER }}/${value_file} ]]; then
-            echo "No value file found, exist test!"
+            echo "No value file found, exiting test!"
             echo "skip_validate=true" >> $GITHUB_ENV
             echo "should_cleanup=false" >> $GITHUB_ENV
             exit 0
@@ -175,7 +180,7 @@ jobs:
                 echo "Response check failed, please check the logs in artifacts!"
                 exit 1
             else
-                echo "Response check succeed!"
+                echo "Response check succeeded!"
                 exit 0
             fi
           fi
