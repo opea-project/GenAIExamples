@@ -50,7 +50,7 @@ function start_services() {
     done
 }
 
-function validate_services() {
+function validate_service() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
@@ -92,7 +92,7 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # tei for embedding service
-    validate_services \
+    validate_service \
         "${ip_address}:6040/embed" \
         "[[" \
         "tei-embedding" \
@@ -101,14 +101,14 @@ function validate_microservices() {
 
     # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
-    validate_services \
+    validate_service \
         "${ip_address}:6043/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-qdrant-server"
 
     # test upload link
-    validate_services \
+    validate_service \
         "${ip_address}:6043/v1/dataprep" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
@@ -116,7 +116,7 @@ function validate_microservices() {
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-    validate_services \
+    validate_service \
         "${ip_address}:6045/v1/retrieval" \
         "retrieved_docs" \
         "retrieval" \
@@ -124,25 +124,25 @@ function validate_microservices() {
         "{\"text\":\"What is Deep Learning?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
-    validate_services \
+    validate_service \
         "${ip_address}:6041/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # tgi for llm service
-    validate_services \
-        "${ip_address}:6042/generate" \
+    # vllm for llm service
+    validate_service \
+        "${ip_address}:6042/v1/chat/completions" \
         "text" \
         "vllm-llm" \
         "vllm-service" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
-    validate_services \
+    validate_service \
         "${ip_address}:8912/v1/chatqna" \
         "data: " \
         "mega-chatqna" \

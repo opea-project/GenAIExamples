@@ -144,11 +144,11 @@ function validate_microservices() {
 
     # vllm for llm service
     validate_service \
-        "${ip_address}:9009/generate" \
+        "${ip_address}:9009/v1/chat/completions" \
         "text" \
-        "vllm-llm" \
-        "vllm-service" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+        "tgi-llm" \
+        "tgi-service" \
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {

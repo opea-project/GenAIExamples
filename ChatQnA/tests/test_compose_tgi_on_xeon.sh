@@ -33,7 +33,7 @@ function start_services() {
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
@@ -42,12 +42,12 @@ function start_services() {
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 500 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 }
@@ -155,12 +155,11 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_service \
-        "${ip_address}:9009/generate" \
-        "generated_text" \
-        "tgi-llm" \
-        "tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
+        "${ip_address}:9009/v1/chat/completions" \
+        "text" \
+        "vllm-llm" \
+        "vllm-service" \
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {

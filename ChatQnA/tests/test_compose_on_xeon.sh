@@ -50,7 +50,7 @@ function start_services() {
     done
 }
 
-function validate_services() {
+function validate_service() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
@@ -82,7 +82,7 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # tei for embedding service
-    validate_services \
+    validate_service \
         "${ip_address}:6006/embed" \
         "\[\[" \
         "tei-embedding" \
@@ -93,7 +93,7 @@ function validate_microservices() {
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-    validate_services \
+    validate_service \
         "${ip_address}:7000/v1/retrieval" \
         " " \
         "retrieval" \
@@ -101,7 +101,7 @@ function validate_microservices() {
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
-    validate_services \
+    validate_service \
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
@@ -109,17 +109,17 @@ function validate_microservices() {
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
     # vllm for llm service
-    validate_services \
-        "${ip_address}:9009/v1/completions" \
+    validate_service \
+        "${ip_address}:9009/v1/chat/completions" \
         "text" \
         "vllm-llm" \
         "vllm-service" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
-    validate_services \
+    validate_service \
         "${ip_address}:8888/v1/chatqna" \
         "data" \
         "mega-chatqna" \
