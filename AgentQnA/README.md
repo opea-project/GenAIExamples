@@ -265,6 +265,12 @@ The AgentQnA UI can be deployed locally or using Docker.
 
 For detailed instructions on deploying AgentQnA UI, refer to the [AgentQnA UI Guide](./ui/svelte/README.md).
 
+## Deploy AgentQnA UI
+
+The AgentQnA UI can be deployed locally or using Docker.
+
+For detailed instructions on deploying AgentQnA UI, refer to the [AgentQnA UI Guide](./ui/svelte/README.md).
+
 ## How to register your own tools with agent
 
 You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md).
