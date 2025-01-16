@@ -130,3 +130,12 @@ body:
       render: shell
     validations:
       required: false
+
+
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Attachments
+      description: Attach any relevant files or screenshots.
+    validations:
+      required: false
