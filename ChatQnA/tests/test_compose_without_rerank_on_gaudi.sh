@@ -149,7 +149,7 @@ function validate_microservices() {
         "content" \
         "vllm-llm" \
         "vllm-gaudi-server" \
-        '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
 }
 
 function validate_megaservice() {

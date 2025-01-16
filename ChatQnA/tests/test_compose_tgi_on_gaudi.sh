@@ -158,11 +158,11 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_service \
-        "${ip_address}:8005/generate" \
+        "${ip_address}:8005/v1/chat/completions" \
         "content" \
         "tgi-llm" \
         "tgi-gaudi-server" \
-        '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
 }
 
 function validate_megaservice() {
