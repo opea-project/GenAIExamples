@@ -73,7 +73,7 @@ services:
       MULTIMODAL_EMBEDDING: true
     restart: unless-stopped
   retriever-redis:
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-redis
     depends_on:
       - redis-vector-db
@@ -87,7 +87,8 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
-      RETRIEVER_TYPE: "redis"
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tgi-rocm:
     image: ghcr.io/huggingface/text-generation-inference:3.0.1-rocm

@@ -29,12 +29,12 @@ services:
       dockerfile: comps/third_parties/clip/src/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
-  retriever-vdms:
+  retriever:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/vdms/langchain/Dockerfile
+      dockerfile: comps/retrievers/src/Dockerfile
     extends: videoqna
-    image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
   reranking:
     build:
       context: GenAIComps
