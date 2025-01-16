@@ -14,7 +14,7 @@ from conversation import multimodalqna_conv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from gradio_pdf import PDF
-from utils import build_logger, make_temp_image, moderation_msg, server_error_msg, split_video
+from utils import build_logger, make_temp_image, server_error_msg, split_video
 
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
 logflag = os.getenv("LOGFLAG", False)
@@ -57,7 +57,7 @@ def clear_history(state, request: gr.Request):
     video = gr.Video(height=512, width=512, elem_id="video", visible=True, label="Media")
     image = gr.Image(height=512, width=512, elem_id="image", visible=False, label="Media")
     pdf = PDF(height=512, elem_id="pdf", interactive=False, visible=False, label="Media")
-    return (state, state.to_gradio_chatbot(), None, None, video, image, pdf) + (disable_btn,) * 1
+    return (state, state.to_gradio_chatbot(), {"text": "", "files": []}, None, video, image, pdf) + (disable_btn,) * 1
 
 
 def add_text(state, textbox, audio, request: gr.Request):
@@ -98,8 +98,7 @@ def http_bot(state, request: gr.Request):
     is_audio_query = state.audio_query_file is not None
     if state.skip_next:
         # This generate call is skipped due to invalid inputs
-        path_to_sub_videos = state.get_path_to_subvideos()
-        yield (state, state.to_gradio_chatbot(), path_to_sub_videos, None, None) + (no_change_btn,) * 1
+        yield (state, state.to_gradio_chatbot(), None, None, None) + (no_change_btn,) * 1
         return
 
     if len(state.messages) == state.offset + 2:
@@ -542,7 +541,7 @@ with gr.Blocks() as qna:
             with gr.Row():
                 with gr.Column(scale=8):
                     with gr.Tabs():
-                        with gr.TabItem("Text Query"):
+                        with gr.TabItem("Text & Image Query"):
                             textbox = gr.MultimodalTextbox(
                                 show_label=False, container=True, submit_btn=False, file_types=["image"]
                             )
