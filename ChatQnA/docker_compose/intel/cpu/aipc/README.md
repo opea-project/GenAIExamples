@@ -58,7 +58,7 @@ cd GenAIComps
 docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 6 Docker Images:
+Then run the command `docker images`, you will have the following Docker Images:
 
 1. `opea/dataprep-redis:latest`
 2. `opea/retriever-redis:latest`
