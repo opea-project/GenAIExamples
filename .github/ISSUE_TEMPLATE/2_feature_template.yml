@@ -66,6 +66,7 @@ body:
       options:
         - Single Node
         - Multiple Nodes
+        - NA
       default: 0
     validations:
       required: true

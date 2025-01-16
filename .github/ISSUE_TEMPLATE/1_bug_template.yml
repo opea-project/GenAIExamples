@@ -66,6 +66,7 @@ body:
       options:
         - label: Pull docker images from hub.docker.com
         - label: Build docker images from source
+        - label: Other
     validations:
       required: true
 
@@ -74,10 +75,10 @@ body:
     attributes:
       label: Deploy method
       options:
-        - label: Docker compose
         - label: Docker
-        - label: Kubernetes
-        - label: Helm
+        - label: Docker Compose
+        - label: Kubernetes Helm Charts
+        - label: NA
     validations:
       required: true
 
@@ -88,6 +89,7 @@ body:
       options:
         - Single Node
         - Multiple Nodes
+        - NA
       default: 0
     validations:
       required: true
