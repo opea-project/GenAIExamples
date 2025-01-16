@@ -11,15 +11,15 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/graphrag:${TAG:-latest}
-  retriever-neo4j-llamaindex:
+  retriever:
     build:
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: GenAIComps
-      dockerfile: comps/retrievers/neo4j/llama_index/Dockerfile
-    image: ${REGISTRY:-opea}/retriever-neo4j-llamaindex:${TAG:-latest}
+      dockerfile: comps/retrievers/src/Dockerfile
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
   dataprep-neo4j-llamaindex:
     build:
       args:

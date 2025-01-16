@@ -108,7 +108,7 @@ cd GenAIComps
 ### 1. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-pinecone:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/pinecone/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 2. Build Dataprep Image
@@ -170,7 +170,7 @@ docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-a
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `opea/dataprep-pinecone:latest`
-2. `opea/retriever-pinecone:latest`
+2. `opea/retriever:latest`
 3. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest`
 4. `opea/chatqna-ui:latest`
 5. `opea/nginx:latest`
@@ -352,7 +352,7 @@ click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comp
 Or run this command to get the file on a terminal.
 
 ```bash
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 
 ```
 

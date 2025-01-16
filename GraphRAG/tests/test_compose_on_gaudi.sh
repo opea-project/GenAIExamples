@@ -38,6 +38,7 @@ function start_services() {
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
     export TGI_LLM_ENDPOINT="http://${ip_address}:6005"
     export host_ip=${ip_address}
+    export LOGFLAG=true
 
     # Start Docker Containers
     sed -i "s|container_name: graphrag-gaudi-backend-server|container_name: graphrag-gaudi-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
@@ -125,10 +126,12 @@ function validate_microservices() {
         "extract_graph_neo4j" \
         "dataprep-neo4j-server"
 
+    sleep 2m
+
     # retrieval microservice
     validate_service \
-        "${ip_address}:6009/v1/retrieval" \
-        "Retrieval of answers from community summaries successful" \
+        "${ip_address}:7000/v1/retrieval" \
+        "retrieved_docs" \
         "retriever_community_answers_neo4j" \
         "retriever-neo4j-server" \
         "{\"model\": \"gpt-4o-mini\",\"messages\": [{\"role\": \"user\",\"content\": \"Who is John Brady and has he had any confrontations?\"}]}"
