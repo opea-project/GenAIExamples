@@ -37,10 +37,6 @@ export WHISPER_PORT=7066
 export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
 export MAX_IMAGES=1
 export WHISPER_MODEL="base"
-export ASR_ENDPOINT=http://$host_ip:$WHISPER_PORT
-export ASR_PORT=9099
-export ASR_SERVICE_PORT=3001
-export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
 export DATAPREP_MMR_PORT=6007
 export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/ingest_with_text"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_transcripts"
@@ -116,7 +112,7 @@ docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy 
 docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
 ```
 
-### 5. Build asr images
+### 5. Build Whisper Server Image
 
 Build whisper server image
 
@@ -220,7 +216,7 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
 
-4. asr
+4. whisper
 
 ```bash
 curl ${WHISPER_SERVER_ENDPOINT} \
@@ -356,7 +352,7 @@ curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
 Test the MegaService with an audio query:
 
 ```bash
-curl http://${host_ip}:8888/v1/multimodalqna  \
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna  \
     -H "Content-Type: application/json"  \
     -d '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
 ```
@@ -364,7 +360,7 @@ curl http://${host_ip}:8888/v1/multimodalqna  \
 Test the MegaService with a text and image query:
 
 ```bash
-curl http://${host_ip}:8888/v1/multimodalqna \
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -H "Content-Type: application/json" \
     -d  '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Green bananas in a tree"}, {"type": "image_url", "image_url": {"url": "http://images.cocodataset.org/test-stuff2017/000000004248.jpg"}}]}]}'
 ```

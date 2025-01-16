@@ -70,10 +70,6 @@ function setup_env() {
     export MAX_IMAGES=1
     export WHISPER_MODEL="base"
     export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
-    export ASR_ENDPOINT=http://$host_ip:$WHISPER_PORT
-    export ASR_PORT=9099
-    export ASR_SERVICE_PORT=3001
-    export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
     export DATAPREP_MMR_PORT=6007
     export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/ingest_with_text"
     export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_transcripts"

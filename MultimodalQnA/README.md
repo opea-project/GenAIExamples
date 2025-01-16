@@ -172,8 +172,29 @@ docker compose -f compose.yaml up -d
 
 ## MultimodalQnA Demo on Gaudi2
 
-![MultimodalQnA-upload-waiting-screenshot](./assets/img/upload-gen-trans.png)
+### Multimodal QnA UI
+![MultimodalQnA-ui-screenshot](./assets/img/mmqna-ui.png)
 
-![MultimodalQnA-upload-done-screenshot](./assets/img/upload-gen-captions.png)
+### Video Ingestion
+![MultimodalQnA-ingest-video-screenshot](./assets/img/video-ingestion.png)
 
-![MultimodalQnA-query-example-screenshot](./assets/img/example_query.png)
+### Text Query following the ingestion of a Video
+![MultimodalQnA-video-query-screenshot](./assets/img/video-query.png)
+
+### Image Ingestion
+![MultimodalQnA-ingest-image-screenshot](./assets/img/image-ingestion.png)
+
+### Text Query following the ingestion of an image
+![MultimodalQnA-video-query-screenshot](./assets/img/image-query.png)
+
+### Audio Ingestion
+![MultimodalQnA-audio-ingestion-screenshot](./assets/img/audio-ingestion.png)
+
+### Text Query following the ingestion of an Audio Podcast
+![MultimodalQnA-audio-query-screenshot](./assets/img/audio-query.png)
+
+### PDF Ingestion
+![MultimodalQnA-upload-pdf-screenshot](./assets/img/ingest_pdf.png)
+
+### Text query following the ingestion of a PDF
+![MultimodalQnA-pdf-query-example-screenshot](./assets/img/pdf-query.png)

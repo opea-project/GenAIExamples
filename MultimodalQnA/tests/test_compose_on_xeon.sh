@@ -63,10 +63,6 @@ function setup_env() {
     export MAX_IMAGES=1
     export WHISPER_MODEL="base"
     export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
-    export ASR_ENDPOINT=http://$host_ip:$WHISPER_PORT
-    export ASR_PORT=9099
-    export ASR_SERVICE_PORT=3001
-    export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
     export REDIS_DB_PORT=6379
     export REDIS_INSIGHTS_PORT=8001
     export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"

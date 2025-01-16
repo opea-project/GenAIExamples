@@ -23,14 +23,10 @@ export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
 export REDIS_HOST=${host_ip}
 export INDEX_NAME="mm-rag-redis"
 
+export WHISPER_MODEL="base"
 export WHISPER_PORT=7066
 export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
 export MAX_IMAGES=1
-export WHISPER_MODEL="base"
-export ASR_ENDPOINT=http://$host_ip:$WHISPER_PORT
-export ASR_PORT=9099
-export ASR_SERVICE_PORT=3001
-export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
 
 export DATAPREP_MMR_PORT=6007
 export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/ingest_with_text"

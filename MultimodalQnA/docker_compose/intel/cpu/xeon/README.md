@@ -40,6 +40,10 @@ lvm
 ===
 Port 9399 - Open to 0.0.0.0/0
 
+whisper
+===
+port 7066 - Open to 0.0.0.0/0
+
 dataprep-multimodal-redis
 ===
 Port 6007 - Open to 0.0.0.0/0
@@ -83,10 +87,6 @@ export WHISPER_PORT=7066
 export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
 export WHISPER_MODEL="base"
 export MAX_IMAGES=1
-export ASR_ENDPOINT=http://$host_ip:$WHISPER_PORT
-export ASR_PORT=9099
-export ASR_SERVICE_PORT=3001
-export ASR_SERVICE_ENDPOINT="http://${host_ip}:${ASR_SERVICE_PORT}/v1/audio/transcriptions"
 export REDIS_DB_PORT=6379
 export REDIS_INSIGHTS_PORT=8001
 export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
@@ -164,7 +164,7 @@ docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy 
 docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
 ```
 
-### 5. Build asr images
+### 5. Build Whisper Server Image
 
 Build whisper server image
 
@@ -270,7 +270,7 @@ curl http://${host_ip}:${REDIS_RETRIEVER_PORT}/v1/multimodal_retrieval \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
 
-4. asr
+4. whisper
 
 ```bash
 curl ${WHISPER_SERVER_ENDPOINT} \
@@ -406,7 +406,7 @@ curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
 Test the MegaService with an audio query:
 
 ```bash
-curl http://${host_ip}:8888/v1/multimodalqna  \
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna  \
     -H "Content-Type: application/json"  \
     -d '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
 ```
@@ -414,7 +414,7 @@ curl http://${host_ip}:8888/v1/multimodalqna  \
 Test the MegaService with a text and image query:
 
 ```bash
-curl http://${host_ip}:8888/v1/multimodalqna \
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -H "Content-Type: application/json" \
     -d  '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Green bananas in a tree"}, {"type": "image_url", "image_url": {"url": "http://images.cocodataset.org/test-stuff2017/000000004248.jpg"}}]}]}'
 ```

@@ -14,19 +14,6 @@ services:
       https_proxy: ${https_proxy}
       WHISPER_PORT: ${WHISPER_PORT}
     restart: unless-stopped
-  asr:
-    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
-    container_name: asr-service
-    ports:
-      - "${ASR_SERVICE_PORT}:${ASR_PORT}"
-    ipc: host
-    environment:
-      WHISPER_PORT: ${WHISPER_PORT}
-      MAX_IMAGES: ${MAX_IMAGES}
-      ASR_PORT: ${ASR_PORT}
-      ASR_ENDPOINT: ${ASR_ENDPOINT}
-      ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
-      ASR_SERVICE_ENDPOINT: ${ASR_SERVICE_ENDPOINT}
   redis-vector-db:
     image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
@@ -162,8 +149,6 @@ services:
       MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
       LVM_MODEL_ID: ${LVM_MODEL_ID}
-      ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
-      ASR_SERVICE_ENDPOINT: ${ASR_SERVICE_ENDPOINT}
       WHISPER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     ipc: host
