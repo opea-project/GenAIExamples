@@ -6,13 +6,12 @@ services:
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
     container_name: whisper-service
     ports:
-      - "${WHISPER_PORT}:${WHISPER_PORT}"
+      - "${WHISPER_PORT}:7066"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      WHISPER_PORT: ${WHISPER_PORT}
     restart: unless-stopped
   redis-vector-db:
     image: redis/redis-stack:7.2.0-v9
