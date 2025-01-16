@@ -22,8 +22,8 @@ services:
       https_proxy: ${https_proxy}
       QDRANT_HOST: qdrant-vector-db
       QDRANT_PORT: 6333
-      COLLECTION_NAME: ${INDEX_NAME}
-      TEI_ENDPOINT: http://tei-embedding-service:80
+      QDRANT_INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -39,7 +39,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   retriever:
-    image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-qdrant-server
     depends_on:
       - qdrant-vector-db
@@ -54,6 +54,8 @@ services:
       QDRANT_PORT: 6333
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_QDRANT"
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5

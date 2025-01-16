@@ -59,7 +59,7 @@ docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$h
 ### 2. Build Retriever Image
 
 ```bash
-docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/vdms/langchain/Dockerfile .
+docker build -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 3. Build Reranking Image
@@ -108,15 +108,13 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 
 1. `opea/dataprep-multimodal-vdms:latest`
 2. `opea/embedding-multimodal-clip:latest`
-3. `opea/retriever-vdms:latest`
-   <<<<<<< HEAD
+3. `opea/retriever:latest`
 4. `opea/reranking:latest`
 5. `opea/video-llama-lvm-server:latest`
 6. # `opea/lvm-video-llama:latest`
 7. `opea/reranking-tei:latest`
 8. `opea/lvm-video-llama:latest`
 9. `opea/lvm:latest`
-   > > > > > > > d93597cbfd9da92b956adb3673c9e5d743c181af
 10. `opea/videoqna:latest`
 11. `opea/videoqna-ui:latest`
 

@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-pinecone retriever-pinecone nginx"
+    service_list="chatqna chatqna-ui dataprep-pinecone retriever nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
@@ -38,6 +38,7 @@ function start_services() {
     export PINECONE_INDEX_NAME="langchain-test"
     export INDEX_NAME="langchain-test"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export LOGFLAG=true
 
     # Start Docker Containers
     docker compose -f compose_pinecone.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -111,7 +112,7 @@ function validate_microservices() {
 
     # test /v1/dataprep/delete_file
     validate_service \
-       "http://${ip_address}:6009/v1/dataprep/delete_file" \
+       "http://${ip_address}:6007/v1/dataprep/delete_file" \
        '{"status":true}' \
         "dataprep_del" \
         "dataprep-pinecone-server"

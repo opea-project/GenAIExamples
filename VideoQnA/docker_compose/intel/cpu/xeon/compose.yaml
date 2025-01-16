@@ -41,7 +41,7 @@ services:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
     restart: unless-stopped
   retriever:
-    image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-vdms-server
     depends_on:
       - vdms-vector-db
@@ -52,10 +52,12 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      INDEX_NAME: ${INDEX_NAME}
+      VDMS_INDEX_NAME: ${INDEX_NAME}
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
-      USECLIP: ${USECLIP}
+      VDMS_USE_CLIP: ${USECLIP}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_VDMS"
     entrypoint: sh -c 'sleep 30 && python retriever_vdms.py'
     restart: unless-stopped
     volumes:

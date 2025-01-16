@@ -23,7 +23,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever-redis lvm dataprep-multimodal-redis whisper"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -196,7 +196,7 @@ function validate_microservices() {
         "dataprep_get" \
         "dataprep-multimodal-redis"
 
-    sleep 1m
+    sleep 2m
 
     # multimodal retrieval microservice
     echo "Validating retriever-redis"
@@ -208,7 +208,7 @@ function validate_microservices() {
         "retriever-redis" \
         "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 
-    sleep 3m
+    sleep 5m
 
     # llava server
     echo "Evaluating lvm-llava"
