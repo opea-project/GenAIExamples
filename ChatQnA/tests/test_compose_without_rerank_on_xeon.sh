@@ -194,7 +194,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose_without_rerank.yaml stop && docker compose -f compose_without_rerank.yaml rm -f
+    docker compose -f compose_without_rerank.yaml down
 }
 
 function main() {

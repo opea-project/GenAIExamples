@@ -38,7 +38,7 @@ function start_services() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
     # Start Docker Containers
-    docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
@@ -159,7 +159,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    docker compose -f compose_vllm.yaml down
+    docker compose -f compose.yaml down
 }
 
 function main() {

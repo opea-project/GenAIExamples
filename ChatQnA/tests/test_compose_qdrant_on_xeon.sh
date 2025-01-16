@@ -175,7 +175,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    docker compose -f compose_qdrant.yaml stop && docker compose -f compose_qdrant.yaml rm -f
+    docker compose -f compose_qdrant.yaml down
 }
 
 function main() {
