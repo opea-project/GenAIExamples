@@ -79,6 +79,14 @@ class AutoMergeRetriever(BaseComponent, AutoMergingRetriever):
 
         return None
 
+    @model_serializer
+    def ser_model(self):
+        set = {
+            "idx": self.idx,
+            "retriever_type": self.comp_subtype,
+            "retrieve_topk": self.topk,
+        }
+        return set
 
 class SimpleBM25Retriever(BaseComponent):
     # The nodes parameter in BM25Retriever is not from index,
@@ -103,3 +111,12 @@ class SimpleBM25Retriever(BaseComponent):
                 return bm25_retr.retrieve(v)
 
         return None
+
+    @model_serializer
+    def ser_model(self):
+        set = {
+            "idx": self.idx,
+            "retriever_type": self.comp_subtype,
+            "retrieve_topk": self.topk,
+        }
+        return set
