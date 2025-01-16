@@ -2,6 +2,8 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
 
+The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component.
+
 Quick Start:
 
 1. Set up the environment variables.
