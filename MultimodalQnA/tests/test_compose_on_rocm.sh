@@ -20,8 +20,8 @@ export caption_fn="apple.txt"
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-
+    #git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone https://github.com/mhbuehler/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"mmqna-image-query"}" && cd ../
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
