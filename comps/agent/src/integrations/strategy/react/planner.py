@@ -194,7 +194,7 @@ class ReActAgentNodeLlama:
         print("@@@ History: ", history)
 
         tools_used = self.tools
-        if state["tool_choice"] is not None:
+        if state.get("tool_choice") is not None:
             tools_used = filter_tools(self.tools, state["tool_choice"])
 
         tools_descriptions = tool_renderer(tools_used)
@@ -283,7 +283,7 @@ class ReActAgentLlama(BaseAgent):
     def prepare_initial_state(self, query):
         return {"messages": [HumanMessage(content=query)]}
 
-    async def stream_generator(self, query, config):
+    async def stream_generator(self, query, config, thread_id=None):
         initial_state = self.prepare_initial_state(query)
         if "tool_choice" in config:
             initial_state["tool_choice"] = config.pop("tool_choice")

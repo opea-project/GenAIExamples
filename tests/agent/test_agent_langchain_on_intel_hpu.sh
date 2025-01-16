@@ -53,10 +53,10 @@ function build_vllm_docker_images() {
     cd $WORKPATH
     echo $WORKPATH
     if [ ! -d "./vllm" ]; then
-        git clone https://github.com/vllm-project/vllm.git
+        git clone https://github.com/HabanaAI/vllm-fork.git
     fi
-    cd ./vllm
-    git checkout main
+    cd ./vllm-fork
+    git checkout v0.6.4.post2+Gaudi-1.19.0
     docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:comps --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
         echo "opea/vllm-gaudi:comps failed"
@@ -235,6 +235,7 @@ function validate() {
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
     # local CONTENT_TO_VALIDATE= "$CONTENT" | grep -oP '(?<=text:).*?(?=prompt)'
+    echo "EXPECTED_RESULT: $EXPECTED_RESULT"
     echo "Content: $CONTENT"
     # echo "Content to validate: $CONTENT_TO_VALIDATE"
 
@@ -255,6 +256,12 @@ function validate_microservice() {
     CONTENT=$(python3 $WORKPATH/tests/agent/test.py)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-agent")
     echo "$EXIT_CODE"
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    if [ "$EXIT_CODE" == "1" ]; then
+        echo "try new EXPECTED_RESULT: "
+        local EXIT_CODE=$(validate "$CONTENT" "OPEA stands for Open Platform for Enterprise AI." "test-agent")
+        echo "$EXIT_CODE"
+    fi
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
@@ -286,7 +293,7 @@ function validate_microservice_streaming() {
 function validate_assistant_api() {
     cd $WORKPATH
     echo "Testing agent service - assistant api"
-    local CONTENT=$(python3 comps/agent/src/test_assistant_api.py --ip_addr ${ip_address} --ext_port 9095 --assistants_api_test --query 'What is Intel OPEA project?' 2>&1 | tee ${LOG_PATH}/test-agent-assistantsapi.log)
+    local CONTENT=$(python3 comps/agent/src/test_assistant_api.py --ip_addr ${ip_address} --ext_port 9095 --assistants_api_test --query 'What is Intel OPEA project?' --llm_endpoint_url $LLM_ENDPOINT_URL 2>&1 | tee ${LOG_PATH}/test-agent-assistantsapi.log)
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "test-agent-assistantsapi")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"

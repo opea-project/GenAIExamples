@@ -33,7 +33,15 @@ def test_assistants_http(args):
             return False
 
     # step 1. create assistants
-    query = {}
+    # query = {}
+    query = {
+        "agent_config": {
+            "llm_engine": "tgi",
+            "llm_endpoint_url": args.llm_endpoint_url,
+            "tools": "/home/user/tools/custom_tools.yaml",
+        }
+    }
+
     if ret := process_request("assistants", query):
         assistant_id = ret.get("id")
         print("Created Assistant Id: ", assistant_id)
@@ -84,6 +92,7 @@ if __name__ == "__main__":
     parser.add_argument("--filename", type=str, default="query.csv", help="query_list_file")
     parser.add_argument("--output", type=str, default="output.csv", help="query_list_file")
     parser.add_argument("--ut", action="store_true", help="ut")
+    parser.add_argument("--llm_endpoint_url", type=str, default="http://localhost:8085", help="tgi/vllm endpoint")
 
     args, _ = parser.parse_known_args()
 
