@@ -39,7 +39,7 @@ function build_docker_images() {
 
     echo "Build vllm_openvino image from GenAIComps..."
     cd $WORKPATH && git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}"
-    cd comps/llms/text-generation/vllm/langchain/dependency
+    cd comps/third_parties/vllm/src/
     bash ./build_docker_vllm_openvino.sh gpu
 
     docker images && sleep 1s
