@@ -32,7 +32,7 @@ export ASR_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 export DOCSUM_CARD_ID="card1"
 export DOCSUM_RENDER_ID="renderD136"
-export DocSum_COMPONENT_NAME="OPEADocSum_TGI"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 export LOGFLAG=True
 
 function build_docker_images() {

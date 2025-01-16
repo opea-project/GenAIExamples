@@ -20,4 +20,4 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 export LLM_ENDPOINT_PORT=8008
 export DOCSUM_PORT=9000
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-export DocSum_COMPONENT_NAME="OPEADocSum_TGI"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
