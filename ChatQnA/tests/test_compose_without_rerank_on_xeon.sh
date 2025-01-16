@@ -146,8 +146,8 @@ function validate_microservices() {
     validate_service \
         "${ip_address}:9009/v1/chat/completions" \
         "content" \
-        "tgi-llm" \
-        "tgi-service" \
+        "vllm-llm" \
+        "vllm-service" \
         '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
