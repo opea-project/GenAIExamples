@@ -90,9 +90,7 @@ class Conversation:
                             content.append(
                                 {
                                     "type": "image_url",
-                                    "image_url": {
-                                        "url": get_b64_frame_from_timestamp(self.image_query_files[i], 0)
-                                    },
+                                    "image_url": {"url": get_b64_frame_from_timestamp(self.image_query_files[i], 0)},
                                 }
                             )
                         dic["content"] = content
