@@ -1,13 +1,13 @@
-﻿# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 import os
 from typing import Optional
 
 from fastapi import HTTPException
-from mongo_store import DocumentStore
 from pydantic import BaseModel
 
 from comps import CustomLogger
+from comps.chathistory.src.document_store import DocumentStore
 from comps.cores.mega.micro_service import opea_microservices, register_microservice
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 

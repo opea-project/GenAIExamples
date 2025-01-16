@@ -4,8 +4,9 @@
 
 import bson.errors as BsonError
 from bson.objectid import ObjectId
-from config import COLLECTION_NAME
-from mongo_conn import MongoClient
+
+from comps.chathistory.src.integrations.mongo.config import COLLECTION_NAME
+from comps.chathistory.src.integrations.mongo.mongo_conn import MongoClient
 
 
 class DocumentStore:

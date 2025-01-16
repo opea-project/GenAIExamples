@@ -20,11 +20,11 @@ COPY comps /home/user/comps
 COPY requirements.txt /home/user/
 
 RUN pip install --no-cache-dir --upgrade pip setuptools && \
-    pip install --no-cache-dir -r /home/user/comps/chathistory/mongo/requirements.txt && \
+    pip install --no-cache-dir -r /home/user/comps/chathistory/src/requirements.txt && \
     pip install --no-cache-dir -r /home/user/requirements.txt
 
 ENV PYTHONPATH=$PYTHONPATH:/home/user
 
-WORKDIR /home/user/comps/chathistory/mongo
+WORKDIR /home/user/comps/chathistory/src
 
-ENTRYPOINT ["python", "chathistory_mongo.py"]
+ENTRYPOINT ["python", "opea_chathistory_microservice.py"]
