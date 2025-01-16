@@ -53,6 +53,33 @@ parent_dir = os.path.dirname(current_file_path)
 
 
 #######################################################
+#                Elasticsearch                        #
+#######################################################
+ES_CONNECTION_STRING = os.getenv("ES_CONNECTION_STRING", "http://localhost:9200")
+ES_INDEX_NAME = os.getenv("ES_INDEX_NAME", "rag_elasticsearch")
+
+
+#######################################################
+#                    Neo4j                            #
+#######################################################
+NEO4J_URL = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+NEO4J_USERNAME = os.getenv("NEO4J_USERNAME", "neo4j")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "test")
+host_ip = os.getenv("host_ip")
+TGI_LLM_ENDPOINT = os.getenv("TGI_LLM_ENDPOINT", f"http://{host_ip}:6005")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+OPENAI_LLM_MODEL = os.getenv("OPENAI_LLM_MODEL", "gpt-4o")
+
+
+#######################################################
+#                    Pathway                          #
+#######################################################
+PATHWAY_HOST = os.getenv("PATHWAY_HOST", "127.0.0.1")
+PATHWAY_PORT = int(os.getenv("PATHWAY_PORT", 8666))
+
+
+#######################################################
 #                     Redis                           #
 #######################################################
 INDEX_NAME = os.getenv("INDEX_NAME", "rag_redis")
@@ -78,6 +105,9 @@ def format_redis_conn_from_env():
 
 
 REDIS_URL = format_redis_conn_from_env()
+REDIS_SCHEMA = os.getenv("REDIS_SCHEMA", "redis_schema_multi.yml")
+schema_path = os.path.join(parent_dir, REDIS_SCHEMA)
+INDEX_SCHEMA = schema_path
 
 
 #######################################################
@@ -93,3 +123,63 @@ TEI_EMBEDDING_MODEL = os.environ.get("TEI_EMBEDDING_MODEL", "/home/user/bce-embe
 TEI_EMBEDDING_ENDPOINT = os.environ.get("TEI_EMBEDDING_ENDPOINT", "")
 os.environ["OPENAI_API_BASE"] = TEI_EMBEDDING_ENDPOINT
 os.environ["OPENAI_API_KEY"] = "Dummy key"
+
+
+#######################################################
+#                   Opensearch                        #
+#######################################################
+# OpenSearch Connection Information
+OPENSEARCH_HOST = os.getenv("OPENSEARCH_HOST", "localhost")
+OPENSEARCH_PORT = int(os.getenv("OPENSEARCH_PORT", 9200))
+OPENSEARCH_INITIAL_ADMIN_PASSWORD = os.getenv("OPENSEARCH_INITIAL_ADMIN_PASSWORD", "")
+
+
+def format_opensearch_conn_from_env():
+    opensearch_url = os.getenv("OPENSEARCH_URL", None)
+    if opensearch_url:
+        return opensearch_url
+    else:
+        using_ssl = get_boolean_env_var("OPENSEARCH_SSL", False)
+        start = "https://" if using_ssl else "http://"
+
+        return start + f"{OPENSEARCH_HOST}:{OPENSEARCH_PORT}"
+
+
+OPENSEARCH_URL = format_opensearch_conn_from_env()
+OPENSEARCH_INDEX_NAME = os.getenv("OPENSEARCH_INDEX_NAME", "rag_opensearch")
+
+
+#######################################################
+#                     Pinecone                        #
+#######################################################
+# Pinecone configuration
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "xxx_xxx")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "rag_pinecone")
+
+
+#######################################################
+#                     PGvector                        #
+#######################################################
+PG_CONNECTION_STRING = os.getenv("PG_CONNECTION_STRING", "localhost")
+PG_INDEX_NAME = os.getenv("PG_INDEX_NAME", "rag_pgvector")
+
+
+#######################################################
+#                        QDrant                       #
+#######################################################
+QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
+QDRANT_PORT = int(os.getenv("QDRANT_PORT", 6333))
+QDRANT_EMBED_DIMENSION = os.getenv("QDRANT_EMBED_DIMENSION", 768)
+QDRANT_INDEX_NAME = os.getenv("QDRANT_INDEX_NAME", "rag_qdrant")
+
+
+#######################################################
+#                        VDMs                         #
+#######################################################
+# VDMS Connection Information
+VDMS_HOST = os.getenv("VDMS_HOST", "localhost")
+VDMS_PORT = int(os.getenv("VDMS_PORT", 55555))
+VDMS_INDEX_NAME = os.getenv("VDMS_INDEX_NAME", "rag_vdms")
+VDMS_USE_CLIP = int(os.getenv("VDMS_USE_CLIP", 0))
+SEARCH_ENGINE = "FaissFlat"
+DISTANCE_STRATEGY = "IP"

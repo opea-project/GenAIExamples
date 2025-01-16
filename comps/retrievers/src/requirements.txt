@@ -1,15 +1,42 @@
+bs4
+cairosvg
 docarray[full]
+docx2txt
 easyocr
 fastapi
+future
+graspologic
+haystack-ai==2.3.1
+langchain-elasticsearch --extra-index-url https://download.pytorch.org/whl/cpu
+langchain-pinecone --extra-index-url https://download.pytorch.org/whl/cpu
 langchain_community --extra-index-url https://download.pytorch.org/whl/cpu
 langchain_huggingface --extra-index-url https://download.pytorch.org/whl/cpu
 langchain_milvus --extra-index-url https://download.pytorch.org/whl/cpu
+llama-index-core
+llama-index-embeddings-openai
+llama-index-embeddings-text-embeddings-inference
+llama-index-llms-openai
+llama-index-llms-text-generation-inference
+llama_index_graph_stores_neo4j==0.3.3
+neo4j
+numpy
+opensearch-py
 opentelemetry-api
 opentelemetry-exporter-otlp
 opentelemetry-sdk
+pathway
+pgvector==0.2.5
 prometheus-fastapi-instrumentator
+psycopg2-binary
+pydantic
 pymupdf
+pytesseract
+python-docx
+python-multipart
+python-pptx
+qdrant-haystack
 redis
 sentence_transformers
 shortuuid
+tiktoken
 uvicorn
