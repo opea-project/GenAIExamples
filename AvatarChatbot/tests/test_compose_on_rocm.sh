@@ -39,7 +39,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
 
     export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
-    export OPENAI_API_KEY=''
+    export OPENAI_API_KEY=$OPENAI_API_KEY
     export host_ip=${ip_address}
 
     export TGI_SERVICE_PORT=3006
