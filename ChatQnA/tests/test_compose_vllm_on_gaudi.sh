@@ -17,21 +17,19 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-    git clone https://github.com/vllm-project/vllm.git
+    git clone https://github.com/HabanaAI/vllm-fork.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-redis retriever vllm nginx"
+    service_list="chatqna chatqna-ui dataprep-redis retriever vllm-gaudi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-
+    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
-
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
@@ -41,9 +39,10 @@ function start_services() {
     # Start Docker Containers
     docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log
-        if grep -q Connected ${LOG_PATH}/vllm_service_start.log; then
+    until [[ "$n" -ge 160 ]]; do
+        echo "n=$n"
+        docker logs vllm-gaudi-server > vllm_service_start.log
+        if grep -q "Warmup finished" vllm_service_start.log; then
             break
         fi
         sleep 5s
@@ -84,10 +83,10 @@ function validate_microservices() {
 
     # tei for embedding service
     validate_services \
-        "${ip_address}:6006/embed" \
+        "${ip_address}:8090/embed" \
         "\[\[" \
         "tei-embedding" \
-        "tei-embedding-server" \
+        "tei-embedding-gaudi-server" \
         '{"inputs":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -106,25 +105,25 @@ function validate_microservices() {
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
-        "tei-reranking-server" \
+        "tei-reranking-gaudi-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
     # vllm for llm service
     validate_services \
-        "${ip_address}:9009/v1/completions" \
+        "${ip_address}:8007/v1/completions" \
         "text" \
         "vllm-llm" \
-        "vllm-service" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
+        "vllm-gaudi-server" \
+        '{"model": "Intel/neural-chat-7b-v3-3","prompt": "What is Deep Learning?","max_tokens": 32,"temperature": 0}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
         "${ip_address}:8888/v1/chatqna" \
-        "data" \
+        "data:" \
         "mega-chatqna" \
-        "chatqna-xeon-backend-server" \
+        "chatqna-gaudi-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
@@ -138,7 +137,6 @@ function validate_frontend() {
     else
         conda create -n ${conda_env_name} python=3.12 -y
     fi
-
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
@@ -159,7 +157,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose -f compose_vllm.yaml down
 }
 
@@ -171,15 +169,11 @@ function main() {
     start_services
     end_time=$(date +%s)
     duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s" && sleep 1s
+    echo "Mega service start duration is $duration s"
 
-    if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/tests/chatqna_benchmark.py
-    elif [ "${mode}" == "" ]; then
-        validate_microservices
-        validate_megaservice
-        # validate_frontend
-    fi
+    validate_microservices
+    validate_megaservice
+    # validate_frontend
 
     stop_docker
     echo y | docker system prune

@@ -20,7 +20,7 @@ function build_docker_images() {
     git clone https://github.com/HabanaAI/vllm-fork.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever-redis vllm-gaudi guardrails nginx"
+    service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever vllm-gaudi guardrails nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
