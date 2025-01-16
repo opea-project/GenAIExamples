@@ -51,7 +51,7 @@ docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=
 ### 7. Build Chat History Image
 
 ```bash
-docker build -t opea/chathistory-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/mongo/Dockerfile .
+docker build -t opea/chathistory-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/src/Dockerfile .
 cd ..
 ```
 
