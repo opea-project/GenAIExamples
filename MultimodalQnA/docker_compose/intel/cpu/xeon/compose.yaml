@@ -89,7 +89,7 @@ services:
       MULTIMODAL_EMBEDDING: true
     restart: unless-stopped
   retriever-redis:
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-redis
     depends_on:
       - redis-vector-db
@@ -106,7 +106,8 @@ services:
       REDIS_RETRIEVER_PORT: ${REDIS_RETRIEVER_PORT}
       INDEX_NAME: ${INDEX_NAME}
       BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
-      RETRIEVER_TYPE: "redis"
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   lvm-llava:
     image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
