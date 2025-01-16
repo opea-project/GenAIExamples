@@ -58,7 +58,7 @@ def read_pdf(file):
 
 
 def video2audio(
-        video_base64: str,
+    video_base64: str,
 ) -> str:
     """Convert a base64 video string to a base64 audio string using ffmpeg.
 
@@ -114,8 +114,8 @@ def read_text_from_file(file, save_file_name):
         file_content = [doc.page_content for doc in documents]
     # read docx file
     elif (
-            file.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            or file.headers["content-type"] == "application/octet-stream"
+        file.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        or file.headers["content-type"] == "application/octet-stream"
     ):
         file_content = docx2txt.process(save_file_name)
 
@@ -247,9 +247,9 @@ class DocSumService:
             for node, response in result_dict.items():
                 # Here it suppose the last microservice in the megaservice is LLM.
                 if (
-                        isinstance(response, StreamingResponse)
-                        and node == list(self.megaservice.services.keys())[-1]
-                        and self.megaservice.services[node].service_type == ServiceType.LLM
+                    isinstance(response, StreamingResponse)
+                    and node == list(self.megaservice.services.keys())[-1]
+                    and self.megaservice.services[node].service_type == ServiceType.LLM
                 ):
                     return response
         else:
@@ -260,9 +260,9 @@ class DocSumService:
             for node, response in result_dict.items():
                 # Here it suppose the last microservice in the megaservice is LLM.
                 if (
-                        isinstance(response, StreamingResponse)
-                        and node == list(self.megaservice.services.keys())[-1]
-                        and self.megaservice.services[node].service_type == ServiceType.LLM
+                    isinstance(response, StreamingResponse)
+                    and node == list(self.megaservice.services.keys())[-1]
+                    and self.megaservice.services[node].service_type == ServiceType.LLM
                 ):
                     return response
 
