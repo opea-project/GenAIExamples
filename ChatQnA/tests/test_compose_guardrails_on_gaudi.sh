@@ -17,12 +17,12 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone https://github.com/HabanaAI/vllm-fork.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever-redis guardrails nginx"
+    service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever-redis vllm-gaudi guardrails nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
 
@@ -41,20 +41,20 @@ function start_services() {
     # Start Docker Containers
     docker compose -f compose_guardrails.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-gaudi-server > tgi_service_start.log
-        if grep -q Connected tgi_service_start.log; then
+    until [[ "$n" -ge 160 ]]; do
+        docker logs vllm-gaudi-server > vllm_service_start.log
+        if grep -q "Warmup finished" vllm_service_start.log; then
             break
         fi
         sleep 5s
         n=$((n+1))
     done
 
-    # Make sure tgi guardrails service is ready
+    # Make sure vllm guardrails service is ready
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-guardrails-server > tgi_guardrails_service_start.log
-        if grep -q Connected tgi_guardrails_service_start.log; then
+    until [[ "$n" -ge 160 ]]; do
+        docker logs vllm-guardrails-server > vllm_guardrails_service_start.log
+        if grep -q "Warmup finished" vllm_guardrails_service_start.log; then
             break
         fi
         sleep 5s
@@ -62,7 +62,7 @@ function start_services() {
     done
 }
 
-function validate_services() {
+function validate_service() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
@@ -97,7 +97,7 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # tei for embedding service
-    validate_services \
+    validate_service \
         "${ip_address}:8090/embed" \
         "[[" \
         "tei-embedding" \
@@ -108,7 +108,7 @@ function validate_microservices() {
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-    validate_services \
+    validate_service \
         "${ip_address}:7000/v1/retrieval" \
         "retrieved_docs" \
         "retrieval" \
@@ -116,23 +116,23 @@ function validate_microservices() {
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
-    validate_services \
+    validate_service \
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
         "tei-reranking-gaudi-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # tgi for llm service
-    validate_services \
-        "${ip_address}:8008/generate" \
-        "generated_text" \
-        "tgi-llm" \
-        "tgi-gaudi-server" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+    # vllm for llm service
+    validate_service \
+        "${ip_address}:8008/v1/chat/completions" \
+        "text" \
+        "vllm-llm" \
+        "vllm-gaudi-server" \
+        '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
 
     # guardrails microservice
-    validate_services \
+    validate_service \
         "${ip_address}:9090/v1/guardrails" \
         "Violated policies" \
         "guardrails" \
@@ -142,7 +142,7 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
-    validate_services \
+    validate_service \
         "${ip_address}:8888/v1/chatqna" \
         "data: " \
         "mega-chatqna" \
