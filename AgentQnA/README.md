@@ -3,7 +3,7 @@
 ## Overview
 
 This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from the knowledge base (a vector database). The worker SQL agent retrieve relevant data from the SQL database. Although not included in this example, but other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
-![Architecture Overview](assets/agent_qna_arch.png)
+![Architecture Overview](assets/img/agent_qna_arch.png)
 
 The AgentQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
@@ -263,6 +263,12 @@ curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: applic
      "messages": "How many albums does Iron Maiden have?"
     }'
 ```
+
+## Deploy AgentQnA UI
+
+The AgentQnA UI can be deployed locally or using Docker.
+
+For detailed instructions on deploying AgentQnA UI, refer to the [AgentQnA UI Guide](./ui/svelte/README.md).
 
 ## How to register your own tools with agent
 
