@@ -15,8 +15,8 @@ logger = CustomLogger("opea_textgen_predictionguard")
 logflag = os.getenv("LOGFLAG", False)
 
 
-@OpeaComponentRegistry.register("OPEATextGen_Predictionguard")
-class OPEATextGen_Predictionguard(OpeaComponent):
+@OpeaComponentRegistry.register("OpeaTextGenPredictionguard")
+class OpeaTextGenPredictionguard(OpeaComponent):
     """A specialized OPEA TextGen component derived from OpeaComponent for interacting with Predictionguard services.
 
     Attributes:
@@ -28,9 +28,9 @@ class OPEATextGen_Predictionguard(OpeaComponent):
         self.client = PredictionGuard()
         health_status = self.check_health()
         if not health_status:
-            logger.error("OPEATextGen_Predictionguard health check failed.")
+            logger.error("OpeaTextGenPredictionguard health check failed.")
         else:
-            logger.info("OPEATextGen_Predictionguard health check success.")
+            logger.info("OpeaTextGenPredictionguard health check success.")
 
     def check_health(self) -> bool:
         """Checks the health of the Predictionguard LLM service.

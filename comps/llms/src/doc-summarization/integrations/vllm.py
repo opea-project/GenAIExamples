@@ -14,9 +14,9 @@ logger = CustomLogger("llm_docsum_vllm")
 logflag = os.getenv("LOGFLAG", False)
 
 
-@OpeaComponentRegistry.register("OPEADocSum_vLLM")
-class OPEADocSum_vLLM(OPEADocSum):
-    """A specialized OPEA DocSum vLLM component derived from OPEADocSum for interacting with vLLM services based on Lanchain VLLMOpenAI API.
+@OpeaComponentRegistry.register("OpeaDocSumvLLM")
+class OpeaDocSumvLLM(OpeaDocSum):
+    """A specialized OPEA DocSum vLLM component derived from OpeaDocSum for interacting with vLLM services based on Lanchain VLLMOpenAI API.
 
     Attributes:
         client (vLLM): An instance of the vLLM client for text generation.

@@ -20,17 +20,17 @@ function build_docker_images() {
 }
 
 function start_service() {
-    export LLM_ENDPOINT_PORT=5062
-    export FAQ_PORT=5063
+    export LLM_ENDPOINT_PORT=5060
+    export FAQ_PORT=5061
     export host_ip=${host_ip}
     export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN} # Remember to set HF_TOKEN before invoking this test!
     export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI"
+    export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
     export LOGFLAG=True
 
     cd $WORKPATH/comps/llms/deployment/docker_compose
-    docker compose -f faq-generation_tgi_on_intel_hpu.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f faq-generation_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     sleep 30s
 }
@@ -72,7 +72,7 @@ function validate_backend_microservices() {
         "${host_ip}:${LLM_ENDPOINT_PORT}/generate" \
         "generated_text" \
         "tgi" \
-        "tgi-gaudi-server" \
+        "tgi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # faq
@@ -94,7 +94,7 @@ function validate_backend_microservices() {
 
 function stop_docker() {
     cd $WORKPATH/comps/llms/deployment/docker_compose
-    docker compose -f faq-generation_tgi_on_intel_hpu.yaml down
+    docker compose -f faq-generation_tgi.yaml down
 }
 
 function main() {

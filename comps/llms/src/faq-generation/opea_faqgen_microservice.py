@@ -4,8 +4,8 @@
 import os
 import time
 
-from integrations.tgi import OPEAFAQGen_TGI
-from integrations.vllm import OPEAFAQGen_vLLM
+from integrations.tgi import OpeaFaqGenTgi
+from integrations.vllm import OpeaFaqGenvLLM
 
 from comps import (
     CustomLogger,
@@ -21,7 +21,7 @@ from comps import (
 logger = CustomLogger("llm_faqgen")
 logflag = os.getenv("LOGFLAG", False)
 
-llm_component_name = os.getenv("FAQGen_COMPONENT_NAME", "OPEAFAQGen_TGI")
+llm_component_name = os.getenv("FAQGen_COMPONENT_NAME", "OpeaFaqGenTgi")
 # Initialize OpeaComponentLoader
 loader = OpeaComponentLoader(llm_component_name, description=f"OPEA LLM FAQGen Component: {llm_component_name}")
 

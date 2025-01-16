@@ -28,7 +28,7 @@ function start_service() {
     docker run -d --name=test-comps-llm-textgen-pg-server \
         -e http_proxy= -e https_proxy= \
         -e PREDICTIONGUARD_API_KEY=${PREDICTIONGUARD_API_KEY} \
-        -e LLM_COMPONENT_NAME="OPEATextGen_Predictionguard" \
+        -e LLM_COMPONENT_NAME="OpeaTextGenPredictionguard" \
         -e LOGFLAG=True \
         -p 9000:9000 --ipc=host opea/llm-textgen:comps
     sleep 60  # Sleep for 1 minute to allow the service to start

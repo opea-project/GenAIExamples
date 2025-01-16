@@ -14,9 +14,9 @@ logger = CustomLogger("opea_faqgen_vllm")
 logflag = os.getenv("LOGFLAG", False)
 
 
-@OpeaComponentRegistry.register("OPEAFAQGen_vLLM")
-class OPEAFAQGen_vLLM(OPEAFAQGen):
-    """A specialized OPEA FAQGen vLLM component derived from OPEAFAQGen for interacting with vLLM services based on Lanchain VLLMOpenAI API.
+@OpeaComponentRegistry.register("OpeaFaqGenvLLM")
+class OpeaFaqGenvLLM(OpeaFaqGen):
+    """A specialized OPEA FAQGen vLLM component derived from OpeaFaqGen for interacting with vLLM services based on Lanchain VLLMOpenAI API.
 
     Attributes:
         client (vLLM): An instance of the vLLM client for text generation.

@@ -56,7 +56,7 @@ def get_llm_endpoint():
             raise ConfigError(f"Input model {MODEL_NAME} not present in model_configs")
 
 
-class OPEADocSum(OpeaComponent):
+class OpeaDocSum(OpeaComponent):
     """A specialized OPEA DocSum component derived from OpeaComponent.
 
     Attributes:
@@ -72,7 +72,7 @@ class OPEADocSum(OpeaComponent):
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
         health_status = self.check_health()
         if not health_status:
-            logger.error("OPEADocSum health check failed.")
+            logger.error("OpeaDocSum health check failed.")
 
     async def generate(self, input: DocSumLLMParams, client):
         """Invokes the TGI/vLLM LLM service to generate summarization for the provided input.

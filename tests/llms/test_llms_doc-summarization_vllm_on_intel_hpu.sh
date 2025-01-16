@@ -40,7 +40,7 @@ function start_service() {
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export MAX_INPUT_TOKENS=2048
     export MAX_TOTAL_TOKENS=4096
-    export DocSum_COMPONENT_NAME="OPEADocSum_vLLM" # or "vllm"
+    export DocSum_COMPONENT_NAME="OpeaDocSumvLLM" # or "vllm"
     export VLLM_SKIP_WARMUP=true
     export LOGFLAG=True
 

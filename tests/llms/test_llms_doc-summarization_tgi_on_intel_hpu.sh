@@ -21,18 +21,18 @@ function build_docker_images() {
 
 function start_service() {
     export host_ip=${host_ip}
-    export LLM_ENDPOINT_PORT=5072
-    export DOCSUM_PORT=5073
+    export LLM_ENDPOINT_PORT=5071
+    export DOCSUM_PORT=5072
     export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
     export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export MAX_INPUT_TOKENS=2048
     export MAX_TOTAL_TOKENS=4096
-    export DocSum_COMPONENT_NAME="OPEADocSum_TGI" # or "vllm"
+    export DocSum_COMPONENT_NAME="OpeaDocSumTgi" # or "vllm"
     export LOGFLAG=True
 
     cd $WORKPATH/comps/llms/deployment/docker_compose
-    docker compose -f doc-summarization_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f doc-summarization_tgi_on_intel_hpu.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     sleep 30s
 }
@@ -78,7 +78,7 @@ function validate_microservices() {
         "${LLM_ENDPOINT}/generate" \
         "generated_text" \
         "tgi" \
-        "tgi-server" \
+        "tgi_gaudi_server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     echo "Validate stream=True..."
@@ -132,7 +132,7 @@ function validate_microservices() {
 
 function stop_docker() {
     cd $WORKPATH/comps/llms/deployment/docker_compose
-    docker compose -f doc-summarization_tgi.yaml down
+    docker compose -f doc-summarization_tgi_on_intel_hpu.yaml down
 }
 
 function main() {

@@ -14,9 +14,9 @@ logger = CustomLogger("opea_faqgen_tgi")
 logflag = os.getenv("LOGFLAG", False)
 
 
-@OpeaComponentRegistry.register("OPEAFAQGen_TGI")
-class OPEAFAQGen_TGI(OPEAFAQGen):
-    """A specialized OPEA FAQGen TGI component derived from OPEAFAQGen for interacting with TGI services based on Lanchain HuggingFaceEndpoint API.
+@OpeaComponentRegistry.register("OpeaFaqGenTgi")
+class OpeaFaqGenTgi(OpeaFaqGen):
+    """A specialized OPEA FAQGen TGI component derived from OpeaFaqGen for interacting with TGI services based on Lanchain HuggingFaceEndpoint API.
 
     Attributes:
         client (TGI): An instance of the TGI client for text generation.

@@ -14,9 +14,9 @@ logger = CustomLogger("llm_docsum_tgi")
 logflag = os.getenv("LOGFLAG", False)
 
 
-@OpeaComponentRegistry.register("OPEADocSum_TGI")
-class OPEADocSum_TGI(OPEADocSum):
-    """A specialized OPEA DocSum TGI component derived from OPEADocSum for interacting with TGI services based on Lanchain HuggingFaceEndpoint API.
+@OpeaComponentRegistry.register("OpeaDocSumTgi")
+class OpeaDocSumTgi(OpeaDocSum):
+    """A specialized OPEA DocSum TGI component derived from OpeaDocSum for interacting with TGI services based on Lanchain HuggingFaceEndpoint API.
 
     Attributes:
         client (TGI): An instance of the TGI client for text generation.

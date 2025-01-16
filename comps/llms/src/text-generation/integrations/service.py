@@ -47,8 +47,8 @@ def get_llm_endpoint():
         raise ConfigError(f"Input model {MODEL_NAME} not present in model_configs")
 
 
-@OpeaComponentRegistry.register("OPEA_LLM")
-class OPEALLM(OpeaComponent):
+@OpeaComponentRegistry.register("OpeaTextGenService")
+class OpeaTextGenService(OpeaComponent):
     """A specialized OPEA LLM component derived from OpeaComponent for interacting with TGI/vLLM services based on OpenAI API.
 
     Attributes:
@@ -60,7 +60,7 @@ class OPEALLM(OpeaComponent):
         self.client = self._initialize_client()
         health_status = self.check_health()
         if not health_status:
-            logger.error("OPEALLM health check failed.")
+            logger.error("OpeaTextGenService health check failed.")
 
     def _initialize_client(self) -> AsyncOpenAI:
         """Initializes the AsyncOpenAI."""

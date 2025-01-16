@@ -15,7 +15,7 @@ export FAQ_PORT=9000
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 export LLM_MODEL_ID=${your_hf_llm_model}
-export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI" # or "vllm"
+export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi" # or "vllm"
 ```
 
 ### 1.2 Build Docker Image

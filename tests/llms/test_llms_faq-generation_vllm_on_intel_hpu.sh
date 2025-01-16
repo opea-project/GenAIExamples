@@ -39,7 +39,7 @@ function start_service() {
     export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN} # Remember to set HF_TOKEN before invoking this test!
     export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export FAQGen_COMPONENT_NAME="OPEAFAQGen_vLLM"
+    export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
     export VLLM_SKIP_WARMUP=true
     export LOGFLAG=True
 

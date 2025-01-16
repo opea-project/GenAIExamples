@@ -17,7 +17,7 @@ export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 export LLM_MODEL_ID=${your_hf_llm_model}
 export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
-export DocSum_COMPONENT_NAME="OPEADocSum_TGI" # or "OPEADocSum_vLLM"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi" # or "OpeaDocSumvLLM"
 ```
 
 Please make sure MAX_TOTAL_TOKENS should be larger than (MAX_INPUT_TOKENS + max_new_tokens + 50), 50 is reserved prompt length.

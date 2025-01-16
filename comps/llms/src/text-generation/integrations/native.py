@@ -200,8 +200,8 @@ def initialize():
             initialized = True
 
 
-@OpeaComponentRegistry.register("OPEATextGen_Native")
-class OPEATextGen_Native(OpeaComponent):
+@OpeaComponentRegistry.register("OpeaTextGenNative")
+class OpeaTextGenNative(OpeaComponent):
     """A specialized OPEA TextGen component derived from OpeaComponent for interacting with LLM services based on native optimum habana."""
 
     def __init__(self, name: str, description: str, config: dict = None):
@@ -209,9 +209,9 @@ class OPEATextGen_Native(OpeaComponent):
         initialize()
         health_status = self.check_health()
         if not health_status:
-            logger.error("OPEATextGen_Native health check failed.")
+            logger.error("OpeaTextGenNative health check failed.")
         else:
-            logger.info("OPEATextGen_Native health check success.")
+            logger.info("OpeaTextGenNative health check success.")
 
     def check_health(self) -> bool:
         """Checks the health of the LLM service.

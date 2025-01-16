@@ -56,7 +56,7 @@ def get_llm_endpoint():
             raise ConfigError(f"Input model {MODEL_NAME} not present in model_configs")
 
 
-class OPEAFAQGen(OpeaComponent):
+class OpeaFaqGen(OpeaComponent):
     """A specialized OPEA FAQGen component derived from OpeaComponent.
 
     Attributes:
@@ -72,7 +72,7 @@ class OPEAFAQGen(OpeaComponent):
         self.llm_endpoint = get_llm_endpoint()
         health_status = self.check_health()
         if not health_status:
-            logger.error("OPEAFAQGen health check failed.")
+            logger.error("OpeaFaqGen health check failed.")
 
     async def generate(self, input: LLMParamsDoc, client):
         """Invokes the TGI/vLLM LLM service to generate FAQ output for the provided input.

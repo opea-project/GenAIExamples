@@ -38,7 +38,7 @@ function start_service() {
         -e HABANA_VISIBLE_DEVICES=all \
         -e OMPI_MCA_btl_vader_single_copy_mechanism=none \
         -e TOKENIZERS_PARALLELISM=false \
-        -e LLM_COMPONENT_NAME="OPEATextGen_Native" \
+        -e LLM_COMPONENT_NAME="OpeaTextGenNative" \
         --restart unless-stopped \
         --network bridge \
         opea/llm-textgen-gaudi:comps
