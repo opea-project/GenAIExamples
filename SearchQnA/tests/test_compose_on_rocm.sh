@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="searchqna searchqna-ui embedding-tei web-retriever-chroma reranking-tei llm-tgi"
+    service_list="searchqna searchqna-ui embedding web-retriever reranking llm-textgen"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -36,6 +36,7 @@ function start_services() {
     export SEARCH_RERANK_MODEL_ID='BAAI/bge-reranker-base'
     export SEARCH_TEI_RERANKING_ENDPOINT=http://${SEARCH_HOST_IP}:3004
     export SEARCH_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export SEARCH_OPENAI_API_KEY=${OPENAI_API_KEY}
     export SEARCH_TGI_LLM_ENDPOINT=http://${SEARCH_HOST_IP}:3006
     export SEARCH_LLM_MODEL_ID='Intel/neural-chat-7b-v3-3'
     export SEARCH_MEGA_SERVICE_HOST_IP=${SEARCH_EXTERNAL_HOST_IP}
