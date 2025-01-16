@@ -26,3 +26,18 @@ services:
     build:
       dockerfile: comps/third_parties/wav2lip/src/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/wav2lip-gaudi:${TAG:-latest}
+  vllm-arc:
+    build:
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.intel_gpu
+    image: ${REGISTRY:-opea}/vllm-arc:${TAG:-latest}
+  vllm-openvino:
+    build:
+      context: vllm-openvino
+      dockerfile: Dockerfile.openvino
+    image: ${REGISTRY:-opea}/vllm-openvino:${TAG:-latest}
+  vllm-gaudi:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    shm_size: '128g'
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}

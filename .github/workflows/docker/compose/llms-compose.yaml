@@ -27,21 +27,6 @@ services:
     build:
       dockerfile: comps/llms/text-generation/native/llama_index/Dockerfile
     image: ${REGISTRY:-opea}/llm-native-llamaindex:${TAG:-latest}
-  vllm-openvino:
-    build:
-      context: vllm-openvino
-      dockerfile: Dockerfile.openvino
-    image: ${REGISTRY:-opea}/vllm-openvino:${TAG:-latest}
-  vllm-gaudi:
-    build:
-      context: vllm-fork
-      dockerfile: Dockerfile.hpu
-    shm_size: '128g'
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
-  vllm-arc:
-    build:
-      dockerfile: comps/llms/text-generation/vllm/langchain/dependency/Dockerfile.intel_gpu
-    image: ${REGISTRY:-opea}/vllm-arc:${TAG:-latest}
   llm-eval:
     build:
       dockerfile: comps/llms/utils/lm-eval/Dockerfile
