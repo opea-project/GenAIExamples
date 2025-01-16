@@ -50,7 +50,7 @@ services:
   chathistory-mongo-server:
     build:
       context: GenAIComps
-      dockerfile: comps/chathistory/mongo/Dockerfile
+      dockerfile: comps/chathistory/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
   productivity-suite-react-ui-server:
