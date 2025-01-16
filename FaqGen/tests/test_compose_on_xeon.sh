@@ -31,7 +31,7 @@ function start_services() {
 
     export host_ip=${ip_address}
     export LLM_ENDPOINT_PORT=8008
-    export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI"
+    export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
