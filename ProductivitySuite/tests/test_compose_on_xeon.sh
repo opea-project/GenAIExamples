@@ -80,7 +80,7 @@ function start_services() {
     export LLM_SERVER_PORT=9009
     export PROMPT_COLLECTION_NAME="prompt"
     export host_ip=${ip_address}
-    export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI"
+    export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
     export LOGFLAG=True
 
     # Start Docker Containers
