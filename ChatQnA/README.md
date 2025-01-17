@@ -369,4 +369,3 @@ There are also OPEA related tracings. Users could understand the time breakdown 
 There might be asyn function such as llm/MicroService_asyn_generate and users need to check the tracing of the asyn function in another operation like
 opea:llm_generate_stream.
 ![image](https://github.com/user-attachments/assets/a973d283-198f-4ce2-a7eb-58515b77503e)
-
