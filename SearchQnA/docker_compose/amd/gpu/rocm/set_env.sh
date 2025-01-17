@@ -5,8 +5,8 @@
 
 # SPDX-License-Identifier: Apache-2.0
 
-export SEARCH_HOST_IP=''
-export SEARCH_EXTERNAL_HOST_IP=''
+export SEARCH_HOST_IP=10.53.22.29
+export SEARCH_EXTERNAL_HOST_IP=68.69.180.77
 export SEARCH_EMBEDDING_MODEL_ID='BAAI/bge-base-en-v1.5'
 export SEARCH_TEI_EMBEDDING_ENDPOINT=http://${SEARCH_HOST_IP}:3001
 export SEARCH_RERANK_MODEL_ID='BAAI/bge-reranker-base'
