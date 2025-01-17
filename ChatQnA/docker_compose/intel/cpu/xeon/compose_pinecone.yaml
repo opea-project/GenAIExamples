@@ -6,7 +6,7 @@ version: "3.8"
 
 services:
   dataprep-pinecone-service:
-    image: ${REGISTRY:-opea}/dataprep-pinecone:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-pinecone-server
     depends_on:
       - tei-embedding-service
@@ -21,6 +21,7 @@ services:
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_PINECONE"
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server

@@ -144,7 +144,7 @@ docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy 
 ### 4. Build dataprep-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 5. Build asr images
@@ -178,7 +178,7 @@ cd ../../../
 
 Then run the command `docker images`, you will have the following 11 Docker Images:
 
-1. `opea/dataprep-multimodal-redis:latest`
+1. `opea/dataprep:latest`
 2. `opea/lvm:latest`
 3. `opea/lvm-llava:latest`
 4. `opea/retriever:latest`

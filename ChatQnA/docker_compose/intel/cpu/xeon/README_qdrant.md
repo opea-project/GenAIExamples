@@ -79,7 +79,7 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 ### 2. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 cd ..
 ```
 
@@ -127,7 +127,7 @@ docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-a
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `opea/dataprep-qdrant:latest`
+1. `opea/dataprep:latest`
 2. `opea/retriever:latest`
 3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest`

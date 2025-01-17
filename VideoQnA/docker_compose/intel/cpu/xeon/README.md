@@ -80,7 +80,7 @@ docker build -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg
 ### 5. Build Dataprep Image
 
 ```bash
-docker build -t opea/dataprep-multimodal-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/Dockerfile .
+docker build -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 6. Build MegaService Docker Image
@@ -106,7 +106,7 @@ docker build -t opea/videoqna-ui:latest --build-arg https_proxy=$https_proxy --b
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
-1. `opea/dataprep-multimodal-vdms:latest`
+1. `opea/dataprep:latest`
 2. `opea/embedding-multimodal-clip:latest`
 3. `opea/retriever:latest`
 4. `opea/reranking:latest`

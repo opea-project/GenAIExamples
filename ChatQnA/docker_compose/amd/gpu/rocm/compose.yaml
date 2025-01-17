@@ -9,7 +9,7 @@ services:
       - "${CHATQNA_REDIS_VECTOR_PORT}:6379"
       - "${CHATQNA_REDIS_VECTOR_INSIGHT_PORT}:8001"
   chatqna-dataprep-redis-service:
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
       - chatqna-redis-vector-db
