@@ -20,6 +20,11 @@ on:
         required: false
         type: string
         description: "Set to true if you want to use released docker images at dockerhub. By default using internal docker registry."
+      mode:
+        default: "CD"
+        description: "Whether the test range is CI, CD or CICD"
+        required: false
+        type: string
       tag:
         default: "latest"
         required: false
@@ -53,10 +58,18 @@ jobs:
         id: get-test-files
         run: |
           set -x
-          # service_list=($(echo "${{ inputs.example }}" | tr ',' ' '))
-          # value_files="{\"include\":["
+          if [ "${{ inputs.mode }}" = "CI" ]; then
+            base_commit=${{ github.event.pull_request.base.sha }}
+            merged_commit=$(git log -1 --format='%H')
+            values_files=$(git diff --name-only ${base_commit} ${merged_commit} | \
+            grep "kubernetes/helm" | \
+            sort -u)
+            echo $values_files
+          elif [ "${{ inputs.mode }}" = "CD" ]; then
+            value_files=$(ls "${{ inputs.example }}"/kubernetes/helm/*values.yaml)
+          fi
           value_files="["
-          for file in "${{ inputs.example }}"/kubernetes/helm/*values.yaml; do
+          for file in ${values_files}; do
             if [ -f "$file" ]; then
               filename=$(basename "$file")
               if [[ "$filename" == *"gaudi"* ]]; then
@@ -75,6 +88,7 @@ jobs:
           # value_files="${value_files%,}"
           # value_files=$value_files"]}"
           value_files="${value_files%,}]"
+
           echo "value_files=${value_files}"
           echo "value_files=${value_files}" >> $GITHUB_OUTPUT
 
