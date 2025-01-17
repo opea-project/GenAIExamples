@@ -11,10 +11,6 @@ services:
     build:
       dockerfile: comps/llms/src/text-generation/Dockerfile.intel_hpu
     image: ${REGISTRY:-opea}/llm-textgen-gaudi:${TAG:-latest}
-  llm-ollama:
-    build:
-      dockerfile: comps/llms/text-generation/ollama/langchain/Dockerfile
-    image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
   llm-docsum:
     build:
       dockerfile: comps/llms/src/doc-summarization/Dockerfile
