@@ -17,12 +17,12 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork && git checkout v0.6.4.post2+Gaudi-1.19.0 && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-without-rerank chatqna-ui dataprep-redis retriever vllm-gaudi nginx"
+    service_list="chatqna chatqna-ui dataprep-redis retriever nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
 
@@ -32,20 +32,25 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
+    export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
+    export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
 
     # Start Docker Containers
-    docker compose -f compose_without_rerank.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    sed -i "s|container_name: chatqna-gaudi-backend-server|container_name: chatqna-gaudi-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 160 ]]; do
-        docker logs vllm-gaudi-server > vllm_service_start.log
-        if grep -q "Warmup finished" vllm_service_start.log; then
+    until [[ "$n" -ge 500 ]]; do
+        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 1s
         n=$((n+1))
     done
 }
@@ -143,12 +148,20 @@ function validate_microservices() {
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
-    # vllm for llm service
+    # tei for rerank microservice
     validate_service \
-        "${ip_address}:8007/v1/chat/completions" \
+        "${ip_address}:8808/rerank" \
+        '{"index":1,"score":' \
+        "tei-rerank" \
+        "tei-reranking-gaudi-server" \
+        '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
+
+    # tgi for llm service
+    validate_service \
+        "${ip_address}:8005/v1/chat/completions" \
         "content" \
-        "vllm-llm" \
-        "vllm-gaudi-server" \
+        "tgi-llm" \
+        "tgi-gaudi-server" \
         '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
 }
 
@@ -193,7 +206,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose  -f compose_without_rerank.yaml down
+    docker compose -f compose_tgi.yaml down
 }
 
 function main() {
