@@ -3,6 +3,7 @@
 
 import json
 from typing import Any, Dict, List, Optional, Tuple
+from collections import OrderedDict
 
 from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
@@ -95,17 +96,17 @@ class RedisPersistence:
 
     def get_all(self, collection: str = DEFAULT_COLLECTION) -> Dict[str, dict]:
         """Get all values from the store."""
-        collection_kv_dict = {}
+        collection_kv_dict = OrderedDict()
         for key, val_str in self._redis_client.hscan_iter(name=collection):
-            value = dict(json.loads(val_str))
+            value = json.loads(val_str)
             collection_kv_dict[key.decode()] = value
         return collection_kv_dict
 
     async def aget_all(self, collection: str = DEFAULT_COLLECTION) -> Dict[str, dict]:
         """Get all values from the store."""
-        collection_kv_dict = {}
+        collection_kv_dict = OrderedDict()
         async for key, val_str in self._async_redis_client.hscan_iter(name=collection):
-            value = dict(json.loads(val_str))
+            value = json.loads(val_str)
             collection_kv_dict[key.decode()] = value
         return collection_kv_dict
 

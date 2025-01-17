@@ -494,6 +494,7 @@ class CreateMessagesRequest(BaseModel):
     role: str = "user"
     content: Union[str, List[MessageContent]]
     attachments: Attachments = None
+    assistant_id: str = None
 
 
 class CreateThreadsRequest(BaseModel):

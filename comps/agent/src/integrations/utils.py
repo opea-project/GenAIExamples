@@ -120,6 +120,16 @@ def adapt_custom_prompt(local_vars, custom_prompt):
             local_vars[k] = v
 
 
+def assemble_store_messages(messages):
+
+    inputs = []
+    for _, message in messages:
+        inputs.append(message["role"] + ":")
+        inputs.append(message["content"]["text"])
+
+    return "\n".join(inputs)
+
+
 def get_args():
     parser = argparse.ArgumentParser()
     # llm args
