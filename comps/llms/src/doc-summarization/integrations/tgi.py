@@ -6,7 +6,8 @@ import os
 import requests
 from langchain_community.llms import HuggingFaceEndpoint
 
-from comps import CustomLogger, DocSumLLMParams, GeneratedDoc, OpeaComponent, OpeaComponentRegistry, ServiceType
+from comps import CustomLogger, GeneratedDoc, OpeaComponent, OpeaComponentRegistry, ServiceType
+from comps.cores.proto.api_protocol import DocSumChatCompletionRequest
 
 from .common import *
 
@@ -47,11 +48,11 @@ class OpeaDocSumTgi(OpeaDocSum):
             logger.error("Health check failed")
             return False
 
-    async def invoke(self, input: DocSumLLMParams):
+    async def invoke(self, input: DocSumChatCompletionRequest):
         """Invokes the TGI LLM service to generate summarization output for the provided input.
 
         Args:
-            input (DocSumLLMParams): The input text(s).
+            input (DocSumChatCompletionRequest): The input text(s).
         """
         server_kwargs = {}
         if self.access_token:
@@ -62,12 +63,12 @@ class OpeaDocSumTgi(OpeaDocSum):
             input.stream = False
         self.client = HuggingFaceEndpoint(
             endpoint_url=self.llm_endpoint,
-            max_new_tokens=input.max_tokens,
-            top_k=input.top_k,
-            top_p=input.top_p,
-            typical_p=input.typical_p,
-            temperature=input.temperature,
-            repetition_penalty=input.repetition_penalty,
+            max_new_tokens=input.max_tokens if input.max_tokens else 1024,
+            top_k=input.top_k if input.top_k else 10,
+            top_p=input.top_p if input.top_p else 0.95,
+            typical_p=input.typical_p if input.typical_p else 0.95,
+            temperature=input.temperature if input.temperature else 0.01,
+            repetition_penalty=input.repetition_penalty if input.repetition_penalty else 1.03,
             streaming=input.stream,
             server_kwargs=server_kwargs,
         )

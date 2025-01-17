@@ -9,7 +9,6 @@ from integrations.vllm import OpeaDocSumvLLM
 
 from comps import (
     CustomLogger,
-    DocSumLLMParams,
     OpeaComponentLoader,
     ServiceType,
     opea_microservices,
@@ -17,6 +16,7 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+from comps.cores.proto.api_protocol import DocSumChatCompletionRequest
 
 logger = CustomLogger("llm_docsum")
 logflag = os.getenv("LOGFLAG", False)
@@ -34,7 +34,7 @@ loader = OpeaComponentLoader(llm_component_name, description=f"OPEA LLM DocSum C
     port=9000,
 )
 @register_statistics(names=["opea_service@llm_docsum"])
-async def llm_generate(input: DocSumLLMParams):
+async def llm_generate(input: DocSumChatCompletionRequest):
     start = time.time()
 
     # Log the input if logging is enabled

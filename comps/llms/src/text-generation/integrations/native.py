@@ -22,7 +22,7 @@ import time
 import torch
 from langchain_core.prompts import PromptTemplate
 
-from comps import CustomLogger, GeneratedDoc, LLMParamsDoc, OpeaComponent, OpeaComponentRegistry, ServiceType
+from comps import CustomLogger, GeneratedDoc, OpeaComponent, OpeaComponentRegistry, ServiceType
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 
 from .template import ChatTemplate
@@ -227,29 +227,43 @@ class OpeaTextGenNative(OpeaComponent):
             logger.error("Health check failed")
             return False
 
-    async def invoke(self, input: LLMParamsDoc):
+    async def invoke(self, input: ChatCompletionRequest):
         """Invokes the LLM service to generate output for the provided input.
 
         Args:
-            input (LLMParamsDoc): The input text(s).
+            input (ChatCompletionRequest): The input text(s).
         """
-        prompt = input.query
+
+        message = None
+        if isinstance(input.messages, str):
+            message = input.messages
+        else:  # List[Dict]
+            for input_data in input.messages:
+                if "role" in input_data and input_data["role"] == "user" and "content" in input_data:
+                    message = input_data["content"]
+                    if logflag:
+                        logger.info(f"Get input text:\n {message}")
+        if message is None:
+            logger.error("Don't receive any input text, exit!")
+            return GeneratedDoc(text=None, prompt=None)
+
+        prompt = message
         prompt_template = None
         if input.chat_template:
             prompt_template = PromptTemplate.from_template(input.chat_template)
             input_variables = prompt_template.input_variables
         if prompt_template:
             if sorted(input_variables) == ["context", "question"]:
-                prompt = prompt_template.format(question=input.query, context="\n".join(input.documents))
+                prompt = prompt_template.format(question=message, context="\n".join(input.documents))
             elif input_variables == ["question"]:
-                prompt = prompt_template.format(question=input.query)
+                prompt = prompt_template.format(question=message)
             else:
                 logger.info(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
         else:
             if input.documents:
-                prompt = ChatTemplate.generate_rag_prompt(input.query, input.documents)
+                prompt = ChatTemplate.generate_rag_prompt(message, input.documents)
         res = generate([prompt])
 
         if logflag:
             logger.info(f"[llm - native] inference result: {res}")
-        return GeneratedDoc(text=res[0], prompt=input.query)
+        return GeneratedDoc(text=res[0], prompt=message)

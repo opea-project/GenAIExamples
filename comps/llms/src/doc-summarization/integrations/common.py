@@ -11,8 +11,9 @@ from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTex
 from langchain_core.prompts import PromptTemplate
 from transformers import AutoTokenizer
 
-from comps import CustomLogger, DocSumLLMParams, GeneratedDoc, OpeaComponent, ServiceType
+from comps import CustomLogger, GeneratedDoc, OpeaComponent, ServiceType
 from comps.cores.mega.utils import ConfigError, get_access_token, load_model_configs
+from comps.cores.proto.api_protocol import DocSumChatCompletionRequest
 
 from .template import templ_en, templ_refine_en, templ_refine_zh, templ_zh
 
@@ -74,19 +75,33 @@ class OpeaDocSum(OpeaComponent):
         if not health_status:
             logger.error("OpeaDocSum health check failed.")
 
-    async def generate(self, input: DocSumLLMParams, client):
+    async def generate(self, input: DocSumChatCompletionRequest, client):
         """Invokes the TGI/vLLM LLM service to generate summarization for the provided input.
 
         Args:
-            input (DocSumLLMParams): The input text(s).
+            input (DocSumChatCompletionRequest): The input text(s).
             client: TGI/vLLM based client
         """
+        ### get input text
+        message = None
+        if isinstance(input.messages, str):
+            message = input.messages
+        else:  # List[Dict]
+            for input_data in input.messages:
+                if "role" in input_data and input_data["role"] == "user" and "content" in input_data:
+                    message = input_data["content"]
+                    if logflag:
+                        logger.info(f"Get input text:\n {message}")
+        if message is None:
+            logger.error("Don't receive any input text, exit!")
+            return GeneratedDoc(text=None, prompt=None)
+
         ### check summary type
         summary_types = ["auto", "stuff", "truncate", "map_reduce", "refine"]
         if input.summary_type not in summary_types:
             raise NotImplementedError(f"Please specify the summary_type in {summary_types}")
         if input.summary_type == "auto":  ### Check input token length in auto mode
-            token_len = len(self.tokenizer.encode(input.query))
+            token_len = len(self.tokenizer.encode(message))
             if token_len > MAX_INPUT_TOKENS + 50:
                 input.summary_type = "refine"
                 if logflag:
@@ -141,7 +156,7 @@ class OpeaDocSum(OpeaComponent):
                 logger.info(f"set chunk size to: {chunk_size}")
                 logger.info(f"set chunk overlap to: {chunk_overlap}")
 
-        texts = text_splitter.split_text(input.query)
+        texts = text_splitter.split_text(message)
         docs = [Document(page_content=t) for t in texts]
         if logflag:
             logger.info(f"Split input query into {len(docs)} chunks")
@@ -201,4 +216,4 @@ class OpeaDocSum(OpeaComponent):
                 logger.info("\n\noutput_text:")
                 logger.info(output_text)
 
-            return GeneratedDoc(text=output_text, prompt=input.query)
+            return GeneratedDoc(text=output_text, prompt=message)

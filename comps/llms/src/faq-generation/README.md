@@ -98,13 +98,13 @@ curl http://${host_ip}:${FAQ_PORT}/v1/health_check\
 # Set stream to True. Default will be True.
 curl http://${host_ip}:${FAQ_PORT}/v1/faqgen \
   -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128}' \
+  -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128}' \
   -H 'Content-Type: application/json'
 
 # Non-Streaming Response
 # Set stream to False.
 curl http://${host_ip}:${FAQ_PORT}/v1/faqgen \
   -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128, "stream":false}' \
+  -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128, "stream":false}' \
   -H 'Content-Type: application/json'
 ```

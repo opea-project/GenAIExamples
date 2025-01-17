@@ -58,6 +58,6 @@ curl http://${your_ip}:9000/v1/health_check\
 ```bash
 curl http://${your_ip}:9000/v1/chat/completions\
   -X POST \
-  -d '{"query":"What is Deep Learning?"}' \
+  -d '{"messages":"What is Deep Learning?"}' \
   -H 'Content-Type: application/json'
 ```

@@ -10,8 +10,9 @@ from langchain.docstore.document import Document
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_core.prompts import PromptTemplate
 
-from comps import CustomLogger, GeneratedDoc, LLMParamsDoc, OpeaComponent, ServiceType
+from comps import CustomLogger, GeneratedDoc, OpeaComponent, ServiceType
 from comps.cores.mega.utils import ConfigError, get_access_token, load_model_configs
+from comps.cores.proto.api_protocol import ChatCompletionRequest
 
 logger = CustomLogger("opea_faqgen")
 logflag = os.getenv("LOGFLAG", False)
@@ -74,16 +75,29 @@ class OpeaFaqGen(OpeaComponent):
         if not health_status:
             logger.error("OpeaFaqGen health check failed.")
 
-    async def generate(self, input: LLMParamsDoc, client):
+    async def generate(self, input: ChatCompletionRequest, client):
         """Invokes the TGI/vLLM LLM service to generate FAQ output for the provided input.
 
         Args:
-            input (LLMParamsDoc): The input text(s).
+            input (ChatCompletionRequest): The input text(s).
             client: TGI/vLLM based client
         """
+        message = None
+        if isinstance(input.messages, str):
+            message = input.messages
+        else:  # List[Dict]
+            for input_data in input.messages:
+                if "role" in input_data and input_data["role"] == "user" and "content" in input_data:
+                    message = input_data["content"]
+                    if logflag:
+                        logger.info(f"Get input text:\n {message}")
+        if message is None:
+            logger.error("Don't receive any input text, exit!")
+            return GeneratedDoc(text=None, prompt=None)
+
         PROMPT = PromptTemplate.from_template(templ)
         llm_chain = load_summarize_chain(llm=client, prompt=PROMPT)
-        texts = self.text_splitter.split_text(input.query)
+        texts = self.text_splitter.split_text(message)
 
         # Create multiple documents
         docs = [Document(page_content=t) for t in texts]
@@ -107,4 +121,4 @@ class OpeaFaqGen(OpeaComponent):
             response = response["output_text"]
             if logflag:
                 logger.info(response)
-            return GeneratedDoc(text=response, prompt=input.query)
+            return GeneratedDoc(text=response, prompt=message)

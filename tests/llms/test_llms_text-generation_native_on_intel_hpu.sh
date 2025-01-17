@@ -49,7 +49,7 @@ function start_service() {
 function validate_microservice() {
     llm_native_service_port=5070
     URL="http://${ip_address}:${llm_native_service_port}/v1/chat/completions"
-    INPUT_DATA='{"query":"What is Deep Learning?"}'
+    INPUT_DATA='{"messages":"What is Deep Learning?"}'
     HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')

@@ -9,7 +9,6 @@ from integrations.vllm import OpeaFaqGenvLLM
 
 from comps import (
     CustomLogger,
-    LLMParamsDoc,
     OpeaComponentLoader,
     ServiceType,
     opea_microservices,
@@ -17,6 +16,7 @@ from comps import (
     register_statistics,
     statistics_dict,
 )
+from comps.cores.proto.api_protocol import ChatCompletionRequest
 
 logger = CustomLogger("llm_faqgen")
 logflag = os.getenv("LOGFLAG", False)
@@ -34,7 +34,7 @@ loader = OpeaComponentLoader(llm_component_name, description=f"OPEA LLM FAQGen C
     port=9000,
 )
 @register_statistics(names=["opea_service@llm_faqgen"])
-async def llm_generate(input: LLMParamsDoc):
+async def llm_generate(input: ChatCompletionRequest):
     start = time.time()
 
     # Log the input if logging is enabled

@@ -6,7 +6,8 @@ import os
 import requests
 from langchain_community.llms import VLLMOpenAI
 
-from comps import CustomLogger, DocSumLLMParams, GeneratedDoc, OpeaComponent, OpeaComponentRegistry, ServiceType
+from comps import CustomLogger, GeneratedDoc, OpeaComponent, OpeaComponentRegistry, ServiceType
+from comps.cores.proto.api_protocol import DocSumChatCompletionRequest
 
 from .common import *
 
@@ -40,11 +41,11 @@ class OpeaDocSumvLLM(OpeaDocSum):
             logger.error("Health check failed")
             return False
 
-    async def invoke(self, input: DocSumLLMParams):
+    async def invoke(self, input: DocSumChatCompletionRequest):
         """Invokes the vLLM LLM service to generate summarization output for the provided input.
 
         Args:
-            input (DocSumLLMParams): The input text(s).
+            input (DocSumChatCompletionRequest): The input text(s).
         """
         headers = {}
         if self.access_token:
@@ -58,11 +59,10 @@ class OpeaDocSumvLLM(OpeaDocSum):
             openai_api_base=self.llm_endpoint + "/v1",
             model_name=MODEL_NAME,
             default_headers=headers,
-            max_tokens=input.max_tokens,
-            top_p=input.top_p,
+            max_tokens=input.max_tokens if input.max_tokens else 1024,
+            top_p=input.top_p if input.top_p else 0.95,
             streaming=input.stream,
-            temperature=input.temperature,
-            presence_penalty=input.repetition_penalty,
+            temperature=input.temperature if input.temperature else 0.01,
         )
         result = await self.generate(input, self.client)
 
