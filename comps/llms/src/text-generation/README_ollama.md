@@ -57,18 +57,18 @@ curl --noproxy "*" http://localhost:11434/api/generate -d '{
 ## Build Docker Image
 
 ```bash
-cd GenAIComps/
-docker build --no-cache -t opea/llm-ollama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/ollama/langchain/Dockerfile .
+cd ../../../../
+docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ## Run the Ollama Microservice
 
 ```bash
-docker run --network host -e http_proxy=$http_proxy -e https_proxy=$https_proxy opea/llm-ollama:latest
+docker run --network host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e LLM_ENDPOINT="http://localhost:11434" -e LLM_MODEL_ID="llama3" opea/llm-textgen:latest
 ```
 
 ## Consume the Ollama Microservice
 
 ```bash
-curl http://127.0.0.1:9000/v1/chat/completions  -X POST   -d '{"model": "llama3", "query":"What is Deep Learning?","max_tokens":32,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}'   -H 'Content-Type: application/json'
+curl http://127.0.0.1:9000/v1/chat/completions  -X POST   -d '{"messages": [{"role": "user", "content": "What is Deep Learning?"}]}' -H 'Content-Type: application/json'
 ```
