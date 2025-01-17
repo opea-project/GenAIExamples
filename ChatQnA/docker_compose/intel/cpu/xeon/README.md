@@ -1,6 +1,8 @@
 # Build Mega Service of ChatQnA on Xeon
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
+
+The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component. It also provides options of not using rerank in the pipeline and using TGI backend for LLM microservice, please refer to [start-all-the-services-docker-containers](#start-all-the-services-docker-containers) section in this page. Besides, refer to [Build with Pinecone VectorDB](./README_pinecone.md) and [Build with Qdrant VectorDB](./README_qdrant.md) for other deployment variants.
 
 Quick Start:
 
@@ -186,7 +188,7 @@ By default, the embedding, reranking and LLM models are set to a default value a
 
 Change the `xxx_MODEL_ID` below for your needs.
 
-For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. TGI can load the models either online or offline as described below:
+For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. The vLLM/TGI can load the models either online or offline as described below:
 
 1. Online
 
@@ -194,6 +196,9 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
+   # Start vLLM LLM Service
+   docker run -p 8008:80 -v ./data:/data --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
+   # Start TGI LLM Service
    docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id $model_name
    ```
 
@@ -203,12 +208,15 @@ For users in China who are unable to download models directly from Huggingface, 
 
    - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
 
-   - Run the following command to start TGI service.
+   - Run the following command to start the LLM service.
 
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
+     # Start vLLM LLM Service
+     docker run -p 8008:80 -v $model_path:/data --name vllm-service --shm-size 128g opea/vllm:latest --model /data --host 0.0.0.0 --port 80
+     # Start TGI LLM Service
+     docker run -p 8008:80 -v $model_path:/data --name tgi-service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
      ```
 
 ### Setup Environment Variables
@@ -246,7 +254,7 @@ For users in China who are unable to download models directly from Huggingface, 
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 ```
 
-If use TGI backend.
+If use vLLM as the LLM serving backend.
 
 ```bash
 # Start ChatQnA with Rerank Pipeline
@@ -255,10 +263,10 @@ docker compose -f compose.yaml up -d
 docker compose -f compose_without_rerank.yaml up -d
 ```
 
-If use vLLM backend.
+If use TGI as the LLM serving backend.
 
 ```bash
-docker compose -f compose_vllm.yaml up -d
+docker compose -f compose_tgi.yaml up -d
 ```
 
 ### Validate Microservices
@@ -305,35 +313,32 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
 4. LLM backend Service
 
-   In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
 
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
+   # vLLM service
+   docker logs vllm-service 2>&1 | grep complete
+   # If the service is ready, you will get the response like below.
+   INFO:     Application startup complete.
+   ```
+
+   ```bash
+   # TGI service
    docker logs tgi-service | grep Connected
-   ```
-
-   If the service is ready, you will get the response like below.
-
-   ```
+   # If the service is ready, you will get the response like below.
    2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
    ```
 
    Then try the `cURL` command below to validate services.
 
    ```bash
-   # TGI service
+   # either vLLM or TGI service
    curl http://${host_ip}:9009/v1/chat/completions \
      -X POST \
      -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
-   ```
-
-   ```bash
-   # vLLM Service
-   curl http://${host_ip}:9009/v1/chat/completions \
-     -H "Content-Type: application/json" \
-     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
    ```
 
 5. MegaService
@@ -362,7 +367,6 @@ Or run this command to get the file on a terminal.
 
 ```bash
 wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
-
 ```
 
 Upload:

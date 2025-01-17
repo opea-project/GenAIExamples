@@ -1,6 +1,8 @@
 # Build Mega Service of ChatQnA on Xeon
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
+
+The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component.
 
 Quick Start:
 
@@ -189,7 +191,7 @@ By default, the embedding, reranking and LLM models are set to a default value a
 
 Change the `xxx_MODEL_ID` below for your needs.
 
-For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. TGI can load the models either online or offline as described below:
+For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. The vLLM can load the models either online or offline as described below:
 
 1. Online
 
@@ -197,7 +199,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
-   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id $model_name
+   docker run -p 8008:80 -v ./data:/data --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
    ```
 
 2. Offline
@@ -206,12 +208,12 @@ For users in China who are unable to download models directly from Huggingface, 
 
    - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
 
-   - Run the following command to start TGI service.
+   - Run the following command to start the LLM service.
 
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
+     docker run -p 8008:80 -v $model_path:/data --name vllm-service --shm-size 128g opea/vllm:latest --model /data --host 0.0.0.0 --port 80
      ```
 
 ### Setup Environment Variables
@@ -252,7 +254,7 @@ For users in China who are unable to download models directly from Huggingface, 
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 ```
 
-If use TGI backend.
+If use vLLM backend.
 
 ```bash
 # Start ChatQnA with Rerank Pipeline
@@ -303,24 +305,23 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
 4. LLM backend Service
 
-   In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
 
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
-   docker logs tgi-service | grep Connected
+   docker logs vllm-service 2>&1 | grep complete
    ```
 
    If the service is ready, you will get the response like below.
 
    ```text
-   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   INFO: Application startup complete.
    ```
 
    Then try the `cURL` command below to validate services.
 
    ```bash
-   # TGI service
    curl http://${host_ip}:9009/v1/chat/completions \
      -X POST \
      -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
