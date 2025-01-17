@@ -113,7 +113,7 @@ class FaqGenService:
             model=chat_request.model if chat_request.model else None,
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs={"query": prompt}, llm_parameters=parameters
+            initial_inputs={"messages": prompt}, llm_parameters=parameters
         )
         for node, response in result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
