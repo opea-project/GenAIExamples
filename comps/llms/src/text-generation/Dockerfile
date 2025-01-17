@@ -23,4 +23,3 @@ ENV PYTHONPATH=$PYTHONPATH:/home/user
 WORKDIR /home/user/comps/llms/src/text-generation
 
 ENTRYPOINT ["bash", "entrypoint.sh"]
-

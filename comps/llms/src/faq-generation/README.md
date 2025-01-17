@@ -15,7 +15,7 @@ export FAQ_PORT=9000
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 export LLM_MODEL_ID=${your_hf_llm_model}
-export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI" # or "vllm"
+export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi" # or "vllm"
 ```
 
 ### 1.2 Build Docker Image
@@ -98,13 +98,13 @@ curl http://${host_ip}:${FAQ_PORT}/v1/health_check\
 # Set stream to True. Default will be True.
 curl http://${host_ip}:${FAQ_PORT}/v1/faqgen \
   -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128}' \
+  -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128}' \
   -H 'Content-Type: application/json'
 
 # Non-Streaming Response
 # Set stream to False.
 curl http://${host_ip}:${FAQ_PORT}/v1/faqgen \
   -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128, "stream":false}' \
+  -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128, "stream":false}' \
   -H 'Content-Type: application/json'
 ```

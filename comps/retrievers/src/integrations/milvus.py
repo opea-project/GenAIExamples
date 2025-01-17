@@ -5,10 +5,10 @@
 import os
 from typing import List, Optional
 
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings, OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, HuggingFaceHubEmbeddings
 from langchain_milvus.vectorstores import Milvus
 
-from comps import CustomLogger, EmbedDoc, OpeaComponent, OpeaComponentRegistry, SearchedDoc, ServiceType
+from comps import CustomLogger, EmbedDoc, OpeaComponent, OpeaComponentRegistry, ServiceType
 
 from .config import COLLECTION_NAME, INDEX_PARAMS, LOCAL_EMBEDDING_MODEL, MILVUS_URI, TEI_EMBEDDING_ENDPOINT
 
@@ -47,7 +47,7 @@ class OpeaMilvusRetriever(OpeaComponent):
         return embeddings
 
     def _initialize_client(self) -> Milvus:
-        """Initializes the redis client."""
+        """Initializes the milvus client."""
         try:
             client = Milvus(
                 embedding_function=self.embedder,
@@ -78,13 +78,13 @@ class OpeaMilvusRetriever(OpeaComponent):
             logger.info(f"[ check health ] Failed to connect to Milvus: {e}")
             return False
 
-    async def invoke(self, input: EmbedDoc) -> SearchedDoc:
+    async def invoke(self, input: EmbedDoc) -> list:
         """Search the Milvus index for the most similar documents to the input query.
 
         Args:
             input (EmbedDoc): The input query to search for.
         Output:
-            Union[SearchedDoc, RetrievalResponse, ChatCompletionRequest]: The retrieved documents.
+            list: The retrieved documents.
         """
         if logflag:
             logger.info(input)

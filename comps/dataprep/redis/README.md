@@ -33,7 +33,7 @@ cd langchain_ray; pip install -r requirements_ray.txt
 
 ### 1.2 Start Redis Stack Server
 
-Please refer to this [readme](../../vectorstores/redis/README.md).
+Please refer to this [readme](../../third_parties/redis/src/README.md).
 
 ### 1.3 Setup Environment Variables
 
@@ -90,7 +90,7 @@ python prepare_doc_redis_on_ray.py
 
 ### 2.1 Start Redis Stack Server
 
-Please refer to this [readme](../../vectorstores/redis/README.md).
+Please refer to this [readme](../../third_parties/redis/src/README.md).
 
 ### 2.2 Setup Environment Variables
 

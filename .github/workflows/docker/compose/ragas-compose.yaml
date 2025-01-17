@@ -1,7 +1,0 @@
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-services:
-  ragas:
-    build:
-      dockerfile: comps/ragas/src/tgi/langchain/Dockerfile
-    image: ${REGISTRY:-opea}/ragas:${TAG:-latest}

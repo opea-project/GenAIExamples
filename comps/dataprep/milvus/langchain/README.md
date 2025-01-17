@@ -13,7 +13,7 @@ apt-get install poppler-utils -y
 
 ### 1.2 Start Milvus Server
 
-Please refer to this [readme](../../../vectorstores/milvus/README.md).
+Please refer to this [readme](../../../third_parties/milvus/src/README.md).
 
 ### 1.3 Setup Environment Variables
 
@@ -56,7 +56,7 @@ python prepare_doc_milvus.py
 
 ### 2.1 Start Milvus Server
 
-Please refer to this [readme](../../../vectorstores/milvus/README.md).
+Please refer to this [readme](../../../third_parties/milvus/src/README.md).
 
 ### 2.2 Build Docker Image
 

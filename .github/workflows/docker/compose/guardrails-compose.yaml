@@ -11,6 +11,10 @@ services:
     build:
       dockerfile: comps/guardrails/src/bias_detection/Dockerfile
     image: ${REGISTRY:-opea}/guardrails-bias-detection:${TAG:-latest}
+  guardrails-hallucination-detection:
+    build:
+      dockerfile: comps/guardrails/src/hallucination_detection/Dockerfile
+    image: ${REGISTRY:-opea}/guardrails-hallucination-detection:${TAG:-latest}
   guardrails-pii-predictionguard:
     build:
       dockerfile: comps/guardrails/src/pii_detection/Dockerfile

@@ -269,11 +269,10 @@ class ChatCompletionRequest(BaseModel):
     request_type: Literal["chat"] = "chat"
 
 
-class DocSumChatCompletionRequest(BaseModel):
-    llm_params: Optional[ChatCompletionRequest] = None
-    text: Optional[str] = None
-    audio: Optional[str] = None
-    video: Optional[str] = None
+class DocSumChatCompletionRequest(ChatCompletionRequest):
+    summary_type: str = "auto"  # can be "auto", "stuff", "truncate", "map_reduce", "refine"
+    chunk_size: int = -1
+    chunk_overlap: int = -1
     type: Optional[str] = None
 
 

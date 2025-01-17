@@ -13,7 +13,7 @@ apt-get install poppler-utils -y
 
 ### Start Qdrant Server
 
-Please refer to this [readme](../../../vectorstores/qdrant/README.md).
+docker run -p 6333:6333 -p 6334:6334 -v ./qdrant_storage:/qdrant/storage:z qdrant/qdrant
 
 ### Setup Environment Variables
 
