@@ -17,6 +17,7 @@ from comps import (
     statistics_dict,
 )
 from comps.cores.proto.api_protocol import EmbeddingRequest, EmbeddingResponse
+from comps.cores.telemetry.opea_telemetry import opea_telemetry
 
 logger = CustomLogger("opea_embedding_microservice")
 logflag = os.getenv("LOGFLAG", False)
@@ -36,6 +37,7 @@ loader = OpeaComponentLoader(
     host="0.0.0.0",
     port=6000,
 )
+@opea_telemetry
 @register_statistics(names=["opea_service@embedding"])
 async def embedding(input: EmbeddingRequest) -> EmbeddingResponse:
     start = time.time()
