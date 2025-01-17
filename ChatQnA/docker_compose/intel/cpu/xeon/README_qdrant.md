@@ -1,6 +1,8 @@
 # Build Mega Service of ChatQnA (with Qdrant) on Xeon
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
+
+The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component.
 
 ## 🚀 Apply Xeon Server on AWS
 
@@ -44,7 +46,7 @@ reranking
 =========
 Port 6046 - Open to 0.0.0.0/0
 
-tgi-service
+vllm-service
 ===========
 Port 6042 - Open to 0.0.0.0/0
 
@@ -170,7 +172,7 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 **Append the value of the public IP address to the no_proxy list if you are in a proxy environment**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-qdrant-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
+export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-qdrant-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
 ```
 
 ```bash
@@ -233,23 +235,23 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -H 'Content-Type: application/json'
    ```
 
-4. TGI Service
+4. LLM Backend Service
 
-   In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
 
-   Try the command below to check whether the TGI service is ready.
+   Try the command below to check whether the LLM service is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs vllm-service 2>&1 | grep complete
    ```
 
    If the service is ready, you will get the response like below.
 
-   ```
-   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   ```text
+   INFO: Application startup complete.
    ```
 
-   Then try the `cURL` command below to validate TGI.
+   Then try the `cURL` command below to validate vLLM service.
 
    ```bash
    curl http://${host_ip}:6042/v1/chat/completions \
