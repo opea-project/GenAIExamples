@@ -93,6 +93,11 @@ services:
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8007/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     runtime: habana
     cap_add:
       - SYS_NICE
