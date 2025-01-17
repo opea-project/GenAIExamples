@@ -27,7 +27,7 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 ### 2. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 cd ..
 ```
 

@@ -27,7 +27,7 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: GenAIComps
-      dockerfile: comps/dataprep/neo4j/llama_index/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     image: ${REGISTRY:-opea}/dataprep-neo4j-llamaindex:${TAG:-latest}
   nginx:
     build:

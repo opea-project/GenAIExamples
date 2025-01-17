@@ -50,7 +50,7 @@ services:
   dataprep-multimodal-redis:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/multimodal/redis/langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
   whisper:

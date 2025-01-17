@@ -144,7 +144,7 @@ docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy 
 ### 4. Build dataprep-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 5. Build asr images

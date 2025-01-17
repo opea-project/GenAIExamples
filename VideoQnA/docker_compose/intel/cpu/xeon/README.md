@@ -80,7 +80,7 @@ docker build -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg
 ### 5. Build Dataprep Image
 
 ```bash
-docker build -t opea/dataprep-multimodal-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/Dockerfile .
+docker build -t opea/dataprep-multimodal-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 6. Build MegaService Docker Image

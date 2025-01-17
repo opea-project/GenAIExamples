@@ -32,6 +32,6 @@ services:
   dataprep-redis:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
