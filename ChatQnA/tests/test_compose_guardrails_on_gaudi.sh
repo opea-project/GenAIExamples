@@ -23,6 +23,7 @@ function build_docker_images() {
     service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever vllm-gaudi guardrails nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
 
@@ -51,12 +52,12 @@ function start_services() {
         n=$((n+1))
     done
 
-    # Make sure vllm guardrails service is ready
+    # Make sure tgi guardrails service is ready
     m=0
     until [[ "$m" -ge 160 ]]; do
         echo "m=$m"
-        docker logs vllm-guardrails-server > vllm_guardrails_service_start.log
-        if grep -q "Warmup finished" vllm_guardrails_service_start.log; then
+        docker logs tgi-guardrails-server > tgi_guardrails_service_start.log
+        if grep -q Connected tgi_guardrails_service_start.log; then
             break
         fi
         sleep 5s
