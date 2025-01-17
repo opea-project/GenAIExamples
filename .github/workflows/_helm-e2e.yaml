@@ -54,27 +54,27 @@ jobs:
         run: |
           set -x
           # service_list=($(echo "${{ inputs.example }}" | tr ',' ' '))
-          value_files="{\"include\":["
-          # value_files="["
+          # value_files="{\"include\":["
+          value_files="["
           for file in "${{ inputs.example }}"/kubernetes/helm/*values.yaml; do
             if [ -f "$file" ]; then
               filename=$(basename "$file")
               if [[ "$filename" == *"gaudi"* ]]; then
                 if [[ "${{ inputs.hardware }}" == "gaudi" ]]; then
-                  value_files="${value_files}{\"valuefile\":\"${filename}\"},"
+                  value_files="${value_files}\"${filename}\","
                 fi
               elif [[ "$filename" == *"nv"* ]]; then
                 continue
               else
                 if [[ "${{ inputs.hardware }}" == "xeon" ]]; then
-                  value_files="${value_files}{\"valuefile\":\"${filename}\"},"
+                  value_files="${value_files}\"${filename}\","
                 fi
               fi
             fi
           done
           # value_files="${value_files%,}"
           # value_files=$value_files"]}"
-          value_files="${value_files%,}]}"
+          value_files="${value_files%,}]"
           echo "value_files=${value_files}"
           echo "value_files=${value_files}" >> $GITHUB_OUTPUT
 
@@ -82,7 +82,7 @@ jobs:
     needs: [get-test-case]
     strategy:
       matrix:
-        value_file: ${{ fromJSON(needs.get-test-case.outputs.value_files).include }}
+        value_file: ${{ fromJSON(needs.get-test-case.outputs.value_files) }}
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
     outputs:
@@ -114,7 +114,7 @@ jobs:
         env:
           example: ${{ inputs.example }}
         run: |
-          CHART_NAME="${example}"  # CodeGen
+          CHART_NAME="${example,,}"  # CodeGen
           echo "CHART_NAME=$CHART_NAME" >> $GITHUB_ENV
           echo "RELEASE_NAME=${CHART_NAME}$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
           echo "NAMESPACE=${CHART_NAME}-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
