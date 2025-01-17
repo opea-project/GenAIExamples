@@ -58,7 +58,7 @@ function start_services() {
     export TGI_LLM_ENDPOINT_DOCSUM="http://${ip_address}:9009"
     export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${ip_address}:8888/v1/chatqna"
     export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${ip_address}:8889/v1/faqgen"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6009/v1/dataprep/delete_file"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6009/v1/dataprep/delete"
     export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/ingest"
     export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6008/v1/dataprep/get"
@@ -167,31 +167,31 @@ function validate_microservices() {
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
-    # test /v1/dataprep/delete_file
+    # test /v1/dataprep/delete
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/delete_file" \
+        "http://${ip_address}:6007/v1/dataprep/delete" \
         '{"status":true}' \
         "dataprep_del" \
         "dataprep-redis-server"
 
-    # test /v1/dataprep upload file
+    # test /v1/dataprep/ingest upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-redis-server"
 
     # test /v1/dataprep upload link
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
         "dataprep-redis-server"
 
-    # test /v1/dataprep/get_file
+    # test /v1/dataprep/get
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/get_file" \
+        "http://${ip_address}:6007/v1/dataprep/get" \
         '{"name":' \
         "dataprep_get" \
         "dataprep-redis-server"

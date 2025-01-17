@@ -113,7 +113,7 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 ```bash
 cd GenAIExamples/ChatQnA/ui
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep/ingest"
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
@@ -273,7 +273,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
    Update Knowledge Base via Local File Upload:
 
    ```bash
-   curl -X POST "http://${host_ip}:6043/v1/dataprep" \
+   curl -X POST "http://${host_ip}:6043/v1/dataprep/ingest" \
         -H "Content-Type: multipart/form-data" \
         -F "files=@./your_file.pdf"
    ```
@@ -283,7 +283,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
    Add Knowledge Base via HTTP Links:
 
    ```bash
-   curl -X POST "http://${host_ip}:6043/v1/dataprep" \
+   curl -X POST "http://${host_ip}:6043/v1/dataprep/ingest" \
         -H "Content-Type: multipart/form-data" \
         -F 'link_list=["https://opea.dev"]'
    ```

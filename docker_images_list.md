@@ -2,7 +2,7 @@
 
 A list of released OPEA docker images in https://hub.docker.com/, contains all relevant images from the GenAIExamples, GenAIComps and GenAIInfra projects. Please expect more public available images in the future release.
 
-Take ChatQnA for example. ChatQnA is a chatbot application service based on the Retrieval Augmented Generation (RAG) architecture. It consists of [opea/embedding](https://hub.docker.com/r/opea/embedding), [opea/retriever](https://hub.docker.com/r/opea/retriever-redis), [opea/reranking-tei](https://hub.docker.com/r/opea/reranking-tei), [opea/llm-textgen](https://hub.docker.com/r/opea/llm-textgen), [opea/dataprep-redis](https://hub.docker.com/r/opea/dataprep), [opea/chatqna](https://hub.docker.com/r/opea/chatqna), [opea/chatqna-ui](https://hub.docker.com/r/opea/chatqna-ui) and [opea/chatqna-conversation-ui](https://hub.docker.com/r/opea/chatqna-conversation-ui) (Optional) multiple microservices. Other services are similar, see the corresponding README for details.
+Take ChatQnA for example. ChatQnA is a chatbot application service based on the Retrieval Augmented Generation (RAG) architecture. It consists of [opea/embedding](https://hub.docker.com/r/opea/embedding), [opea/retriever](https://hub.docker.com/r/opea/retriever-redis), [opea/reranking-tei](https://hub.docker.com/r/opea/reranking-tei), [opea/llm-textgen](https://hub.docker.com/r/opea/llm-textgen), [opea/dataprep](), [opea/chatqna](https://hub.docker.com/r/opea/chatqna), [opea/chatqna-ui](https://hub.docker.com/r/opea/chatqna-ui) and [opea/chatqna-conversation-ui](https://hub.docker.com/r/opea/chatqna-conversation-ui) (Optional) multiple microservices. Other services are similar, see the corresponding README for details.
 
 ## Example images
 

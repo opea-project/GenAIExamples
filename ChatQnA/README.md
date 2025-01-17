@@ -203,7 +203,7 @@ Gaudi default compose.yaml
 | Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
 | Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
 | LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
-| Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep |
+| Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep/ingest |
 
 ### Required Models
 
@@ -289,7 +289,7 @@ Here is an example of `Nike 2023` pdf.
 # download pdf file
 wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./nke-10k-2023.pdf"
 ```

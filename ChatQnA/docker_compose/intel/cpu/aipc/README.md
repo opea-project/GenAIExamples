@@ -191,7 +191,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 
 # upload pdf file with dataprep
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F "files=@./nke-10k-2023.pdf"
 ```
@@ -201,7 +201,7 @@ This command updates a knowledge base by uploading a local file for processing. 
 Alternatively, you can add knowledge base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 ```
@@ -211,7 +211,7 @@ This command updates a knowledge base by submitting a list of HTTP links for pro
 To check the uploaded files, you are able to get the file list that uploaded:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
      -H "Content-Type: application/json"
 ```
 

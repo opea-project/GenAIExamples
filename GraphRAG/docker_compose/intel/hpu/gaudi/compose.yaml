@@ -73,7 +73,7 @@ services:
       - tgi-gaudi-service
       - tei-embedding-service
     ports:
-      - "6004:6004"
+      - "6004:5000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}

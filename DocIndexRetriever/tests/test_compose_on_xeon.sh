@@ -73,7 +73,7 @@ function validate() {
 
 function validate_megaservice() {
     echo "===========Ingest data=================="
-    local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep" \
+    local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev/"]')
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon")

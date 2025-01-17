@@ -359,7 +359,7 @@ wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrie
 Upload:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F "files=@./nke-10k-2023.pdf"
 ```
@@ -369,7 +369,7 @@ This command updates a knowledge base by uploading a local file for processing. 
 Add Knowledge Base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 ```
@@ -380,7 +380,7 @@ To delete the files/link you uploaded:
 
 ```bash
 # delete all uploaded files and links
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6009/v1/dataprep/delete" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```

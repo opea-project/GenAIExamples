@@ -98,17 +98,17 @@ function validate_microservices() {
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
-    # test /v1/dataprep upload file
+    # test /v1/dataprep/ingest upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_services \
-        "${ip_address}:6043/v1/dataprep" \
+        "${ip_address}:6043/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-qdrant-server"
 
     # test upload link
     validate_services \
-        "${ip_address}:6043/v1/dataprep" \
+        "${ip_address}:6043/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
         "dataprep-qdrant-server"

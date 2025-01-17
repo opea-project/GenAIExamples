@@ -20,7 +20,7 @@ services:
     depends_on:
       - redis-vector-db
     ports:
-      - "6007:6007"
+      - "6007:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}

@@ -72,14 +72,14 @@ python eval_multihop.py --docs_path MultiHop-RAG/dataset/corpus.json  --dataset_
 If you are using Kubernetes manifest/helm to deploy `ChatQnA` system, you must specify more arguments as following:
 
 ```bash
-python eval_multihop.py --docs_path MultiHop-RAG/dataset/corpus.json  --dataset_path MultiHop-RAG/dataset/MultiHopRAG.json --ingest_docs --retrieval_metrics --ragas_metrics --llm_endpoint http://{llm_as_judge_ip}:{llm_as_judge_port}/generate --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --tei_embedding_endpoint http://{your_tei_embedding_ip}:{your_tei_embedding_port} --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
+python eval_multihop.py --docs_path MultiHop-RAG/dataset/corpus.json  --dataset_path MultiHop-RAG/dataset/MultiHopRAG.json --ingest_docs --retrieval_metrics --ragas_metrics --llm_endpoint http://{llm_as_judge_ip}:{llm_as_judge_port}/generate --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep/ingest --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --tei_embedding_endpoint http://{your_tei_embedding_ip}:{your_tei_embedding_port} --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
 ```
 
 The default values for arguments are:
 |Argument|Default value|
 |--------|-------------|
 |service_url|http://localhost:8888/v1/chatqna|
-|database_endpoint|http://localhost:6007/v1/dataprep|
+|database_endpoint|http://localhost:6007/v1/dataprep/ingest|
 |embedding_endpoint|http://localhost:6000/v1/embeddings|
 |tei_embedding_endpoint|http://localhost:8090|
 |retrieval_endpoint|http://localhost:7000/v1/retrieval|
@@ -139,14 +139,14 @@ python eval_crud.py --dataset_path ./data/split_merged.json --docs_path ./data/8
 If you are using Kubernetes manifest/helm to deploy `ChatQnA` system, you must specify more arguments as following:
 
 ```bash
-python eval_crud.py --dataset_path ./data/split_merged.json --docs_path ./data/80000_docs --ingest_docs --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
+python eval_crud.py --dataset_path ./data/split_merged.json --docs_path ./data/80000_docs --ingest_docs --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep/ingest --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
 ```
 
 The default values for arguments are:
 |Argument|Default value|
 |--------|-------------|
 |service_url|http://localhost:8888/v1/chatqna|
-|database_endpoint|http://localhost:6007/v1/dataprep|
+|database_endpoint|http://localhost:6007/v1/dataprep/ingest|
 |embedding_endpoint|http://localhost:6000/v1/embeddings|
 |retrieval_endpoint|http://localhost:7000/v1/retrieval|
 |reranking_endpoint|http://localhost:8000/v1/reranking|

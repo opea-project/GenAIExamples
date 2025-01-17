@@ -503,7 +503,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: data-prep
-              containerPort: 6007
+              containerPort: 5000
               protocol: TCP
           volumeMounts:
             - mountPath: /tmp

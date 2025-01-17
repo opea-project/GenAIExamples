@@ -11,7 +11,7 @@ services:
     depends_on:
       - tei-embedding-service
     ports:
-      - "6007:6007"
+      - "6007:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
