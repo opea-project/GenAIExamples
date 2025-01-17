@@ -17,51 +17,38 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
-    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork && git checkout v0.6.4.post2+Gaudi-1.19.0 && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-guardrails chatqna-ui dataprep retriever vllm-gaudi guardrails nginx"
+    service_list="chatqna chatqna-ui dataprep retriever nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
 
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
+
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
 
     # Start Docker Containers
-    docker compose -f compose_guardrails.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    sed -i "s|container_name: chatqna-xeon-backend-server|container_name: chatqna-xeon-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+
     n=0
-    until [[ "$n" -ge 160 ]]; do
-        echo "n=$n"
-        docker logs vllm-gaudi-server > vllm_service_start.log
-        if grep -q "Warmup finished" vllm_service_start.log; then
+    until [[ "$n" -ge 100 ]]; do
+        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
         sleep 5s
         n=$((n+1))
-    done
-
-    # Make sure tgi guardrails service is ready
-    m=0
-    until [[ "$m" -ge 160 ]]; do
-        echo "m=$m"
-        docker logs tgi-guardrails-server > tgi_guardrails_service_start.log
-        if grep -q Connected tgi_guardrails_service_start.log; then
-            break
-        fi
-        sleep 5s
-        m=$((m+1))
     done
 }
 
@@ -72,7 +59,18 @@ function validate_service() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [[ $SERVICE_NAME == *"dataprep_upload_file"* ]]; then
+        cd $LOG_PATH
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep_upload_link"* ]]; then
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'link_list=["https://www.ces.tech/"]' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "all"}' -H 'Content-Type: application/json' "$URL")
+    else
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    fi
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
@@ -101,20 +99,49 @@ function validate_microservices() {
 
     # tei for embedding service
     validate_service \
-        "${ip_address}:8090/embed" \
+        "${ip_address}:6006/embed" \
         "[[" \
         "tei-embedding" \
-        "tei-embedding-gaudi-server" \
+        "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
+
+    # test /v1/dataprep upload file
+    echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
+    validate_service \
+        "http://${ip_address}:6007/v1/dataprep" \
+        "Data preparation succeeded" \
+        "dataprep_upload_file" \
+        "dataprep-redis-server"
+
+    # test /v1/dataprep upload link
+    validate_service \
+        "http://${ip_address}:6007/v1/dataprep" \
+        "Data preparation succeeded" \
+        "dataprep_upload_link" \
+        "dataprep-redis-server"
+
+    # test /v1/dataprep/get_file
+    validate_service \
+        "http://${ip_address}:6007/v1/dataprep/get_file" \
+        '{"name":' \
+        "dataprep_get" \
+        "dataprep-redis-server"
+
+    # test /v1/dataprep/delete_file
+    validate_service \
+        "http://${ip_address}:6007/v1/dataprep/delete_file" \
+        '{"status":true}' \
+        "dataprep_del" \
+        "dataprep-redis-server"
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
         "${ip_address}:7000/v1/retrieval" \
         "retrieved_docs" \
-        "retrieval" \
+        "retrieval-microservice" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
@@ -123,24 +150,16 @@ function validate_microservices() {
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
-        "tei-reranking-gaudi-server" \
+        "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # vllm for llm service
+    # tgi for llm service
     validate_service \
-        "${ip_address}:8008/v1/chat/completions" \
+        "${ip_address}:9009/v1/chat/completions" \
         "content" \
-        "vllm-llm" \
-        "vllm-gaudi-server" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
-
-    # guardrails microservice
-    validate_service \
-        "${ip_address}:9090/v1/guardrails" \
-        "Violated policies" \
-        "guardrails" \
-        "guardrails-gaudi-server" \
-        '{"text":"How do you buy a tiger in the US?"}'
+        "tgi-llm" \
+        "tgi-service" \
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {
@@ -148,13 +167,14 @@ function validate_megaservice() {
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
         "data: " \
-        "mega-chatqna" \
-        "chatqna-gaudi-guardrails-server" \
+        "chatqna-megaservice" \
+        "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
 
 function validate_frontend() {
+    echo "[ TEST INFO ]: --------- frontend test started ---------"
     cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
@@ -164,6 +184,7 @@ function validate_frontend() {
         conda create -n ${conda_env_name} python=3.12 -y
     fi
     source activate ${conda_env_name}
+    echo "[ TEST INFO ]: --------- conda env activated ---------"
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
@@ -183,8 +204,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose_guardrails.yaml down
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    docker compose -f compose_tgi.yaml down
 }
 
 function main() {
@@ -195,11 +216,18 @@ function main() {
     start_services
     end_time=$(date +%s)
     duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s"
+    echo "Mega service start duration is $duration s" && sleep 1s
 
-    validate_microservices
-    validate_megaservice
-    validate_frontend
+    if [ "${mode}" == "perf" ]; then
+        python3 $WORKPATH/tests/chatqna_benchmark.py
+    elif [ "${mode}" == "" ]; then
+        validate_microservices
+        echo "==== microservices validated ===="
+        validate_megaservice
+        echo "==== megaservice validated ===="
+        validate_frontend
+        echo "==== frontend validated ===="
+    fi
 
     stop_docker
     echo y | docker system prune
