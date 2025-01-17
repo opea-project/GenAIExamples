@@ -266,16 +266,21 @@ Refer to the [Intel Technology enabling for Openshift readme](https://github.com
 
 ### Check Service Status
 
-Before consuming ChatQnA Service, make sure the TGI/vLLM service is ready (which takes up to 2 minutes to start).
+Before consuming ChatQnA Service, make sure the vLLM/TGI service is ready, which takes some time.
 
 ```bash
+# vLLM example
+docker logs vllm-gaudi-server 2>&1 | grep complete
 # TGI example
-docker logs tgi-service | grep Connected
+docker logs tgi-gaudi-server | grep Connected
 ```
 
-Consume ChatQnA service until you get the TGI response like below.
+Consume ChatQnA service until you get the response like below.
 
 ```log
+# vLLM
+INFO: Application startup complete.
+# TGI
 2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
 ```
 
