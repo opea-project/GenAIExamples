@@ -46,12 +46,14 @@ jobs:
               example=$(echo "$values_file" | cut -d'/' -f1) # CodeGen
               if [[ "$valuefile" == *"gaudi"* ]]; then
                 hardware="gaudi"
-              elif [[ "$valuefile" == *"cpu"* ]]; then
+              elif [[ "$valuefile" == *"nv"* ]]; then
+                continue
+              else
                 hardware="xeon"
               fi
               echo "example=${example}, hardware=${hardware}, valuefile=${valuefile}"
-              if [[ $(echo ${run_matrix} | grep -c "{\"example\":\"${example}\",\"hardware\":\"${hardware}\",\"valuefile\":\"${valuefile}\"},") == 0 ]]; then
-                run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hardware}\",\"valuefile\":\"${valuefile}\"},"
+              if [[ $(echo ${run_matrix} | grep -c "{\"example\":\"${example}\",\"hardware\":\"${hardware}\"},") == 0 ]]; then
+                run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hardware}\"},"
                 echo "------------------ add one values file ------------------"
               fi
             fi

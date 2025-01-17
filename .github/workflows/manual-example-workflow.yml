@@ -37,7 +37,7 @@ on:
         type: boolean
       test_helmchart:
         default: false
-        description: 'Test examples with k8s'
+        description: 'Test examples with helm charts'
         required: false
         type: boolean
       test_gmc:
