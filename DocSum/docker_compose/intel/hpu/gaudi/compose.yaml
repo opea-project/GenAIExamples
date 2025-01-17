@@ -8,7 +8,7 @@ services:
     ports:
       - ${LLM_ENDPOINT_PORT:-8008}:80
     volumes:
-      - "./data:/data"
+      - "${DATA_PATH:-data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}

@@ -91,10 +91,10 @@ function validate_microservices() {
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/faqgen" \
-        "data: " \
+        "text" \
         "llm" \
         "llm-faqgen-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function validate_megaservice() {

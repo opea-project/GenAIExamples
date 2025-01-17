@@ -13,6 +13,7 @@ export TAG=${IMAGE_TAG}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
+export DATA_PATH="/data/cache"
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
@@ -91,10 +92,10 @@ function validate_microservices() {
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/faqgen" \
-        "data: " \
+        "text" \
         "llm" \
         "llm-faqgen-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function validate_megaservice() {
