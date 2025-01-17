@@ -50,7 +50,7 @@ jobs:
 # Image Build
 ####################################################################################################
   build-images:
-    if: ${{ !(fromJSON(inputs.test_helmchart)) }}
+    if: ${{ !(fromJSON(inputs.test_helmchart)) }} || ${{ (fromJSON(inputs.build)) }}
     runs-on: "docker-build-${{ inputs.node }}"
     steps:
       - name: Clean Up Working Directory
@@ -80,6 +80,7 @@ jobs:
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
                git clone https://github.com/HabanaAI/vllm-fork.git
+               cd vllm-fork && git checkout v0.6.4.post2+Gaudi-1.19.0 && cd ../
           fi
           git clone https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git checkout ${{ inputs.opea_branch }} && git rev-parse HEAD && cd ../
