@@ -75,11 +75,11 @@ function validate_megaservice() {
     echo $result
 
     if [[ $result == *"the"* ]]; then
-        docker logs search-web-retriever-chroma-server
+        docker logs search-web-retriever-server
         docker logs search-backend-server
         echo "Result correct."
     else
-        docker logs search-web-retriever-chroma-server
+        docker logs search-web-retriever-server
         docker logs search-backend-server
         echo "Result wrong."
         exit 1
