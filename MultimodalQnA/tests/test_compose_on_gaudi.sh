@@ -161,6 +161,11 @@ function validate_microservices() {
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/ingest"
+    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/generate_transcripts"
+    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/generate_captions"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/get"
+
     # test data prep
     echo "Data Prep with Generating Transcript for Video"
     validate_service \
@@ -271,6 +276,7 @@ function validate_megaservice() {
 
 function validate_delete {
     echo "Validate data prep delete files"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/delete"
     validate_service \
         "${DATAPREP_DELETE_FILE_ENDPOINT}" \
         '{"status":true}' \
