@@ -34,7 +34,7 @@ case "$1" in
           fi
           if [[ $port =~ [0-9] ]]; then
             if [[ $port == 5000 ]]; then
-              echo "Port 5000 is used by local docker registry, please DO NOT use it!!!"
+              echo "Error: Port 5000 is used by local docker registry, please DO NOT use it in docker compose deployment!!!"
               exit 1
             fi
             cid=$(docker ps --filter "publish=${port}" --format "{{.ID}}")
