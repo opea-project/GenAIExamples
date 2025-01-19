@@ -132,6 +132,7 @@ jobs:
           PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
           SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
           SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
           example: ${{ inputs.example }}
