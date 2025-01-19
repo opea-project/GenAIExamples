@@ -49,11 +49,11 @@ function setup_env() {
     export LVM_SERVICE_HOST_IP=${host_ip}
     export MEGA_SERVICE_HOST_IP=${host_ip}
     export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
-    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/generate_transcripts"
-    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/generate_captions"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/ingest"
+    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/generate_transcripts"
+    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/generate_captions"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/get"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/delete"
 }
 
 function start_services() {
