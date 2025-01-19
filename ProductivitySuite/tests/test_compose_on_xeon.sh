@@ -146,6 +146,34 @@ function validate_service() {
     sleep 1s
 }
 
+
+function validate_faqgen() {
+    local URL="$1"
+    local SERVICE_NAME="$2"
+    local DOCKER_NAME="$3"
+    local EXPECTED_RESULT="Embeddings"
+    local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA"  -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
+}
+
 function validate_microservices() {
     # Check if the microservices are running correctly.
 
@@ -238,12 +266,10 @@ function validate_microservices() {
         '{"query":"What is Deep Learning?"}'
 
     # FAQGen llm microservice
-    validate_service \
+    validate_faqgen \
         "${ip_address}:9002/v1/faqgen" \
-        "data: " \
         "llm_faqgen" \
-        "llm-faqgen-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        "llm-faqgen-server"
 
     # CodeGen llm microservice
     validate_service \
@@ -287,33 +313,6 @@ function validate_microservices() {
 
 }
 
-function validate_faqgen() {
-    local SERVICE_NAME="faqgen-xeon-backend-server"
-    local DOCKER_NAME="faqgen-xeon-backend-server"
-    local EXPECTED_RESULT="Embeddings"
-    local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-    local URL="${ip_address}:8889/v1/faqgen"
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-
-        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA"  -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
-    fi
-    sleep 1s
-}
-
 function validate_megaservice() {
 
     # Curl the ChatQnAMega Service
@@ -325,7 +324,10 @@ function validate_megaservice() {
         '{"messages": "What is the revenue of Nike in 2023?"}'\
 
     # Curl the FAQGen Service
-    validate_faqgen
+    validate_faqgen \
+        "${ip_address}:8889/v1/faqgen" \
+        "faqgen-xeon-backend-server" \
+        "faqgen-xeon-backend-server"
 
     # Curl the CodeGen Mega Service
     validate_service \
