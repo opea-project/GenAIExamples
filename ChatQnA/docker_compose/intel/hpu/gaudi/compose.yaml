@@ -29,7 +29,7 @@ services:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-gaudi-server
     ports:
-      - "5000:80"
+      - "8090:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
