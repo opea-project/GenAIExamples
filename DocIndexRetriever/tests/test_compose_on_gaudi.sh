@@ -18,7 +18,7 @@ function build_docker_images() {
     echo "Building Docker Images...."
     cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+        git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
     fi
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
@@ -116,7 +116,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    build_docker_images
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     echo "Dump current docker ps"
     docker ps
     start_time=$(date +%s)
