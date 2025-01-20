@@ -38,7 +38,7 @@ function build_docker_images() {
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     echo "Build vllm_openvino image from GenAIComps..."
-    cd $WORKPATH && git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}"
+    cd $WORKPATH && git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
     cd comps/third_parties/vllm/src/
     bash ./build_docker_vllm_openvino.sh gpu
 
