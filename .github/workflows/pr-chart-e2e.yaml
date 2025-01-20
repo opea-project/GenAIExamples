@@ -4,7 +4,7 @@
 name: E2E Test with Helm Charts
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -37,7 +37,7 @@ jobs:
           base_commit=${{ github.event.pull_request.base.sha }}
           merged_commit=$(git log -1 --format='%H')
           values_files=$(git diff --name-only ${base_commit} ${merged_commit} | \
-          grep "kubernetes/helm" | \
+          grep "values.yaml" | \
           sort -u ) #CodeGen/kubernetes/helm/cpu-values.yaml
           run_matrix="{\"include\":["
           for values_file in ${values_files}; do

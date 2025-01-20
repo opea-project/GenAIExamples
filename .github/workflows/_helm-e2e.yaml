@@ -66,7 +66,7 @@ jobs:
             sort -u)
             echo $values_files
           elif [ "${{ inputs.mode }}" = "CD" ]; then
-            value_files=$(ls "${{ inputs.example }}"/kubernetes/helm/*values.yaml)
+            value_files=$(ls ${{ inputs.example }}/kubernetes/helm/*values.yaml)
           fi
           value_files="["
           for file in ${values_files}; do
@@ -85,8 +85,6 @@ jobs:
               fi
             fi
           done
-          # value_files="${value_files%,}"
-          # value_files=$value_files"]}"
           value_files="${value_files%,}]"
 
           echo "value_files=${value_files}"
@@ -99,8 +97,6 @@ jobs:
         value_file: ${{ fromJSON(needs.get-test-case.outputs.value_files) }}
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
-    outputs:
-      should_cleanup: ${{ steps.set_boolean.outputs.should_cleanup }}
     steps:
       - name: Clean Up Working Directory
         run: |
@@ -157,7 +153,18 @@ jobs:
             exit 0
           fi
 
-          if ! helm install --create-namespace --namespace $NAMESPACE $RELEASE_NAME oci://ghcr.io/opea-project/charts/${CHART_NAME} --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f ${{ inputs.example }}/kubernetes/helm/${value_file} --version 0-latest ; then
+          if ! helm install \
+            --create-namespace \
+            --namespace $NAMESPACE \
+            $RELEASE_NAME \
+            oci://ghcr.io/opea-project/charts/${CHART_NAME} \
+            --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
+            --set global.modelUseHostPath=/home/sdp/.cache/huggingface/hub \
+            --set GOOGLE_API_KEY=${{ env.GOOGLE_API_KEY}} \
+            --set GOOGLE_CSE_ID=${{ env.GOOGLE_CSE_ID}} \
+            -f ${{ inputs.example }}/kubernetes/helm/${value_file} \
+            --version 0-latest \
+            --wait; then
             echo "Failed to install chart ${{ inputs.example }}"
             echo "skip_validate=true" >> $GITHUB_ENV
             .github/workflows/scripts/k8s-utils.sh dump_pods_status $NAMESPACE
@@ -171,7 +178,7 @@ jobs:
           if $skip_validate; then
             echo "Skip validate"
           else
-            LOG_PATH=${{ github.workspace }}/logs
+            LOG_PATH=/home/$(whoami)/helm-logs
             chart=${{ env.CHART_NAME }}
             helm test -n $NAMESPACE $RELEASE_NAME --logs --timeout "$TEST_TIMEOUT_SECONDS" | tee ${LOG_PATH}/charts-${chart}.log
             exit_code=$?
