@@ -55,7 +55,7 @@ teirerank:
     timeoutSeconds: 1
   readinessProbe:
     timeoutSeconds: 1
-# testtest
+
 # Embedding: Second largest bottleneck without rerank
 # By default tei on gaudi is disabled.
 # tei:
