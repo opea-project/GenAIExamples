@@ -135,6 +135,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: "lvl/dataprep_refactor"
           example: ${{ inputs.example }}
           hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}
