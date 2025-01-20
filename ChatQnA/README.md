@@ -39,7 +39,7 @@ Note:
 
 1. If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`.
 
-2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and granted the access to it on (Huggingface)[https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct] or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ### Quick Start: 1.Setup Environment Variable
 

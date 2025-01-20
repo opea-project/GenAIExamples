@@ -4,7 +4,7 @@ This document outlines the deployment process for a ChatQnA application utilizin
 
 The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component.
 
-Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and granted the access to it on (Huggingface)[https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct] or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ## 🚀 Apply Xeon Server on AWS
 

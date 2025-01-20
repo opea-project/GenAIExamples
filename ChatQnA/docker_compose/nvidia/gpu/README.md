@@ -9,7 +9,7 @@ Quick Start Deployment Steps:
 3. Run Docker Compose.
 4. Consume the ChatQnA Service.
 
-Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and granted the access to it on (Huggingface)[https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct] or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ## Quick Start: 1.Setup Environment Variable
 
