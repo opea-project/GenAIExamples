@@ -21,7 +21,7 @@ function build_docker_images() {
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker images && sleep 1s
 }
@@ -39,6 +39,7 @@ function start_services() {
     export TGI_LLM_ENDPOINT="http://${ip_address}:6005"
     export host_ip=${ip_address}
     export LOGFLAG=true
+    export MAX_OUTPUT_TOKENS="1024"
 
     # Start Docker Containers
     sed -i "s|container_name: graphrag-gaudi-backend-server|container_name: graphrag-gaudi-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
@@ -200,7 +201,7 @@ function main() {
     echo "Mega service start duration is $duration s"
 
     if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/tests/chatqna_benchmark.py
+        echo "not implemented"
     elif [ "${mode}" == "" ]; then
         validate_microservices
         validate_megaservice
