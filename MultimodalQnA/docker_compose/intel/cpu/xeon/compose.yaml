@@ -26,7 +26,7 @@ services:
       - redis-vector-db
       - lvm-llava
     ports:
-      - 6007:${DATAPREP_MMR_PORT}"
+      - "6007:${DATAPREP_MMR_PORT}"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
