@@ -10,12 +10,12 @@ services:
     ports:
       - "8001:55555"
   dataprep:
-    image: ${REGISTRY:-opea}/dataprep-multimodal-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-vdms-server
     depends_on:
       - vdms-vector-db
     ports:
-      - "6007:6007"
+      - "6007:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -23,6 +23,7 @@ services:
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
       INDEX_NAME: ${INDEX_NAME}
+      MULTIMODAL_DATAPREP: true
     entrypoint: sh -c 'sleep 15 && python ingest_videos.py'
     volumes:
       - /home/$USER/.cache/clip:/home/user/.cache/clip

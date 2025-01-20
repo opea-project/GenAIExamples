@@ -53,7 +53,7 @@ def main():
     host_ip = args.host_ip
     port = args.port
     proxies = {"http": ""}
-    url = "http://{host_ip}:{port}/v1/dataprep".format(host_ip=host_ip, port=port)
+    url = "http://{host_ip}:{port}/v1/dataprep/ingest".format(host_ip=host_ip, port=port)
 
     # Split jsonl file into json files
     files = split_jsonl_into_txts(os.path.join(args.filedir, args.filename))

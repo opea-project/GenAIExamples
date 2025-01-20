@@ -66,14 +66,14 @@ services:
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 6000 --max-total-tokens 8192
   dataprep-neo4j-llamaindex:
-    image: ${REGISTRY:-opea}/dataprep-neo4j-llamaindex:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-neo4j-server
     depends_on:
       - neo4j-apoc
       - tgi-gaudi-service
       - tei-embedding-service
     ports:
-      - "6004:6004"
+      - "6004:5000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -85,6 +85,7 @@ services:
       NEO4J_URL: ${NEO4J_URL}
       NEO4J_USERNAME: ${NEO4J_USERNAME}
       NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_NEO4J_LLAMAINDEX"
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
@@ -177,7 +178,7 @@ services:
       - BACKEND_SERVICE_IP=graphrag-gaudi-backend-server
       - BACKEND_SERVICE_PORT=8888
       - DATAPREP_SERVICE_IP=dataprep-neo4j-llamaindex
-      - DATAPREP_SERVICE_PORT=6004
+      - DATAPREP_SERVICE_PORT=5000
     ipc: host
     restart: always
 networks:

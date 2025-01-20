@@ -58,10 +58,28 @@ def read_text_from_file(file, save_file_name):
     return file_content
 
 
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.LLM:
+        for key_to_replace in ["text"]:
+            if key_to_replace in inputs:
+                inputs["messages"] = inputs[key_to_replace]
+                del inputs[key_to_replace]
+
+        if "id" in inputs:
+            del inputs["id"]
+        if "max_new_tokens" in inputs:
+            del inputs["max_new_tokens"]
+        if "input" in inputs:
+            del inputs["input"]
+
+    return inputs
+
+
 class FaqGenService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_inputs = align_inputs
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.FAQ_GEN)
 

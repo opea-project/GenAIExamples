@@ -20,7 +20,7 @@ function build_docker_images() {
     if [ ! -d "GenAIComps" ] ; then
         git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
     fi
-    service_list="dataprep-redis embedding retriever doc-index-retriever"
+    service_list="dataprep embedding retriever doc-index-retriever"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -66,7 +66,7 @@ function validate() {
 
 function validate_megaservice() {
     echo "===========Ingest data=================="
-    local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep" \
+    local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev/"]')
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon")
