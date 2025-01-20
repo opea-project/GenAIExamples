@@ -33,6 +33,10 @@ case "$1" in
             port=$(grep -E "export $port=" tests/$test_case | cut -d'=' -f2)
           fi
           if [[ $port =~ [0-9] ]]; then
+            if [[ $port == 5000 ]]; then
+              echo "Error: Port 5000 is used by local docker registry, please DO NOT use it in docker compose deployment!!!"
+              exit 1
+            fi
             cid=$(docker ps --filter "publish=${port}" --format "{{.ID}}")
             if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && echo "release $port"; fi
           fi
