@@ -52,6 +52,7 @@ function start_services() {
     export host_ip=${ip_address}
     export LOGFLAG=true
     export MAX_OUTPUT_TOKENS="1024"
+    unset OPENAI_API_KEY
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
