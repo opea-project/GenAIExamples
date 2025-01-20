@@ -31,7 +31,7 @@ function start_services() {
 
     export host_ip=${ip_address}
     export LLM_ENDPOINT_PORT=8008
-    export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI"
+    export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -91,10 +91,10 @@ function validate_microservices() {
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/faqgen" \
-        "data: " \
+        "text" \
         "llm" \
         "llm-faqgen-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function validate_megaservice() {

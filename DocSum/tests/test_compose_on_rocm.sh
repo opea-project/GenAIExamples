@@ -32,7 +32,7 @@ export ASR_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 export DOCSUM_CARD_ID="card1"
 export DOCSUM_RENDER_ID="renderD136"
-export DocSum_COMPONENT_NAME="OPEADocSum_TGI"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 export LOGFLAG=True
 
 function build_docker_images() {
@@ -50,7 +50,7 @@ function build_docker_images() {
 function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
     sed -i "s/backend_address/$ip_address/g" "$WORKPATH"/ui/svelte/.env
-
+    sed -i "s|container_name: docsum-backend-server|container_name: docsum-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     # Start Docker Containers
     docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
     sleep 3m
@@ -138,10 +138,10 @@ function validate_microservices() {
     # llm microservice
     validate_services \
         "${host_ip}:9000/v1/docsum" \
-        "data: " \
+        "text" \
         "docsum-llm-server" \
         "docsum-llm-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
 }
 
