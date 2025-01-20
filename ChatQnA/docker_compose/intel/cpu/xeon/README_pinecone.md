@@ -116,7 +116,7 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 ### 2. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-pinecone:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/pinecone/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 cd ..
 ```
 
@@ -171,7 +171,7 @@ docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-a
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `opea/dataprep-pinecone:latest`
+1. `opea/dataprep:latest`
 2. `opea/retriever:latest`
 3. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest`
 4. `opea/chatqna-ui:latest`
@@ -360,7 +360,7 @@ wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrie
 Upload:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F "files=@./nke-10k-2023.pdf"
 ```
@@ -370,7 +370,7 @@ This command updates a knowledge base by uploading a local file for processing. 
 Add Knowledge Base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 ```
@@ -381,7 +381,7 @@ To delete the files/link you uploaded:
 
 ```bash
 # delete all uploaded files and links
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6009/v1/dataprep/delete" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```

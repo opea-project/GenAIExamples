@@ -18,6 +18,6 @@ export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TGI_LLM_ENDPOINT="http://${host_ip}:6005"
 export NEO4J_URL="bolt://${host_ip}:7687"
 export NEO4J_USERNAME=neo4j
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6004/v1/dataprep"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/ingest"
 export LOGFLAG=True
 export RETRIEVER_SERVICE_PORT=80

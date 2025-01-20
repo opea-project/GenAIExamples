@@ -94,7 +94,7 @@ function validate_chatqna_dataprep() {
    export CLIENT_POD=$(kubectl get pod -n $CHATQNA_DATAPREP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
    echo "$CLIENT_POD"
    accessUrl=$(kubectl get gmc -n $CHATQNA_DATAPREP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='chatqa')].status.accessUrl}")
-   kubectl exec "$CLIENT_POD" -n $CHATQNA_DATAPREP_NAMESPACE -- curl "$accessUrl/dataprep"  -X POST  -F 'link_list=["https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/test/data/gaudi.txt"]' -H "Content-Type: multipart/form-data" > $LOG_PATH/curl_dataprep.log
+   kubectl exec "$CLIENT_POD" -n $CHATQNA_DATAPREP_NAMESPACE -- curl "$accessUrl/dataprep/ingest"  -X POST  -F 'link_list=["https://raw.githubusercontent.com/opea-project/GenAIInfra/main/microservices-connector/test/data/gaudi.txt"]' -H "Content-Type: multipart/form-data" > $LOG_PATH/curl_dataprep.log
    exit_code=$?
    if [ $exit_code -ne 0 ]; then
        echo "chatqna failed, please check the logs in ${LOG_PATH}!"

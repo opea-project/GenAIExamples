@@ -72,7 +72,7 @@ Here is an example of `Nike 2023` pdf.
 # download pdf file
 wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
-curl -X POST "http://${host_ip}:6004/v1/dataprep" \
+curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./nke-10k-2023.pdf"
 ```
@@ -172,7 +172,7 @@ Gaudi default compose.yaml
 | Embedding | Llama-index | Xeon | 6006 | /v1/embaddings |
 | Retriever | Llama-index, Neo4j | Xeon | 6009 | /v1/retrieval |
 | LLM | Llama-index, TGI | Gaudi | 6005 | /v1/chat/completions |
-| Dataprep | Neo4j, LlamaIndex | Xeon | 6004 | /v1/dataprep |
+| Dataprep | Neo4j, LlamaIndex | Xeon | 6004 | /v1/dataprep/ingest |
 
 ### Models Selection
 
@@ -207,7 +207,7 @@ Here is an example of `Nike 2023` pdf.
 # download pdf file
 wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./nke-10k-2023.pdf"
 ```

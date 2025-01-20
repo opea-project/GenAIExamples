@@ -35,12 +35,12 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
-  dataprep-redis:
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
   promptregistry-mongo-server:
     build:
       context: GenAIComps

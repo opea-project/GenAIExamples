@@ -29,9 +29,9 @@ services:
       dockerfile: comps/rerankings/src/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
-  dataprep-redis:
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: doc-index-retriever
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}

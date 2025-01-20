@@ -9,13 +9,13 @@ services:
       - "6333:6333"
       - "6334:6334"
   dataprep-qdrant-service:
-    image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-qdrant-server
     depends_on:
       - qdrant-vector-db
       - tei-embedding-service
     ports:
-      - "6043:6007"
+      - "6043:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -25,6 +25,7 @@ services:
       QDRANT_INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_QDRANT"
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
@@ -148,7 +149,7 @@ services:
       - BACKEND_SERVICE_IP=chatqna-xeon-backend-server
       - BACKEND_SERVICE_PORT=8888
       - DATAPREP_SERVICE_IP=dataprep-qdrant-service
-      - DATAPREP_SERVICE_PORT=6007
+      - DATAPREP_SERVICE_PORT=5000
     ipc: host
     restart: always
 

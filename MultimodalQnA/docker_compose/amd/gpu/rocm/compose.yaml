@@ -20,13 +20,13 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-multimodal-redis:
-    image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-multimodal-redis
     depends_on:
       - redis-vector-db
       - lvm
     ports:
-      - "6007:6007"
+      - "6007:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -36,6 +36,8 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:9399/v1/lvm"
       HUGGINGFACEHUB_API_TOKEN: ${MULTIMODAL_HUGGINGFACEHUB_API_TOKEN}
+      MULTIMODAL_DATAPREP: true
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALREDIS"
     restart: unless-stopped
   embedding-multimodal-bridgetower:
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}

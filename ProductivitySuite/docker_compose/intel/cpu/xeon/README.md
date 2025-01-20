@@ -39,7 +39,7 @@ docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$http
 ### 5. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 6. Build Prompt Registry Image
@@ -158,12 +158,12 @@ export TGI_LLM_ENDPOINT_CODEGEN="http://${host_ip}:8028"
 export TGI_LLM_ENDPOINT_FAQGEN="http://${host_ip}:9009"
 export TGI_LLM_ENDPOINT_DOCSUM="http://${host_ip}:9009"
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/delete"
 export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${host_ip}:8889/v1/faqgen"
 export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
 export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/ingest"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/get"
 export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
 export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
 export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delete"
@@ -347,7 +347,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
     Update Knowledge Base via Local File Upload:
 
     ```bash
-    curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
          -H "Content-Type: multipart/form-data" \
          -F "files=@./nke-10k-2023.pdf"
     ```
@@ -357,7 +357,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
     Add Knowledge Base via HTTP Links:
 
     ```bash
-    curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
          -H "Content-Type: multipart/form-data" \
          -F 'link_list=["https://opea.dev"]'
     ```
@@ -367,7 +367,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
     Also, you are able to get the file list that you uploaded:
 
     ```bash
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
          -H "Content-Type: application/json"
     ```
 
@@ -375,17 +375,17 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     # delete link
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
          -d '{"file_path": "https://opea.dev.txt"}' \
          -H "Content-Type: application/json"
 
     # delete file
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
          -d '{"file_path": "nke-10k-2023.pdf"}' \
          -H "Content-Type: application/json"
 
     # delete all uploaded files and links
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
          -d '{"file_path": "all"}' \
          -H "Content-Type: application/json"
     ```

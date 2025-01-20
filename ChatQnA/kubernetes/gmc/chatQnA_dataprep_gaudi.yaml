@@ -70,7 +70,7 @@ spec:
         internalService:
           serviceName: data-prep-svc
           config:
-            endpoint: /v1/dataprep
+            endpoint: /v1/dataprep/ingest
             REDIS_URL: redis-vector-db
             TEI_ENDPOINT: tei-embedding-gaudi-svc
           isDownstreamService: true
