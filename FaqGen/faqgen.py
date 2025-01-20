@@ -57,6 +57,7 @@ def read_text_from_file(file, save_file_name):
 
     return file_content
 
+
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.LLM:
         for key_to_replace in ["text"]:
@@ -72,6 +73,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
             del inputs["input"]
 
     return inputs
+
 
 class FaqGenService:
     def __init__(self, host="0.0.0.0", port=8000):
