@@ -231,7 +231,7 @@ and the log shows model warm up, please wait for a while and try it later.
 ```
 2024-06-05T05:45:27.707509646Z 2024-06-05T05:45:27.707361Z  WARN text_generation_router: router/src/main.rs:357: `--revision` is not set
 2024-06-05T05:45:27.707539740Z 2024-06-05T05:45:27.707379Z  WARN text_generation_router: router/src/main.rs:358: We strongly advise to set it to a known supported commit.
-2024-06-05T05:45:27.852525522Z 2024-06-05T05:45:27.852437Z  INFO text_generation_router: router/src/main.rs:379: Serving revision bdd31cf498d13782cc7497cba5896996ce429f91 of model Intel/neural-chat-7b-v3-3
+2024-06-05T05:45:27.852525522Z 2024-06-05T05:45:27.852437Z  INFO text_generation_router: router/src/main.rs:379: Serving revision bdd31cf498d13782cc7497cba5896996ce429f91 of model meta-llama/Meta-Llama-3-8B-Instruct
 2024-06-05T05:45:27.867833811Z 2024-06-05T05:45:27.867759Z  INFO text_generation_router: router/src/main.rs:221: Warming up model
 ```
 
@@ -239,7 +239,7 @@ and the log shows model warm up, please wait for a while and try it later.
 
 ```
 curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-     "model": "Intel/neural-chat-7b-v3-3",
+     "model": "meta-llama/Meta-Llama-3-8B-Instruct",
      "messages": "What is the revenue of Nike in 2023?"
      }'
 ```

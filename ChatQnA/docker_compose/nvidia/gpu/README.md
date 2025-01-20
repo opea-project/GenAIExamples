@@ -9,6 +9,8 @@ Quick Start Deployment Steps:
 3. Run Docker Compose.
 4. Consume the ChatQnA Service.
 
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+
 ## Quick Start: 1.Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
@@ -165,11 +167,11 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
 
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
+| Service   | Model                               |
+| --------- | ----------------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5               |
+| Reranking | BAAI/bge-reranker-base              |
+| LLM       | meta-llama/Meta-Llama-3-8B-Instruct |
 
 Change the `xxx_MODEL_ID` below for your needs.
 
@@ -287,7 +289,7 @@ docker compose up -d
    ```bash
    curl http://${host_ip}:8008/v1/chat/completions \
      -X POST \
-     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 

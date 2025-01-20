@@ -21,7 +21,7 @@ const MODEL_ID = env.MODEL_ID;
 export async function fetchTextStream(query: string) {
 	let payload = {};
 	let url = "";
-	let modelId = "Intel/neural-chat-7b-v3-3";
+	let modelId = "meta-llama/Meta-Llama-3-8B-Instruct";
 
 	if (MODEL_ID) {
 		modelId = MODEL_ID;
