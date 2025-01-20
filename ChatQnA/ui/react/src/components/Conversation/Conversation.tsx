@@ -58,7 +58,7 @@ const Conversation = ({ title }: ConversationProps) => {
       conversationId: selectedConversationId,
       userPrompt,
       messages,
-      model: "Intel/neural-chat-7b-v3-3",
+      model: "meta-llama/Meta-Llama-3-8B-Instruct",
     })
     setPrompt("")
   }

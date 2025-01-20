@@ -10,6 +10,8 @@ Quick Start Deployment Steps:
 2. Run Docker Compose.
 3. Consume the ChatQnA Service.
 
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+
 ## Quick Start: 1.Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
@@ -155,11 +157,11 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
 
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
+| Service   | Model                               |
+| --------- | ----------------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5               |
+| Reranking | BAAI/bge-reranker-base              |
+| LLM       | meta-llama/Meta-Llama-3-8B-Instruct |
 
 Change the `xxx_MODEL_ID` below for your needs.
 
@@ -179,7 +181,7 @@ Change the `xxx_MODEL_ID` below for your needs.
    export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
    export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
    export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
-   export CHATQNA_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+   export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
    export CHATQNA_TGI_SERVICE_PORT=8008
    export CHATQNA_TEI_EMBEDDING_PORT=8090
    export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"

@@ -45,7 +45,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
@@ -173,7 +173,7 @@ function validate_microservices() {
         "content" \
         "tgi-llm" \
         "tgi-gaudi-server" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
 }
 
 function validate_megaservice() {

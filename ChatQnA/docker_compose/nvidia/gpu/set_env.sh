@@ -6,7 +6,7 @@
 
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
 export INDEX_NAME="rag-redis"
 export MEGA_SERVICE_HOST_IP=${host_ip}

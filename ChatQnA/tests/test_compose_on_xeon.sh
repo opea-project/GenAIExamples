@@ -33,7 +33,7 @@ function start_services() {
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export host_ip=${ip_address}
@@ -115,7 +115,7 @@ function validate_microservices() {
         "content" \
         "vllm-llm" \
         "vllm-service" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {
