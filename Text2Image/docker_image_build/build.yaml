@@ -11,6 +11,15 @@ services:
       context: GenAIComps
       dockerfile: comps/text2image/src/Dockerfile
     image: ${REGISTRY:-opea}/text2image:${TAG:-latest}
+  text2image-gaudi:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: GenAIComps
+      dockerfile: comps/text2image/src/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/text2image-gaudi:${TAG:-latest}
   text2image-ui:
     build:
       context: ../ui
