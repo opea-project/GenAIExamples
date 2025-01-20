@@ -11,6 +11,12 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+  chatqna-wrapper:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile.wrapper
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna-wrapper:${TAG:-latest}
   chatqna-guardrails:
     build:
       context: ../
@@ -35,48 +41,30 @@ services:
       dockerfile: ./docker/Dockerfile.react
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}
-  embedding-tei:
+  embedding:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/tei/langchain/Dockerfile
+      dockerfile: comps/embeddings/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-  retriever-redis:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+  retriever:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/redis/langchain/Dockerfile
+      dockerfile: comps/retrievers/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
-  retriever-qdrant:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+  reranking:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/qdrant/haystack/Dockerfile
+      dockerfile: comps/rerankings/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}
-  reranking-tei:
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
+  llm-textgen:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/tei/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
-  llm-tgi:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-  llm-ollama:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/text-generation/ollama/langchain/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
-  llm-vllm:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/text-generation/vllm/langchain/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
   dataprep-redis:
     build:
       context: GenAIComps
@@ -89,27 +77,33 @@ services:
       dockerfile: comps/dataprep/qdrant/langchain/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
-  guardrails-tgi:
+  dataprep-pinecone:
     build:
       context: GenAIComps
-      dockerfile: comps/guardrails/llama_guard/langchain/Dockerfile
+      dockerfile: comps/dataprep/pinecone/langchain/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/guardrails-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep-pinecone:${TAG:-latest}
+  guardrails:
+    build:
+      context: GenAIComps
+      dockerfile: comps/guardrails/src/guardrails/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/guardrails:${TAG:-latest}
   vllm:
     build:
       context: vllm
       dockerfile: Dockerfile.cpu
     extends: chatqna
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
-  vllm-hpu:
+  vllm-gaudi:
     build:
       context: vllm-fork
       dockerfile: Dockerfile.hpu
     extends: chatqna
-    image: ${REGISTRY:-opea}/vllm-hpu:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
   nginx:
     build:
       context: GenAIComps
-      dockerfile: comps/nginx/Dockerfile
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

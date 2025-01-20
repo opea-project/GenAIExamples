@@ -19,7 +19,7 @@ Should the Docker image you seek not yet be available on Docker Hub, you can bui
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 2. Build the MegaService Docker Image
@@ -41,12 +41,6 @@ cd GenAIExamples/CodeGen/ui
 docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 3 Docker Images:
-
-- `opea/llm-tgi:latest`
-- `opea/codegen:latest`
-- `opea/codegen-ui:latest`
-
 ### 4. Build CodeGen React UI Docker Image (Optional)
 
 Build react frontend Docker image via below command:
@@ -58,9 +52,9 @@ cd GenAIExamples/CodeGen/ui
 docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 ```
 
-Then run the command `docker images`, you will have the following 3 Docker Images:
+Then run the command `docker images`, you will have the following Docker Images:
 
-- `opea/llm-tgi:latest`
+- `opea/llm-textgen:latest`
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
 - `opea/codegen-react-ui:latest` (optional)
@@ -138,7 +132,7 @@ docker compose up -d
    ```bash
    curl http://${host_ip}:9000/v1/chat/completions\
      -X POST \
-     -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
      -H 'Content-Type: application/json'
    ```
 
@@ -250,7 +244,7 @@ There are 4 areas worth noting as shown in the screenshot above:
 
 1. Enter and submit your question
 2. Your previous questions
-3. Answers from AI assistant (Code will be highlighted properly according to the programming language it is written in, also support streaming output)
+3. Answers from AI assistant (Code will be highlighted properly according to the programming language it is written in, also support stream output)
 4. Copy or replace code with one click (Note that you need to select the code in the editor first and then click "replace", otherwise the code will be inserted)
 
 You can also select the code in the editor and ask the AI assistant questions about the code directly.

@@ -1,37 +1,23 @@
 # Document Summarization Application
 
-Large Language Models (LLMs) have revolutionized the way we interact with text. These models can be used to create summaries of news articles, research papers, technical documents, legal documents and other types of text. Suppose you have a set of documents (PDFs, Notion pages, customer questions, etc.) and you want to summarize the content. In this example use case, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference.
-
-The architecture for document summarization will be illustrated/described below:
+Large Language Models (LLMs) have revolutionized the way we interact with text. These models can be used to create summaries of news articles, research papers, technical documents, legal documents, multimedia documents, and other types of documents. Suppose you have a set of documents (PDFs, Notion pages, customer questions, multimedia files, etc.) and you want to summarize the content. In this example use case, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference.
 
 ![Architecture](./assets/img/docsum_architecture.png)
-
-![Workflow](./assets/img/docsum_workflow.png)
 
 ## Deploy Document Summarization Service
 
 The Document Summarization service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
-Based on whether you want to use Docker or Kubernetes, follow the instructions below.
-
-Currently we support two ways of deploying Document Summarization services with docker compose:
-
-1. Start services using the docker image on `docker hub`:
-
-   ```bash
-   docker pull opea/docsum:latest
-   ```
-
-2. Start services using the docker images `built from source`: [Guide](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose)
+Based on whether you want to use Docker or Kubernetes, follow the instructions below. Currently we support deploying Document Summarization services with docker compose.
 
 ### Required Models
 
-We set default model as "Intel/neural-chat-7b-v3-3", change "LLM_MODEL_ID" in "docker_compose/set_env.sh" if you want to use other models.
+Default model is "Intel/neural-chat-7b-v3-3". Change "LLM_MODEL_ID" environment variable in commands below if you want to use another model.
 
-```
+```bash
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 ```
 
-If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+When using gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
 ### Setup Environment Variable
 
@@ -57,46 +43,38 @@ To set up environment variables for deploying Document Summarization services, f
 3. Set up other environment variables:
 
    ```bash
-   source ./docker_compose/set_env.sh
+   source GenAIExamples/DocSum/docker_compose/set_env.sh
    ```
 
 ### Deploy using Docker
 
 #### Deploy on Gaudi
 
-Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
+Follow the instructions provided in the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build Docker images from source. Once the images are built, run the following command to start the services:
 
 ```bash
 cd GenAIExamples/DocSum/docker_compose/intel/hpu/gaudi/
 docker compose -f compose.yaml up -d
 ```
 
-Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
+Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
+
+> Notice: Currently only the **Habana Driver 1.16.x** is supported for Gaudi.
 
 #### Deploy on Xeon
 
-Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
+Follow the instructions provided in the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) to build Docker images from source. Once the images are built, run the following command to start the services:
 
 ```bash
 cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon/
-docker compose up -d
+docker compose -f compose.yaml up -d
 ```
 
-Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
+Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
-### Deploy using Kubernetes with GMC
+### Deploy DocSum on Kubernetes using Helm Chart
 
-Refer to [Kubernetes deployment](./kubernetes/intel/README_gmc.md)
-
-### Deploy using Kubernetes without GMC
-
-Refer to [Kubernetes deployment](./kubernetes/intel/README.md)
-
-### Deploy DocSum into Kubernetes using Helm Chart
-
-Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
-
-Refer to the [DocSum helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/docsum/README.md) for instructions on deploying DocSum into Kubernetes on Xeon & Gaudi.
+Refer to the [DocSum helm chart](./kubernetes/helm/README.md) for instructions on deploying DocSum on Kubernetes.
 
 ### Workflow of the deployed Document Summarization Service
 
@@ -120,9 +98,12 @@ flowchart LR
     classDef invisible fill:transparent,stroke:transparent;
     style DocSum-MegaService stroke:#000000
 
+
+
     %% Subgraphs %%
     subgraph DocSum-MegaService["DocSum MegaService "]
         direction LR
+        M2T([Multimedia2text MicroService]):::blue
         LLM([LLM MicroService]):::blue
     end
     subgraph UserInterface[" User Interface "]
@@ -132,20 +113,24 @@ flowchart LR
     end
 
 
-    LLM_gen{{LLM Service <br>}}
+    A2T_SRV{{Audio2Text service<br>}}
+    V2A_SRV{{Video2Audio service<br>}}
+    WSP_SRV{{whisper service<br>}}
     GW([DocSum GateWay<br>]):::orange
 
 
     %% Questions interaction
     direction LR
-    a[User Input Query] --> UI
+    a[User Document for Summarization] --> UI
     UI --> GW
     GW <==> DocSum-MegaService
-
+    M2T ==> LLM
 
     %% Embedding service flow
     direction LR
-    LLM <-.-> LLM_gen
+    M2T .-> V2A_SRV
+    M2T <-.-> A2T_SRV <-.-> WSP_SRV
+    V2A_SRV .-> A2T_SRV
 
 ```
 
@@ -155,22 +140,74 @@ Two ways of consuming Document Summarization Service:
 
 1. Use cURL command on terminal
 
+   Text:
+
    ```bash
-   #Use English mode (default).
+   curl -X POST http://${host_ip}:8888/v1/docsum \
+        -H "Content-Type: application/json" \
+        -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+
+   # Use English mode (default).
    curl http://${host_ip}:8888/v1/docsum \
        -H "Content-Type: multipart/form-data" \
+       -F "type=text" \
        -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
        -F "max_tokens=32" \
        -F "language=en" \
        -F "stream=true"
 
-   #Use Chinese mode.
+   # Use Chinese mode.
    curl http://${host_ip}:8888/v1/docsum \
        -H "Content-Type: multipart/form-data" \
+       -F "type=text" \
        -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
        -F "max_tokens=32" \
        -F "language=zh" \
        -F "stream=true"
+
+   # Upload file
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=text" \
+      -F "messages=" \
+      -F "files=@/path to your file (.txt, .docx, .pdf)" \
+      -F "max_tokens=32" \
+      -F "language=en" \
+      -F "stream=true"
+   ```
+
+   > Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI.
+
+   Audio:
+
+   ```bash
+   curl -X POST http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: application/json" \
+      -d '{"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
+
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=audio" \
+      -F "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
+      -F "max_tokens=32" \
+      -F "language=en" \
+      -F "stream=true"
+   ```
+
+   Video:
+
+   ```bash
+   curl -X POST http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: application/json" \
+      -d '{"type": "video", "messages": "convert your video to base64 data type"}'
+
+   curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=video" \
+      -F "messages=convert your video to base64 data type" \
+      -F "max_tokens=32" \
+      -F "language=en" \
+      -F "stream=true"
    ```
 
 2. Access via frontend
@@ -184,7 +221,6 @@ Two ways of consuming Document Summarization Service:
 1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
 
    ```bash
-   http_proxy=""
    curl http://${host_ip}:8008/generate \
      -X POST \
      -d '{"inputs":"What is Deep Learning?","parameters":{"max_tokens":17, "do_sample": true}}' \

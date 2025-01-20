@@ -1,0 +1,86 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  codegen-tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    container_name: codegen-tgi-service
+    ports:
+      - "${CODEGEN_TGI_SERVICE_PORT:-8028}:80"
+    volumes:
+      - "/var/lib/GenAI/data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGING_FACE_HUB_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:${CODEGEN_TGI_SERVICE_PORT:-8028}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    shm_size: 1g
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    ipc: host
+    command: --model-id ${CODEGEN_LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
+  codegen-llm-server:
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: codegen-llm-server
+    depends_on:
+      codegen-tgi-service:
+        condition: service_healthy
+    ports:
+      - "${CODEGEN_LLM_SERVICE_PORT:-9000}:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: "http://codegen-tgi-service"
+      LLM_MODEL_ID: ${CODEGEN_LLM_MODEL_ID}
+      HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  codegen-backend-server:
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
+    container_name: codegen-backend-server
+    depends_on:
+      - codegen-llm-server
+    ports:
+      - "${CODEGEN_BACKEND_SERVICE_PORT:-7778}:7778"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${CODEGEN_MEGA_SERVICE_HOST_IP}
+      LLM_SERVICE_HOST_IP: "codegen-llm-server"
+    ipc: host
+    restart: always
+  codegen-ui-server:
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
+    container_name: codegen-ui-server
+    depends_on:
+      - codegen-backend-server
+    ports:
+      - "${CODEGEN_UI_SERVICE_PORT:-5173}:5173"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      BASIC_URL: ${CODEGEN_BACKEND_SERVICE_URL}
+      BACKEND_SERVICE_ENDPOINT: ${CODEGEN_BACKEND_SERVICE_URL}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

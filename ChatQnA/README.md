@@ -4,7 +4,26 @@ Chatbots are the most widely adopted use case for leveraging the powerful chat a
 
 RAG bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that responses generated remain factual and current. The core of this architecture are vector databases, which are instrumental in enabling efficient and semantic retrieval of information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
 
-## Deploy ChatQnA Service
+## 🤖 Automated Terraform Deployment using Intel® Optimized Cloud Modules for **Terraform**
+
+| Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                                         | Comments                                                             |
+| -------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Module](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Uses Intel/neural-chat-7b-v3-3 by default                            |
+| AWS Falcon2-11B      | 4th Gen Intel Xeon with Intel AMX | [AWS Module with Falcon11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B) | Uses TII Falcon2-11B LLM Model                                       |
+| GCP                  | 5th Gen Intel Xeon with Intel AMX | [GCP Module](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Also supports Confidential AI by using Intel® TDX with 4th Gen Xeon |
+| Azure                | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
+| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
+
+## Automated Deployment to Ubuntu based system(if not using Terraform) using Intel® Optimized Cloud Modules for **Ansible**
+
+To deploy to existing Xeon Ubuntu based system, use our Intel Optimized Cloud Modules for Ansible. This is the same Ansible playbook used by Terraform.
+Use this if you are not using Terraform and have provisioned your system with another tool or manually including bare metal.
+| Operating System | Intel Optimized Cloud Module for Ansible |
+|------------------|------------------------------------------|
+| Ubuntu 20.04 | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
+| Ubuntu 22.04 | Work-in-progress |
+
+## Manually Deploy ChatQnA Service
 
 The ChatQnA service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors and Nvidia GPU.
 
@@ -41,15 +60,18 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 3. Set up other environment variables:
 
-   > Notice that you can only choose **one** command below to set up envs according to your hardware. Other that the port numbers may be set incorrectly.
+   > Notice that you can only choose **one** hardware option below to set up envs according to your hardware. Make sure port numbers are set correctly as well.
 
    ```bash
    # on Gaudi
    source ./docker_compose/intel/hpu/gaudi/set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
    # on Xeon
    source ./docker_compose/intel/cpu/xeon/set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
    # on Nvidia GPU
    source ./docker_compose/nvidia/gpu/set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-ui-server,chatqna-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
    ```
 
 ### Quick Start: 2.Run Docker Compose
@@ -177,10 +199,10 @@ In the below, we provide a table that describes for each microservice component 
 Gaudi default compose.yaml
 | MicroService | Open Source Project | HW | Port | Endpoint |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding | Langchain | Xeon | 6000 | /v1/embaddings |
+| Embedding | Langchain | Xeon | 6000 | /v1/embeddings |
 | Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
 | Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
-| LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
+| LLM | Langchain, vLLM | Gaudi | 9000 | /v1/chat/completions |
 | Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep |
 
 ### Required Models
@@ -228,19 +250,9 @@ docker compose up -d
 
 Refer to the [NVIDIA GPU Guide](./docker_compose/nvidia/gpu/README.md) for more instructions on building docker images from source.
 
-### Deploy ChatQnA into Kubernetes on Xeon & Gaudi with GMC
+### Deploy ChatQnA on Kubernetes using Helm Chart
 
-Refer to the [Kubernetes Guide](./kubernetes/intel/README_gmc.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi with GMC.
-
-### Deploy ChatQnA into Kubernetes on Xeon & Gaudi without GMC
-
-Refer to the [Kubernetes Guide](./kubernetes/intel/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi without GMC.
-
-### Deploy ChatQnA into Kubernetes using Helm Chart
-
-Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
-
-Refer to the [ChatQnA helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/chatqna/README.md) for instructions on deploying ChatQnA into Kubernetes on Xeon & Gaudi.
+Refer to the [ChatQnA helm chart](./kubernetes/helm/README.md) for instructions on deploying ChatQnA on Kubernetes.
 
 ### Deploy ChatQnA on AI PC
 
@@ -254,16 +266,21 @@ Refer to the [Intel Technology enabling for Openshift readme](https://github.com
 
 ### Check Service Status
 
-Before consuming ChatQnA Service, make sure the TGI/vLLM service is ready (which takes up to 2 minutes to start).
+Before consuming ChatQnA Service, make sure the vLLM/TGI service is ready, which takes some time.
 
 ```bash
+# vLLM example
+docker logs vllm-gaudi-server 2>&1 | grep complete
 # TGI example
-docker logs tgi-service | grep Connected
+docker logs tgi-gaudi-server | grep Connected
 ```
 
-Consume ChatQnA service until you get the TGI response like below.
+Consume ChatQnA service until you get the response like below.
 
 ```log
+# vLLM
+INFO: Application startup complete.
+# TGI
 2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
 ```
 
@@ -275,7 +292,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:6007/v1/dataprep" \
     -H "Content-Type: multipart/form-data" \
@@ -322,3 +339,22 @@ OPEA microservice deployment can easily be monitored through Grafana dashboards 
 
 ![chatqna dashboards](./assets/img/chatqna_dashboards.png)
 ![tgi dashboard](./assets/img/tgi_dashboard.png)
+
+## Tracing Services with OpenTelemetry Tracing and Jaeger
+
+> NOTE: limited support. Only LLM inference serving with TGI on Gaudi is enabled for this feature.
+
+OPEA microservice and TGI/TEI serving can easily be traced through Jaeger dashboards in conjunction with OpenTelemetry Tracing feature. Follow the [README](https://github.com/opea-project/GenAIComps/tree/main/comps/cores/telemetry#tracing) to trace additional functions if needed.
+
+Tracing data is exported to http://{EXTERNAL_IP}:4318/v1/traces via Jaeger.
+Users could also get the external IP via below command.
+
+```bash
+ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+'
+```
+
+For TGI serving on Gaudi, users could see different services like opea, TEI and TGI.
+![Screenshot from 2024-12-27 11-58-18](https://github.com/user-attachments/assets/6126fa70-e830-4780-bd3f-83cb6eff064e)
+
+Here is a screenshot for one tracing of TGI serving request.
+![Screenshot from 2024-12-27 11-26-25](https://github.com/user-attachments/assets/3a7c51c6-f422-41eb-8e82-c3df52cd48b8)

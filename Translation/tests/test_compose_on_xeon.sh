@@ -19,7 +19,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="translation translation-ui llm-tgi nginx"
+    service_list="translation translation-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
@@ -41,6 +41,7 @@ function start_services() {
     export BACKEND_SERVICE_NAME=translation
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -103,7 +104,7 @@ function validate_microservices() {
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "llm-tgi-server" \
+        "llm-textgen-server" \
         '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
 }
 
@@ -138,7 +139,7 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 

@@ -19,10 +19,10 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codetrans codetrans-ui llm-tgi nginx"
+    service_list="codetrans codetrans-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
@@ -43,6 +43,7 @@ function start_services() {
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=7777
     export NGINX_PORT=80
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -102,7 +103,7 @@ function validate_microservices() {
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "llm-tgi-gaudi-server" \
+        "llm-textgen-gaudi-server" \
         '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
 }
 
@@ -138,7 +139,7 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 

@@ -8,12 +8,23 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
   dataprep-multimodal-redis:
     image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
     container_name: dataprep-multimodal-redis
     depends_on:
       - redis-vector-db
-      - lvm-tgi
+      - lvm
     ports:
       - "6007:6007"
     environment:
@@ -36,13 +47,20 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       PORT: ${EMBEDDER_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMBEDDER_PORT}/v1/health_check"]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+      start_period: 30s
     entrypoint: ["python", "bridgetower_server.py", "--device", "hpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
     restart: unless-stopped
-  embedding-multimodal:
-    image: ${REGISTRY:-opea}/embedding-multimodal:${TAG:-latest}
-    container_name: embedding-multimodal
+  embedding:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding
     depends_on:
-      - embedding-multimodal-bridgetower
+      embedding-multimodal-bridgetower:
+        condition: service_healthy
     ports:
       - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
     ipc: host
@@ -52,10 +70,11 @@ services:
       https_proxy: ${https_proxy}
       MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MULTIMODAL_EMBEDDING: true
     restart: unless-stopped
-  retriever-multimodal-redis:
-    image: ${REGISTRY:-opea}/retriever-multimodal-redis:${TAG:-latest}
-    container_name: retriever-multimodal-redis
+  retriever-redis:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    container_name: retriever-redis
     depends_on:
       - redis-vector-db
     ports:
@@ -67,9 +86,12 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
+      BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tgi-gaudi:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
     container_name: tgi-llava-gaudi-server
     ports:
       - "8399:80"
@@ -84,15 +106,19 @@ services:
       PREFILL_BATCH_BUCKET_SIZE: 1
       BATCH_BUCKET_SIZE: 1
       MAX_BATCH_TOTAL_TOKENS: 4096
+      ENABLE_HPU_GRAPH: true
+      LIMIT_HPU_GRAPH: true
+      USE_FLASH_ATTENTION: true
+      FLASH_ATTENTION_RECOMPUTE: true
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
     command: --model-id ${LVM_MODEL_ID} --max-input-tokens 3048 --max-total-tokens 4096
     restart: unless-stopped
-  lvm-tgi:
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-    container_name: lvm-tgi
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm
     depends_on:
       - tgi-gaudi
     ports:
@@ -102,6 +128,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
@@ -112,9 +139,9 @@ services:
     depends_on:
       - redis-vector-db
       - dataprep-multimodal-redis
-      - embedding-multimodal
-      - retriever-multimodal-redis
-      - lvm-tgi
+      - embedding
+      - retriever-redis
+      - lvm
     ports:
       - "8888:8888"
     environment:
@@ -126,6 +153,8 @@ services:
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
       MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
+      WHISPER_SERVER_PORT: ${WHISPER_SERVER_PORT}
+      WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     ipc: host
     restart: always
   multimodalqna-ui:

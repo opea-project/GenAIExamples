@@ -53,7 +53,7 @@ To set up environment variables for deploying GraphRAG services, follow these st
 
 ### Quick Start: 2.Run Docker Compose
 
-If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](../ChatQnA/docker_compose/intel/cpu/xeon/README.md). [test_compose.sh](tests/test_compose.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD.
+If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](../ChatQnA/docker_compose/intel/cpu/xeon/README.md). [test_compose_on_gaudi.sh](tests/test_compose_on_gaudi.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD.
 
 Docker compose will start 8 services: ![8 servicesi in GraphRAG](assets/8microservices.png)
 
@@ -70,7 +70,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:6004/v1/dataprep" \
     -H "Content-Type: multipart/form-data" \
@@ -191,7 +191,7 @@ Working on a table comparison of various model sizes vs. naive RAG with a datase
 
 ### Check Service Status
 
-Before consuming GraphRAG Service, make sure each microservice is ready by checking the docker logs of each microservice. [test_compose.sh](tests/test_compose.sh) can be a good resource as it shows how CI/CD validated each microservices based on returned HTTP status and response body.
+Before consuming GraphRAG Service, make sure each microservice is ready by checking the docker logs of each microservice. [test_compose_on_gaudi.sh](tests/test_compose_on_gaudi.sh) can be a good resource as it shows how CI/CD validated each microservices based on returned HTTP status and response body.
 
 ```bash
 docker logs container_name
@@ -205,7 +205,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:6007/v1/dataprep" \
     -H "Content-Type: multipart/form-data" \

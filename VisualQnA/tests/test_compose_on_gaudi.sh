@@ -21,7 +21,7 @@ function build_docker_images() {
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
@@ -49,7 +49,7 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs lvm-tgi-gaudi-server > ${LOG_PATH}/lvm_tgi_service_start.log
+        docker logs lvm-gaudi-server > ${LOG_PATH}/lvm_tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
             break
         fi
@@ -93,8 +93,8 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:9399/v1/lvm" \
         "The image" \
-        "lvm-tgi" \
-        "lvm-tgi-gaudi-server" \
+        "lvm" \
+        "lvm-gaudi-server" \
         '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }
 
@@ -167,7 +167,7 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 

@@ -2,48 +2,84 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+  tgi-gaudi-server:
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
     container_name: tgi-gaudi-server
     ports:
-      - "8008:80"
+      - ${LLM_ENDPOINT_PORT:-8008}:80
+    volumes:
+      - "${DATA_PATH:-data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
       ENABLE_HPU_GRAPH: true
       LIMIT_HPU_GRAPH: true
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
-    volumes:
-      - "./data:/data"
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
-  llm:
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${LLM_MODEL_ID} --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
+
+  llm-docsum-tgi:
+    image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
     container_name: llm-docsum-gaudi-server
     depends_on:
-      - tgi-service
+      tgi-gaudi-server:
+        condition: service_healthy
     ports:
-      - "9000:9000"
+      - ${DOCSUM_PORT:-9000}:9000
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
+
+  whisper:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-server
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+
   docsum-gaudi-backend-server:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-gaudi-backend-server
     depends_on:
-      - tgi-service
-      - llm
+      - tgi-gaudi-server
+      - llm-docsum-tgi
     ports:
       - "8888:8888"
     environment:
@@ -52,10 +88,13 @@ services:
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
+
     ipc: host
     restart: always
-  docsum-gaudi-ui-server:
-    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+
+  docsum-gradio-ui:
+    image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
     container_name: docsum-gaudi-ui-server
     depends_on:
       - docsum-gaudi-backend-server
@@ -65,6 +104,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
       - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always

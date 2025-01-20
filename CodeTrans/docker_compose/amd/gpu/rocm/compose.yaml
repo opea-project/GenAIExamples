@@ -1,0 +1,107 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  codetrans-tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    container_name: codetrans-tgi-service
+    ports:
+      - "${CODETRANS_TGI_SERVICE_PORT:-8008}:80"
+    volumes:
+      - "/var/lib/GenAI/codetrans/data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${CODETRANS_TGI_LLM_ENDPOINT}
+      HUGGING_FACE_HUB_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8008/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    ipc: host
+    command: --model-id ${CODETRANS_LLM_MODEL_ID}
+  codetrans-llm-server:
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: codetrans-llm-server
+    depends_on:
+      codetrans-tgi-service:
+        condition: service_healthy
+    ports:
+      - "${CODETRANS_LLM_SERVICE_PORT:-9000}:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: "http://codetrans-tgi-service"
+      LLM_MODEL_ID: ${CODETRANS_LLM_MODEL_ID}
+      HUGGINGFACEHUB_API_TOKEN: ${CODETRANS_HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  codetrans-backend-server:
+    image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}
+    container_name: codetrans-backend-server
+    depends_on:
+      - codetrans-tgi-service
+      - codetrans-llm-server
+    ports:
+      - "${CODETRANS_BACKEND_SERVICE_PORT:-7777}:7777"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${HOST_IP}
+      LLM_SERVICE_HOST_IP: "codetrans-llm-server"
+    ipc: host
+    restart: always
+  codetrans-ui-server:
+    image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}
+    container_name: codetrans-ui-server
+    depends_on:
+      - codetrans-backend-server
+    ports:
+      - "${CODETRANS_FRONTEND_SERVICE_PORT:-5173}:5173"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      BASE_URL: ${CODETRANS_BACKEND_SERVICE_URL}
+      BASIC_URL: ${CODETRANS_BACKEND_SERVICE_URL}
+    ipc: host
+    restart: always
+  codetrans-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: codetrans-nginx-server
+    depends_on:
+      - codetrans-backend-server
+      - codetrans-ui-server
+    ports:
+      - "${CODETRANS_NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=${CODETRANS_FRONTEND_SERVICE_IP}
+      - FRONTEND_SERVICE_PORT=${CODETRANS_FRONTEND_SERVICE_PORT}
+      - BACKEND_SERVICE_NAME=${CODETRANS_BACKEND_SERVICE_NAME}
+      - BACKEND_SERVICE_IP=${CODETRANS_BACKEND_SERVICE_IP}
+      - BACKEND_SERVICE_PORT=${CODETRANS_BACKEND_SERVICE_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

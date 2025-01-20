@@ -21,7 +21,7 @@ export https_proxy="Your_HTTPs_Proxy"
 ### 1. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 2. Build Dataprep Image
@@ -55,13 +55,13 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 
 ```bash
 cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 6 Docker Images:
+Then run the command `docker images`, you will have the following Docker Images:
 
 1. `opea/dataprep-redis:latest`
-2. `opea/retriever-redis:latest`
+2. `opea/retriever:latest`
 3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest`
 5. `opea/nginx:latest`
@@ -188,7 +188,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:6007/v1/dataprep" \

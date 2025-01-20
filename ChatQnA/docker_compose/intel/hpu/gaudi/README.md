@@ -1,6 +1,8 @@
 # Build MegaService of ChatQnA on Gaudi
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as embedding, retriever, rerank, and llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
+
+The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component. It also provides options of not using rerank in the pipeline, leveraging guardrails, or using TGI backend for LLM microservice, please refer to [start-all-the-services-docker-containers](#start-all-the-services-docker-containers) section in this page.
 
 Quick Start:
 
@@ -26,7 +28,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,guardrails
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
    ```
 
 3. Set up other environment variables:
@@ -78,7 +80,7 @@ cd GenAIComps
 ### 1. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 2. Build Dataprep Image
@@ -92,7 +94,7 @@ docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$h
 To fortify AI initiatives in production, Guardrails microservice can secure model inputs and outputs, building Trustworthy, Safe, and Secure LLM-based Applications.
 
 ```bash
-docker build -t opea/guardrails-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/llama_guard/langchain/Dockerfile .
+docker build -t opea/guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/src/guardrails/Dockerfile .
 ```
 
 ### 4. Build MegaService Docker Image
@@ -151,12 +153,12 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 
 ```bash
 cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-- `opea/retriever-redis:latest`
+- `opea/retriever:latest`
 - `opea/dataprep-redis:latest`
 - `opea/chatqna:latest`
 - `opea/chatqna-ui:latest`
@@ -168,7 +170,7 @@ If Conversation React UI is built, you will find one more image:
 
 If Guardrails docker image is built, you will find one more image:
 
-- `opea/guardrails-tgi:latest`
+- `opea/guardrails:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -184,7 +186,7 @@ By default, the embedding, reranking and LLM models are set to a default value a
 
 Change the `xxx_MODEL_ID` below for your needs.
 
-For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. TGI can load the models either online or offline as described below:
+For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. The vLLM/TGI can load the models either online or offline as described below:
 
 1. Online
 
@@ -192,7 +194,10 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
-   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.5 --model-id $model_name --max-input-tokens 1024 --max-total-tokens 2048
+   # Start vLLM LLM Service
+   docker run -p 8007:80 -v ./data:/data --name vllm-gaudi-server -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e VLLM_TORCH_PROFILER_DIR="/mnt" --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model $model_name --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
+   # Start TGI LLM Service
+   docker run -p 8005:80 -v ./data:/data --name tgi-gaudi-server -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.6 --model-id $model_name --max-input-tokens 1024 --max-total-tokens 2048
    ```
 
 2. Offline
@@ -201,12 +206,15 @@ For users in China who are unable to download models directly from Huggingface, 
 
    - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
 
-   - Run the following command to start TGI service.
+   - Run the following command to start the LLM service.
 
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.5 --model-id /data --max-input-tokens 1024 --max-total-tokens 2048
+     # Start vLLM LLM Service
+     docker run -p 8007:80 -v $model_path:/data --name vllm-gaudi-server --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e VLLM_TORCH_PROFILER_DIR="/mnt" --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model /data --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
+     # Start TGI LLM Service
+     docker run -p 8005:80 -v $model_path:/data --name tgi-gaudi-server --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.6 --model-id /data --max-input-tokens 1024 --max-total-tokens 2048
      ```
 
 ### Setup Environment Variables
@@ -227,7 +235,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service,guardrails
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
    ```
 
 3. Set up other environment variables:
@@ -242,7 +250,7 @@ For users in China who are unable to download models directly from Huggingface, 
 cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
 ```
 
-If use tgi for llm backend.
+If use vLLM as the LLM serving backend.
 
 ```bash
 # Start ChatQnA with Rerank Pipeline
@@ -251,10 +259,10 @@ docker compose -f compose.yaml up -d
 docker compose -f compose_without_rerank.yaml up -d
 ```
 
-If use vllm for llm backend.
+If use TGI as the LLM serving backend.
 
 ```bash
-docker compose -f compose_vllm.yaml up -d
+docker compose -f compose_tgi.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
@@ -309,40 +317,40 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
 
 4. LLM backend Service
 
-   In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
 
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
-   docker logs tgi-service | grep Connected
+   # vLLM service
+   docker logs vllm-gaudi-server 2>&1 | grep complete
+   # If the service is ready, you will get the response like below.
+   INFO:     Application startup complete.
    ```
 
+   ```bash
+   # TGI service
+   docker logs tgi-gaudi-server | grep Connected
    If the service is ready, you will get the response like below.
-
-   ```
    2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
    ```
 
    Then try the `cURL` command below to validate services.
 
    ```bash
-   #TGI Service
-   curl http://${host_ip}:8005/generate \
+   # vLLM Service
+   curl http://${host_ip}:8007/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
+     -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 
    ```bash
-   #vLLM Service
-   curl http://${host_ip}:8007/v1/completions \
-     -H "Content-Type: application/json" \
-     -d '{
-     "model": "${LLM_MODEL_ID}",
-     "prompt": "What is Deep Learning?",
-     "max_tokens": 32,
-     "temperature": 0
-     }'
+   # TGI service
+   curl http://${host_ip}:8005/v1/chat/completions \
+     -X POST \
+     -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -H 'Content-Type: application/json'
    ```
 
 5. MegaService
@@ -438,6 +446,68 @@ curl http://${host_ip}:9090/v1/guardrails\
   -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
   -H 'Content-Type: application/json'
 ```
+
+### Profile Microservices
+
+To further analyze MicroService Performance, users could follow the instructions to profile MicroServices.
+
+#### 1. vLLM backend Service
+
+Users could follow previous section to testing vLLM microservice or ChatQnA MegaService.  
+ By default, vLLM profiling is not enabled. Users could start and stop profiling by following commands.
+
+##### Start vLLM profiling
+
+```bash
+curl http://${host_ip}:9009/start_profile \
+  -H "Content-Type: application/json" \
+  -d '{"model": ${LLM_MODEL_ID}}'
+```
+
+Users would see below docker logs from vllm-service if profiling is started correctly.
+
+```bash
+INFO api_server.py:361] Starting profiler...
+INFO api_server.py:363] Profiler started.
+INFO:     x.x.x.x:35940 - "POST /start_profile HTTP/1.1" 200 OK
+```
+
+After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService  
+ or ChatQnA MicroService.
+
+##### Stop vLLM profiling
+
+By following command, users could stop vLLM profliing and generate a \*.pt.trace.json.gz file as profiling result  
+ under /mnt folder in vllm-service docker instance.
+
+```bash
+# vLLM Service
+curl http://${host_ip}:9009/stop_profile \
+  -H "Content-Type: application/json" \
+  -d '{"model": ${LLM_MODEL_ID}}'
+```
+
+Users would see below docker logs from vllm-service if profiling is stopped correctly.
+
+```bash
+INFO api_server.py:368] Stopping profiler...
+INFO api_server.py:370] Profiler stopped.
+INFO:     x.x.x.x:41614 - "POST /stop_profile HTTP/1.1" 200 OK
+```
+
+After vllm profiling is stopped, users could use below command to get the \*.pt.trace.json.gz file under /mnt folder.
+
+```bash
+docker cp  vllm-service:/mnt/ .
+```
+
+##### Check profiling result
+
+Open a web browser and type "chrome://tracing" or "ui.perfetto.dev", and then load the json.gz file, you should be able  
+ to see the vLLM profiling result as below diagram.
+![image](https://github.com/user-attachments/assets/487c52c8-d187-46dc-ab3a-43f21d657d41)
+
+![image](https://github.com/user-attachments/assets/e3c51ce5-d704-4eb7-805e-0d88b0c158e3)
 
 ## 🚀 Launch the UI
 

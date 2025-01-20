@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 // Constants definition
-const CHAT_ITEMS = ["What is the total revenue of Nike in 2023?"];
+const CHAT_ITEMS = ["What is the capital of China?"];
 
 // Helper function: Enter message to chat
 async function enterMessageToChat(page: Page, message: string) {

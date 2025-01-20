@@ -24,7 +24,7 @@ embedding-multimodal-bridgetower
 =====================
 Port 6006 - Open to 0.0.0.0/0
 
-embedding-multimodal
+embedding
 =========
 Port 6000 - Open to 0.0.0.0/0
 
@@ -36,7 +36,7 @@ lvm-llava
 ================
 Port 8399 - Open to 0.0.0.0/0
 
-lvm-llava-svc
+lvm
 ===
 Port 9399 - Open to 0.0.0.0/0
 
@@ -76,11 +76,14 @@ export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDER_PORT=6006
-export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT/v1/encode"
+export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT"
 export MM_EMBEDDING_PORT_MICROSERVICE=6000
+export WHISPER_SERVER_PORT=7066
+export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_SERVER_PORT}/v1/asr"
 export REDIS_URL="redis://${host_ip}:6379"
 export REDIS_HOST=${host_ip}
 export INDEX_NAME="mm-rag-redis"
+export BRIDGE_TOWER_EMBEDDING=true
 export LLAVA_SERVER_PORT=8399
 export LVM_ENDPOINT="http://${host_ip}:8399"
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
@@ -109,19 +112,19 @@ Build embedding-multimodal-bridgetower docker image
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/bridgetower/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/bridgetower/src/Dockerfile .
 ```
 
-Build embedding-multimodal microservice image
+Build embedding microservice image
 
 ```bash
-docker build --no-cache -t opea/embedding-multimodal:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal/multimodal_langchain/Dockerfile .
+docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
 ```
 
 ### 2. Build retriever-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/retriever-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 3. Build LVM Images
@@ -129,13 +132,13 @@ docker build --no-cache -t opea/retriever-multimodal-redis:latest --build-arg ht
 Build lvm-llava image
 
 ```bash
-docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/dependency/Dockerfile .
+docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/llava/Dockerfile .
 ```
 
-Build lvm-llava-svc microservice image
+Build lvm microservice image
 
 ```bash
-docker build --no-cache -t opea/lvm-llava-svc:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/llava/Dockerfile .
+docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
 ```
 
 ### 4. Build dataprep-multimodal-redis Image
@@ -144,7 +147,15 @@ docker build --no-cache -t opea/lvm-llava-svc:latest --build-arg https_proxy=$ht
 docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
 ```
 
-### 5. Build MegaService Docker Image
+### 5. Build asr images
+
+Build whisper server image
+
+```bash
+docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
+```
+
+### 6. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalqna.py](../../../../multimodalqna.py) Python script. Build MegaService Docker image via below command:
 
@@ -155,7 +166,7 @@ docker build --no-cache -t opea/multimodalqna:latest --build-arg https_proxy=$ht
 cd ../..
 ```
 
-### 6. Build UI Docker Image
+### 7. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -165,16 +176,18 @@ docker build --no-cache -t opea/multimodalqna-ui:latest --build-arg https_proxy=
 cd ../../../
 ```
 
-Then run the command `docker images`, you will have the following 8 Docker Images:
+Then run the command `docker images`, you will have the following 11 Docker Images:
 
 1. `opea/dataprep-multimodal-redis:latest`
-2. `opea/lvm-llava-svc:latest`
+2. `opea/lvm:latest`
 3. `opea/lvm-llava:latest`
-4. `opea/retriever-multimodal-redis:latest`
-5. `opea/embedding-multimodal:latest`
-6. `opea/embedding-multimodal-bridgetower:latest`
-7. `opea/multimodalqna:latest`
-8. `opea/multimodalqna-ui:latest`
+4. `opea/retriever:latest`
+5. `opea/whisper:latest`
+6. `opea/redis-vector-db`
+7. `opea/embedding:latest`
+8. `opea/embedding-multimodal-bridgetower:latest`
+9. `opea/multimodalqna:latest`
+10. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -182,10 +195,10 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
 
-| Service              | Model                                       |
-| -------------------- | ------------------------------------------- |
-| embedding-multimodal | BridgeTower/bridgetower-large-itm-mlm-gaudi |
-| LVM                  | llava-hf/llava-1.5-7b-hf                    |
+| Service   | Model                                       |
+| --------- | ------------------------------------------- |
+| embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
+| LVM       | llava-hf/llava-1.5-7b-hf                    |
 
 ### Start all the services Docker Containers
 
@@ -214,7 +227,7 @@ curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
      -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-2. embedding-multimodal
+2. embedding
 
 ```bash
 curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
@@ -240,7 +253,16 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
 
-4. lvm-llava
+4. asr
+
+```bash
+curl ${WHISPER_SERVER_ENDPOINT} \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"audio" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
+```
+
+5. lvm-llava
 
 ```bash
 curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
@@ -249,7 +271,7 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
      -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-5. lvm-llava-svc
+6. lvm
 
 ```bash
 curl http://${host_ip}:9399/v1/lvm \
@@ -274,7 +296,7 @@ curl http://${host_ip}:9399/v1/lvm \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
-6. dataprep-multimodal-redis
+7. dataprep-multimodal-redis
 
 Download a sample video, image, and audio file and create a caption
 
@@ -348,13 +370,19 @@ curl -X POST \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
-7. MegaService
+8. MegaService
 
 ```bash
 curl http://${host_ip}:8888/v1/multimodalqna \
     -H "Content-Type: application/json" \
     -X POST \
     -d '{"messages": "What is the revenue of Nike in 2023?"}'
+```
+
+```bash
+curl http://${host_ip}:8888/v1/multimodalqna  \
+    -H "Content-Type: application/json"  \
+    -d '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
 ```
 
 ```bash

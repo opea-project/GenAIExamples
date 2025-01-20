@@ -9,19 +9,19 @@ DocRetriever are the most widely adopted use case for leveraging the different m
   ```bash
   git clone https://github.com/opea-project/GenAIComps.git
   cd GenAIComps
-  docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
+  docker build -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
   ```
 
 - Retriever Vector store Image
 
   ```bash
-  docker build -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+  docker build -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
   ```
 
 - Rerank TEI Image
 
   ```bash
-  docker build -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
+  docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/src/Dockerfile .
   ```
 
 - Dataprep Image
@@ -115,7 +115,7 @@ curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: applicati
      -X POST \
      -d '{"text":"Explain the OPEA project"}' \
      -H 'Content-Type: application/json' > query
-   docker container logs embedding-tei-server
+   docker container logs embedding-server
 
    # if you used tei-gaudi
    docker container logs tei-embedding-gaudi-server

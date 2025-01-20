@@ -1,6 +1,8 @@
 # Build Mega Service of ChatQnA on Xeon
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
+
+The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component. It also provides options of not using rerank in the pipeline and using TGI backend for LLM microservice, please refer to [start-all-the-services-docker-containers](#start-all-the-services-docker-containers) section in this page. Besides, refer to [Build with Pinecone VectorDB](./README_pinecone.md) and [Build with Qdrant VectorDB](./README_qdrant.md) for other deployment variants.
 
 Quick Start:
 
@@ -26,8 +28,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
    ```
 
 3. Set up other environment variables:
@@ -106,7 +107,7 @@ cd GenAIComps
 ### 1. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 2. Build Dataprep Image
@@ -162,13 +163,13 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 
 ```bash
 cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `opea/dataprep-redis:latest`
-2. `opea/retriever-redis:latest`
+2. `opea/retriever:latest`
 3. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest`
 4. `opea/chatqna-ui:latest`
 5. `opea/nginx:latest`
@@ -187,7 +188,7 @@ By default, the embedding, reranking and LLM models are set to a default value a
 
 Change the `xxx_MODEL_ID` below for your needs.
 
-For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. TGI can load the models either online or offline as described below:
+For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. The vLLM/TGI can load the models either online or offline as described below:
 
 1. Online
 
@@ -195,6 +196,9 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="Intel/neural-chat-7b-v3-3"
+   # Start vLLM LLM Service
+   docker run -p 8008:80 -v ./data:/data --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
+   # Start TGI LLM Service
    docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id $model_name
    ```
 
@@ -204,12 +208,15 @@ For users in China who are unable to download models directly from Huggingface, 
 
    - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
 
-   - Run the following command to start TGI service.
+   - Run the following command to start the LLM service.
 
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
+     # Start vLLM LLM Service
+     docker run -p 8008:80 -v $model_path:/data --name vllm-service --shm-size 128g opea/vllm:latest --model /data --host 0.0.0.0 --port 80
+     # Start TGI LLM Service
+     docker run -p 8008:80 -v $model_path:/data --name tgi-service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
      ```
 
 ### Setup Environment Variables
@@ -230,7 +237,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm_service
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
    ```
 
 3. Set up other environment variables:
@@ -247,7 +254,7 @@ For users in China who are unable to download models directly from Huggingface, 
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 ```
 
-If use TGI backend.
+If use vLLM as the LLM serving backend.
 
 ```bash
 # Start ChatQnA with Rerank Pipeline
@@ -256,10 +263,10 @@ docker compose -f compose.yaml up -d
 docker compose -f compose_without_rerank.yaml up -d
 ```
 
-If use vLLM backend.
+If use TGI as the LLM serving backend.
 
 ```bash
-docker compose -f compose_vllm.yaml up -d
+docker compose -f compose_tgi.yaml up -d
 ```
 
 ### Validate Microservices
@@ -306,35 +313,32 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
 4. LLM backend Service
 
-   In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
 
    Try the command below to check whether the LLM serving is ready.
 
    ```bash
+   # vLLM service
+   docker logs vllm-service 2>&1 | grep complete
+   # If the service is ready, you will get the response like below.
+   INFO:     Application startup complete.
+   ```
+
+   ```bash
+   # TGI service
    docker logs tgi-service | grep Connected
-   ```
-
-   If the service is ready, you will get the response like below.
-
-   ```
+   # If the service is ready, you will get the response like below.
    2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
    ```
 
    Then try the `cURL` command below to validate services.
 
    ```bash
-   # TGI service
-   curl http://${host_ip}:9009/generate \
+   # either vLLM or TGI service
+   curl http://${host_ip}:9009/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
-   ```
-
-   ```bash
-   # vLLM Service
-   curl http://${host_ip}:9009/v1/completions \
-     -H "Content-Type: application/json" \
-     -d '{"model": "Intel/neural-chat-7b-v3-3", "prompt": "What is Deep Learning?", "max_tokens": 32, "temperature": 0}'
    ```
 
 5. MegaService
@@ -357,13 +361,12 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
 If you want to update the default knowledge base, you can use the following commands:
 
-Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
-click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
+click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
 Or run this command to get the file on a terminal.
 
 ```bash
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
-
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 ```
 
 Upload:
@@ -432,6 +435,66 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```
+
+### Profile Microservices
+
+To further analyze MicroService Performance, users could follow the instructions to profile MicroServices.
+
+#### 1. vLLM backend Service
+
+Users could follow previous section to testing vLLM microservice or ChatQnA MegaService.  
+ By default, vLLM profiling is not enabled. Users could start and stop profiling by following commands.
+
+##### Start vLLM profiling
+
+```bash
+curl http://${host_ip}:9009/start_profile \
+  -H "Content-Type: application/json" \
+  -d '{"model": "Intel/neural-chat-7b-v3-3"}'
+```
+
+Users would see below docker logs from vllm-service if profiling is started correctly.
+
+```bash
+INFO api_server.py:361] Starting profiler...
+INFO api_server.py:363] Profiler started.
+INFO:     x.x.x.x:35940 - "POST /start_profile HTTP/1.1" 200 OK
+```
+
+After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService  
+ or ChatQnA MicroService.
+
+##### Stop vLLM profiling
+
+By following command, users could stop vLLM profliing and generate a \*.pt.trace.json.gz file as profiling result  
+ under /mnt folder in vllm-service docker instance.
+
+```bash
+# vLLM Service
+curl http://${host_ip}:9009/stop_profile \
+  -H "Content-Type: application/json" \
+  -d '{"model": "Intel/neural-chat-7b-v3-3"}'
+```
+
+Users would see below docker logs from vllm-service if profiling is stopped correctly.
+
+```bash
+INFO api_server.py:368] Stopping profiler...
+INFO api_server.py:370] Profiler stopped.
+INFO:     x.x.x.x:41614 - "POST /stop_profile HTTP/1.1" 200 OK
+```
+
+After vllm profiling is stopped, users could use below command to get the \*.pt.trace.json.gz file under /mnt folder.
+
+```bash
+docker cp  vllm-service:/mnt/ .
+```
+
+##### Check profiling result
+
+Open a web browser and type "chrome://tracing" or "ui.perfetto.dev", and then load the json.gz file, you should be able  
+ to see the vLLM profiling result as below diagram.
+![image](https://github.com/user-attachments/assets/55c7097e-5574-41dc-97a7-5e87c31bc286)
 
 ## 🚀 Launch the UI
 
