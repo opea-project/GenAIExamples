@@ -24,33 +24,47 @@ export your_no_proxy=${your_no_proxy},"External_Public_IP"
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
-export EMBEDDER_PORT=6006
-export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMBEDDER_PORT"
-export MM_EMBEDDING_PORT_MICROSERVICE=6000
-export REDIS_URL="redis://${host_ip}:6379"
-export REDIS_HOST=${host_ip}
-export INDEX_NAME="mm-rag-redis"
-export BRIDGE_TOWER_EMBEDDING=true
-export LLAVA_SERVER_PORT=8399
-export LVM_ENDPOINT="http://${host_ip}:8399"
-export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
-export WHISPER_MODEL="base"
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export WHISPER_SERVER_PORT=7066
-export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_SERVER_PORT}/v1/asr"v1/audio/transcriptions"
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/multimodalqna"
-export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/ingest_with_text"
-export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_transcripts"
-export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/generate_captions"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_files"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete_files"
+export REDIS_DB_PORT=6379
+export REDIS_INSIGHTS_PORT=8001
+export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
+export REDIS_HOST=${host_ip}
+export INDEX_NAME="mm-rag-redis"
+export WHISPER_PORT=7066
+export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
+export MAX_IMAGES=1
+export WHISPER_MODEL="base"
+export DATAPREP_MMR_PORT=5000
+export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
+export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
+export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
+export EMM_BRIDGETOWER_PORT=6006
+export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
+export BRIDGE_TOWER_EMBEDDING=true
+export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT"
+export MM_EMBEDDING_PORT_MICROSERVICE=6000
+export REDIS_RETRIEVER_PORT=7000
+export LVM_PORT=9399
+export LLAVA_SERVER_PORT=8399
+export TGI_GAUDI_PORT="${LLAVA_SERVER_PORT}:80"
+export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
+export LVM_ENDPOINT="http://${host_ip}:${LLAVA_SERVER_PORT}"
+export MEGA_SERVICE_PORT=8888
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna"
+export UI_PORT=5173
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+
+> Note: The `MAX_IMAGES` environment variable is used to specify the maximum number of images that will be sent from the LVM service to the LLaVA server.
+> If an image list longer than `MAX_IMAGES` is sent to the LVM server, a shortened image list will be sent to the LLaVA service. If the image list
+> needs to be shortened, the most recent images (the ones at the end of the list) are prioritized to send to the LLaVA service. Some LLaVA models have not
+> been trained with multiple images and may lead to inaccurate results. If `MAX_IMAGES` is not set, it will default to `1`.
 
 ## 🚀 Build Docker Images
 
@@ -63,7 +77,7 @@ Build embedding-multimodal-bridgetower docker image
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/bridgetower/src/Dockerfile .
+docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMM_BRIDGETOWER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/bridgetower/src/Dockerfile .
 ```
 
 Build embedding microservice image
@@ -95,10 +109,10 @@ docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy 
 ### 4. Build dataprep-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
-### 5. Build asr images
+### 5. Build Whisper Server Image
 
 Build whisper server image
 
@@ -127,7 +141,7 @@ docker build --no-cache -t opea/multimodalqna-ui:latest --build-arg https_proxy=
 
 Then run the command `docker images`, you will have the following 11 Docker Images:
 
-1. `opea/dataprep-multimodal-redis:latest`
+1. `opea/dataprep:latest`
 2. `opea/lvm:latest`
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 4. `opea/retriever:latest`
@@ -163,14 +177,14 @@ docker compose -f compose.yaml up -d
 1. embedding-multimodal-bridgetower
 
 ```bash
-curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
      -X POST \
      -H "Content-Type:application/json" \
      -d '{"text":"This is example"}'
 ```
 
 ```bash
-curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
      -X POST \
      -H "Content-Type:application/json" \
      -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
@@ -202,7 +216,7 @@ curl http://${host_ip}:7000/v1/multimodal_retrieval \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
 
-4. asr
+4. whisper
 
 ```bash
 curl ${WHISPER_SERVER_ENDPOINT} \
@@ -223,14 +237,14 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
 6. lvm
 
 ```bash
-curl http://${host_ip}:9399/v1/lvm \
+curl http://${host_ip}:${LVM_PORT}/v1/lvm \
     -X POST \
     -H 'Content-Type: application/json' \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
 ```bash
-curl http://${host_ip}:9399/v1/lvm  \
+curl http://${host_ip}:${LVM_PORT}/v1/lvm  \
     -X POST \
     -H 'Content-Type: application/json' \
     -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
@@ -239,7 +253,7 @@ curl http://${host_ip}:9399/v1/lvm  \
 Also, validate LVM TGI Gaudi Server with empty retrieval results
 
 ```bash
-curl http://${host_ip}:9399/v1/lvm \
+curl http://${host_ip}:${LVM_PORT}/v1/lvm \
     -X POST \
     -H 'Content-Type: application/json' \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
@@ -247,7 +261,7 @@ curl http://${host_ip}:9399/v1/lvm \
 
 7. Multimodal Dataprep Microservice
 
-Download a sample video, image, and audio file and create a caption
+Download a sample video, image, PDF, and audio file and create a caption
 
 ```bash
 export video_fn="WeAreGoingOnBullrun.mp4"
@@ -255,6 +269,9 @@ wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoing
 
 export image_fn="apple.png"
 wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
+
+export pdf_fn="nke-10k-2023.pdf"
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf -O ${pdf_fn}
 
 export caption_fn="apple.txt"
 echo "This is an apple."  > ${caption_fn}
@@ -264,6 +281,15 @@ wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_ex
 ```
 
 Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
+
+```bash
+export DATAPREP_MMR_PORT=6007
+export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
+export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
+export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
+```
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
@@ -283,13 +309,14 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     -X POST -F "files=@./${image_fn}"
 ```
 
-Now, test the microservice with posting a custom caption along with an image
+Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_INGEST_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
-    -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}"
+    -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}" \
+    -F "files=@./${pdf_fn}"
 ```
 
 Also, you are able to get the list of all files that you uploaded:
@@ -307,7 +334,8 @@ Then you will get the response python-style LIST like this. Notice the name of e
     "WeAreGoingOnBullrun_7ac553a1-116c-40a2-9fc5-deccbb89b507.mp4",
     "WeAreGoingOnBullrun_6d13cf26-8ba2-4026-a3a9-ab2e5eb73a29.mp4",
     "apple_fcade6e6-11a5-44a2-833a-3e534cbe4419.png",
-    "AudioSample_976a85a6-dc3e-43ab-966c-9d81beef780c.wav
+    "nke-10k-2023_28000757-5533-4b1b-89fe-7c0a1b7e2cd0.pdf",
+    "AudioSample_976a85a6-dc3e-43ab-966c-9d81beef780c.wav"
 ]
 ```
 
@@ -321,15 +349,35 @@ curl -X POST \
 
 8. MegaService
 
+Test the MegaService with a text query:
+
 ```bash
-curl http://${host_ip}:8888/v1/multimodalqna \
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -H "Content-Type: application/json" \
     -X POST \
     -d '{"messages": "What is the revenue of Nike in 2023?"}'
 ```
 
+Test the MegaService with an audio query:
+
 ```bash
-curl http://${host_ip}:8888/v1/multimodalqna \
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna  \
+    -H "Content-Type: application/json"  \
+    -d '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
+```
+
+Test the MegaService with a text and image query:
+
+```bash
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
+    -H "Content-Type: application/json" \
+    -d  '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Green bananas in a tree"}, {"type": "image_url", "image_url": {"url": "http://images.cocodataset.org/test-stuff2017/000000004248.jpg"}}]}]}'
+```
+
+Test the MegaService with a back and forth conversation between the user and assistant:
+
+```bash
+curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
 	-H "Content-Type: application/json" \
 	-d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
 ```

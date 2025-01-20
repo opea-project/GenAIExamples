@@ -47,7 +47,7 @@ function start_services() {
     sleep 30s
 
     # Insert some sample data to the DB
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep \
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep/ingest \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./data/op_1_0320241830.mp4")
 
@@ -154,7 +154,7 @@ function validate_microservices() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon//data
 
     # dataprep microservice
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep \
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep/ingest \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./op_1_0320241830.mp4")
 

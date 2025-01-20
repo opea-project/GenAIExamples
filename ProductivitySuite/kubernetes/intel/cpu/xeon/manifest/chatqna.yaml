@@ -499,11 +499,11 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-          image: "opea/dataprep-redis:latest"
+          image: "opea/dataprep:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - name: data-prep
-              containerPort: 6007
+              containerPort: 5000
               protocol: TCP
           volumeMounts:
             - mountPath: /tmp

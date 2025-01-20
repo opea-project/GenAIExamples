@@ -16,13 +16,11 @@ RUN useradd -m -s /bin/bash user && \
 
 WORKDIR $HOME
 
-
 # Stage 2: latest GenAIComps sources
 FROM base AS git
 
 RUN apt-get update && apt-get install -y --no-install-recommends git
 RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git
-
 
 # Stage 3: common layer shared by services using GenAIComps
 FROM base AS comps-base

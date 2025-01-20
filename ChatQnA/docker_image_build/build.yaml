@@ -11,12 +11,6 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
-  chatqna-wrapper:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile.wrapper
-    extends: chatqna
-    image: ${REGISTRY:-opea}/chatqna-wrapper:${TAG:-latest}
   chatqna-guardrails:
     build:
       context: ../
@@ -65,24 +59,12 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
-  dataprep-redis:
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
-  dataprep-qdrant:
-    build:
-      context: GenAIComps
-      dockerfile: comps/dataprep/qdrant/langchain/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
-  dataprep-pinecone:
-    build:
-      context: GenAIComps
-      dockerfile: comps/dataprep/pinecone/langchain/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/dataprep-pinecone:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
   guardrails:
     build:
       context: GenAIComps

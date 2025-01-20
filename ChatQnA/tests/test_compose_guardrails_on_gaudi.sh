@@ -20,7 +20,7 @@ function build_docker_images() {
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork && git checkout v0.6.4.post2+Gaudi-1.19.0 && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever vllm-gaudi guardrails nginx"
+    service_list="chatqna-guardrails chatqna-ui dataprep retriever vllm-gaudi guardrails nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -34,7 +34,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
@@ -132,7 +132,7 @@ function validate_microservices() {
         "content" \
         "vllm-llm" \
         "vllm-gaudi-server" \
-        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
 
     # guardrails microservice
     validate_service \

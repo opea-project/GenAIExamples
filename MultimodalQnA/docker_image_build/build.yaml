@@ -47,21 +47,15 @@ services:
       dockerfile: comps/lvms/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
-  dataprep-multimodal-redis:
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/multimodal/redis/langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: multimodalqna
-    image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
   whisper:
     build:
       context: GenAIComps
       dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-  asr:
-    build:
-      context: GenAIComps
-      dockerfile: comps/asr/src/Dockerfile
-    extends: multimodalqna
-    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
