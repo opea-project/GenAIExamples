@@ -31,6 +31,33 @@ services:
       LANGCHAIN_PROJECT: "opea-worker-agent-service"
       port: 9095
 
+  worker-sql-agent:
+    image: opea/agent:latest
+    container_name: sql-agent-endpoint
+    volumes:
+      - ${WORKDIR}/TAG-Bench/:/home/user/TAG-Bench # SQL database
+    ports:
+      - "9096:9096"
+    ipc: host
+    environment:
+      ip_address: ${ip_address}
+      strategy: sql_agent
+      db_name: ${db_name}
+      db_path: ${db_path}
+      use_hints: false
+      hints_file: /home/user/TAG-Bench/${db_name}_hints.csv
+      recursion_limit: ${recursion_limit_worker}
+      llm_engine: openai
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      model: ${model}
+      temperature: 0
+      max_new_tokens: ${max_new_tokens}
+      stream: false
+      require_human_feedback: false
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      port: 9096
 
   supervisor-react-agent:
     image: opea/agent:latest

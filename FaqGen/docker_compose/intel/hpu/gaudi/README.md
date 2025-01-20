@@ -98,7 +98,7 @@ docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/llm-faqgen-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/faq-generation/tgi/langchain/Dockerfile .
+docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/faq-generation/Dockerfile .
 ```
 
 ### 3. Build MegaService Docker Image
@@ -133,7 +133,7 @@ docker build -t opea/faqgen-react-ui:latest --build-arg https_proxy=$https_proxy
 Then run the command `docker images`, you will have the following Docker Images:
 
 1. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
-2. `opea/llm-faqgen-tgi:latest`
+2. `opea/llm-faqgen:latest`
 3. `opea/faqgen:latest`
 4. `opea/faqgen-ui:latest`
 5. `opea/faqgen-react-ui:latest`
@@ -154,12 +154,15 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
+export host_ip=${your_host_ip}
+export LLM_ENDPOINT_PORT=8008
+export LLM_SERVICE_PORT=9000
+export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_PORT=9000
+export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
 ```
 
