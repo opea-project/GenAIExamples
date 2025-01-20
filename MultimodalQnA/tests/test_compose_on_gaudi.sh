@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -x
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -43,10 +43,23 @@ function check_service_ready() {
 }
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
+    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
+    if [[ "${opea_branch}" != "main" ]]; then
+        cd $WORKPATH
+        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
+        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
+        find . -type f -name "Dockerfile*" | while read -r file; do
+            echo "Processing file: $file"
+            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
+        done
+    fi
+
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep-multimodal-redis whisper"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -69,12 +82,12 @@ function setup_env() {
     export MAX_IMAGES=1
     export WHISPER_MODEL="base"
     export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
-    export DATAPREP_MMR_PORT=6007
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/ingest_with_text"
-    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_transcripts"
-    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_captions"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get_files"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete_files"
+    export DATAPREP_MMR_PORT=5000
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
+    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
+    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
     export EMM_BRIDGETOWER_PORT=6006
     export BRIDGE_TOWER_EMBEDDING=true
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
@@ -95,9 +108,8 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     # Start Docker Containers
-    sed -i "s|container_name: multimodalqna-backend-server|container_name: multimodalqna-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 2m
+    sleep 1m
 }
 
 function prepare_data() {
@@ -134,7 +146,7 @@ function validate_service() {
     elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "apple.txt"}' -H 'Content-Type: application/json' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
@@ -197,6 +209,11 @@ function validate_microservices() {
         '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
+
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
+    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/generate_transcripts"
+    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/generate_captions"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
 
     # test data prep
     echo "Validating Data Prep with Generating Transcript for Video"
@@ -332,6 +349,7 @@ function validate_megaservice() {
 
 function validate_delete {
     echo "Validating data prep delete files"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
     validate_service \
         "${DATAPREP_DELETE_FILE_ENDPOINT}" \
         '{"status":true}' \

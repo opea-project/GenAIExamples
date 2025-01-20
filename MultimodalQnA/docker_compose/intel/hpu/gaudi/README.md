@@ -37,12 +37,12 @@ export WHISPER_PORT=7066
 export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
 export MAX_IMAGES=1
 export WHISPER_MODEL="base"
-export DATAPREP_MMR_PORT=6007
-export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/ingest_with_text"
-export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_transcripts"
-export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/generate_captions"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get_files"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete_files"
+export DATAPREP_MMR_PORT=5000
+export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
+export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
+export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
 export EMM_BRIDGETOWER_PORT=6006
 export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
 export BRIDGE_TOWER_EMBEDDING=true
@@ -109,7 +109,7 @@ docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy 
 ### 4. Build dataprep-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 5. Build Whisper Server Image
@@ -141,7 +141,7 @@ docker build --no-cache -t opea/multimodalqna-ui:latest --build-arg https_proxy=
 
 Then run the command `docker images`, you will have the following 11 Docker Images:
 
-1. `opea/dataprep-multimodal-redis:latest`
+1. `opea/dataprep:latest`
 2. `opea/lvm:latest`
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 4. `opea/retriever:latest`
@@ -281,6 +281,15 @@ wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_ex
 ```
 
 Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
+
+```bash
+export DATAPREP_MMR_PORT=6007
+export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
+export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
+export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
+```
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
