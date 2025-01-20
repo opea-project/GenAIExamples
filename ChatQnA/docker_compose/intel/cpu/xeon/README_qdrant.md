@@ -4,6 +4,8 @@ This document outlines the deployment process for a ChatQnA application utilizin
 
 The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component.
 
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+
 ## 🚀 Apply Xeon Server on AWS
 
 To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage the power of 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
@@ -141,11 +143,11 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
 
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
+| Service   | Model                               |
+| --------- | ----------------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5               |
+| Reranking | BAAI/bge-reranker-base              |
+| LLM       | meta-llama/Meta-Llama-3-8B-Instruct |
 
 Change the `xxx_MODEL_ID` below for your needs.
 
@@ -181,7 +183,7 @@ export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export INDEX_NAME="rag-qdrant"
 ```
 
@@ -256,7 +258,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
    ```bash
    curl http://${host_ip}:6042/v1/chat/completions \
      -X POST \
-     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 
