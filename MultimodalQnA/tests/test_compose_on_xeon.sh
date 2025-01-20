@@ -19,13 +19,25 @@ export video_fn="WeAreGoingOnBullrun.mp4"
 export caption_fn="apple.txt"
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
+    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
+    if [[ "${opea_branch}" != "main" ]]; then
+        cd $WORKPATH
+        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
+        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
+        find . -type f -name "Dockerfile*" | while read -r file; do
+            echo "Processing file: $file"
+            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
+        done
+    fi
+
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm-llava lvm dataprep-multimodal-redis whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
-
-    docker images && sleep 1m
+    docker images && sleep 1s
 }
 
 function setup_env() {
@@ -58,12 +70,8 @@ function setup_env() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-
-
-    # Start Docker Containers
-    sed -i "s|container_name: multimodalqna-backend-server|container_name: multimodalqna-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 2m
+    sleep 1m
 }
 
 function prepare_data() {
