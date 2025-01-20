@@ -66,6 +66,7 @@ body:
       options:
         - label: Pull docker images from hub.docker.com
         - label: Build docker images from source
+        - label: Other
     validations:
       required: true
 
@@ -74,10 +75,11 @@ body:
     attributes:
       label: Deploy method
       options:
-        - label: Docker compose
         - label: Docker
-        - label: Kubernetes
-        - label: Helm
+        - label: Docker Compose
+        - label: Kubernetes Helm Charts
+        - label: Kubernetes GMC
+        - label: Other
     validations:
       required: true
 
@@ -88,6 +90,7 @@ body:
       options:
         - Single Node
         - Multiple Nodes
+        - Other
       default: 0
     validations:
       required: true
@@ -125,5 +128,14 @@ body:
       label: Raw log
       description: Provide the log of RESTFul API or docker for micro-service by `docker logs CONTAINER`
       render: shell
+    validations:
+      required: false
+
+
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Attachments
+      description: Attach any relevant files or screenshots.
     validations:
       required: false
