@@ -35,7 +35,7 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep-multimodal-redis whisper"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -68,11 +68,11 @@ function setup_env() {
     export LVM_SERVICE_HOST_IP=${HOST_IP}
     export MEGA_SERVICE_HOST_IP=${HOST_IP}
     export BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:8888/v1/multimodalqna"
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/ingest_with_text"
-    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/generate_transcripts"
-    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/generate_captions"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/get_files"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/delete_files"
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${HOST_IP}:5000/v1/dataprep/ingest"
+    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${HOST_IP}:5000/v1/dataprep/generate_transcripts"
+    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${HOST_IP}:5000/v1/dataprep/generate_captions"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:5000/v1/dataprep/get"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:5000/v1/dataprep/delete"
 }
 
 function start_services() {
@@ -111,7 +111,7 @@ function validate_service() {
     elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "apple.txt"}' -H 'Content-Type: application/json' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
@@ -174,6 +174,11 @@ function validate_microservices() {
         '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
+
+    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/ingest"
+    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/generate_transcripts"
+    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/generate_captions"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/get"
 
     # test data prep
     echo "Data Prep with Generating Transcript for Video"
@@ -284,6 +289,7 @@ function validate_megaservice() {
 
 function validate_delete {
     echo "Validate data prep delete files"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/delete"
     validate_service \
         "${DATAPREP_DELETE_FILE_ENDPOINT}" \
         '{"status":true}' \

@@ -17,12 +17,12 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/videoqna-ui:${TAG:-latest}
-  dataprep-multimodal-vdms:
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/vdms/multimodal_langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: videoqna
-    image: ${REGISTRY:-opea}/dataprep-multimodal-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
   embedding-multimodal-clip:
     build:
       context: GenAIComps

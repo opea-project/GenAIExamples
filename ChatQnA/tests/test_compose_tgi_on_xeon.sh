@@ -31,7 +31,7 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-redis retriever nginx"
+    service_list="chatqna chatqna-ui dataprep retriever nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
@@ -121,28 +121,28 @@ function validate_microservices() {
     # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-redis-server"
 
     # test /v1/dataprep upload link
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
         "dataprep-redis-server"
 
     # test /v1/dataprep/get_file
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/get_file" \
+        "http://${ip_address}:6007/v1/dataprep/get" \
         '{"name":' \
         "dataprep_get" \
         "dataprep-redis-server"
 
     # test /v1/dataprep/delete_file
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/delete_file" \
+        "http://${ip_address}:6007/v1/dataprep/delete" \
         '{"status":true}' \
         "dataprep_del" \
         "dataprep-redis-server"
