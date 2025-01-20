@@ -1,8 +1,8 @@
 # MultimodalQnA Application
 
-Suppose you possess a set of videos and wish to perform question-answering to extract insights from these videos. To respond to your questions, it typically necessitates comprehension of visual cues within the videos, knowledge derived from the audio content, or often a mix of both these visual elements and auditory facts. The MultimodalQnA framework offers an optimal solution for this purpose.
+Suppose you possess a set of videos, images, audio files, PDFs, or some combination thereof and wish to perform question-answering to extract insights from these documents. To respond to your questions, the system needs to comprehend a mix of textual, visual, and audio facts drawn from the document contents. The MultimodalQnA framework offers an optimal solution for this purpose.
 
-`MultimodalQnA` addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos, images, and audio files. For this purpose, MultimodalQnA utilizes [BridgeTower model](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi), a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MultimodalQnA will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVM) as input context to generate a response for the user.
+`MultimodalQnA` addresses your questions by dynamically fetching the most pertinent multimodal information (e.g. images, transcripts, and captions) from your collection of video, image, audio, and PDF files. For this purpose, MultimodalQnA utilizes [BridgeTower model](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi), a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MultimodalQnA will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVM) as input context to generate a response for the user.
 
 The MultimodalQnA architecture shows below:
 
@@ -87,12 +87,12 @@ In the below, we provide a table that describes for each microservice component 
 <details>
 <summary><b>Gaudi default compose.yaml</b></summary>
 
-| MicroService | Open Source Project   | HW    | Port | Endpoint                                        |
-| ------------ | --------------------- | ----- | ---- | ----------------------------------------------- |
-| Embedding    | Langchain             | Xeon  | 6000 | /v1/embeddings                                  |
-| Retriever    | Langchain, Redis      | Xeon  | 7000 | /v1/multimodal_retrieval                        |
-| LVM          | Langchain, TGI        | Gaudi | 9399 | /v1/lvm                                         |
-| Dataprep     | Redis, Langchain, TGI | Gaudi | 6007 | /v1/generate_transcripts, /v1/generate_captions |
+| MicroService | Open Source Project   | HW    | Port | Endpoint                                                              |
+| ------------ | --------------------- | ----- | ---- | --------------------------------------------------------------------- |
+| Embedding    | Langchain             | Xeon  | 6000 | /v1/embeddings                                                        |
+| Retriever    | Langchain, Redis      | Xeon  | 7000 | /v1/multimodal_retrieval                                              |
+| LVM          | Langchain, TGI        | Gaudi | 9399 | /v1/lvm                                                               |
+| Dataprep     | Redis, Langchain, TGI | Gaudi | 6007 | /v1/generate_transcripts, /v1/generate_captions, /v1/ingest_with_text |
 
 </details>
 
@@ -172,8 +172,38 @@ docker compose -f compose.yaml up -d
 
 ## MultimodalQnA Demo on Gaudi2
 
-![MultimodalQnA-upload-waiting-screenshot](./assets/img/upload-gen-trans.png)
+### Multimodal QnA UI
 
-![MultimodalQnA-upload-done-screenshot](./assets/img/upload-gen-captions.png)
+![MultimodalQnA-ui-screenshot](./assets/img/mmqna-ui.png)
 
-![MultimodalQnA-query-example-screenshot](./assets/img/example_query.png)
+### Video Ingestion
+
+![MultimodalQnA-ingest-video-screenshot](./assets/img/video-ingestion.png)
+
+### Text Query following the ingestion of a Video
+
+![MultimodalQnA-video-query-screenshot](./assets/img/video-query.png)
+
+### Image Ingestion
+
+![MultimodalQnA-ingest-image-screenshot](./assets/img/image-ingestion.png)
+
+### Text Query following the ingestion of an image
+
+![MultimodalQnA-video-query-screenshot](./assets/img/image-query.png)
+
+### Audio Ingestion
+
+![MultimodalQnA-audio-ingestion-screenshot](./assets/img/audio-ingestion.png)
+
+### Text Query following the ingestion of an Audio Podcast
+
+![MultimodalQnA-audio-query-screenshot](./assets/img/audio-query.png)
+
+### PDF Ingestion
+
+![MultimodalQnA-upload-pdf-screenshot](./assets/img/ingest_pdf.png)
+
+### Text query following the ingestion of a PDF
+
+![MultimodalQnA-pdf-query-example-screenshot](./assets/img/pdf-query.png)
