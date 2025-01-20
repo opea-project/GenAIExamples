@@ -13,7 +13,12 @@ services:
       - http_proxy=${http_proxy}
       - MODEL=${MODEL}
       - HF_TOKEN=${HF_TOKEN}
+      - HABANA_VISIBLE_DEVICES=all
+      - OMPI_MCA_btl_vader_single_copy_mechanism=none
     ipc: host
+    runtime: habana
+    cap_add:
+      - SYS_NICE
     restart: always
   text2image-gaudi-ui-server:
     image: ${REGISTRY:-opea}/text2image-ui:${TAG:-latest}
@@ -42,7 +47,7 @@ services:
       - http_proxy=${http_proxy}
       - FRONTEND_SERVICE_IP=text2image-gaudi-ui-server
       - FRONTEND_SERVICE_PORT=5173
-      - BACKEND_SERVICE_NAME=text2image-gaudi
+      - BACKEND_SERVICE_NAME=text2image
       - BACKEND_SERVICE_IP=text2image-gaudi-server
       - BACKEND_SERVICE_PORT=9379
     ipc: host
