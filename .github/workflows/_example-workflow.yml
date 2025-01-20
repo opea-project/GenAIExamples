@@ -85,7 +85,7 @@ jobs:
           cd GenAIComps && git checkout ${{ inputs.opea_branch }} && git rev-parse HEAD && cd ../
 
       - name: Build Image
-        if: ${{ fromJSON(inputs.build) }}
+        if: ${{ fromJSON(inputs.build) && inputs.services != '' && inputs.services != null}}
         uses: opea-project/validation/actions/image-build@main
         with:
           work_dir: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
