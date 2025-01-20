@@ -28,7 +28,7 @@ on:
         default: false
         required: false
         type: boolean
-      test_k8s:
+      test_helmchart:
         default: false
         required: false
         type: boolean
@@ -50,6 +50,7 @@ jobs:
 # Image Build
 ####################################################################################################
   build-images:
+    if: ${{ !(fromJSON(inputs.test_helmchart)) }}
     runs-on: "docker-build-${{ inputs.node }}"
     steps:
       - name: Clean Up Working Directory
@@ -106,20 +107,21 @@ jobs:
       tag: ${{ inputs.tag }}
       example: ${{ inputs.example }}
       hardware: ${{ inputs.node }}
+      mode: "CD"
     secrets: inherit
 
 
 ####################################################################################################
-# K8S Test
+# helmchart Test
 ####################################################################################################
-  test-k8s-manifest:
-    needs: [build-images]
-    if: ${{ fromJSON(inputs.test_k8s) }}
-    uses: ./.github/workflows/_manifest-e2e.yml
+  test-helmchart:
+    if: ${{ fromJSON(inputs.test_helmchart) }}
+    uses: ./.github/workflows/_helm-e2e.yml
     with:
       example: ${{ inputs.example }}
       hardware: ${{ inputs.node }}
       tag: ${{ inputs.tag }}
+      mode: "CD"
     secrets: inherit
 
 ####################################################################################################
