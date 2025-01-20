@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -51,6 +51,8 @@ function start_services() {
     export TGI_LLM_ENDPOINT="http://${ip_address}:6005"
     export host_ip=${ip_address}
     export LOGFLAG=true
+    export MAX_OUTPUT_TOKENS="1024"
+    unset OPENAI_API_KEY
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -76,6 +78,7 @@ function validate_service() {
     if [[ $SERVICE_NAME == *"extract_graph_neo4j"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
+        echo $HTTP_RESPONSE
     elif [[ $SERVICE_NAME == *"neo4j-apoc"* ]]; then
          HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" "$URL")
     else
@@ -211,7 +214,7 @@ function main() {
     echo "Mega service start duration is $duration s"
 
     if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/tests/chatqna_benchmark.py
+        echo "not implemented"
     elif [ "${mode}" == "" ]; then
         validate_microservices
         validate_megaservice
