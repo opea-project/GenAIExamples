@@ -3,7 +3,7 @@
 
 services:
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
     container_name: tgi-gaudi-server
     ports:
       - "8028:80"
@@ -21,10 +21,10 @@ services:
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
     healthcheck:
-      test: ["CMD-SHELL", "sleep 500 && exit 0"]
-      interval: 1s
-      timeout: 505s
-      retries: 1
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8028/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     runtime: habana
     cap_add:
       - SYS_NICE
