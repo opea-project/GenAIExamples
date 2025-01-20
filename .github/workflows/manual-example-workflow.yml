@@ -35,9 +35,9 @@ on:
         description: 'Test examples with docker compose'
         required: false
         type: boolean
-      test_k8s:
+      test_helmchart:
         default: false
-        description: 'Test examples with k8s'
+        description: 'Test examples with helm charts'
         required: false
         type: boolean
       test_gmc:
@@ -103,7 +103,7 @@ jobs:
       tag: ${{ inputs.tag }}
       build: ${{ fromJSON(inputs.build) }}
       test_compose: ${{ fromJSON(inputs.test_compose) }}
-      test_k8s: ${{ fromJSON(inputs.test_k8s) }}
+      test_helmchart: ${{ fromJSON(inputs.test_helmchart) }}
       test_gmc: ${{ fromJSON(inputs.test_gmc) }}
       opea_branch: ${{ inputs.opea_branch }}
       inject_commit: ${{ inputs.inject_commit }}
