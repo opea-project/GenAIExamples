@@ -18,8 +18,7 @@ function build_docker_images() {
     echo "Building Docker Images...."
     cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
-        echo "Cloning GenAIComps repository"
-        git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+        git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
     fi
     service_list="dataprep-redis embedding retriever reranking doc-index-retriever"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
@@ -125,7 +124,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    build_docker_images
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     echo "Dump current docker ps"
     docker ps
     start_time=$(date +%s)

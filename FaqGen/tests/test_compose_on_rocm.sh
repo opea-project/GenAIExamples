@@ -28,7 +28,7 @@ export MEGA_SERVICE_HOST_IP=${ip_address}
 export LLM_SERVICE_HOST_IP=${ip_address}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/faqgen"
 export PATH="~/miniconda3/bin:$PATH"
-export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI"
+export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
 export LOGFLAG=True
 
 function build_docker_images() {
@@ -95,10 +95,10 @@ function validate_microservices() {
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/faqgen" \
-        "data: " \
+        "text" \
         "llm" \
         "faqgen-llm-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function validate_megaservice() {

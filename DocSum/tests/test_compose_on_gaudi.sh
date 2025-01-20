@@ -26,8 +26,9 @@ export no_proxy="${no_proxy},${host_ip}"
 export LLM_ENDPOINT_PORT=8008
 export DOCSUM_PORT=9000
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-export DocSum_COMPONENT_NAME="OPEADocSum_TGI"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 export LOGFLAG=True
+export DATA_PATH="/data/cache"
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -51,6 +52,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
+    sed -i "s|container_name: docsum-gaudi-backend-server|container_name: docsum-gaudi-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 3m
 }
@@ -158,10 +160,10 @@ function validate_microservices() {
     # llm microservice
     validate_services_json \
         "${host_ip}:9000/v1/docsum" \
-        "data: " \
+        "text" \
         "llm-docsum-tgi" \
         "llm-docsum-gaudi-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     # whisper microservice
     ulimit -s 65536
