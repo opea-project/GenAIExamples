@@ -272,7 +272,7 @@ function validate_megaservice() {
 }
 
 function validate_delete {
-    echo "Validate data prep delete files"\
+    echo "Validate data prep delete files"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
     validate_service \
         "${DATAPREP_DELETE_FILE_ENDPOINT}" \
