@@ -39,7 +39,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   retriever:
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -55,6 +55,8 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -72,31 +74,32 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
-  vllm-service:
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
-    container_name: vllm-service
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-service
     ports:
       - "9009:80"
     volumes:
       - "./data:/data"
-    shm_size: 128g
+    shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      LLM_MODEL_ID: ${LLM_MODEL_ID}
-      VLLM_TORCH_PROFILER_DIR: "/mnt"
-    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   chatqna-xeon-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
       - tei-embedding-service
+      - dataprep-redis-service
       - retriever
       - tei-reranking-service
-      - vllm-service
+      - tgi-service
     ports:
       - "8888:8888"
     environment:
@@ -109,7 +112,7 @@ services:
       - RETRIEVER_SERVICE_HOST_IP=retriever
       - RERANK_SERVER_HOST_IP=tei-reranking-service
       - RERANK_SERVER_PORT=${RERANK_SERVER_PORT:-80}
-      - LLM_SERVER_HOST_IP=vllm-service
+      - LLM_SERVER_HOST_IP=tgi-service
       - LLM_SERVER_PORT=${LLM_SERVER_PORT:-80}
       - LLM_MODEL=${LLM_MODEL_ID}
       - LOGFLAG=${LOGFLAG}

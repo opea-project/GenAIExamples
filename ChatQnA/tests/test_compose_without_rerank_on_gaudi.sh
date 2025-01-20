@@ -17,12 +17,12 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork && git checkout v0.6.4.post2+Gaudi-1.19.0 && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-without-rerank chatqna-ui dataprep-redis retriever-redis nginx"
+    service_list="chatqna-without-rerank chatqna-ui dataprep-redis retriever vllm-gaudi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
 
@@ -40,9 +40,9 @@ function start_services() {
     docker compose -f compose_without_rerank.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+    until [[ "$n" -ge 160 ]]; do
+        docker logs vllm-gaudi-server > vllm_service_start.log
+        if grep -q "Warmup finished" vllm_service_start.log; then
             break
         fi
         sleep 5s
@@ -143,13 +143,13 @@ function validate_microservices() {
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
-    # tgi for llm service
+    # vllm for llm service
     validate_service \
-        "${ip_address}:8005/generate" \
-        "generated_text" \
-        "tgi-llm" \
-        "tgi-gaudi-server" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+        "${ip_address}:8007/v1/chat/completions" \
+        "content" \
+        "vllm-llm" \
+        "vllm-gaudi-server" \
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
 }
 
 function validate_megaservice() {
@@ -193,7 +193,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose  -f compose_without_rerank.yaml stop && docker compose -f compose_without_rerank.yaml rm -f
+    docker compose  -f compose_without_rerank.yaml down
 }
 
 function main() {
