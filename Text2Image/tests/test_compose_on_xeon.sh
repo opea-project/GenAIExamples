@@ -18,7 +18,7 @@ MODEL=stabilityai/stable-diffusion-2-1
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+        git clone --depth 1 --branch ${opea_branch:-"main"} https://github.com/opea-project/GenAIComps.git
     fi
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 }
