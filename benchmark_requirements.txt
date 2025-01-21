@@ -1,0 +1,9 @@
+kubernetes
+locust
+numpy
+opea-eval
+pytest
+pyyaml
+requests
+sseclient-py
+transformers
