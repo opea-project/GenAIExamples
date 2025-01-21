@@ -6,7 +6,7 @@ services:
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
     container_name: whisper-service
     ports:
-      - "7066:7066"
+      - "${WHISPER_PORT}:7066"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -17,38 +17,42 @@ services:
     image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
     ports:
-      - "6379:6379"
-      - "8001:8001"
+      - "${REDIS_DB_PORT}:${REDIS_DB_PORT}"
+      - "${REDIS_INSIGHTS_PORT}:${REDIS_INSIGHTS_PORT}"
   dataprep-multimodal-redis:
-    image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-multimodal-redis
     depends_on:
       - redis-vector-db
       - lvm-llava
     ports:
-      - "6007:6007"
+      - "6007:${DATAPREP_MMR_PORT}"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       REDIS_HOST: ${REDIS_HOST}
+      DATAPREP_MMR_PORT: ${DATAPREP_MMR_PORT}
       INDEX_NAME: ${INDEX_NAME}
-      LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:9399/v1/lvm"
+      LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:${LVM_PORT}/v1/lvm"
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      MULTIMODAL_DATAPREP: true
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALREDIS"
     restart: unless-stopped
   embedding-multimodal-bridgetower:
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
     container_name: embedding-multimodal-bridgetower
     ports:
-      - ${EMBEDDER_PORT}:${EMBEDDER_PORT}
+      - ${EMM_BRIDGETOWER_PORT}:${EMM_BRIDGETOWER_PORT}
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      PORT: ${EMBEDDER_PORT}
+      EMM_BRIDGETOWER_PORT: ${EMM_BRIDGETOWER_PORT}
+      PORT: ${EMM_BRIDGETOWER_PORT}
     healthcheck:
-      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMBEDDER_PORT}/v1/health_check"]
+      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMM_BRIDGETOWER_PORT}/v1/health_check"]
       interval: 10s
       timeout: 6s
       retries: 18
@@ -78,13 +82,16 @@ services:
     depends_on:
       - redis-vector-db
     ports:
-      - "7000:7000"
+      - "${REDIS_RETRIEVER_PORT}:${REDIS_RETRIEVER_PORT}"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
+      REDIS_DB_PORT: ${REDIS_DB_PORT}
+      REDIS_INSIGHTS_PORT: ${REDIS_INSIGHTS_PORT}
+      REDIS_RETRIEVER_PORT: ${REDIS_RETRIEVER_PORT}
       INDEX_NAME: ${INDEX_NAME}
       BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
       LOGFLAG: ${LOGFLAG}
@@ -94,11 +101,13 @@ services:
     image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
     container_name: lvm-llava
     ports:
-      - "8399:8399"
+      - "${LLAVA_SERVER_PORT}:${LLAVA_SERVER_PORT}"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
+      LVM_PORT: ${LVM_PORT}
     entrypoint: ["python", "llava_server.py", "--device", "cpu", "--model_name_or_path", $LVM_MODEL_ID]
     restart: unless-stopped
   lvm:
@@ -107,7 +116,7 @@ services:
     depends_on:
       - lvm-llava
     ports:
-      - "9399:9399"
+      - "${LVM_PORT}:${LVM_PORT}"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -115,6 +124,9 @@ services:
       https_proxy: ${https_proxy}
       LVM_COMPONENT_NAME: "OPEA_LLAVA_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
+      LVM_PORT: ${LVM_PORT}
+      MAX_IMAGES: ${MAX_IMAGES:-1}
     restart: unless-stopped
   multimodalqna:
     image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
@@ -126,17 +138,19 @@ services:
       - retriever-redis
       - lvm
     ports:
-      - "8888:8888"
+      - "${MEGA_SERVICE_PORT}:${MEGA_SERVICE_PORT}"
     environment:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
       MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      MEGA_SERVICE_PORT: ${MEGA_SERVICE_PORT}
       MM_EMBEDDING_SERVICE_HOST_IP: ${MM_EMBEDDING_SERVICE_HOST_IP}
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
       MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
-      WHISPER_SERVER_PORT: ${WHISPER_SERVER_PORT}
+      LVM_MODEL_ID: ${LVM_MODEL_ID}
+      WHISPER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     ipc: host
     restart: always
@@ -146,7 +160,7 @@ services:
     depends_on:
       - multimodalqna
     ports:
-      - "5173:5173"
+      - "${UI_PORT}:${UI_PORT}"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
@@ -155,6 +169,9 @@ services:
       - DATAPREP_INGEST_SERVICE_ENDPOINT=${DATAPREP_INGEST_SERVICE_ENDPOINT}
       - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
       - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+      - MEGA_SERVICE_PORT:=${MEGA_SERVICE_PORT}
+      - UI_PORT=${UI_PORT}
+      - DATAPREP_MMR_PORT=${DATAPREP_MMR_PORT}
     ipc: host
     restart: always
 

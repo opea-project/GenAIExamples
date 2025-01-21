@@ -80,7 +80,7 @@ docker build -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg
 ### 5. Build Dataprep Image
 
 ```bash
-docker build -t opea/dataprep-multimodal-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/Dockerfile .
+docker build -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 6. Build MegaService Docker Image
@@ -106,7 +106,7 @@ docker build -t opea/videoqna-ui:latest --build-arg https_proxy=$https_proxy --b
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
-1. `opea/dataprep-multimodal-vdms:latest`
+1. `opea/dataprep:latest`
 2. `opea/embedding-multimodal-clip:latest`
 3. `opea/retriever:latest`
 4. `opea/reranking:latest`
@@ -161,8 +161,8 @@ export LVM_SERVICE_HOST_IP=${host_ip}
 export LVM_ENDPOINT="http://${host_ip}:9009"
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/videoqna"
 export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:8888/v1/health_check"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
 export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
 
 export VDMS_HOST=${host_ip}
@@ -195,7 +195,7 @@ docker compose up vdms-vector-db dataprep -d
 sleep 1m # wait for the services ready
 
 # Insert some sample data to the DB
-curl -X POST http://${host_ip}:6007/v1/dataprep \
+curl -X POST http://${host_ip}:6007/v1/dataprep/ingest \
       -H "Content-Type: multipart/form-data" \
       -F "files=@./data/op_1_0320241830.mp4"
 
