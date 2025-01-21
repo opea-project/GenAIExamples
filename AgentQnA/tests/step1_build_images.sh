@@ -11,14 +11,13 @@ export ip_address=$(hostname -I | awk '{print $1}')
 
 function get_genai_comps() {
     if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+        git clone --depth 1 --branch ${opea_branch:-"main"} https://github.com/opea-project/GenAIComps.git
     fi
 }
 
 
 function build_docker_images_for_retrieval_tool(){
     cd $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/
-    # git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     get_genai_comps
     echo "Build all the images with --no-cache..."
     service_list="doc-index-retriever dataprep embedding retriever reranking"
