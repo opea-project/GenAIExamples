@@ -280,7 +280,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 1. TEI Embedding Service
 
    ```bash
-   curl ${host_ip}:6006/embed \
+   curl http://${host_ip}:6006/embed \
        -X POST \
        -d '{"inputs":"What is Deep Learning?"}' \
        -H 'Content-Type: application/json'
