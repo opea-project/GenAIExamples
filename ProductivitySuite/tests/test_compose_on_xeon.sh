@@ -144,8 +144,7 @@ function validate_service() {
     sleep 1s
 }
 
-
-function validate_faqgen() {
+function validate_faqgen_megaservice() {
     local URL="$1"
     local SERVICE_NAME="$2"
     local DOCKER_NAME="$3"
@@ -156,6 +155,34 @@ function validate_faqgen() {
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
         local CONTENT=$(curl -s -X POST -F "$INPUT_DATA"  -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
+}
+
+function validate_faqgen() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local INPUT_DATA="$5"
+
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
 
         if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
@@ -266,8 +293,10 @@ function validate_microservices() {
     # FAQGen llm microservice
     validate_faqgen \
         "${ip_address}:9002/v1/faqgen" \
+        "text" \
         "llm_faqgen" \
-        "llm-faqgen-server"
+        "llm-faqgen-server" \
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     # CodeGen llm microservice
     validate_service \
@@ -321,8 +350,8 @@ function validate_megaservice() {
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'\
 
-    # Curl the FAQGen Service
-    validate_faqgen \
+    # Curl the FAQGenMega Service
+    validate_faqgen_megaservice \
         "${ip_address}:8889/v1/faqgen" \
         "faqgen-xeon-backend-server" \
         "faqgen-xeon-backend-server"
