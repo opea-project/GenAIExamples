@@ -75,15 +75,14 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
-              git clone https://github.com/vllm-project/vllm.git
+              git clone --depth 1 https://github.com/vllm-project/vllm.git
               cd vllm && git rev-parse HEAD && cd ../
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
-               git clone https://github.com/HabanaAI/vllm-fork.git
-               cd vllm-fork && git checkout v0.6.4.post2+Gaudi-1.19.0 && cd ../
+               git clone --depth 1 --branch v0.6.4.post2+Gaudi-1.19.0 https://github.com/HabanaAI/vllm-fork.git
           fi
-          git clone https://github.com/opea-project/GenAIComps.git
-          cd GenAIComps && git checkout ${{ inputs.opea_branch }} && git rev-parse HEAD && cd ../
+          git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
+          cd GenAIComps && git rev-parse HEAD && cd ../
 
       - name: Build Image
         if: ${{ fromJSON(inputs.build) }}
