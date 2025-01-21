@@ -8,12 +8,12 @@ WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
-export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+export TOOLSET_PATH=$WORKPATH/tools/
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 model="meta-llama/Meta-Llama-3.1-70B-Instruct"
 
-export HF_CACHE_DIR=$WORKDIR/hf_cache
+export HF_CACHE_DIR=${HOME}/.cache/huggingface
 if [ ! -d "$HF_CACHE_DIR" ]; then
     mkdir -p "$HF_CACHE_DIR"
 fi
