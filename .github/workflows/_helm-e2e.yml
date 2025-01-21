@@ -63,6 +63,7 @@ jobs:
             merged_commit=$(git log -1 --format='%H')
             values_files=$(git diff --name-only ${base_commit} ${merged_commit} | \
             grep "${{ inputs.example }}/kubernetes/helm" | \
+            grep "values.yaml" |\
             sort -u)
             echo $values_files
           elif [ "${{ inputs.mode }}" = "CD" ]; then
