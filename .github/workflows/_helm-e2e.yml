@@ -63,10 +63,11 @@ jobs:
             merged_commit=$(git log -1 --format='%H')
             values_files=$(git diff --name-only ${base_commit} ${merged_commit} | \
             grep "kubernetes/helm" | \
+            grep "${{ inputs.example }}" | \
             sort -u)
             echo $values_files
           elif [ "${{ inputs.mode }}" = "CD" ]; then
-            value_files=$(ls ${{ inputs.example }}/kubernetes/helm/*values.yaml)
+            values_files=$(ls ${{ inputs.example }}/kubernetes/helm/*values.yaml)
           fi
           value_files="["
           for file in ${values_files}; do
