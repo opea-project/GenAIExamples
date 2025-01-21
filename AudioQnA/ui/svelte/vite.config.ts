@@ -17,6 +17,9 @@ import type { UserConfig } from "vite";
 
 const config: UserConfig = {
 	plugins: [sveltekit()],
+	server: {
+		allowedHosts: true,
+	},
 };
 
 export default config;
