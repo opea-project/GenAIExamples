@@ -66,7 +66,7 @@ jobs:
             sort -u)
             echo $values_files
           elif [ "${{ inputs.mode }}" = "CD" ]; then
-            value_files=$(ls ${{ inputs.example }}/kubernetes/helm/*values.yaml)
+            values_files=$(ls ${{ inputs.example }}/kubernetes/helm/*values.yaml)
           fi
           value_files="["
           for file in ${values_files}; do
