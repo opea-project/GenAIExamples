@@ -4,7 +4,7 @@
 - For more deploy options, refer to [helm charts README](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts#readme).
 
 ## Deploy on Xeon
-#test  
+
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
 helm install audioqna oci://ghcr.io/opea-project/charts/audioqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f cpu-values.yaml
