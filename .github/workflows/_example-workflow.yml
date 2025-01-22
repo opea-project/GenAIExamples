@@ -50,7 +50,6 @@ jobs:
 # Image Build
 ####################################################################################################
   build-images:
-    if: ${{ !(fromJSON(inputs.test_helmchart)) }}
     runs-on: "docker-build-${{ inputs.node }}"
     steps:
       - name: Clean Up Working Directory
