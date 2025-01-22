@@ -45,12 +45,12 @@ function build_vllm_docker_image() {
     cd ./vllm
     echo "Checking out latest stable release of vllm"
     git checkout v0.6.6
-    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:comps --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:ci --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
-        echo "opea/vllm-gaudi:comps failed"
+        echo "opea/vllm-gaudi:ci failed"
         exit 1
     else
-        echo "opea/vllm-gaudi:comps successful"
+        echo "opea/vllm-gaudi:ci successful"
     fi
 }
 
