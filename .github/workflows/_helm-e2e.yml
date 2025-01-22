@@ -29,6 +29,10 @@ on:
         default: "latest"
         required: false
         type: string
+      version:
+        default: "0-latest"
+        required: false
+        type: string
 
 jobs:
   get-test-case:
@@ -154,6 +158,13 @@ jobs:
             exit 0
           fi
 
+          for img in `helm template -n $NAMESPACE $RELEASE_NAME oci://ghcr.io/opea-project/charts/${CHART_NAME} -f ${{ inputs.example }}/kubernetes/helm/${value_file} --version ${{ inputs.version }} | grep 'image:' | grep 'opea/' | awk '{print $2}' | xargs`;
+          do
+            # increase helm install wait for for vllm-gaudi case
+            if [[ $img == *"vllm-gaudi"* ]]; then
+              ROLLOUT_TIMEOUT_SECONDS=900s
+            fi
+          done
           if ! helm install \
             --create-namespace \
             --namespace $NAMESPACE \
@@ -163,9 +174,11 @@ jobs:
             --set global.modelUseHostPath=/home/sdp/.cache/huggingface/hub \
             --set GOOGLE_API_KEY=${{ env.GOOGLE_API_KEY}} \
             --set GOOGLE_CSE_ID=${{ env.GOOGLE_CSE_ID}} \
+            --set web-retriever.GOOGLE_API_KEY=${{ env.GOOGLE_API_KEY}} \
+            --set web-retriever.GOOGLE_CSE_ID=${{ env.GOOGLE_CSE_ID}} \
             -f ${{ inputs.example }}/kubernetes/helm/${value_file} \
-            --version 0-latest \
-            --wait; then
+            --version ${{ inputs.version }} \
+            --wait --timeout "$ROLLOUT_TIMEOUT_SECONDS"; then
             echo "Failed to install chart ${{ inputs.example }}"
             echo "skip_validate=true" >> $GITHUB_ENV
             .github/workflows/scripts/k8s-utils.sh dump_pods_status $NAMESPACE
