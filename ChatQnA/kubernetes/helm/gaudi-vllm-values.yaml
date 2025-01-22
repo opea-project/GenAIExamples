@@ -6,9 +6,9 @@
 
 tgi:
   enabled: false
-
 vllm:
   enabled: true
+  shmSize: 1Gi
   accelDevice: "gaudi"
   image:
     repository: opea/vllm-gaudi
@@ -19,7 +19,7 @@ vllm:
     initialDelaySeconds: 5
     periodSeconds: 5
     timeoutSeconds: 1
-    failureThreshold: 120
+    failureThreshold: 180
   readinessProbe:
     initialDelaySeconds: 5
     periodSeconds: 5
@@ -38,7 +38,6 @@ vllm:
     "--max-num-seqs", "256",
     "--max-seq_len-to-capture", "2048"
   ]
-
 
 # Reranking: second largest bottleneck when reranking is in use
 # (i.e. query context docs have been uploaded with data-prep)

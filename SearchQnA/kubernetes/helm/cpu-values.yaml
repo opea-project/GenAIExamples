@@ -1,0 +1,7 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
+llm_uservice:
+  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3

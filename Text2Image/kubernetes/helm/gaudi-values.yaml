@@ -1,0 +1,30 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+text2image:
+  accelDevice: "gaudi"
+  image:
+    repository: opea/text2image-gaudi
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+      # The following hugepage related settings is for default MODEL stable-diffusion-v1-5/stable-diffusion-v1-5
+      # User should change the resource limits for other models
+      hugepages-2Mi: 256Mi
+  volumes:
+    - name: hugepage-2mi
+      emptyDir:
+        medium: HugePages-2Mi
+  volumeMounts:
+    - name: hugepage-2mi
+      mountPath: /hugepages-2Mi
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120
