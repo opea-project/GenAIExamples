@@ -315,6 +315,7 @@ Also, you are able to get the list of all files that you uploaded:
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
+    -d '{"file_path": "all"}' \
     ${DATAPREP_GET_FILE_ENDPOINT}
 ```
 
