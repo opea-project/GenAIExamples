@@ -23,6 +23,12 @@ services:
       dockerfile: comps/third_parties/bridgetower/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
+  embedding-multimodal-bridgetower-gaudi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/bridgetower/src/Dockerfile.intel_hpu
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
   embedding:
     build:
       context: GenAIComps

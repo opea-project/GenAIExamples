@@ -42,16 +42,21 @@ services:
       MULTIMODAL_DATAPREP: true
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALREDIS"
     restart: unless-stopped
-  embedding-multimodal-bridgetower:
-    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
-    container_name: embedding-multimodal-bridgetower
+  embedding-multimodal-bridgetower-gaudi:
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
+    container_name: embedding-multimodal-bridgetower-gaudi
     ports:
       - ${EMM_BRIDGETOWER_PORT}:${EMM_BRIDGETOWER_PORT}
+    ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       PORT: ${EMM_BRIDGETOWER_PORT}
+      HABANA_VISIBLE_DEVICES: all
+    runtime: habana
+    cap_add:
+      - SYS_NICE
     healthcheck:
       test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMM_BRIDGETOWER_PORT}/v1/health_check"]
       interval: 10s
@@ -64,7 +69,7 @@ services:
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
     container_name: embedding
     depends_on:
-      embedding-multimodal-bridgetower:
+      embedding-multimodal-bridgetower-gaudi:
         condition: service_healthy
     ports:
       - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
