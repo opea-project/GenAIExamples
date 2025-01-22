@@ -38,13 +38,11 @@ function build_vllm_docker_image() {
     echo "Building the vllm docker image"
     cd $WORKPATH
     echo $WORKPATH
-    if [ ! -d "./vllm" ]; then
-        echo "clone vllm repo...."
-        git clone https://github.com/vllm-project/vllm.git
+    if [ ! -d "./vllm-fork" ]; then
+        git clone https://github.com/HabanaAI/vllm-fork.git
     fi
-    cd ./vllm
-    echo "Checking out latest stable release of vllm"
-    git checkout v0.6.6
+    cd ./vllm-fork
+    git checkout v0.6.4.post2+Gaudi-1.19.0
     docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:ci --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
         echo "opea/vllm-gaudi:ci failed"
