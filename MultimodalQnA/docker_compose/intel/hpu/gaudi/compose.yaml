@@ -69,7 +69,7 @@ services:
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
     container_name: embedding
     depends_on:
-      embedding-multimodal-bridgetower:
+      embedding-multimodal-bridgetower-gaudi:
         condition: service_healthy
     ports:
       - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
