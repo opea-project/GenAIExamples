@@ -59,7 +59,7 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower-gaudi embedding retriever lvm dataprep whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
@@ -177,19 +177,19 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # Bridgetower Embedding Server
-    echo "Validating embedding-multimodal-bridgetower"
+    echo "Validating embedding-multimodal-bridgetower-gaudi"
     validate_service \
         "http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode" \
         '"embedding":[' \
-        "embedding-multimodal-bridgetower" \
-        "embedding-multimodal-bridgetower" \
+        "embedding-multimodal-bridgetower-gaudi" \
+        "embedding-multimodal-bridgetower-gaudi" \
         '{"text":"This is example"}'
 
     validate_service \
         "http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode" \
         '"embedding":[' \
-        "embedding-multimodal-bridgetower" \
-        "embedding-multimodal-bridgetower" \
+        "embedding-multimodal-bridgetower-gaudi" \
+        "embedding-multimodal-bridgetower-gaudi" \
         '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 
     # embedding microservice
