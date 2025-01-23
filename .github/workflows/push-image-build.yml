@@ -24,6 +24,7 @@ jobs:
 
   image-build:
     needs: job1
+    if: always() && ${{ needs.job1.outputs.run_matrix.example.length > 0 }}
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
       fail-fast: false
