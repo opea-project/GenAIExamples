@@ -8,11 +8,10 @@ on:
     branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - "**/kubernetes/**/gmc/**"
+      - "**/kubernetes/gmc/**"
       - "**/tests/test_gmc**"
       - "!**.md"
       - "!**.txt"
-      - "!**/kubernetes/**/manifest/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -22,7 +21,7 @@ jobs:
   job1:
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '\.github|docker_compose|manifest|assets|\.md|\.txt'
+      diff_excluded_files: '\.github|docker_compose|assets|\.md|\.txt'
       test_mode: "gmc"
 
   gmc-test:
