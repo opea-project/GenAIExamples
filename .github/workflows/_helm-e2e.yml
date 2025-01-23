@@ -101,6 +101,7 @@ jobs:
     strategy:
       matrix:
         value_file: ${{ fromJSON(needs.get-test-case.outputs.value_files) }}
+      fail-fast: false
     runs-on: k8s-${{ inputs.hardware }}
     continue-on-error: true
     steps:

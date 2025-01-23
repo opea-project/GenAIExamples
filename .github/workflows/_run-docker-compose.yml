@@ -89,9 +89,9 @@ jobs:
           echo "test_cases=$test_cases"
           echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
 
-  run-test:
+  compose-test:
     needs: [get-test-case]
-    if: always() && ${{ needs.get-test-case.outputs.test_cases.length > 0 }}
+    if: always() && ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
     strategy:
       matrix:
         test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
