@@ -19,6 +19,7 @@ for example in ${examples}; do
     if [[ "$test_mode" == "docker_image_build" ]]; then
         hardware_list="gaudi xeon"
     else
+        find_name="test_${test_mode}*_on_*.sh"
         hardware_list=$(find . -type f -name "${find_name}" | cut -d/ -f2 | cut -d. -f1 | awk -F'_on_' '{print $2}'| sort -u)
     fi
     echo -e "Test supported hardware list: \n${hardware_list}"
