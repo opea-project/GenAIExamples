@@ -150,7 +150,6 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
                 "seed": test_params.get("seed", None),
                 "llm-model": test_params["llm_model"],
                 "deployment-type": test_params["deployment_type"],
-                "load-shape": test_params["load_shape"],
             },
             "runs": [{"name": test_phase, "users": concurrency, "max-request": num_queries}],
         }
@@ -576,11 +575,11 @@ def _get_hw_values_file(deploy_config, chart_dir):
 
 def _configure_node_selectors(values, node_selector, deploy_config):
     """Configure node selectors for all services."""
-    for service_name, config in deploy_config["services"].items():
+    for service_name, service_config in deploy_config["services"].items():
         if service_name == "backend":
             values["nodeSelector"] = {key: value for key, value in node_selector.items()}
         elif service_name == "llm":
-            engine = config.get("engine", "tgi")
+            engine = service_config.get("engine", "tgi")
             values[engine] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
         else:
             values[service_name] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
@@ -589,17 +588,17 @@ def _configure_node_selectors(values, node_selector, deploy_config):
 
 def _configure_replica(values, deploy_config):
     """Get replica configuration based on example type and node count."""
-    for service_name, config in deploy_config["services"].items():
-        if not config.get("instance_num"):
+    for service_name, service_config in deploy_config["services"].items():
+        if not service_config.get("instance_num"):
             continue
 
         if service_name == "llm":
-            engine = config.get("engine", "tgi")
-            values[engine]["replicaCount"] = config["instance_num"]
+            engine = service_config.get("engine", "tgi")
+            values[engine]["replicaCount"] = service_config["instance_num"]
         elif service_name == "backend":
-            values["replicaCount"] = config["instance_num"]
+            values["replicaCount"] = service_config["instance_num"]
         else:
-            values[service_name]["replicaCount"] = config["instance_num"]
+            values[service_name]["replicaCount"] = service_config["instance_num"]
 
     return values
 
@@ -616,26 +615,26 @@ def _configure_resources(values, deploy_config):
     """Configure resources when tuning is enabled."""
     resource_configs = []
 
-    for service_name, config in deploy_config["services"].items():
+    for service_name, service_config in deploy_config["services"].items():
         resources = {}
-        if deploy_config["device"] == "gaudi" and config.get("cards_per_instance", 0) > 1:
+        if deploy_config["device"] == "gaudi" and service_config.get("cards_per_instance", 0) > 1:
             resources = {
-                "limits": {"habana.ai/gaudi": config["cards_per_instance"]},
-                "requests": {"habana.ai/gaudi": config["cards_per_instance"]},
+                "limits": {"habana.ai/gaudi": service_config["cards_per_instance"]},
+                "requests": {"habana.ai/gaudi": service_config["cards_per_instance"]},
             }
         else:
             limits = {}
             requests = {}
 
             # Only add CPU if cores_per_instance has a value
-            if config.get("cores_per_instance"):
-                limits["cpu"] = config["cores_per_instance"]
-                requests["cpu"] = config["cores_per_instance"]
+            if service_config.get("cores_per_instance"):
+                limits["cpu"] = service_config["cores_per_instance"]
+                requests["cpu"] = service_config["cores_per_instance"]
 
             # Only add memory if memory_capacity has a value
-            if config.get("memory_capacity"):
-                limits["memory"] = config["memory_capacity"]
-                requests["memory"] = config["memory_capacity"]
+            if service_config.get("memory_capacity"):
+                limits["memory"] = service_config["memory_capacity"]
+                requests["memory"] = service_config["memory_capacity"]
 
             # Only create resources if we have any limits/requests
             if limits and requests:
@@ -644,7 +643,7 @@ def _configure_resources(values, deploy_config):
 
         if resources:
             if service_name == "llm":
-                engine = config.get("engine", "tgi")
+                engine = service_config.get("engine", "tgi")
                 resource_configs.append(
                     {
                         "name": engine,
@@ -659,19 +658,19 @@ def _configure_resources(values, deploy_config):
                     }
                 )
 
-    for config in [r for r in resource_configs if r]:
-        service_name = config["name"]
+    for service_config in [r for r in resource_configs if r]:
+        service_name = service_config["name"]
         if service_name == "backend":
-            values["resources"] = config["resources"]
+            values["resources"] = service_config["resources"]
         elif service_name in values:
-            values[service_name]["resources"] = config["resources"]
+            values[service_name]["resources"] = service_config["resources"]
 
     return values
 
 
 def _configure_extra_cmd_args(values, deploy_config):
     """Configure extra command line arguments for services."""
-    for service_name, config in deploy_config["services"].items():
+    for service_name, service_config in deploy_config["services"].items():
         extra_cmd_args = []
 
         for param in [
@@ -681,12 +680,12 @@ def _configure_extra_cmd_args(values, deploy_config):
             "max_batch_total_tokens",
             "max_batch_prefill_tokens",
         ]:
-            if config.get(param):
-                extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(config[param])])
+            if service_config.get(param):
+                extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(service_config[param])])
 
         if extra_cmd_args:
             if service_name == "llm":
-                engine = config.get("engine", "tgi")
+                engine = service_config.get("engine", "tgi")
                 if engine not in values:
                     values[engine] = {}
                 values[engine]["extraCmdArgs"] = extra_cmd_args
@@ -700,19 +699,19 @@ def _configure_extra_cmd_args(values, deploy_config):
 
 def _configure_models(values, deploy_config):
     """Configure model settings for services."""
-    for service_name, config in deploy_config["services"].items():
+    for service_name, service_config in deploy_config["services"].items():
         # Skip if no model_id defined or service is disabled
-        if not config.get("model_id") or config.get("enabled") is False:
+        if not service_config.get("model_id") or service_config.get("enabled") is False:
             continue
 
         if service_name == "llm":
             # For LLM service, use its engine as the key
-            engine = config.get("engine", "tgi")
-            values[engine]["LLM_MODEL_ID"] = config.get("model_id")
+            engine = service_config.get("engine", "tgi")
+            values[engine]["LLM_MODEL_ID"] = service_config.get("model_id")
         elif service_name == "tei":
-            values[service_name]["EMBEDDING_MODEL_ID"] = config.get("model_id")
+            values[service_name]["EMBEDDING_MODEL_ID"] = service_config.get("model_id")
         elif service_name == "teirerank":
-            values[service_name]["RERANK_MODEL_ID"] = config.get("model_id")
+            values[service_name]["RERANK_MODEL_ID"] = service_config.get("model_id")
 
     return values
 
@@ -862,8 +861,6 @@ def deploy_start_services(config_file, chart_name, namespace, label, chart_dir, 
     with open(values_file_path, "r") as file:
         print("Generated YAML contents:")
         print(file.read())
-
-    breakpoint()
     
     # Handle service update if specified
     if update_service:
@@ -1021,7 +1018,7 @@ def deploy_and_benchmark(max_batch_sizes, deploy_config, node, chart_name, names
             if res:
                 print("[OPEA DEPLOYMENT] 🚀 Deployments are ready!")
             else:
-                print(f"Deployments status failed with returncode: {e.returncode}")
+                print(f"Deployments status failed to start for {node} nodes with max_batch_size {max_batch_size}.")
 
             # run benchmark for current deployment
             run_benchmark(benchmark_config)
@@ -1041,12 +1038,12 @@ def deploy_and_benchmark(max_batch_sizes, deploy_config, node, chart_name, names
 #                   main                   #
 ############################################
 def main(yaml_file="./ChatQnA/chatqna.yaml", target_node=None):
-    config = load_yaml(yaml_file)
+    yaml_config = load_yaml(yaml_file)
 
     # Process configs for deployment and benchmark
     chart_name = os.path.splitext(os.path.basename(yaml_file))[0]
-    deploy_config = config["deploy"]
-    benchmark_config = config["benchmark"]
+    deploy_config = yaml_config["deploy"]
+    benchmark_config = yaml_config["benchmark"]
 
     # Prepare common variables
     nodes = deploy_config.get("node", [])
@@ -1086,7 +1083,6 @@ def main(yaml_file="./ChatQnA/chatqna.yaml", target_node=None):
             if not isinstance(max_batch_sizes, list):
                 max_batch_sizes = [max_batch_sizes]
 
-            breakpoint()
             deploy_and_benchmark(max_batch_sizes, deploy_config, node, chart_name, namespace, chart_dir, benchmark_config, label)
 
         finally:
