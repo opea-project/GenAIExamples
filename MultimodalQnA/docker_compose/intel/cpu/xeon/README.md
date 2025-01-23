@@ -92,7 +92,7 @@ export REDIS_INSIGHTS_PORT=8001
 export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
 export REDIS_HOST=${host_ip}
 export INDEX_NAME="mm-rag-redis"
-export DATAPREP_MMR_PORT=5000
+export DATAPREP_MMR_PORT=6007
 export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
 export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
@@ -334,15 +334,6 @@ export audio_fn="AudioSample.wav"
 wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav -O ${audio_fn}
 ```
 
-```bash
-export DATAPREP_MMR_PORT=6007
-export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
-export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
-export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
-```
-
 Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
 
 ```bash
@@ -398,6 +389,7 @@ To delete all uploaded files along with data indexed with `$INDEX_NAME` in REDIS
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
+    -d '{"file_path": "all"}' \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 

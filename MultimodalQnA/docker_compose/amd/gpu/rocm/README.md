@@ -289,6 +289,7 @@ To delete all uploaded files along with data indexed with `$INDEX_NAME` in REDIS
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
+    -d '{"file_path": "all"}' \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
