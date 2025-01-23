@@ -18,7 +18,7 @@ export HOST_IP=${ip_address}
 export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
 export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export CHATQNA_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export CHATQNA_TGI_SERVICE_PORT=9009
 export CHATQNA_TEI_EMBEDDING_PORT=8090
 export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"
@@ -31,9 +31,9 @@ export CHATQNA_INDEX_NAME="rag-redis"
 export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
-export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep"
-export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get_file"
-export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete_file"
+export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/ingest"
+export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get"
+export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete"
 export CHATQNA_FRONTEND_SERVICE_IP=${HOST_IP}
 export CHATQNA_FRONTEND_SERVICE_PORT=15173
 export CHATQNA_BACKEND_SERVICE_NAME=chatqna
@@ -48,11 +48,23 @@ export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export PATH="/home/huggingface/miniconda3/bin:$PATH"
 
 function build_docker_images() {
-    cd "$WORKPATH"/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    opea_branch=${opea_branch:-"main"}
+    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
+    if [[ "${opea_branch}" != "main" ]]; then
+        cd $WORKPATH
+        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
+        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
+        find . -type f -name "Dockerfile*" | while read -r file; do
+            echo "Processing file: $file"
+            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
+        done
+    fi
+
+    cd $WORKPATH/docker_image_build
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep-redis retriever nginx"
+    service_list="chatqna chatqna-ui dataprep retriever nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
@@ -65,16 +77,15 @@ function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
-    sed -i "s|container_name: chatqna-backend-server|container_name: chatqna-backend-server\n    volumes:\n      - \"${WORKPATH}\/docker_image_build\/GenAIComps:\/home\/user\/GenAIComps\"|g" compose.yaml
     docker compose -f compose.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 500 ]]; do
+    until [[ "$n" -ge 160 ]]; do
         docker logs chatqna-tgi-server > "${LOG_PATH}"/tgi_service_start.log
         if grep -q Connected "${LOG_PATH}"/tgi_service_start.log; then
             break
         fi
-        sleep 1s
+        sleep 5s
         n=$((n+1))
     done
 
@@ -136,31 +147,31 @@ function validate_microservices() {
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
-    # test /v1/dataprep upload file
+    # test /v1/dataprep/ingest upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > "$LOG_PATH"/dataprep_file.txt
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-redis-server"
 
-    # test /v1/dataprep upload link
+    # test /v1/dataprep/ingest upload link
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
         "dataprep-redis-server"
 
-    # test /v1/dataprep/get_file
+    # test /v1/dataprep/get
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/get_file" \
+        "http://${ip_address}:6007/v1/dataprep/get" \
         '{"name":' \
         "dataprep_get" \
         "dataprep-redis-server"
 
-    # test /v1/dataprep/delete_file
+    # test /v1/dataprep/delete
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/delete_file" \
+        "http://${ip_address}:6007/v1/dataprep/delete" \
         '{"status":true}' \
         "dataprep_del" \
         "dataprep-redis-server"

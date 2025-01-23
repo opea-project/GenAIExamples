@@ -10,6 +10,8 @@ Quick Start Deployment Steps:
 2. Run Docker Compose.
 3. Consume the ChatQnA Service.
 
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+
 ## Quick Start: 1.Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
@@ -65,7 +67,7 @@ Prepare and upload test document
 # download pdf file
 wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./nke-10k-2023.pdf"
 ```
@@ -100,7 +102,7 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 ### 3. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 4. Build MegaService Docker Image
@@ -144,7 +146,7 @@ docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-a
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `opea/retriever:latest`
-2. `opea/dataprep-redis:latest`
+2. `opea/dataprep:latest`
 3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest` or `opea/chatqna-react-ui:latest`
 5. `opea/nginx:latest`
@@ -155,11 +157,11 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
 
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
+| Service   | Model                               |
+| --------- | ----------------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5               |
+| Reranking | BAAI/bge-reranker-base              |
+| LLM       | meta-llama/Meta-Llama-3-8B-Instruct |
 
 Change the `xxx_MODEL_ID` below for your needs.
 
@@ -179,7 +181,7 @@ Change the `xxx_MODEL_ID` below for your needs.
    export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
    export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
    export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
-   export CHATQNA_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+   export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
    export CHATQNA_TGI_SERVICE_PORT=8008
    export CHATQNA_TEI_EMBEDDING_PORT=8090
    export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"
@@ -192,9 +194,9 @@ Change the `xxx_MODEL_ID` below for your needs.
    export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
    export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
    export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
-   export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep"
-   export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get_file"
-   export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete_file"
+   export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/ingest"
+   export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get"
+   export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete"
    export CHATQNA_FRONTEND_SERVICE_IP=${HOST_IP}
    export CHATQNA_FRONTEND_SERVICE_PORT=5173
    export CHATQNA_BACKEND_SERVICE_NAME=chatqna
@@ -331,7 +333,7 @@ If you want to update the default knowledge base, you can use the following comm
 Update Knowledge Base via Local File Upload:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F "files=@./nke-10k-2023.pdf"
 ```
@@ -341,7 +343,7 @@ This command updates a knowledge base by uploading a local file for processing. 
 Add Knowledge Base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 ```
@@ -351,7 +353,7 @@ This command updates a knowledge base by submitting a list of HTTP links for pro
 Also, you are able to get the file list that you uploaded:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
      -H "Content-Type: application/json"
 ```
 
@@ -359,17 +361,17 @@ To delete the file/link you uploaded:
 
 ```bash
 # delete link
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "https://opea.dev"}' \
      -H "Content-Type: application/json"
 
 # delete file
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "nke-10k-2023.pdf"}' \
      -H "Content-Type: application/json"
 
 # delete all uploaded files and links
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```

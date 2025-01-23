@@ -44,44 +44,13 @@ teirerank:
   readinessProbe:
     timeoutSeconds: 1
 
-tgi:
-  accelDevice: "gaudi"
-  image:
-    repository: ghcr.io/huggingface/tgi-gaudi
-    tag: "2.0.6"
-  resources:
-    limits:
-      habana.ai/gaudi: 1
-  # higher limits are needed with extra input tokens added by rerank
-  MAX_INPUT_LENGTH: "2048"
-  MAX_TOTAL_TOKENS: "4096"
-  CUDA_GRAPHS: ""
-  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
-  ENABLE_HPU_GRAPH: "true"
-  LIMIT_HPU_GRAPH: "true"
-  USE_FLASH_ATTENTION: "true"
-  FLASH_ATTENTION_RECOMPUTE: "true"
-  livenessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
-  readinessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
-  startupProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
-    failureThreshold: 120
-
 tgi-guardrails:
   enabled: true
   accelDevice: "gaudi"
   LLM_MODEL_ID: "meta-llama/Meta-Llama-Guard-2-8B"
   image:
     repository: ghcr.io/huggingface/tgi-gaudi
-    tag: "2.0.6"
+    tag: "2.3.1"
   resources:
     limits:
       habana.ai/gaudi: 1
@@ -106,3 +75,38 @@ tgi-guardrails:
     periodSeconds: 5
     timeoutSeconds: 1
     failureThreshold: 120
+
+tgi:
+  enabled: false
+vllm:
+  enabled: true
+  shmSize: 1Gi
+  accelDevice: "gaudi"
+  image:
+    repository: opea/vllm-gaudi
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 180
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+
+  PT_HPU_ENABLE_LAZY_COLLECTIVES: "true"
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+
+  extraCmdArgs: [
+    "--tensor-parallel-size", "1",
+    "--block-size", "128",
+    "--max-num-seqs", "256",
+    "--max-seq_len-to-capture", "2048"
+  ]

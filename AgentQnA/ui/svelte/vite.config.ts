@@ -7,14 +7,7 @@ import type { UserConfig } from "vite";
 const config: UserConfig = {
 	plugins: [sveltekit()],
 	server: {
-		proxy: {
-			"/api": {
-				target: "http://10.112.228.168:8000",
-				changeOrigin: true,
-				secure: true,
-				rewrite: (path) => path.replace(/^\/api/, ""),
-			},
-		},
+		allowedHosts: true,
 	},
 };
 

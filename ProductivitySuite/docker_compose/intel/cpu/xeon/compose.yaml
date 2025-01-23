@@ -15,12 +15,12 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
     ports:
-      - "6007:6007"
+      - "6007:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
