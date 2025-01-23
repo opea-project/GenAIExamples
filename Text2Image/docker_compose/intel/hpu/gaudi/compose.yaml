@@ -1,0 +1,58 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  text2image-gaudi-server:
+    image: ${REGISTRY:-opea}/text2image-gaudi:${TAG:-latest}
+    container_name: text2image-gaudi-server
+    ports:
+      - "9379:9379"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MODEL=${MODEL}
+      - HF_TOKEN=${HF_TOKEN}
+      - HABANA_VISIBLE_DEVICES=all
+      - OMPI_MCA_btl_vader_single_copy_mechanism=none
+    ipc: host
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    restart: always
+  text2image-gaudi-ui-server:
+    image: ${REGISTRY:-opea}/text2image-ui:${TAG:-latest}
+    container_name: text2image-gaudi-ui-server
+    depends_on:
+      - text2image-gaudi-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ipc: host
+    restart: always
+  text2image-gaudi-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: text2image-gaudi-nginx-server
+    depends_on:
+      - text2image-gaudi-server
+      - text2image-gaudi-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=text2image-gaudi-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=text2image
+      - BACKEND_SERVICE_IP=text2image-gaudi-server
+      - BACKEND_SERVICE_PORT=9379
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

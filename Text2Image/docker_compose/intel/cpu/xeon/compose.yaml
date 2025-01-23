@@ -1,0 +1,53 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  text2image-server:
+    image: ${REGISTRY:-opea}/text2image:${TAG:-latest}
+    container_name: text2image-server
+    ports:
+      - "9379:9379"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MODEL=${MODEL}
+      - HF_TOKEN=${HF_TOKEN}
+    ipc: host
+    restart: always
+  text2image-ui-server:
+    image: ${REGISTRY:-opea}/text2image-ui:${TAG:-latest}
+    container_name: text2image-ui-server
+    depends_on:
+      - text2image-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ipc: host
+    restart: always
+  text2image-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: text2image-nginx-server
+    depends_on:
+      - text2image-server
+      - text2image-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=text2image-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=text2image
+      - BACKEND_SERVICE_IP=text2image-server
+      - BACKEND_SERVICE_PORT=9379
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
