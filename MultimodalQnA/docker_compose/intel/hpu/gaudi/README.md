@@ -37,7 +37,7 @@ export WHISPER_PORT=7066
 export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
 export MAX_IMAGES=1
 export WHISPER_MODEL="base"
-export DATAPREP_MMR_PORT=5000
+export DATAPREP_MMR_PORT=6007
 export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
 export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
 export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
@@ -283,15 +283,6 @@ wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_ex
 Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
 
 ```bash
-export DATAPREP_MMR_PORT=6007
-export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
-export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
-export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
-```
-
-```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     ${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT} \
     -H 'Content-Type: multipart/form-data' \
@@ -324,6 +315,7 @@ Also, you are able to get the list of all files that you uploaded:
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
+    -d '{"file_path": "all"}' \
     ${DATAPREP_GET_FILE_ENDPOINT}
 ```
 
