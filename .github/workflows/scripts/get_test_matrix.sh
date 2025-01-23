@@ -17,11 +17,11 @@ for example in ${examples}; do
     cd tests
     ls -l
     if [[ "$test_mode" == "docker_image_build" ]]; then
-        find_name="test_manifest_on_*.sh"
+        hardware_list="gaudi xeon"
     else
         find_name="test_${test_mode}*_on_*.sh"
+        hardware_list=$(find . -type f -name "${find_name}" | cut -d/ -f2 | cut -d. -f1 | awk -F'_on_' '{print $2}'| sort -u)
     fi
-    hardware_list=$(find . -type f -name "${find_name}" | cut -d/ -f2 | cut -d. -f1 | awk -F'_on_' '{print $2}'| sort -u)
     echo -e "Test supported hardware list: \n${hardware_list}"
 
     run_hardware=""
