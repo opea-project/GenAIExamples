@@ -91,7 +91,6 @@ jobs:
 
   compose-test:
     needs: [get-test-case]
-    if: always() && ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
     strategy:
       matrix:
         test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
