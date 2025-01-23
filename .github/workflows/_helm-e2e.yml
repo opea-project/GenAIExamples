@@ -71,7 +71,7 @@ jobs:
             sort -u)
             echo $values_files
           elif [ "${{ inputs.mode }}" = "CD" ]; then
-            values_files=$(ls ${{ inputs.example }}/kubernetes/helm/*values.yaml)
+            values_files=$(ls ${{ inputs.example }}/kubernetes/helm/*values.yaml || true)
           fi
           value_files="["
           for file in ${values_files}; do
@@ -97,6 +97,7 @@ jobs:
 
   helm-test:
     needs: [get-test-case]
+    if: always() && ${{ needs.get-test-case.outputs.value_files.length > 0 }}
     strategy:
       matrix:
         value_file: ${{ fromJSON(needs.get-test-case.outputs.value_files) }}
