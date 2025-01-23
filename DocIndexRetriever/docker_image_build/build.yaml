@@ -17,21 +17,21 @@ services:
       dockerfile: comps/embeddings/src/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
-  retriever-redis:
+  retriever:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/redis/langchain/Dockerfile
+      dockerfile: comps/retrievers/src/Dockerfile
     extends: doc-index-retriever
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
   reranking:
     build:
       context: GenAIComps
       dockerfile: comps/rerankings/src/Dockerfile
     extends: doc-index-retriever
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
-  dataprep-redis:
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: doc-index-retriever
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}

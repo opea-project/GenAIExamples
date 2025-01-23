@@ -34,7 +34,7 @@ export FAQGEN_HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export FAQGEN_BACKEND_SERVER_PORT=8888
 export FAGGEN_UI_PORT=5173
 export LLM_ENDPOINT="http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}"
-export FAQGen_COMPONENT_NAME="OPEAFAQGen_TGI"
+export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
 ```
 
 Note: Please replace with `host_ip` with your external IP address, do not use localhost.

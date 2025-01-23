@@ -5,7 +5,7 @@ tgi:
   accelDevice: "gaudi"
   image:
     repository: ghcr.io/huggingface/tgi-gaudi
-    tag: "2.0.6"
+    tag: "2.3.1"
   resources:
     limits:
       habana.ai/gaudi: 1
@@ -33,11 +33,15 @@ tgi:
     failureThreshold: 120
 
 whisper:
+  image:
+    repository: opea/whisper-gaudi
   resources:
     limits:
       habana.ai/gaudi: 1
 
 speecht5:
+  image:
+    repository: opea/speecht5-gaudi
   resources:
     limits:
       habana.ai/gaudi: 1

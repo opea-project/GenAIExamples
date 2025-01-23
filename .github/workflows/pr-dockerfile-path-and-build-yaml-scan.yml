@@ -21,7 +21,7 @@ jobs:
       - name: Clone Repo GenAIComps
         run: |
           cd ..
-          git clone https://github.com/opea-project/GenAIComps.git
+          git clone --depth 1 https://github.com/opea-project/GenAIComps.git
 
       - name: Check for Missing Dockerfile Paths in GenAIComps
         run: |
@@ -60,7 +60,7 @@ jobs:
           shopt -s globstar
           no_add="FALSE"
           cd ${{github.workspace}}
-          Dockerfiles=$(realpath $(find ./ -name '*Dockerfile*' ! -path './tests/*'))
+          Dockerfiles=$(realpath $(find ./ -name '*Dockerfile*' ! -path '*/tests/*'))
           if [ -n "$Dockerfiles" ]; then
             for dockerfile in $Dockerfiles; do
               service=$(echo "$dockerfile" | awk -F '/GenAIExamples/' '{print $2}' | awk -F '/' '{print $2}')

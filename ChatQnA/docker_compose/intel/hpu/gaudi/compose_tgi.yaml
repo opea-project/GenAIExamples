@@ -1,0 +1,189 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  dataprep-redis-service:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+    ports:
+      - "6007:5000"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: redis://redis-vector-db:6379
+      REDIS_HOST: redis-vector-db
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: http://tei-embedding-service:80
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      TELEMETRY_ENDPOINT: ${TELEMETRY_ENDPOINT}
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-embedding-gaudi-server
+    ports:
+      - "8090:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+  retriever:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    container_name: retriever-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: redis://redis-vector-db:6379
+      REDIS_HOST: redis-vector-db
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      TELEMETRY_ENDPOINT: ${TELEMETRY_ENDPOINT}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
+    restart: unless-stopped
+  tei-reranking-service:
+    image: ghcr.io/huggingface/tei-gaudi:1.5.0
+    container_name: tei-reranking-gaudi-server
+    ports:
+      - "8808:80"
+    volumes:
+      - "./data:/data"
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      MAX_WARMUP_SEQUENCE_LENGTH: 512
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+  tgi-service:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
+    container_name: tgi-gaudi-server
+    ports:
+      - "8005:80"
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      ENABLE_HPU_GRAPH: true
+      LIMIT_HPU_GRAPH: true
+      USE_FLASH_ATTENTION: true
+      FLASH_ATTENTION_RECOMPUTE: true
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096 --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "9411:9411"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      COLLECTOR_ZIPKIN_HOST_PORT: 9411
+    restart: unless-stopped
+  chatqna-gaudi-backend-server:
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    container_name: chatqna-gaudi-backend-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+      - retriever
+      - tei-reranking-service
+      - tgi-service
+    ports:
+      - "8888:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=chatqna-gaudi-backend-server
+      - EMBEDDING_SERVER_HOST_IP=tei-embedding-service
+      - EMBEDDING_SERVER_PORT=${EMBEDDING_SERVER_PORT:-80}
+      - RETRIEVER_SERVICE_HOST_IP=retriever
+      - RERANK_SERVER_HOST_IP=tei-reranking-service
+      - RERANK_SERVER_PORT=${RERANK_SERVER_PORT:-80}
+      - LLM_SERVER_HOST_IP=tgi-service
+      - LLM_SERVER_PORT=${LLM_SERVER_PORT:-80}
+      - LLM_MODEL=${LLM_MODEL_ID}
+      - LOGFLAG=${LOGFLAG}
+      - TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
+    ipc: host
+    restart: always
+  chatqna-gaudi-ui-server:
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    container_name: chatqna-gaudi-ui-server
+    depends_on:
+      - chatqna-gaudi-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ipc: host
+    restart: always
+  chatqna-gaudi-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: chatqna-gaudi-nginx-server
+    depends_on:
+      - chatqna-gaudi-backend-server
+      - chatqna-gaudi-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=chatqna-gaudi-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=chatqna
+      - BACKEND_SERVICE_IP=chatqna-gaudi-backend-server
+      - BACKEND_SERVICE_PORT=8888
+      - DATAPREP_SERVICE_IP=dataprep-redis-service
+      - DATAPREP_SERVICE_PORT=5000
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

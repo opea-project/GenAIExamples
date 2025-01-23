@@ -8,7 +8,7 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 
 | Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                                         | Comments                                                             |
 | -------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Module](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Uses Intel/neural-chat-7b-v3-3 by default                            |
+| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Module](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Uses meta-llama/Meta-Llama-3-8B-Instruct by default                  |
 | AWS Falcon2-11B      | 4th Gen Intel Xeon with Intel AMX | [AWS Module with Falcon11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B) | Uses TII Falcon2-11B LLM Model                                       |
 | GCP                  | 5th Gen Intel Xeon with Intel AMX | [GCP Module](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Also supports Confidential AI by using Intel® TDX with 4th Gen Xeon |
 | Azure                | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
@@ -25,7 +25,7 @@ Use this if you are not using Terraform and have provisioned your system with an
 
 ## Manually Deploy ChatQnA Service
 
-The ChatQnA service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors and Nvidia GPU.
+The ChatQnA service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors，Nvidia GPU and AMD GPU.
 
 Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
 
@@ -35,7 +35,11 @@ Quick Start Deployment Steps:
 2. Run Docker Compose.
 3. Consume the ChatQnA Service.
 
-Note: If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`
+Note:
+
+1. If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`.
+
+2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ### Quick Start: 1.Setup Environment Variable
 
@@ -203,17 +207,17 @@ Gaudi default compose.yaml
 | Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
 | Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
 | LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
-| Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep |
+| Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep/ingest |
 
 ### Required Models
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
 
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
+| Service   | Model                               |
+| --------- | ----------------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5               |
+| Reranking | BAAI/bge-reranker-base              |
+| LLM       | meta-llama/Meta-Llama-3-8B-Instruct |
 
 Change the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh` for your needs.
 
@@ -266,16 +270,21 @@ Refer to the [Intel Technology enabling for Openshift readme](https://github.com
 
 ### Check Service Status
 
-Before consuming ChatQnA Service, make sure the TGI/vLLM service is ready (which takes up to 2 minutes to start).
+Before consuming ChatQnA Service, make sure the vLLM/TGI service is ready, which takes some time.
 
 ```bash
+# vLLM example
+docker logs vllm-gaudi-server 2>&1 | grep complete
 # TGI example
-docker logs tgi-service | grep Connected
+docker logs tgi-gaudi-server | grep Connected
 ```
 
-Consume ChatQnA service until you get the TGI response like below.
+Consume ChatQnA service until you get the response like below.
 
 ```log
+# vLLM
+INFO: Application startup complete.
+# TGI
 2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
 ```
 
@@ -289,7 +298,7 @@ Here is an example of `Nike 2023` pdf.
 # download pdf file
 wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./nke-10k-2023.pdf"
 ```
