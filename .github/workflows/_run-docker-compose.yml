@@ -89,7 +89,7 @@ jobs:
           echo "test_cases=$test_cases"
           echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
 
-  run-test:
+  compose-test:
     needs: [get-test-case]
     strategy:
       matrix:

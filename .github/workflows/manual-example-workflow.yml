@@ -36,7 +36,7 @@ on:
         required: false
         type: boolean
       test_helmchart:
-        default: false
+        default: true
         description: 'Test examples with helm charts'
         required: false
         type: boolean
