@@ -15,11 +15,18 @@
 -->
 
 <script>
-  import "../app.pcss";
-  import Notifications from "svelte-notifications";
 
 </script>
-
-<Notifications>
-  <slot />
-</Notifications>
+<header
+  class="sticky top-0 z-40 flex-none w-full mx-auto bg-[#0d6efd] border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800"
+>
+  <nav
+    class="bg-[#0d6efd] dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 divide-gray-200 dark:divide-gray-700 px-2 sm:px-4 w-full py-1.5"
+  >
+    <div class="mx-auto flex flex-wrap justify-end items-center w-full">
+      <span
+        class="whitespace-nowrap py-2 text-3xl font-semibold text-white ml-4">Code Translation</span
+      >
+    </div>
+  </nav>
+</header>

@@ -11,17 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+import { env } from "$env/dynamic/public";
+import { SSE } from "sse.js";
 
-// See https://kit.svelte.dev/docs/types#app
-// for information about these interfaces
-declare global {
-  namespace App {
-    // interface Error {}
-    // interface Locals {}
-    // interface PageData {}
-    // interface PageState {}
-    // interface Platform {}
-  }
+const BASE_URL = env.BASE_URL;
+
+export async function fetchTextStream(query: string, langFrom, langTo) {
+  const payload = {
+    language_from: langFrom,
+    language_to: langTo,
+    source_code: query,
+  };
+
+  let url = `${BASE_URL}`;
+
+  return new SSE(url, {
+    headers: { "Content-Type": "application/json" },
+    payload: JSON.stringify(payload),
+  });
 }
-
-export {};
