@@ -275,7 +275,11 @@ def _run_service_test(example, service, test_suite_config):
     return output_folders
 
 
-def run_benchmark(benchmark_config, chart_name, namespace, llm_model="Qwen/Qwen2.5-Coder-7B-Instruct", report=False):
+def run_benchmark(benchmark_config, chart_name, namespace, llm_model=None, report=False):
+    # If llm_model is None or an empty string, set to default value
+    if not llm_model:
+        llm_model = "Qwen/Qwen2.5-Coder-7B-Instruct"
+
     # Extract data
     parsed_data = construct_benchmark_config(benchmark_config)
     test_suite_config = {
