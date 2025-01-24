@@ -180,4 +180,3 @@ Utilizes the open-source platform **Keycloak** for single sign-on identity and a
 
 - **[Keycloak Configuration Guide](./docker_compose/intel/cpu/xeon/keycloak_setup_guide.md)**: Instructions to set up Keycloak for identity and access management.
 - **[Xeon Guide](./docker_compose/intel/cpu/xeon/README.md)**: Instructions to build Docker images from source and run the application via Docker Compose.
-- **[Xeon Kubernetes Guide](./kubernetes/intel/README.md)**: Instructions to deploy the application via Kubernetes.
