@@ -92,7 +92,8 @@ def main(yaml_file, target_node=None):
     benchmark_config = config['benchmark']
 
     # Extract chart name from the YAML file name
-    chart_name = os.path.splitext(os.path.basename(yaml_file))[0]
+    chart_name = os.path.splitext(os.path.basename(yaml_file))[0].split('_')[-1]
+    print(f"chart_name: {chart_name}")
     python_cmd = sys.executable
 
     # Process nodes
