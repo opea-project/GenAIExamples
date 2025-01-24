@@ -15,8 +15,8 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 
-export HOST_IP=ip_address
-export HOST_IP_EXTERNAL=ip_address
+export HOST_IP=${ip_address}
+export HOST_IP_EXTERNAL=${ip_address}
 export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -204,7 +204,7 @@ function stop_docker() {
 
 function main() {
 
-#    stop_docker
+    stop_docker
 #    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
