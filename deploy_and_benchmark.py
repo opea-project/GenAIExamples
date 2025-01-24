@@ -14,8 +14,6 @@ from datetime import datetime
 
 import yaml
 
-eval_path = "/home/sdp/letong/GenAIEval/"
-sys.path.append(eval_path)
 from evals.benchmark.stresscli.commands.load_test import locust_runtests
 from kubernetes import client, config
 
@@ -53,8 +51,8 @@ def construct_benchmark_config(content):
         "totoal_query_num": test_suite_config.get("user_queries", []),
         "duration:": test_suite_config.get("duration:", []),
         "query_num_per_concurrency": test_suite_config.get("query_num_per_concurrency", []),
-        "possion": test_suite_config.get("possion", False),
-        "possion_arrival_rate": test_suite_config.get("possion_arrival_rate", 1.0),
+        "poisson": test_suite_config.get("poisson", False),
+        "poisson_arrival_rate": test_suite_config.get("poisson_arrival_rate", 1.0),
         "warmup_iterations": test_suite_config.get("warmup_iterations", 10),
         "seed": test_suite_config.get("seed", None),
         "dataset": test_suite_config.get("dataset", []),
@@ -201,9 +199,6 @@ def _create_stresscli_yaml(example, case_type, case_params, test_params, test_ph
         max_lines = dataset.split("pub_med")[-1]
         os.environ["DATASET"] = f"pubmed_{max_lines}.txt"
         os.environ["MAX_LINES"] = max_lines
-        print("================ max_lines ==================")
-        print(max_lines)
-        print("-----------------------------------------------")
 
     # Generate the content of stresscli configuration file
     stresscli_yaml = _create_yaml_content(case_params, base_url, bench_target, test_phase, num_queries, test_params)
@@ -328,12 +323,6 @@ def _run_service_test(example, service_type, service, test_suite_config):
         test_suite_config.get("service_port"),
         test_suite_config.get("namespace"),
     )
-    # svc_ip, port = "localhost", "8888"
-
-    print("=============== svc_ip, port ==================")
-    print(svc_ip)
-    print(port)
-    print("-----------------------------------------------")
 
     base_url = f"http://{svc_ip}:{port}"
     endpoint = service_endpoints[example]
@@ -348,10 +337,6 @@ def _run_service_test(example, service_type, service, test_suite_config):
         example, deployment_type, service_type, service, base_url, test_suite_config, timestamp
     )
 
-    print("============== run_yaml_paths =================")
-    print(run_yaml_paths)
-    print("-----------------------------------------------")
-
     # Run the test using locust_runtests function
     output_folders = []
     for index, run_yaml_path in enumerate(run_yaml_paths, start=1):
@@ -363,13 +348,10 @@ def _run_service_test(example, service_type, service, test_suite_config):
     return output_folders
 
 
-def run_benchmark(benchmark_config, report=False):
+def run_benchmark(benchmark_config, namespace, report=False):
     # Extract data
     parsed_data = construct_benchmark_config(benchmark_config)
     os.environ["MAX_TOKENS"] = str(parsed_data["llm_max_token_size"])
-    print("================ parsed data ==================")
-    print(parsed_data)
-    print("-----------------------------------------------")
     test_suite_config = {
         "user_queries": [1, 2, 4],  # num of user queries set to 1 by default
         "random_prompt": False,  # whether to use random prompt, set to False by default
@@ -379,7 +361,7 @@ def run_benchmark(benchmark_config, report=False):
         "deployment_type": "k8s",  # Default is "k8s", can also be "docker"
         "service_ip": None,  # Leave as None for k8s, specify for Docker
         "service_port": None,  # Leave as None for k8s, specify for Docker
-        "test_output_dir": "/home/sdp/letong/GenAIExamples/benchmark_output",  # The directory to store the test output
+        "test_output_dir": os.getcwd()+"/benchmark_output",  # The directory to store the test output
         "load_shape": {
             "name": "constant",
             "params": {"constant": {"concurrent_level": 4}, "poisson": {"arrival_rate": 1.0}},
@@ -387,15 +369,12 @@ def run_benchmark(benchmark_config, report=False):
         "concurrent_level": 4,
         "arrival_rate": 1.0,
         "query_timeout": 120,
-        "warm_ups": 0,
-        "seed": None,
-        "namespace": "default",
+        "warm_ups": parsed_data["warmup_iterations"],
+        "seed": parsed_data['seed'],
+        "namespace": namespace,
         "dataset": parsed_data["dataset"],
         "data_ratio": parsed_data["data_ratio"],
     }
-    print("============= test_suite_config ===============")
-    print(test_suite_config)
-    print("-----------------------------------------------")
 
     service_type = "e2e"
     dataset = None
@@ -417,9 +396,6 @@ def run_benchmark(benchmark_config, report=False):
         "max_output": 128,  # max number of output tokens
         "k": 1,  # number of retrieved documents
     }
-    print("================= case_data ===================")
-    print(case_data)
-    print("-----------------------------------------------")
     output_folder = _run_service_test(parsed_data["example_name"], service_type, case_data, test_suite_config)
     print(f"[OPEA BENCHMARK] 🚀 Test Finished. Output saved in {output_folder}.")
 
@@ -1058,7 +1034,7 @@ def deploy_and_benchmark(
                 print(f"Deployments status failed to start for {node} nodes with max_batch_size {max_batch_size}.")
 
             # run benchmark for current deployment
-            run_benchmark(benchmark_config)
+            run_benchmark(benchmark_config, namespace)
 
         except Exception as e:
             print(
