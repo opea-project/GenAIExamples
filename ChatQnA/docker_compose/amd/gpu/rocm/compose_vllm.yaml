@@ -39,7 +39,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${CHATQNA_EMBEDDING_MODEL_ID} --auto-truncate
   chatqna-retriever:
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: chatqna-retriever
     depends_on:
       - chatqna-redis-vector-db
