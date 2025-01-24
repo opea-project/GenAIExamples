@@ -123,10 +123,10 @@ function validate_microservices() {
 
     # tei for embedding service
     validate_service \
-        "${ip_address}:6006/embed" \
+        "${ip_address}:${CHATQNA_TEI_EMBEDDING_PORT}/embed" \
         "\[\[" \
         "tei-embedding" \
-        "tei-embedding-server" \
+        "chatqna-tei-embedding-service" \
         '{"inputs":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
@@ -134,36 +134,36 @@ function validate_microservices() {
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
-        "${ip_address}:7000/v1/retrieval" \
+        "${ip_address}:${CHATQNA_REDIS_RETRIEVER_PORT}/v1/retrieval" \
         " " \
         "retrieval" \
-        "retriever-redis-server" \
+        "chatqna-retriever" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
     validate_service \
-        "${ip_address}:8808/rerank" \
+        "${ip_address}:${CHATQNA_TEI_RERANKING_PORT}/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
-        "tei-reranking-server" \
+        "chatqna-tei-reranking-service" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
     # vllm for llm service
     validate_service \
-        "${ip_address}:9009/v1/chat/completions" \
+        "${ip_address}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions" \
         "content" \
         "vllm-llm" \
-        "vllm-service" \
+        "chatqna-vllm-service" \
         '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
-        "${ip_address}:8888/v1/chatqna" \
+        "${ip_address}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna" \
         "data" \
         "mega-chatqna" \
-        "chatqna-xeon-backend-server" \
+        "chatqna-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
