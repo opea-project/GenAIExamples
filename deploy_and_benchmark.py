@@ -7,6 +7,8 @@ import argparse
 import shutil
 import re
 
+from benchmark import run_benchmark
+
 def read_yaml(file_path):
     try:
         with open(file_path, 'r') as file:
@@ -220,7 +222,14 @@ def main(yaml_file, target_node=None):
                         except subprocess.CalledProcessError as e:
                             print(f"Depoyments status failed with returncode: {e.returncode}")
 
-                        # TODO: Here is to call benchmark
+                        # Run benchmark
+                        run_benchmark(
+                            benchmark_config=benchmark_config,
+                            chart_name=chart_name,
+                            namespace=namespace,
+                            llm_model=deploy_config.get('services', {}).get('llm', {}).get('model_id', "")
+                        )
+
 
                     except Exception as e:
                         print(f"Error during {'deployment' if i == 0 else 'update'} for {node} nodes with max_batch_size {max_batch_size}: {str(e)}")
