@@ -78,7 +78,8 @@ jobs:
               cd vllm && git rev-parse HEAD && cd ../
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
-               git clone --depth 1 --branch v0.6.4.post2+Gaudi-1.19.0 https://github.com/HabanaAI/vllm-fork.git
+              git clone --depth 1 --branch v0.6.4.post2+Gaudi-1.19.0 https://github.com/HabanaAI/vllm-fork.git
+              sed -i 's/triton/triton==3.1.0/g' vllm-fork/requirements-hpu.txt
           fi
           git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git rev-parse HEAD && cd ../
