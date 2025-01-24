@@ -1,0 +1,83 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+deploy:
+  device: gaudi
+  version: 1.1.0
+  modelUseHostPath: /mnt/models
+  HUGGINGFACEHUB_API_TOKEN: ""
+  node: [1, 2, 4, 8]
+  namespace: ""
+
+  services:
+    backend:
+      instance_num: [2, 2, 4, 8]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    teirerank:
+      enabled: True
+      model_id: ""
+      replicaCount: [1, 1, 1, 1]
+      cards_per_instance: 1
+
+    tei:
+      model_id: ""
+      replicaCount: [1, 2, 4, 8]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    llm:
+      engine: tgi
+      model_id: ""
+      replicaCount: [7, 15, 31, 63]
+      max_batch_size: [1, 2, 4, 8]
+      max_input_length: ""
+      max_total_tokens: ""
+      max_batch_total_tokens: ""
+      max_batch_prefill_tokens: ""
+      cards_per_instance: 1
+
+    data-prep:
+      replicaCount: [1, 1, 1, 1]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    retriever-usvc:
+      replicaCount: [2, 2, 4, 8]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    redis-vector-db:
+      replicaCount: [1, 1, 1, 1]
+      cores_per_instance: ""
+      memory_capacity: ""
+
+    chatqna-ui:
+      replicaCount: [1, 1, 1, 1]
+
+    nginx:
+      replicaCount: [1, 1, 1, 1]
+
+benchmark:
+  # http request behavior related fields
+  concurrency:               [1, 2, 4]
+  totoal_query_num:          [2048, 4096]
+  duration:                  [5, 10] # unit minutes
+  query_num_per_concurrency: [4, 8, 16]
+  possion:                   True
+  possion_arrival_rate:      1.0
+  warmup_iterations:         10
+  seed:                      1024
+
+  # workload, all of the test cases will run for benchmark
+  test_cases:
+    - chatqnafixed
+    - chatqna_qlist_pubmed:
+        dataset: pub_med10  # pub_med10, pub_med100, pub_med1000
+  user_queries:              [1, 2, 4]
+  query_token_size:          128                   # if specified, means fixed query token size will be sent out
+
+  llm:
+    # specify the llm output token size
+    max_token_size:          [128, 256]
