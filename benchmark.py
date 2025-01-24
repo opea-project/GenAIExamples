@@ -3,12 +3,11 @@
 
 import os
 import sys
-import yaml
 from datetime import datetime
-from kubernetes import client, config
 
+import yaml
 from evals.benchmark.stresscli.commands.load_test import locust_runtests
-
+from kubernetes import client, config
 
 # only support chatqna for now
 service_endpoints = {
@@ -111,6 +110,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
         concurrency = test_params["concurrent_level"]
 
     import importlib.util
+
     package_name = "opea-eval"
     spec = importlib.util.find_spec(package_name)
     print(spec)
@@ -118,11 +118,12 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
     # get folder path of opea-eval
     eval_path = None
     import pkg_resources
+
     for dist in pkg_resources.working_set:
-        if 'opea-eval' in dist.project_name:
+        if "opea-eval" in dist.project_name:
             eval_path = dist.location
     if not eval_path:
-        print(f"Fail to load opea-eval package. Please install it first.")
+        print("Fail to load opea-eval package. Please install it first.")
         exit(1)
 
     yaml_content = {
@@ -157,9 +158,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
     return yaml_content
 
 
-def _create_stresscli_confs(
-        case_params, test_params, test_phase, num_queries, base_url, ts
-) -> str:
+def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, base_url, ts) -> str:
     """Create a stresscli configuration file and persist it on disk."""
     stresscli_confs = []
     # Get the workload
@@ -173,9 +172,8 @@ def _create_stresscli_confs(
             bench_target = list(test_case.keys())[0]
             dataset_conf = test_case[bench_target]
         if bench_target == "chatqna_qlist_pubmed":
-            max_lines = dataset_conf['dataset'].split("pub_med")[-1]
-            stresscli_conf['envs'] = {'DATASET': f"pubmed_{max_lines}.txt",
-                                      'MAX_LINES': max_lines}
+            max_lines = dataset_conf["dataset"].split("pub_med")[-1]
+            stresscli_conf["envs"] = {"DATASET": f"pubmed_{max_lines}.txt", "MAX_LINES": max_lines}
         # Generate the content of stresscli configuration file
         stresscli_yaml = _create_yaml_content(case_params, base_url, bench_target, test_phase, num_queries, test_params)
 
@@ -186,7 +184,7 @@ def _create_stresscli_confs(
         )
         with open(run_yaml_path, "w") as yaml_file:
             yaml.dump(stresscli_yaml, yaml_file)
-        stresscli_conf['run_yaml_path'] = run_yaml_path
+        stresscli_conf["run_yaml_path"] = run_yaml_path
         stresscli_confs.append(stresscli_conf)
     return stresscli_confs
 
@@ -200,28 +198,18 @@ def create_stresscli_confs(service, base_url, test_suite_config, index):
     # Add YAML configuration of stresscli for warm-ups
     warm_ups = test_suite_config["warm_ups"]
     if warm_ups is not None and warm_ups > 0:
-        stresscli_confs.extend(
-            _create_stresscli_confs(
-                service, test_suite_config, "warmup", warm_ups, base_url, index
-            )
-        )
+        stresscli_confs.extend(_create_stresscli_confs(service, test_suite_config, "warmup", warm_ups, base_url, index))
 
     # Add YAML configuration of stresscli for benchmark
     user_queries_lst = test_suite_config["user_queries"]
     if user_queries_lst is None or len(user_queries_lst) == 0:
         # Test stop is controlled by run time
-        stresscli_confs.extend(
-            _create_stresscli_confs(
-                service, test_suite_config, "benchmark", -1, base_url, index
-            )
-        )
+        stresscli_confs.extend(_create_stresscli_confs(service, test_suite_config, "benchmark", -1, base_url, index))
     else:
         # Test stop is controlled by request count
         for user_queries in user_queries_lst:
             stresscli_confs.extend(
-                _create_stresscli_confs(
-                    service, test_suite_config, "benchmark", user_queries, base_url, index
-                )
+                _create_stresscli_confs(service, test_suite_config, "benchmark", user_queries, base_url, index)
             )
 
     return stresscli_confs
@@ -243,7 +231,7 @@ def _run_service_test(example, service, test_suite_config):
         deployment_type,
         test_suite_config.get("service_ip"),
         test_suite_config.get("service_port"),
-        test_suite_config.get("namespace")
+        test_suite_config.get("namespace"),
     )
 
     base_url = f"http://{svc_ip}:{port}"
@@ -255,18 +243,16 @@ def _run_service_test(example, service, test_suite_config):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Create the run.yaml for the service
-    stresscli_confs = create_stresscli_confs(
-        service, base_url, test_suite_config, timestamp
-    )
+    stresscli_confs = create_stresscli_confs(service, base_url, test_suite_config, timestamp)
 
     # Do benchmark in for-loop for different user queries
     output_folders = []
     for index, stresscli_conf in enumerate(stresscli_confs, start=1):
-        run_yaml_path = stresscli_conf['run_yaml_path']
+        run_yaml_path = stresscli_conf["run_yaml_path"]
         print(f"[OPEA BENCHMARK] 🚀 The {index} time test is running, run yaml: {run_yaml_path}...")
-        os.environ['MAX_TOKENS'] = str(service.get("max_output"))
-        if stresscli_conf.get('envs') is not None:
-            for key, value in stresscli_conf.get('envs').items():
+        os.environ["MAX_TOKENS"] = str(service.get("max_output"))
+        if stresscli_conf.get("envs") is not None:
+            for key, value in stresscli_conf.get("envs").items():
                 os.environ[key] = value
 
         output_folders.append(locust_runtests(None, run_yaml_path))
@@ -283,7 +269,7 @@ def run_benchmark(benchmark_config, chart_name, namespace, llm_model=None, repor
     # Extract data
     parsed_data = construct_benchmark_config(benchmark_config)
     test_suite_config = {
-        "user_queries": parsed_data['user_queries'],  # num of user queries
+        "user_queries": parsed_data["user_queries"],  # num of user queries
         "random_prompt": False,  # whether to use random prompt, set to False by default
         "run_time": "60m",  # The max total run time for the test suite, set to 60m by default
         "collect_service_metric": False,  # whether to collect service metrics, set to False by default
@@ -292,23 +278,25 @@ def run_benchmark(benchmark_config, chart_name, namespace, llm_model=None, repor
         "service_ip": None,  # Leave as None for k8s, specify for Docker
         "service_port": None,  # Leave as None for k8s, specify for Docker
         "test_output_dir": os.getcwd() + "/benchmark_output",  # The directory to store the test output
-        "load_shape": {"name": "constant",
-                       "params": {"constant": {"concurrent_level": 4}, "poisson": {"arrival_rate": 1.0}}},
+        "load_shape": {
+            "name": "constant",
+            "params": {"constant": {"concurrent_level": 4}, "poisson": {"arrival_rate": 1.0}},
+        },
         "concurrent_level": 4,
         "arrival_rate": 1.0,
         "query_timeout": 120,
-        "warm_ups": parsed_data['warmup_iterations'],
-        "seed": parsed_data['seed'],
+        "warm_ups": parsed_data["warmup_iterations"],
+        "seed": parsed_data["seed"],
         "namespace": namespace,
         "test_cases": parsed_data["test_cases"],
-        "llm_max_token_size": parsed_data['llm_max_token_size']
+        "llm_max_token_size": parsed_data["llm_max_token_size"],
     }
 
     dataset = None
     query_data = None
 
     # Do benchmark in for-loop for different llm_max_token_size
-    for llm_max_token in parsed_data['llm_max_token_size']:
+    for llm_max_token in parsed_data["llm_max_token_size"]:
         print(f"[OPEA BENCHMARK] 🚀 Run benchmark on {dataset} with llm max-output-token {llm_max_token}.")
         case_data = {}
         # Support chatqna only for now
@@ -325,13 +313,13 @@ def run_benchmark(benchmark_config, chart_name, namespace, llm_model=None, repor
                     "chatqna-retriever-usvc",
                     "chatqna-tei",
                     "chatqna-teirerank",
-                    "chatqna-tgi"
+                    "chatqna-tgi",
                 ],
                 "test_cases": parsed_data["test_cases"],
                 # Activate if random_prompt=true: leave blank = default dataset(WebQuestions) or sharegpt
                 "prompts": query_data,
                 "max_output": llm_max_token,  # max number of output tokens
-                "k": 1  # number of retrieved documents
+                "k": 1,  # number of retrieved documents
             }
         output_folder = _run_service_test(chart_name, case_data, test_suite_config)
 
@@ -352,8 +340,4 @@ def run_benchmark(benchmark_config, chart_name, namespace, llm_model=None, repor
 
 if __name__ == "__main__":
     benchmark_config = load_yaml("./benchmark.yaml")
-    run_benchmark(
-        benchmark_config=benchmark_config, 
-        chart_name='chatqna',
-        namespace='deploy-benchmark'
-    )
+    run_benchmark(benchmark_config=benchmark_config, chart_name="chatqna", namespace="deploy-benchmark")

@@ -21,6 +21,7 @@ We aim to run these benchmarks and share them with the OPEA community for three 
 Before running the benchmarks, ensure you have:
 
 1. **Kubernetes Environment**
+
    - Kubernetes installation: Use [kubespray](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md) or other official Kubernetes installation guides
    - (Optional) [Kubernetes set up guide on Intel Gaudi product](https://github.com/opea-project/GenAIInfra/blob/main/README.md#setup-kubernetes-cluster)
 
@@ -32,6 +33,7 @@ Before running the benchmarks, ensure you have:
 Before running benchmarks, you need to:
 
 1. **Prepare Test Data**
+
    - Download the retrieval file:
      ```bash
      wget https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/data/upload_file.txt
@@ -55,6 +57,7 @@ The benchmarking process consists of two main components: deployment and benchma
 The script `deploy_and_benchmark.py` serves as the main entry point. Here's an example using ChatQnA configuration (you can replace it with any other example's configuration YAML file):
 
 1. For a specific number of nodes:
+
    ```bash
    python deploy_and_benchmark.py ./ChatQnA/benchmark_chatqna.yaml --target-node 1
    ```

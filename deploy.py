@@ -8,16 +8,16 @@ import os
 import subprocess
 import sys
 import time
+from enum import Enum, auto
 
 import yaml
-
-from enum import Enum, auto
 
 ################################################################################
 #                                                                              #
 #                        HELM VALUES GENERATION SECTION                        #
 #                                                                              #
 ################################################################################
+
 
 def configure_node_selectors(values, node_selector, deploy_config):
     """Configure node selectors for all services."""
@@ -30,6 +30,7 @@ def configure_node_selectors(values, node_selector, deploy_config):
         else:
             values[service_name] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
     return values
+
 
 def configure_replica(values, deploy_config):
     """Get replica configuration based on example type and node count."""
@@ -47,12 +48,14 @@ def configure_replica(values, deploy_config):
 
     return values
 
+
 def get_output_filename(num_nodes, with_rerank, example_type, device, action_type):
     """Generate output filename based on configuration."""
     rerank_suffix = "with-rerank-" if with_rerank else ""
     action_suffix = "deploy-" if action_type == 0 else "update-" if action_type == 1 else ""
 
     return f"{example_type}-{num_nodes}-{device}-{action_suffix}{rerank_suffix}values.yaml"
+
 
 def configure_resources(values, deploy_config):
     """Configure resources when tuning is enabled."""
@@ -87,15 +90,19 @@ def configure_resources(values, deploy_config):
         if resources:
             if service_name == "llm":
                 engine = config.get("engine", "tgi")
-                resource_configs.append({
-                    "name": engine,
-                    "resources": resources,
-                })
+                resource_configs.append(
+                    {
+                        "name": engine,
+                        "resources": resources,
+                    }
+                )
             else:
-                resource_configs.append({
-                    "name": service_name,
-                    "resources": resources,
-                })
+                resource_configs.append(
+                    {
+                        "name": service_name,
+                        "resources": resources,
+                    }
+                )
 
     for config in [r for r in resource_configs if r]:
         service_name = config["name"]
@@ -106,13 +113,19 @@ def configure_resources(values, deploy_config):
 
     return values
 
+
 def configure_extra_cmd_args(values, deploy_config):
     """Configure extra command line arguments for services."""
     for service_name, config in deploy_config["services"].items():
         extra_cmd_args = []
 
-        for param in ["max_batch_size", "max_input_length", "max_total_tokens",
-                     "max_batch_total_tokens", "max_batch_prefill_tokens"]:
+        for param in [
+            "max_batch_size",
+            "max_input_length",
+            "max_total_tokens",
+            "max_batch_total_tokens",
+            "max_batch_prefill_tokens",
+        ]:
             if config.get(param):
                 extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(config[param])])
 
@@ -128,6 +141,7 @@ def configure_extra_cmd_args(values, deploy_config):
                 values[service_name]["extraCmdArgs"] = extra_cmd_args
 
     return values
+
 
 def configure_models(values, deploy_config):
     """Configure model settings for services."""
@@ -147,8 +161,9 @@ def configure_models(values, deploy_config):
 
     return values
 
+
 def configure_rerank(values, with_rerank, deploy_config, example_type, node_selector):
-    """Configure rerank service"""
+    """Configure rerank service."""
     if with_rerank:
         if "teirerank" not in values:
             values["teirerank"] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
@@ -163,6 +178,7 @@ def configure_rerank(values, with_rerank, deploy_config, example_type, node_sele
             values["teirerank"]["enabled"] = False
     return values
 
+
 def generate_helm_values(example_type, deploy_config, chart_dir, action_type, node_selector=None):
     """Create a values.yaml file based on the provided configuration."""
     if deploy_config is None:
@@ -170,10 +186,7 @@ def generate_helm_values(example_type, deploy_config, chart_dir, action_type, no
 
     # Ensure the chart_dir exists
     if not os.path.exists(chart_dir):
-        return {
-            "status": "false",
-            "message": f"Chart directory {chart_dir} does not exist"
-        }
+        return {"status": "false", "message": f"Chart directory {chart_dir} does not exist"}
 
     num_nodes = deploy_config.get("node", 1)
     with_rerank = deploy_config["services"].get("teirerank", {}).get("enabled", False)
@@ -214,11 +227,13 @@ def generate_helm_values(example_type, deploy_config, chart_dir, action_type, no
     print(f"YAML file {filepath} has been generated.")
     return {"status": "success", "filepath": filepath}
 
+
 ################################################################################
 #                                                                              #
 #                            DEPLOYMENT SECTION                                #
 #                                                                              #
 ################################################################################
+
 
 def run_kubectl_command(command):
     """Run a kubectl command and return the output."""
@@ -388,14 +403,14 @@ def uninstall_helm_release(release_name, namespace=None):
 
 def update_service(release_name, chart_name, namespace, hw_values_file, deploy_values_file, update_values_file):
     """Update the deployment using helm upgrade with new values.
-    
+
     Args:
         release_name: The helm release name
         namespace: The kubernetes namespace
         deploy_config: The deployment configuration
         chart_name: The chart name for the deployment
     """
- 
+
     # Construct helm upgrade command
     command = [
         "helm",
@@ -409,13 +424,13 @@ def update_service(release_name, chart_name, namespace, hw_values_file, deploy_v
         "-f",
         deploy_values_file,
         "-f",
-        update_values_file
+        update_values_file,
     ]
     # Execute helm upgrade
     print(f"Running command: {' '.join(command)}")
     run_kubectl_command(command)
-    print(f"Deployment updated successfully")
-        
+    print("Deployment updated successfully")
+
 
 def read_deploy_config(config_path):
     """Read and parse the deploy config file.
@@ -427,7 +442,7 @@ def read_deploy_config(config_path):
         The parsed deploy config dictionary or None if failed
     """
     try:
-        with open(config_path, 'r') as f:
+        with open(config_path, "r") as f:
             return yaml.safe_load(f)
     except Exception as e:
         print(f"Failed to load deploy config: {str(e)}")
@@ -464,19 +479,16 @@ def check_deployment_ready(release_name, namespace, timeout=300, interval=5, log
         # Loop through each deployment to check its readiness
         for deployment_name in deployments:
 
-            if '-' not in deployment_name or 'ui' in deployment_name or 'nginx' in deployment_name:
+            if "-" not in deployment_name or "ui" in deployment_name or "nginx" in deployment_name:
                 continue
 
-            instance_name = deployment_name.split('-', 1)[0]
-            app_name = deployment_name.split('-', 1)[1]
+            instance_name = deployment_name.split("-", 1)[0]
+            app_name = deployment_name.split("-", 1)[1]
 
             if instance_name != release_name:
                 continue
 
-            cmd = [
-                "kubectl", "-n", namespace, "get", "deployment", deployment_name,
-                "-o", "jsonpath={.spec.replicas}"
-            ]
+            cmd = ["kubectl", "-n", namespace, "get", "deployment", deployment_name, "-o", "jsonpath={.spec.replicas}"]
             desired_replicas = int(subprocess.check_output(cmd, text=True).strip())
 
             with open(logfile, "a") as log:
@@ -484,24 +496,37 @@ def check_deployment_ready(release_name, namespace, timeout=300, interval=5, log
 
             while True:
                 cmd = [
-                    "kubectl", "-n", namespace, "get", "pods",
-                    "-l", f"app.kubernetes.io/instance={instance_name}",
-                    "-l", f"app.kubernetes.io/name={app_name}",
-                    "--field-selector=status.phase=Running", "-o", "json"
+                    "kubectl",
+                    "-n",
+                    namespace,
+                    "get",
+                    "pods",
+                    "-l",
+                    f"app.kubernetes.io/instance={instance_name}",
+                    "-l",
+                    f"app.kubernetes.io/name={app_name}",
+                    "--field-selector=status.phase=Running",
+                    "-o",
+                    "json",
                 ]
 
                 pods_output = subprocess.check_output(cmd, text=True)
                 pods = json.loads(pods_output)
 
                 ready_pods = sum(
-                    1 for pod in pods["items"] if
-                    all(container.get('ready') for container in pod.get('status', {}).get('containerStatuses', []))
+                    1
+                    for pod in pods["items"]
+                    if all(container.get("ready") for container in pod.get("status", {}).get("containerStatuses", []))
                 )
 
-                terminating_pods = sum(1 for pod in pods["items"] if pod.get("metadata", {}).get("deletionTimestamp") is not None)
+                terminating_pods = sum(
+                    1 for pod in pods["items"] if pod.get("metadata", {}).get("deletionTimestamp") is not None
+                )
 
                 with open(logfile, "a") as log:
-                    log.write(f"Ready pods: {ready_pods}, Desired replicas: {desired_replicas}, Terminating pods: {terminating_pods}\n")
+                    log.write(
+                        f"Ready pods: {ready_pods}, Desired replicas: {desired_replicas}, Terminating pods: {terminating_pods}\n"
+                    )
 
                 if ready_pods == desired_replicas and terminating_pods == 0:
                     with open(logfile, "a") as log:
@@ -510,7 +535,9 @@ def check_deployment_ready(release_name, namespace, timeout=300, interval=5, log
 
                 if timer >= timeout:
                     with open(logfile, "a") as log:
-                        log.write(f"Timeout reached for deployment '{deployment_name}'. Not all pods are running and ready.\n")
+                        log.write(
+                            f"Timeout reached for deployment '{deployment_name}'. Not all pods are running and ready.\n"
+                        )
                     return 1  # Failure
 
                 time.sleep(interval)
@@ -606,7 +633,7 @@ def main():
             example_type=args.chart_name,
             deploy_config=deploy_config,
             chart_dir=args.chart_dir,
-            action_type=action_type, # 0 - deploy, 1 - update
+            action_type=action_type,  # 0 - deploy, 1 - update
             node_selector=node_selector,
         )
 
@@ -630,12 +657,7 @@ def main():
 
         try:
             update_service(
-                args.chart_name,
-                args.chart_name,
-                args.namespace,
-                hw_values_file,
-                args.user_values,
-                values_file_path
+                args.chart_name, args.chart_name, args.namespace, hw_values_file, args.user_values, values_file_path
             )
             return
         except Exception as e:
@@ -644,13 +666,7 @@ def main():
 
     # Deploy unless --create-values-only is specified
     if not args.create_values_only:
-        install_helm_release(
-            args.chart_name,
-            args.chart_name,
-            args.namespace,
-            hw_values_file,
-            values_file_path
-        )
+        install_helm_release(args.chart_name, args.chart_name, args.namespace, hw_values_file, values_file_path)
         print(f"values_file_path: {values_file_path}")
 
 

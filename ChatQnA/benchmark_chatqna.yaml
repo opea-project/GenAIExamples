@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 deploy:
   device: gaudi
   version: 1.1.0
@@ -68,9 +71,9 @@ benchmark:
   seed:                      1024
 
   # workload, all of the test cases will run for benchmark
-  test_cases: 
-    - chatqnafixed  
-    - chatqna_qlist_pubmed:     
+  test_cases:
+    - chatqnafixed
+    - chatqna_qlist_pubmed:
         dataset: pub_med10  # pub_med10, pub_med100, pub_med1000
   user_queries:              [1, 2, 4]
   query_token_size:          128                   # if specified, means fixed query token size will be sent out
