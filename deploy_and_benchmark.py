@@ -13,7 +13,6 @@ import time
 from datetime import datetime
 
 import yaml
-
 from evals.benchmark.stresscli.commands.load_test import locust_runtests
 from kubernetes import client, config
 
@@ -361,7 +360,7 @@ def run_benchmark(benchmark_config, namespace, report=False):
         "deployment_type": "k8s",  # Default is "k8s", can also be "docker"
         "service_ip": None,  # Leave as None for k8s, specify for Docker
         "service_port": None,  # Leave as None for k8s, specify for Docker
-        "test_output_dir": os.getcwd()+"/benchmark_output",  # The directory to store the test output
+        "test_output_dir": os.getcwd() + "/benchmark_output",  # The directory to store the test output
         "load_shape": {
             "name": "constant",
             "params": {"constant": {"concurrent_level": 4}, "poisson": {"arrival_rate": 1.0}},
@@ -370,7 +369,7 @@ def run_benchmark(benchmark_config, namespace, report=False):
         "arrival_rate": 1.0,
         "query_timeout": 120,
         "warm_ups": parsed_data["warmup_iterations"],
-        "seed": parsed_data['seed'],
+        "seed": parsed_data["seed"],
         "namespace": namespace,
         "dataset": parsed_data["dataset"],
         "data_ratio": parsed_data["data_ratio"],
