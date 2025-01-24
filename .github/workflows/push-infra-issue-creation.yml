@@ -54,6 +54,6 @@ jobs:
 
             ${{ env.changed_files }}
 
-            Please verify if the helm charts and manifests need to be changed accordingly.
+            Please verify if the helm charts need to be changed accordingly.
 
             > This issue was created automatically by CI.
