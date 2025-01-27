@@ -24,7 +24,6 @@ services:
       VDMS_PORT: ${VDMS_PORT}
       INDEX_NAME: ${INDEX_NAME}
       MULTIMODAL_DATAPREP: true
-    entrypoint: sh -c 'sleep 15 && python ingest_videos.py'
     volumes:
       - /home/$USER/.cache/clip:/home/user/.cache/clip
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
