@@ -10,6 +10,8 @@ Quick Start:
 2. Run Docker Compose.
 3. Consume the ChatQnA Service.
 
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+
 ## Quick Start: 1.Setup Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
@@ -113,7 +115,7 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 ### 2. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 cd ..
 ```
 
@@ -168,7 +170,7 @@ docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-a
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `opea/dataprep-redis:latest`
+1. `opea/dataprep:latest`
 2. `opea/retriever:latest`
 3. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest`
 4. `opea/chatqna-ui:latest`
@@ -180,11 +182,11 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
 
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
+| Service   | Model                               |
+| --------- | ----------------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5               |
+| Reranking | BAAI/bge-reranker-base              |
+| LLM       | meta-llama/Meta-Llama-3-8B-Instruct |
 
 Change the `xxx_MODEL_ID` below for your needs.
 
@@ -195,7 +197,7 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
-   model_name="Intel/neural-chat-7b-v3-3"
+   model_name="meta-llama/Meta-Llama-3-8B-Instruct"
    # Start vLLM LLM Service
    docker run -p 8008:80 -v ./data:/data --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
    # Start TGI LLM Service
@@ -204,7 +206,7 @@ For users in China who are unable to download models directly from Huggingface, 
 
 2. Offline
 
-   - Search your model name in ModelScope. For example, check [this page](https://www.modelscope.cn/models/ai-modelscope/neural-chat-7b-v3-1/files) for model `neural-chat-7b-v3-1`.
+   - Search your model name in ModelScope. For example, check [this page](https://modelscope.cn/models/LLM-Research/Meta-Llama-3-8B-Instruct/files) for model `Meta-Llama-3-8B-Instruct`.
 
    - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
 
@@ -278,7 +280,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 1. TEI Embedding Service
 
    ```bash
-   curl ${host_ip}:6006/embed \
+   curl http://${host_ip}:6006/embed \
        -X POST \
        -d '{"inputs":"What is Deep Learning?"}' \
        -H 'Content-Type: application/json'
@@ -337,7 +339,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
    # either vLLM or TGI service
    curl http://${host_ip}:9009/v1/chat/completions \
      -X POST \
-     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 
@@ -372,7 +374,7 @@ wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrie
 Upload:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F "files=@./nke-10k-2023.pdf"
 ```
@@ -382,7 +384,7 @@ This command updates a knowledge base by uploading a local file for processing. 
 Add Knowledge Base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 ```
@@ -392,7 +394,7 @@ This command updates a knowledge base by submitting a list of HTTP links for pro
 Also, you are able to get the file list that you uploaded:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
      -H "Content-Type: application/json"
 ```
 
@@ -417,21 +419,21 @@ Then you will get the response JSON like this. Notice that the returned `name`/`
 
 To delete the file/link you uploaded:
 
-The `file_path` here should be the `id` get from `/v1/dataprep/get_file` API.
+The `file_path` here should be the `id` get from `/v1/dataprep/get` API.
 
 ```bash
 # delete link
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "https://opea.dev.txt"}' \
      -H "Content-Type: application/json"
 
 # delete file
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "nke-10k-2023.pdf"}' \
      -H "Content-Type: application/json"
 
 # delete all uploaded files and links
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```
@@ -450,7 +452,7 @@ Users could follow previous section to testing vLLM microservice or ChatQnA Mega
 ```bash
 curl http://${host_ip}:9009/start_profile \
   -H "Content-Type: application/json" \
-  -d '{"model": "Intel/neural-chat-7b-v3-3"}'
+  -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct"}'
 ```
 
 Users would see below docker logs from vllm-service if profiling is started correctly.
@@ -473,7 +475,7 @@ By following command, users could stop vLLM profliing and generate a \*.pt.trace
 # vLLM Service
 curl http://${host_ip}:9009/stop_profile \
   -H "Content-Type: application/json" \
-  -d '{"model": "Intel/neural-chat-7b-v3-3"}'
+  -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct"}'
 ```
 
 Users would see below docker logs from vllm-service if profiling is stopped correctly.

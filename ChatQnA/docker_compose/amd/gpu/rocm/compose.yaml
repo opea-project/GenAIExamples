@@ -9,13 +9,13 @@ services:
       - "${CHATQNA_REDIS_VECTOR_PORT}:6379"
       - "${CHATQNA_REDIS_VECTOR_INSIGHT_PORT}:8001"
   chatqna-dataprep-redis-service:
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
       - chatqna-redis-vector-db
       - chatqna-tei-embedding-service
     ports:
-      - "${CHATQNA_REDIS_DATAPREP_PORT}:6007"
+      - "${CHATQNA_REDIS_DATAPREP_PORT}:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -78,7 +78,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     devices:
@@ -100,7 +100,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     volumes:

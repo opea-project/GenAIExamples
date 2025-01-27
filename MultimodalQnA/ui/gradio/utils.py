@@ -126,7 +126,7 @@ def make_temp_image(
     output_image_name: str = "image_tmp",
 ):
     Path(output_image_path).mkdir(parents=True, exist_ok=True)
-    output_image = os.path.join(output_image_path, "{}.{}".format(output_image_name, file_ext))
+    output_image = os.path.join(output_image_path, "{}{}".format(output_image_name, file_ext))
     shutil.copy(image_name, output_image)
     return output_image
 
