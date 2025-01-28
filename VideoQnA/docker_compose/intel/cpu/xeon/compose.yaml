@@ -30,7 +30,7 @@ services:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   embedding:
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
-    container_name: embedding-multimodal-server
+    container_name: clip-embedding-server
     ports:
       - "6000:5000"
     ipc: host
@@ -38,8 +38,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      MULTIMODAL_EMBEDDING: true
-      EMBEDDING_COMPONENT_NAME: "OPEA_MULTIMODAL_EMBEDDING_CLIP"
+      EMBEDDING_COMPONENT_NAME: "OPEA_CLIP_EMBEDDING"
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
     restart: unless-stopped
