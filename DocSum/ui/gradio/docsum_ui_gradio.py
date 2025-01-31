@@ -322,7 +322,7 @@ if __name__ == "__main__":
     logger.info(">>> Starting server at %s:%d", args.host, args.port)
 
     # Needed for UnstructuredURLLoader when reading content from a URL
-    nltk.download('punkt_tab')
-    nltk.download('averaged_perceptron_tagger_eng')
+    nltk.download("punkt_tab")
+    nltk.download("averaged_perceptron_tagger_eng")
 
     uvicorn.run(app, host=args.host, port=args.port)
