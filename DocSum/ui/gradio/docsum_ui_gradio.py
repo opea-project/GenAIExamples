@@ -312,6 +312,7 @@ app = gr.mount_gradio_app(app, demo, path="/")
 
 if __name__ == "__main__":
     import argparse
+
     import nltk
 
     parser = argparse.ArgumentParser()
