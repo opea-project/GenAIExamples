@@ -312,6 +312,7 @@ app = gr.mount_gradio_app(app, demo, path="/")
 
 if __name__ == "__main__":
     import argparse
+
     import nltk
 
     parser = argparse.ArgumentParser()
@@ -320,6 +321,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     logger.info(">>> Starting server at %s:%d", args.host, args.port)
-    nltk.download('punkt_tab')
-    nltk.download('averaged_perceptron_tagger_eng')
+    nltk.download("punkt_tab")
+    nltk.download("averaged_perceptron_tagger_eng")
     uvicorn.run(app, host=args.host, port=args.port)
