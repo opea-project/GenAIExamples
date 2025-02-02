@@ -89,7 +89,6 @@ services:
       no_proxy: ${no_proxy}
       llm_download: ${LLM_DOWNLOAD}
     volumes:
-      - "/home/$USER/.cache:/home/user/.cache"
       - video-llama-model:/home/user/model
     restart: unless-stopped
   lvm:
