@@ -28,7 +28,7 @@ services:
       context: GenAIComps
       dockerfile: comps/embeddings/src/Dockerfile
     extends: videoqna
-    image: ${REGISTRY:-opea}//embedding:${TAG:-latest}
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
   retriever:
     build:
       context: GenAIComps
