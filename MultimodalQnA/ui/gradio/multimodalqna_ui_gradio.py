@@ -430,28 +430,27 @@ def hide_text(request: gr.Request):
 def clear_text(request: gr.Request):
     return None
 
+
 def get_files():
     try:
         response = requests.post(dataprep_get_file_addr, headers=headers)
         logger.info(response.status_code)
         files = response.json()
         html_content = "<ul>" + "".join(f"<li>{item}</li>" for item in files) + "</ul>"
-        yield (
-            gr.HTML(html_content, visible=True, max_height=200)
-        )
+        yield (gr.HTML(html_content, visible=True, max_height=200))
         return
     except Exception as e:
         logger.info(f"Error getting files from vector store: {str(e)}")
-        
+
+
 def delete_files():
     import json
-    data = { "file_path": "all" }
+
+    data = {"file_path": "all"}
     try:
         response = requests.post(dataprep_delete_file_addr, headers=headers, data=json.dumps(data))
         logger.info(response.status_code)
-        yield (
-            gr.update(value="Deleted all files!")
-        )
+        yield (gr.update(value="Deleted all files!"))
         return
     except Exception as e:
         logger.info(f"Error deleting files from vector store: {str(e)}")
@@ -606,7 +605,7 @@ with gr.Blocks() as qna:
 
 with gr.Blocks() as vector_store:
     gr.Markdown("# Uploaded Files")
-    
+
     with gr.Row():
         with gr.Column(scale=6):
             files = gr.HTML(visible=False)
@@ -615,7 +614,7 @@ with gr.Blocks() as vector_store:
             delete_btn = gr.Button(value="🗑️ Delete", interactive=True, variant="stop")
         refresh_btn.click(get_files, None, [files])
         delete_btn.click(delete_files, None, [files])
-    
+
 with gr.Blocks(css=css) as demo:
     gr.Markdown("# MultimodalQnA")
     with gr.Tabs():
