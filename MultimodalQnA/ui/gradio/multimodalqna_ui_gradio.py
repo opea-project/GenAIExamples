@@ -430,6 +430,32 @@ def hide_text(request: gr.Request):
 def clear_text(request: gr.Request):
     return None
 
+def get_files():
+    try:
+        response = requests.post(dataprep_get_file_addr, headers=headers)
+        logger.info(response.status_code)
+        files = response.json()
+        html_content = "<ul>" + "".join(f"<li>{item}</li>" for item in files) + "</ul>"
+        yield (
+            gr.HTML(html_content, visible=True, max_height=200)
+        )
+        return
+    except Exception as e:
+        logger.info(f"Error getting files from vector store: {str(e)}")
+        
+def delete_files():
+    import json
+    data = { "file_path": "all" }
+    try:
+        response = requests.post(dataprep_delete_file_addr, headers=headers, data=json.dumps(data))
+        logger.info(response.status_code)
+        yield (
+            gr.update(value="Deleted all files!")
+        )
+        return
+    except Exception as e:
+        logger.info(f"Error deleting files from vector store: {str(e)}")
+
 
 with gr.Blocks() as upload_video:
     gr.Markdown("# Ingest Videos Using Generated Transcripts or Captions")
@@ -577,6 +603,19 @@ with gr.Blocks() as qna:
         ],
         [state, chatbot, video, image, pdf, clear_btn],
     )
+
+with gr.Blocks() as vector_store:
+    gr.Markdown("# Uploaded Files")
+    
+    with gr.Row():
+        with gr.Column(scale=6):
+            files = gr.HTML(visible=False)
+        with gr.Column(scale=3):
+            refresh_btn = gr.Button(value="↻ Refresh", interactive=True, variant="primary")
+            delete_btn = gr.Button(value="🗑️ Delete", interactive=True, variant="stop")
+        refresh_btn.click(get_files, None, [files])
+        delete_btn.click(delete_files, None, [files])
+    
 with gr.Blocks(css=css) as demo:
     gr.Markdown("# MultimodalQnA")
     with gr.Tabs():
@@ -590,6 +629,8 @@ with gr.Blocks(css=css) as demo:
             upload_audio.render()
         with gr.TabItem("Upload PDF"):
             upload_pdf.render()
+        with gr.TabItem("Vector Store"):
+            vector_store.render()
 
 demo.queue()
 app = gr.mount_gradio_app(app, demo, path="/")
@@ -618,6 +659,12 @@ if __name__ == "__main__":
     dataprep_gen_caption_endpoint = os.getenv(
         "DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT", f"http://localhost:{DATAPREP_MMR_PORT}/v1/generate_captions"
     )
+    dataprep_get_file_endpoint = os.getenv(
+        "DATAPREP_GET_FILE_ENDPOINT", f"http://localhost:{DATAPREP_MMR_PORT}/v1/dataprep/get"
+    )
+    dataprep_delete_file_endpoint = os.getenv(
+        "DATAPREP_DELETE_FILE_ENDPOINT", f"http://localhost:{DATAPREP_MMR_PORT}/v1/dataprep/delete"
+    )
     args = parser.parse_args()
     logger.info(f"args: {args}")
     global gateway_addr
@@ -628,5 +675,9 @@ if __name__ == "__main__":
     dataprep_gen_transcript_addr = dataprep_gen_transcript_endpoint
     global dataprep_gen_caption_addr
     dataprep_gen_caption_addr = dataprep_gen_caption_endpoint
+    global dataprep_get_file_addr
+    dataprep_get_file_addr = dataprep_get_file_endpoint
+    global dataprep_delete_file_addr
+    dataprep_delete_file_addr = dataprep_delete_file_endpoint
 
     uvicorn.run(app, host=args.host, port=args.port)
