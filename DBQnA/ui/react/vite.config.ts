@@ -24,7 +24,7 @@ export default defineConfig({
   },
   define: {
     // Dynamically set the hostname for the VITE_TEXT_TO_SQL_URL
-    "import.meta.env.VITE_TEXT_TO_SQL_URL": JSON.stringify(`http://${os.hostname()}:9090/v1`),
+    "import.meta.env.VITE_TEXT_TO_SQL_URL": JSON.stringify(`http://${process.env.TEXT_TO_SQL_URL}`),
     "import.meta.env": process.env,
   },
 });
