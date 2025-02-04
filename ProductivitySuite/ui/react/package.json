@@ -18,7 +18,7 @@
     "@microsoft/fetch-event-source": "^2.0.1",
     "@react-keycloak/web": "^3.4.0",
     "@reduxjs/toolkit": "^2.2.5",
-    "@tabler/icons-react": "^3.5.0",
+    "@tabler/icons-react": "3.27.1",
     "axios": "^1.7.2",
     "keycloak-js": "^25.0.2",
     "luxon": "^3.4.4",

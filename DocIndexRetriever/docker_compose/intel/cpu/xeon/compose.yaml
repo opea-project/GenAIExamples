@@ -11,12 +11,12 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
     ports:
-      - "6007:6007"
+      - "6007:5000"
       - "6008:6008"
       - "6009:6009"
     environment:
@@ -28,8 +28,10 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LOGFLAG: ${LOGFLAG}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     container_name: tei-embedding-server
     ports:
       - "6006:80"
@@ -41,24 +43,31 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:6006/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
   embedding:
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-    container_name: embedding-tei-server
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding-server
     ports:
       - "6000:6000"
     ipc: host
     depends_on:
-      - tei-embedding-service
+      tei-embedding-service:
+        condition: service_healthy
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   retriever:
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -73,9 +82,12 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${RERANK_MODEL_ID} --auto-truncate"
     container_name: tei-reranking-server
     ports:
       - "8808:80"
@@ -89,12 +101,18 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8808/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
   reranking:
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-xeon-server
     depends_on:
-      - tei-reranking-service
+      tei-reranking-service:
+        condition: service_healthy
     ports:
       - "8000:8000"
     ipc: host
@@ -102,10 +120,12 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      RERANK_TYPE: ${RERANK_TYPE}
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
+      LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   doc-index-retriever-server:
     image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}

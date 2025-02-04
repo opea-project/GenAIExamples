@@ -11,7 +11,7 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/summarization/tgi/langchain/Dockerfile .
+docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/doc-summarization/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following four Docker Images:
@@ -81,6 +81,7 @@ export DOCSUM_HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export DOCSUM_LLM_SERVER_PORT="8008"
 export DOCSUM_BACKEND_SERVER_PORT="8888"
 export DOCSUM_FRONTEND_PORT="5173"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 ```
 
 Note: Please replace with `host_ip` with your external IP address, do not use localhost.
@@ -126,7 +127,7 @@ docker compose up -d
 2. LLM Microservice
 
    ```bash
-   curl http://${host_ip}:9000/v1/chat/docsum \
+   curl http://${host_ip}:9000/v1/docsum \
      -X POST \
      -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
      -H 'Content-Type: application/json'

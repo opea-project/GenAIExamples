@@ -17,39 +17,39 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/videoqna-ui:${TAG:-latest}
-  dataprep-multimodal-vdms:
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/vdms/multimodal_langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: videoqna
-    image: ${REGISTRY:-opea}/dataprep-multimodal-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
   embedding-multimodal-clip:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/multimodal_clip/Dockerfile
+      dockerfile: comps/third_parties/clip/src/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
-  retriever-vdms:
+  retriever:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/vdms/langchain/Dockerfile
+      dockerfile: comps/retrievers/src/Dockerfile
     extends: videoqna
-    image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
-  reranking-videoqna:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+  reranking:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/videoqna/Dockerfile
+      dockerfile: comps/rerankings/src/Dockerfile
     extends: videoqna
-    image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
-  video-llama-lvm-server:
-    build:
-      context: GenAIComps
-      dockerfile: comps/lvms/video-llama/dependency/Dockerfile
-    extends: videoqna
-    image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
   lvm-video-llama:
     build:
       context: GenAIComps
-      dockerfile: comps/lvms/video-llama/Dockerfile
+      dockerfile: comps/lvms/src/integrations/dependency/video-llama/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
+  lvm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/lvms/src/Dockerfile
+    extends: videoqna
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}

@@ -40,7 +40,7 @@ jobs:
       - name: Create Issue
         uses: daisy-ycguo/create-issue-action@stable
         with:
-          token: ${{ secrets.Infra_Issue_Token }}
+          token: ${{ secrets.ACTION_TOKEN }}
           owner: opea-project
           repo: GenAIInfra
           title: |
@@ -54,6 +54,6 @@ jobs:
 
             ${{ env.changed_files }}
 
-            Please verify if the helm charts and manifests need to be changed accordingly.
+            Please verify if the helm charts need to be changed accordingly.
 
             > This issue was created automatically by CI.

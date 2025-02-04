@@ -8,8 +8,6 @@ IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 
-
-
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
@@ -22,7 +20,6 @@ export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HOST_IP=${ip_address}
 export host_ip=${ip_address}
 export DOCSUM_TGI_SERVICE_PORT="8008"
-export DOCSUM_TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export DOCSUM_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export DOCSUM_LLM_SERVER_PORT="9000"
 export DOCSUM_BACKEND_SERVER_PORT="8888"
@@ -33,13 +30,27 @@ export ASR_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 export DOCSUM_CARD_ID="card1"
 export DOCSUM_RENDER_ID="renderD136"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
+export LOGFLAG=True
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
+    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
+    if [[ "${opea_branch}" != "main" ]]; then
+        cd $WORKPATH
+        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
+        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
+        find . -type f -name "Dockerfile*" | while read -r file; do
+            echo "Processing file: $file"
+            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
+        done
+    fi
+
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-gradio-ui whisper llm-docsum-tgi"
+    service_list="docsum docsum-gradio-ui whisper llm-docsum"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:1.4
@@ -49,18 +60,9 @@ function build_docker_images() {
 function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
     sed -i "s/backend_address/$ip_address/g" "$WORKPATH"/ui/svelte/.env
-
     # Start Docker Containers
     docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
-
-    until [[ "$n" -ge 100 ]]; do
-        docker logs docsum-tgi-service > "${LOG_PATH}"/tgi_service_start.log
-        if grep -q Connected "${LOG_PATH}"/tgi_service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
+    sleep 1m
 }
 
 function validate_services() {
@@ -144,11 +146,11 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${host_ip}:9000/v1/chat/docsum" \
-        "data: " \
+        "${host_ip}:9000/v1/docsum" \
+        "text" \
         "docsum-llm-server" \
         "docsum-llm-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
 }
 

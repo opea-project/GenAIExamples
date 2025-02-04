@@ -18,7 +18,7 @@ cd GenAIComps
 The Whisper Service converts audio files to text. Follow these steps to build and run the service:
 
 ```bash
-docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
+docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -115,7 +115,7 @@ You will have the following Docker Images:
 
 1. `opea/docsum-ui:latest`
 2. `opea/docsum:latest`
-3. `opea/llm-docsum-tgi:latest`
+3. `opea/llm-docsum:latest`
 4. `opea/whisper:latest`
 
 ### Validate Microservices
@@ -132,7 +132,7 @@ You will have the following Docker Images:
 2. LLM Microservice
 
    ```bash
-   curl http://${host_ip}:9000/v1/chat/docsum \
+   curl http://${host_ip}:9000/v1/docsum \
      -X POST \
      -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
      -H 'Content-Type: application/json'
@@ -280,7 +280,7 @@ You will have the following Docker Images:
 
    **summary_type=map_reduce**
 
-   Map_reduce mode will split the inputs into multiple chunks, map each document to an individual summary, then consolidate those summaries into a single global summary. `streaming=True` is not allowed here.
+   Map_reduce mode will split the inputs into multiple chunks, map each document to an individual summary, then consolidate those summaries into a single global summary. `stream=True` is not allowed here.
 
    In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
 

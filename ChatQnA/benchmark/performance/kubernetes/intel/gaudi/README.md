@@ -47,7 +47,8 @@ Results will be displayed in the terminal and saved as CSV file named `1_stats.c
 
 ### Prerequisites
 
-- Kubernetes installation: Use [kubespray](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md) or other official Kubernetes installation guides.
+- Kubernetes installation: Use [kubespray](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md) or other official Kubernetes installation guides: 
+- (Optional) [Kubernetes set up guide on Intel Gaudi product](https://github.com/opea-project/GenAIInfra/blob/main/README.md#setup-kubernetes-cluster) 
 - Helm installation: Follow the [Helm documentation](https://helm.sh/docs/intro/install/#helm) to install Helm.
 - Setup Hugging Face Token
 
@@ -163,7 +164,7 @@ Use the following `cURL` command to upload file:
 
 ```bash
 cd GenAIEval/evals/benchmark/data
-curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
+curl -X POST "http://${cluster_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F "chunk_size=3800" \
      -F "files=@./upload_file.txt"
