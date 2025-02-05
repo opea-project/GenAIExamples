@@ -22,22 +22,23 @@ services:
       https_proxy: ${https_proxy}
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
-      INDEX_NAME: ${INDEX_NAME}
+      COLLECTION_NAME: ${INDEX_NAME}
       MULTIMODAL_DATAPREP: true
-    entrypoint: sh -c 'sleep 15 && python ingest_videos.py'
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALVDMS"
     volumes:
       - /home/$USER/.cache/clip:/home/user/.cache/clip
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   embedding:
-    image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
-    container_name: embedding-multimodal-server
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: clip-embedding-server
     ports:
-      - "6000:6000"
+      - "6000:5000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      EMBEDDING_COMPONENT_NAME: "OPEA_CLIP_EMBEDDING"
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
     restart: unless-stopped
@@ -59,7 +60,6 @@ services:
       VDMS_USE_CLIP: ${USECLIP}
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_VDMS"
-    entrypoint: sh -c 'sleep 30 && python retriever_vdms.py'
     restart: unless-stopped
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
@@ -89,7 +89,6 @@ services:
       no_proxy: ${no_proxy}
       llm_download: ${LLM_DOWNLOAD}
     volumes:
-      - "/home/$USER/.cache:/home/user/.cache"
       - video-llama-model:/home/user/model
     restart: unless-stopped
   lvm:
