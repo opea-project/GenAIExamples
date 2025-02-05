@@ -10,7 +10,7 @@ Quick Start:
 2. Run Docker Compose.
 3. Consume the ChatQnA Service.
 
-Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models). We now support running the latest DeepSeek models, including [deepseek-ai/DeepSeek-R1-Distill-Llama-70B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B) and [deepseek-ai/DeepSeek-R1-Distill-Qwen-32B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B) on Gaudi accelerators. To run `deepseek-ai/DeepSeek-R1-Distill-Llama-70B`, update the `LLM_MODEL_ID` and configure `NUM_CARDS` to 8 in the [set_env.sh](./set_env.sh) script. To run `deepseek-ai/DeepSeek-R1-Distill-Qwen-32B`, update the `LLM_MODEL_ID` and configure `NUM_CARDS` to 4 in the [set_env.sh](./set_env.sh) script.
 
 ## Quick Start: 1.Setup Environment Variable
 
