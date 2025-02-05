@@ -28,10 +28,26 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
+      diff_excluded_files: '\.md|\.txt|kubernetes|gmc|assets|benchmark'
+
+  check-matrix:
+    runs-on: ubuntu-latest
+    needs: [get-test-matrix]
+    steps:
+      - name: Check matrix
+        id: check-matrix
+        run: |
+          run_matrix=${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
+          echo "$run_matrix"
+          if [[ "$run_matrix" == '{"include":[]}' ]]; then
+            echo "matrix_empty="true"" >> $GITHUB_OUTPUT
+          else
+            echo "matrix_empty="false"" >> $GITHUB_OUTPUT
+          fi
 
   example-test:
-    needs: [get-test-matrix]
+    needs: [get-test-matrix, check-matrix]
+    if: ${{ needs.check-matrix.outputs.matrix_empty == 'false' }}
     strategy:
       matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false
