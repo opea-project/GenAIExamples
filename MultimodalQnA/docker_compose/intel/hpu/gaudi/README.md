@@ -261,7 +261,7 @@ curl http://${host_ip}:${LVM_PORT}/v1/lvm \
 
 7. Multimodal Dataprep Microservice
 
-Download a sample video, image, PDF, and audio file and create a caption
+Download a sample video (.mp4), image (.png, .gif, .jpg), pdf, and audio file (.wav, .mp3) and create a caption
 
 ```bash
 export video_fn="WeAreGoingOnBullrun.mp4"
@@ -280,7 +280,7 @@ export audio_fn="AudioSample.wav"
 wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav -O ${audio_fn}
 ```
 
-Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
+Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav or .mp3 file.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \

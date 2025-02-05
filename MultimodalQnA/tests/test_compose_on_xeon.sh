@@ -16,6 +16,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 export image_fn="apple.png"
 export video_fn="WeAreGoingOnBullrun.mp4"
+export audio_fn="sample_audio.mp3"
 export caption_fn="apple.txt"
 export pdf_fn="nke-10k-2023.pdf"
 
@@ -113,6 +114,7 @@ function prepare_data() {
     cd $LOG_PATH
     echo "Downloading image and video"
     wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
+    wget https://github.com/intel/intel-extension-for-transformers/raw/refs/tags/v1.5/intel_extension_for_transformers/neural_chat/ui/customized/talkingbot/src/lib/components/talkbot/assets/mid-age-man.mp3 -O ${audio_fn}
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
     wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf -O ${pdf_fn}
     echo "Writing caption file"
@@ -130,7 +132,7 @@ function validate_service() {
 
     if [[ $SERVICE_NAME == *"dataprep-multimodal-redis-transcript"* ]]; then
         cd $LOG_PATH
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${video_fn}" -H 'Content-Type: multipart/form-data' "$URL")
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${video_fn}" -F "files=@./${audio_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-caption"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -H 'Content-Type: multipart/form-data' "$URL")
@@ -340,7 +342,7 @@ function validate_megaservice() {
 
 function validate_delete {
     echo "Validating data prep delete files"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
     validate_service \
         "${DATAPREP_DELETE_FILE_ENDPOINT}" \
         '{"status":true}' \
@@ -353,6 +355,7 @@ function delete_data() {
     echo "Deleting image, video, and caption"
     rm -rf ${image_fn}
     rm -rf ${video_fn}
+    rm -rf ${audio_fn}
     rm -rf ${pdf_fn}
     rm -rf ${caption_fn}
 }
