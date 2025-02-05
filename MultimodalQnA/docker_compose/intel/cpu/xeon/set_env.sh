@@ -17,6 +17,9 @@ export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 
+export TTS_PORT=7055
+export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts"
+
 export WHISPER_PORT=7066
 export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
 export WHISPER_MODEL="base"
