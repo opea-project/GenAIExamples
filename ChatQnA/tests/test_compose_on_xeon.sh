@@ -178,12 +178,25 @@ function stop_docker() {
 function main() {
 
     stop_docker
+    # install perfspect
+    wget -qO- https://github.com/intel/PerfSpect/releases/latest/download/perfspect.tgz | tar xvz
+
+    # get used disk
+    list="$(./perfspect/perfspect report --filesystem 2>&1)"
+    list=$( for i in ` echo  $list `; do [[ $i =~ json ]] && echo $i ; done )
+    used_disk_before="$(python parse_perfspect.py $list 2>&1)"
+
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
+
+    # trace  max used memory
+    list="$(./perfspect/perfspect telemetry --duration 10 2>&1)"
+    list=$( for i in ` echo  $list `; do [[ $i =~ json ]] && echo $i ; done )
+    max_used_mem="$(python parse_perfspect.py $list 2>&1)"
 
     if [ "${mode}" == "perf" ]; then
         python3 $WORKPATH/tests/chatqna_benchmark.py
@@ -192,6 +205,16 @@ function main() {
         validate_megaservice
         # validate_frontend
     fi
+
+    # get used disk
+    list="$(./perfspect/perfspect report --filesystem 2>&1)"
+    list=$( for i in ` echo  $list `; do [[ $i =~ json ]] && echo $i ; done )
+    used_disk_after="$(python parse_perfspect.py $list 2>&1)"
+
+    used_disk=$used_disk_after - $used_disk_before
+    # used disk and memory for the run
+    echo $used_disk
+    echo $max_used_mem
 
     stop_docker
     echo y | docker system prune
