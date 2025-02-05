@@ -54,7 +54,7 @@ Here're some of the project's features:
 - Run the Docker container:
 
   ```
-  docker run -d --network host -p 3000:3000 --name agent-ui opea:agent-ui
+  docker run -d -p 5173:5173 --name agent-ui opea:agent-ui
   ```
 
 - The application will be available at `http://localhost:5173`.
