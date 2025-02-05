@@ -357,8 +357,17 @@ Users could also get the external IP via below command.
 ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+'
 ```
 
+Access the Jaeger dashboard UI at http://{EXTERNAL_IP}:16686
+
 For TGI serving on Gaudi, users could see different services like opea, TEI and TGI.
 ![Screenshot from 2024-12-27 11-58-18](https://github.com/user-attachments/assets/6126fa70-e830-4780-bd3f-83cb6eff064e)
 
 Here is a screenshot for one tracing of TGI serving request.
 ![Screenshot from 2024-12-27 11-26-25](https://github.com/user-attachments/assets/3a7c51c6-f422-41eb-8e82-c3df52cd48b8)
+
+There are also OPEA related tracings. Users could understand the time breakdown of each service request by looking into each opea:schedule operation.
+![image](https://github.com/user-attachments/assets/6137068b-b374-4ff8-b345-993343c0c25f)
+
+There could be async function such as `llm/MicroService_asyn_generate` and user needs to check the trace of the async function in another operation like
+opea:llm_generate_stream.
+![image](https://github.com/user-attachments/assets/a973d283-198f-4ce2-a7eb-58515b77503e)
