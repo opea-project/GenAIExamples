@@ -4,7 +4,8 @@
 name: E2E test with docker compose
 
 on:
-  pull_request_target:
+  # pull_request_target:
+  pull_request:
     branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -28,10 +29,24 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
+      diff_excluded_files: '\.md|\.txt|kubernetes|gmc|assets|benchmark'
+
+  check-matrix:
+    needs: [get-test-matrix]
+    runs-on: ubuntu-latest
+    # strategy:
+    #   matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
+    #   fail-fast: true
+    steps:
+      - name: Check matrix
+        run: |
+          echo "Run matrix: ${{ needs.get-test-matrix.outputs.run_matrix }}"
+          echo "Matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}"
+
 
   example-test:
     needs: [get-test-matrix]
+    if: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix).include | length > 0 }}
     strategy:
       matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false

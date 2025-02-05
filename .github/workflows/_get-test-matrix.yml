@@ -69,3 +69,16 @@ jobs:
           export test_mode=${{ inputs.test_mode }}
           export WORKSPACE=${{ github.workspace }}
           bash .github/workflows/scripts/get_test_matrix.sh
+          echo "${run_matrix}"
+          echo "include=$(echo ${run_matrix} | jq -r '.include')"
+
+      - name: Check matrix
+        id: check-matrix
+        run: |
+          echo "Run matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}"
+          echo "Include: ${{ fromJSON(steps.get-test-matrix.outputs.run_matrix).include }}"
+          include_str="${{ fromJSON(steps.get-test-matrix.outputs.run_matrix).include }}"
+          echo "Length: ${#include_str}"
+          # echo ${{ fromJSON(steps.get-test-matrix.outputs.run_matrix) }}
+          # echo ${{ fromJSON(steps.get-test-matrix.outputs.run_matrix).include }}
+          # echo "Matrix length: ${{ fromJSON(steps.get-test-matrix.outputs.run_matrix).include | length }}"
