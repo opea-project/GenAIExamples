@@ -19,4 +19,5 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
+        texttosql_url: ${build_texttosql_url}
     image: ${REGISTRY:-opea}/text2sql-react-ui:${TAG:-latest}
