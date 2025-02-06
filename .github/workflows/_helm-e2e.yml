@@ -97,6 +97,7 @@ jobs:
 
   helm-test:
     needs: [get-test-case]
+    if: ${{ fromJSON(needs.get-test-case.outputs.value_files).length != 0 }}
     strategy:
       matrix:
         value_file: ${{ fromJSON(needs.get-test-case.outputs.value_files) }}
