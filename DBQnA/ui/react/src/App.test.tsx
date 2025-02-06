@@ -26,7 +26,7 @@ test('testing api with dynamic host', async () => {
   const formData = {
     user: 'postgres',
     database: 'chinook',
-    host: host,  // Dynamic IP
+    host: host,
     password: 'testpwd',
     port: '5442',
   };
