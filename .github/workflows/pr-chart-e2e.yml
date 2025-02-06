@@ -65,7 +65,7 @@ jobs:
 
   helm-chart-test:
     needs: [job1]
-    if: always() && ${{ needs.job1.outputs.run_matrix.example.length > 0 }}
+    if: always() && ${{ fromJSON(needs.job1.outputs.run_matrix).length != 0 }}
     uses: ./.github/workflows/_helm-e2e.yml
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}

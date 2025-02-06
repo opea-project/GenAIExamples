@@ -51,6 +51,7 @@ jobs:
 
   image-build:
     needs: get-test-matrix
+    if: ${{ fromJSON(needs.get-test-matrix.outputs.nodes).length != 0 }}
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
