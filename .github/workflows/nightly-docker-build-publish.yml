@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
+  EXAMPLES: "" #${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   TAG: "latest"
   PUBLISH_TAGS: "latest"
 
@@ -34,6 +34,7 @@ jobs:
 
   build-and-test:
     needs: get-build-matrix
+    if: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json).length != 0 }}
     strategy:
       matrix:
         example: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json) }}
@@ -53,6 +54,7 @@ jobs:
 
   publish:
     needs: [get-build-matrix, get-image-list, build-and-test]
+    if: ${{ fromJSON(needs.get-image-list.outputs.matrix).length != 0 }}
     strategy:
       matrix:
         image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}

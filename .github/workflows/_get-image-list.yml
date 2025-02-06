@@ -51,4 +51,5 @@ jobs:
           echo "print image list..."
           echo "$image_list" | jq . | jq -r '.[]'
           echo "end of image list..."
-          echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
+          # echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
+          echo "matrix=$(echo "" | jq -c '.')" >> $GITHUB_OUTPUT
