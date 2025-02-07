@@ -34,7 +34,7 @@ jobs:
 
   build-and-test:
     needs: get-build-matrix
-    if: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json).length != 0 }}
+    if: ${{ needs.get-build-matrix.outputs.examples_json != '' }}
     strategy:
       matrix:
         example: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json) }}
