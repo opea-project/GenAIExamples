@@ -44,12 +44,12 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 docker compose up -d
 ```
 
-To enable Open Telemetry Tracing, compose_telemetry.yaml file need to be merged along with default compose.yaml file.   
-CPU example with Open Telemetry feature:  
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.  
+CPU example with Open Telemetry feature:
 
 ```bash
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
-docker compose -f compose.yaml -f compose_telemetry.yaml up -d
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
 It will automatically download the docker image on `docker hub`:
@@ -272,7 +272,7 @@ docker compose -f compose.yaml up -d
 # Start ChatQnA without Rerank Pipeline
 docker compose -f compose_without_rerank.yaml up -d
 # Start ChatQnA with Rerank Pipeline and Open Telemetry Tracing
-docker compose -f compose.yaml -f compose_telemetry.yaml up -d 
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
 If use TGI as the LLM serving backend.
@@ -280,7 +280,7 @@ If use TGI as the LLM serving backend.
 ```bash
 docker compose -f compose_tgi.yaml up -d
 # Start ChatQnA with Open Telemetry Tracing
-docker compose -f compose_tgi.yaml -f compose_tgi_telemetry.yaml up -d 
+docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d
 ```
 
 ### Validate Microservices

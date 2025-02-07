@@ -90,12 +90,13 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 # cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
 docker compose up -d
 ```
-To enable Open Telemetry Tracing, compose_telemetry.yaml file need to be merged along with default compose.yaml file.   
-CPU example with Open Telemetry feature:  
+
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.  
+CPU example with Open Telemetry feature:
 
 ```bash
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
-docker compose -f compose.yaml -f compose_telemetry.yaml up -d
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
 It will automatically download the docker image on `docker hub`:
@@ -239,10 +240,11 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
 docker compose up -d
 ```
 
-To enable Open Telemetry Tracing, compose_telemetry.yaml file need to be merged along with default compose.yaml file.   
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
+
 ```bash
 cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
-docker compose -f compose.yaml -f compose_telemetry.yaml up -d
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
@@ -255,10 +257,12 @@ Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.ya
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 docker compose up -d
 ```
-To enable Open Telemetry Tracing, compose_telemetry.yaml file need to be merged along with default compose.yaml file.   
+
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
+
 ```bash
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
-docker compose -f compose.yaml -f compose_telemetry.yaml up -d
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
@@ -364,7 +368,7 @@ OPEA microservice deployment can easily be monitored through Grafana dashboards 
 
 ## Tracing Services with OpenTelemetry Tracing and Jaeger
 
-> NOTE: This feature is disabled by default. Please check the Deploy ChatQnA sessions for how to enable this feature with compose_telemetry.yaml file.  
+> NOTE: This feature is disabled by default. Please check the Deploy ChatQnA sessions for how to enable this feature with compose_telemetry.yaml file.
 
 OPEA microservice and TGI/TEI serving can easily be traced through Jaeger dashboards in conjunction with OpenTelemetry Tracing feature. Follow the [README](https://github.com/opea-project/GenAIComps/tree/main/comps/cores/telemetry#tracing) to trace additional functions if needed.
 
