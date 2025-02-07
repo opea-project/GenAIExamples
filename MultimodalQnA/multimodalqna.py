@@ -9,6 +9,7 @@ from io import BytesIO
 import requests
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.proto.api_protocol import (
+    AudioChatCompletionRequest,
     ChatCompletionRequest,
     ChatCompletionResponse,
     ChatCompletionResponseChoice,
@@ -29,6 +30,8 @@ LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_PORT", 9399))
 WHISPER_PORT = int(os.getenv("WHISPER_PORT", 7066))
 WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", "http://0.0.0.0:$WHISPER_PORT/v1/asr")
+TTS_PORT = int(os.getenv("TTS_PORT", 7055))
+TTS_ENDPOINT = os.getenv("TTS_ENDPOINT", "http://0.0.0.0:7055/v1/tts")
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -251,6 +254,22 @@ class MultimodalQnAService:
 
         response = response.json()
         return response["asr_result"]
+    
+    def convert_text_to_audio(self, text):
+        if isinstance(text, dict):
+            input_dict = {"text": text["text"]}
+        else:
+            input_dict = {"text": text}
+        
+        response = requests.post(TTS_ENDPOINT, data=json.dumps(input_dict))
+
+        if response.status_code != 200:
+            return JSONResponse(
+                status_code=503, content={"message": "Unable to convert text to audio. {}".format(response.text)}
+            )
+
+        response = response.json()
+        return response["tts_result"]
 
     async def handle_request(self, request: Request):
         """MultimodalQnA accepts input queries as text, images, and/or audio.
@@ -335,6 +354,10 @@ class MultimodalQnAService:
 
         if "text" in result_dict[last_node].keys():
             response = result_dict[last_node]["text"]
+
+            # toggle on and off?
+            tts_audio = self.convert_text_to_audio(response)
+
         else:
             # text is not in response message
             # something wrong, for example due to empty retrieval results
@@ -345,14 +368,16 @@ class MultimodalQnAService:
         if "metadata" in result_dict[last_node].keys():
             # from retrieval results
             metadata = result_dict[last_node]["metadata"]
+            metadata["tts_response"] = tts_audio
             if decoded_audio_input:
                 metadata["audio"] = decoded_audio_input
         else:
             # follow-up question, no retrieval
             if decoded_audio_input:
                 metadata = {"audio": decoded_audio_input}
+                metadata["tts_response"] = tts_audio
             else:
-                metadata = None
+                metadata = {"tts_response": tts_audio}
 
         choices = []
         usage = UsageInfo()
