@@ -6,6 +6,10 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
+if [ -z "$HF_TOKEN" ]; then
+    echo "Error: The HF_TOKEN environment variable is **NOT** set. Please set it"
+    return -1
+fi
 
 export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
 export LVM_ENDPOINT="http://${host_ip}:8399"
