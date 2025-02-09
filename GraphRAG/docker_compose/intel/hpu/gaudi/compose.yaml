@@ -35,11 +35,12 @@ services:
       NO_PROXY: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
     ipc: host
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   tgi-gaudi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
     container_name: tgi-gaudi-server
     ports:
       - "6005:80"

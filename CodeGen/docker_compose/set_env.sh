@@ -6,7 +6,12 @@ pushd "../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
+if [ -z "$HF_TOKEN" ]; then
+    echo "Error: The HF_TOKEN environment variable is **NOT** set. Please set it"
+    return -1
+fi
 
+export host_ip=$(hostname -I | awk '{print $1}')
 export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8028"
 export MEGA_SERVICE_HOST_IP=${host_ip}

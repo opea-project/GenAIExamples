@@ -5,7 +5,11 @@
 
 # export host_ip=<your External Public IP>
 export host_ip=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+
+if [ -z "$HF_TOKEN" ]; then
+    echo "Error: The HF_TOKEN environment variable is **NOT** set. Please set it"
+    return -1
+fi
 # <token>
 
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
