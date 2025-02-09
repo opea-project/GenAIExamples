@@ -38,7 +38,7 @@ services:
       - SYS_NICE
     restart: unless-stopped
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
     container_name: tgi-gaudi-server
     ports:
       - "3006:80"
@@ -48,7 +48,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       HABANA_VISIBLE_DEVICES: all

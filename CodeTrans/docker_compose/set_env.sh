@@ -6,6 +6,10 @@ pushd "../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
+if [ -z "$HF_TOKEN" ]; then
+    echo "Error: The HF_TOKEN environment variable is **NOT** set. Please set it"
+    return -1
+fi
 
 export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8008"

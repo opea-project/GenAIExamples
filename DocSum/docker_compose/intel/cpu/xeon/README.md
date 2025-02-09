@@ -83,7 +83,7 @@ Default model is "Intel/neural-chat-7b-v3-3". Change "LLM_MODEL_ID" environment 
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 ```
 
-When using gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+When using gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) to "HF_TOKEN" environment variable.
 
 ### Setup Environment Variable
 
@@ -96,7 +96,7 @@ To set up environment variables for deploying Document Summarization services, f
    export host_ip="External_Public_IP"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
    export no_proxy="Your_No_Proxy"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   export HF_TOKEN="Your_Huggingface_API_Token"
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
