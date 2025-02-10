@@ -19,6 +19,8 @@ from utils import build_logger, make_temp_image, server_error_msg, split_video
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
 logflag = os.getenv("LOGFLAG", False)
 
+ui_timeout = int(os.getenv("UI_TIMEOUT", 200))
+
 headers = {"Content-Type": "application/json"}
 
 css = """
@@ -132,7 +134,7 @@ def http_bot(state, request: gr.Request):
             url,
             headers=headers,
             json=pload,
-            timeout=100,
+            timeout=ui_timeout,
         )
         logger.info(response.status_code)
         if logflag:

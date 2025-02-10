@@ -111,6 +111,7 @@ export LVM_ENDPOINT="http://${host_ip}:$LLAVA_SERVER_PORT"
 export MEGA_SERVICE_PORT=8888
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:$MEGA_SERVICE_PORT/v1/multimodalqna"
 export UI_PORT=5173
+export UI_TIMEOUT=200
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
