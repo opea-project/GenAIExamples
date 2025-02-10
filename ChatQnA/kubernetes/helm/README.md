@@ -14,17 +14,17 @@ helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUG
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-values.yaml
+helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-vllm-values.yaml
 ```
 
 ## Deploy variants of ChatQnA
 
 ChatQnA is configurable and you can enable/disable features by providing values.yaml file.
-For example, to run with vllm instead of tgi on Gaudi hardware, use gaudi-vllm-values.yaml file:
+For example, to run with tgi instead of vllm inference engine on Gaudi hardware, use gaudi-tgi-values.yaml file:
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-vllm-values.yaml
+helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-tgi-values.yaml
 ```
 
 See other *-values.yaml files in this directory for more reference.

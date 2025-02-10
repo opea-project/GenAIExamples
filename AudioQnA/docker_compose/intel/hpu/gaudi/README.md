@@ -49,7 +49,7 @@ Before starting the services with `docker compose`, you have to recheck the foll
 
 ```bash
 export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=<your HF token>
+export HF_TOKEN=<your HF token>
 
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
 

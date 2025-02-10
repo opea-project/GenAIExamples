@@ -89,8 +89,9 @@ jobs:
           echo "test_cases=$test_cases"
           echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
 
-  run-test:
+  compose-test:
     needs: [get-test-case]
+    if: ${{ fromJSON(needs.get-test-case.outputs.test_cases).length != 0 }}
     strategy:
       matrix:
         test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
@@ -132,6 +133,7 @@ jobs:
           PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
           SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
           SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
           example: ${{ inputs.example }}

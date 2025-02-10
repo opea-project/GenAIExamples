@@ -44,7 +44,7 @@ cd GenAIExamples/CodeGen/ui
 docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 ```
 
-Then run the command `docker images`, you will have the following 3 Docker images:
+Then run the command `docker images`, you will have the following Docker images:
 
 - `opea/llm-textgen:latest`
 - `opea/codegen:latest`
@@ -87,7 +87,7 @@ export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8028"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7778/v1/codegen"

@@ -23,18 +23,24 @@ services:
       dockerfile: comps/third_parties/bridgetower/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
+  embedding-multimodal-bridgetower-gaudi:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/bridgetower/src/Dockerfile.intel_hpu
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
   embedding:
     build:
       context: GenAIComps
       dockerfile: comps/embeddings/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
-  retriever-redis:
+  retriever:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/redis/langchain/Dockerfile
+      dockerfile: comps/retrievers/src/Dockerfile
     extends: multimodalqna
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
   lvm-llava:
     build:
       context: GenAIComps
@@ -47,21 +53,15 @@ services:
       dockerfile: comps/lvms/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
-  dataprep-multimodal-redis:
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/multimodal/redis/langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: multimodalqna
-    image: ${REGISTRY:-opea}/dataprep-multimodal-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
   whisper:
     build:
       context: GenAIComps
       dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-  asr:
-    build:
-      context: GenAIComps
-      dockerfile: comps/asr/src/Dockerfile
-    extends: multimodalqna
-    image: ${REGISTRY:-opea}/asr:${TAG:-latest}

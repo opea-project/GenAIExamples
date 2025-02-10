@@ -26,14 +26,20 @@ case "$1" in
         echo "Release all ports used by the services in $yaml_file ..."
         pip install jq yq
         ports=$(yq '.services[].ports[] | split(":")[0]' $yaml_file | grep -o '[0-9a-zA-Z_-]\+')
+        echo "All ports list..."
         echo "$ports"
         for port in $ports; do
           if [[ $port =~ [a-zA-Z_-] ]]; then
             port=$(grep -E "export $port=" tests/$test_case | cut -d'=' -f2)
           fi
-          echo $port
-          cid=$(docker ps --filter "publish=${port}" --format "{{.ID}}")
-          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          if [[ $port =~ [0-9] ]]; then
+            if [[ $port == 5000 ]]; then
+              echo "Error: Port 5000 is used by local docker registry, please DO NOT use it in docker compose deployment!!!"
+              exit 1
+            fi
+            cid=$(docker ps --filter "publish=${port}" --format "{{.ID}}")
+            if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && echo "release $port"; fi
+          fi
         done
         ;;
     *)
