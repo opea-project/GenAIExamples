@@ -101,11 +101,12 @@ services:
       LIMIT_HPU_GRAPH: true
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
+      NUM_CARDS: ${NUM_CARDS}
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096 --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+    command: --model-id ${LLM_MODEL_ID} --num-shard ${NUM_CARDS} --max-input-length 2048 --max-total-tokens 4096 --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger

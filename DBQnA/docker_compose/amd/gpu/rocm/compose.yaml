@@ -1,0 +1,75 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  dbqna-tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    container_name: dbqna-tgi-service
+    ports:
+      - "${DBQNA_TGI_SERVICE_PORT:-8008}:80"
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_SERVICE_PORT: ${DBQNA_TGI_SERVICE_PORT}
+      MODEL_ID: ${DBQNA_LLM_MODEL_ID}
+      HUGGING_FACE_HUB_TOKEN: ${DBQNA_HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${DBQNA_HUGGINGFACEHUB_API_TOKEN}
+    shm_size: 1g
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    ipc: host
+    command: --model-id ${MODEL_ID} --max-input-length 2048 --max-total-tokens 4096
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres-container
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - '5442:5432'
+    volumes:
+      - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
+
+  text2sql:
+    image: opea/text2sql:latest
+    container_name: text2sql
+    ports:
+      - "${DBQNA_TEXT_TO_SQL_PORT:-9090}:8080"
+    environment:
+      TGI_LLM_ENDPOINT: ${DBQNA_TGI_LLM_ENDPOINT}
+
+  text2sql-react-ui:
+    image: opea/text2sql-react-ui:latest
+    container_name: text2sql-react-ui
+    depends_on:
+      - text2sql
+    ports:
+      - "${DBQNA_UI_PORT:-5174}:80"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      texttosql_port: ${texttosql_port}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
