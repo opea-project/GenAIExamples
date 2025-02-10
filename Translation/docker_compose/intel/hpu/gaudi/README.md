@@ -83,7 +83,7 @@ Change the `LLM_MODEL_ID` below for your needs.
    export host_ip="External_Public_IP"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
    export no_proxy="Your_No_Proxy"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   export HF_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
    ```
