@@ -28,6 +28,12 @@ Before running the benchmarks, ensure you have:
 2. **Configuration YAML**
    The configuration file (e.g., `./ChatQnA/benchmark_chatqna.yaml`) consists of two main sections: deployment and benchmarking. Required fields must be filled with valid values (like the Hugging Face token). For all other fields, you can either customize them according to your needs or leave them empty ("") to use the default values from the [helm charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts).
 
+3. **Install required Python packages**
+   Run the following command to install all necessary dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
 ## Data Preparation
 
 Before running benchmarks, you need to:
