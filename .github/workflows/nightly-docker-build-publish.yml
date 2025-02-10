@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLES: "AvatarChatbot,AudioQnA"
+  EXAMPLES: "AvatarChatbot"
   #${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   TAG: "latest"
   PUBLISH_TAGS: "latest"
@@ -55,7 +55,7 @@ jobs:
 
   publish:
     needs: [get-build-matrix, get-image-list, build-and-test]
-    if: ${{ fromJSON(needs.get-image-list.outputs.matrix).length != 0 }}
+    if: ${{ needs.get-image-list.outputs.matrix != '' }}
     strategy:
       matrix:
         image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
