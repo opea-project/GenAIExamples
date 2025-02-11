@@ -66,7 +66,7 @@ Before starting the services with `docker compose`, you have to recheck the foll
 export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
 export GOOGLE_CSE_ID=<your cse id>
 export GOOGLE_API_KEY=<your google api key>
-export HF_TOKEN=<your HF token>
+export HUGGINGFACEHUB_API_TOKEN=<your HF token>
 
 export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 export TEI_EMBEDDING_ENDPOINT=http://${host_ip}:3001

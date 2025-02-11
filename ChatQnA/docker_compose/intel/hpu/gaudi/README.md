@@ -21,7 +21,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   export HF_TOKEN="Your_Huggingface_API_Token"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -203,9 +203,9 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="meta-llama/Meta-Llama-3-8B-Instruct"
    # Start vLLM LLM Service
-   docker run -p 8007:80 -v ./data:/data --name vllm-gaudi-server -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_TOKEN=$HF_TOKEN -e VLLM_TORCH_PROFILER_DIR="/mnt" --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model $model_name --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
+   docker run -p 8007:80 -v ./data:/data --name vllm-gaudi-server -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e VLLM_TORCH_PROFILER_DIR="/mnt" --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model $model_name --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
    # Start TGI LLM Service
-   docker run -p 8005:80 -v ./data:/data --name tgi-gaudi-server -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.6 --model-id $model_name --max-input-tokens 1024 --max-total-tokens 2048
+   docker run -p 8005:80 -v ./data:/data --name tgi-gaudi-server -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.6 --model-id $model_name --max-input-tokens 1024 --max-total-tokens 2048
    ```
 
 2. Offline
@@ -220,9 +220,9 @@ For users in China who are unable to download models directly from Huggingface, 
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
      # Start vLLM LLM Service
-     docker run -p 8007:80 -v $model_path:/data --name vllm-gaudi-server --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_TOKEN=$HF_TOKEN -e VLLM_TORCH_PROFILER_DIR="/mnt" --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model /data --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
+     docker run -p 8007:80 -v $model_path:/data --name vllm-gaudi-server --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e VLLM_TORCH_PROFILER_DIR="/mnt" --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model /data --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 2048
      # Start TGI LLM Service
-     docker run -p 8005:80 -v $model_path:/data --name tgi-gaudi-server --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.6 --model-id /data --max-input-tokens 1024 --max-total-tokens 2048
+     docker run -p 8005:80 -v $model_path:/data --name tgi-gaudi-server --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.6 --model-id /data --max-input-tokens 1024 --max-total-tokens 2048
      ```
 
 ### Setup Environment Variables
@@ -232,7 +232,7 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   export HF_TOKEN="Your_Huggingface_API_Token"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
    ```
