@@ -51,8 +51,21 @@ def construct_deploy_config(deploy_config, target_node, batch_param_value=None):
     # Set the single node value
     new_config["node"] = target_node
 
+    # First determine which llm replicaCount to use based on teirerank.enabled
+    services = new_config.get("services", {})
+    teirerank_enabled = services.get("teirerank", {}).get("enabled", True)
+
+    if "llm" in services:
+        llm_config = services["llm"]
+        if isinstance(llm_config.get("replicaCount"), dict):
+            replica_counts = llm_config["replicaCount"]
+            llm_config["replicaCount"] = (
+                replica_counts["with_teirerank"] if teirerank_enabled
+                else replica_counts["without_teirerank"]
+            )
+
     # Update instance_num for each service based on the same index
-    for service_name, service_config in new_config.get("services", {}).items():
+    for service_name, service_config in services.items():
         if "replicaCount" in service_config:
             instance_nums = service_config["replicaCount"]
             if isinstance(instance_nums, list):
