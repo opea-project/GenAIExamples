@@ -41,7 +41,7 @@ jobs:
 
   publish:
     needs: [get-image-list]
-    if: ${{ fromJSON(needs.get-image-list.outputs.matrix).length != 0 }}
+    if: ${{ needs.get-image-list.outputs.matrix != '' }}
     strategy:
       matrix:
         image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
