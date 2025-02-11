@@ -47,7 +47,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    For example, change to DeepSeek-R1-Distill-Qwen-32B using the following command.
 
    ```bash
-   export LLM_MODEL_ID=deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+   export LLM_MODEL_ID="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
    ```
 
    Please also check [required gaudi cards for different models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#system-requirements-for-llm-models) for new models.  
