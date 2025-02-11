@@ -9,12 +9,6 @@ popd > /dev/null
 export MAX_INPUT_TOKENS=1024
 export MAX_TOTAL_TOKENS=2048
 
-if [ -z "$HF_TOKEN" ]; then
-    echo "Error: The HF_TOKEN environment variable is **NOT** set. Please set it"
-    return -1
-fi
-
-export host_ip=$(hostname -I | awk '{print $1}')
 export no_proxy="${no_proxy},${host_ip}"
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}

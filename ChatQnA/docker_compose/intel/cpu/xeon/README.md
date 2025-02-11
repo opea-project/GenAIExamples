@@ -21,7 +21,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   export HF_TOKEN="Your_Huggingface_API_Token"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -236,7 +236,7 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   export HF_TOKEN="Your_Huggingface_API_Token"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
    ```

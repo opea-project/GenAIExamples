@@ -24,8 +24,7 @@ services:
       REDIS_HOST: redis-vector-db
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: http://tei-embedding-service:80
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-      HF_TOKEN: ${HF_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-gaudi-server
@@ -55,8 +54,7 @@ services:
       REDIS_HOST: redis-vector-db
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-      HF_TOKEN: ${HF_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   tei-reranking-service:
     image: ghcr.io/huggingface/tei-gaudi:1.5.0
@@ -90,7 +88,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       LLM_MODEL_ID: ${LLM_MODEL_ID}

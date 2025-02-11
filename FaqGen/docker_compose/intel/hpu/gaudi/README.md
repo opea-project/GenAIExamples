@@ -17,7 +17,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip=$(hostname -I | awk '{print $1}')
-   export HF_TOKEN="Your_Huggingface_API_Token"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -144,7 +144,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 We set default model as "meta-llama/Meta-Llama-3-8B-Instruct", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
 
-If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HF_TOKEN" environment variable.
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
 ### Setup Environment Variables
 
@@ -159,7 +159,7 @@ export LLM_ENDPOINT_PORT=8008
 export LLM_SERVICE_PORT=9000
 export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export HF_TOKEN=${your_hf_api_token}
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"

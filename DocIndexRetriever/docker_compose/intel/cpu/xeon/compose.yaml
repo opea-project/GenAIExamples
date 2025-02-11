@@ -27,8 +27,7 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-      HF_TOKEN: ${HF_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LOGFLAG: ${LOGFLAG}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -43,8 +42,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-      HF_TOKEN: ${HF_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:6006/health || exit 1"]
@@ -64,7 +62,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
@@ -82,8 +80,7 @@ services:
       https_proxy: ${https_proxy}
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-      HF_TOKEN: ${HF_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
@@ -101,8 +98,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-      HF_TOKEN: ${HF_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       host_ip: ${host_ip}
@@ -126,8 +122,7 @@ services:
       https_proxy: ${https_proxy}
       RERANK_TYPE: ${RERANK_TYPE}
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
-      HF_TOKEN: ${HF_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       LOGFLAG: ${LOGFLAG}
