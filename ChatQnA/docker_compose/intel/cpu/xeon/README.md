@@ -47,7 +47,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    For example, change to Llama-2-7b-chat-hf using the following command.
 
    ```bash
-   export LLM_MODEL_ID=meta-llama/Llama-2-7b-chat-hf
+   export LLM_MODEL_ID="meta-llama/Llama-2-7b-chat-hf"
    ```
 
 ## Quick Start: 2.Run Docker Compose
