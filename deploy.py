@@ -117,28 +117,36 @@ def configure_resources(values, deploy_config):
 def configure_extra_cmd_args(values, deploy_config):
     """Configure extra command line arguments for services."""
     for service_name, config in deploy_config["services"].items():
-        extra_cmd_args = []
+        if service_name == "llm":
+            extra_cmd_args = []
+            engine = config.get("engine", "tgi")
 
-        for param in [
-            "max_batch_size",
-            "max_input_length",
-            "max_total_tokens",
-            "max_batch_total_tokens",
-            "max_batch_prefill_tokens",
-        ]:
-            if config.get(param):
-                extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(config[param])])
+            # Define parameters based on engine type
+            if engine == "tgi":
+                params = [
+                    "max_batch_size",
+                    "max_input_length",
+                    "max_total_tokens",
+                    "max_batch_total_tokens",
+                    "max_batch_prefill_tokens",
+                ]
+            elif engine == "vllm":
+                params = [
+                    "max_num_seqs",
+                    "max_input_length",
+                    "max_total_tokens",
+                    "max_batch_total_tokens",
+                    "max_batch_prefill_tokens",
+                ]
 
-        if extra_cmd_args:
-            if service_name == "llm":
-                engine = config.get("engine", "tgi")
+            for param in params:
+                if config.get(param):
+                    extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(config[param])])
+
+            if extra_cmd_args:
                 if engine not in values:
                     values[engine] = {}
                 values[engine]["extraCmdArgs"] = extra_cmd_args
-            else:
-                if service_name not in values:
-                    values[service_name] = {}
-                values[service_name]["extraCmdArgs"] = extra_cmd_args
 
     return values
 

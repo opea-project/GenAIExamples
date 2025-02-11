@@ -28,10 +28,14 @@ deploy:
       memory_capacity: ""
 
     llm:
-      engine: tgi
+      engine: tgi  # or vllm
       model_id: ""
       replicaCount: [7, 15, 31, 63]
+      # TGI specific settings
       max_batch_size: [1, 2, 4, 8]
+      # VLLM specific settings
+      max_num_seqs: [1, 2, 4, 8]
+      # Common settings
       max_input_length: ""
       max_total_tokens: ""
       max_batch_total_tokens: ""
