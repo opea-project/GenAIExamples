@@ -384,12 +384,24 @@ def install_helm_release(release_name, chart_name, namespace, hw_values_file, de
 
 
 def uninstall_helm_release(release_name, namespace=None):
-    """Uninstall a Helm release and clean up resources, optionally delete the namespace if not 'default'."""
+    """Uninstall a Helm release and clean up resources, optionally delete the namespace if not 'default'.
+
+    First checks if the release exists before attempting to uninstall.
+    """
     # Default to 'default' namespace if none is specified
     if not namespace:
         namespace = "default"
 
     try:
+        # Check if the release exists
+        check_command = ["helm", "list", "--namespace", namespace, "--filter", release_name, "--output", "json"]
+        output = run_kubectl_command(check_command)
+        releases = json.loads(output)
+
+        if not releases:
+            print(f"Helm release {release_name} not found in namespace {namespace}. Nothing to uninstall.")
+            return
+
         # Uninstall the Helm release
         command = ["helm", "uninstall", release_name, "--namespace", namespace]
         print(f"Uninstalling Helm release {release_name} in namespace {namespace}...")
@@ -407,6 +419,8 @@ def uninstall_helm_release(release_name, namespace=None):
 
     except subprocess.CalledProcessError as e:
         print(f"Error occurred while uninstalling Helm release or deleting namespace: {e}")
+    except json.JSONDecodeError as e:
+        print(f"Error parsing helm list output: {e}")
 
 
 def update_service(release_name, chart_name, namespace, hw_values_file, deploy_values_file, update_values_file):
