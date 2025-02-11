@@ -1,0 +1,27 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  tei-embedding-service:
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+  tei-reranking-service:
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "9411:9411"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      COLLECTOR_ZIPKIN_HOST_PORT: 9411
+    restart: unless-stopped
+  chatqna-xeon-backend-server:
+    environment:
+      - ENABLE_OPEA_TELEMETRY=true
+      - TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
