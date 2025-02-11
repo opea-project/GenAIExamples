@@ -4,7 +4,8 @@
 name: E2E test with docker compose
 
 on:
-  pull_request_target:
+  # pull_request_target:
+  pull_request:
     branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
@@ -28,7 +29,7 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '\.md|\.txt|kubernetes|gmc|assets|benchmark' #\.github|
+      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
 
   example-test:
     needs: [get-test-matrix]
