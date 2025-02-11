@@ -36,7 +36,6 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false
-    if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       registry: "opea"
