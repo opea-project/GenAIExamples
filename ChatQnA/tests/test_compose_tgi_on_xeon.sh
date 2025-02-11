@@ -53,7 +53,7 @@ function start_services() {
     export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
 
     # Start Docker Containers
-    docker compose -f compose_tgi.yaml -f compose_tgi_telemetry.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -219,7 +219,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    docker compose -f compose_tgi.yaml -f compose_tgi_telemetry.yaml down
+    docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml down
 }
 
 function main() {
