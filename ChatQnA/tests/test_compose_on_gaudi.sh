@@ -48,6 +48,7 @@ function start_services() {
     export NUM_CARDS=1
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export host_ip=${ip_address}
 
     # Start Docker Containers
