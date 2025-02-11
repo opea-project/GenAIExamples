@@ -25,8 +25,8 @@ Before running the benchmarks, ensure you have:
    - Kubernetes installation: Use [kubespray](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md) or other official Kubernetes installation guides
    - (Optional) [Kubernetes set up guide on Intel Gaudi product](https://github.com/opea-project/GenAIInfra/blob/main/README.md#setup-kubernetes-cluster)
 
-2. **Configuration YAML**
-   The configuration file (e.g., `./ChatQnA/benchmark_chatqna.yaml`) consists of two main sections: deployment and benchmarking. Required fields must be filled with valid values (like the Hugging Face token). For all other fields, you can either customize them according to your needs or leave them empty ("") to use the default values from the [helm charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts).
+2. **Configuration YAML**   
+   The configuration file (e.g., `./ChatQnA/benchmark_chatqna.yaml`) consists of two main sections: deployment and benchmarking. Required fields with `# mandatory` comment must be filled with valid values, such as `HUGGINGFACEHUB_API_TOKEN`. For all other fields, you can either customize them according to your needs or leave them empty ("") to use the default values from the [helm charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts).
 
 ## Data Preparation
 
@@ -45,7 +45,7 @@ Before running benchmarks, you need to:
    pip install -U "huggingface_hub[cli]"
    sudo mkdir -p /mnt/models
    sudo chmod 777 /mnt/models
-   huggingface-cli download --cache-dir /mnt/models Intel/neural-chat-7b-v3-3
+   huggingface-cli download --cache-dir /mnt/models meta-llama/Meta-Llama-3-8B-Instruct
    ```
 
 ## Overview

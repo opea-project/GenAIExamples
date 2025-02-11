@@ -3,9 +3,9 @@
 
 deploy:
   device: gaudi
-  version: 1.1.0
+  version: 1.2.0
   modelUseHostPath: /mnt/models
-  HUGGINGFACEHUB_API_TOKEN: ""
+  HUGGINGFACEHUB_API_TOKEN: "Your_Huggingface_API_Token" # mandatory
   node: [1, 2, 4, 8]
   namespace: ""
 

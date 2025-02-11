@@ -116,7 +116,7 @@ def main(yaml_file, target_node=None):
 
     # Pull the Helm chart
     chart_pull_url = f"oci://ghcr.io/opea-project/charts/{chart_name}"
-    version = deploy_config.get("version", "1.1.0")
+    version = deploy_config.get("version", "0-latest")
     chart_dir = pull_helm_chart(chart_pull_url, version, chart_name)
     if not chart_dir:
         return
