@@ -351,15 +351,13 @@ class MultimodalQnAService:
                 return response
         last_node = runtime_graph.all_leaves()[-1]
 
-        # Temporary until we create a toggle in the UI
-        tts = True
         tts_audio = ""
         if "text" in result_dict[last_node].keys():
             response = result_dict[last_node]["text"]
             print("Text response is ", response)
 
-            # toggle on and off?
-            if tts:
+            # toggle for TTS
+            if "audio" in data["modalities"]:
                 tts_audio = self.convert_text_to_audio(response)
 
         else:
@@ -384,7 +382,7 @@ class MultimodalQnAService:
         choices = []
         usage = UsageInfo()
 
-        if tts and tts_audio:
+        if tts_audio:
             chat_message = ChatMessage(role="assistant", content=response, audio={"data": tts_audio})
         else:
             chat_message = ChatMessage(role="assistant", content=response)
@@ -397,7 +395,7 @@ class MultimodalQnAService:
                 metadata=metadata,
             )
         )
-        return ChatCompletionResponse(model="multimodalqna", choices=choices, usage=usage)
+        return ChatCompletionResponse(model="multimodalqna", choices=choices, usage=usage, modalities=data["modalities"])
 
     def start(self):
         self.service = MicroService(
