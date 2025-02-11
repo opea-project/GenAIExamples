@@ -368,7 +368,7 @@ OPEA microservice deployment can easily be monitored through Grafana dashboards 
 
 ## Tracing Services with OpenTelemetry Tracing and Jaeger
 
-> NOTE: This feature is disabled by default. Please check the Deploy ChatQnA sessions for how to enable this feature with compose_telemetry.yaml file.
+> NOTE: This feature is disabled by default. Please check the Deploy ChatQnA sessions for how to enable this feature with compose.telemetry.yaml file.
 
 OPEA microservice and TGI/TEI serving can easily be traced through Jaeger dashboards in conjunction with OpenTelemetry Tracing feature. Follow the [README](https://github.com/opea-project/GenAIComps/tree/main/comps/cores/telemetry#tracing) to trace additional functions if needed.
 
