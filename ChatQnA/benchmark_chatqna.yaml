@@ -28,8 +28,8 @@ deploy:
       memory_capacity: ""
 
     llm:
-      engine: tgi  # or vllm
-      model_id: ""
+      engine: vllm  # or tgi
+      model_id: "meta-llama/Meta-Llama-3-8B-Instruct"
       replicaCount:
         with_teirerank: [7, 15, 31, 63]     # When teirerank.enabled is True
         without_teirerank: [8, 16, 32, 64]   # When teirerank.enabled is False
