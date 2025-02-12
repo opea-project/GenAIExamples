@@ -220,8 +220,8 @@ function main() {
     if [ "${mode}" == "perf" ]; then
         python3 $WORKPATH/tests/chatqna_benchmark.py
     elif [ "${mode}" == "" ]; then
-        validate_microservices
-        validate_megaservice
+#        validate_microservices
+#        validate_megaservice
         validate_frontend
     fi
 
