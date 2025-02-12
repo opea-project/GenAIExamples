@@ -97,7 +97,7 @@ function validate_services() {
 
 function validate_microservices() {
     # vLLM for llm service
-    validate_service \
+    validate_services \
         "${ip_address}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions" \
         "content" \
         "vllm-llm" \
@@ -161,17 +161,17 @@ function stop_docker() {
 
 function main() {
 
-    stop_docker
+#    stop_docker
 
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+#    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices
     validate_megaservice
     validate_frontend
 
-    stop_docker
-    echo y | docker system prune
+#    stop_docker
+#    echo y | docker system prune
     cd $WORKPATH
 
 }
