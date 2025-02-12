@@ -57,12 +57,12 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs codegen-tgi-service > ${LOG_PATH}/codegen_tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/codegen_tgi_service_start.log; then
+    until [[ "$n" -ge 500 ]]; do
+        docker logs chatqna-vllm-service >& "${LOG_PATH}"/chatqna-vllm-service_start.log
+        if grep -q "Application startup complete" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 20s
         n=$((n+1))
     done
 }
