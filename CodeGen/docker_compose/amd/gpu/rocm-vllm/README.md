@@ -49,7 +49,7 @@ It is recommended to use the React UI as it works for downloading files. The use
 
 ### Features of Docker compose for AMD GPUs
 
-1. Added forwarding of GPU devices to the container TGI service with instructions:
+1. Added forwarding of GPU devices to the container vLLM service with instructions:
 
 ```yaml
 shm_size: 1g
