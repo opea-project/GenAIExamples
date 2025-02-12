@@ -13,11 +13,19 @@ cd GenAIComps
 docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
-### Build the MegaService Docker Image
+### Build vLLM ROCm Docker image
 
 ```bash
 ### Cloning repo
 git clone https://github.com/opea-project/GenAIExamples
+
+cd GenAIExamples/CodeGen
+docker build -t opea/llm-vllm-rocm:latest -f Dockerfile-vllm-rocm .
+```
+
+### Build the MegaService Docker Image
+
+```bash
 cd GenAIExamples/CodeTrans
 
 ### Build Docker image
@@ -36,7 +44,7 @@ docker build -t opea/codetrans-ui:latest --build-arg https_proxy=$https_proxy --
 
 ### Features of Docker compose for AMD GPUs
 
-1. Added forwarding of GPU devices to the container TGI service with instructions:
+1. Added forwarding of GPU devices to the container vLLM service with instructions:
 
 ```yaml
 shm_size: 1g
@@ -74,12 +82,12 @@ To find out which GPU device IDs cardN and renderN correspond to the same GPU, u
 ### Go to the directory with the Docker compose file
 
 ```bash
-cd GenAIExamples/CodeTrans/docker_compose/amd/gpu/rocm
+cd GenAIExamples/CodeTrans/docker_compose/amd/gpu/rocm-vllm
 ```
 
 ### Set environments
 
-In the file "GenAIExamples/CodeTrans/docker_compose/amd/gpu/rocm/set_env.sh " it is necessary to set the required values. Parameter assignments are specified in the comments for each variable setting command
+In the file "GenAIExamples/CodeTrans/docker_compose/amd/gpu/rocm-vllm/set_env.sh " it is necessary to set the required values. Parameter assignments are specified in the comments for each variable setting command
 
 ```bash
 chmod +x set_env.sh
@@ -89,17 +97,17 @@ chmod +x set_env.sh
 ### Run services
 
 ```
-docker compose up -d
+docker compose up -d --force-recreate
 ```
 
 # Validate the MicroServices and MegaService
 
-## Validate TGI service
+## Validate vLLM service
 
 ```bash
-curl http://${HOST_IP}:${CODETRANS_TGI_SERVICE_PORT}/generate \
+curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
-  -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+  -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}' \
   -H 'Content-Type: application/json'
 ```
 
