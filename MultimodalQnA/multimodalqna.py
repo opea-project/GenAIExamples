@@ -354,9 +354,7 @@ class MultimodalQnAService:
         tts_audio = ""
         if "text" in result_dict[last_node].keys():
             response = result_dict[last_node]["text"]
-            print("Text response is ", response)
-
-            # toggle for TTS
+            # Toggle for TTS
             if "audio" in data["modalities"]:
                 tts_audio = self.convert_text_to_audio(response)
 
