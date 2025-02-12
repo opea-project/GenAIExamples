@@ -38,7 +38,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/amd/gpu/rocm/
+    cd $WORKPATH/docker_compose/amd/gpu/rocm-vllm/
 
     export CODEGEN_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
     export CODEGEN_VLLM_SERVICE_PORT=8028
@@ -155,7 +155,7 @@ function validate_frontend() {
 
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/amd/gpu/rocm/
+    cd $WORKPATH/docker_compose/amd/gpu/rocm-vllm/
     docker compose stop && docker compose rm -f
 }
 
