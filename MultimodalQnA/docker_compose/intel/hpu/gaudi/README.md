@@ -125,7 +125,7 @@ docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_pr
 Build TTS server image
 
 ```bash
-docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile.intel_hpu .
+docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
 ```
 
 ### 7. Build MegaService Docker Image
@@ -154,7 +154,7 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 4. `opea/retriever:latest`
 5. `opea/whisper:latest`
-6. `opea/speech5-gaudi:latest`
+6. `opea/speech5:latest`
 7. `opea/redis-vector-db`
 8. `opea/embedding:latest`
 9. `opea/embedding-multimodal-bridgetower:latest`
@@ -166,6 +166,7 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 ### Required Models
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
+
 
 | Service   | Model                                       |
 | --------- | ------------------------------------------- |

@@ -22,10 +22,10 @@ services:
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     restart: unless-stopped
   speecht5-service:
-    image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
     container_name: speecht5-service
     ports:
-      - "${TTS_PORT}:${TTS_PORT}"
+      - "${TTS_PORT}:7055"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -33,11 +33,6 @@ services:
       https_proxy: ${https_proxy}
       TTS_PORT: ${TTS_PORT}
       TTS_ENDPOINT: ${TTS_ENDPOINT}
-      HABANA_VISIBLE_DEVICES: all
-      OMPI_MCA_btl_vader_single_copy_mechanism: none
-    runtime: habana
-    cap_add:
-      - SYS_NICE
     restart: unless-stopped
   dataprep-multimodal-redis:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}

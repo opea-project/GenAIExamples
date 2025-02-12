@@ -357,7 +357,6 @@ class MultimodalQnAService:
             # Toggle for TTS
             if "audio" in data["modalities"]:
                 tts_audio = self.convert_text_to_audio(response)
-
         else:
             # text is not in response message
             # something wrong, for example due to empty retrieval results
