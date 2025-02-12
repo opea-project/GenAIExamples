@@ -8,6 +8,7 @@ export HOST_IP=''
 
 ### The port of the vLLM service. On this port, the TGI service will accept connections
 export CODEGEN_VLLM_SERVICE_PORT=8028
+export CODEGEN_VLLM_ENDPOINT="http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}"
 
 ### A token for accessing repositories with models
 export CODEGEN_HUGGINGFACEHUB_API_TOKEN=''
