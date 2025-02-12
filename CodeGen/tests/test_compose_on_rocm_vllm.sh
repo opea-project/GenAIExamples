@@ -28,6 +28,8 @@ function build_docker_images() {
     fi
 
     cd $WORKPATH/docker_image_build
+    echo Y | rm -R GenAIComps
+    echo Y | rm -R vllm
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
