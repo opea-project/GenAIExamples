@@ -296,8 +296,8 @@ class DocSumUI:
                     audio_ui.render()
                 with gr.TabItem("Upload Video"):
                     video_ui.render()
-                with gr.TabItem("Enter URL"):
-                    url_ui.render()
+                # with gr.TabItem("Enter URL"):
+                #     url_ui.render()
 
         return self.demo
 

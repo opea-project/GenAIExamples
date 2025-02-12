@@ -36,6 +36,7 @@
     urlSuffix: string,
     params: string
   ) => {
+    messages = "";
     // Fetch the stream
     const eventStream = await fetchTextStream(
       query,
