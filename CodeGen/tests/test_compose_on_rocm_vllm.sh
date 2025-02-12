@@ -42,6 +42,7 @@ function start_services() {
 
     export CODEGEN_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
     export CODEGEN_VLLM_SERVICE_PORT=8028
+    export CODEGEN_VLLM_ENDPOINT="http://${ip_address}:${CODEGEN_VLLM_SERVICE_PORT}"
     export CODEGEN_LLM_SERVICE_PORT=9000
     export CODEGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export CODEGEN_MEGA_SERVICE_HOST_IP=${ip_address}
