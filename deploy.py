@@ -72,17 +72,19 @@ def configure_resources(values, deploy_config):
             limits = {}
             requests = {}
 
-            # Only add CPU if cores_per_instance has a value
-            if config.get("cores_per_instance"):
-                limits["cpu"] = config["cores_per_instance"]
-                requests["cpu"] = config["cores_per_instance"]
+            # Only add CPU if cores_per_instance has a valid value
+            cores = config.get("cores_per_instance")
+            if cores is not None and cores != "":
+                limits["cpu"] = cores
+                requests["cpu"] = cores
 
-            # Only add memory if memory_capacity has a value
-            if config.get("memory_capacity"):
-                limits["memory"] = config["memory_capacity"]
-                requests["memory"] = config["memory_capacity"]
+            # Only add memory if memory_capacity has a valid value
+            memory = config.get("memory_capacity")
+            if memory is not None and memory != "":
+                limits["memory"] = memory
+                requests["memory"] = memory
 
-            # Only create resources if we have any limits/requests
+            # Only create resources if we have any valid limits/requests
             if limits and requests:
                 resources["limits"] = limits
                 resources["requests"] = requests
@@ -140,8 +142,10 @@ def configure_extra_cmd_args(values, deploy_config):
                 ]
 
             for param in params:
-                if config.get(param):
-                    extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(config[param])])
+                param_value = config.get(param)
+                # Only add parameter if its value is not None and not empty string
+                if param_value is not None and param_value != "":
+                    extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(param_value)])
 
             if extra_cmd_args:
                 if engine not in values:
@@ -154,18 +158,21 @@ def configure_extra_cmd_args(values, deploy_config):
 def configure_models(values, deploy_config):
     """Configure model settings for services."""
     for service_name, config in deploy_config["services"].items():
-        # Skip if no model_id defined or service is disabled
-        if not config.get("model_id") or config.get("enabled") is False:
+        # Get model_id and check if it's valid (not None or empty string)
+        model_id = config.get("model_id")
+        if not model_id or model_id == "" or config.get("enabled") is False:
             continue
 
         if service_name == "llm":
             # For LLM service, use its engine as the key
+            # Check if engine is valid (not None or empty string)
             engine = config.get("engine", "tgi")
-            values[engine]["LLM_MODEL_ID"] = config.get("model_id")
+            if engine and engine != "":
+                values[engine]["LLM_MODEL_ID"] = model_id
         elif service_name == "tei":
-            values[service_name]["EMBEDDING_MODEL_ID"] = config.get("model_id")
+            values[service_name]["EMBEDDING_MODEL_ID"] = model_id
         elif service_name == "teirerank":
-            values[service_name]["RERANK_MODEL_ID"] = config.get("model_id")
+            values[service_name]["RERANK_MODEL_ID"] = model_id
 
     return values
 
