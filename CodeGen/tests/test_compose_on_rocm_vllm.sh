@@ -98,7 +98,7 @@ function validate_services() {
 function validate_microservices() {
     # vLLM for llm service
     validate_services \
-        "${ip_address}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "${ip_address}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions" \
         "content" \
         "codegen-vllm-service" \
         "codegen-vllm-service" \
