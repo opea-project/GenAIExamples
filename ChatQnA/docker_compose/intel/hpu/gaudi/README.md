@@ -10,7 +10,7 @@ Quick Start:
 2. Run Docker Compose.
 3. Consume the ChatQnA Service.
 
-Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models). We now support running the latest DeepSeek models, including [deepseek-ai/DeepSeek-R1-Distill-Llama-70B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B) and [deepseek-ai/DeepSeek-R1-Distill-Qwen-32B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B) on Gaudi accelerators. To run `deepseek-ai/DeepSeek-R1-Distill-Llama-70B`, update the `LLM_MODEL_ID` and configure `NUM_CARDS` to 8 in the [set_env.sh](./set_env.sh) script. To run `deepseek-ai/DeepSeek-R1-Distill-Qwen-32B`, update the `LLM_MODEL_ID` and configure `NUM_CARDS` to 4 in the [set_env.sh](./set_env.sh) script.
 
 ## Quick Start: 1.Setup Environment Variable
 
@@ -39,10 +39,35 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    source ./set_env.sh
    ```
 
+4. Change Model for LLM serving
+
+   By default, Meta-Llama-3-8B-Instruct is used for LLM serving, the default model can be changed to other validated LLM models.  
+   Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.  
+   To change the default model defined in set_env.sh, overwrite it by exporting LLM_MODEL_ID to the new model or by modifying set_env.sh, and then repeat step 3.  
+   For example, change to DeepSeek-R1-Distill-Qwen-32B using the following command.
+
+   ```bash
+   export LLM_MODEL_ID="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+   ```
+
+   Please also check [required gaudi cards for different models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#system-requirements-for-llm-models) for new models.  
+   It might be necessary to increase the number of Gaudi cards for the model by exporting NUM_CARDS to the new model or by modifying set_env.sh, and then repeating step 3. For example, increase the number of Gaudi cards for DeepSeek-R1-
+   Distill-Qwen-32B using the following command:
+
+   ```bash
+   export NUM_CARDS=4
+   ```
+
 ## Quick Start: 2.Run Docker Compose
 
 ```bash
 docker compose up -d
+```
+
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
+
+```bash
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
 It will automatically download the docker image on `docker hub`:
@@ -259,12 +284,16 @@ If use vLLM as the LLM serving backend.
 docker compose -f compose.yaml up -d
 # Start ChatQnA without Rerank Pipeline
 docker compose -f compose_without_rerank.yaml up -d
+# Start ChatQnA with Rerank Pipeline and Open Telemetry Tracing
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
 If use TGI as the LLM serving backend.
 
 ```bash
 docker compose -f compose_tgi.yaml up -d
+# Start ChatQnA with Open Telemetry Tracing
+docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:

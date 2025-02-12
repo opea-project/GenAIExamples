@@ -1,11 +1,7 @@
 #!/bin/bash
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 set -xe
-
-echo "All running containers"
-docker ps
 
 WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
