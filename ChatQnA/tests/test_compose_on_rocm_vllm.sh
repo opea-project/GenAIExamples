@@ -27,19 +27,19 @@ export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export MODEL=${CHATQNA_LLM_MODEL_ID}
-export CHATQNA_VLLM_SERVICE_PORT=18008
-export CHATQNA_TEI_EMBEDDING_PORT=18090
+export CHATQNA_VLLM_SERVICE_PORT=9009
+export CHATQNA_TEI_EMBEDDING_PORT=6006
 export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"
-export CHATQNA_TEI_RERANKING_PORT=18808
-export CHATQNA_REDIS_VECTOR_PORT=16379
+export CHATQNA_TEI_RERANKING_PORT=8808
+export CHATQNA_REDIS_VECTOR_PORT=6379
 export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8001
-export CHATQNA_REDIS_DATAPREP_PORT=18103
+export CHATQNA_REDIS_DATAPREP_PORT=6007
 export CHATQNA_REDIS_RETRIEVER_PORT=7000
 export CHATQNA_FRONTEND_SERVICE_IP=${HOST_IP}
 export CHATQNA_FRONTEND_SERVICE_PORT=5173
 export CHATQNA_BACKEND_SERVICE_NAME=chatqna
 export CHATQNA_BACKEND_SERVICE_IP=${HOST_IP_EXTERNAL}
-export CHATQNA_BACKEND_SERVICE_PORT=18102
+export CHATQNA_BACKEND_SERVICE_PORT=8888
 export CHATQNA_INDEX_NAME="rag-redis"
 export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
@@ -51,7 +51,7 @@ export CHATQNA_REDIS_URL="redis://${HOST_IP}:${CHATQNA_REDIS_VECTOR_PORT}"
 export CHATQNA_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_RERANK_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_LLM_SERVICE_HOST_IP=${HOST_IP}
-export CHATQNA_NGINX_PORT=18104
+export CHATQNA_NGINX_PORT=8089
 
 
 function build_docker_images() {
@@ -211,17 +211,17 @@ function main() {
 
 #    stop_docker
 #    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-#    start_time=$(date +%s)
-#    start_services
-#    end_time=$(date +%s)
-#    duration=$((end_time-start_time))
-#    echo "Mega service start duration is $duration s" && sleep 1s
-#
+    start_time=$(date +%s)
+    start_services
+    end_time=$(date +%s)
+    duration=$((end_time-start_time))
+    echo "Mega service start duration is $duration s" && sleep 1s
+
     if [ "${mode}" == "perf" ]; then
         python3 $WORKPATH/tests/chatqna_benchmark.py
     elif [ "${mode}" == "" ]; then
-#        validate_microservices
-#        validate_megaservice
+        validate_microservices
+        validate_megaservice
         validate_frontend
     fi
 
