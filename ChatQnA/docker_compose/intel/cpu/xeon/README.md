@@ -34,8 +34,20 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```
 
 3. Set up other environment variables:
+
    ```bash
    source ./set_env.sh
+   ```
+
+4. Change Model for LLM serving
+
+   By default, Meta-Llama-3-8B-Instruct is used for LLM serving, the default model can be changed to other validated LLM models.  
+   Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.  
+   To change the default model defined in set_env.sh, overwrite it by exporting LLM_MODEL_ID to the new model or by modifying set_env.sh, and then repeat step 3.  
+   For example, change to Llama-2-7b-chat-hf using the following command.
+
+   ```bash
+   export LLM_MODEL_ID="meta-llama/Llama-2-7b-chat-hf"
    ```
 
 ## Quick Start: 2.Run Docker Compose
