@@ -58,7 +58,7 @@
 	const readFileAsBase64 = (file) => {
     const reader = new FileReader();
     reader.onload = () => {
-        const base64Data = reader.result; 
+        const base64Data = reader.result;
         const fileType = file.type;
 
         if (!fileType.includes("png")) {
@@ -108,10 +108,10 @@ const convertImageToPNG = async (base64Data) => {
         try {
             // Resize and compress the image using Pica
             await pica.resize(canvas, outputCanvas);
-            
+
             // Convert canvas to PNG format with data URL
             const pngDataUrl = outputCanvas.toDataURL("image/png", 0.8); // Adjust quality (0.9 is high, between 0-1)
-            
+
             // Store the Base64 PNG image
             base64ImageStore.set(pngDataUrl);
         } catch (err) {

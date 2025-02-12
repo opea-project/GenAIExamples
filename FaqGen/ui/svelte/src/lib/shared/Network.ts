@@ -74,9 +74,8 @@ export async function fetchTextStream(query: string | Blob, params: string, file
         })
         .filter((line) => line); // Remove empty lines
 
-
       const validJsonChunks = cleanedChunks.filter((item) => {
-        if (item === '[DONE]') {
+        if (item === "[DONE]") {
           return true;
         }
         try {
@@ -94,7 +93,6 @@ export async function fetchTextStream(query: string | Blob, params: string, file
         // Further clean to ensure all unnecessary parts are removed
         yield cleanedChunk.replace(/^b'|['"]$/g, ""); // Again clean 'b' and other single or double quotes
       }
-
 
       // If there is an incomplete message in the current buffer, keep it
       buffer = buffer.endsWith("\n") ? "" : cleanedChunks.pop() || ""; // Keep the last incomplete part
