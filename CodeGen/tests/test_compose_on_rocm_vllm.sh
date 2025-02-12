@@ -102,7 +102,7 @@ function validate_microservices() {
         "content" \
         "codegen-vllm-service" \
         "codegen-vllm-service" \
-        '{"model": "${CODEGEN_LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 
     # llm microservice
     validate_services \
