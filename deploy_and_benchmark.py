@@ -105,13 +105,18 @@ def pull_helm_chart(chart_pull_url, version, chart_name):
     return untar_dir
 
 
-def main(yaml_file, target_node=None):
+def main(yaml_file, target_node=None, test_mode="oob"):
     """Main function to process deployment configuration.
 
     Args:
         yaml_file: Path to the YAML configuration file
         target_node: Optional target number of nodes to deploy. If not specified, will process all nodes.
+        test_mode: Test mode, either "oob" (out of box) or "tune". Defaults to "oob".
     """
+    if test_mode not in ["oob", "tune"]:
+        print("Error: test_mode must be either 'oob' or 'tune'")
+        return None
+
     config = read_yaml(yaml_file)
     if config is None:
         print("Failed to read YAML file.")
@@ -161,30 +166,39 @@ def main(yaml_file, target_node=None):
                 continue
 
             try:
-                # Process batch parameters based on engine type
-                llm_config = deploy_config.get("services", {}).get("llm", {})
-                engine = llm_config.get("engine", "tgi")
+                # Only process batch parameters in tune mode
+                if test_mode == "tune":
+                    # Process batch parameters based on engine type
+                    llm_config = deploy_config.get("services", {}).get("llm", {})
+                    engine = llm_config.get("engine", "tgi")
 
-                if engine == "tgi":
-                    batch_params = llm_config.get("max_batch_size", [])
-                    param_name = "max_batch_size"
-                elif engine == "vllm":
-                    batch_params = llm_config.get("max_num_seqs", [])
-                    param_name = "max_num_seqs"
+                    if engine == "tgi":
+                        batch_params = llm_config.get("max_batch_size", [])
+                        param_name = "max_batch_size"
+                    elif engine == "vllm":
+                        batch_params = llm_config.get("max_num_seqs", [])
+                        param_name = "max_num_seqs"
+                    else:
+                        print(f"Unsupported LLM engine: {engine}")
+                        continue
+
+                    if not isinstance(batch_params, list):
+                        batch_params = [batch_params]
+
+                    # Skip multiple iterations if batch parameter is empty
+                    if batch_params == [""] or not batch_params:
+                        batch_params = [None]
                 else:
-                    print(f"Unsupported LLM engine: {engine}")
-                    continue
-
-                if not isinstance(batch_params, list):
-                    batch_params = [batch_params]
-
-                # Skip multiple iterations if batch parameter is empty
-                if batch_params == [""] or not batch_params:
+                    # In OOB mode, just do one iteration with no batch parameter
                     batch_params = [None]
+                    param_name = "batch_param"
 
                 values_file_path = None
                 for i, batch_param in enumerate(batch_params):
-                    print(f"\nProcessing {param_name}: {batch_param}")
+                    if test_mode == "tune":
+                        print(f"\nProcessing {param_name}: {batch_param}")
+                    else:
+                        print("\nProcessing OOB deployment")
 
                     # Construct new deploy config
                     new_deploy_config = construct_deploy_config(deploy_config, node, batch_param)
@@ -209,6 +223,8 @@ def main(yaml_file, target_node=None):
                                 namespace,
                                 "--chart-dir",
                                 chart_dir,
+                                "--test-mode",
+                                test_mode,
                             ]
                             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
 
@@ -235,6 +251,8 @@ def main(yaml_file, target_node=None):
                                 "--user-values",
                                 values_file_path,
                                 "--update-service",
+                                "--test-mode",
+                                test_mode,
                             ]
                             result = subprocess.run(cmd, check=True)
                             if result.returncode != 0:
@@ -325,6 +343,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Deploy and benchmark with specific node configuration.")
     parser.add_argument("yaml_file", help="Path to the YAML configuration file")
     parser.add_argument("--target-node", type=int, help="Optional: Target number of nodes to deploy.", default=None)
+    parser.add_argument("--test-mode", type=str, help="Test mode, either 'oob' (out of box) or 'tune'.", default="oob")
 
     args = parser.parse_args()
-    main(args.yaml_file, args.target_node)
+    main(args.yaml_file, args.target_node, args.test_mode)

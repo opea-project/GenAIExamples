@@ -194,7 +194,7 @@ def configure_rerank(values, with_rerank, deploy_config, example_type, node_sele
     return values
 
 
-def generate_helm_values(example_type, deploy_config, chart_dir, action_type, node_selector=None):
+def generate_helm_values(example_type, deploy_config, chart_dir, action_type, node_selector=None, test_mode="oob"):
     """Create a values.yaml file based on the provided configuration."""
     if deploy_config is None:
         raise ValueError("deploy_config is required")
@@ -223,8 +223,12 @@ def generate_helm_values(example_type, deploy_config, chart_dir, action_type, no
     values = configure_node_selectors(values, node_selector or {}, deploy_config)
     values = configure_rerank(values, with_rerank, deploy_config, example_type, node_selector or {})
     values = configure_replica(values, deploy_config)
-    values = configure_resources(values, deploy_config)
-    values = configure_extra_cmd_args(values, deploy_config)
+
+    # Only configure resources and extra cmd args in tune mode
+    if test_mode == "tune":
+        values = configure_resources(values, deploy_config)
+        values = configure_extra_cmd_args(values, deploy_config)
+
     values = configure_models(values, deploy_config)
 
     device = deploy_config.get("device", "unknown")
@@ -614,6 +618,13 @@ def main():
     )
     parser.add_argument("--update-service", action="store_true", help="Update the deployment with new configuration.")
     parser.add_argument("--check-ready", action="store_true", help="Check if all services in the deployment are ready.")
+    parser.add_argument(
+        "--test-mode",
+        type=str,
+        choices=["oob", "tune"],
+        default="oob",
+        help="Test mode: 'oob' (out of box) or 'tune' (default: oob)",
+    )
     parser.add_argument("--chart-dir", default=".", help="Path to the untarred Helm chart directory.")
 
     args = parser.parse_args()
@@ -664,6 +675,7 @@ def main():
             chart_dir=args.chart_dir,
             action_type=action_type,  # 0 - deploy, 1 - update
             node_selector=node_selector,
+            test_mode=args.test_mode,  # Pass the test mode to generate_helm_values
         )
 
         # Check result status
