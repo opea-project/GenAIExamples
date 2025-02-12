@@ -52,6 +52,7 @@ export async function fetchTextStream(query: string | Blob, params: string, file
     }
     const reader = postResponse.body.getReader();
     const decoder = new TextDecoder("utf-8");
+
     let done, value;
 
     let buffer = ""; // Initialize a buffer
@@ -61,6 +62,7 @@ export async function fetchTextStream(query: string | Blob, params: string, file
 
       // Decode chunk and append to buffer
       const chunk = decoder.decode(value, { stream: true });
+
       buffer += chunk;
 
       // Use regex to clean and extract data
@@ -72,10 +74,27 @@ export async function fetchTextStream(query: string | Blob, params: string, file
         })
         .filter((line) => line); // Remove empty lines
 
+
+      const validJsonChunks = cleanedChunks.filter((item) => {
+        if (item === '[DONE]') {
+          return true;
+        }
+        try {
+          JSON.parse(item);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      });
+
+      cleanedChunks.length = 0;
+      cleanedChunks.push(...validJsonChunks);
+
       for (const cleanedChunk of cleanedChunks) {
         // Further clean to ensure all unnecessary parts are removed
         yield cleanedChunk.replace(/^b'|['"]$/g, ""); // Again clean 'b' and other single or double quotes
       }
+
 
       // If there is an incomplete message in the current buffer, keep it
       buffer = buffer.endsWith("\n") ? "" : cleanedChunks.pop() || ""; // Keep the last incomplete part
