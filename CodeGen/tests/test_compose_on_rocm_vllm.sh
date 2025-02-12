@@ -100,9 +100,9 @@ function validate_microservices() {
     validate_services \
         "${ip_address}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions" \
         "content" \
-        "vllm-llm" \
-        "chatqna-vllm-service" \
-        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
+        "codegen-vllm-service" \
+        "codegen-vllm-service" \
+        '{"model": "${CODEGEN_LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 
     # llm microservice
     validate_services \
