@@ -58,8 +58,8 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs chatqna-vllm-service >& "${LOG_PATH}"/chatqna-vllm-service_start.log
-        if grep -q "Application startup complete" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
+        docker logs codegen-vllm-service >& "${LOG_PATH}"/codegen-vllm-service_start.log
+        if grep -q "Application startup complete" "${LOG_PATH}"/codegen-vllm-service_start.log; then
             break
         fi
         sleep 20s
