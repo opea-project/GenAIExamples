@@ -1,4 +1,4 @@
-FROM rocm/vllm:rocm6.2_mi300_ubuntu20.04_py3.9_vllm_0.6.4
+FROM rocm/vllm-dev:main
 
 # Set the working directory
 WORKDIR /workspace
