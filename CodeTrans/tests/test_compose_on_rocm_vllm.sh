@@ -42,6 +42,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm-vllm/
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
+    export HOST_IP=${ip_address}
     export CODETRANS_VLLM_SERVICE_PORT=8008
     export CODETRANS_LLM_SERVICE_PORT=9000
     export CODETRANS_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
@@ -176,17 +177,17 @@ function stop_docker() {
 
 function main() {
 
-    stop_docker
+#    stop_docker
 
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+#    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_microservices
     validate_megaservice
     validate_frontend
 
-    stop_docker
-    echo y | docker system prune
+#    stop_docker
+#    echo y | docker system prune
 
 }
 
