@@ -209,8 +209,8 @@ function stop_docker() {
 
 function main() {
 
-#    stop_docker
-#    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    stop_docker
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
@@ -225,8 +225,8 @@ function main() {
 #        validate_frontend
     fi
 
-#    stop_docker
-#    echo y | docker system prune
+    stop_docker
+    echo y | docker system prune
 
 }
 
