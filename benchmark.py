@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-import requests
 from datetime import datetime
 
+import requests
 import yaml
 from evals.benchmark.stresscli.commands.load_test import locust_runtests
 from kubernetes import client, config
@@ -225,16 +225,14 @@ def ingest_data_to_db(service, dataset, namespace):
                 #     if "opea-eval" in dist.project_name:
                 #         file_path = dist.location
                 #         break
-                
+
                 # if not file_path:
                 #     print("Fail to load opea-eval package. Please install it first.")
                 #     exit(1)
-                
+
                 # data = f"files=@{os.path.join(file_path, "evals/benchmark/data/", dataset)}"
-                files = {
-                    "files": open(dataset, "rb")
-                }
-                
+                files = {"files": open(dataset, "rb")}
+
                 response = requests.post(url, files=files)
                 if response.status_code != 200:
                     print(f"Error ingesting data: {response.text}. Status code: {response.status_code}")
@@ -242,7 +240,7 @@ def ingest_data_to_db(service, dataset, namespace):
                 if "Data preparation succeeded" not in response.text:
                     print(f"Error ingesting data: {response.text}. Response: {response}")
                     return False
-            
+
             except Exception as e:
                 print(f"Error ingesting data: {e}")
                 return False
@@ -262,11 +260,7 @@ def delete_all_data_from_db(service, namespace):
                 data = {"file_path": "all"}
                 print(f"[OPEA BENCHMARK] 🚀 Deleting data from the database for {service_name} with {url}")
 
-                response = requests.post(
-                    url, 
-                    json=data,
-                    headers={"Content-Type": "application/json"}
-                )
+                response = requests.post(url, json=data, headers={"Content-Type": "application/json"})
                 if response.status_code != 200:
                     print(f"Error deleting data: {response.text}. Status code: {response.status_code}")
                     return False
@@ -325,9 +319,9 @@ def _run_service_test(example, service, test_suite_config, namespace):
                 if key == "DATASET":
                     dataset = value
         if not dataset:
-            print(f"[OPEA BENCHMARK] 🚀 Dataset is not specified for {service_name}. Check the benchmark.yaml agin.")
+            print(f"[OPEA BENCHMARK] 🚀 Dataset is not specified for {service_name}. Check the benchmark.yaml again.")
             exit(1)
-        
+
         # Ingest data into the database for single run of benchmark
         result = ingest_data_to_db(service, dataset, namespace)
         if not result:
