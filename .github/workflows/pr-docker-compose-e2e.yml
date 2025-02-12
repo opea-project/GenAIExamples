@@ -28,11 +28,11 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '\.md|\.txt|kubernetes|gmc|assets|benchmark' #\.github|
+      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
 
   example-test:
     needs: [get-test-matrix]
-    if: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix).length != 0 }}
+    if: ${{ needs.get-test-matrix.outputs.run_matrix != '' }}
     strategy:
       matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false

@@ -6,11 +6,6 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
-if [ -z "$HF_TOKEN" ]; then
-    echo "Error: The HF_TOKEN environment variable is **NOT** set. Please set it"
-    return -1
-fi
-
 export host_ip=$(hostname -I | awk '{print $1}')
 
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
@@ -62,3 +57,4 @@ export MEGA_SERVICE_PORT=8888
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna"
 
 export UI_PORT=5173
+export UI_TIMEOUT=200

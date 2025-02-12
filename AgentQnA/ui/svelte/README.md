@@ -18,7 +18,7 @@ Here're some of the project's features:
 2. cd command to the current folder.
 
    ```
-   cd AgentQnA/ui
+   cd AgentQnA/ui/svelte
    ```
 
 3. Modify the required .env variables.
@@ -41,7 +41,7 @@ Here're some of the project's features:
   npm run dev
   ```
 
-- The application will be available at `http://localhost:3000`.
+- The application will be available at `http://localhost:5173`.
 
 5. **For Docker Setup:**
 
@@ -54,7 +54,7 @@ Here're some of the project's features:
 - Run the Docker container:
 
   ```
-  docker run -d -p 3000:3000 --name agent-ui opea:agent-ui
+  docker run -d -p 5173:5173 --name agent-ui opea:agent-ui
   ```
 
-- The application will be available at `http://localhost:3000`.
+- The application will be available at `http://localhost:5173`.
