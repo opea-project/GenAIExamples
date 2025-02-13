@@ -28,10 +28,16 @@ deploy:
       memory_capacity: ""
 
     llm:
-      engine: tgi
-      model_id: ""
-      replicaCount: [7, 15, 31, 63]
+      engine: vllm  # or tgi
+      model_id: "meta-llama/Meta-Llama-3-8B-Instruct"
+      replicaCount:
+        with_teirerank: [7, 15, 31, 63]     # When teirerank.enabled is True
+        without_teirerank: [8, 16, 32, 64]   # When teirerank.enabled is False
+      # TGI specific settings
       max_batch_size: [1, 2, 4, 8]
+      # VLLM specific settings
+      max_num_seqs: [1, 2, 4, 8]
+      # Common settings
       max_input_length: ""
       max_total_tokens: ""
       max_batch_total_tokens: ""
