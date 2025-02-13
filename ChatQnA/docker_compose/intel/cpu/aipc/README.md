@@ -105,7 +105,7 @@ export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export INDEX_NAME="rag-redis"
-export HF_TOKEN=${your_hf_api_token}
+export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export OLLAMA_HOST=${host_ip}
 export OLLAMA_MODEL="llama3.2"
 ```
@@ -116,7 +116,7 @@ export OLLAMA_MODEL="llama3.2"
 set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 set RERANK_MODEL_ID=BAAI/bge-reranker-base
 set INDEX_NAME=rag-redis
-set HF_TOKEN=%your_hf_api_token%
+set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
 set OLLAMA_HOST=host.docker.internal
 set OLLAMA_MODEL="llama3.2"
 ```
