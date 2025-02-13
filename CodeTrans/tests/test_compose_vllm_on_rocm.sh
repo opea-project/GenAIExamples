@@ -39,7 +39,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/amd/gpu/rocm-vllm/
+    cd $WORKPATH/docker_compose/amd/gpu/rocm/
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
     export HOST_IP=${ip_address}
@@ -62,7 +62,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 500 ]]; do
@@ -171,8 +171,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/amd/gpu/rocm-vllm/
-    docker compose stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/amd/gpu/rocm/
+    docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
 function main() {
