@@ -379,7 +379,6 @@ class MultimodalQnAService:
 
         choices = []
         usage = UsageInfo()
-
         choices.append(
             ChatCompletionResponseChoice(
                 index=0,

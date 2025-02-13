@@ -386,7 +386,7 @@ curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -d  '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Green bananas in a tree"}, {"type": "image_url", "image_url": {"url": "http://images.cocodataset.org/test-stuff2017/000000004248.jpg"}}]}]}'
 ```
 
-Test the MegaService with a back and forth conversation between the user and assistant:
+Test the MegaService with a back and forth conversation between the user and assistant including a text to speech response from the assistant using `"modalities": ["text", "audio"]'`:
 
 ```bash
 curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
