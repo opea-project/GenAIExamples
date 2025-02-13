@@ -218,9 +218,7 @@ def ingest_data_to_db(service, dataset, namespace):
                 svc_ip, port = _get_service_ip(service_name, "k8s", None, None, namespace)
                 url = f"http://{svc_ip}:{port}/v1/dataprep/ingest"
 
-                files = {
-                    "files": open(dataset, "rb")
-                }
+                files = {"files": open(dataset, "rb")}
 
                 response = requests.post(url, files=files)
                 if response.status_code != 200:
@@ -349,8 +347,9 @@ def run_benchmark(benchmark_config, chart_name, namespace, llm_model=None, repor
         "load_shape": {
             "name": parsed_data["load_shape_type"],
             "params": {
-                "constant": {"concurrent_level": parsed_data["concurrent_level"]}, 
-                "poisson": {"arrival_rate": parsed_data["poisson_arrival_rate"]}},
+                "constant": {"concurrent_level": parsed_data["concurrent_level"]},
+                "poisson": {"arrival_rate": parsed_data["poisson_arrival_rate"]},
+            },
         },
         "concurrent_level": parsed_data["concurrent_level"],
         "arrival_rate": parsed_data["poisson_arrival_rate"],

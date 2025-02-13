@@ -76,11 +76,13 @@ Before running benchmarks, you need to:
 1. **Prepare Test Data**
 
    - Testing for general benchmark target:
-     
+
      Download the retrieval file using the command below for data ingestion in RAG:
+
      ```bash
      wget https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/data/upload_file.txt
      ```
+
    - Testing for pubmed benchmark target:
 
      For the `chatqna_qlist_pubmed` test case, prepare `pubmed_${max_lines}.txt` by following this [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/stresscli/README_Pubmed_qlist.md)
