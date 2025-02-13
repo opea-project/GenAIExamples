@@ -7,6 +7,7 @@ set -e
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 vllm_port=${vllm_port}
+VLLM_VERSION=v0.7.2
 [[ -z "$vllm_port" ]] && vllm_port=8084
 model=mistralai/Mistral-7B-Instruct-v0.3
 export WORKDIR=$WORKPATH/../../
@@ -17,8 +18,8 @@ function build_vllm_docker_image() {
     cd $WORKPATH
     echo $WORKPATH
     if [ ! -d "./vllm" ]; then
-        git clone https://github.com/vllm-project/vllm.git
-        cd ./vllm; git checkout tags/v0.6.0
+        git clone --branch ${VLLM_VERSION} https://github.com/vllm-project/vllm.git
+        cd vllm && git rev-parse HEAD;
     else
         cd ./vllm
     fi
