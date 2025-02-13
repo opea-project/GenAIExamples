@@ -87,22 +87,22 @@ To find out which GPU device IDs cardN and renderN correspond to the same GPU, u
 ### Go to the directory with the Docker compose file
 
 ```bash
-cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm-vllm
+cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
 ```
 
 ### Set environments
 
-In the file "GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm-vllm/set_env.sh " it is necessary to set the required values. Parameter assignments are specified in the comments for each variable setting command
+In the file "GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm/set_env_vllm.sh " it is necessary to set the required values. Parameter assignments are specified in the comments for each variable setting command
 
 ```bash
-chmod +x set_env.sh
+chmod +x set_env_vllm.sh
 . set_env.sh
 ```
 
 ### Run services
 
 ```
-docker compose up -d --force-recreate
+docker compose -f compose_vllm.yaml up -d --force-recreate
 ```
 
 # Validate the MicroServices and MegaService
