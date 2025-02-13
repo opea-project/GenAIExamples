@@ -60,8 +60,7 @@ def construct_deploy_config(deploy_config, target_node, batch_param_value=None):
         if isinstance(llm_config.get("replicaCount"), dict):
             replica_counts = llm_config["replicaCount"]
             llm_config["replicaCount"] = (
-                replica_counts["with_teirerank"] if teirerank_enabled
-                else replica_counts["without_teirerank"]
+                replica_counts["with_teirerank"] if teirerank_enabled else replica_counts["without_teirerank"]
             )
 
     # Update instance_num for each service based on the same index
@@ -204,8 +203,11 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                     new_deploy_config = construct_deploy_config(deploy_config, node, batch_param)
 
                     # Write the new deploy config to a temporary file
-                    temp_config_file = (f"temp_deploy_config_{node}.yaml" if batch_param is None
-                                      else f"temp_deploy_config_{node}_{batch_param}.yaml")
+                    temp_config_file = (
+                        f"temp_deploy_config_{node}.yaml"
+                        if batch_param is None
+                        else f"temp_deploy_config_{node}_{batch_param}.yaml"
+                    )
                     try:
                         with open(temp_config_file, "w") as f:
                             yaml.dump(new_deploy_config, f)
@@ -256,9 +258,7 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                             ]
                             result = subprocess.run(cmd, check=True)
                             if result.returncode != 0:
-                                print(
-                                    f"Update failed for {node} nodes configuration with {param_name} {batch_param}"
-                                )
+                                print(f"Update failed for {node} nodes configuration with {param_name} {batch_param}")
                                 break  # Skip remaining {param_name} for this node
 
                         # Wait for deployment to be ready

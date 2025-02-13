@@ -24,10 +24,11 @@ Before running the benchmarks, ensure you have:
    - Kubernetes installation: Use [kubespray](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md) or other official Kubernetes installation guides
    - (Optional) [Kubernetes set up guide on Intel Gaudi product](https://github.com/opea-project/GenAIInfra/blob/main/README.md#setup-kubernetes-cluster)
 
-2. **Configuration YAML**   
+2. **Configuration YAML**  
    The configuration file (e.g., `./ChatQnA/benchmark_chatqna.yaml`) consists of two main sections: deployment and benchmarking. Required fields with `# mandatory` comment must be filled with valid values, such as `HUGGINGFACEHUB_API_TOKEN`. For all other fields, you can either customize them according to their needs or leave them empty ("") to use the default values from the [helm charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts).
 
    **Default Models**:
+
    - LLM: `meta-llama/Meta-Llama-3-8B-Instruct` (Required: must be specified as it's shared between deployment and benchmarking phases)
    - Embedding: `BAAI/bge-base-en-v1.5`
    - Reranking: `BAAI/bge-reranker-base`
@@ -35,10 +36,10 @@ Before running the benchmarks, ensure you have:
    You can customize these models by setting the `model_id` field in the corresponding service section. Note that the LLM model must be specified in the configuration as it is used by both deployment and benchmarking processes.
 
    **Important Notes**:
+
    - For Gaudi deployments:
      - LLM service runs on Gaudi devices
      - If enabled, the reranking service (teirerank) also runs on Gaudi devices
-   
    - **Llama Model Access**:
      - Downloading Llama models requires both:
        1. HuggingFace API token
@@ -47,11 +48,14 @@ Before running the benchmarks, ensure you have:
      - Deployment will fail if model download is unsuccessful due to missing authorization
 
    **Node and Replica Configuration**:
+
    ```yaml
-   node: [1, 2, 4, 8]           # Number of nodes to deploy
-   replicaCount: [1, 2, 4, 8]   # Must align with node configuration
+   node: [1, 2, 4, 8] # Number of nodes to deploy
+   replicaCount: [1, 2, 4, 8] # Must align with node configuration
    ```
+
    The `replicaCount` values must align with the `node` configuration by index:
+
    - When deploying on 1 node → uses replicaCount[0] = 1
    - When deploying on 2 nodes → uses replicaCount[1] = 2
    - When deploying on 4 nodes → uses replicaCount[2] = 4
@@ -94,6 +98,7 @@ The benchmarking process consists of two main components: deployment and benchma
 The script `deploy_and_benchmark.py` serves as the main entry point. You can use any example's configuration YAML file. Here are examples using ChatQnA configuration:
 
 1. For a specific number of nodes:
+
    ```bash
    # Default OOB (Out of Box) mode
    python deploy_and_benchmark.py ./ChatQnA/benchmark_chatqna.yaml --target-node 1
@@ -103,6 +108,7 @@ The script `deploy_and_benchmark.py` serves as the main entry point. You can use
    ```
 
 2. For all node configurations:
+
    ```bash
    # Default OOB (Out of Box) mode
    python deploy_and_benchmark.py ./ChatQnA/benchmark_chatqna.yaml
@@ -110,6 +116,7 @@ The script `deploy_and_benchmark.py` serves as the main entry point. You can use
    # Or specify test mode explicitly
    python deploy_and_benchmark.py ./ChatQnA/benchmark_chatqna.yaml --test-mode [oob|tune]
    ```
+
    This will process all node configurations defined in your YAML file.
 
 ### Test Modes
@@ -117,9 +124,11 @@ The script `deploy_and_benchmark.py` serves as the main entry point. You can use
 The script provides two test modes controlled by the `--test-mode` parameter:
 
 1. **OOB (Out of Box) Mode** - Default
+
    ```bash
    --test-mode oob  # or omit the parameter
    ```
+
    - Uses default values from Helm chart
    - Ignores performance tuning configurations
    - Suitable for basic functionality testing
@@ -146,11 +155,13 @@ Choose "oob" mode for basic functionality testing or "tune" mode when optimizing
 ### Troubleshooting
 
 **Helm Chart Directory Issues**
+
 - During execution, the script downloads and extracts the Helm chart to a directory named after your example
 - The directory name is derived from your input YAML file path
   - For example: if your input is `./ChatQnA/benchmark_chatqna.yaml`, the extracted directory will be `chatqna/`
 - In some error cases, this directory might not be properly cleaned up
 - If you encounter deployment issues, check if there's a leftover Helm chart directory:
+
   ```bash
   # Example: for ./ChatQnA/benchmark_chatqna.yaml
   ls -la chatqna/
@@ -158,6 +169,7 @@ Choose "oob" mode for basic functionality testing or "tune" mode when optimizing
   # Clean up if needed
   rm -rf chatqna/
   ```
+
 - After cleaning up the directory, try running the deployment again
 
 Note: Always ensure there are no leftover Helm chart directories from previous failed runs before starting a new deployment.
