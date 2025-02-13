@@ -28,9 +28,9 @@ MM_RETRIEVER_SERVICE_PORT = int(os.getenv("MM_RETRIEVER_SERVICE_PORT", 7000))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_PORT", 9399))
 WHISPER_PORT = int(os.getenv("WHISPER_PORT", 7066))
-WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", "http://0.0.0.0:$WHISPER_PORT/v1/asr")
+WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", f"http://0.0.0.0:{WHISPER_PORT}/v1/asr")
 TTS_PORT = int(os.getenv("TTS_PORT", 7055))
-TTS_ENDPOINT = os.getenv("TTS_ENDPOINT", "http://0.0.0.0:7055/v1/tts")
+TTS_ENDPOINT = os.getenv("TTS_ENDPOINT", f"http://0.0.0.0:{TTS_PORT}/v1/tts")
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -289,6 +289,7 @@ class MultimodalQnAService:
             print("[ MultimodalQnAService ] stream=True not used, this has not support stream yet!")
             stream_opt = False
         chat_request = ChatCompletionRequest.model_validate(data)
+        modalities = chat_request.modalities
         num_messages = len(data["messages"]) if isinstance(data["messages"], list) else 1
         messages = self._handle_message(chat_request.messages)
         decoded_audio_input = ""
@@ -351,12 +352,12 @@ class MultimodalQnAService:
                 return response
         last_node = runtime_graph.all_leaves()[-1]
 
-        tts_audio = ""
+        tts_audio = None
         if "text" in result_dict[last_node].keys():
             response = result_dict[last_node]["text"]
             # Toggle for TTS
-            if "audio" in data["modalities"]:
-                tts_audio = self.convert_text_to_audio(response)
+            if "audio" in modalities:
+                tts_audio = {"data": self.convert_text_to_audio(response)}
         else:
             # text is not in response message
             # something wrong, for example due to empty retrieval results
@@ -379,20 +380,15 @@ class MultimodalQnAService:
         choices = []
         usage = UsageInfo()
 
-        if tts_audio:
-            chat_message = ChatMessage(role="assistant", content=response, audio={"data": tts_audio})
-        else:
-            chat_message = ChatMessage(role="assistant", content=response)
-
         choices.append(
             ChatCompletionResponseChoice(
                 index=0,
-                message=chat_message,
+                message=ChatMessage(role="assistant", content=response, audio=tts_audio),
                 finish_reason="stop",
                 metadata=metadata,
             )
         )
-        return ChatCompletionResponse(model="multimodalqna", choices=choices, usage=usage, modalities=data["modalities"])
+        return ChatCompletionResponse(model="multimodalqna", choices=choices, usage=usage)
 
     def start(self):
         self.service = MicroService(
