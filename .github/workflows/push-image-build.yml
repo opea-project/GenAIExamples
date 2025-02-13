@@ -5,12 +5,15 @@ name: Build latest images on push event
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: [ 'main','Fix-CICD' ]
     paths:
       - "**.py"
       - "**Dockerfile*"
       - "**docker_image_build/build.yaml"
       - "**/ui/**"
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-on-push
