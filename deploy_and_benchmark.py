@@ -23,13 +23,13 @@ def read_yaml(file_path):
         return None
 
 
-def construct_deploy_config(deploy_config, target_node, max_batch_size=None):
-    """Construct a new deploy config based on the target node number and optional max_batch_size.
+def construct_deploy_config(deploy_config, target_node, batch_param_value=None):
+    """Construct a new deploy config based on the target node number and optional batch parameter value.
 
     Args:
         deploy_config: Original deploy config dictionary
         target_node: Target node number to match in the node array
-        max_batch_size: Optional specific max_batch_size value to use
+        batch_param_value: Optional specific batch parameter value to use (max_batch_size for TGI or max_num_seqs for VLLM)
 
     Returns:
         A new deploy config with single values for node and instance_num
@@ -51,8 +51,20 @@ def construct_deploy_config(deploy_config, target_node, max_batch_size=None):
     # Set the single node value
     new_config["node"] = target_node
 
+    # First determine which llm replicaCount to use based on teirerank.enabled
+    services = new_config.get("services", {})
+    teirerank_enabled = services.get("teirerank", {}).get("enabled", True)
+
+    if "llm" in services:
+        llm_config = services["llm"]
+        if isinstance(llm_config.get("replicaCount"), dict):
+            replica_counts = llm_config["replicaCount"]
+            llm_config["replicaCount"] = (
+                replica_counts["with_teirerank"] if teirerank_enabled else replica_counts["without_teirerank"]
+            )
+
     # Update instance_num for each service based on the same index
-    for service_name, service_config in new_config.get("services", {}).items():
+    for service_name, service_config in services.items():
         if "replicaCount" in service_config:
             instance_nums = service_config["replicaCount"]
             if isinstance(instance_nums, list):
@@ -63,9 +75,17 @@ def construct_deploy_config(deploy_config, target_node, max_batch_size=None):
                     )
                 service_config["replicaCount"] = instance_nums[node_index]
 
-    # Update max_batch_size if specified
-    if max_batch_size is not None and "llm" in new_config["services"]:
-        new_config["services"]["llm"]["max_batch_size"] = max_batch_size
+    # Update batch parameter if specified
+    if batch_param_value is not None and "llm" in new_config["services"]:
+        llm_config = new_config["services"]["llm"]
+        engine = llm_config.get("engine", "tgi")
+
+        if engine == "tgi":
+            llm_config["max_batch_size"] = batch_param_value
+        elif engine == "vllm":
+            llm_config["max_num_seqs"] = batch_param_value
+            # Remove TGI-specific parameter if it exists
+            llm_config.pop("max_batch_size", None)
 
     return new_config
 
@@ -84,13 +104,18 @@ def pull_helm_chart(chart_pull_url, version, chart_name):
     return untar_dir
 
 
-def main(yaml_file, target_node=None):
+def main(yaml_file, target_node=None, test_mode="oob"):
     """Main function to process deployment configuration.
 
     Args:
         yaml_file: Path to the YAML configuration file
         target_node: Optional target number of nodes to deploy. If not specified, will process all nodes.
+        test_mode: Test mode, either "oob" (out of box) or "tune". Defaults to "oob".
     """
+    if test_mode not in ["oob", "tune"]:
+        print("Error: test_mode must be either 'oob' or 'tune'")
+        return None
+
     config = read_yaml(yaml_file)
     if config is None:
         print("Failed to read YAML file.")
@@ -140,20 +165,49 @@ def main(yaml_file, target_node=None):
                 continue
 
             try:
-                # Process max_batch_sizes
-                max_batch_sizes = deploy_config.get("services", {}).get("llm", {}).get("max_batch_size", [])
-                if not isinstance(max_batch_sizes, list):
-                    max_batch_sizes = [max_batch_sizes]
+                # Only process batch parameters in tune mode
+                if test_mode == "tune":
+                    # Process batch parameters based on engine type
+                    llm_config = deploy_config.get("services", {}).get("llm", {})
+                    engine = llm_config.get("engine", "tgi")
+
+                    if engine == "tgi":
+                        batch_params = llm_config.get("max_batch_size", [])
+                        param_name = "max_batch_size"
+                    elif engine == "vllm":
+                        batch_params = llm_config.get("max_num_seqs", [])
+                        param_name = "max_num_seqs"
+                    else:
+                        print(f"Unsupported LLM engine: {engine}")
+                        continue
+
+                    if not isinstance(batch_params, list):
+                        batch_params = [batch_params]
+
+                    # Skip multiple iterations if batch parameter is empty
+                    if batch_params == [""] or not batch_params:
+                        batch_params = [None]
+                else:
+                    # In OOB mode, just do one iteration with no batch parameter
+                    batch_params = [None]
+                    param_name = "batch_param"
 
                 values_file_path = None
-                for i, max_batch_size in enumerate(max_batch_sizes):
-                    print(f"\nProcessing max_batch_size: {max_batch_size}")
+                for i, batch_param in enumerate(batch_params):
+                    if test_mode == "tune":
+                        print(f"\nProcessing {param_name}: {batch_param}")
+                    else:
+                        print("\nProcessing OOB deployment")
 
                     # Construct new deploy config
-                    new_deploy_config = construct_deploy_config(deploy_config, node, max_batch_size)
+                    new_deploy_config = construct_deploy_config(deploy_config, node, batch_param)
 
                     # Write the new deploy config to a temporary file
-                    temp_config_file = f"temp_deploy_config_{node}_{max_batch_size}.yaml"
+                    temp_config_file = (
+                        f"temp_deploy_config_{node}.yaml"
+                        if batch_param is None
+                        else f"temp_deploy_config_{node}_{batch_param}.yaml"
+                    )
                     try:
                         with open(temp_config_file, "w") as f:
                             yaml.dump(new_deploy_config, f)
@@ -171,6 +225,8 @@ def main(yaml_file, target_node=None):
                                 namespace,
                                 "--chart-dir",
                                 chart_dir,
+                                "--test-mode",
+                                test_mode,
                             ]
                             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
 
@@ -197,13 +253,13 @@ def main(yaml_file, target_node=None):
                                 "--user-values",
                                 values_file_path,
                                 "--update-service",
+                                "--test-mode",
+                                test_mode,
                             ]
                             result = subprocess.run(cmd, check=True)
                             if result.returncode != 0:
-                                print(
-                                    f"Update failed for {node} nodes configuration with max_batch_size {max_batch_size}"
-                                )
-                                break  # Skip remaining max_batch_sizes for this node
+                                print(f"Update failed for {node} nodes configuration with {param_name} {batch_param}")
+                                break  # Skip remaining {param_name} for this node
 
                         # Wait for deployment to be ready
                         print("\nWaiting for deployment to be ready...")
@@ -232,9 +288,9 @@ def main(yaml_file, target_node=None):
 
                     except Exception as e:
                         print(
-                            f"Error during {'deployment' if i == 0 else 'update'} for {node} nodes with max_batch_size {max_batch_size}: {str(e)}"
+                            f"Error during {'deployment' if i == 0 else 'update'} for {node} nodes with {param_name} {batch_param}: {str(e)}"
                         )
-                        break  # Skip remaining max_batch_sizes for this node
+                        break  # Skip remaining {param_name} for this node
                     finally:
                         # Clean up the temporary file
                         if os.path.exists(temp_config_file):
@@ -287,6 +343,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Deploy and benchmark with specific node configuration.")
     parser.add_argument("yaml_file", help="Path to the YAML configuration file")
     parser.add_argument("--target-node", type=int, help="Optional: Target number of nodes to deploy.", default=None)
+    parser.add_argument("--test-mode", type=str, help="Test mode, either 'oob' (out of box) or 'tune'.", default="oob")
 
     args = parser.parse_args()
-    main(args.yaml_file, args.target_node)
+    main(args.yaml_file, args.target_node, args.test_mode)
