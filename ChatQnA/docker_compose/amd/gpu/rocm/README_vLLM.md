@@ -251,7 +251,7 @@ Please find more information about accessing and restricting AMD GPUs in the lin
 
 ```bash
 cd GenAIExamples/ChatQnA/docker_compose/amd/gpu/rocm
-docker compose up -d
+docker compose -f compose_vllm.yaml up -d
 ```
 
 ### Validate MicroServices and MegaService
