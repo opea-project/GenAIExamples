@@ -1,6 +1,0 @@
-INFO:     10.23.167.165:40738 - "POST /v1/embeddings HTTP/1.1" 200 OK
-INFO:     10.23.167.165:40738 - "POST /v1/embeddings HTTP/1.1" 200 OK
-INFO:     10.23.167.165:40750 - "POST /v1/embeddings HTTP/1.1" 200 OK
-INFO:     10.23.167.165:48432 - "POST /v1/embeddings HTTP/1.1" 200 OK
-INFO:     10.23.167.165:48432 - "POST /v1/embeddings HTTP/1.1" 200 OK
-INFO:     10.23.167.165:48448 - "POST /v1/embeddings HTTP/1.1" 200 OK
