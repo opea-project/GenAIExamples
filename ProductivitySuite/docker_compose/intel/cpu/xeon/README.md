@@ -45,13 +45,13 @@ docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_p
 ### 6. Build Prompt Registry Image
 
 ```bash
-docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/src/Dockerfile .
+docker build -t opea/promptregistry-mongo:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/src/Dockerfile .
 ```
 
 ### 7. Build Chat History Image
 
 ```bash
-docker build -t opea/chathistory-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/src/Dockerfile .
+docker build -t opea/chathistory-mongo:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/src/Dockerfile .
 cd ..
 ```
 
