@@ -75,11 +75,17 @@ Before running benchmarks, you need to:
 
 1. **Prepare Test Data**
 
-   - Download the retrieval file:
+   - Testing for general benchmark target:
+     
+     Download the retrieval file using the command below for data ingestion in RAG:
      ```bash
      wget https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/data/upload_file.txt
      ```
-   - For the `chatqna_qlist_pubmed` test case, prepare `pubmed_${max_lines}.txt` by following this [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/stresscli/README_Pubmed_qlist.md)
+   - Testing for pubmed benchmark target:
+
+     For the `chatqna_qlist_pubmed` test case, prepare `pubmed_${max_lines}.txt` by following this [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/stresscli/README_Pubmed_qlist.md)
+
+   After the data is prepared, please update the `absolute path` of this file in the benchmark.yaml file. For example, in the `ChatQnA/benchmark_chatqna.yaml` file, `/home/sdp/upload_file.txt` should be replaced by your file path.
 
 2. **Prepare Model Files (Recommended)**
    ```bash
