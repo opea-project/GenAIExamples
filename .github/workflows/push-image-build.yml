@@ -27,7 +27,7 @@ jobs:
 
   image-build:
     needs: job1
-    if: ${{ needs.job1.outputs.run_matrix != "" }}
+    if: ${{ needs.job1.outputs.run_matrix != '' }}
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
       fail-fast: false
