@@ -72,17 +72,19 @@ def configure_resources(values, deploy_config):
             limits = {}
             requests = {}
 
-            # Only add CPU if cores_per_instance has a value
-            if config.get("cores_per_instance"):
-                limits["cpu"] = config["cores_per_instance"]
-                requests["cpu"] = config["cores_per_instance"]
+            # Only add CPU if cores_per_instance has a valid value
+            cores = config.get("cores_per_instance")
+            if cores is not None and cores != "":
+                limits["cpu"] = cores
+                requests["cpu"] = cores
 
-            # Only add memory if memory_capacity has a value
-            if config.get("memory_capacity"):
-                limits["memory"] = config["memory_capacity"]
-                requests["memory"] = config["memory_capacity"]
+            # Only add memory if memory_capacity has a valid value
+            memory = config.get("memory_capacity")
+            if memory is not None and memory != "":
+                limits["memory"] = memory
+                requests["memory"] = memory
 
-            # Only create resources if we have any limits/requests
+            # Only create resources if we have any valid limits/requests
             if limits and requests:
                 resources["limits"] = limits
                 resources["requests"] = requests
@@ -117,28 +119,38 @@ def configure_resources(values, deploy_config):
 def configure_extra_cmd_args(values, deploy_config):
     """Configure extra command line arguments for services."""
     for service_name, config in deploy_config["services"].items():
-        extra_cmd_args = []
+        if service_name == "llm":
+            extra_cmd_args = []
+            engine = config.get("engine", "tgi")
 
-        for param in [
-            "max_batch_size",
-            "max_input_length",
-            "max_total_tokens",
-            "max_batch_total_tokens",
-            "max_batch_prefill_tokens",
-        ]:
-            if config.get(param):
-                extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(config[param])])
+            # Define parameters based on engine type
+            if engine == "tgi":
+                params = [
+                    "max_batch_size",
+                    "max_input_length",
+                    "max_total_tokens",
+                    "max_batch_total_tokens",
+                    "max_batch_prefill_tokens",
+                ]
+            elif engine == "vllm":
+                params = [
+                    "max_num_seqs",
+                    "max_input_length",
+                    "max_total_tokens",
+                    "max_batch_total_tokens",
+                    "max_batch_prefill_tokens",
+                ]
 
-        if extra_cmd_args:
-            if service_name == "llm":
-                engine = config.get("engine", "tgi")
+            for param in params:
+                param_value = config.get(param)
+                # Only add parameter if its value is not None and not empty string
+                if param_value is not None and param_value != "":
+                    extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(param_value)])
+
+            if extra_cmd_args:
                 if engine not in values:
                     values[engine] = {}
                 values[engine]["extraCmdArgs"] = extra_cmd_args
-            else:
-                if service_name not in values:
-                    values[service_name] = {}
-                values[service_name]["extraCmdArgs"] = extra_cmd_args
 
     return values
 
@@ -146,18 +158,21 @@ def configure_extra_cmd_args(values, deploy_config):
 def configure_models(values, deploy_config):
     """Configure model settings for services."""
     for service_name, config in deploy_config["services"].items():
-        # Skip if no model_id defined or service is disabled
-        if not config.get("model_id") or config.get("enabled") is False:
+        # Get model_id and check if it's valid (not None or empty string)
+        model_id = config.get("model_id")
+        if not model_id or model_id == "" or config.get("enabled") is False:
             continue
 
         if service_name == "llm":
             # For LLM service, use its engine as the key
+            # Check if engine is valid (not None or empty string)
             engine = config.get("engine", "tgi")
-            values[engine]["LLM_MODEL_ID"] = config.get("model_id")
+            if engine and engine != "":
+                values[engine]["LLM_MODEL_ID"] = model_id
         elif service_name == "tei":
-            values[service_name]["EMBEDDING_MODEL_ID"] = config.get("model_id")
+            values[service_name]["EMBEDDING_MODEL_ID"] = model_id
         elif service_name == "teirerank":
-            values[service_name]["RERANK_MODEL_ID"] = config.get("model_id")
+            values[service_name]["RERANK_MODEL_ID"] = model_id
 
     return values
 
@@ -179,7 +194,7 @@ def configure_rerank(values, with_rerank, deploy_config, example_type, node_sele
     return values
 
 
-def generate_helm_values(example_type, deploy_config, chart_dir, action_type, node_selector=None):
+def generate_helm_values(example_type, deploy_config, chart_dir, action_type, node_selector=None, test_mode="oob"):
     """Create a values.yaml file based on the provided configuration."""
     if deploy_config is None:
         raise ValueError("deploy_config is required")
@@ -208,8 +223,12 @@ def generate_helm_values(example_type, deploy_config, chart_dir, action_type, no
     values = configure_node_selectors(values, node_selector or {}, deploy_config)
     values = configure_rerank(values, with_rerank, deploy_config, example_type, node_selector or {})
     values = configure_replica(values, deploy_config)
-    values = configure_resources(values, deploy_config)
-    values = configure_extra_cmd_args(values, deploy_config)
+
+    # Only configure resources and extra cmd args in tune mode
+    if test_mode == "tune":
+        values = configure_resources(values, deploy_config)
+        values = configure_extra_cmd_args(values, deploy_config)
+
     values = configure_models(values, deploy_config)
 
     device = deploy_config.get("device", "unknown")
@@ -376,12 +395,24 @@ def install_helm_release(release_name, chart_name, namespace, hw_values_file, de
 
 
 def uninstall_helm_release(release_name, namespace=None):
-    """Uninstall a Helm release and clean up resources, optionally delete the namespace if not 'default'."""
+    """Uninstall a Helm release and clean up resources, optionally delete the namespace if not 'default'.
+
+    First checks if the release exists before attempting to uninstall.
+    """
     # Default to 'default' namespace if none is specified
     if not namespace:
         namespace = "default"
 
     try:
+        # Check if the release exists
+        check_command = ["helm", "list", "--namespace", namespace, "--filter", release_name, "--output", "json"]
+        output = run_kubectl_command(check_command)
+        releases = json.loads(output)
+
+        if not releases:
+            print(f"Helm release {release_name} not found in namespace {namespace}. Nothing to uninstall.")
+            return
+
         # Uninstall the Helm release
         command = ["helm", "uninstall", release_name, "--namespace", namespace]
         print(f"Uninstalling Helm release {release_name} in namespace {namespace}...")
@@ -399,6 +430,8 @@ def uninstall_helm_release(release_name, namespace=None):
 
     except subprocess.CalledProcessError as e:
         print(f"Error occurred while uninstalling Helm release or deleting namespace: {e}")
+    except json.JSONDecodeError as e:
+        print(f"Error parsing helm list output: {e}")
 
 
 def update_service(release_name, chart_name, namespace, hw_values_file, deploy_values_file, update_values_file):
@@ -585,6 +618,13 @@ def main():
     )
     parser.add_argument("--update-service", action="store_true", help="Update the deployment with new configuration.")
     parser.add_argument("--check-ready", action="store_true", help="Check if all services in the deployment are ready.")
+    parser.add_argument(
+        "--test-mode",
+        type=str,
+        choices=["oob", "tune"],
+        default="oob",
+        help="Test mode: 'oob' (out of box) or 'tune' (default: oob)",
+    )
     parser.add_argument("--chart-dir", default=".", help="Path to the untarred Helm chart directory.")
 
     args = parser.parse_args()
@@ -635,6 +675,7 @@ def main():
             chart_dir=args.chart_dir,
             action_type=action_type,  # 0 - deploy, 1 - update
             node_selector=node_selector,
+            test_mode=args.test_mode,  # Pass the test mode to generate_helm_values
         )
 
         # Check result status
