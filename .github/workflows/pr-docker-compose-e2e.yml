@@ -33,6 +33,7 @@ jobs:
 
   example-test:
     needs: [get-test-matrix]
+    if: ${{ needs.get-test-matrix.outputs.run_matrix != '' }}
     strategy:
       matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false
