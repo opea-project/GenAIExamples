@@ -16,8 +16,8 @@ jobs:
   freeze-images:
     runs-on: ubuntu-latest
     env:
-      USER_NAME: "NeuralChatBot"
-      USER_EMAIL: "grp_neural_chat_bot@intel.com"
+      USER_NAME: "CICD-at-OPEA"
+      USER_EMAIL: "CICD@opea.dev"
       BRANCH_NAME: "update_images_tag"
     steps:
       - name: Checkout repository

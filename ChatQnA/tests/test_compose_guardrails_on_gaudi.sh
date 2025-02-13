@@ -29,7 +29,6 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     git clone --depth 1 --branch v0.6.4.post2+Gaudi-1.19.0 https://github.com/HabanaAI/vllm-fork.git
-    sed -i 's/triton/triton==3.1.0/g' vllm-fork/requirements-hpu.txt
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna-guardrails chatqna-ui dataprep retriever vllm-gaudi guardrails nginx"
@@ -47,6 +46,7 @@ function start_services() {
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+    export NUM_CARDS=1
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"

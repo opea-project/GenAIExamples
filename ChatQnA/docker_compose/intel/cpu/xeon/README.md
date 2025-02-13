@@ -34,14 +34,34 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```
 
 3. Set up other environment variables:
+
    ```bash
    source ./set_env.sh
+   ```
+
+4. Change Model for LLM serving
+
+   By default, Meta-Llama-3-8B-Instruct is used for LLM serving, the default model can be changed to other validated LLM models.  
+   Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.  
+   To change the default model defined in set_env.sh, overwrite it by exporting LLM_MODEL_ID to the new model or by modifying set_env.sh, and then repeat step 3.  
+   For example, change to Llama-2-7b-chat-hf using the following command.
+
+   ```bash
+   export LLM_MODEL_ID="meta-llama/Llama-2-7b-chat-hf"
    ```
 
 ## Quick Start: 2.Run Docker Compose
 
 ```bash
 docker compose up -d
+```
+
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.  
+CPU example with Open Telemetry feature:
+
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
 It will automatically download the docker image on `docker hub`:
@@ -263,12 +283,16 @@ If use vLLM as the LLM serving backend.
 docker compose -f compose.yaml up -d
 # Start ChatQnA without Rerank Pipeline
 docker compose -f compose_without_rerank.yaml up -d
+# Start ChatQnA with Rerank Pipeline and Open Telemetry Tracing
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
 If use TGI as the LLM serving backend.
 
 ```bash
 docker compose -f compose_tgi.yaml up -d
+# Start ChatQnA with Open Telemetry Tracing
+docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d
 ```
 
 ### Validate Microservices
