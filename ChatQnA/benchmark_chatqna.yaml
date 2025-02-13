@@ -5,7 +5,7 @@ deploy:
   device: gaudi
   version: 1.2.0
   modelUseHostPath: /mnt/models
-  HUGGINGFACEHUB_API_TOKEN: "" # mandatory
+  HUGGINGFACEHUB_API_TOKEN: "Your_Huggingface_API_Token" # mandatory
   node: [1, 2, 4, 8]
   namespace: ""
 
@@ -68,8 +68,9 @@ deploy:
 benchmark:
   # http request behavior related fields
   user_queries:              [1, 2, 4]
-  possion:                   True
-  possion_arrival_rate:      1.0
+  load_shape_type:           "poisson" # "constant" or "poisson"
+  concurrent_level:          5
+  poisson_arrival_rate:      1.0
   warmup_iterations:         10
   seed:                      1024
 

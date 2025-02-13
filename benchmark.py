@@ -26,8 +26,9 @@ def construct_benchmark_config(test_suite_config):
 
     return {
         "user_queries": test_suite_config.get("user_queries", [1]),
-        "possion": test_suite_config.get("possion", False),
-        "possion_arrival_rate": test_suite_config.get("possion_arrival_rate", 1.0),
+        "load_shape_type": test_suite_config.get("load_shape_type", "constant"),
+        "concurrent_level": test_suite_config.get("concurrent_level", 5),
+        "poisson_arrival_rate": test_suite_config.get("poisson_arrival_rate", 1.0),
         "warmup_iterations": test_suite_config.get("warmup_iterations", 10),
         "seed": test_suite_config.get("seed", None),
         "bench_target": test_suite_config.get("bench_target", ["chatqnafixed"]),
@@ -113,7 +114,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
     print(spec)
 
     # get folder path of opea-eval
-    # TODO: discuss about the usage of GenAIEval package
+    # TODO: use environment variable for now until related issues been fixed in opea-eval
     eval_path = os.getenv("EVAL_PATH", "")
     # import pkg_resources
 
@@ -133,7 +134,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
                 "locustfile": os.path.join(eval_path, "evals/benchmark/stresscli/locust/aistress.py"),
                 "host": base_url,
                 "stop-timeout": test_params["query_timeout"],
-                "processes": 4,
+                "processes": test_params["concurrent_level"],
                 "namespace": test_params["namespace"],
                 "bench-target": bench_target,
                 "service-metric-collect": test_params["collect_service_metric"],
@@ -217,20 +218,6 @@ def ingest_data_to_db(service, dataset, namespace):
                 svc_ip, port = _get_service_ip(service_name, "k8s", None, None, namespace)
                 url = f"http://{svc_ip}:{port}/v1/dataprep/ingest"
 
-                # TODO: discuss about the dataset file path
-                # file_path = None
-                # import pkg_resources
-
-                # for dist in pkg_resources.working_set:
-                #     if "opea-eval" in dist.project_name:
-                #         file_path = dist.location
-                #         break
-                
-                # if not file_path:
-                #     print("Fail to load opea-eval package. Please install it first.")
-                #     exit(1)
-                
-                # data = f"files=@{os.path.join(file_path, "evals/benchmark/data/", dataset)}"
                 files = {
                     "files": open(dataset, "rb")
                 }
@@ -325,8 +312,7 @@ def _run_service_test(example, service, test_suite_config, namespace):
                 if key == "DATASET":
                     dataset = value
         if not dataset:
-            print(f"[OPEA BENCHMARK] 🚀 Dataset is not specified for {service_name}. Check the benchmark.yaml agin.")
-            exit(1)
+            print(f"[OPEA BENCHMARK] 🚀 Dataset is not specified for {service_name}. Check the benchmark.yaml again.")
         
         # Ingest data into the database for single run of benchmark
         result = ingest_data_to_db(service, dataset, namespace)
@@ -365,11 +351,13 @@ def run_benchmark(benchmark_config, chart_name, namespace, llm_model=None, repor
         "service_port": None,  # Leave as None for k8s, specify for Docker
         "test_output_dir": os.getcwd() + "/benchmark_output",  # The directory to store the test output
         "load_shape": {
-            "name": "constant",
-            "params": {"constant": {"concurrent_level": 4}, "poisson": {"arrival_rate": 1.0}},
+            "name": parsed_data["load_shape_type"],
+            "params": {
+                "constant": {"concurrent_level": parsed_data["concurrent_level"]}, 
+                "poisson": {"arrival_rate": parsed_data["poisson_arrival_rate"]}},
         },
-        "concurrent_level": 4,
-        "arrival_rate": 1.0,
+        "concurrent_level": parsed_data["concurrent_level"],
+        "arrival_rate": parsed_data["poisson_arrival_rate"],
         "query_timeout": 120,
         "warm_ups": parsed_data["warmup_iterations"],
         "seed": parsed_data["seed"],
