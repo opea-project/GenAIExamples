@@ -123,7 +123,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
     #         eval_path = dist.location
     #         break
     if not eval_path:
-        print("Fail to localte the opea-eval package. Please install/download it first.")
+        print("Fail to find the opea-eval package. Please install/download it first.")
         exit(1)
 
     yaml_content = {
@@ -238,7 +238,7 @@ def ingest_data_to_db(service, dataset, namespace):
     return True
 
 
-def delete_all_data_from_db(service, namespace):
+def clear_db(service, namespace):
     """Delete all files from the database."""
     for service_name in service.get("service_list"):
         if "data" in service_name:
@@ -324,7 +324,7 @@ def _run_service_test(example, service, test_suite_config, namespace):
         output_folders.append(locust_runtests(None, run_yaml_path))
 
         # Delete all files from the database after the test
-        result = delete_all_data_from_db(service, namespace)
+        result = clear_db(service, namespace)
         if not result:
             print(f"[OPEA BENCHMARK] 🚀 Data deletion failed for {service_name}.")
             exit(1)

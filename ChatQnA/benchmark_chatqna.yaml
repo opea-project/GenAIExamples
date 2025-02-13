@@ -76,7 +76,7 @@ benchmark:
 
   # workload, all of the test cases will run for benchmark
   bench_target: [chatqnafixed, chatqna_qlist_pubmed] # specify the bench_target for benchmark
-  dataset: ["/home/sdp/upload_file.txt", "/home/sdp/pubmed_10000.txt"]  # specify the absolute path of upload dataset file
+  dataset: ["/home/sdp/upload_file.txt", "/home/sdp/pubmed_10000.txt"]  # specify the absolute path to the dataset file
   prompt: [10, 1000]  # set the prompt length for the chatqna_qlist_pubmed workload, set to 10 for chatqnafixed workload
 
   llm:
