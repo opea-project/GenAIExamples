@@ -26,8 +26,8 @@ def construct_benchmark_config(test_suite_config):
 
     return {
         "user_queries": test_suite_config.get("user_queries", [1]),
+        "concurrency": test_suite_config.get("concurrency", [1]),
         "load_shape_type": test_suite_config.get("load_shape_type", "constant"),
-        "concurrent_level": test_suite_config.get("concurrent_level", 5),
         "poisson_arrival_rate": test_suite_config.get("poisson_arrival_rate", 1.0),
         "warmup_iterations": test_suite_config.get("warmup_iterations", 10),
         "seed": test_suite_config.get("seed", None),
@@ -95,17 +95,11 @@ def _get_service_ip(service_name, deployment_type="k8s", service_ip=None, servic
     return svc_ip, port
 
 
-def _create_yaml_content(service, base_url, bench_target, test_phase, num_queries, test_params):
+def _create_yaml_content(service, base_url, bench_target, test_phase, num_queries, test_params, concurrency=1):
     """Create content for the run.yaml file."""
 
-    # If a load shape includes the parameter concurrent_level,
-    # the parameter will be passed to Locust to launch fixed
-    # number of simulated users.
-    concurrency = 1
-    if num_queries >= 0:
-        concurrency = max(1, num_queries // test_params["concurrent_level"])
-    else:
-        concurrency = test_params["concurrent_level"]
+    # calculate the number of concurrent users
+    concurrent_level = int(num_queries // concurrency)
 
     import importlib.util
 
@@ -126,6 +120,9 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
         print("Fail to find the opea-eval package. Please install/download it first.")
         exit(1)
 
+    load_shape = test_params["load_shape"]
+    load_shape["params"]["constant"] = {"concurrent_level": concurrent_level}
+
     yaml_content = {
         "profile": {
             "storage": {"hostpath": test_params["test_output_dir"]},
@@ -134,7 +131,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
                 "locustfile": os.path.join(eval_path, "evals/benchmark/stresscli/locust/aistress.py"),
                 "host": base_url,
                 "stop-timeout": test_params["query_timeout"],
-                "processes": test_params["concurrent_level"],
+                "processes": 2,  # set to 2 by default
                 "namespace": test_params["namespace"],
                 "bench-target": bench_target,
                 "service-metric-collect": test_params["collect_service_metric"],
@@ -145,7 +142,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
                 "seed": test_params.get("seed", None),
                 "llm-model": test_params["llm_model"],
                 "deployment-type": test_params["deployment_type"],
-                "load-shape": test_params["load_shape"],
+                "load-shape": load_shape,
             },
             "runs": [{"name": test_phase, "users": concurrency, "max-request": num_queries}],
         }
@@ -158,7 +155,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
     return yaml_content
 
 
-def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, base_url, ts) -> str:
+def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, base_url, ts, concurrency=1) -> str:
     """Create a stresscli configuration file and persist it on disk."""
     stresscli_confs = []
     # Get the workload
@@ -168,7 +165,9 @@ def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, b
         print(f"[OPEA BENCHMARK] 🚀 Running test for {b_target} in phase {test_phase} for {num_queries} queries")
         stresscli_conf["envs"] = {"DATASET": test_params["dataset"][i], "MAX_LINES": str(test_params["prompt"][i])}
         # Generate the content of stresscli configuration file
-        stresscli_yaml = _create_yaml_content(case_params, base_url, b_target, test_phase, num_queries, test_params)
+        stresscli_yaml = _create_yaml_content(
+            case_params, base_url, b_target, test_phase, num_queries, test_params, concurrency
+        )
 
         # Dump the stresscli configuration file
         service_name = case_params.get("service_name")
@@ -200,9 +199,19 @@ def create_stresscli_confs(service, base_url, test_suite_config, index):
         stresscli_confs.extend(_create_stresscli_confs(service, test_suite_config, "benchmark", -1, base_url, index))
     else:
         # Test stop is controlled by request count
-        for user_queries in user_queries_lst:
+        for i, user_query in enumerate(user_queries_lst):
+            concurrency_list = test_suite_config["concurrency"]
+            user_query *= test_suite_config["node_num"]
             stresscli_confs.extend(
-                _create_stresscli_confs(service, test_suite_config, "benchmark", user_queries, base_url, index)
+                _create_stresscli_confs(
+                    service,
+                    test_suite_config,
+                    "benchmark",
+                    user_query,
+                    base_url,
+                    index,
+                    concurrency=concurrency_list[i],
+                )
             )
 
     return stresscli_confs
@@ -327,7 +336,17 @@ def _run_service_test(example, service, test_suite_config, namespace):
     return output_folders
 
 
-def run_benchmark(benchmark_config, chart_name, namespace, llm_model=None, report=False):
+def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=False):
+    """Run the benchmark test for the specified helm chart and configuration.
+
+    Args:
+        benchmark_config (dict): The benchmark configuration.
+        chart_name (str): The name of the helm chart.
+        namespace (str): The namespace to deploy the chart.
+        node_num (int): The number of nodes of current deployment.
+        llm_model (str): The LLM model to use for the test.
+        report (bool): Whether to generate a report after the test.
+    """
     # If llm_model is None or an empty string, set to default value
     if not llm_model:
         llm_model = "meta-llama/Meta-Llama-3-8B-Instruct"
@@ -344,14 +363,14 @@ def run_benchmark(benchmark_config, chart_name, namespace, llm_model=None, repor
         "service_ip": None,  # Leave as None for k8s, specify for Docker
         "service_port": None,  # Leave as None for k8s, specify for Docker
         "test_output_dir": os.getcwd() + "/benchmark_output",  # The directory to store the test output
+        "node_num": node_num,
         "load_shape": {
             "name": parsed_data["load_shape_type"],
             "params": {
-                "constant": {"concurrent_level": parsed_data["concurrent_level"]},
                 "poisson": {"arrival_rate": parsed_data["poisson_arrival_rate"]},
             },
         },
-        "concurrent_level": parsed_data["concurrent_level"],
+        "concurrency": parsed_data["concurrency"],
         "arrival_rate": parsed_data["poisson_arrival_rate"],
         "query_timeout": 120,
         "warm_ups": parsed_data["warmup_iterations"],
