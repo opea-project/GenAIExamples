@@ -67,10 +67,10 @@ deploy:
 
 benchmark:
   # http request behavior related fields
-  user_queries:              [1, 2, 4]
-  load_shape_type:           "poisson" # "constant" or "poisson"
-  concurrent_level:          5
-  poisson_arrival_rate:      1.0
+  user_queries:              [640]
+  concurrency:               [128]
+  load_shape_type:           "constant" # "constant" or "poisson"
+  poisson_arrival_rate:      1.0  # only used when load_shape_type is "poisson"
   warmup_iterations:         10
   seed:                      1024
 
