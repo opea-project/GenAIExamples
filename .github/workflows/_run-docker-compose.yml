@@ -85,6 +85,10 @@ jobs:
               fi
           done
 
+          if [ -z "$run_test_cases" ] && [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep /tests/) ]]; then
+              run_test_cases=$other_test_cases
+          fi
+
           test_cases=$(echo $run_test_cases | tr ' ' '\n' | sort -u | jq -R '.' | jq -sc '.')
           echo "test_cases=$test_cases"
           echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
