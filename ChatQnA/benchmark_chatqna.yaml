@@ -67,22 +67,17 @@ deploy:
 
 benchmark:
   # http request behavior related fields
-  concurrency:               [1, 2, 4]
-  totoal_query_num:          [2048, 4096]
-  duration:                  [5, 10] # unit minutes
-  query_num_per_concurrency: [4, 8, 16]
-  possion:                   True
-  possion_arrival_rate:      1.0
+  user_queries:              [1, 2, 4]
+  load_shape_type:           "poisson" # "constant" or "poisson"
+  concurrent_level:          5
+  poisson_arrival_rate:      1.0
   warmup_iterations:         10
   seed:                      1024
 
   # workload, all of the test cases will run for benchmark
-  test_cases:
-    - chatqnafixed
-    - chatqna_qlist_pubmed:
-        dataset: pub_med10  # pub_med10, pub_med100, pub_med1000
-  user_queries:              [1, 2, 4]
-  query_token_size:          128                   # if specified, means fixed query token size will be sent out
+  bench_target: [chatqnafixed, chatqna_qlist_pubmed] # specify the bench_target for benchmark
+  dataset: ["/home/sdp/upload_file.txt", "/home/sdp/pubmed_10000.txt"]  # specify the absolute path to the dataset file
+  prompt: [10, 1000]  # set the prompt length for the chatqna_qlist_pubmed workload, set to 10 for chatqnafixed workload
 
   llm:
     # specify the llm output token size
